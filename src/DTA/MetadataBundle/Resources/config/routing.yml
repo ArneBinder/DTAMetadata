@@ -1,0 +1,19 @@
+dta_metadata_homepage:
+    pattern:  /mockup
+    defaults: { _controller: DTAMetadataBundle:Home:index }
+
+dataDomain:
+    pattern: /daten
+    defaults: { _controller: DTAMetadataBundle:DataDomain:index }
+    
+conceptualDomain:
+    pattern: /ordnungssysteme
+    defaults: { _controller: DTAMetadataBundle:ConceptualDomain:index }
+
+workflowDomain:
+    pattern: /arbeitsfluss
+    defaults: { _controller: DTAMetadataBundle:WorkflowDomain:index }
+
+administrationDomain:
+    pattern: /administration
+    defaults: { _controller: DTAMetadataBundle:AdministrationDomain:index }

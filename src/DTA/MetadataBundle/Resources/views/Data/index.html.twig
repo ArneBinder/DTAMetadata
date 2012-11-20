@@ -1,0 +1,12 @@
+{% extends 'DTAMetadataBundle::base.html.twig' %}
+
+{% block menuFooter %} 
+    {% for item in classMenu %}
+        <a href="#">{{ item.caption }}</a>
+    {% endfor %}
+{% endblock %}
+{% block title %}DTA Metadatenbank{% endblock %}
+
+{% block body %}
+    Base persistence test: {{ persistedObject }}.
+{% endblock %}

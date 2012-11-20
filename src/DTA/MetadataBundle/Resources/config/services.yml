@@ -1,0 +1,7 @@
+parameters:
+#    dta_metadata.example.class: DTA\MetadataBundle\Example
+
+services:
+#    dta_metadata.example:
+#        class: %dta_metadata.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]

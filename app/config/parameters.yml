@@ -1,0 +1,16 @@
+parameters:
+    database_driver:   mysql
+    database_host:     localhost
+    database_port:     ~
+    database_name:     DTAMetadata
+    database_user:     root
+    database_password: garamond4000
+    database_charset:  UTF8
+
+    mailer_transport:  smtp
+    mailer_host:       localhost
+    mailer_user:       ~
+    mailer_password:   ~
+
+    locale:            en
+    secret:            89234KSJDFNKN102HBNklfhh2p3hYB

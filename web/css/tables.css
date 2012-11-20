@@ -1,0 +1,45 @@
+/* 
+    Document   : tables
+    Created on : 14.11.2012, 16:51:36
+    Author     : stud
+    Description:
+        Legacy style tables.
+*/
+
+.compact-table {
+	
+	height:250px;
+	overflow:auto;
+	float:left;
+	
+	text-align:left;
+	margin:10px;
+	padding:2px;
+	width: 350px;
+}
+.compact-table a {
+
+	text-align:left;
+	border-bottom: 1px solid white;
+	text-decoration:none;
+	background-color: white;
+	color: green;
+
+	border:1px solid #a5acb2;
+	border-bottom:1px solid white;
+	padding:2px;
+	margin-top:2px;
+}
+
+.compact-table-body {
+
+	text-align:left;
+	border:1px solid silver;
+	padding: 5px;
+}
+.compact-table-body a {
+
+	text-align:left;
+	border:0px solid silver;
+	
+}

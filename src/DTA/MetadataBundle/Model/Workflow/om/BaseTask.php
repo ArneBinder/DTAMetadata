@@ -1,0 +1,1625 @@
+<?php
+
+namespace DTA\MetadataBundle\Model\Workflow\om;
+
+use \BaseObject;
+use \BasePeer;
+use \Criteria;
+use \DateTime;
+use \Exception;
+use \PDO;
+use \Persistent;
+use \Propel;
+use \PropelDateTime;
+use \PropelException;
+use \PropelPDO;
+use DTA\MetadataBundle\Model\Publication\Writ;
+use DTA\MetadataBundle\Model\Publication\WritQuery;
+use DTA\MetadataBundle\Model\Workflow\Task;
+use DTA\MetadataBundle\Model\Workflow\TaskPeer;
+use DTA\MetadataBundle\Model\Workflow\TaskQuery;
+use DTA\MetadataBundle\Model\Workflow\Tasktype;
+use DTA\MetadataBundle\Model\Workflow\TasktypeQuery;
+use DTA\MetadataBundle\Model\Workflow\User;
+use DTA\MetadataBundle\Model\Workflow\UserQuery;
+use DTA\MetadataBundle\Model\Workflow\Writgroup;
+use DTA\MetadataBundle\Model\Workflow\WritgroupQuery;
+
+abstract class BaseTask extends BaseObject implements Persistent
+{
+    /**
+     * Peer class name
+     */
+    const PEER = 'DTA\\MetadataBundle\\Model\\Workflow\\TaskPeer';
+
+    /**
+     * The Peer class.
+     * Instance provides a convenient way of calling static methods on a class
+     * that calling code may not be able to identify.
+     * @var        TaskPeer
+     */
+    protected static $peer;
+
+    /**
+     * The flag var to prevent infinit loop in deep copy
+     * @var       boolean
+     */
+    protected $startCopy = false;
+
+    /**
+     * The value for the id field.
+     * @var        int
+     */
+    protected $id;
+
+    /**
+     * The value for the tasktype_id field.
+     * @var        int
+     */
+    protected $tasktype_id;
+
+    /**
+     * The value for the done field.
+     * @var        boolean
+     */
+    protected $done;
+
+    /**
+     * The value for the start field.
+     * @var        string
+     */
+    protected $start;
+
+    /**
+     * The value for the end field.
+     * @var        string
+     */
+    protected $end;
+
+    /**
+     * The value for the comments field.
+     * @var        string
+     */
+    protected $comments;
+
+    /**
+     * The value for the writgroup_id field.
+     * @var        int
+     */
+    protected $writgroup_id;
+
+    /**
+     * The value for the writ_id field.
+     * @var        int
+     */
+    protected $writ_id;
+
+    /**
+     * The value for the responsibleuser_id field.
+     * @var        int
+     */
+    protected $responsibleuser_id;
+
+    /**
+     * @var        Tasktype
+     */
+    protected $aTasktype;
+
+    /**
+     * @var        Writgroup
+     */
+    protected $aWritgroup;
+
+    /**
+     * @var        Writ
+     */
+    protected $aWrit;
+
+    /**
+     * @var        User
+     */
+    protected $aUser;
+
+    /**
+     * Flag to prevent endless save loop, if this object is referenced
+     * by another object which falls in this transaction.
+     * @var        boolean
+     */
+    protected $alreadyInSave = false;
+
+    /**
+     * Flag to prevent endless validation loop, if this object is referenced
+     * by another object which falls in this transaction.
+     * @var        boolean
+     */
+    protected $alreadyInValidation = false;
+
+    /**
+     * Get the [id] column value.
+     *
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Get the [tasktype_id] column value.
+     *
+     * @return int
+     */
+    public function getTasktypeId()
+    {
+        return $this->tasktype_id;
+    }
+
+    /**
+     * Get the [done] column value.
+     *
+     * @return boolean
+     */
+    public function getDone()
+    {
+        return $this->done;
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [start] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null, and 0 if column value is 0000-00-00 00:00:00
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getStart($format = null)
+    {
+        if ($this->start === null) {
+            return null;
+        }
+
+        if ($this->start === '0000-00-00 00:00:00') {
+            // while technically this is not a default value of null,
+            // this seems to be closest in meaning.
+            return null;
+        } else {
+            try {
+                $dt = new DateTime($this->start);
+            } catch (Exception $x) {
+                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->start, true), $x);
+            }
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        } elseif (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        } else {
+            return $dt->format($format);
+        }
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [end] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null, and 0 if column value is 0000-00-00 00:00:00
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getEnd($format = null)
+    {
+        if ($this->end === null) {
+            return null;
+        }
+
+        if ($this->end === '0000-00-00 00:00:00') {
+            // while technically this is not a default value of null,
+            // this seems to be closest in meaning.
+            return null;
+        } else {
+            try {
+                $dt = new DateTime($this->end);
+            } catch (Exception $x) {
+                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->end, true), $x);
+            }
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        } elseif (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        } else {
+            return $dt->format($format);
+        }
+    }
+
+    /**
+     * Get the [comments] column value.
+     *
+     * @return string
+     */
+    public function getComments()
+    {
+        return $this->comments;
+    }
+
+    /**
+     * Get the [writgroup_id] column value.
+     *
+     * @return int
+     */
+    public function getWritgroupId()
+    {
+        return $this->writgroup_id;
+    }
+
+    /**
+     * Get the [writ_id] column value.
+     *
+     * @return int
+     */
+    public function getWritId()
+    {
+        return $this->writ_id;
+    }
+
+    /**
+     * Get the [responsibleuser_id] column value.
+     *
+     * @return int
+     */
+    public function getResponsibleuserId()
+    {
+        return $this->responsibleuser_id;
+    }
+
+    /**
+     * Set the value of [id] column.
+     *
+     * @param int $v new value
+     * @return Task The current object (for fluent API support)
+     */
+    public function setId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->id !== $v) {
+            $this->id = $v;
+            $this->modifiedColumns[] = TaskPeer::ID;
+        }
+
+
+        return $this;
+    } // setId()
+
+    /**
+     * Set the value of [tasktype_id] column.
+     *
+     * @param int $v new value
+     * @return Task The current object (for fluent API support)
+     */
+    public function setTasktypeId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->tasktype_id !== $v) {
+            $this->tasktype_id = $v;
+            $this->modifiedColumns[] = TaskPeer::TASKTYPE_ID;
+        }
+
+        if ($this->aTasktype !== null && $this->aTasktype->getId() !== $v) {
+            $this->aTasktype = null;
+        }
+
+
+        return $this;
+    } // setTasktypeId()
+
+    /**
+     * Sets the value of the [done] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param boolean|integer|string $v The new value
+     * @return Task The current object (for fluent API support)
+     */
+    public function setDone($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->done !== $v) {
+            $this->done = $v;
+            $this->modifiedColumns[] = TaskPeer::DONE;
+        }
+
+
+        return $this;
+    } // setDone()
+
+    /**
+     * Sets the value of [start] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return Task The current object (for fluent API support)
+     */
+    public function setStart($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->start !== null || $dt !== null) {
+            $currentDateAsString = ($this->start !== null && $tmpDt = new DateTime($this->start)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->start = $newDateAsString;
+                $this->modifiedColumns[] = TaskPeer::START;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setStart()
+
+    /**
+     * Sets the value of [end] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return Task The current object (for fluent API support)
+     */
+    public function setEnd($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->end !== null || $dt !== null) {
+            $currentDateAsString = ($this->end !== null && $tmpDt = new DateTime($this->end)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->end = $newDateAsString;
+                $this->modifiedColumns[] = TaskPeer::END;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setEnd()
+
+    /**
+     * Set the value of [comments] column.
+     *
+     * @param string $v new value
+     * @return Task The current object (for fluent API support)
+     */
+    public function setComments($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->comments !== $v) {
+            $this->comments = $v;
+            $this->modifiedColumns[] = TaskPeer::COMMENTS;
+        }
+
+
+        return $this;
+    } // setComments()
+
+    /**
+     * Set the value of [writgroup_id] column.
+     *
+     * @param int $v new value
+     * @return Task The current object (for fluent API support)
+     */
+    public function setWritgroupId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->writgroup_id !== $v) {
+            $this->writgroup_id = $v;
+            $this->modifiedColumns[] = TaskPeer::WRITGROUP_ID;
+        }
+
+        if ($this->aWritgroup !== null && $this->aWritgroup->getId() !== $v) {
+            $this->aWritgroup = null;
+        }
+
+
+        return $this;
+    } // setWritgroupId()
+
+    /**
+     * Set the value of [writ_id] column.
+     *
+     * @param int $v new value
+     * @return Task The current object (for fluent API support)
+     */
+    public function setWritId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->writ_id !== $v) {
+            $this->writ_id = $v;
+            $this->modifiedColumns[] = TaskPeer::WRIT_ID;
+        }
+
+        if ($this->aWrit !== null && $this->aWrit->getId() !== $v) {
+            $this->aWrit = null;
+        }
+
+
+        return $this;
+    } // setWritId()
+
+    /**
+     * Set the value of [responsibleuser_id] column.
+     *
+     * @param int $v new value
+     * @return Task The current object (for fluent API support)
+     */
+    public function setResponsibleuserId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->responsibleuser_id !== $v) {
+            $this->responsibleuser_id = $v;
+            $this->modifiedColumns[] = TaskPeer::RESPONSIBLEUSER_ID;
+        }
+
+        if ($this->aUser !== null && $this->aUser->getId() !== $v) {
+            $this->aUser = null;
+        }
+
+
+        return $this;
+    } // setResponsibleuserId()
+
+    /**
+     * Indicates whether the columns in this object are only set to default values.
+     *
+     * This method can be used in conjunction with isModified() to indicate whether an object is both
+     * modified _and_ has some values set which are non-default.
+     *
+     * @return boolean Whether the columns in this object are only been set with default values.
+     */
+    public function hasOnlyDefaultValues()
+    {
+        // otherwise, everything was equal, so return true
+        return true;
+    } // hasOnlyDefaultValues()
+
+    /**
+     * Hydrates (populates) the object variables with values from the database resultset.
+     *
+     * An offset (0-based "start column") is specified so that objects can be hydrated
+     * with a subset of the columns in the resultset rows.  This is needed, for example,
+     * for results of JOIN queries where the resultset row includes columns from two or
+     * more tables.
+     *
+     * @param array $row The row returned by PDOStatement->fetch(PDO::FETCH_NUM)
+     * @param int $startcol 0-based offset column which indicates which restultset column to start with.
+     * @param boolean $rehydrate Whether this object is being re-hydrated from the database.
+     * @return int             next starting column
+     * @throws PropelException - Any caught Exception will be rewrapped as a PropelException.
+     */
+    public function hydrate($row, $startcol = 0, $rehydrate = false)
+    {
+        try {
+
+            $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
+            $this->tasktype_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+            $this->done = ($row[$startcol + 2] !== null) ? (boolean) $row[$startcol + 2] : null;
+            $this->start = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+            $this->end = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+            $this->comments = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+            $this->writgroup_id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
+            $this->writ_id = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
+            $this->responsibleuser_id = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+            $this->resetModified();
+
+            $this->setNew(false);
+
+            if ($rehydrate) {
+                $this->ensureConsistency();
+            }
+            $this->postHydrate($row, $startcol, $rehydrate);
+            return $startcol + 9; // 9 = TaskPeer::NUM_HYDRATE_COLUMNS.
+
+        } catch (Exception $e) {
+            throw new PropelException("Error populating Task object", $e);
+        }
+    }
+
+    /**
+     * Checks and repairs the internal consistency of the object.
+     *
+     * This method is executed after an already-instantiated object is re-hydrated
+     * from the database.  It exists to check any foreign keys to make sure that
+     * the objects related to the current object are correct based on foreign key.
+     *
+     * You can override this method in the stub class, but you should always invoke
+     * the base method from the overridden method (i.e. parent::ensureConsistency()),
+     * in case your model changes.
+     *
+     * @throws PropelException
+     */
+    public function ensureConsistency()
+    {
+
+        if ($this->aTasktype !== null && $this->tasktype_id !== $this->aTasktype->getId()) {
+            $this->aTasktype = null;
+        }
+        if ($this->aWritgroup !== null && $this->writgroup_id !== $this->aWritgroup->getId()) {
+            $this->aWritgroup = null;
+        }
+        if ($this->aWrit !== null && $this->writ_id !== $this->aWrit->getId()) {
+            $this->aWrit = null;
+        }
+        if ($this->aUser !== null && $this->responsibleuser_id !== $this->aUser->getId()) {
+            $this->aUser = null;
+        }
+    } // ensureConsistency
+
+    /**
+     * Reloads this object from datastore based on primary key and (optionally) resets all associated objects.
+     *
+     * This will only work if the object has been saved and has a valid primary key set.
+     *
+     * @param boolean $deep (optional) Whether to also de-associated any related objects.
+     * @param PropelPDO $con (optional) The PropelPDO connection to use.
+     * @return void
+     * @throws PropelException - if this object is deleted, unsaved or doesn't have pk match in db
+     */
+    public function reload($deep = false, PropelPDO $con = null)
+    {
+        if ($this->isDeleted()) {
+            throw new PropelException("Cannot reload a deleted object.");
+        }
+
+        if ($this->isNew()) {
+            throw new PropelException("Cannot reload an unsaved object.");
+        }
+
+        if ($con === null) {
+            $con = Propel::getConnection(TaskPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        // We don't need to alter the object instance pool; we're just modifying this instance
+        // already in the pool.
+
+        $stmt = TaskPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+        $row = $stmt->fetch(PDO::FETCH_NUM);
+        $stmt->closeCursor();
+        if (!$row) {
+            throw new PropelException('Cannot find matching row in the database to reload object values.');
+        }
+        $this->hydrate($row, 0, true); // rehydrate
+
+        if ($deep) {  // also de-associate any related objects?
+
+            $this->aTasktype = null;
+            $this->aWritgroup = null;
+            $this->aWrit = null;
+            $this->aUser = null;
+        } // if (deep)
+    }
+
+    /**
+     * Removes this object from datastore and sets delete attribute.
+     *
+     * @param PropelPDO $con
+     * @return void
+     * @throws PropelException
+     * @throws Exception
+     * @see        BaseObject::setDeleted()
+     * @see        BaseObject::isDeleted()
+     */
+    public function delete(PropelPDO $con = null)
+    {
+        if ($this->isDeleted()) {
+            throw new PropelException("This object has already been deleted.");
+        }
+
+        if ($con === null) {
+            $con = Propel::getConnection(TaskPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+        }
+
+        $con->beginTransaction();
+        try {
+            $deleteQuery = TaskQuery::create()
+                ->filterByPrimaryKey($this->getPrimaryKey());
+            $ret = $this->preDelete($con);
+            if ($ret) {
+                $deleteQuery->delete($con);
+                $this->postDelete($con);
+                $con->commit();
+                $this->setDeleted(true);
+            } else {
+                $con->commit();
+            }
+        } catch (Exception $e) {
+            $con->rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Persists this object to the database.
+     *
+     * If the object is new, it inserts it; otherwise an update is performed.
+     * All modified related objects will also be persisted in the doSave()
+     * method.  This method wraps all precipitate database operations in a
+     * single transaction.
+     *
+     * @param PropelPDO $con
+     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @throws PropelException
+     * @throws Exception
+     * @see        doSave()
+     */
+    public function save(PropelPDO $con = null)
+    {
+        if ($this->isDeleted()) {
+            throw new PropelException("You cannot save an object that has been deleted.");
+        }
+
+        if ($con === null) {
+            $con = Propel::getConnection(TaskPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+        }
+
+        $con->beginTransaction();
+        $isInsert = $this->isNew();
+        try {
+            $ret = $this->preSave($con);
+            if ($isInsert) {
+                $ret = $ret && $this->preInsert($con);
+            } else {
+                $ret = $ret && $this->preUpdate($con);
+            }
+            if ($ret) {
+                $affectedRows = $this->doSave($con);
+                if ($isInsert) {
+                    $this->postInsert($con);
+                } else {
+                    $this->postUpdate($con);
+                }
+                $this->postSave($con);
+                TaskPeer::addInstanceToPool($this);
+            } else {
+                $affectedRows = 0;
+            }
+            $con->commit();
+
+            return $affectedRows;
+        } catch (Exception $e) {
+            $con->rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Performs the work of inserting or updating the row in the database.
+     *
+     * If the object is new, it inserts it; otherwise an update is performed.
+     * All related objects are also updated in this method.
+     *
+     * @param PropelPDO $con
+     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @throws PropelException
+     * @see        save()
+     */
+    protected function doSave(PropelPDO $con)
+    {
+        $affectedRows = 0; // initialize var to track total num of affected rows
+        if (!$this->alreadyInSave) {
+            $this->alreadyInSave = true;
+
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aTasktype !== null) {
+                if ($this->aTasktype->isModified() || $this->aTasktype->isNew()) {
+                    $affectedRows += $this->aTasktype->save($con);
+                }
+                $this->setTasktype($this->aTasktype);
+            }
+
+            if ($this->aWritgroup !== null) {
+                if ($this->aWritgroup->isModified() || $this->aWritgroup->isNew()) {
+                    $affectedRows += $this->aWritgroup->save($con);
+                }
+                $this->setWritgroup($this->aWritgroup);
+            }
+
+            if ($this->aWrit !== null) {
+                if ($this->aWrit->isModified() || $this->aWrit->isNew()) {
+                    $affectedRows += $this->aWrit->save($con);
+                }
+                $this->setWrit($this->aWrit);
+            }
+
+            if ($this->aUser !== null) {
+                if ($this->aUser->isModified() || $this->aUser->isNew()) {
+                    $affectedRows += $this->aUser->save($con);
+                }
+                $this->setUser($this->aUser);
+            }
+
+            if ($this->isNew() || $this->isModified()) {
+                // persist changes
+                if ($this->isNew()) {
+                    $this->doInsert($con);
+                } else {
+                    $this->doUpdate($con);
+                }
+                $affectedRows += 1;
+                $this->resetModified();
+            }
+
+            $this->alreadyInSave = false;
+
+        }
+
+        return $affectedRows;
+    } // doSave()
+
+    /**
+     * Insert the row in the database.
+     *
+     * @param PropelPDO $con
+     *
+     * @throws PropelException
+     * @see        doSave()
+     */
+    protected function doInsert(PropelPDO $con)
+    {
+        $modifiedColumns = array();
+        $index = 0;
+
+        $this->modifiedColumns[] = TaskPeer::ID;
+        if (null !== $this->id) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . TaskPeer::ID . ')');
+        }
+
+         // check the columns in natural order for more readable SQL queries
+        if ($this->isColumnModified(TaskPeer::ID)) {
+            $modifiedColumns[':p' . $index++]  = '`ID`';
+        }
+        if ($this->isColumnModified(TaskPeer::TASKTYPE_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`TASKTYPE_ID`';
+        }
+        if ($this->isColumnModified(TaskPeer::DONE)) {
+            $modifiedColumns[':p' . $index++]  = '`DONE`';
+        }
+        if ($this->isColumnModified(TaskPeer::START)) {
+            $modifiedColumns[':p' . $index++]  = '`START`';
+        }
+        if ($this->isColumnModified(TaskPeer::END)) {
+            $modifiedColumns[':p' . $index++]  = '`END`';
+        }
+        if ($this->isColumnModified(TaskPeer::COMMENTS)) {
+            $modifiedColumns[':p' . $index++]  = '`COMMENTS`';
+        }
+        if ($this->isColumnModified(TaskPeer::WRITGROUP_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`WRITGROUP_ID`';
+        }
+        if ($this->isColumnModified(TaskPeer::WRIT_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`WRIT_ID`';
+        }
+        if ($this->isColumnModified(TaskPeer::RESPONSIBLEUSER_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`RESPONSIBLEUSER_ID`';
+        }
+
+        $sql = sprintf(
+            'INSERT INTO `task` (%s) VALUES (%s)',
+            implode(', ', $modifiedColumns),
+            implode(', ', array_keys($modifiedColumns))
+        );
+
+        try {
+            $stmt = $con->prepare($sql);
+            foreach ($modifiedColumns as $identifier => $columnName) {
+                switch ($columnName) {
+                    case '`ID`':
+                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
+                        break;
+                    case '`TASKTYPE_ID`':
+                        $stmt->bindValue($identifier, $this->tasktype_id, PDO::PARAM_INT);
+                        break;
+                    case '`DONE`':
+                        $stmt->bindValue($identifier, (int) $this->done, PDO::PARAM_INT);
+                        break;
+                    case '`START`':
+                        $stmt->bindValue($identifier, $this->start, PDO::PARAM_STR);
+                        break;
+                    case '`END`':
+                        $stmt->bindValue($identifier, $this->end, PDO::PARAM_STR);
+                        break;
+                    case '`COMMENTS`':
+                        $stmt->bindValue($identifier, $this->comments, PDO::PARAM_STR);
+                        break;
+                    case '`WRITGROUP_ID`':
+                        $stmt->bindValue($identifier, $this->writgroup_id, PDO::PARAM_INT);
+                        break;
+                    case '`WRIT_ID`':
+                        $stmt->bindValue($identifier, $this->writ_id, PDO::PARAM_INT);
+                        break;
+                    case '`RESPONSIBLEUSER_ID`':
+                        $stmt->bindValue($identifier, $this->responsibleuser_id, PDO::PARAM_INT);
+                        break;
+                }
+            }
+            $stmt->execute();
+        } catch (Exception $e) {
+            Propel::log($e->getMessage(), Propel::LOG_ERR);
+            throw new PropelException(sprintf('Unable to execute INSERT statement [%s]', $sql), $e);
+        }
+
+        try {
+            $pk = $con->lastInsertId();
+        } catch (Exception $e) {
+            throw new PropelException('Unable to get autoincrement id.', $e);
+        }
+        $this->setId($pk);
+
+        $this->setNew(false);
+    }
+
+    /**
+     * Update the row in the database.
+     *
+     * @param PropelPDO $con
+     *
+     * @see        doSave()
+     */
+    protected function doUpdate(PropelPDO $con)
+    {
+        $selectCriteria = $this->buildPkeyCriteria();
+        $valuesCriteria = $this->buildCriteria();
+        BasePeer::doUpdate($selectCriteria, $valuesCriteria, $con);
+    }
+
+    /**
+     * Array of ValidationFailed objects.
+     * @var        array ValidationFailed[]
+     */
+    protected $validationFailures = array();
+
+    /**
+     * Gets any ValidationFailed objects that resulted from last call to validate().
+     *
+     *
+     * @return array ValidationFailed[]
+     * @see        validate()
+     */
+    public function getValidationFailures()
+    {
+        return $this->validationFailures;
+    }
+
+    /**
+     * Validates the objects modified field values and all objects related to this table.
+     *
+     * If $columns is either a column name or an array of column names
+     * only those columns are validated.
+     *
+     * @param mixed $columns Column name or an array of column names.
+     * @return boolean Whether all columns pass validation.
+     * @see        doValidate()
+     * @see        getValidationFailures()
+     */
+    public function validate($columns = null)
+    {
+        $res = $this->doValidate($columns);
+        if ($res === true) {
+            $this->validationFailures = array();
+
+            return true;
+        } else {
+            $this->validationFailures = $res;
+
+            return false;
+        }
+    }
+
+    /**
+     * This function performs the validation work for complex object models.
+     *
+     * In addition to checking the current object, all related objects will
+     * also be validated.  If all pass then <code>true</code> is returned; otherwise
+     * an aggreagated array of ValidationFailed objects will be returned.
+     *
+     * @param array $columns Array of column names to validate.
+     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objets otherwise.
+     */
+    protected function doValidate($columns = null)
+    {
+        if (!$this->alreadyInValidation) {
+            $this->alreadyInValidation = true;
+            $retval = null;
+
+            $failureMap = array();
+
+
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aTasktype !== null) {
+                if (!$this->aTasktype->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aTasktype->getValidationFailures());
+                }
+            }
+
+            if ($this->aWritgroup !== null) {
+                if (!$this->aWritgroup->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aWritgroup->getValidationFailures());
+                }
+            }
+
+            if ($this->aWrit !== null) {
+                if (!$this->aWrit->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aWrit->getValidationFailures());
+                }
+            }
+
+            if ($this->aUser !== null) {
+                if (!$this->aUser->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aUser->getValidationFailures());
+                }
+            }
+
+
+            if (($retval = TaskPeer::doValidate($this, $columns)) !== true) {
+                $failureMap = array_merge($failureMap, $retval);
+            }
+
+
+
+            $this->alreadyInValidation = false;
+        }
+
+        return (!empty($failureMap) ? $failureMap : true);
+    }
+
+    /**
+     * Retrieves a field from the object by name passed in as a string.
+     *
+     * @param string $name name
+     * @param string $type The type of fieldname the $name is of:
+     *               one of the class type constants BasePeer::TYPE_PHPNAME, BasePeer::TYPE_STUDLYPHPNAME
+     *               BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM.
+     *               Defaults to BasePeer::TYPE_PHPNAME
+     * @return mixed Value of field.
+     */
+    public function getByName($name, $type = BasePeer::TYPE_PHPNAME)
+    {
+        $pos = TaskPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+        $field = $this->getByPosition($pos);
+
+        return $field;
+    }
+
+    /**
+     * Retrieves a field from the object by Position as specified in the xml schema.
+     * Zero-based.
+     *
+     * @param int $pos position in xml schema
+     * @return mixed Value of field at $pos
+     */
+    public function getByPosition($pos)
+    {
+        switch ($pos) {
+            case 0:
+                return $this->getId();
+                break;
+            case 1:
+                return $this->getTasktypeId();
+                break;
+            case 2:
+                return $this->getDone();
+                break;
+            case 3:
+                return $this->getStart();
+                break;
+            case 4:
+                return $this->getEnd();
+                break;
+            case 5:
+                return $this->getComments();
+                break;
+            case 6:
+                return $this->getWritgroupId();
+                break;
+            case 7:
+                return $this->getWritId();
+                break;
+            case 8:
+                return $this->getResponsibleuserId();
+                break;
+            default:
+                return null;
+                break;
+        } // switch()
+    }
+
+    /**
+     * Exports the object as an array.
+     *
+     * You can specify the key type of the array by passing one of the class
+     * type constants.
+     *
+     * @param     string  $keyType (optional) One of the class type constants BasePeer::TYPE_PHPNAME, BasePeer::TYPE_STUDLYPHPNAME,
+     *                    BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM.
+     *                    Defaults to BasePeer::TYPE_PHPNAME.
+     * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to true.
+     * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
+     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
+     *
+     * @return array an associative array containing the field names (as keys) and field values
+     */
+    public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
+    {
+        if (isset($alreadyDumpedObjects['Task'][$this->getPrimaryKey()])) {
+            return '*RECURSION*';
+        }
+        $alreadyDumpedObjects['Task'][$this->getPrimaryKey()] = true;
+        $keys = TaskPeer::getFieldNames($keyType);
+        $result = array(
+            $keys[0] => $this->getId(),
+            $keys[1] => $this->getTasktypeId(),
+            $keys[2] => $this->getDone(),
+            $keys[3] => $this->getStart(),
+            $keys[4] => $this->getEnd(),
+            $keys[5] => $this->getComments(),
+            $keys[6] => $this->getWritgroupId(),
+            $keys[7] => $this->getWritId(),
+            $keys[8] => $this->getResponsibleuserId(),
+        );
+        if ($includeForeignObjects) {
+            if (null !== $this->aTasktype) {
+                $result['Tasktype'] = $this->aTasktype->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aWritgroup) {
+                $result['Writgroup'] = $this->aWritgroup->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aWrit) {
+                $result['Writ'] = $this->aWrit->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aUser) {
+                $result['User'] = $this->aUser->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Sets a field from the object by name passed in as a string.
+     *
+     * @param string $name peer name
+     * @param mixed $value field value
+     * @param string $type The type of fieldname the $name is of:
+     *                     one of the class type constants BasePeer::TYPE_PHPNAME, BasePeer::TYPE_STUDLYPHPNAME
+     *                     BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM.
+     *                     Defaults to BasePeer::TYPE_PHPNAME
+     * @return void
+     */
+    public function setByName($name, $value, $type = BasePeer::TYPE_PHPNAME)
+    {
+        $pos = TaskPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+
+        $this->setByPosition($pos, $value);
+    }
+
+    /**
+     * Sets a field from the object by Position as specified in the xml schema.
+     * Zero-based.
+     *
+     * @param int $pos position in xml schema
+     * @param mixed $value field value
+     * @return void
+     */
+    public function setByPosition($pos, $value)
+    {
+        switch ($pos) {
+            case 0:
+                $this->setId($value);
+                break;
+            case 1:
+                $this->setTasktypeId($value);
+                break;
+            case 2:
+                $this->setDone($value);
+                break;
+            case 3:
+                $this->setStart($value);
+                break;
+            case 4:
+                $this->setEnd($value);
+                break;
+            case 5:
+                $this->setComments($value);
+                break;
+            case 6:
+                $this->setWritgroupId($value);
+                break;
+            case 7:
+                $this->setWritId($value);
+                break;
+            case 8:
+                $this->setResponsibleuserId($value);
+                break;
+        } // switch()
+    }
+
+    /**
+     * Populates the object using an array.
+     *
+     * This is particularly useful when populating an object from one of the
+     * request arrays (e.g. $_POST).  This method goes through the column
+     * names, checking to see whether a matching key exists in populated
+     * array. If so the setByName() method is called for that column.
+     *
+     * You can specify the key type of the array by additionally passing one
+     * of the class type constants BasePeer::TYPE_PHPNAME, BasePeer::TYPE_STUDLYPHPNAME,
+     * BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM.
+     * The default key type is the column's BasePeer::TYPE_PHPNAME
+     *
+     * @param array  $arr     An array to populate the object from.
+     * @param string $keyType The type of keys the array uses.
+     * @return void
+     */
+    public function fromArray($arr, $keyType = BasePeer::TYPE_PHPNAME)
+    {
+        $keys = TaskPeer::getFieldNames($keyType);
+
+        if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
+        if (array_key_exists($keys[1], $arr)) $this->setTasktypeId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setDone($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setStart($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setEnd($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setComments($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setWritgroupId($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setWritId($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setResponsibleuserId($arr[$keys[8]]);
+    }
+
+    /**
+     * Build a Criteria object containing the values of all modified columns in this object.
+     *
+     * @return Criteria The Criteria object containing all modified values.
+     */
+    public function buildCriteria()
+    {
+        $criteria = new Criteria(TaskPeer::DATABASE_NAME);
+
+        if ($this->isColumnModified(TaskPeer::ID)) $criteria->add(TaskPeer::ID, $this->id);
+        if ($this->isColumnModified(TaskPeer::TASKTYPE_ID)) $criteria->add(TaskPeer::TASKTYPE_ID, $this->tasktype_id);
+        if ($this->isColumnModified(TaskPeer::DONE)) $criteria->add(TaskPeer::DONE, $this->done);
+        if ($this->isColumnModified(TaskPeer::START)) $criteria->add(TaskPeer::START, $this->start);
+        if ($this->isColumnModified(TaskPeer::END)) $criteria->add(TaskPeer::END, $this->end);
+        if ($this->isColumnModified(TaskPeer::COMMENTS)) $criteria->add(TaskPeer::COMMENTS, $this->comments);
+        if ($this->isColumnModified(TaskPeer::WRITGROUP_ID)) $criteria->add(TaskPeer::WRITGROUP_ID, $this->writgroup_id);
+        if ($this->isColumnModified(TaskPeer::WRIT_ID)) $criteria->add(TaskPeer::WRIT_ID, $this->writ_id);
+        if ($this->isColumnModified(TaskPeer::RESPONSIBLEUSER_ID)) $criteria->add(TaskPeer::RESPONSIBLEUSER_ID, $this->responsibleuser_id);
+
+        return $criteria;
+    }
+
+    /**
+     * Builds a Criteria object containing the primary key for this object.
+     *
+     * Unlike buildCriteria() this method includes the primary key values regardless
+     * of whether or not they have been modified.
+     *
+     * @return Criteria The Criteria object containing value(s) for primary key(s).
+     */
+    public function buildPkeyCriteria()
+    {
+        $criteria = new Criteria(TaskPeer::DATABASE_NAME);
+        $criteria->add(TaskPeer::ID, $this->id);
+
+        return $criteria;
+    }
+
+    /**
+     * Returns the primary key for this object (row).
+     * @return int
+     */
+    public function getPrimaryKey()
+    {
+        return $this->getId();
+    }
+
+    /**
+     * Generic method to set the primary key (id column).
+     *
+     * @param  int $key Primary key.
+     * @return void
+     */
+    public function setPrimaryKey($key)
+    {
+        $this->setId($key);
+    }
+
+    /**
+     * Returns true if the primary key for this object is null.
+     * @return boolean
+     */
+    public function isPrimaryKeyNull()
+    {
+
+        return null === $this->getId();
+    }
+
+    /**
+     * Sets contents of passed object to values from current object.
+     *
+     * If desired, this method can also make copies of all associated (fkey referrers)
+     * objects.
+     *
+     * @param object $copyObj An object of Task (or compatible) type.
+     * @param boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @param boolean $makeNew Whether to reset autoincrement PKs and make the object new.
+     * @throws PropelException
+     */
+    public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
+    {
+        $copyObj->setTasktypeId($this->getTasktypeId());
+        $copyObj->setDone($this->getDone());
+        $copyObj->setStart($this->getStart());
+        $copyObj->setEnd($this->getEnd());
+        $copyObj->setComments($this->getComments());
+        $copyObj->setWritgroupId($this->getWritgroupId());
+        $copyObj->setWritId($this->getWritId());
+        $copyObj->setResponsibleuserId($this->getResponsibleuserId());
+
+        if ($deepCopy && !$this->startCopy) {
+            // important: temporarily setNew(false) because this affects the behavior of
+            // the getter/setter methods for fkey referrer objects.
+            $copyObj->setNew(false);
+            // store object hash to prevent cycle
+            $this->startCopy = true;
+
+            //unflag object copy
+            $this->startCopy = false;
+        } // if ($deepCopy)
+
+        if ($makeNew) {
+            $copyObj->setNew(true);
+            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
+        }
+    }
+
+    /**
+     * Makes a copy of this object that will be inserted as a new row in table when saved.
+     * It creates a new object filling in the simple attributes, but skipping any primary
+     * keys that are defined for the table.
+     *
+     * If desired, this method can also make copies of all associated (fkey referrers)
+     * objects.
+     *
+     * @param boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @return Task Clone of current object.
+     * @throws PropelException
+     */
+    public function copy($deepCopy = false)
+    {
+        // we use get_class(), because this might be a subclass
+        $clazz = get_class($this);
+        $copyObj = new $clazz();
+        $this->copyInto($copyObj, $deepCopy);
+
+        return $copyObj;
+    }
+
+    /**
+     * Returns a peer instance associated with this om.
+     *
+     * Since Peer classes are not to have any instance attributes, this method returns the
+     * same instance for all member of this class. The method could therefore
+     * be static, but this would prevent one from overriding the behavior.
+     *
+     * @return TaskPeer
+     */
+    public function getPeer()
+    {
+        if (self::$peer === null) {
+            self::$peer = new TaskPeer();
+        }
+
+        return self::$peer;
+    }
+
+    /**
+     * Declares an association between this object and a Tasktype object.
+     *
+     * @param             Tasktype $v
+     * @return Task The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setTasktype(Tasktype $v = null)
+    {
+        if ($v === null) {
+            $this->setTasktypeId(NULL);
+        } else {
+            $this->setTasktypeId($v->getId());
+        }
+
+        $this->aTasktype = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Tasktype object, it will not be re-added.
+        if ($v !== null) {
+            $v->addTask($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Tasktype object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Tasktype The associated Tasktype object.
+     * @throws PropelException
+     */
+    public function getTasktype(PropelPDO $con = null)
+    {
+        if ($this->aTasktype === null && ($this->tasktype_id !== null)) {
+            $this->aTasktype = TasktypeQuery::create()->findPk($this->tasktype_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aTasktype->addTasks($this);
+             */
+        }
+
+        return $this->aTasktype;
+    }
+
+    /**
+     * Declares an association between this object and a Writgroup object.
+     *
+     * @param             Writgroup $v
+     * @return Task The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setWritgroup(Writgroup $v = null)
+    {
+        if ($v === null) {
+            $this->setWritgroupId(NULL);
+        } else {
+            $this->setWritgroupId($v->getId());
+        }
+
+        $this->aWritgroup = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Writgroup object, it will not be re-added.
+        if ($v !== null) {
+            $v->addTask($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Writgroup object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Writgroup The associated Writgroup object.
+     * @throws PropelException
+     */
+    public function getWritgroup(PropelPDO $con = null)
+    {
+        if ($this->aWritgroup === null && ($this->writgroup_id !== null)) {
+            $this->aWritgroup = WritgroupQuery::create()->findPk($this->writgroup_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aWritgroup->addTasks($this);
+             */
+        }
+
+        return $this->aWritgroup;
+    }
+
+    /**
+     * Declares an association between this object and a Writ object.
+     *
+     * @param             Writ $v
+     * @return Task The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setWrit(Writ $v = null)
+    {
+        if ($v === null) {
+            $this->setWritId(NULL);
+        } else {
+            $this->setWritId($v->getId());
+        }
+
+        $this->aWrit = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Writ object, it will not be re-added.
+        if ($v !== null) {
+            $v->addTask($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Writ object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Writ The associated Writ object.
+     * @throws PropelException
+     */
+    public function getWrit(PropelPDO $con = null)
+    {
+        if ($this->aWrit === null && ($this->writ_id !== null)) {
+            $this->aWrit = WritQuery::create()->findPk($this->writ_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aWrit->addTasks($this);
+             */
+        }
+
+        return $this->aWrit;
+    }
+
+    /**
+     * Declares an association between this object and a User object.
+     *
+     * @param             User $v
+     * @return Task The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setUser(User $v = null)
+    {
+        if ($v === null) {
+            $this->setResponsibleuserId(NULL);
+        } else {
+            $this->setResponsibleuserId($v->getId());
+        }
+
+        $this->aUser = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the User object, it will not be re-added.
+        if ($v !== null) {
+            $v->addTask($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated User object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return User The associated User object.
+     * @throws PropelException
+     */
+    public function getUser(PropelPDO $con = null)
+    {
+        if ($this->aUser === null && ($this->responsibleuser_id !== null)) {
+            $this->aUser = UserQuery::create()->findPk($this->responsibleuser_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aUser->addTasks($this);
+             */
+        }
+
+        return $this->aUser;
+    }
+
+    /**
+     * Clears the current object and sets all attributes to their default values
+     */
+    public function clear()
+    {
+        $this->id = null;
+        $this->tasktype_id = null;
+        $this->done = null;
+        $this->start = null;
+        $this->end = null;
+        $this->comments = null;
+        $this->writgroup_id = null;
+        $this->writ_id = null;
+        $this->responsibleuser_id = null;
+        $this->alreadyInSave = false;
+        $this->alreadyInValidation = false;
+        $this->clearAllReferences();
+        $this->resetModified();
+        $this->setNew(true);
+        $this->setDeleted(false);
+    }
+
+    /**
+     * Resets all references to other model objects or collections of model objects.
+     *
+     * This method is a user-space workaround for PHP's inability to garbage collect
+     * objects with circular references (even in PHP 5.3). This is currently necessary
+     * when using Propel in certain daemon or large-volumne/high-memory operations.
+     *
+     * @param boolean $deep Whether to also clear the references on all referrer objects.
+     */
+    public function clearAllReferences($deep = false)
+    {
+        if ($deep) {
+        } // if ($deep)
+
+        $this->aTasktype = null;
+        $this->aWritgroup = null;
+        $this->aWrit = null;
+        $this->aUser = null;
+    }
+
+    /**
+     * return the string representation of this object
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string) $this->exportTo(TaskPeer::DEFAULT_STRING_FORMAT);
+    }
+
+    /**
+     * return true is the object is in saving state
+     *
+     * @return boolean
+     */
+    public function isAlreadyInSave()
+    {
+        return $this->alreadyInSave;
+    }
+
+}

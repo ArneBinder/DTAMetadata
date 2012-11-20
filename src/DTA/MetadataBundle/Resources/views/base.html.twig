@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        
+        {% block stylesheets %}
+            <link href="{{ asset('css/main.css') }}" type="text/css" rel="stylesheet" />
+        {% endblock %}
+        
+        {# <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" /> #}
+    </head>
+    <body>
+        <div id="menue">
+            {% block menu %}
+                DTA Metadatenbank               
+                <a href="{{ path('dataDomain') }}">Daten</a>
+                <a href="{{ path('conceptualDomain') }}">Ordnungssysteme</a>
+                <a href="{{ path('workflowDomain') }}">Arbeitsfluss</a>
+                <a href="{{ path('administrationDomain') }}">Administration</a>
+            {% endblock %}
+        </div>
+        <div id="menuefooter">
+            {% block menuFooter %}
+            Nothing.
+            {% endblock %}
+        </div>
+
+        {% block body %}{% endblock %}
+        {% block javascripts %}{% endblock %}
+
+        <div id="footer">
+        {% block footer %}
+          DTA-Projektdatenbank (V 2.0)
+        {% endblock %}
+        </div>
+
+    </body>
+</html>
