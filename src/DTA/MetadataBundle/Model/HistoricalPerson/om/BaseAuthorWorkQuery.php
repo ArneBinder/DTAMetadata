@@ -1,6 +1,6 @@
 <?php
 
-namespace DTA\MetadataBundle\Model\om;
+namespace DTA\MetadataBundle\Model\HistoricalPerson\om;
 
 use \Criteria;
 use \Exception;
@@ -12,10 +12,10 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
-use DTA\MetadataBundle\Model\AuthorWork;
-use DTA\MetadataBundle\Model\AuthorWorkPeer;
-use DTA\MetadataBundle\Model\AuthorWorkQuery;
 use DTA\MetadataBundle\Model\HistoricalPerson\Author;
+use DTA\MetadataBundle\Model\HistoricalPerson\AuthorWork;
+use DTA\MetadataBundle\Model\HistoricalPerson\AuthorWorkPeer;
+use DTA\MetadataBundle\Model\HistoricalPerson\AuthorWorkQuery;
 use DTA\MetadataBundle\Model\Publication\Work;
 
 /**
@@ -63,7 +63,7 @@ abstract class BaseAuthorWorkQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'DTAMetadata', $modelName = 'DTA\\MetadataBundle\\Model\\AuthorWork', $modelAlias = null)
+    public function __construct($dbName = 'DTAMetadata', $modelName = 'DTA\\MetadataBundle\\Model\\HistoricalPerson\\AuthorWork', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }

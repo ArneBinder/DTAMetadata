@@ -1,6 +1,6 @@
 <?php
 
-namespace DTA\MetadataBundle\Model\om;
+namespace DTA\MetadataBundle\Model\HistoricalPerson\om;
 
 use \BaseObject;
 use \BasePeer;
@@ -11,26 +11,26 @@ use \Persistent;
 use \Propel;
 use \PropelException;
 use \PropelPDO;
-use DTA\MetadataBundle\Model\WritWritgroup;
-use DTA\MetadataBundle\Model\WritWritgroupPeer;
-use DTA\MetadataBundle\Model\WritWritgroupQuery;
-use DTA\MetadataBundle\Model\Publication\Writ;
-use DTA\MetadataBundle\Model\Publication\WritQuery;
-use DTA\MetadataBundle\Model\Workflow\Writgroup;
-use DTA\MetadataBundle\Model\Workflow\WritgroupQuery;
+use DTA\MetadataBundle\Model\HistoricalPerson\Author;
+use DTA\MetadataBundle\Model\HistoricalPerson\AuthorQuery;
+use DTA\MetadataBundle\Model\HistoricalPerson\AuthorWork;
+use DTA\MetadataBundle\Model\HistoricalPerson\AuthorWorkPeer;
+use DTA\MetadataBundle\Model\HistoricalPerson\AuthorWorkQuery;
+use DTA\MetadataBundle\Model\Publication\Work;
+use DTA\MetadataBundle\Model\Publication\WorkQuery;
 
-abstract class BaseWritWritgroup extends BaseObject implements Persistent
+abstract class BaseAuthorWork extends BaseObject implements Persistent
 {
     /**
      * Peer class name
      */
-    const PEER = 'DTA\\MetadataBundle\\Model\\WritWritgroupPeer';
+    const PEER = 'DTA\\MetadataBundle\\Model\\HistoricalPerson\\AuthorWorkPeer';
 
     /**
      * The Peer class.
      * Instance provides a convenient way of calling static methods on a class
      * that calling code may not be able to identify.
-     * @var        WritWritgroupPeer
+     * @var        AuthorWorkPeer
      */
     protected static $peer;
 
@@ -41,26 +41,38 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
     protected $startCopy = false;
 
     /**
-     * The value for the writgroup_id field.
+     * The value for the work_id field.
      * @var        int
      */
-    protected $writgroup_id;
+    protected $work_id;
 
     /**
-     * The value for the writ_id field.
+     * The value for the author_id field.
      * @var        int
      */
-    protected $writ_id;
+    protected $author_id;
 
     /**
-     * @var        Writgroup
+     * The value for the author_person_id field.
+     * @var        int
      */
-    protected $aWritgroup;
+    protected $author_person_id;
 
     /**
-     * @var        Writ
+     * The value for the name_id field.
+     * @var        int
      */
-    protected $aWrit;
+    protected $name_id;
+
+    /**
+     * @var        Work
+     */
+    protected $aWork;
+
+    /**
+     * @var        Author
+     */
+    protected $aAuthor;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -77,74 +89,140 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
-     * Get the [writgroup_id] column value.
+     * Get the [work_id] column value.
      *
      * @return int
      */
-    public function getWritgroupId()
+    public function getWorkId()
     {
-        return $this->writgroup_id;
+        return $this->work_id;
     }
 
     /**
-     * Get the [writ_id] column value.
+     * Get the [author_id] column value.
      *
      * @return int
      */
-    public function getWritId()
+    public function getAuthorId()
     {
-        return $this->writ_id;
+        return $this->author_id;
     }
 
     /**
-     * Set the value of [writgroup_id] column.
+     * Get the [author_person_id] column value.
+     *
+     * @return int
+     */
+    public function getAuthorPersonId()
+    {
+        return $this->author_person_id;
+    }
+
+    /**
+     * Get the [name_id] column value.
+     *
+     * @return int
+     */
+    public function getNameId()
+    {
+        return $this->name_id;
+    }
+
+    /**
+     * Set the value of [work_id] column.
      *
      * @param int $v new value
-     * @return WritWritgroup The current object (for fluent API support)
+     * @return AuthorWork The current object (for fluent API support)
      */
-    public function setWritgroupId($v)
+    public function setWorkId($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->writgroup_id !== $v) {
-            $this->writgroup_id = $v;
-            $this->modifiedColumns[] = WritWritgroupPeer::WRITGROUP_ID;
+        if ($this->work_id !== $v) {
+            $this->work_id = $v;
+            $this->modifiedColumns[] = AuthorWorkPeer::WORK_ID;
         }
 
-        if ($this->aWritgroup !== null && $this->aWritgroup->getId() !== $v) {
-            $this->aWritgroup = null;
+        if ($this->aWork !== null && $this->aWork->getId() !== $v) {
+            $this->aWork = null;
         }
 
 
         return $this;
-    } // setWritgroupId()
+    } // setWorkId()
 
     /**
-     * Set the value of [writ_id] column.
+     * Set the value of [author_id] column.
      *
      * @param int $v new value
-     * @return WritWritgroup The current object (for fluent API support)
+     * @return AuthorWork The current object (for fluent API support)
      */
-    public function setWritId($v)
+    public function setAuthorId($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->writ_id !== $v) {
-            $this->writ_id = $v;
-            $this->modifiedColumns[] = WritWritgroupPeer::WRIT_ID;
+        if ($this->author_id !== $v) {
+            $this->author_id = $v;
+            $this->modifiedColumns[] = AuthorWorkPeer::AUTHOR_ID;
         }
 
-        if ($this->aWrit !== null && $this->aWrit->getId() !== $v) {
-            $this->aWrit = null;
+        if ($this->aAuthor !== null && $this->aAuthor->getId() !== $v) {
+            $this->aAuthor = null;
         }
 
 
         return $this;
-    } // setWritId()
+    } // setAuthorId()
+
+    /**
+     * Set the value of [author_person_id] column.
+     *
+     * @param int $v new value
+     * @return AuthorWork The current object (for fluent API support)
+     */
+    public function setAuthorPersonId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->author_person_id !== $v) {
+            $this->author_person_id = $v;
+            $this->modifiedColumns[] = AuthorWorkPeer::AUTHOR_PERSON_ID;
+        }
+
+        if ($this->aAuthor !== null && $this->aAuthor->getPersonId() !== $v) {
+            $this->aAuthor = null;
+        }
+
+
+        return $this;
+    } // setAuthorPersonId()
+
+    /**
+     * Set the value of [name_id] column.
+     *
+     * @param int $v new value
+     * @return AuthorWork The current object (for fluent API support)
+     */
+    public function setNameId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->name_id !== $v) {
+            $this->name_id = $v;
+            $this->modifiedColumns[] = AuthorWorkPeer::NAME_ID;
+        }
+
+
+        return $this;
+    } // setNameId()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -178,8 +256,10 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
     {
         try {
 
-            $this->writgroup_id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-            $this->writ_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+            $this->work_id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
+            $this->author_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+            $this->author_person_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+            $this->name_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -188,10 +268,10 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 2; // 2 = WritWritgroupPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 4; // 4 = AuthorWorkPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating WritWritgroup object", $e);
+            throw new PropelException("Error populating AuthorWork object", $e);
         }
     }
 
@@ -211,11 +291,14 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
-        if ($this->aWritgroup !== null && $this->writgroup_id !== $this->aWritgroup->getId()) {
-            $this->aWritgroup = null;
+        if ($this->aWork !== null && $this->work_id !== $this->aWork->getId()) {
+            $this->aWork = null;
         }
-        if ($this->aWrit !== null && $this->writ_id !== $this->aWrit->getId()) {
-            $this->aWrit = null;
+        if ($this->aAuthor !== null && $this->author_id !== $this->aAuthor->getId()) {
+            $this->aAuthor = null;
+        }
+        if ($this->aAuthor !== null && $this->author_person_id !== $this->aAuthor->getPersonId()) {
+            $this->aAuthor = null;
         }
     } // ensureConsistency
 
@@ -240,13 +323,13 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(WritWritgroupPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(AuthorWorkPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $stmt = WritWritgroupPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+        $stmt = AuthorWorkPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
         $row = $stmt->fetch(PDO::FETCH_NUM);
         $stmt->closeCursor();
         if (!$row) {
@@ -256,8 +339,8 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aWritgroup = null;
-            $this->aWrit = null;
+            $this->aWork = null;
+            $this->aAuthor = null;
         } // if (deep)
     }
 
@@ -278,12 +361,12 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(WritWritgroupPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(AuthorWorkPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = WritWritgroupQuery::create()
+            $deleteQuery = AuthorWorkQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -321,7 +404,7 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(WritWritgroupPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(AuthorWorkPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         $con->beginTransaction();
@@ -341,7 +424,7 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                WritWritgroupPeer::addInstanceToPool($this);
+                AuthorWorkPeer::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -376,18 +459,18 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aWritgroup !== null) {
-                if ($this->aWritgroup->isModified() || $this->aWritgroup->isNew()) {
-                    $affectedRows += $this->aWritgroup->save($con);
+            if ($this->aWork !== null) {
+                if ($this->aWork->isModified() || $this->aWork->isNew()) {
+                    $affectedRows += $this->aWork->save($con);
                 }
-                $this->setWritgroup($this->aWritgroup);
+                $this->setWork($this->aWork);
             }
 
-            if ($this->aWrit !== null) {
-                if ($this->aWrit->isModified() || $this->aWrit->isNew()) {
-                    $affectedRows += $this->aWrit->save($con);
+            if ($this->aAuthor !== null) {
+                if ($this->aAuthor->isModified() || $this->aAuthor->isNew()) {
+                    $affectedRows += $this->aAuthor->save($con);
                 }
-                $this->setWrit($this->aWrit);
+                $this->setAuthor($this->aAuthor);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -423,15 +506,21 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
 
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(WritWritgroupPeer::WRITGROUP_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`WRITGROUP_ID`';
+        if ($this->isColumnModified(AuthorWorkPeer::WORK_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`WORK_ID`';
         }
-        if ($this->isColumnModified(WritWritgroupPeer::WRIT_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`WRIT_ID`';
+        if ($this->isColumnModified(AuthorWorkPeer::AUTHOR_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`AUTHOR_ID`';
+        }
+        if ($this->isColumnModified(AuthorWorkPeer::AUTHOR_PERSON_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`AUTHOR_PERSON_ID`';
+        }
+        if ($this->isColumnModified(AuthorWorkPeer::NAME_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`NAME_ID`';
         }
 
         $sql = sprintf(
-            'INSERT INTO `writ_writGroup` (%s) VALUES (%s)',
+            'INSERT INTO `author_work` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -440,11 +529,17 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`WRITGROUP_ID`':
-                        $stmt->bindValue($identifier, $this->writgroup_id, PDO::PARAM_INT);
+                    case '`WORK_ID`':
+                        $stmt->bindValue($identifier, $this->work_id, PDO::PARAM_INT);
                         break;
-                    case '`WRIT_ID`':
-                        $stmt->bindValue($identifier, $this->writ_id, PDO::PARAM_INT);
+                    case '`AUTHOR_ID`':
+                        $stmt->bindValue($identifier, $this->author_id, PDO::PARAM_INT);
+                        break;
+                    case '`AUTHOR_PERSON_ID`':
+                        $stmt->bindValue($identifier, $this->author_person_id, PDO::PARAM_INT);
+                        break;
+                    case '`NAME_ID`':
+                        $stmt->bindValue($identifier, $this->name_id, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -538,20 +633,20 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aWritgroup !== null) {
-                if (!$this->aWritgroup->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aWritgroup->getValidationFailures());
+            if ($this->aWork !== null) {
+                if (!$this->aWork->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aWork->getValidationFailures());
                 }
             }
 
-            if ($this->aWrit !== null) {
-                if (!$this->aWrit->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aWrit->getValidationFailures());
+            if ($this->aAuthor !== null) {
+                if (!$this->aAuthor->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aAuthor->getValidationFailures());
                 }
             }
 
 
-            if (($retval = WritWritgroupPeer::doValidate($this, $columns)) !== true) {
+            if (($retval = AuthorWorkPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
@@ -575,7 +670,7 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
      */
     public function getByName($name, $type = BasePeer::TYPE_PHPNAME)
     {
-        $pos = WritWritgroupPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+        $pos = AuthorWorkPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -592,10 +687,16 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
     {
         switch ($pos) {
             case 0:
-                return $this->getWritgroupId();
+                return $this->getWorkId();
                 break;
             case 1:
-                return $this->getWritId();
+                return $this->getAuthorId();
+                break;
+            case 2:
+                return $this->getAuthorPersonId();
+                break;
+            case 3:
+                return $this->getNameId();
                 break;
             default:
                 return null;
@@ -620,21 +721,23 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
      */
     public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['WritWritgroup'][serialize($this->getPrimaryKey())])) {
+        if (isset($alreadyDumpedObjects['AuthorWork'][serialize($this->getPrimaryKey())])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['WritWritgroup'][serialize($this->getPrimaryKey())] = true;
-        $keys = WritWritgroupPeer::getFieldNames($keyType);
+        $alreadyDumpedObjects['AuthorWork'][serialize($this->getPrimaryKey())] = true;
+        $keys = AuthorWorkPeer::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getWritgroupId(),
-            $keys[1] => $this->getWritId(),
+            $keys[0] => $this->getWorkId(),
+            $keys[1] => $this->getAuthorId(),
+            $keys[2] => $this->getAuthorPersonId(),
+            $keys[3] => $this->getNameId(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aWritgroup) {
-                $result['Writgroup'] = $this->aWritgroup->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aWork) {
+                $result['Work'] = $this->aWork->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aWrit) {
-                $result['Writ'] = $this->aWrit->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aAuthor) {
+                $result['Author'] = $this->aAuthor->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -654,7 +757,7 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
      */
     public function setByName($name, $value, $type = BasePeer::TYPE_PHPNAME)
     {
-        $pos = WritWritgroupPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+        $pos = AuthorWorkPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 
         $this->setByPosition($pos, $value);
     }
@@ -671,10 +774,16 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
     {
         switch ($pos) {
             case 0:
-                $this->setWritgroupId($value);
+                $this->setWorkId($value);
                 break;
             case 1:
-                $this->setWritId($value);
+                $this->setAuthorId($value);
+                break;
+            case 2:
+                $this->setAuthorPersonId($value);
+                break;
+            case 3:
+                $this->setNameId($value);
                 break;
         } // switch()
     }
@@ -698,10 +807,12 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
      */
     public function fromArray($arr, $keyType = BasePeer::TYPE_PHPNAME)
     {
-        $keys = WritWritgroupPeer::getFieldNames($keyType);
+        $keys = AuthorWorkPeer::getFieldNames($keyType);
 
-        if (array_key_exists($keys[0], $arr)) $this->setWritgroupId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setWritId($arr[$keys[1]]);
+        if (array_key_exists($keys[0], $arr)) $this->setWorkId($arr[$keys[0]]);
+        if (array_key_exists($keys[1], $arr)) $this->setAuthorId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setAuthorPersonId($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setNameId($arr[$keys[3]]);
     }
 
     /**
@@ -711,10 +822,12 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(WritWritgroupPeer::DATABASE_NAME);
+        $criteria = new Criteria(AuthorWorkPeer::DATABASE_NAME);
 
-        if ($this->isColumnModified(WritWritgroupPeer::WRITGROUP_ID)) $criteria->add(WritWritgroupPeer::WRITGROUP_ID, $this->writgroup_id);
-        if ($this->isColumnModified(WritWritgroupPeer::WRIT_ID)) $criteria->add(WritWritgroupPeer::WRIT_ID, $this->writ_id);
+        if ($this->isColumnModified(AuthorWorkPeer::WORK_ID)) $criteria->add(AuthorWorkPeer::WORK_ID, $this->work_id);
+        if ($this->isColumnModified(AuthorWorkPeer::AUTHOR_ID)) $criteria->add(AuthorWorkPeer::AUTHOR_ID, $this->author_id);
+        if ($this->isColumnModified(AuthorWorkPeer::AUTHOR_PERSON_ID)) $criteria->add(AuthorWorkPeer::AUTHOR_PERSON_ID, $this->author_person_id);
+        if ($this->isColumnModified(AuthorWorkPeer::NAME_ID)) $criteria->add(AuthorWorkPeer::NAME_ID, $this->name_id);
 
         return $criteria;
     }
@@ -729,9 +842,10 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(WritWritgroupPeer::DATABASE_NAME);
-        $criteria->add(WritWritgroupPeer::WRITGROUP_ID, $this->writgroup_id);
-        $criteria->add(WritWritgroupPeer::WRIT_ID, $this->writ_id);
+        $criteria = new Criteria(AuthorWorkPeer::DATABASE_NAME);
+        $criteria->add(AuthorWorkPeer::WORK_ID, $this->work_id);
+        $criteria->add(AuthorWorkPeer::AUTHOR_ID, $this->author_id);
+        $criteria->add(AuthorWorkPeer::AUTHOR_PERSON_ID, $this->author_person_id);
 
         return $criteria;
     }
@@ -744,8 +858,9 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
     public function getPrimaryKey()
     {
         $pks = array();
-        $pks[0] = $this->getWritgroupId();
-        $pks[1] = $this->getWritId();
+        $pks[0] = $this->getWorkId();
+        $pks[1] = $this->getAuthorId();
+        $pks[2] = $this->getAuthorPersonId();
 
         return $pks;
     }
@@ -758,8 +873,9 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
      */
     public function setPrimaryKey($keys)
     {
-        $this->setWritgroupId($keys[0]);
-        $this->setWritId($keys[1]);
+        $this->setWorkId($keys[0]);
+        $this->setAuthorId($keys[1]);
+        $this->setAuthorPersonId($keys[2]);
     }
 
     /**
@@ -769,7 +885,7 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
     public function isPrimaryKeyNull()
     {
 
-        return (null === $this->getWritgroupId()) && (null === $this->getWritId());
+        return (null === $this->getWorkId()) && (null === $this->getAuthorId()) && (null === $this->getAuthorPersonId());
     }
 
     /**
@@ -778,15 +894,17 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param object $copyObj An object of WritWritgroup (or compatible) type.
+     * @param object $copyObj An object of AuthorWork (or compatible) type.
      * @param boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setWritgroupId($this->getWritgroupId());
-        $copyObj->setWritId($this->getWritId());
+        $copyObj->setWorkId($this->getWorkId());
+        $copyObj->setAuthorId($this->getAuthorId());
+        $copyObj->setAuthorPersonId($this->getAuthorPersonId());
+        $copyObj->setNameId($this->getNameId());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -813,7 +931,7 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
      * objects.
      *
      * @param boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return WritWritgroup Clone of current object.
+     * @return AuthorWork Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -833,38 +951,38 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
      * same instance for all member of this class. The method could therefore
      * be static, but this would prevent one from overriding the behavior.
      *
-     * @return WritWritgroupPeer
+     * @return AuthorWorkPeer
      */
     public function getPeer()
     {
         if (self::$peer === null) {
-            self::$peer = new WritWritgroupPeer();
+            self::$peer = new AuthorWorkPeer();
         }
 
         return self::$peer;
     }
 
     /**
-     * Declares an association between this object and a Writgroup object.
+     * Declares an association between this object and a Work object.
      *
-     * @param             Writgroup $v
-     * @return WritWritgroup The current object (for fluent API support)
+     * @param             Work $v
+     * @return AuthorWork The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setWritgroup(Writgroup $v = null)
+    public function setWork(Work $v = null)
     {
         if ($v === null) {
-            $this->setWritgroupId(NULL);
+            $this->setWorkId(NULL);
         } else {
-            $this->setWritgroupId($v->getId());
+            $this->setWorkId($v->getId());
         }
 
-        $this->aWritgroup = $v;
+        $this->aWork = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Writgroup object, it will not be re-added.
+        // If this object has already been added to the Work object, it will not be re-added.
         if ($v !== null) {
-            $v->addWritWritgroup($this);
+            $v->addAuthorWork($this);
         }
 
 
@@ -873,49 +991,55 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
 
 
     /**
-     * Get the associated Writgroup object
+     * Get the associated Work object
      *
      * @param PropelPDO $con Optional Connection object.
-     * @return Writgroup The associated Writgroup object.
+     * @return Work The associated Work object.
      * @throws PropelException
      */
-    public function getWritgroup(PropelPDO $con = null)
+    public function getWork(PropelPDO $con = null)
     {
-        if ($this->aWritgroup === null && ($this->writgroup_id !== null)) {
-            $this->aWritgroup = WritgroupQuery::create()->findPk($this->writgroup_id, $con);
+        if ($this->aWork === null && ($this->work_id !== null)) {
+            $this->aWork = WorkQuery::create()->findPk($this->work_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aWritgroup->addWritWritgroups($this);
+                $this->aWork->addAuthorWorks($this);
              */
         }
 
-        return $this->aWritgroup;
+        return $this->aWork;
     }
 
     /**
-     * Declares an association between this object and a Writ object.
+     * Declares an association between this object and a Author object.
      *
-     * @param             Writ $v
-     * @return WritWritgroup The current object (for fluent API support)
+     * @param             Author $v
+     * @return AuthorWork The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setWrit(Writ $v = null)
+    public function setAuthor(Author $v = null)
     {
         if ($v === null) {
-            $this->setWritId(NULL);
+            $this->setAuthorId(NULL);
         } else {
-            $this->setWritId($v->getId());
+            $this->setAuthorId($v->getId());
         }
 
-        $this->aWrit = $v;
+        if ($v === null) {
+            $this->setAuthorPersonId(NULL);
+        } else {
+            $this->setAuthorPersonId($v->getPersonId());
+        }
+
+        $this->aAuthor = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Writ object, it will not be re-added.
+        // If this object has already been added to the Author object, it will not be re-added.
         if ($v !== null) {
-            $v->addWritWritgroup($this);
+            $v->addAuthorWork($this);
         }
 
 
@@ -924,26 +1048,26 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
 
 
     /**
-     * Get the associated Writ object
+     * Get the associated Author object
      *
      * @param PropelPDO $con Optional Connection object.
-     * @return Writ The associated Writ object.
+     * @return Author The associated Author object.
      * @throws PropelException
      */
-    public function getWrit(PropelPDO $con = null)
+    public function getAuthor(PropelPDO $con = null)
     {
-        if ($this->aWrit === null && ($this->writ_id !== null)) {
-            $this->aWrit = WritQuery::create()->findPk($this->writ_id, $con);
+        if ($this->aAuthor === null && ($this->author_id !== null && $this->author_person_id !== null)) {
+            $this->aAuthor = AuthorQuery::create()->findPk(array($this->author_id, $this->author_person_id), $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aWrit->addWritWritgroups($this);
+                $this->aAuthor->addAuthorWorks($this);
              */
         }
 
-        return $this->aWrit;
+        return $this->aAuthor;
     }
 
     /**
@@ -951,8 +1075,10 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
      */
     public function clear()
     {
-        $this->writgroup_id = null;
-        $this->writ_id = null;
+        $this->work_id = null;
+        $this->author_id = null;
+        $this->author_person_id = null;
+        $this->name_id = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->clearAllReferences();
@@ -975,8 +1101,8 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
         if ($deep) {
         } // if ($deep)
 
-        $this->aWritgroup = null;
-        $this->aWrit = null;
+        $this->aWork = null;
+        $this->aAuthor = null;
     }
 
     /**
@@ -986,7 +1112,7 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
      */
     public function __toString()
     {
-        return (string) $this->exportTo(WritWritgroupPeer::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(AuthorWorkPeer::DEFAULT_STRING_FORMAT);
     }
 
     /**

@@ -21,7 +21,7 @@ class TranslatorType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'DTA\MetadataBundle\Model\Translator',
+            'data_class' => 'DTA\MetadataBundle\Model\HistoricalPerson\Translator',
         ));
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace DTA\MetadataBundle\Model\map;
+namespace DTA\MetadataBundle\Model\HistoricalPerson\map;
 
 use \RelationMap;
 use \TableMap;
@@ -16,7 +16,7 @@ use \TableMap;
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package    propel.generator.src.DTA.MetadataBundle.Model.map
+ * @package    propel.generator.src.DTA.MetadataBundle.Model.HistoricalPerson.map
  */
 class AuthorWorkTableMap extends TableMap
 {
@@ -24,7 +24,7 @@ class AuthorWorkTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'src.DTA.MetadataBundle.Model.map.AuthorWorkTableMap';
+    const CLASS_NAME = 'src.DTA.MetadataBundle.Model.HistoricalPerson.map.AuthorWorkTableMap';
 
     /**
      * Initialize the table attributes, columns and validators
@@ -38,8 +38,8 @@ class AuthorWorkTableMap extends TableMap
         // attributes
         $this->setName('author_work');
         $this->setPhpName('AuthorWork');
-        $this->setClassname('DTA\\MetadataBundle\\Model\\AuthorWork');
-        $this->setPackage('src.DTA.MetadataBundle.Model');
+        $this->setClassname('DTA\\MetadataBundle\\Model\\HistoricalPerson\\AuthorWork');
+        $this->setPackage('src.DTA.MetadataBundle.Model.HistoricalPerson');
         $this->setUseIdGenerator(false);
         $this->setIsCrossRef(true);
         // columns

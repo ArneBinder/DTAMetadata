@@ -2,6 +2,11 @@ dta_metadata_homepage:
     pattern:  /mockup
     defaults: { _controller: DTAMetadataBundle:Home:index }
 
+test_class_introspection:
+    pattern:  /class/{className}
+    defaults: { _controller: DTAMetadataBundle:Home:index }
+
+
 dataDomain:
     pattern: /daten
     defaults: { _controller: DTAMetadataBundle:DataDomain:index }

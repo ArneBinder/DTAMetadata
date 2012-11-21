@@ -16,7 +16,7 @@ use \TableMap;
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package    propel.generator.src.Publication.map
+ * @package    propel.generator.src.DTA.MetadataBundle.Model.Publication.map
  */
 class WritTableMap extends TableMap
 {
@@ -24,7 +24,7 @@ class WritTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'src.Publication.map.WritTableMap';
+    const CLASS_NAME = 'src.DTA.MetadataBundle.Model.Publication.map.WritTableMap';
 
     /**
      * Initialize the table attributes, columns and validators
@@ -39,7 +39,7 @@ class WritTableMap extends TableMap
         $this->setName('writ');
         $this->setPhpName('Writ');
         $this->setClassname('DTA\\MetadataBundle\\Model\\Publication\\Writ');
-        $this->setPackage('src.Publication');
+        $this->setPackage('src.DTA.MetadataBundle.Model.Publication');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
@@ -65,9 +65,9 @@ class WritTableMap extends TableMap
         $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Publication\\Publication', RelationMap::MANY_TO_ONE, array('publication_id' => 'id', ), null, null);
         $this->addRelation('Relatedset', 'DTA\\MetadataBundle\\Model\\Workflow\\Relatedset', RelationMap::MANY_TO_ONE, array('relatedSet_id' => 'id', ), null, null);
         $this->addRelation('Corpus', 'DTA\\MetadataBundle\\Model\\Classification\\Corpus', RelationMap::ONE_TO_MANY, array('id' => 'writ_id', ), null, null, 'Corpuses');
+        $this->addRelation('WritWritgroup', 'DTA\\MetadataBundle\\Model\\Publication\\WritWritgroup', RelationMap::ONE_TO_MANY, array('id' => 'writ_id', ), null, null, 'WritWritgroups');
         $this->addRelation('Source', 'DTA\\MetadataBundle\\Model\\Workflow\\Source', RelationMap::ONE_TO_MANY, array('id' => 'writ_id', ), null, null, 'Sources');
         $this->addRelation('Task', 'DTA\\MetadataBundle\\Model\\Workflow\\Task', RelationMap::ONE_TO_MANY, array('id' => 'writ_id', ), null, null, 'Tasks');
-        $this->addRelation('WritWritgroup', 'DTA\\MetadataBundle\\Model\\WritWritgroup', RelationMap::ONE_TO_MANY, array('id' => 'writ_id', ), null, null, 'WritWritgroups');
         $this->addRelation('Writgroup', 'DTA\\MetadataBundle\\Model\\Workflow\\Writgroup', RelationMap::MANY_TO_MANY, array(), null, null, 'Writgroups');
     } // buildRelations()
 

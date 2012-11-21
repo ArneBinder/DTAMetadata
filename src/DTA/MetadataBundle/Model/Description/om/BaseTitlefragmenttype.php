@@ -1,6 +1,6 @@
 <?php
 
-namespace DTA\MetadataBundle\Model\om;
+namespace DTA\MetadataBundle\Model\Description\om;
 
 use \BaseObject;
 use \BasePeer;
@@ -9,28 +9,28 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
+use \PropelCollection;
 use \PropelException;
+use \PropelObjectCollection;
 use \PropelPDO;
-use DTA\MetadataBundle\Model\AuthorWork;
-use DTA\MetadataBundle\Model\AuthorWorkPeer;
-use DTA\MetadataBundle\Model\AuthorWorkQuery;
-use DTA\MetadataBundle\Model\HistoricalPerson\Author;
-use DTA\MetadataBundle\Model\HistoricalPerson\AuthorQuery;
-use DTA\MetadataBundle\Model\Publication\Work;
-use DTA\MetadataBundle\Model\Publication\WorkQuery;
+use DTA\MetadataBundle\Model\Description\Titlefragment;
+use DTA\MetadataBundle\Model\Description\TitlefragmentQuery;
+use DTA\MetadataBundle\Model\Description\Titlefragmenttype;
+use DTA\MetadataBundle\Model\Description\TitlefragmenttypePeer;
+use DTA\MetadataBundle\Model\Description\TitlefragmenttypeQuery;
 
-abstract class BaseAuthorWork extends BaseObject implements Persistent
+abstract class BaseTitlefragmenttype extends BaseObject implements Persistent
 {
     /**
      * Peer class name
      */
-    const PEER = 'DTA\\MetadataBundle\\Model\\AuthorWorkPeer';
+    const PEER = 'DTA\\MetadataBundle\\Model\\Description\\TitlefragmenttypePeer';
 
     /**
      * The Peer class.
      * Instance provides a convenient way of calling static methods on a class
      * that calling code may not be able to identify.
-     * @var        AuthorWorkPeer
+     * @var        TitlefragmenttypePeer
      */
     protected static $peer;
 
@@ -41,38 +41,22 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
     protected $startCopy = false;
 
     /**
-     * The value for the work_id field.
+     * The value for the id field.
      * @var        int
      */
-    protected $work_id;
+    protected $id;
 
     /**
-     * The value for the author_id field.
-     * @var        int
+     * The value for the name field.
+     * @var        string
      */
-    protected $author_id;
+    protected $name;
 
     /**
-     * The value for the author_person_id field.
-     * @var        int
+     * @var        PropelObjectCollection|Titlefragment[] Collection to store aggregation of Titlefragment objects.
      */
-    protected $author_person_id;
-
-    /**
-     * The value for the name_id field.
-     * @var        int
-     */
-    protected $name_id;
-
-    /**
-     * @var        Work
-     */
-    protected $aWork;
-
-    /**
-     * @var        Author
-     */
-    protected $aAuthor;
+    protected $collTitlefragments;
+    protected $collTitlefragmentsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -89,140 +73,72 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
-     * Get the [work_id] column value.
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $titlefragmentsScheduledForDeletion = null;
+
+    /**
+     * Get the [id] column value.
      *
      * @return int
      */
-    public function getWorkId()
+    public function getId()
     {
-        return $this->work_id;
+        return $this->id;
     }
 
     /**
-     * Get the [author_id] column value.
+     * Get the [name] column value.
      *
-     * @return int
+     * @return string
      */
-    public function getAuthorId()
+    public function getName()
     {
-        return $this->author_id;
+        return $this->name;
     }
 
     /**
-     * Get the [author_person_id] column value.
-     *
-     * @return int
-     */
-    public function getAuthorPersonId()
-    {
-        return $this->author_person_id;
-    }
-
-    /**
-     * Get the [name_id] column value.
-     *
-     * @return int
-     */
-    public function getNameId()
-    {
-        return $this->name_id;
-    }
-
-    /**
-     * Set the value of [work_id] column.
+     * Set the value of [id] column.
      *
      * @param int $v new value
-     * @return AuthorWork The current object (for fluent API support)
+     * @return Titlefragmenttype The current object (for fluent API support)
      */
-    public function setWorkId($v)
+    public function setId($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->work_id !== $v) {
-            $this->work_id = $v;
-            $this->modifiedColumns[] = AuthorWorkPeer::WORK_ID;
-        }
-
-        if ($this->aWork !== null && $this->aWork->getId() !== $v) {
-            $this->aWork = null;
+        if ($this->id !== $v) {
+            $this->id = $v;
+            $this->modifiedColumns[] = TitlefragmenttypePeer::ID;
         }
 
 
         return $this;
-    } // setWorkId()
+    } // setId()
 
     /**
-     * Set the value of [author_id] column.
+     * Set the value of [name] column.
      *
-     * @param int $v new value
-     * @return AuthorWork The current object (for fluent API support)
+     * @param string $v new value
+     * @return Titlefragmenttype The current object (for fluent API support)
      */
-    public function setAuthorId($v)
+    public function setName($v)
     {
         if ($v !== null) {
-            $v = (int) $v;
+            $v = (string) $v;
         }
 
-        if ($this->author_id !== $v) {
-            $this->author_id = $v;
-            $this->modifiedColumns[] = AuthorWorkPeer::AUTHOR_ID;
-        }
-
-        if ($this->aAuthor !== null && $this->aAuthor->getId() !== $v) {
-            $this->aAuthor = null;
+        if ($this->name !== $v) {
+            $this->name = $v;
+            $this->modifiedColumns[] = TitlefragmenttypePeer::NAME;
         }
 
 
         return $this;
-    } // setAuthorId()
-
-    /**
-     * Set the value of [author_person_id] column.
-     *
-     * @param int $v new value
-     * @return AuthorWork The current object (for fluent API support)
-     */
-    public function setAuthorPersonId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->author_person_id !== $v) {
-            $this->author_person_id = $v;
-            $this->modifiedColumns[] = AuthorWorkPeer::AUTHOR_PERSON_ID;
-        }
-
-        if ($this->aAuthor !== null && $this->aAuthor->getPersonId() !== $v) {
-            $this->aAuthor = null;
-        }
-
-
-        return $this;
-    } // setAuthorPersonId()
-
-    /**
-     * Set the value of [name_id] column.
-     *
-     * @param int $v new value
-     * @return AuthorWork The current object (for fluent API support)
-     */
-    public function setNameId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->name_id !== $v) {
-            $this->name_id = $v;
-            $this->modifiedColumns[] = AuthorWorkPeer::NAME_ID;
-        }
-
-
-        return $this;
-    } // setNameId()
+    } // setName()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -256,10 +172,8 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
     {
         try {
 
-            $this->work_id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-            $this->author_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-            $this->author_person_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
-            $this->name_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+            $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
+            $this->name = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -268,10 +182,10 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 4; // 4 = AuthorWorkPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 2; // 2 = TitlefragmenttypePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating AuthorWork object", $e);
+            throw new PropelException("Error populating Titlefragmenttype object", $e);
         }
     }
 
@@ -291,15 +205,6 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
-        if ($this->aWork !== null && $this->work_id !== $this->aWork->getId()) {
-            $this->aWork = null;
-        }
-        if ($this->aAuthor !== null && $this->author_id !== $this->aAuthor->getId()) {
-            $this->aAuthor = null;
-        }
-        if ($this->aAuthor !== null && $this->author_person_id !== $this->aAuthor->getPersonId()) {
-            $this->aAuthor = null;
-        }
     } // ensureConsistency
 
     /**
@@ -323,13 +228,13 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(AuthorWorkPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(TitlefragmenttypePeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $stmt = AuthorWorkPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+        $stmt = TitlefragmenttypePeer::doSelectStmt($this->buildPkeyCriteria(), $con);
         $row = $stmt->fetch(PDO::FETCH_NUM);
         $stmt->closeCursor();
         if (!$row) {
@@ -339,8 +244,8 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aWork = null;
-            $this->aAuthor = null;
+            $this->collTitlefragments = null;
+
         } // if (deep)
     }
 
@@ -361,12 +266,12 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(AuthorWorkPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(TitlefragmenttypePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = AuthorWorkQuery::create()
+            $deleteQuery = TitlefragmenttypeQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -404,7 +309,7 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(AuthorWorkPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(TitlefragmenttypePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         $con->beginTransaction();
@@ -424,7 +329,7 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                AuthorWorkPeer::addInstanceToPool($this);
+                TitlefragmenttypePeer::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -454,25 +359,6 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
-            // We call the save method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aWork !== null) {
-                if ($this->aWork->isModified() || $this->aWork->isNew()) {
-                    $affectedRows += $this->aWork->save($con);
-                }
-                $this->setWork($this->aWork);
-            }
-
-            if ($this->aAuthor !== null) {
-                if ($this->aAuthor->isModified() || $this->aAuthor->isNew()) {
-                    $affectedRows += $this->aAuthor->save($con);
-                }
-                $this->setAuthor($this->aAuthor);
-            }
-
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -482,6 +368,23 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->titlefragmentsScheduledForDeletion !== null) {
+                if (!$this->titlefragmentsScheduledForDeletion->isEmpty()) {
+                    TitlefragmentQuery::create()
+                        ->filterByPrimaryKeys($this->titlefragmentsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->titlefragmentsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collTitlefragments !== null) {
+                foreach ($this->collTitlefragments as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -504,23 +407,21 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
         $modifiedColumns = array();
         $index = 0;
 
+        $this->modifiedColumns[] = TitlefragmenttypePeer::ID;
+        if (null !== $this->id) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . TitlefragmenttypePeer::ID . ')');
+        }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(AuthorWorkPeer::WORK_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`WORK_ID`';
+        if ($this->isColumnModified(TitlefragmenttypePeer::ID)) {
+            $modifiedColumns[':p' . $index++]  = '`ID`';
         }
-        if ($this->isColumnModified(AuthorWorkPeer::AUTHOR_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`AUTHOR_ID`';
-        }
-        if ($this->isColumnModified(AuthorWorkPeer::AUTHOR_PERSON_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`AUTHOR_PERSON_ID`';
-        }
-        if ($this->isColumnModified(AuthorWorkPeer::NAME_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`NAME_ID`';
+        if ($this->isColumnModified(TitlefragmenttypePeer::NAME)) {
+            $modifiedColumns[':p' . $index++]  = '`NAME`';
         }
 
         $sql = sprintf(
-            'INSERT INTO `author_work` (%s) VALUES (%s)',
+            'INSERT INTO `titleFragmentType` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -529,17 +430,11 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`WORK_ID`':
-                        $stmt->bindValue($identifier, $this->work_id, PDO::PARAM_INT);
+                    case '`ID`':
+                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`AUTHOR_ID`':
-                        $stmt->bindValue($identifier, $this->author_id, PDO::PARAM_INT);
-                        break;
-                    case '`AUTHOR_PERSON_ID`':
-                        $stmt->bindValue($identifier, $this->author_person_id, PDO::PARAM_INT);
-                        break;
-                    case '`NAME_ID`':
-                        $stmt->bindValue($identifier, $this->name_id, PDO::PARAM_INT);
+                    case '`NAME`':
+                        $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -548,6 +443,13 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
             Propel::log($e->getMessage(), Propel::LOG_ERR);
             throw new PropelException(sprintf('Unable to execute INSERT statement [%s]', $sql), $e);
         }
+
+        try {
+            $pk = $con->lastInsertId();
+        } catch (Exception $e) {
+            throw new PropelException('Unable to get autoincrement id.', $e);
+        }
+        $this->setId($pk);
 
         $this->setNew(false);
     }
@@ -628,28 +530,18 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
             $failureMap = array();
 
 
-            // We call the validate method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aWork !== null) {
-                if (!$this->aWork->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aWork->getValidationFailures());
-                }
-            }
-
-            if ($this->aAuthor !== null) {
-                if (!$this->aAuthor->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aAuthor->getValidationFailures());
-                }
-            }
-
-
-            if (($retval = AuthorWorkPeer::doValidate($this, $columns)) !== true) {
+            if (($retval = TitlefragmenttypePeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
+
+                if ($this->collTitlefragments !== null) {
+                    foreach ($this->collTitlefragments as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
 
 
             $this->alreadyInValidation = false;
@@ -670,7 +562,7 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
      */
     public function getByName($name, $type = BasePeer::TYPE_PHPNAME)
     {
-        $pos = AuthorWorkPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+        $pos = TitlefragmenttypePeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -687,16 +579,10 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
     {
         switch ($pos) {
             case 0:
-                return $this->getWorkId();
+                return $this->getId();
                 break;
             case 1:
-                return $this->getAuthorId();
-                break;
-            case 2:
-                return $this->getAuthorPersonId();
-                break;
-            case 3:
-                return $this->getNameId();
+                return $this->getName();
                 break;
             default:
                 return null;
@@ -721,23 +607,18 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
      */
     public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['AuthorWork'][serialize($this->getPrimaryKey())])) {
+        if (isset($alreadyDumpedObjects['Titlefragmenttype'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['AuthorWork'][serialize($this->getPrimaryKey())] = true;
-        $keys = AuthorWorkPeer::getFieldNames($keyType);
+        $alreadyDumpedObjects['Titlefragmenttype'][$this->getPrimaryKey()] = true;
+        $keys = TitlefragmenttypePeer::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getWorkId(),
-            $keys[1] => $this->getAuthorId(),
-            $keys[2] => $this->getAuthorPersonId(),
-            $keys[3] => $this->getNameId(),
+            $keys[0] => $this->getId(),
+            $keys[1] => $this->getName(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aWork) {
-                $result['Work'] = $this->aWork->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->aAuthor) {
-                $result['Author'] = $this->aAuthor->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collTitlefragments) {
+                $result['Titlefragments'] = $this->collTitlefragments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -757,7 +638,7 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
      */
     public function setByName($name, $value, $type = BasePeer::TYPE_PHPNAME)
     {
-        $pos = AuthorWorkPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+        $pos = TitlefragmenttypePeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 
         $this->setByPosition($pos, $value);
     }
@@ -774,16 +655,10 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
     {
         switch ($pos) {
             case 0:
-                $this->setWorkId($value);
+                $this->setId($value);
                 break;
             case 1:
-                $this->setAuthorId($value);
-                break;
-            case 2:
-                $this->setAuthorPersonId($value);
-                break;
-            case 3:
-                $this->setNameId($value);
+                $this->setName($value);
                 break;
         } // switch()
     }
@@ -807,12 +682,10 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
      */
     public function fromArray($arr, $keyType = BasePeer::TYPE_PHPNAME)
     {
-        $keys = AuthorWorkPeer::getFieldNames($keyType);
+        $keys = TitlefragmenttypePeer::getFieldNames($keyType);
 
-        if (array_key_exists($keys[0], $arr)) $this->setWorkId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setAuthorId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setAuthorPersonId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setNameId($arr[$keys[3]]);
+        if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
+        if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
     }
 
     /**
@@ -822,12 +695,10 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(AuthorWorkPeer::DATABASE_NAME);
+        $criteria = new Criteria(TitlefragmenttypePeer::DATABASE_NAME);
 
-        if ($this->isColumnModified(AuthorWorkPeer::WORK_ID)) $criteria->add(AuthorWorkPeer::WORK_ID, $this->work_id);
-        if ($this->isColumnModified(AuthorWorkPeer::AUTHOR_ID)) $criteria->add(AuthorWorkPeer::AUTHOR_ID, $this->author_id);
-        if ($this->isColumnModified(AuthorWorkPeer::AUTHOR_PERSON_ID)) $criteria->add(AuthorWorkPeer::AUTHOR_PERSON_ID, $this->author_person_id);
-        if ($this->isColumnModified(AuthorWorkPeer::NAME_ID)) $criteria->add(AuthorWorkPeer::NAME_ID, $this->name_id);
+        if ($this->isColumnModified(TitlefragmenttypePeer::ID)) $criteria->add(TitlefragmenttypePeer::ID, $this->id);
+        if ($this->isColumnModified(TitlefragmenttypePeer::NAME)) $criteria->add(TitlefragmenttypePeer::NAME, $this->name);
 
         return $criteria;
     }
@@ -842,40 +713,30 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(AuthorWorkPeer::DATABASE_NAME);
-        $criteria->add(AuthorWorkPeer::WORK_ID, $this->work_id);
-        $criteria->add(AuthorWorkPeer::AUTHOR_ID, $this->author_id);
-        $criteria->add(AuthorWorkPeer::AUTHOR_PERSON_ID, $this->author_person_id);
+        $criteria = new Criteria(TitlefragmenttypePeer::DATABASE_NAME);
+        $criteria->add(TitlefragmenttypePeer::ID, $this->id);
 
         return $criteria;
     }
 
     /**
-     * Returns the composite primary key for this object.
-     * The array elements will be in same order as specified in XML.
-     * @return array
+     * Returns the primary key for this object (row).
+     * @return int
      */
     public function getPrimaryKey()
     {
-        $pks = array();
-        $pks[0] = $this->getWorkId();
-        $pks[1] = $this->getAuthorId();
-        $pks[2] = $this->getAuthorPersonId();
-
-        return $pks;
+        return $this->getId();
     }
 
     /**
-     * Set the [composite] primary key.
+     * Generic method to set the primary key (id column).
      *
-     * @param array $keys The elements of the composite key (order must match the order in XML file).
+     * @param  int $key Primary key.
      * @return void
      */
-    public function setPrimaryKey($keys)
+    public function setPrimaryKey($key)
     {
-        $this->setWorkId($keys[0]);
-        $this->setAuthorId($keys[1]);
-        $this->setAuthorPersonId($keys[2]);
+        $this->setId($key);
     }
 
     /**
@@ -885,7 +746,7 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
     public function isPrimaryKeyNull()
     {
 
-        return (null === $this->getWorkId()) && (null === $this->getAuthorId()) && (null === $this->getAuthorPersonId());
+        return null === $this->getId();
     }
 
     /**
@@ -894,17 +755,14 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param object $copyObj An object of AuthorWork (or compatible) type.
+     * @param object $copyObj An object of Titlefragmenttype (or compatible) type.
      * @param boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setWorkId($this->getWorkId());
-        $copyObj->setAuthorId($this->getAuthorId());
-        $copyObj->setAuthorPersonId($this->getAuthorPersonId());
-        $copyObj->setNameId($this->getNameId());
+        $copyObj->setName($this->getName());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -913,12 +771,19 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
+            foreach ($this->getTitlefragments() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addTitlefragment($relObj->copy($deepCopy));
+                }
+            }
+
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
 
         if ($makeNew) {
             $copyObj->setNew(true);
+            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -931,7 +796,7 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
      * objects.
      *
      * @param boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return AuthorWork Clone of current object.
+     * @return Titlefragmenttype Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -951,123 +816,271 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
      * same instance for all member of this class. The method could therefore
      * be static, but this would prevent one from overriding the behavior.
      *
-     * @return AuthorWorkPeer
+     * @return TitlefragmenttypePeer
      */
     public function getPeer()
     {
         if (self::$peer === null) {
-            self::$peer = new AuthorWorkPeer();
+            self::$peer = new TitlefragmenttypePeer();
         }
 
         return self::$peer;
     }
 
+
     /**
-     * Declares an association between this object and a Work object.
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param             Work $v
-     * @return AuthorWork The current object (for fluent API support)
+     * @param string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('Titlefragment' == $relationName) {
+            $this->initTitlefragments();
+        }
+    }
+
+    /**
+     * Clears out the collTitlefragments collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Titlefragmenttype The current object (for fluent API support)
+     * @see        addTitlefragments()
+     */
+    public function clearTitlefragments()
+    {
+        $this->collTitlefragments = null; // important to set this to null since that means it is uninitialized
+        $this->collTitlefragmentsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collTitlefragments collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialTitlefragments($v = true)
+    {
+        $this->collTitlefragmentsPartial = $v;
+    }
+
+    /**
+     * Initializes the collTitlefragments collection.
+     *
+     * By default this just sets the collTitlefragments collection to an empty array (like clearcollTitlefragments());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initTitlefragments($overrideExisting = true)
+    {
+        if (null !== $this->collTitlefragments && !$overrideExisting) {
+            return;
+        }
+        $this->collTitlefragments = new PropelObjectCollection();
+        $this->collTitlefragments->setModel('Titlefragment');
+    }
+
+    /**
+     * Gets an array of Titlefragment objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Titlefragmenttype is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Titlefragment[] List of Titlefragment objects
      * @throws PropelException
      */
-    public function setWork(Work $v = null)
+    public function getTitlefragments($criteria = null, PropelPDO $con = null)
     {
-        if ($v === null) {
-            $this->setWorkId(NULL);
+        $partial = $this->collTitlefragmentsPartial && !$this->isNew();
+        if (null === $this->collTitlefragments || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collTitlefragments) {
+                // return empty collection
+                $this->initTitlefragments();
+            } else {
+                $collTitlefragments = TitlefragmentQuery::create(null, $criteria)
+                    ->filterByTitlefragmenttype($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collTitlefragmentsPartial && count($collTitlefragments)) {
+                      $this->initTitlefragments(false);
+
+                      foreach($collTitlefragments as $obj) {
+                        if (false == $this->collTitlefragments->contains($obj)) {
+                          $this->collTitlefragments->append($obj);
+                        }
+                      }
+
+                      $this->collTitlefragmentsPartial = true;
+                    }
+
+                    return $collTitlefragments;
+                }
+
+                if($partial && $this->collTitlefragments) {
+                    foreach($this->collTitlefragments as $obj) {
+                        if($obj->isNew()) {
+                            $collTitlefragments[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collTitlefragments = $collTitlefragments;
+                $this->collTitlefragmentsPartial = false;
+            }
+        }
+
+        return $this->collTitlefragments;
+    }
+
+    /**
+     * Sets a collection of Titlefragment objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $titlefragments A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Titlefragmenttype The current object (for fluent API support)
+     */
+    public function setTitlefragments(PropelCollection $titlefragments, PropelPDO $con = null)
+    {
+        $this->titlefragmentsScheduledForDeletion = $this->getTitlefragments(new Criteria(), $con)->diff($titlefragments);
+
+        foreach ($this->titlefragmentsScheduledForDeletion as $titlefragmentRemoved) {
+            $titlefragmentRemoved->setTitlefragmenttype(null);
+        }
+
+        $this->collTitlefragments = null;
+        foreach ($titlefragments as $titlefragment) {
+            $this->addTitlefragment($titlefragment);
+        }
+
+        $this->collTitlefragments = $titlefragments;
+        $this->collTitlefragmentsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Titlefragment objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Titlefragment objects.
+     * @throws PropelException
+     */
+    public function countTitlefragments(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collTitlefragmentsPartial && !$this->isNew();
+        if (null === $this->collTitlefragments || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collTitlefragments) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getTitlefragments());
+                }
+                $query = TitlefragmentQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByTitlefragmenttype($this)
+                    ->count($con);
+            }
         } else {
-            $this->setWorkId($v->getId());
+            return count($this->collTitlefragments);
+        }
+    }
+
+    /**
+     * Method called to associate a Titlefragment object to this object
+     * through the Titlefragment foreign key attribute.
+     *
+     * @param    Titlefragment $l Titlefragment
+     * @return Titlefragmenttype The current object (for fluent API support)
+     */
+    public function addTitlefragment(Titlefragment $l)
+    {
+        if ($this->collTitlefragments === null) {
+            $this->initTitlefragments();
+            $this->collTitlefragmentsPartial = true;
+        }
+        if (!in_array($l, $this->collTitlefragments->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddTitlefragment($l);
         }
 
-        $this->aWork = $v;
+        return $this;
+    }
 
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Work object, it will not be re-added.
-        if ($v !== null) {
-            $v->addAuthorWork($this);
+    /**
+     * @param	Titlefragment $titlefragment The titlefragment object to add.
+     */
+    protected function doAddTitlefragment($titlefragment)
+    {
+        $this->collTitlefragments[]= $titlefragment;
+        $titlefragment->setTitlefragmenttype($this);
+    }
+
+    /**
+     * @param	Titlefragment $titlefragment The titlefragment object to remove.
+     * @return Titlefragmenttype The current object (for fluent API support)
+     */
+    public function removeTitlefragment($titlefragment)
+    {
+        if ($this->getTitlefragments()->contains($titlefragment)) {
+            $this->collTitlefragments->remove($this->collTitlefragments->search($titlefragment));
+            if (null === $this->titlefragmentsScheduledForDeletion) {
+                $this->titlefragmentsScheduledForDeletion = clone $this->collTitlefragments;
+                $this->titlefragmentsScheduledForDeletion->clear();
+            }
+            $this->titlefragmentsScheduledForDeletion[]= $titlefragment;
+            $titlefragment->setTitlefragmenttype(null);
         }
-
 
         return $this;
     }
 
 
     /**
-     * Get the associated Work object
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Titlefragmenttype is new, it will return
+     * an empty collection; or if this Titlefragmenttype has previously
+     * been saved, it will retrieve related Titlefragments from storage.
      *
-     * @param PropelPDO $con Optional Connection object.
-     * @return Work The associated Work object.
-     * @throws PropelException
-     */
-    public function getWork(PropelPDO $con = null)
-    {
-        if ($this->aWork === null && ($this->work_id !== null)) {
-            $this->aWork = WorkQuery::create()->findPk($this->work_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aWork->addAuthorWorks($this);
-             */
-        }
-
-        return $this->aWork;
-    }
-
-    /**
-     * Declares an association between this object and a Author object.
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Titlefragmenttype.
      *
-     * @param             Author $v
-     * @return AuthorWork The current object (for fluent API support)
-     * @throws PropelException
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Titlefragment[] List of Titlefragment objects
      */
-    public function setAuthor(Author $v = null)
+    public function getTitlefragmentsJoinTitle($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
-        if ($v === null) {
-            $this->setAuthorId(NULL);
-        } else {
-            $this->setAuthorId($v->getId());
-        }
+        $query = TitlefragmentQuery::create(null, $criteria);
+        $query->joinWith('Title', $join_behavior);
 
-        if ($v === null) {
-            $this->setAuthorPersonId(NULL);
-        } else {
-            $this->setAuthorPersonId($v->getPersonId());
-        }
-
-        $this->aAuthor = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Author object, it will not be re-added.
-        if ($v !== null) {
-            $v->addAuthorWork($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated Author object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return Author The associated Author object.
-     * @throws PropelException
-     */
-    public function getAuthor(PropelPDO $con = null)
-    {
-        if ($this->aAuthor === null && ($this->author_id !== null && $this->author_person_id !== null)) {
-            $this->aAuthor = AuthorQuery::create()->findPk(array($this->author_id, $this->author_person_id), $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aAuthor->addAuthorWorks($this);
-             */
-        }
-
-        return $this->aAuthor;
+        return $this->getTitlefragments($query, $con);
     }
 
     /**
@@ -1075,10 +1088,8 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
      */
     public function clear()
     {
-        $this->work_id = null;
-        $this->author_id = null;
-        $this->author_person_id = null;
-        $this->name_id = null;
+        $this->id = null;
+        $this->name = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->clearAllReferences();
@@ -1099,10 +1110,17 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collTitlefragments) {
+                foreach ($this->collTitlefragments as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        $this->aWork = null;
-        $this->aAuthor = null;
+        if ($this->collTitlefragments instanceof PropelCollection) {
+            $this->collTitlefragments->clearIterator();
+        }
+        $this->collTitlefragments = null;
     }
 
     /**
@@ -1112,7 +1130,7 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
      */
     public function __toString()
     {
-        return (string) $this->exportTo(AuthorWorkPeer::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(TitlefragmenttypePeer::DEFAULT_STRING_FORMAT);
     }
 
     /**

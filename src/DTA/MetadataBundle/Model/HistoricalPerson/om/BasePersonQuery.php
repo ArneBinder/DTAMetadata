@@ -32,13 +32,13 @@ use DTA\MetadataBundle\Model\HistoricalPerson\Translator;
  * @method PersonQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method PersonQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method PersonQuery leftJoinAuthor($relationAlias = null) Adds a LEFT JOIN clause to the query using the Author relation
- * @method PersonQuery rightJoinAuthor($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Author relation
- * @method PersonQuery innerJoinAuthor($relationAlias = null) Adds a INNER JOIN clause to the query using the Author relation
- *
  * @method PersonQuery leftJoinPersonalname($relationAlias = null) Adds a LEFT JOIN clause to the query using the Personalname relation
  * @method PersonQuery rightJoinPersonalname($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Personalname relation
  * @method PersonQuery innerJoinPersonalname($relationAlias = null) Adds a INNER JOIN clause to the query using the Personalname relation
+ *
+ * @method PersonQuery leftJoinAuthor($relationAlias = null) Adds a LEFT JOIN clause to the query using the Author relation
+ * @method PersonQuery rightJoinAuthor($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Author relation
+ * @method PersonQuery innerJoinAuthor($relationAlias = null) Adds a INNER JOIN clause to the query using the Author relation
  *
  * @method PersonQuery leftJoinPrinter($relationAlias = null) Adds a LEFT JOIN clause to the query using the Printer relation
  * @method PersonQuery rightJoinPrinter($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Printer relation
@@ -306,80 +306,6 @@ abstract class BasePersonQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Author object
-     *
-     * @param   Author|PropelObjectCollection $author  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   PersonQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByAuthor($author, $comparison = null)
-    {
-        if ($author instanceof Author) {
-            return $this
-                ->addUsingAlias(PersonPeer::ID, $author->getPersonId(), $comparison);
-        } elseif ($author instanceof PropelObjectCollection) {
-            return $this
-                ->useAuthorQuery()
-                ->filterByPrimaryKeys($author->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByAuthor() only accepts arguments of type Author or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Author relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return PersonQuery The current query, for fluid interface
-     */
-    public function joinAuthor($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Author');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Author');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Author relation Author object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\HistoricalPerson\AuthorQuery A secondary query class using the current class as primary query
-     */
-    public function useAuthorQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinAuthor($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Author', '\DTA\MetadataBundle\Model\HistoricalPerson\AuthorQuery');
-    }
-
-    /**
      * Filter the query by a related Personalname object
      *
      * @param   Personalname|PropelObjectCollection $personalname  the related object to use as filter
@@ -451,6 +377,80 @@ abstract class BasePersonQuery extends ModelCriteria
         return $this
             ->joinPersonalname($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Personalname', '\DTA\MetadataBundle\Model\Description\PersonalnameQuery');
+    }
+
+    /**
+     * Filter the query by a related Author object
+     *
+     * @param   Author|PropelObjectCollection $author  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   PersonQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByAuthor($author, $comparison = null)
+    {
+        if ($author instanceof Author) {
+            return $this
+                ->addUsingAlias(PersonPeer::ID, $author->getPersonId(), $comparison);
+        } elseif ($author instanceof PropelObjectCollection) {
+            return $this
+                ->useAuthorQuery()
+                ->filterByPrimaryKeys($author->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByAuthor() only accepts arguments of type Author or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Author relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return PersonQuery The current query, for fluid interface
+     */
+    public function joinAuthor($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Author');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Author');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Author relation Author object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\HistoricalPerson\AuthorQuery A secondary query class using the current class as primary query
+     */
+    public function useAuthorQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinAuthor($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Author', '\DTA\MetadataBundle\Model\HistoricalPerson\AuthorQuery');
     }
 
     /**

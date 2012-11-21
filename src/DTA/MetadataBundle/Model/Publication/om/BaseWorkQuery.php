@@ -12,12 +12,11 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
-use DTA\MetadataBundle\Model\AuthorWork;
 use DTA\MetadataBundle\Model\Classification\Dwdsgenre;
 use DTA\MetadataBundle\Model\Classification\Genre;
 use DTA\MetadataBundle\Model\Description\Datespecification;
-use DTA\MetadataBundle\Model\Description\Title;
 use DTA\MetadataBundle\Model\HistoricalPerson\Author;
+use DTA\MetadataBundle\Model\HistoricalPerson\AuthorWork;
 use DTA\MetadataBundle\Model\Publication\Work;
 use DTA\MetadataBundle\Model\Publication\WorkPeer;
 use DTA\MetadataBundle\Model\Publication\WorkQuery;
@@ -80,10 +79,6 @@ use DTA\MetadataBundle\Model\Workflow\Status;
  * @method WorkQuery leftJoinAuthorWork($relationAlias = null) Adds a LEFT JOIN clause to the query using the AuthorWork relation
  * @method WorkQuery rightJoinAuthorWork($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AuthorWork relation
  * @method WorkQuery innerJoinAuthorWork($relationAlias = null) Adds a INNER JOIN clause to the query using the AuthorWork relation
- *
- * @method WorkQuery leftJoinTitle($relationAlias = null) Adds a LEFT JOIN clause to the query using the Title relation
- * @method WorkQuery rightJoinTitle($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Title relation
- * @method WorkQuery innerJoinTitle($relationAlias = null) Adds a INNER JOIN clause to the query using the Title relation
  *
  * @method WorkQuery leftJoinWrit($relationAlias = null) Adds a LEFT JOIN clause to the query using the Writ relation
  * @method WorkQuery rightJoinWrit($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Writ relation
@@ -1226,87 +1221,13 @@ abstract class BaseWorkQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \DTA\MetadataBundle\Model\AuthorWorkQuery A secondary query class using the current class as primary query
+     * @return   \DTA\MetadataBundle\Model\HistoricalPerson\AuthorWorkQuery A secondary query class using the current class as primary query
      */
     public function useAuthorWorkQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
             ->joinAuthorWork($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'AuthorWork', '\DTA\MetadataBundle\Model\AuthorWorkQuery');
-    }
-
-    /**
-     * Filter the query by a related Title object
-     *
-     * @param   Title|PropelObjectCollection $title  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   WorkQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByTitle($title, $comparison = null)
-    {
-        if ($title instanceof Title) {
-            return $this
-                ->addUsingAlias(WorkPeer::ID, $title->getWorkId(), $comparison);
-        } elseif ($title instanceof PropelObjectCollection) {
-            return $this
-                ->useTitleQuery()
-                ->filterByPrimaryKeys($title->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByTitle() only accepts arguments of type Title or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Title relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return WorkQuery The current query, for fluid interface
-     */
-    public function joinTitle($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Title');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Title');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Title relation Title object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\Description\TitleQuery A secondary query class using the current class as primary query
-     */
-    public function useTitleQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinTitle($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Title', '\DTA\MetadataBundle\Model\Description\TitleQuery');
+            ->useQuery($relationAlias ? $relationAlias : 'AuthorWork', '\DTA\MetadataBundle\Model\HistoricalPerson\AuthorWorkQuery');
     }
 
     /**

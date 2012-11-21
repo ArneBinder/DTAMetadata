@@ -1,6 +1,6 @@
 <?php
 
-namespace DTA\MetadataBundle\Model\om;
+namespace DTA\MetadataBundle\Model\HistoricalPerson\om;
 
 use \BasePeer;
 use \Criteria;
@@ -9,11 +9,11 @@ use \PDOStatement;
 use \Propel;
 use \PropelException;
 use \PropelPDO;
-use DTA\MetadataBundle\Model\AuthorWork;
-use DTA\MetadataBundle\Model\AuthorWorkPeer;
 use DTA\MetadataBundle\Model\HistoricalPerson\AuthorPeer;
+use DTA\MetadataBundle\Model\HistoricalPerson\AuthorWork;
+use DTA\MetadataBundle\Model\HistoricalPerson\AuthorWorkPeer;
+use DTA\MetadataBundle\Model\HistoricalPerson\map\AuthorWorkTableMap;
 use DTA\MetadataBundle\Model\Publication\WorkPeer;
-use DTA\MetadataBundle\Model\map\AuthorWorkTableMap;
 
 abstract class BaseAuthorWorkPeer
 {
@@ -25,7 +25,7 @@ abstract class BaseAuthorWorkPeer
     const TABLE_NAME = 'author_work';
 
     /** the related Propel class for this table */
-    const OM_CLASS = 'DTA\\MetadataBundle\\Model\\AuthorWork';
+    const OM_CLASS = 'DTA\\MetadataBundle\\Model\\HistoricalPerson\\AuthorWork';
 
     /** the related TableMap class for this table */
     const TM_CLASS = 'AuthorWorkTableMap';

@@ -11,6 +11,7 @@ use \PropelException;
 use \PropelPDO;
 use DTA\MetadataBundle\Model\Description\DatespecificationPeer;
 use DTA\MetadataBundle\Model\Description\PlacePeer;
+use DTA\MetadataBundle\Model\Description\TitlePeer;
 use DTA\MetadataBundle\Model\Publication\Publication;
 use DTA\MetadataBundle\Model\Publication\PublicationPeer;
 use DTA\MetadataBundle\Model\Publication\PublishingcompanyPeer;
@@ -32,16 +33,19 @@ abstract class BasePublicationPeer
     const TM_CLASS = 'PublicationTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 10;
+    const NUM_COLUMNS = 11;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 10;
+    const NUM_HYDRATE_COLUMNS = 11;
 
     /** the column name for the ID field */
     const ID = 'publication.ID';
+
+    /** the column name for the TITLE_ID field */
+    const TITLE_ID = 'publication.TITLE_ID';
 
     /** the column name for the PUBLISHINGCOMPANY_ID field */
     const PUBLISHINGCOMPANY_ID = 'publication.PUBLISHINGCOMPANY_ID';
@@ -89,12 +93,12 @@ abstract class BasePublicationPeer
      * e.g. PublicationPeer::$fieldNames[PublicationPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'PublishingcompanyId', 'PlaceId', 'DatespecificationId', 'Printrun', 'Printruncomment', 'Edition', 'Numpages', 'Numpagesnormed', 'Bibliographiccitation', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publishingcompanyId', 'placeId', 'datespecificationId', 'printrun', 'printruncomment', 'edition', 'numpages', 'numpagesnormed', 'bibliographiccitation', ),
-        BasePeer::TYPE_COLNAME => array (PublicationPeer::ID, PublicationPeer::PUBLISHINGCOMPANY_ID, PublicationPeer::PLACE_ID, PublicationPeer::DATESPECIFICATION_ID, PublicationPeer::PRINTRUN, PublicationPeer::PRINTRUNCOMMENT, PublicationPeer::EDITION, PublicationPeer::NUMPAGES, PublicationPeer::NUMPAGESNORMED, PublicationPeer::BIBLIOGRAPHICCITATION, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLISHINGCOMPANY_ID', 'PLACE_ID', 'DATESPECIFICATION_ID', 'PRINTRUN', 'PRINTRUNCOMMENT', 'EDITION', 'NUMPAGES', 'NUMPAGESNORMED', 'BIBLIOGRAPHICCITATION', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'publishingCompany_id', 'place_id', 'dateSpecification_id', 'printRun', 'printRunComment', 'edition', 'numPages', 'numPagesNormed', 'bibliographicCitation', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'TitleId', 'PublishingcompanyId', 'PlaceId', 'DatespecificationId', 'Printrun', 'Printruncomment', 'Edition', 'Numpages', 'Numpagesnormed', 'Bibliographiccitation', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'titleId', 'publishingcompanyId', 'placeId', 'datespecificationId', 'printrun', 'printruncomment', 'edition', 'numpages', 'numpagesnormed', 'bibliographiccitation', ),
+        BasePeer::TYPE_COLNAME => array (PublicationPeer::ID, PublicationPeer::TITLE_ID, PublicationPeer::PUBLISHINGCOMPANY_ID, PublicationPeer::PLACE_ID, PublicationPeer::DATESPECIFICATION_ID, PublicationPeer::PRINTRUN, PublicationPeer::PRINTRUNCOMMENT, PublicationPeer::EDITION, PublicationPeer::NUMPAGES, PublicationPeer::NUMPAGESNORMED, PublicationPeer::BIBLIOGRAPHICCITATION, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TITLE_ID', 'PUBLISHINGCOMPANY_ID', 'PLACE_ID', 'DATESPECIFICATION_ID', 'PRINTRUN', 'PRINTRUNCOMMENT', 'EDITION', 'NUMPAGES', 'NUMPAGESNORMED', 'BIBLIOGRAPHICCITATION', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'title_id', 'publishingCompany_id', 'place_id', 'dateSpecification_id', 'printRun', 'printRunComment', 'edition', 'numPages', 'numPagesNormed', 'bibliographicCitation', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
     );
 
     /**
@@ -104,12 +108,12 @@ abstract class BasePublicationPeer
      * e.g. PublicationPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublishingcompanyId' => 1, 'PlaceId' => 2, 'DatespecificationId' => 3, 'Printrun' => 4, 'Printruncomment' => 5, 'Edition' => 6, 'Numpages' => 7, 'Numpagesnormed' => 8, 'Bibliographiccitation' => 9, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publishingcompanyId' => 1, 'placeId' => 2, 'datespecificationId' => 3, 'printrun' => 4, 'printruncomment' => 5, 'edition' => 6, 'numpages' => 7, 'numpagesnormed' => 8, 'bibliographiccitation' => 9, ),
-        BasePeer::TYPE_COLNAME => array (PublicationPeer::ID => 0, PublicationPeer::PUBLISHINGCOMPANY_ID => 1, PublicationPeer::PLACE_ID => 2, PublicationPeer::DATESPECIFICATION_ID => 3, PublicationPeer::PRINTRUN => 4, PublicationPeer::PRINTRUNCOMMENT => 5, PublicationPeer::EDITION => 6, PublicationPeer::NUMPAGES => 7, PublicationPeer::NUMPAGESNORMED => 8, PublicationPeer::BIBLIOGRAPHICCITATION => 9, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLISHINGCOMPANY_ID' => 1, 'PLACE_ID' => 2, 'DATESPECIFICATION_ID' => 3, 'PRINTRUN' => 4, 'PRINTRUNCOMMENT' => 5, 'EDITION' => 6, 'NUMPAGES' => 7, 'NUMPAGESNORMED' => 8, 'BIBLIOGRAPHICCITATION' => 9, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publishingCompany_id' => 1, 'place_id' => 2, 'dateSpecification_id' => 3, 'printRun' => 4, 'printRunComment' => 5, 'edition' => 6, 'numPages' => 7, 'numPagesNormed' => 8, 'bibliographicCitation' => 9, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'TitleId' => 1, 'PublishingcompanyId' => 2, 'PlaceId' => 3, 'DatespecificationId' => 4, 'Printrun' => 5, 'Printruncomment' => 6, 'Edition' => 7, 'Numpages' => 8, 'Numpagesnormed' => 9, 'Bibliographiccitation' => 10, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'titleId' => 1, 'publishingcompanyId' => 2, 'placeId' => 3, 'datespecificationId' => 4, 'printrun' => 5, 'printruncomment' => 6, 'edition' => 7, 'numpages' => 8, 'numpagesnormed' => 9, 'bibliographiccitation' => 10, ),
+        BasePeer::TYPE_COLNAME => array (PublicationPeer::ID => 0, PublicationPeer::TITLE_ID => 1, PublicationPeer::PUBLISHINGCOMPANY_ID => 2, PublicationPeer::PLACE_ID => 3, PublicationPeer::DATESPECIFICATION_ID => 4, PublicationPeer::PRINTRUN => 5, PublicationPeer::PRINTRUNCOMMENT => 6, PublicationPeer::EDITION => 7, PublicationPeer::NUMPAGES => 8, PublicationPeer::NUMPAGESNORMED => 9, PublicationPeer::BIBLIOGRAPHICCITATION => 10, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TITLE_ID' => 1, 'PUBLISHINGCOMPANY_ID' => 2, 'PLACE_ID' => 3, 'DATESPECIFICATION_ID' => 4, 'PRINTRUN' => 5, 'PRINTRUNCOMMENT' => 6, 'EDITION' => 7, 'NUMPAGES' => 8, 'NUMPAGESNORMED' => 9, 'BIBLIOGRAPHICCITATION' => 10, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'title_id' => 1, 'publishingCompany_id' => 2, 'place_id' => 3, 'dateSpecification_id' => 4, 'printRun' => 5, 'printRunComment' => 6, 'edition' => 7, 'numPages' => 8, 'numPagesNormed' => 9, 'bibliographicCitation' => 10, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
     );
 
     /**
@@ -184,6 +188,7 @@ abstract class BasePublicationPeer
     {
         if (null === $alias) {
             $criteria->addSelectColumn(PublicationPeer::ID);
+            $criteria->addSelectColumn(PublicationPeer::TITLE_ID);
             $criteria->addSelectColumn(PublicationPeer::PUBLISHINGCOMPANY_ID);
             $criteria->addSelectColumn(PublicationPeer::PLACE_ID);
             $criteria->addSelectColumn(PublicationPeer::DATESPECIFICATION_ID);
@@ -195,6 +200,7 @@ abstract class BasePublicationPeer
             $criteria->addSelectColumn(PublicationPeer::BIBLIOGRAPHICCITATION);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
+            $criteria->addSelectColumn($alias . '.TITLE_ID');
             $criteria->addSelectColumn($alias . '.PUBLISHINGCOMPANY_ID');
             $criteria->addSelectColumn($alias . '.PLACE_ID');
             $criteria->addSelectColumn($alias . '.DATESPECIFICATION_ID');
@@ -501,6 +507,57 @@ abstract class BasePublicationPeer
 
 
     /**
+     * Returns the number of rows matching criteria, joining the related Title table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinTitle(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(PublicationPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            PublicationPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(PublicationPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(PublicationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(PublicationPeer::TITLE_ID, TitlePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
      * Returns the number of rows matching criteria, joining the related Publishingcompany table
      *
      * @param      Criteria $criteria
@@ -650,6 +707,73 @@ abstract class BasePublicationPeer
         $stmt->closeCursor();
 
         return $count;
+    }
+
+
+    /**
+     * Selects a collection of Publication objects pre-filled with their Title objects.
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Publication objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinTitle(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(PublicationPeer::DATABASE_NAME);
+        }
+
+        PublicationPeer::addSelectColumns($criteria);
+        $startcol = PublicationPeer::NUM_HYDRATE_COLUMNS;
+        TitlePeer::addSelectColumns($criteria);
+
+        $criteria->addJoin(PublicationPeer::TITLE_ID, TitlePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = PublicationPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = PublicationPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+
+                $cls = PublicationPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                PublicationPeer::addInstanceToPool($obj1, $key1);
+            } // if $obj1 already loaded
+
+            $key2 = TitlePeer::getPrimaryKeyHashFromRow($row, $startcol);
+            if ($key2 !== null) {
+                $obj2 = TitlePeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = TitlePeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol);
+                    TitlePeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 already loaded
+
+                // Add the $obj1 (Publication) to $obj2 (Title)
+                $obj2->addPublication($obj1);
+
+            } // if joined row was not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
     }
 
 
@@ -890,6 +1014,8 @@ abstract class BasePublicationPeer
             $con = Propel::getConnection(PublicationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
+        $criteria->addJoin(PublicationPeer::TITLE_ID, TitlePeer::ID, $join_behavior);
+
         $criteria->addJoin(PublicationPeer::PUBLISHINGCOMPANY_ID, PublishingcompanyPeer::ID, $join_behavior);
 
         $criteria->addJoin(PublicationPeer::PLACE_ID, PlacePeer::ID, $join_behavior);
@@ -930,14 +1056,19 @@ abstract class BasePublicationPeer
         PublicationPeer::addSelectColumns($criteria);
         $startcol2 = PublicationPeer::NUM_HYDRATE_COLUMNS;
 
+        TitlePeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + TitlePeer::NUM_HYDRATE_COLUMNS;
+
         PublishingcompanyPeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + PublishingcompanyPeer::NUM_HYDRATE_COLUMNS;
+        $startcol4 = $startcol3 + PublishingcompanyPeer::NUM_HYDRATE_COLUMNS;
 
         PlacePeer::addSelectColumns($criteria);
-        $startcol4 = $startcol3 + PlacePeer::NUM_HYDRATE_COLUMNS;
+        $startcol5 = $startcol4 + PlacePeer::NUM_HYDRATE_COLUMNS;
 
         DatespecificationPeer::addSelectColumns($criteria);
-        $startcol5 = $startcol4 + DatespecificationPeer::NUM_HYDRATE_COLUMNS;
+        $startcol6 = $startcol5 + DatespecificationPeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(PublicationPeer::TITLE_ID, TitlePeer::ID, $join_behavior);
 
         $criteria->addJoin(PublicationPeer::PUBLISHINGCOMPANY_ID, PublishingcompanyPeer::ID, $join_behavior);
 
@@ -962,58 +1093,76 @@ abstract class BasePublicationPeer
                 PublicationPeer::addInstanceToPool($obj1, $key1);
             } // if obj1 already loaded
 
-            // Add objects for joined Publishingcompany rows
+            // Add objects for joined Title rows
 
-            $key2 = PublishingcompanyPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+            $key2 = TitlePeer::getPrimaryKeyHashFromRow($row, $startcol2);
             if ($key2 !== null) {
-                $obj2 = PublishingcompanyPeer::getInstanceFromPool($key2);
+                $obj2 = TitlePeer::getInstanceFromPool($key2);
                 if (!$obj2) {
 
-                    $cls = PublishingcompanyPeer::getOMClass();
+                    $cls = TitlePeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol2);
-                    PublishingcompanyPeer::addInstanceToPool($obj2, $key2);
+                    TitlePeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 loaded
 
-                // Add the $obj1 (Publication) to the collection in $obj2 (Publishingcompany)
+                // Add the $obj1 (Publication) to the collection in $obj2 (Title)
                 $obj2->addPublication($obj1);
+            } // if joined row not null
+
+            // Add objects for joined Publishingcompany rows
+
+            $key3 = PublishingcompanyPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+            if ($key3 !== null) {
+                $obj3 = PublishingcompanyPeer::getInstanceFromPool($key3);
+                if (!$obj3) {
+
+                    $cls = PublishingcompanyPeer::getOMClass();
+
+                    $obj3 = new $cls();
+                    $obj3->hydrate($row, $startcol3);
+                    PublishingcompanyPeer::addInstanceToPool($obj3, $key3);
+                } // if obj3 loaded
+
+                // Add the $obj1 (Publication) to the collection in $obj3 (Publishingcompany)
+                $obj3->addPublication($obj1);
             } // if joined row not null
 
             // Add objects for joined Place rows
 
-            $key3 = PlacePeer::getPrimaryKeyHashFromRow($row, $startcol3);
-            if ($key3 !== null) {
-                $obj3 = PlacePeer::getInstanceFromPool($key3);
-                if (!$obj3) {
+            $key4 = PlacePeer::getPrimaryKeyHashFromRow($row, $startcol4);
+            if ($key4 !== null) {
+                $obj4 = PlacePeer::getInstanceFromPool($key4);
+                if (!$obj4) {
 
                     $cls = PlacePeer::getOMClass();
 
-                    $obj3 = new $cls();
-                    $obj3->hydrate($row, $startcol3);
-                    PlacePeer::addInstanceToPool($obj3, $key3);
-                } // if obj3 loaded
+                    $obj4 = new $cls();
+                    $obj4->hydrate($row, $startcol4);
+                    PlacePeer::addInstanceToPool($obj4, $key4);
+                } // if obj4 loaded
 
-                // Add the $obj1 (Publication) to the collection in $obj3 (Place)
-                $obj3->addPublication($obj1);
+                // Add the $obj1 (Publication) to the collection in $obj4 (Place)
+                $obj4->addPublication($obj1);
             } // if joined row not null
 
             // Add objects for joined Datespecification rows
 
-            $key4 = DatespecificationPeer::getPrimaryKeyHashFromRow($row, $startcol4);
-            if ($key4 !== null) {
-                $obj4 = DatespecificationPeer::getInstanceFromPool($key4);
-                if (!$obj4) {
+            $key5 = DatespecificationPeer::getPrimaryKeyHashFromRow($row, $startcol5);
+            if ($key5 !== null) {
+                $obj5 = DatespecificationPeer::getInstanceFromPool($key5);
+                if (!$obj5) {
 
                     $cls = DatespecificationPeer::getOMClass();
 
-                    $obj4 = new $cls();
-                    $obj4->hydrate($row, $startcol4);
-                    DatespecificationPeer::addInstanceToPool($obj4, $key4);
-                } // if obj4 loaded
+                    $obj5 = new $cls();
+                    $obj5->hydrate($row, $startcol5);
+                    DatespecificationPeer::addInstanceToPool($obj5, $key5);
+                } // if obj5 loaded
 
-                // Add the $obj1 (Publication) to the collection in $obj4 (Datespecification)
-                $obj4->addPublication($obj1);
+                // Add the $obj1 (Publication) to the collection in $obj5 (Datespecification)
+                $obj5->addPublication($obj1);
             } // if joined row not null
 
             $results[] = $obj1;
@@ -1021,6 +1170,61 @@ abstract class BasePublicationPeer
         $stmt->closeCursor();
 
         return $results;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Title table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAllExceptTitle(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(PublicationPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            PublicationPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
+
+        // Set the correct dbName
+        $criteria->setDbName(PublicationPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(PublicationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(PublicationPeer::PUBLISHINGCOMPANY_ID, PublishingcompanyPeer::ID, $join_behavior);
+
+        $criteria->addJoin(PublicationPeer::PLACE_ID, PlacePeer::ID, $join_behavior);
+
+        $criteria->addJoin(PublicationPeer::DATESPECIFICATION_ID, DatespecificationPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
     }
 
 
@@ -1059,6 +1263,8 @@ abstract class BasePublicationPeer
         if ($con === null) {
             $con = Propel::getConnection(PublicationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
+
+        $criteria->addJoin(PublicationPeer::TITLE_ID, TitlePeer::ID, $join_behavior);
 
         $criteria->addJoin(PublicationPeer::PLACE_ID, PlacePeer::ID, $join_behavior);
 
@@ -1113,6 +1319,8 @@ abstract class BasePublicationPeer
             $con = Propel::getConnection(PublicationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
+        $criteria->addJoin(PublicationPeer::TITLE_ID, TitlePeer::ID, $join_behavior);
+
         $criteria->addJoin(PublicationPeer::PUBLISHINGCOMPANY_ID, PublishingcompanyPeer::ID, $join_behavior);
 
         $criteria->addJoin(PublicationPeer::DATESPECIFICATION_ID, DatespecificationPeer::ID, $join_behavior);
@@ -1166,6 +1374,8 @@ abstract class BasePublicationPeer
             $con = Propel::getConnection(PublicationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
+        $criteria->addJoin(PublicationPeer::TITLE_ID, TitlePeer::ID, $join_behavior);
+
         $criteria->addJoin(PublicationPeer::PUBLISHINGCOMPANY_ID, PublishingcompanyPeer::ID, $join_behavior);
 
         $criteria->addJoin(PublicationPeer::PLACE_ID, PlacePeer::ID, $join_behavior);
@@ -1184,7 +1394,7 @@ abstract class BasePublicationPeer
 
 
     /**
-     * Selects a collection of Publication objects pre-filled with all related objects except Publishingcompany.
+     * Selects a collection of Publication objects pre-filled with all related objects except Title.
      *
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
@@ -1193,203 +1403,7 @@ abstract class BasePublicationPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinAllExceptPublishingcompany(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $criteria = clone $criteria;
-
-        // Set the correct dbName if it has not been overridden
-        // $criteria->getDbName() will return the same object if not set to another value
-        // so == check is okay and faster
-        if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(PublicationPeer::DATABASE_NAME);
-        }
-
-        PublicationPeer::addSelectColumns($criteria);
-        $startcol2 = PublicationPeer::NUM_HYDRATE_COLUMNS;
-
-        PlacePeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + PlacePeer::NUM_HYDRATE_COLUMNS;
-
-        DatespecificationPeer::addSelectColumns($criteria);
-        $startcol4 = $startcol3 + DatespecificationPeer::NUM_HYDRATE_COLUMNS;
-
-        $criteria->addJoin(PublicationPeer::PLACE_ID, PlacePeer::ID, $join_behavior);
-
-        $criteria->addJoin(PublicationPeer::DATESPECIFICATION_ID, DatespecificationPeer::ID, $join_behavior);
-
-
-        $stmt = BasePeer::doSelect($criteria, $con);
-        $results = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = PublicationPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = PublicationPeer::getInstanceFromPool($key1))) {
-                // We no longer rehydrate the object, since this can cause data loss.
-                // See http://www.propelorm.org/ticket/509
-                // $obj1->hydrate($row, 0, true); // rehydrate
-            } else {
-                $cls = PublicationPeer::getOMClass();
-
-                $obj1 = new $cls();
-                $obj1->hydrate($row);
-                PublicationPeer::addInstanceToPool($obj1, $key1);
-            } // if obj1 already loaded
-
-                // Add objects for joined Place rows
-
-                $key2 = PlacePeer::getPrimaryKeyHashFromRow($row, $startcol2);
-                if ($key2 !== null) {
-                    $obj2 = PlacePeer::getInstanceFromPool($key2);
-                    if (!$obj2) {
-
-                        $cls = PlacePeer::getOMClass();
-
-                    $obj2 = new $cls();
-                    $obj2->hydrate($row, $startcol2);
-                    PlacePeer::addInstanceToPool($obj2, $key2);
-                } // if $obj2 already loaded
-
-                // Add the $obj1 (Publication) to the collection in $obj2 (Place)
-                $obj2->addPublication($obj1);
-
-            } // if joined row is not null
-
-                // Add objects for joined Datespecification rows
-
-                $key3 = DatespecificationPeer::getPrimaryKeyHashFromRow($row, $startcol3);
-                if ($key3 !== null) {
-                    $obj3 = DatespecificationPeer::getInstanceFromPool($key3);
-                    if (!$obj3) {
-
-                        $cls = DatespecificationPeer::getOMClass();
-
-                    $obj3 = new $cls();
-                    $obj3->hydrate($row, $startcol3);
-                    DatespecificationPeer::addInstanceToPool($obj3, $key3);
-                } // if $obj3 already loaded
-
-                // Add the $obj1 (Publication) to the collection in $obj3 (Datespecification)
-                $obj3->addPublication($obj1);
-
-            } // if joined row is not null
-
-            $results[] = $obj1;
-        }
-        $stmt->closeCursor();
-
-        return $results;
-    }
-
-
-    /**
-     * Selects a collection of Publication objects pre-filled with all related objects except Place.
-     *
-     * @param      Criteria  $criteria
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of Publication objects.
-     * @throws PropelException Any exceptions caught during processing will be
-     *		 rethrown wrapped into a PropelException.
-     */
-    public static function doSelectJoinAllExceptPlace(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $criteria = clone $criteria;
-
-        // Set the correct dbName if it has not been overridden
-        // $criteria->getDbName() will return the same object if not set to another value
-        // so == check is okay and faster
-        if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(PublicationPeer::DATABASE_NAME);
-        }
-
-        PublicationPeer::addSelectColumns($criteria);
-        $startcol2 = PublicationPeer::NUM_HYDRATE_COLUMNS;
-
-        PublishingcompanyPeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + PublishingcompanyPeer::NUM_HYDRATE_COLUMNS;
-
-        DatespecificationPeer::addSelectColumns($criteria);
-        $startcol4 = $startcol3 + DatespecificationPeer::NUM_HYDRATE_COLUMNS;
-
-        $criteria->addJoin(PublicationPeer::PUBLISHINGCOMPANY_ID, PublishingcompanyPeer::ID, $join_behavior);
-
-        $criteria->addJoin(PublicationPeer::DATESPECIFICATION_ID, DatespecificationPeer::ID, $join_behavior);
-
-
-        $stmt = BasePeer::doSelect($criteria, $con);
-        $results = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = PublicationPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = PublicationPeer::getInstanceFromPool($key1))) {
-                // We no longer rehydrate the object, since this can cause data loss.
-                // See http://www.propelorm.org/ticket/509
-                // $obj1->hydrate($row, 0, true); // rehydrate
-            } else {
-                $cls = PublicationPeer::getOMClass();
-
-                $obj1 = new $cls();
-                $obj1->hydrate($row);
-                PublicationPeer::addInstanceToPool($obj1, $key1);
-            } // if obj1 already loaded
-
-                // Add objects for joined Publishingcompany rows
-
-                $key2 = PublishingcompanyPeer::getPrimaryKeyHashFromRow($row, $startcol2);
-                if ($key2 !== null) {
-                    $obj2 = PublishingcompanyPeer::getInstanceFromPool($key2);
-                    if (!$obj2) {
-
-                        $cls = PublishingcompanyPeer::getOMClass();
-
-                    $obj2 = new $cls();
-                    $obj2->hydrate($row, $startcol2);
-                    PublishingcompanyPeer::addInstanceToPool($obj2, $key2);
-                } // if $obj2 already loaded
-
-                // Add the $obj1 (Publication) to the collection in $obj2 (Publishingcompany)
-                $obj2->addPublication($obj1);
-
-            } // if joined row is not null
-
-                // Add objects for joined Datespecification rows
-
-                $key3 = DatespecificationPeer::getPrimaryKeyHashFromRow($row, $startcol3);
-                if ($key3 !== null) {
-                    $obj3 = DatespecificationPeer::getInstanceFromPool($key3);
-                    if (!$obj3) {
-
-                        $cls = DatespecificationPeer::getOMClass();
-
-                    $obj3 = new $cls();
-                    $obj3->hydrate($row, $startcol3);
-                    DatespecificationPeer::addInstanceToPool($obj3, $key3);
-                } // if $obj3 already loaded
-
-                // Add the $obj1 (Publication) to the collection in $obj3 (Datespecification)
-                $obj3->addPublication($obj1);
-
-            } // if joined row is not null
-
-            $results[] = $obj1;
-        }
-        $stmt->closeCursor();
-
-        return $results;
-    }
-
-
-    /**
-     * Selects a collection of Publication objects pre-filled with all related objects except Datespecification.
-     *
-     * @param      Criteria  $criteria
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of Publication objects.
-     * @throws PropelException Any exceptions caught during processing will be
-     *		 rethrown wrapped into a PropelException.
-     */
-    public static function doSelectJoinAllExceptDatespecification(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinAllExceptTitle(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -1409,9 +1423,14 @@ abstract class BasePublicationPeer
         PlacePeer::addSelectColumns($criteria);
         $startcol4 = $startcol3 + PlacePeer::NUM_HYDRATE_COLUMNS;
 
+        DatespecificationPeer::addSelectColumns($criteria);
+        $startcol5 = $startcol4 + DatespecificationPeer::NUM_HYDRATE_COLUMNS;
+
         $criteria->addJoin(PublicationPeer::PUBLISHINGCOMPANY_ID, PublishingcompanyPeer::ID, $join_behavior);
 
         $criteria->addJoin(PublicationPeer::PLACE_ID, PlacePeer::ID, $join_behavior);
+
+        $criteria->addJoin(PublicationPeer::DATESPECIFICATION_ID, DatespecificationPeer::ID, $join_behavior);
 
 
         $stmt = BasePeer::doSelect($criteria, $con);
@@ -1466,6 +1485,391 @@ abstract class BasePublicationPeer
 
                 // Add the $obj1 (Publication) to the collection in $obj3 (Place)
                 $obj3->addPublication($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Datespecification rows
+
+                $key4 = DatespecificationPeer::getPrimaryKeyHashFromRow($row, $startcol4);
+                if ($key4 !== null) {
+                    $obj4 = DatespecificationPeer::getInstanceFromPool($key4);
+                    if (!$obj4) {
+
+                        $cls = DatespecificationPeer::getOMClass();
+
+                    $obj4 = new $cls();
+                    $obj4->hydrate($row, $startcol4);
+                    DatespecificationPeer::addInstanceToPool($obj4, $key4);
+                } // if $obj4 already loaded
+
+                // Add the $obj1 (Publication) to the collection in $obj4 (Datespecification)
+                $obj4->addPublication($obj1);
+
+            } // if joined row is not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Selects a collection of Publication objects pre-filled with all related objects except Publishingcompany.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Publication objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAllExceptPublishingcompany(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        // $criteria->getDbName() will return the same object if not set to another value
+        // so == check is okay and faster
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(PublicationPeer::DATABASE_NAME);
+        }
+
+        PublicationPeer::addSelectColumns($criteria);
+        $startcol2 = PublicationPeer::NUM_HYDRATE_COLUMNS;
+
+        TitlePeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + TitlePeer::NUM_HYDRATE_COLUMNS;
+
+        PlacePeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + PlacePeer::NUM_HYDRATE_COLUMNS;
+
+        DatespecificationPeer::addSelectColumns($criteria);
+        $startcol5 = $startcol4 + DatespecificationPeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(PublicationPeer::TITLE_ID, TitlePeer::ID, $join_behavior);
+
+        $criteria->addJoin(PublicationPeer::PLACE_ID, PlacePeer::ID, $join_behavior);
+
+        $criteria->addJoin(PublicationPeer::DATESPECIFICATION_ID, DatespecificationPeer::ID, $join_behavior);
+
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = PublicationPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = PublicationPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = PublicationPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                PublicationPeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+                // Add objects for joined Title rows
+
+                $key2 = TitlePeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                if ($key2 !== null) {
+                    $obj2 = TitlePeer::getInstanceFromPool($key2);
+                    if (!$obj2) {
+
+                        $cls = TitlePeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    TitlePeer::addInstanceToPool($obj2, $key2);
+                } // if $obj2 already loaded
+
+                // Add the $obj1 (Publication) to the collection in $obj2 (Title)
+                $obj2->addPublication($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Place rows
+
+                $key3 = PlacePeer::getPrimaryKeyHashFromRow($row, $startcol3);
+                if ($key3 !== null) {
+                    $obj3 = PlacePeer::getInstanceFromPool($key3);
+                    if (!$obj3) {
+
+                        $cls = PlacePeer::getOMClass();
+
+                    $obj3 = new $cls();
+                    $obj3->hydrate($row, $startcol3);
+                    PlacePeer::addInstanceToPool($obj3, $key3);
+                } // if $obj3 already loaded
+
+                // Add the $obj1 (Publication) to the collection in $obj3 (Place)
+                $obj3->addPublication($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Datespecification rows
+
+                $key4 = DatespecificationPeer::getPrimaryKeyHashFromRow($row, $startcol4);
+                if ($key4 !== null) {
+                    $obj4 = DatespecificationPeer::getInstanceFromPool($key4);
+                    if (!$obj4) {
+
+                        $cls = DatespecificationPeer::getOMClass();
+
+                    $obj4 = new $cls();
+                    $obj4->hydrate($row, $startcol4);
+                    DatespecificationPeer::addInstanceToPool($obj4, $key4);
+                } // if $obj4 already loaded
+
+                // Add the $obj1 (Publication) to the collection in $obj4 (Datespecification)
+                $obj4->addPublication($obj1);
+
+            } // if joined row is not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Selects a collection of Publication objects pre-filled with all related objects except Place.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Publication objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAllExceptPlace(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        // $criteria->getDbName() will return the same object if not set to another value
+        // so == check is okay and faster
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(PublicationPeer::DATABASE_NAME);
+        }
+
+        PublicationPeer::addSelectColumns($criteria);
+        $startcol2 = PublicationPeer::NUM_HYDRATE_COLUMNS;
+
+        TitlePeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + TitlePeer::NUM_HYDRATE_COLUMNS;
+
+        PublishingcompanyPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + PublishingcompanyPeer::NUM_HYDRATE_COLUMNS;
+
+        DatespecificationPeer::addSelectColumns($criteria);
+        $startcol5 = $startcol4 + DatespecificationPeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(PublicationPeer::TITLE_ID, TitlePeer::ID, $join_behavior);
+
+        $criteria->addJoin(PublicationPeer::PUBLISHINGCOMPANY_ID, PublishingcompanyPeer::ID, $join_behavior);
+
+        $criteria->addJoin(PublicationPeer::DATESPECIFICATION_ID, DatespecificationPeer::ID, $join_behavior);
+
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = PublicationPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = PublicationPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = PublicationPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                PublicationPeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+                // Add objects for joined Title rows
+
+                $key2 = TitlePeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                if ($key2 !== null) {
+                    $obj2 = TitlePeer::getInstanceFromPool($key2);
+                    if (!$obj2) {
+
+                        $cls = TitlePeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    TitlePeer::addInstanceToPool($obj2, $key2);
+                } // if $obj2 already loaded
+
+                // Add the $obj1 (Publication) to the collection in $obj2 (Title)
+                $obj2->addPublication($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Publishingcompany rows
+
+                $key3 = PublishingcompanyPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+                if ($key3 !== null) {
+                    $obj3 = PublishingcompanyPeer::getInstanceFromPool($key3);
+                    if (!$obj3) {
+
+                        $cls = PublishingcompanyPeer::getOMClass();
+
+                    $obj3 = new $cls();
+                    $obj3->hydrate($row, $startcol3);
+                    PublishingcompanyPeer::addInstanceToPool($obj3, $key3);
+                } // if $obj3 already loaded
+
+                // Add the $obj1 (Publication) to the collection in $obj3 (Publishingcompany)
+                $obj3->addPublication($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Datespecification rows
+
+                $key4 = DatespecificationPeer::getPrimaryKeyHashFromRow($row, $startcol4);
+                if ($key4 !== null) {
+                    $obj4 = DatespecificationPeer::getInstanceFromPool($key4);
+                    if (!$obj4) {
+
+                        $cls = DatespecificationPeer::getOMClass();
+
+                    $obj4 = new $cls();
+                    $obj4->hydrate($row, $startcol4);
+                    DatespecificationPeer::addInstanceToPool($obj4, $key4);
+                } // if $obj4 already loaded
+
+                // Add the $obj1 (Publication) to the collection in $obj4 (Datespecification)
+                $obj4->addPublication($obj1);
+
+            } // if joined row is not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Selects a collection of Publication objects pre-filled with all related objects except Datespecification.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Publication objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAllExceptDatespecification(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        // $criteria->getDbName() will return the same object if not set to another value
+        // so == check is okay and faster
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(PublicationPeer::DATABASE_NAME);
+        }
+
+        PublicationPeer::addSelectColumns($criteria);
+        $startcol2 = PublicationPeer::NUM_HYDRATE_COLUMNS;
+
+        TitlePeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + TitlePeer::NUM_HYDRATE_COLUMNS;
+
+        PublishingcompanyPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + PublishingcompanyPeer::NUM_HYDRATE_COLUMNS;
+
+        PlacePeer::addSelectColumns($criteria);
+        $startcol5 = $startcol4 + PlacePeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(PublicationPeer::TITLE_ID, TitlePeer::ID, $join_behavior);
+
+        $criteria->addJoin(PublicationPeer::PUBLISHINGCOMPANY_ID, PublishingcompanyPeer::ID, $join_behavior);
+
+        $criteria->addJoin(PublicationPeer::PLACE_ID, PlacePeer::ID, $join_behavior);
+
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = PublicationPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = PublicationPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = PublicationPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                PublicationPeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+                // Add objects for joined Title rows
+
+                $key2 = TitlePeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                if ($key2 !== null) {
+                    $obj2 = TitlePeer::getInstanceFromPool($key2);
+                    if (!$obj2) {
+
+                        $cls = TitlePeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    TitlePeer::addInstanceToPool($obj2, $key2);
+                } // if $obj2 already loaded
+
+                // Add the $obj1 (Publication) to the collection in $obj2 (Title)
+                $obj2->addPublication($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Publishingcompany rows
+
+                $key3 = PublishingcompanyPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+                if ($key3 !== null) {
+                    $obj3 = PublishingcompanyPeer::getInstanceFromPool($key3);
+                    if (!$obj3) {
+
+                        $cls = PublishingcompanyPeer::getOMClass();
+
+                    $obj3 = new $cls();
+                    $obj3->hydrate($row, $startcol3);
+                    PublishingcompanyPeer::addInstanceToPool($obj3, $key3);
+                } // if $obj3 already loaded
+
+                // Add the $obj1 (Publication) to the collection in $obj3 (Publishingcompany)
+                $obj3->addPublication($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Place rows
+
+                $key4 = PlacePeer::getPrimaryKeyHashFromRow($row, $startcol4);
+                if ($key4 !== null) {
+                    $obj4 = PlacePeer::getInstanceFromPool($key4);
+                    if (!$obj4) {
+
+                        $cls = PlacePeer::getOMClass();
+
+                    $obj4 = new $cls();
+                    $obj4->hydrate($row, $startcol4);
+                    PlacePeer::addInstanceToPool($obj4, $key4);
+                } // if $obj4 already loaded
+
+                // Add the $obj1 (Publication) to the collection in $obj4 (Place)
+                $obj4->addPublication($obj1);
 
             } // if joined row is not null
 

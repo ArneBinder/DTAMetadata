@@ -16,7 +16,7 @@ use \TableMap;
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package    propel.generator.src.HistoricalPerson.map
+ * @package    propel.generator.src.DTA.MetadataBundle.Model.HistoricalPerson.map
  */
 class PersonTableMap extends TableMap
 {
@@ -24,7 +24,7 @@ class PersonTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'src.HistoricalPerson.map.PersonTableMap';
+    const CLASS_NAME = 'src.DTA.MetadataBundle.Model.HistoricalPerson.map.PersonTableMap';
 
     /**
      * Initialize the table attributes, columns and validators
@@ -39,7 +39,7 @@ class PersonTableMap extends TableMap
         $this->setName('person');
         $this->setPhpName('Person');
         $this->setClassname('DTA\\MetadataBundle\\Model\\HistoricalPerson\\Person');
-        $this->setPackage('src.HistoricalPerson');
+        $this->setPackage('src.DTA.MetadataBundle.Model.HistoricalPerson');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
@@ -52,8 +52,8 @@ class PersonTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Author', 'DTA\\MetadataBundle\\Model\\HistoricalPerson\\Author', RelationMap::ONE_TO_MANY, array('id' => 'person_id', ), null, null, 'Authors');
         $this->addRelation('Personalname', 'DTA\\MetadataBundle\\Model\\Description\\Personalname', RelationMap::ONE_TO_MANY, array('id' => 'person_id', ), null, null, 'Personalnames');
+        $this->addRelation('Author', 'DTA\\MetadataBundle\\Model\\HistoricalPerson\\Author', RelationMap::ONE_TO_MANY, array('id' => 'person_id', ), null, null, 'Authors');
         $this->addRelation('Printer', 'DTA\\MetadataBundle\\Model\\HistoricalPerson\\Printer', RelationMap::ONE_TO_MANY, array('id' => 'person_id', ), null, null, 'Printers');
         $this->addRelation('Publisher', 'DTA\\MetadataBundle\\Model\\HistoricalPerson\\Publisher', RelationMap::ONE_TO_MANY, array('id' => 'person_id', ), null, null, 'Publishers');
         $this->addRelation('Translator', 'DTA\\MetadataBundle\\Model\\HistoricalPerson\\Translator', RelationMap::ONE_TO_MANY, array('id' => 'person_id', ), null, null, 'Translators');

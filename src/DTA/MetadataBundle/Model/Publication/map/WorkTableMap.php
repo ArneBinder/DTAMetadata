@@ -16,7 +16,7 @@ use \TableMap;
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package    propel.generator.src.Publication.map
+ * @package    propel.generator.src.DTA.MetadataBundle.Model.Publication.map
  */
 class WorkTableMap extends TableMap
 {
@@ -24,7 +24,7 @@ class WorkTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'src.Publication.map.WorkTableMap';
+    const CLASS_NAME = 'src.DTA.MetadataBundle.Model.Publication.map.WorkTableMap';
 
     /**
      * Initialize the table attributes, columns and validators
@@ -39,7 +39,7 @@ class WorkTableMap extends TableMap
         $this->setName('work');
         $this->setPhpName('Work');
         $this->setClassname('DTA\\MetadataBundle\\Model\\Publication\\Work');
-        $this->setPackage('src.Publication');
+        $this->setPackage('src.DTA.MetadataBundle.Model.Publication');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
@@ -67,8 +67,7 @@ class WorkTableMap extends TableMap
         $this->addRelation('DwdsgenreRelatedByDwdsgenreId', 'DTA\\MetadataBundle\\Model\\Classification\\Dwdsgenre', RelationMap::MANY_TO_ONE, array('dwdsGenre_id' => 'id', ), null, null);
         $this->addRelation('DwdsgenreRelatedByDwdssubgenreId', 'DTA\\MetadataBundle\\Model\\Classification\\Dwdsgenre', RelationMap::MANY_TO_ONE, array('dwdsSubgenre_id' => 'id', ), null, null);
         $this->addRelation('Datespecification', 'DTA\\MetadataBundle\\Model\\Description\\Datespecification', RelationMap::MANY_TO_ONE, array('dateSpecification_id' => 'id', ), null, null);
-        $this->addRelation('AuthorWork', 'DTA\\MetadataBundle\\Model\\AuthorWork', RelationMap::ONE_TO_MANY, array('id' => 'work_id', ), null, null, 'AuthorWorks');
-        $this->addRelation('Title', 'DTA\\MetadataBundle\\Model\\Description\\Title', RelationMap::ONE_TO_MANY, array('id' => 'work_id', ), null, null, 'Titles');
+        $this->addRelation('AuthorWork', 'DTA\\MetadataBundle\\Model\\HistoricalPerson\\AuthorWork', RelationMap::ONE_TO_MANY, array('id' => 'work_id', ), null, null, 'AuthorWorks');
         $this->addRelation('Writ', 'DTA\\MetadataBundle\\Model\\Publication\\Writ', RelationMap::ONE_TO_MANY, array('id' => 'work_id', ), null, null, 'Writs');
         $this->addRelation('Author', 'DTA\\MetadataBundle\\Model\\HistoricalPerson\\Author', RelationMap::MANY_TO_MANY, array(), null, null, 'Authors');
     } // buildRelations()

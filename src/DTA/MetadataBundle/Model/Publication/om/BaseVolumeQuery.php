@@ -8,11 +8,9 @@ use \ModelCriteria;
 use \ModelJoin;
 use \PDO;
 use \Propel;
-use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
-use DTA\MetadataBundle\Model\Description\Title;
 use DTA\MetadataBundle\Model\Publication\Monograph;
 use DTA\MetadataBundle\Model\Publication\Volume;
 use DTA\MetadataBundle\Model\Publication\VolumePeer;
@@ -40,10 +38,6 @@ use DTA\MetadataBundle\Model\Publication\VolumeQuery;
  * @method VolumeQuery leftJoinMonograph($relationAlias = null) Adds a LEFT JOIN clause to the query using the Monograph relation
  * @method VolumeQuery rightJoinMonograph($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Monograph relation
  * @method VolumeQuery innerJoinMonograph($relationAlias = null) Adds a INNER JOIN clause to the query using the Monograph relation
- *
- * @method VolumeQuery leftJoinTitle($relationAlias = null) Adds a LEFT JOIN clause to the query using the Title relation
- * @method VolumeQuery rightJoinTitle($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Title relation
- * @method VolumeQuery innerJoinTitle($relationAlias = null) Adds a INNER JOIN clause to the query using the Title relation
  *
  * @method Volume findOne(PropelPDO $con = null) Return the first Volume matching the query
  * @method Volume findOneOrCreate(PropelPDO $con = null) Return the first Volume matching the query, or a new Volume object populated from the query conditions when no match is found
@@ -542,80 +536,6 @@ abstract class BaseVolumeQuery extends ModelCriteria
         return $this
             ->joinMonograph($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Monograph', '\DTA\MetadataBundle\Model\Publication\MonographQuery');
-    }
-
-    /**
-     * Filter the query by a related Title object
-     *
-     * @param   Title|PropelObjectCollection $title  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   VolumeQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByTitle($title, $comparison = null)
-    {
-        if ($title instanceof Title) {
-            return $this
-                ->addUsingAlias(VolumePeer::ID, $title->getVolumeId(), $comparison);
-        } elseif ($title instanceof PropelObjectCollection) {
-            return $this
-                ->useTitleQuery()
-                ->filterByPrimaryKeys($title->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByTitle() only accepts arguments of type Title or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Title relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return VolumeQuery The current query, for fluid interface
-     */
-    public function joinTitle($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Title');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Title');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Title relation Title object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\Description\TitleQuery A secondary query class using the current class as primary query
-     */
-    public function useTitleQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinTitle($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Title', '\DTA\MetadataBundle\Model\Description\TitleQuery');
     }
 
     /**

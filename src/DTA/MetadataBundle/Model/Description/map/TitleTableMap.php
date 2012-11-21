@@ -16,7 +16,7 @@ use \TableMap;
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package    propel.generator.src.Description.map
+ * @package    propel.generator.src.DTA.MetadataBundle.Model.Description.map
  */
 class TitleTableMap extends TableMap
 {
@@ -24,7 +24,7 @@ class TitleTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'src.Description.map.TitleTableMap';
+    const CLASS_NAME = 'src.DTA.MetadataBundle.Model.Description.map.TitleTableMap';
 
     /**
      * Initialize the table attributes, columns and validators
@@ -39,16 +39,10 @@ class TitleTableMap extends TableMap
         $this->setName('title');
         $this->setPhpName('Title');
         $this->setClassname('DTA\\MetadataBundle\\Model\\Description\\Title');
-        $this->setPackage('src.Description');
+        $this->setPackage('src.DTA.MetadataBundle.Model.Description');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('SEQUENCEINDEX', 'Sequenceindex', 'INTEGER', true, null, null);
-        $this->addColumn('TITLE', 'Title', 'LONGVARCHAR', true, null, null);
-        $this->addForeignKey('WORK_ID', 'WorkId', 'INTEGER', 'work', 'ID', false, null, null);
-        $this->addForeignKey('PUBLICATION_ID', 'PublicationId', 'INTEGER', 'publication', 'ID', false, null, null);
-        $this->addForeignKey('VOLUME_ID', 'VolumeId', 'INTEGER', 'volume', 'ID', false, null, null);
-        $this->addForeignKey('TITLETYPE_ID', 'TitletypeId', 'INTEGER', 'titleType', 'ID', true, null, null);
         // validators
     } // initialize()
 
@@ -57,10 +51,8 @@ class TitleTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Titletype', 'DTA\\MetadataBundle\\Model\\Description\\Titletype', RelationMap::MANY_TO_ONE, array('titleType_id' => 'id', ), null, null);
-        $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Publication\\Publication', RelationMap::MANY_TO_ONE, array('publication_id' => 'id', ), null, null);
-        $this->addRelation('Volume', 'DTA\\MetadataBundle\\Model\\Publication\\Volume', RelationMap::MANY_TO_ONE, array('volume_id' => 'id', ), null, null);
-        $this->addRelation('Work', 'DTA\\MetadataBundle\\Model\\Publication\\Work', RelationMap::MANY_TO_ONE, array('work_id' => 'id', ), null, null);
+        $this->addRelation('Titlefragment', 'DTA\\MetadataBundle\\Model\\Description\\Titlefragment', RelationMap::ONE_TO_MANY, array('id' => 'title_id', ), null, null, 'Titlefragments');
+        $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Publication\\Publication', RelationMap::ONE_TO_MANY, array('id' => 'title_id', ), null, null, 'Publications');
     } // buildRelations()
 
 } // TitleTableMap

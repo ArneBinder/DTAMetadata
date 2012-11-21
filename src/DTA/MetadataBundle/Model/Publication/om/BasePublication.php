@@ -63,6 +63,12 @@ abstract class BasePublication extends BaseObject implements Persistent
     protected $id;
 
     /**
+     * The value for the title_id field.
+     * @var        int
+     */
+    protected $title_id;
+
+    /**
      * The value for the publishingcompany_id field.
      * @var        int
      */
@@ -117,6 +123,11 @@ abstract class BasePublication extends BaseObject implements Persistent
     protected $bibliographiccitation;
 
     /**
+     * @var        Title
+     */
+    protected $aTitle;
+
+    /**
      * @var        Publishingcompany
      */
     protected $aPublishingcompany;
@@ -154,12 +165,6 @@ abstract class BasePublication extends BaseObject implements Persistent
      */
     protected $collSeries;
     protected $collSeriesPartial;
-
-    /**
-     * @var        PropelObjectCollection|Title[] Collection to store aggregation of Title objects.
-     */
-    protected $collTitles;
-    protected $collTitlesPartial;
 
     /**
      * @var        PropelObjectCollection|Writ[] Collection to store aggregation of Writ objects.
@@ -209,12 +214,6 @@ abstract class BasePublication extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $titlesScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
     protected $writsScheduledForDeletion = null;
 
     /**
@@ -225,6 +224,16 @@ abstract class BasePublication extends BaseObject implements Persistent
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * Get the [title_id] column value.
+     *
+     * @return int
+     */
+    public function getTitleId()
+    {
+        return $this->title_id;
     }
 
     /**
@@ -337,6 +346,31 @@ abstract class BasePublication extends BaseObject implements Persistent
 
         return $this;
     } // setId()
+
+    /**
+     * Set the value of [title_id] column.
+     *
+     * @param int $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setTitleId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->title_id !== $v) {
+            $this->title_id = $v;
+            $this->modifiedColumns[] = PublicationPeer::TITLE_ID;
+        }
+
+        if ($this->aTitle !== null && $this->aTitle->getId() !== $v) {
+            $this->aTitle = null;
+        }
+
+
+        return $this;
+    } // setTitleId()
 
     /**
      * Set the value of [publishingcompany_id] column.
@@ -572,15 +606,16 @@ abstract class BasePublication extends BaseObject implements Persistent
         try {
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-            $this->publishingcompany_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-            $this->place_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
-            $this->datespecification_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
-            $this->printrun = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-            $this->printruncomment = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-            $this->edition = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-            $this->numpages = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-            $this->numpagesnormed = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
-            $this->bibliographiccitation = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+            $this->title_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+            $this->publishingcompany_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+            $this->place_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+            $this->datespecification_id = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
+            $this->printrun = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+            $this->printruncomment = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+            $this->edition = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+            $this->numpages = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+            $this->numpagesnormed = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+            $this->bibliographiccitation = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -589,7 +624,7 @@ abstract class BasePublication extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 10; // 10 = PublicationPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 11; // 11 = PublicationPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Publication object", $e);
@@ -612,6 +647,9 @@ abstract class BasePublication extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aTitle !== null && $this->title_id !== $this->aTitle->getId()) {
+            $this->aTitle = null;
+        }
         if ($this->aPublishingcompany !== null && $this->publishingcompany_id !== $this->aPublishingcompany->getId()) {
             $this->aPublishingcompany = null;
         }
@@ -660,6 +698,7 @@ abstract class BasePublication extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->aTitle = null;
             $this->aPublishingcompany = null;
             $this->aPlace = null;
             $this->aDatespecification = null;
@@ -670,8 +709,6 @@ abstract class BasePublication extends BaseObject implements Persistent
             $this->collMonographs = null;
 
             $this->collSeries = null;
-
-            $this->collTitles = null;
 
             $this->collWrits = null;
 
@@ -793,6 +830,13 @@ abstract class BasePublication extends BaseObject implements Persistent
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
+            if ($this->aTitle !== null) {
+                if ($this->aTitle->isModified() || $this->aTitle->isNew()) {
+                    $affectedRows += $this->aTitle->save($con);
+                }
+                $this->setTitle($this->aTitle);
+            }
+
             if ($this->aPublishingcompany !== null) {
                 if ($this->aPublishingcompany->isModified() || $this->aPublishingcompany->isNew()) {
                     $affectedRows += $this->aPublishingcompany->save($con);
@@ -893,24 +937,6 @@ abstract class BasePublication extends BaseObject implements Persistent
                 }
             }
 
-            if ($this->titlesScheduledForDeletion !== null) {
-                if (!$this->titlesScheduledForDeletion->isEmpty()) {
-                    foreach ($this->titlesScheduledForDeletion as $title) {
-                        // need to save related object because we set the relation to null
-                        $title->save($con);
-                    }
-                    $this->titlesScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collTitles !== null) {
-                foreach ($this->collTitles as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             if ($this->writsScheduledForDeletion !== null) {
                 if (!$this->writsScheduledForDeletion->isEmpty()) {
                     WritQuery::create()
@@ -957,6 +983,9 @@ abstract class BasePublication extends BaseObject implements Persistent
         if ($this->isColumnModified(PublicationPeer::ID)) {
             $modifiedColumns[':p' . $index++]  = '`ID`';
         }
+        if ($this->isColumnModified(PublicationPeer::TITLE_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`TITLE_ID`';
+        }
         if ($this->isColumnModified(PublicationPeer::PUBLISHINGCOMPANY_ID)) {
             $modifiedColumns[':p' . $index++]  = '`PUBLISHINGCOMPANY_ID`';
         }
@@ -997,6 +1026,9 @@ abstract class BasePublication extends BaseObject implements Persistent
                 switch ($columnName) {
                     case '`ID`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
+                        break;
+                    case '`TITLE_ID`':
+                        $stmt->bindValue($identifier, $this->title_id, PDO::PARAM_INT);
                         break;
                     case '`PUBLISHINGCOMPANY_ID`':
                         $stmt->bindValue($identifier, $this->publishingcompany_id, PDO::PARAM_INT);
@@ -1124,6 +1156,12 @@ abstract class BasePublication extends BaseObject implements Persistent
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
+            if ($this->aTitle !== null) {
+                if (!$this->aTitle->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aTitle->getValidationFailures());
+                }
+            }
+
             if ($this->aPublishingcompany !== null) {
                 if (!$this->aPublishingcompany->validate($columns)) {
                     $failureMap = array_merge($failureMap, $this->aPublishingcompany->getValidationFailures());
@@ -1180,14 +1218,6 @@ abstract class BasePublication extends BaseObject implements Persistent
                     }
                 }
 
-                if ($this->collTitles !== null) {
-                    foreach ($this->collTitles as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
                 if ($this->collWrits !== null) {
                     foreach ($this->collWrits as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -1235,30 +1265,33 @@ abstract class BasePublication extends BaseObject implements Persistent
                 return $this->getId();
                 break;
             case 1:
-                return $this->getPublishingcompanyId();
+                return $this->getTitleId();
                 break;
             case 2:
-                return $this->getPlaceId();
+                return $this->getPublishingcompanyId();
                 break;
             case 3:
-                return $this->getDatespecificationId();
+                return $this->getPlaceId();
                 break;
             case 4:
-                return $this->getPrintrun();
+                return $this->getDatespecificationId();
                 break;
             case 5:
-                return $this->getPrintruncomment();
+                return $this->getPrintrun();
                 break;
             case 6:
-                return $this->getEdition();
+                return $this->getPrintruncomment();
                 break;
             case 7:
-                return $this->getNumpages();
+                return $this->getEdition();
                 break;
             case 8:
-                return $this->getNumpagesnormed();
+                return $this->getNumpages();
                 break;
             case 9:
+                return $this->getNumpagesnormed();
+                break;
+            case 10:
                 return $this->getBibliographiccitation();
                 break;
             default:
@@ -1291,17 +1324,21 @@ abstract class BasePublication extends BaseObject implements Persistent
         $keys = PublicationPeer::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getPublishingcompanyId(),
-            $keys[2] => $this->getPlaceId(),
-            $keys[3] => $this->getDatespecificationId(),
-            $keys[4] => $this->getPrintrun(),
-            $keys[5] => $this->getPrintruncomment(),
-            $keys[6] => $this->getEdition(),
-            $keys[7] => $this->getNumpages(),
-            $keys[8] => $this->getNumpagesnormed(),
-            $keys[9] => $this->getBibliographiccitation(),
+            $keys[1] => $this->getTitleId(),
+            $keys[2] => $this->getPublishingcompanyId(),
+            $keys[3] => $this->getPlaceId(),
+            $keys[4] => $this->getDatespecificationId(),
+            $keys[5] => $this->getPrintrun(),
+            $keys[6] => $this->getPrintruncomment(),
+            $keys[7] => $this->getEdition(),
+            $keys[8] => $this->getNumpages(),
+            $keys[9] => $this->getNumpagesnormed(),
+            $keys[10] => $this->getBibliographiccitation(),
         );
         if ($includeForeignObjects) {
+            if (null !== $this->aTitle) {
+                $result['Title'] = $this->aTitle->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
             if (null !== $this->aPublishingcompany) {
                 $result['Publishingcompany'] = $this->aPublishingcompany->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
@@ -1322,9 +1359,6 @@ abstract class BasePublication extends BaseObject implements Persistent
             }
             if (null !== $this->collSeries) {
                 $result['Series'] = $this->collSeries->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
-            if (null !== $this->collTitles) {
-                $result['Titles'] = $this->collTitles->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collWrits) {
                 $result['Writs'] = $this->collWrits->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1367,30 +1401,33 @@ abstract class BasePublication extends BaseObject implements Persistent
                 $this->setId($value);
                 break;
             case 1:
-                $this->setPublishingcompanyId($value);
+                $this->setTitleId($value);
                 break;
             case 2:
-                $this->setPlaceId($value);
+                $this->setPublishingcompanyId($value);
                 break;
             case 3:
-                $this->setDatespecificationId($value);
+                $this->setPlaceId($value);
                 break;
             case 4:
-                $this->setPrintrun($value);
+                $this->setDatespecificationId($value);
                 break;
             case 5:
-                $this->setPrintruncomment($value);
+                $this->setPrintrun($value);
                 break;
             case 6:
-                $this->setEdition($value);
+                $this->setPrintruncomment($value);
                 break;
             case 7:
-                $this->setNumpages($value);
+                $this->setEdition($value);
                 break;
             case 8:
-                $this->setNumpagesnormed($value);
+                $this->setNumpages($value);
                 break;
             case 9:
+                $this->setNumpagesnormed($value);
+                break;
+            case 10:
                 $this->setBibliographiccitation($value);
                 break;
         } // switch()
@@ -1418,15 +1455,16 @@ abstract class BasePublication extends BaseObject implements Persistent
         $keys = PublicationPeer::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setPublishingcompanyId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setPlaceId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setDatespecificationId($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setPrintrun($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setPrintruncomment($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setEdition($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setNumpages($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setNumpagesnormed($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setBibliographiccitation($arr[$keys[9]]);
+        if (array_key_exists($keys[1], $arr)) $this->setTitleId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setPublishingcompanyId($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setPlaceId($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setDatespecificationId($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setPrintrun($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setPrintruncomment($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setEdition($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setNumpages($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setNumpagesnormed($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setBibliographiccitation($arr[$keys[10]]);
     }
 
     /**
@@ -1439,6 +1477,7 @@ abstract class BasePublication extends BaseObject implements Persistent
         $criteria = new Criteria(PublicationPeer::DATABASE_NAME);
 
         if ($this->isColumnModified(PublicationPeer::ID)) $criteria->add(PublicationPeer::ID, $this->id);
+        if ($this->isColumnModified(PublicationPeer::TITLE_ID)) $criteria->add(PublicationPeer::TITLE_ID, $this->title_id);
         if ($this->isColumnModified(PublicationPeer::PUBLISHINGCOMPANY_ID)) $criteria->add(PublicationPeer::PUBLISHINGCOMPANY_ID, $this->publishingcompany_id);
         if ($this->isColumnModified(PublicationPeer::PLACE_ID)) $criteria->add(PublicationPeer::PLACE_ID, $this->place_id);
         if ($this->isColumnModified(PublicationPeer::DATESPECIFICATION_ID)) $criteria->add(PublicationPeer::DATESPECIFICATION_ID, $this->datespecification_id);
@@ -1511,6 +1550,7 @@ abstract class BasePublication extends BaseObject implements Persistent
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
+        $copyObj->setTitleId($this->getTitleId());
         $copyObj->setPublishingcompanyId($this->getPublishingcompanyId());
         $copyObj->setPlaceId($this->getPlaceId());
         $copyObj->setDatespecificationId($this->getDatespecificationId());
@@ -1549,12 +1589,6 @@ abstract class BasePublication extends BaseObject implements Persistent
             foreach ($this->getSeries() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addSeries($relObj->copy($deepCopy));
-                }
-            }
-
-            foreach ($this->getTitles() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addTitle($relObj->copy($deepCopy));
                 }
             }
 
@@ -1612,6 +1646,57 @@ abstract class BasePublication extends BaseObject implements Persistent
         }
 
         return self::$peer;
+    }
+
+    /**
+     * Declares an association between this object and a Title object.
+     *
+     * @param             Title $v
+     * @return Publication The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setTitle(Title $v = null)
+    {
+        if ($v === null) {
+            $this->setTitleId(NULL);
+        } else {
+            $this->setTitleId($v->getId());
+        }
+
+        $this->aTitle = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Title object, it will not be re-added.
+        if ($v !== null) {
+            $v->addPublication($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Title object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Title The associated Title object.
+     * @throws PropelException
+     */
+    public function getTitle(PropelPDO $con = null)
+    {
+        if ($this->aTitle === null && ($this->title_id !== null)) {
+            $this->aTitle = TitleQuery::create()->findPk($this->title_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aTitle->addPublications($this);
+             */
+        }
+
+        return $this->aTitle;
     }
 
     /**
@@ -1789,9 +1874,6 @@ abstract class BasePublication extends BaseObject implements Persistent
         }
         if ('Series' == $relationName) {
             $this->initSeries();
-        }
-        if ('Title' == $relationName) {
-            $this->initTitles();
         }
         if ('Writ' == $relationName) {
             $this->initWrits();
@@ -2659,296 +2741,6 @@ abstract class BasePublication extends BaseObject implements Persistent
     }
 
     /**
-     * Clears out the collTitles collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return Publication The current object (for fluent API support)
-     * @see        addTitles()
-     */
-    public function clearTitles()
-    {
-        $this->collTitles = null; // important to set this to null since that means it is uninitialized
-        $this->collTitlesPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * reset is the collTitles collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialTitles($v = true)
-    {
-        $this->collTitlesPartial = $v;
-    }
-
-    /**
-     * Initializes the collTitles collection.
-     *
-     * By default this just sets the collTitles collection to an empty array (like clearcollTitles());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initTitles($overrideExisting = true)
-    {
-        if (null !== $this->collTitles && !$overrideExisting) {
-            return;
-        }
-        $this->collTitles = new PropelObjectCollection();
-        $this->collTitles->setModel('Title');
-    }
-
-    /**
-     * Gets an array of Title objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Publication is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|Title[] List of Title objects
-     * @throws PropelException
-     */
-    public function getTitles($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collTitlesPartial && !$this->isNew();
-        if (null === $this->collTitles || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collTitles) {
-                // return empty collection
-                $this->initTitles();
-            } else {
-                $collTitles = TitleQuery::create(null, $criteria)
-                    ->filterByPublication($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collTitlesPartial && count($collTitles)) {
-                      $this->initTitles(false);
-
-                      foreach($collTitles as $obj) {
-                        if (false == $this->collTitles->contains($obj)) {
-                          $this->collTitles->append($obj);
-                        }
-                      }
-
-                      $this->collTitlesPartial = true;
-                    }
-
-                    return $collTitles;
-                }
-
-                if($partial && $this->collTitles) {
-                    foreach($this->collTitles as $obj) {
-                        if($obj->isNew()) {
-                            $collTitles[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collTitles = $collTitles;
-                $this->collTitlesPartial = false;
-            }
-        }
-
-        return $this->collTitles;
-    }
-
-    /**
-     * Sets a collection of Title objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $titles A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     * @return Publication The current object (for fluent API support)
-     */
-    public function setTitles(PropelCollection $titles, PropelPDO $con = null)
-    {
-        $this->titlesScheduledForDeletion = $this->getTitles(new Criteria(), $con)->diff($titles);
-
-        foreach ($this->titlesScheduledForDeletion as $titleRemoved) {
-            $titleRemoved->setPublication(null);
-        }
-
-        $this->collTitles = null;
-        foreach ($titles as $title) {
-            $this->addTitle($title);
-        }
-
-        $this->collTitles = $titles;
-        $this->collTitlesPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related Title objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related Title objects.
-     * @throws PropelException
-     */
-    public function countTitles(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collTitlesPartial && !$this->isNew();
-        if (null === $this->collTitles || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collTitles) {
-                return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getTitles());
-                }
-                $query = TitleQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByPublication($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collTitles);
-        }
-    }
-
-    /**
-     * Method called to associate a Title object to this object
-     * through the Title foreign key attribute.
-     *
-     * @param    Title $l Title
-     * @return Publication The current object (for fluent API support)
-     */
-    public function addTitle(Title $l)
-    {
-        if ($this->collTitles === null) {
-            $this->initTitles();
-            $this->collTitlesPartial = true;
-        }
-        if (!in_array($l, $this->collTitles->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddTitle($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	Title $title The title object to add.
-     */
-    protected function doAddTitle($title)
-    {
-        $this->collTitles[]= $title;
-        $title->setPublication($this);
-    }
-
-    /**
-     * @param	Title $title The title object to remove.
-     * @return Publication The current object (for fluent API support)
-     */
-    public function removeTitle($title)
-    {
-        if ($this->getTitles()->contains($title)) {
-            $this->collTitles->remove($this->collTitles->search($title));
-            if (null === $this->titlesScheduledForDeletion) {
-                $this->titlesScheduledForDeletion = clone $this->collTitles;
-                $this->titlesScheduledForDeletion->clear();
-            }
-            $this->titlesScheduledForDeletion[]= $title;
-            $title->setPublication(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Publication is new, it will return
-     * an empty collection; or if this Publication has previously
-     * been saved, it will retrieve related Titles from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Publication.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Title[] List of Title objects
-     */
-    public function getTitlesJoinTitletype($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = TitleQuery::create(null, $criteria);
-        $query->joinWith('Titletype', $join_behavior);
-
-        return $this->getTitles($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Publication is new, it will return
-     * an empty collection; or if this Publication has previously
-     * been saved, it will retrieve related Titles from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Publication.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Title[] List of Title objects
-     */
-    public function getTitlesJoinVolume($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = TitleQuery::create(null, $criteria);
-        $query->joinWith('Volume', $join_behavior);
-
-        return $this->getTitles($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Publication is new, it will return
-     * an empty collection; or if this Publication has previously
-     * been saved, it will retrieve related Titles from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Publication.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Title[] List of Title objects
-     */
-    public function getTitlesJoinWork($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = TitleQuery::create(null, $criteria);
-        $query->joinWith('Work', $join_behavior);
-
-        return $this->getTitles($query, $con);
-    }
-
-    /**
      * Clears out the collWrits collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -3294,6 +3086,7 @@ abstract class BasePublication extends BaseObject implements Persistent
     public function clear()
     {
         $this->id = null;
+        $this->title_id = null;
         $this->publishingcompany_id = null;
         $this->place_id = null;
         $this->datespecification_id = null;
@@ -3343,11 +3136,6 @@ abstract class BasePublication extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collTitles) {
-                foreach ($this->collTitles as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collWrits) {
                 foreach ($this->collWrits as $o) {
                     $o->clearAllReferences($deep);
@@ -3371,14 +3159,11 @@ abstract class BasePublication extends BaseObject implements Persistent
             $this->collSeries->clearIterator();
         }
         $this->collSeries = null;
-        if ($this->collTitles instanceof PropelCollection) {
-            $this->collTitles->clearIterator();
-        }
-        $this->collTitles = null;
         if ($this->collWrits instanceof PropelCollection) {
             $this->collWrits->clearIterator();
         }
         $this->collWrits = null;
+        $this->aTitle = null;
         $this->aPublishingcompany = null;
         $this->aPlace = null;
         $this->aDatespecification = null;

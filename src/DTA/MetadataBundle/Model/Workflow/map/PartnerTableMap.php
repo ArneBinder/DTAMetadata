@@ -16,7 +16,7 @@ use \TableMap;
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package    propel.generator.src.Workflow.map
+ * @package    propel.generator.src.DTA.MetadataBundle.Model.Workflow.map
  */
 class PartnerTableMap extends TableMap
 {
@@ -24,7 +24,7 @@ class PartnerTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'src.Workflow.map.PartnerTableMap';
+    const CLASS_NAME = 'src.DTA.MetadataBundle.Model.Workflow.map.PartnerTableMap';
 
     /**
      * Initialize the table attributes, columns and validators
@@ -39,7 +39,7 @@ class PartnerTableMap extends TableMap
         $this->setName('partner');
         $this->setPhpName('Partner');
         $this->setClassname('DTA\\MetadataBundle\\Model\\Workflow\\Partner');
-        $this->setPackage('src.Workflow');
+        $this->setPackage('src.DTA.MetadataBundle.Model.Workflow');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, 10, null);

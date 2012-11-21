@@ -1,6 +1,6 @@
 <?php
 
-namespace DTA\MetadataBundle\Model\om;
+namespace DTA\MetadataBundle\Model\Publication\om;
 
 use \Criteria;
 use \Exception;
@@ -12,10 +12,10 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
-use DTA\MetadataBundle\Model\WritWritgroup;
-use DTA\MetadataBundle\Model\WritWritgroupPeer;
-use DTA\MetadataBundle\Model\WritWritgroupQuery;
 use DTA\MetadataBundle\Model\Publication\Writ;
+use DTA\MetadataBundle\Model\Publication\WritWritgroup;
+use DTA\MetadataBundle\Model\Publication\WritWritgroupPeer;
+use DTA\MetadataBundle\Model\Publication\WritWritgroupQuery;
 use DTA\MetadataBundle\Model\Workflow\Writgroup;
 
 /**
@@ -55,7 +55,7 @@ abstract class BaseWritWritgroupQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'DTAMetadata', $modelName = 'DTA\\MetadataBundle\\Model\\WritWritgroup', $modelAlias = null)
+    public function __construct($dbName = 'DTAMetadata', $modelName = 'DTA\\MetadataBundle\\Model\\Publication\\WritWritgroup', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }

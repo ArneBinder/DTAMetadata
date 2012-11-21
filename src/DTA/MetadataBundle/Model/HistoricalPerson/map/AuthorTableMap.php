@@ -16,7 +16,7 @@ use \TableMap;
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package    propel.generator.src.HistoricalPerson.map
+ * @package    propel.generator.src.DTA.MetadataBundle.Model.HistoricalPerson.map
  */
 class AuthorTableMap extends TableMap
 {
@@ -24,7 +24,7 @@ class AuthorTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'src.HistoricalPerson.map.AuthorTableMap';
+    const CLASS_NAME = 'src.DTA.MetadataBundle.Model.HistoricalPerson.map.AuthorTableMap';
 
     /**
      * Initialize the table attributes, columns and validators
@@ -39,7 +39,7 @@ class AuthorTableMap extends TableMap
         $this->setName('author');
         $this->setPhpName('Author');
         $this->setClassname('DTA\\MetadataBundle\\Model\\HistoricalPerson\\Author');
-        $this->setPackage('src.HistoricalPerson');
+        $this->setPackage('src.DTA.MetadataBundle.Model.HistoricalPerson');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
@@ -53,7 +53,7 @@ class AuthorTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Person', 'DTA\\MetadataBundle\\Model\\HistoricalPerson\\Person', RelationMap::MANY_TO_ONE, array('person_id' => 'id', ), null, null);
-        $this->addRelation('AuthorWork', 'DTA\\MetadataBundle\\Model\\AuthorWork', RelationMap::ONE_TO_MANY, array('id' => 'author_id', 'person_id' => 'author_person_id', ), null, null, 'AuthorWorks');
+        $this->addRelation('AuthorWork', 'DTA\\MetadataBundle\\Model\\HistoricalPerson\\AuthorWork', RelationMap::ONE_TO_MANY, array('id' => 'author_id', 'person_id' => 'author_person_id', ), null, null, 'AuthorWorks');
         $this->addRelation('Work', 'DTA\\MetadataBundle\\Model\\Publication\\Work', RelationMap::MANY_TO_MANY, array(), null, null, 'Works');
     } // buildRelations()
 

@@ -16,7 +16,7 @@ use \TableMap;
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package    propel.generator.src.Publication.map
+ * @package    propel.generator.src.DTA.MetadataBundle.Model.Publication.map
  */
 class PublicationTableMap extends TableMap
 {
@@ -24,7 +24,7 @@ class PublicationTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'src.Publication.map.PublicationTableMap';
+    const CLASS_NAME = 'src.DTA.MetadataBundle.Model.Publication.map.PublicationTableMap';
 
     /**
      * Initialize the table attributes, columns and validators
@@ -39,10 +39,11 @@ class PublicationTableMap extends TableMap
         $this->setName('publication');
         $this->setPhpName('Publication');
         $this->setClassname('DTA\\MetadataBundle\\Model\\Publication\\Publication');
-        $this->setPackage('src.Publication');
+        $this->setPackage('src.DTA.MetadataBundle.Model.Publication');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+        $this->addForeignKey('TITLE_ID', 'TitleId', 'INTEGER', 'title', 'ID', true, null, null);
         $this->addForeignKey('PUBLISHINGCOMPANY_ID', 'PublishingcompanyId', 'INTEGER', 'publishingCompany', 'ID', false, null, null);
         $this->addForeignKey('PLACE_ID', 'PlaceId', 'INTEGER', 'place', 'ID', false, null, null);
         $this->addForeignKey('DATESPECIFICATION_ID', 'DatespecificationId', 'INTEGER', 'dateSpecification', 'ID', false, null, null);
@@ -60,6 +61,7 @@ class PublicationTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('Title', 'DTA\\MetadataBundle\\Model\\Description\\Title', RelationMap::MANY_TO_ONE, array('title_id' => 'id', ), null, null);
         $this->addRelation('Publishingcompany', 'DTA\\MetadataBundle\\Model\\Publication\\Publishingcompany', RelationMap::MANY_TO_ONE, array('publishingCompany_id' => 'id', ), null, null);
         $this->addRelation('Place', 'DTA\\MetadataBundle\\Model\\Description\\Place', RelationMap::MANY_TO_ONE, array('place_id' => 'id', ), null, null);
         $this->addRelation('Datespecification', 'DTA\\MetadataBundle\\Model\\Description\\Datespecification', RelationMap::MANY_TO_ONE, array('dateSpecification_id' => 'id', ), null, null);
@@ -67,7 +69,6 @@ class PublicationTableMap extends TableMap
         $this->addRelation('Magazine', 'DTA\\MetadataBundle\\Model\\Publication\\Magazine', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Magazines');
         $this->addRelation('Monograph', 'DTA\\MetadataBundle\\Model\\Publication\\Monograph', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Monographs');
         $this->addRelation('Series', 'DTA\\MetadataBundle\\Model\\Publication\\Series', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Series');
-        $this->addRelation('Title', 'DTA\\MetadataBundle\\Model\\Description\\Title', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Titles');
         $this->addRelation('Writ', 'DTA\\MetadataBundle\\Model\\Publication\\Writ', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Writs');
     } // buildRelations()
 

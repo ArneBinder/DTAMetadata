@@ -52,9 +52,9 @@ assetic:
 
 propel:
     build_properties:
-      propel.namespace.autoPackage: true
       propel.packageObjectModel: true
-      
+      propel.namespace.autoPackage: true
+      propel.behavior.reconstructed_flaggable.class: src.DTA.MetadataBundle.Model.CustomBehaviors.ReconstructedFlaggableBehavior
 #      propel.database: "%database_driver%"
 #      propel.database.url: "%database_driver%:host=%database_host%;dbname=%database_name%;charset=%database_charset%"
 #      propel.database.user: "%database_user%"

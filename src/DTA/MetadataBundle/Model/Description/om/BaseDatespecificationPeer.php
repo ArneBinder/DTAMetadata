@@ -43,11 +43,11 @@ abstract class BaseDatespecificationPeer
     /** the column name for the YEAR field */
     const YEAR = 'dateSpecification.YEAR';
 
-    /** the column name for the YEARISRECONSTRUCTED field */
-    const YEARISRECONSTRUCTED = 'dateSpecification.YEARISRECONSTRUCTED';
-
     /** the column name for the COMMENTS field */
     const COMMENTS = 'dateSpecification.COMMENTS';
+
+    /** the column name for the YEAR_IS_RECONSTRUCTED field */
+    const YEAR_IS_RECONSTRUCTED = 'dateSpecification.YEAR_IS_RECONSTRUCTED';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -68,11 +68,11 @@ abstract class BaseDatespecificationPeer
      * e.g. DatespecificationPeer::$fieldNames[DatespecificationPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Year', 'Yearisreconstructed', 'Comments', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'year', 'yearisreconstructed', 'comments', ),
-        BasePeer::TYPE_COLNAME => array (DatespecificationPeer::ID, DatespecificationPeer::YEAR, DatespecificationPeer::YEARISRECONSTRUCTED, DatespecificationPeer::COMMENTS, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'YEAR', 'YEARISRECONSTRUCTED', 'COMMENTS', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'year', 'yearIsReconstructed', 'comments', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Year', 'Comments', 'YearIsReconstructed', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'year', 'comments', 'yearIsReconstructed', ),
+        BasePeer::TYPE_COLNAME => array (DatespecificationPeer::ID, DatespecificationPeer::YEAR, DatespecificationPeer::COMMENTS, DatespecificationPeer::YEAR_IS_RECONSTRUCTED, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'YEAR', 'COMMENTS', 'YEAR_IS_RECONSTRUCTED', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'year', 'comments', 'year_is_reconstructed', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
@@ -83,11 +83,11 @@ abstract class BaseDatespecificationPeer
      * e.g. DatespecificationPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Year' => 1, 'Yearisreconstructed' => 2, 'Comments' => 3, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'year' => 1, 'yearisreconstructed' => 2, 'comments' => 3, ),
-        BasePeer::TYPE_COLNAME => array (DatespecificationPeer::ID => 0, DatespecificationPeer::YEAR => 1, DatespecificationPeer::YEARISRECONSTRUCTED => 2, DatespecificationPeer::COMMENTS => 3, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'YEAR' => 1, 'YEARISRECONSTRUCTED' => 2, 'COMMENTS' => 3, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'year' => 1, 'yearIsReconstructed' => 2, 'comments' => 3, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Year' => 1, 'Comments' => 2, 'YearIsReconstructed' => 3, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'year' => 1, 'comments' => 2, 'yearIsReconstructed' => 3, ),
+        BasePeer::TYPE_COLNAME => array (DatespecificationPeer::ID => 0, DatespecificationPeer::YEAR => 1, DatespecificationPeer::COMMENTS => 2, DatespecificationPeer::YEAR_IS_RECONSTRUCTED => 3, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'YEAR' => 1, 'COMMENTS' => 2, 'YEAR_IS_RECONSTRUCTED' => 3, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'year' => 1, 'comments' => 2, 'year_is_reconstructed' => 3, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
@@ -164,13 +164,13 @@ abstract class BaseDatespecificationPeer
         if (null === $alias) {
             $criteria->addSelectColumn(DatespecificationPeer::ID);
             $criteria->addSelectColumn(DatespecificationPeer::YEAR);
-            $criteria->addSelectColumn(DatespecificationPeer::YEARISRECONSTRUCTED);
             $criteria->addSelectColumn(DatespecificationPeer::COMMENTS);
+            $criteria->addSelectColumn(DatespecificationPeer::YEAR_IS_RECONSTRUCTED);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.YEAR');
-            $criteria->addSelectColumn($alias . '.YEARISRECONSTRUCTED');
             $criteria->addSelectColumn($alias . '.COMMENTS');
+            $criteria->addSelectColumn($alias . '.YEAR_IS_RECONSTRUCTED');
         }
     }
 

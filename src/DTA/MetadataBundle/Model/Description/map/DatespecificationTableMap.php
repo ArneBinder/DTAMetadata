@@ -16,7 +16,7 @@ use \TableMap;
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package    propel.generator.src.Description.map
+ * @package    propel.generator.src.DTA.MetadataBundle.Model.Description.map
  */
 class DatespecificationTableMap extends TableMap
 {
@@ -24,7 +24,7 @@ class DatespecificationTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'src.Description.map.DatespecificationTableMap';
+    const CLASS_NAME = 'src.DTA.MetadataBundle.Model.Description.map.DatespecificationTableMap';
 
     /**
      * Initialize the table attributes, columns and validators
@@ -39,13 +39,13 @@ class DatespecificationTableMap extends TableMap
         $this->setName('dateSpecification');
         $this->setPhpName('Datespecification');
         $this->setClassname('DTA\\MetadataBundle\\Model\\Description\\Datespecification');
-        $this->setPackage('src.Description');
+        $this->setPackage('src.DTA.MetadataBundle.Model.Description');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('YEAR', 'Year', 'INTEGER', false, null, null);
-        $this->addColumn('YEARISRECONSTRUCTED', 'Yearisreconstructed', 'BOOLEAN', false, 1, false);
         $this->addColumn('COMMENTS', 'Comments', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('YEAR_IS_RECONSTRUCTED', 'YearIsReconstructed', 'BOOLEAN', false, 1, false);
         // validators
     } // initialize()
 
@@ -57,5 +57,18 @@ class DatespecificationTableMap extends TableMap
         $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Publication\\Publication', RelationMap::ONE_TO_MANY, array('id' => 'dateSpecification_id', ), null, null, 'Publications');
         $this->addRelation('Work', 'DTA\\MetadataBundle\\Model\\Publication\\Work', RelationMap::ONE_TO_MANY, array('id' => 'dateSpecification_id', ), null, null, 'Works');
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'reconstructed_flaggable' => array('column' => 'year', ),
+        );
+    } // getBehaviors()
 
 } // DatespecificationTableMap

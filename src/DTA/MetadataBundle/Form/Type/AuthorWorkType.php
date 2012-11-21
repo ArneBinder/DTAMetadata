@@ -22,7 +22,7 @@ class AuthorWorkType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'DTA\MetadataBundle\Model\AuthorWork',
+            'data_class' => 'DTA\MetadataBundle\Model\HistoricalPerson\AuthorWork',
         ));
     }
 

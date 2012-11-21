@@ -16,7 +16,7 @@ use \TableMap;
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package    propel.generator.src.Classification.map
+ * @package    propel.generator.src.DTA.MetadataBundle.Model.Classification.map
  */
 class CorpusTableMap extends TableMap
 {
@@ -24,7 +24,7 @@ class CorpusTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'src.Classification.map.CorpusTableMap';
+    const CLASS_NAME = 'src.DTA.MetadataBundle.Model.Classification.map.CorpusTableMap';
 
     /**
      * Initialize the table attributes, columns and validators
@@ -39,7 +39,7 @@ class CorpusTableMap extends TableMap
         $this->setName('corpus');
         $this->setPhpName('Corpus');
         $this->setClassname('DTA\\MetadataBundle\\Model\\Classification\\Corpus');
-        $this->setPackage('src.Classification');
+        $this->setPackage('src.DTA.MetadataBundle.Model.Classification');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, 10, null);

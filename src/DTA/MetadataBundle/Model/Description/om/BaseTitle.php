@@ -9,19 +9,17 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
+use \PropelCollection;
 use \PropelException;
+use \PropelObjectCollection;
 use \PropelPDO;
 use DTA\MetadataBundle\Model\Description\Title;
 use DTA\MetadataBundle\Model\Description\TitlePeer;
 use DTA\MetadataBundle\Model\Description\TitleQuery;
-use DTA\MetadataBundle\Model\Description\Titletype;
-use DTA\MetadataBundle\Model\Description\TitletypeQuery;
+use DTA\MetadataBundle\Model\Description\Titlefragment;
+use DTA\MetadataBundle\Model\Description\TitlefragmentQuery;
 use DTA\MetadataBundle\Model\Publication\Publication;
 use DTA\MetadataBundle\Model\Publication\PublicationQuery;
-use DTA\MetadataBundle\Model\Publication\Volume;
-use DTA\MetadataBundle\Model\Publication\VolumeQuery;
-use DTA\MetadataBundle\Model\Publication\Work;
-use DTA\MetadataBundle\Model\Publication\WorkQuery;
 
 abstract class BaseTitle extends BaseObject implements Persistent
 {
@@ -51,60 +49,16 @@ abstract class BaseTitle extends BaseObject implements Persistent
     protected $id;
 
     /**
-     * The value for the sequenceindex field.
-     * @var        int
+     * @var        PropelObjectCollection|Titlefragment[] Collection to store aggregation of Titlefragment objects.
      */
-    protected $sequenceindex;
+    protected $collTitlefragments;
+    protected $collTitlefragmentsPartial;
 
     /**
-     * The value for the title field.
-     * @var        string
+     * @var        PropelObjectCollection|Publication[] Collection to store aggregation of Publication objects.
      */
-    protected $title;
-
-    /**
-     * The value for the work_id field.
-     * @var        int
-     */
-    protected $work_id;
-
-    /**
-     * The value for the publication_id field.
-     * @var        int
-     */
-    protected $publication_id;
-
-    /**
-     * The value for the volume_id field.
-     * @var        int
-     */
-    protected $volume_id;
-
-    /**
-     * The value for the titletype_id field.
-     * @var        int
-     */
-    protected $titletype_id;
-
-    /**
-     * @var        Titletype
-     */
-    protected $aTitletype;
-
-    /**
-     * @var        Publication
-     */
-    protected $aPublication;
-
-    /**
-     * @var        Volume
-     */
-    protected $aVolume;
-
-    /**
-     * @var        Work
-     */
-    protected $aWork;
+    protected $collPublications;
+    protected $collPublicationsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -121,6 +75,18 @@ abstract class BaseTitle extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $titlefragmentsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $publicationsScheduledForDeletion = null;
+
+    /**
      * Get the [id] column value.
      *
      * @return int
@@ -128,66 +94,6 @@ abstract class BaseTitle extends BaseObject implements Persistent
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * Get the [sequenceindex] column value.
-     *
-     * @return int
-     */
-    public function getSequenceindex()
-    {
-        return $this->sequenceindex;
-    }
-
-    /**
-     * Get the [title] column value.
-     *
-     * @return string
-     */
-    public function getTitle()
-    {
-        return $this->title;
-    }
-
-    /**
-     * Get the [work_id] column value.
-     *
-     * @return int
-     */
-    public function getWorkId()
-    {
-        return $this->work_id;
-    }
-
-    /**
-     * Get the [publication_id] column value.
-     *
-     * @return int
-     */
-    public function getPublicationId()
-    {
-        return $this->publication_id;
-    }
-
-    /**
-     * Get the [volume_id] column value.
-     *
-     * @return int
-     */
-    public function getVolumeId()
-    {
-        return $this->volume_id;
-    }
-
-    /**
-     * Get the [titletype_id] column value.
-     *
-     * @return int
-     */
-    public function getTitletypeId()
-    {
-        return $this->titletype_id;
     }
 
     /**
@@ -210,148 +116,6 @@ abstract class BaseTitle extends BaseObject implements Persistent
 
         return $this;
     } // setId()
-
-    /**
-     * Set the value of [sequenceindex] column.
-     *
-     * @param int $v new value
-     * @return Title The current object (for fluent API support)
-     */
-    public function setSequenceindex($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->sequenceindex !== $v) {
-            $this->sequenceindex = $v;
-            $this->modifiedColumns[] = TitlePeer::SEQUENCEINDEX;
-        }
-
-
-        return $this;
-    } // setSequenceindex()
-
-    /**
-     * Set the value of [title] column.
-     *
-     * @param string $v new value
-     * @return Title The current object (for fluent API support)
-     */
-    public function setTitle($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->title !== $v) {
-            $this->title = $v;
-            $this->modifiedColumns[] = TitlePeer::TITLE;
-        }
-
-
-        return $this;
-    } // setTitle()
-
-    /**
-     * Set the value of [work_id] column.
-     *
-     * @param int $v new value
-     * @return Title The current object (for fluent API support)
-     */
-    public function setWorkId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->work_id !== $v) {
-            $this->work_id = $v;
-            $this->modifiedColumns[] = TitlePeer::WORK_ID;
-        }
-
-        if ($this->aWork !== null && $this->aWork->getId() !== $v) {
-            $this->aWork = null;
-        }
-
-
-        return $this;
-    } // setWorkId()
-
-    /**
-     * Set the value of [publication_id] column.
-     *
-     * @param int $v new value
-     * @return Title The current object (for fluent API support)
-     */
-    public function setPublicationId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->publication_id !== $v) {
-            $this->publication_id = $v;
-            $this->modifiedColumns[] = TitlePeer::PUBLICATION_ID;
-        }
-
-        if ($this->aPublication !== null && $this->aPublication->getId() !== $v) {
-            $this->aPublication = null;
-        }
-
-
-        return $this;
-    } // setPublicationId()
-
-    /**
-     * Set the value of [volume_id] column.
-     *
-     * @param int $v new value
-     * @return Title The current object (for fluent API support)
-     */
-    public function setVolumeId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->volume_id !== $v) {
-            $this->volume_id = $v;
-            $this->modifiedColumns[] = TitlePeer::VOLUME_ID;
-        }
-
-        if ($this->aVolume !== null && $this->aVolume->getId() !== $v) {
-            $this->aVolume = null;
-        }
-
-
-        return $this;
-    } // setVolumeId()
-
-    /**
-     * Set the value of [titletype_id] column.
-     *
-     * @param int $v new value
-     * @return Title The current object (for fluent API support)
-     */
-    public function setTitletypeId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->titletype_id !== $v) {
-            $this->titletype_id = $v;
-            $this->modifiedColumns[] = TitlePeer::TITLETYPE_ID;
-        }
-
-        if ($this->aTitletype !== null && $this->aTitletype->getId() !== $v) {
-            $this->aTitletype = null;
-        }
-
-
-        return $this;
-    } // setTitletypeId()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -386,12 +150,6 @@ abstract class BaseTitle extends BaseObject implements Persistent
         try {
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-            $this->sequenceindex = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-            $this->title = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-            $this->work_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
-            $this->publication_id = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
-            $this->volume_id = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
-            $this->titletype_id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -400,7 +158,7 @@ abstract class BaseTitle extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 7; // 7 = TitlePeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 1; // 1 = TitlePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Title object", $e);
@@ -423,18 +181,6 @@ abstract class BaseTitle extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
-        if ($this->aWork !== null && $this->work_id !== $this->aWork->getId()) {
-            $this->aWork = null;
-        }
-        if ($this->aPublication !== null && $this->publication_id !== $this->aPublication->getId()) {
-            $this->aPublication = null;
-        }
-        if ($this->aVolume !== null && $this->volume_id !== $this->aVolume->getId()) {
-            $this->aVolume = null;
-        }
-        if ($this->aTitletype !== null && $this->titletype_id !== $this->aTitletype->getId()) {
-            $this->aTitletype = null;
-        }
     } // ensureConsistency
 
     /**
@@ -474,10 +220,10 @@ abstract class BaseTitle extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aTitletype = null;
-            $this->aPublication = null;
-            $this->aVolume = null;
-            $this->aWork = null;
+            $this->collTitlefragments = null;
+
+            $this->collPublications = null;
+
         } // if (deep)
     }
 
@@ -591,39 +337,6 @@ abstract class BaseTitle extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
-            // We call the save method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aTitletype !== null) {
-                if ($this->aTitletype->isModified() || $this->aTitletype->isNew()) {
-                    $affectedRows += $this->aTitletype->save($con);
-                }
-                $this->setTitletype($this->aTitletype);
-            }
-
-            if ($this->aPublication !== null) {
-                if ($this->aPublication->isModified() || $this->aPublication->isNew()) {
-                    $affectedRows += $this->aPublication->save($con);
-                }
-                $this->setPublication($this->aPublication);
-            }
-
-            if ($this->aVolume !== null) {
-                if ($this->aVolume->isModified() || $this->aVolume->isNew()) {
-                    $affectedRows += $this->aVolume->save($con);
-                }
-                $this->setVolume($this->aVolume);
-            }
-
-            if ($this->aWork !== null) {
-                if ($this->aWork->isModified() || $this->aWork->isNew()) {
-                    $affectedRows += $this->aWork->save($con);
-                }
-                $this->setWork($this->aWork);
-            }
-
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -633,6 +346,40 @@ abstract class BaseTitle extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->titlefragmentsScheduledForDeletion !== null) {
+                if (!$this->titlefragmentsScheduledForDeletion->isEmpty()) {
+                    TitlefragmentQuery::create()
+                        ->filterByPrimaryKeys($this->titlefragmentsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->titlefragmentsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collTitlefragments !== null) {
+                foreach ($this->collTitlefragments as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->publicationsScheduledForDeletion !== null) {
+                if (!$this->publicationsScheduledForDeletion->isEmpty()) {
+                    PublicationQuery::create()
+                        ->filterByPrimaryKeys($this->publicationsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->publicationsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collPublications !== null) {
+                foreach ($this->collPublications as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -664,24 +411,6 @@ abstract class BaseTitle extends BaseObject implements Persistent
         if ($this->isColumnModified(TitlePeer::ID)) {
             $modifiedColumns[':p' . $index++]  = '`ID`';
         }
-        if ($this->isColumnModified(TitlePeer::SEQUENCEINDEX)) {
-            $modifiedColumns[':p' . $index++]  = '`SEQUENCEINDEX`';
-        }
-        if ($this->isColumnModified(TitlePeer::TITLE)) {
-            $modifiedColumns[':p' . $index++]  = '`TITLE`';
-        }
-        if ($this->isColumnModified(TitlePeer::WORK_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`WORK_ID`';
-        }
-        if ($this->isColumnModified(TitlePeer::PUBLICATION_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`PUBLICATION_ID`';
-        }
-        if ($this->isColumnModified(TitlePeer::VOLUME_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`VOLUME_ID`';
-        }
-        if ($this->isColumnModified(TitlePeer::TITLETYPE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`TITLETYPE_ID`';
-        }
 
         $sql = sprintf(
             'INSERT INTO `title` (%s) VALUES (%s)',
@@ -695,24 +424,6 @@ abstract class BaseTitle extends BaseObject implements Persistent
                 switch ($columnName) {
                     case '`ID`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
-                        break;
-                    case '`SEQUENCEINDEX`':
-                        $stmt->bindValue($identifier, $this->sequenceindex, PDO::PARAM_INT);
-                        break;
-                    case '`TITLE`':
-                        $stmt->bindValue($identifier, $this->title, PDO::PARAM_STR);
-                        break;
-                    case '`WORK_ID`':
-                        $stmt->bindValue($identifier, $this->work_id, PDO::PARAM_INT);
-                        break;
-                    case '`PUBLICATION_ID`':
-                        $stmt->bindValue($identifier, $this->publication_id, PDO::PARAM_INT);
-                        break;
-                    case '`VOLUME_ID`':
-                        $stmt->bindValue($identifier, $this->volume_id, PDO::PARAM_INT);
-                        break;
-                    case '`TITLETYPE_ID`':
-                        $stmt->bindValue($identifier, $this->titletype_id, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -808,40 +519,26 @@ abstract class BaseTitle extends BaseObject implements Persistent
             $failureMap = array();
 
 
-            // We call the validate method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aTitletype !== null) {
-                if (!$this->aTitletype->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aTitletype->getValidationFailures());
-                }
-            }
-
-            if ($this->aPublication !== null) {
-                if (!$this->aPublication->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aPublication->getValidationFailures());
-                }
-            }
-
-            if ($this->aVolume !== null) {
-                if (!$this->aVolume->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aVolume->getValidationFailures());
-                }
-            }
-
-            if ($this->aWork !== null) {
-                if (!$this->aWork->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aWork->getValidationFailures());
-                }
-            }
-
-
             if (($retval = TitlePeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
+
+                if ($this->collTitlefragments !== null) {
+                    foreach ($this->collTitlefragments as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collPublications !== null) {
+                    foreach ($this->collPublications as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
 
 
             $this->alreadyInValidation = false;
@@ -881,24 +578,6 @@ abstract class BaseTitle extends BaseObject implements Persistent
             case 0:
                 return $this->getId();
                 break;
-            case 1:
-                return $this->getSequenceindex();
-                break;
-            case 2:
-                return $this->getTitle();
-                break;
-            case 3:
-                return $this->getWorkId();
-                break;
-            case 4:
-                return $this->getPublicationId();
-                break;
-            case 5:
-                return $this->getVolumeId();
-                break;
-            case 6:
-                return $this->getTitletypeId();
-                break;
             default:
                 return null;
                 break;
@@ -929,25 +608,13 @@ abstract class BaseTitle extends BaseObject implements Persistent
         $keys = TitlePeer::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getSequenceindex(),
-            $keys[2] => $this->getTitle(),
-            $keys[3] => $this->getWorkId(),
-            $keys[4] => $this->getPublicationId(),
-            $keys[5] => $this->getVolumeId(),
-            $keys[6] => $this->getTitletypeId(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aTitletype) {
-                $result['Titletype'] = $this->aTitletype->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collTitlefragments) {
+                $result['Titlefragments'] = $this->collTitlefragments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->aPublication) {
-                $result['Publication'] = $this->aPublication->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->aVolume) {
-                $result['Volume'] = $this->aVolume->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->aWork) {
-                $result['Work'] = $this->aWork->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collPublications) {
+                $result['Publications'] = $this->collPublications->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -986,24 +653,6 @@ abstract class BaseTitle extends BaseObject implements Persistent
             case 0:
                 $this->setId($value);
                 break;
-            case 1:
-                $this->setSequenceindex($value);
-                break;
-            case 2:
-                $this->setTitle($value);
-                break;
-            case 3:
-                $this->setWorkId($value);
-                break;
-            case 4:
-                $this->setPublicationId($value);
-                break;
-            case 5:
-                $this->setVolumeId($value);
-                break;
-            case 6:
-                $this->setTitletypeId($value);
-                break;
         } // switch()
     }
 
@@ -1029,12 +678,6 @@ abstract class BaseTitle extends BaseObject implements Persistent
         $keys = TitlePeer::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setSequenceindex($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setTitle($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setWorkId($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setPublicationId($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setVolumeId($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setTitletypeId($arr[$keys[6]]);
     }
 
     /**
@@ -1047,12 +690,6 @@ abstract class BaseTitle extends BaseObject implements Persistent
         $criteria = new Criteria(TitlePeer::DATABASE_NAME);
 
         if ($this->isColumnModified(TitlePeer::ID)) $criteria->add(TitlePeer::ID, $this->id);
-        if ($this->isColumnModified(TitlePeer::SEQUENCEINDEX)) $criteria->add(TitlePeer::SEQUENCEINDEX, $this->sequenceindex);
-        if ($this->isColumnModified(TitlePeer::TITLE)) $criteria->add(TitlePeer::TITLE, $this->title);
-        if ($this->isColumnModified(TitlePeer::WORK_ID)) $criteria->add(TitlePeer::WORK_ID, $this->work_id);
-        if ($this->isColumnModified(TitlePeer::PUBLICATION_ID)) $criteria->add(TitlePeer::PUBLICATION_ID, $this->publication_id);
-        if ($this->isColumnModified(TitlePeer::VOLUME_ID)) $criteria->add(TitlePeer::VOLUME_ID, $this->volume_id);
-        if ($this->isColumnModified(TitlePeer::TITLETYPE_ID)) $criteria->add(TitlePeer::TITLETYPE_ID, $this->titletype_id);
 
         return $criteria;
     }
@@ -1116,12 +753,6 @@ abstract class BaseTitle extends BaseObject implements Persistent
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setSequenceindex($this->getSequenceindex());
-        $copyObj->setTitle($this->getTitle());
-        $copyObj->setWorkId($this->getWorkId());
-        $copyObj->setPublicationId($this->getPublicationId());
-        $copyObj->setVolumeId($this->getVolumeId());
-        $copyObj->setTitletypeId($this->getTitletypeId());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1129,6 +760,18 @@ abstract class BaseTitle extends BaseObject implements Persistent
             $copyObj->setNew(false);
             // store object hash to prevent cycle
             $this->startCopy = true;
+
+            foreach ($this->getTitlefragments() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addTitlefragment($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getPublications() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addPublication($relObj->copy($deepCopy));
+                }
+            }
 
             //unflag object copy
             $this->startCopy = false;
@@ -1180,208 +823,553 @@ abstract class BaseTitle extends BaseObject implements Persistent
         return self::$peer;
     }
 
+
     /**
-     * Declares an association between this object and a Titletype object.
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param             Titletype $v
+     * @param string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('Titlefragment' == $relationName) {
+            $this->initTitlefragments();
+        }
+        if ('Publication' == $relationName) {
+            $this->initPublications();
+        }
+    }
+
+    /**
+     * Clears out the collTitlefragments collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
      * @return Title The current object (for fluent API support)
+     * @see        addTitlefragments()
+     */
+    public function clearTitlefragments()
+    {
+        $this->collTitlefragments = null; // important to set this to null since that means it is uninitialized
+        $this->collTitlefragmentsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collTitlefragments collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialTitlefragments($v = true)
+    {
+        $this->collTitlefragmentsPartial = $v;
+    }
+
+    /**
+     * Initializes the collTitlefragments collection.
+     *
+     * By default this just sets the collTitlefragments collection to an empty array (like clearcollTitlefragments());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initTitlefragments($overrideExisting = true)
+    {
+        if (null !== $this->collTitlefragments && !$overrideExisting) {
+            return;
+        }
+        $this->collTitlefragments = new PropelObjectCollection();
+        $this->collTitlefragments->setModel('Titlefragment');
+    }
+
+    /**
+     * Gets an array of Titlefragment objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Title is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Titlefragment[] List of Titlefragment objects
      * @throws PropelException
      */
-    public function setTitletype(Titletype $v = null)
+    public function getTitlefragments($criteria = null, PropelPDO $con = null)
     {
-        if ($v === null) {
-            $this->setTitletypeId(NULL);
+        $partial = $this->collTitlefragmentsPartial && !$this->isNew();
+        if (null === $this->collTitlefragments || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collTitlefragments) {
+                // return empty collection
+                $this->initTitlefragments();
+            } else {
+                $collTitlefragments = TitlefragmentQuery::create(null, $criteria)
+                    ->filterByTitle($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collTitlefragmentsPartial && count($collTitlefragments)) {
+                      $this->initTitlefragments(false);
+
+                      foreach($collTitlefragments as $obj) {
+                        if (false == $this->collTitlefragments->contains($obj)) {
+                          $this->collTitlefragments->append($obj);
+                        }
+                      }
+
+                      $this->collTitlefragmentsPartial = true;
+                    }
+
+                    return $collTitlefragments;
+                }
+
+                if($partial && $this->collTitlefragments) {
+                    foreach($this->collTitlefragments as $obj) {
+                        if($obj->isNew()) {
+                            $collTitlefragments[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collTitlefragments = $collTitlefragments;
+                $this->collTitlefragmentsPartial = false;
+            }
+        }
+
+        return $this->collTitlefragments;
+    }
+
+    /**
+     * Sets a collection of Titlefragment objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $titlefragments A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Title The current object (for fluent API support)
+     */
+    public function setTitlefragments(PropelCollection $titlefragments, PropelPDO $con = null)
+    {
+        $this->titlefragmentsScheduledForDeletion = $this->getTitlefragments(new Criteria(), $con)->diff($titlefragments);
+
+        foreach ($this->titlefragmentsScheduledForDeletion as $titlefragmentRemoved) {
+            $titlefragmentRemoved->setTitle(null);
+        }
+
+        $this->collTitlefragments = null;
+        foreach ($titlefragments as $titlefragment) {
+            $this->addTitlefragment($titlefragment);
+        }
+
+        $this->collTitlefragments = $titlefragments;
+        $this->collTitlefragmentsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Titlefragment objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Titlefragment objects.
+     * @throws PropelException
+     */
+    public function countTitlefragments(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collTitlefragmentsPartial && !$this->isNew();
+        if (null === $this->collTitlefragments || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collTitlefragments) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getTitlefragments());
+                }
+                $query = TitlefragmentQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByTitle($this)
+                    ->count($con);
+            }
         } else {
-            $this->setTitletypeId($v->getId());
+            return count($this->collTitlefragments);
+        }
+    }
+
+    /**
+     * Method called to associate a Titlefragment object to this object
+     * through the Titlefragment foreign key attribute.
+     *
+     * @param    Titlefragment $l Titlefragment
+     * @return Title The current object (for fluent API support)
+     */
+    public function addTitlefragment(Titlefragment $l)
+    {
+        if ($this->collTitlefragments === null) {
+            $this->initTitlefragments();
+            $this->collTitlefragmentsPartial = true;
+        }
+        if (!in_array($l, $this->collTitlefragments->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddTitlefragment($l);
         }
 
-        $this->aTitletype = $v;
+        return $this;
+    }
 
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Titletype object, it will not be re-added.
-        if ($v !== null) {
-            $v->addTitle($this);
+    /**
+     * @param	Titlefragment $titlefragment The titlefragment object to add.
+     */
+    protected function doAddTitlefragment($titlefragment)
+    {
+        $this->collTitlefragments[]= $titlefragment;
+        $titlefragment->setTitle($this);
+    }
+
+    /**
+     * @param	Titlefragment $titlefragment The titlefragment object to remove.
+     * @return Title The current object (for fluent API support)
+     */
+    public function removeTitlefragment($titlefragment)
+    {
+        if ($this->getTitlefragments()->contains($titlefragment)) {
+            $this->collTitlefragments->remove($this->collTitlefragments->search($titlefragment));
+            if (null === $this->titlefragmentsScheduledForDeletion) {
+                $this->titlefragmentsScheduledForDeletion = clone $this->collTitlefragments;
+                $this->titlefragmentsScheduledForDeletion->clear();
+            }
+            $this->titlefragmentsScheduledForDeletion[]= $titlefragment;
+            $titlefragment->setTitle(null);
         }
-
 
         return $this;
     }
 
 
     /**
-     * Get the associated Titletype object
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Titlefragments from storage.
      *
-     * @param PropelPDO $con Optional Connection object.
-     * @return Titletype The associated Titletype object.
-     * @throws PropelException
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Titlefragment[] List of Titlefragment objects
      */
-    public function getTitletype(PropelPDO $con = null)
+    public function getTitlefragmentsJoinTitlefragmenttype($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
-        if ($this->aTitletype === null && ($this->titletype_id !== null)) {
-            $this->aTitletype = TitletypeQuery::create()->findPk($this->titletype_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aTitletype->addTitles($this);
-             */
-        }
+        $query = TitlefragmentQuery::create(null, $criteria);
+        $query->joinWith('Titlefragmenttype', $join_behavior);
 
-        return $this->aTitletype;
+        return $this->getTitlefragments($query, $con);
     }
 
     /**
-     * Declares an association between this object and a Publication object.
+     * Clears out the collPublications collection
      *
-     * @param             Publication $v
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
      * @return Title The current object (for fluent API support)
+     * @see        addPublications()
+     */
+    public function clearPublications()
+    {
+        $this->collPublications = null; // important to set this to null since that means it is uninitialized
+        $this->collPublicationsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collPublications collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialPublications($v = true)
+    {
+        $this->collPublicationsPartial = $v;
+    }
+
+    /**
+     * Initializes the collPublications collection.
+     *
+     * By default this just sets the collPublications collection to an empty array (like clearcollPublications());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initPublications($overrideExisting = true)
+    {
+        if (null !== $this->collPublications && !$overrideExisting) {
+            return;
+        }
+        $this->collPublications = new PropelObjectCollection();
+        $this->collPublications->setModel('Publication');
+    }
+
+    /**
+     * Gets an array of Publication objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Title is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Publication[] List of Publication objects
      * @throws PropelException
      */
-    public function setPublication(Publication $v = null)
+    public function getPublications($criteria = null, PropelPDO $con = null)
     {
-        if ($v === null) {
-            $this->setPublicationId(NULL);
+        $partial = $this->collPublicationsPartial && !$this->isNew();
+        if (null === $this->collPublications || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collPublications) {
+                // return empty collection
+                $this->initPublications();
+            } else {
+                $collPublications = PublicationQuery::create(null, $criteria)
+                    ->filterByTitle($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collPublicationsPartial && count($collPublications)) {
+                      $this->initPublications(false);
+
+                      foreach($collPublications as $obj) {
+                        if (false == $this->collPublications->contains($obj)) {
+                          $this->collPublications->append($obj);
+                        }
+                      }
+
+                      $this->collPublicationsPartial = true;
+                    }
+
+                    return $collPublications;
+                }
+
+                if($partial && $this->collPublications) {
+                    foreach($this->collPublications as $obj) {
+                        if($obj->isNew()) {
+                            $collPublications[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collPublications = $collPublications;
+                $this->collPublicationsPartial = false;
+            }
+        }
+
+        return $this->collPublications;
+    }
+
+    /**
+     * Sets a collection of Publication objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $publications A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Title The current object (for fluent API support)
+     */
+    public function setPublications(PropelCollection $publications, PropelPDO $con = null)
+    {
+        $this->publicationsScheduledForDeletion = $this->getPublications(new Criteria(), $con)->diff($publications);
+
+        foreach ($this->publicationsScheduledForDeletion as $publicationRemoved) {
+            $publicationRemoved->setTitle(null);
+        }
+
+        $this->collPublications = null;
+        foreach ($publications as $publication) {
+            $this->addPublication($publication);
+        }
+
+        $this->collPublications = $publications;
+        $this->collPublicationsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Publication objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Publication objects.
+     * @throws PropelException
+     */
+    public function countPublications(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collPublicationsPartial && !$this->isNew();
+        if (null === $this->collPublications || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collPublications) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getPublications());
+                }
+                $query = PublicationQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByTitle($this)
+                    ->count($con);
+            }
         } else {
-            $this->setPublicationId($v->getId());
+            return count($this->collPublications);
+        }
+    }
+
+    /**
+     * Method called to associate a Publication object to this object
+     * through the Publication foreign key attribute.
+     *
+     * @param    Publication $l Publication
+     * @return Title The current object (for fluent API support)
+     */
+    public function addPublication(Publication $l)
+    {
+        if ($this->collPublications === null) {
+            $this->initPublications();
+            $this->collPublicationsPartial = true;
+        }
+        if (!in_array($l, $this->collPublications->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddPublication($l);
         }
 
-        $this->aPublication = $v;
+        return $this;
+    }
 
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Publication object, it will not be re-added.
-        if ($v !== null) {
-            $v->addTitle($this);
+    /**
+     * @param	Publication $publication The publication object to add.
+     */
+    protected function doAddPublication($publication)
+    {
+        $this->collPublications[]= $publication;
+        $publication->setTitle($this);
+    }
+
+    /**
+     * @param	Publication $publication The publication object to remove.
+     * @return Title The current object (for fluent API support)
+     */
+    public function removePublication($publication)
+    {
+        if ($this->getPublications()->contains($publication)) {
+            $this->collPublications->remove($this->collPublications->search($publication));
+            if (null === $this->publicationsScheduledForDeletion) {
+                $this->publicationsScheduledForDeletion = clone $this->collPublications;
+                $this->publicationsScheduledForDeletion->clear();
+            }
+            $this->publicationsScheduledForDeletion[]= $publication;
+            $publication->setTitle(null);
         }
-
 
         return $this;
     }
 
 
     /**
-     * Get the associated Publication object
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Publications from storage.
      *
-     * @param PropelPDO $con Optional Connection object.
-     * @return Publication The associated Publication object.
-     * @throws PropelException
-     */
-    public function getPublication(PropelPDO $con = null)
-    {
-        if ($this->aPublication === null && ($this->publication_id !== null)) {
-            $this->aPublication = PublicationQuery::create()->findPk($this->publication_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aPublication->addTitles($this);
-             */
-        }
-
-        return $this->aPublication;
-    }
-
-    /**
-     * Declares an association between this object and a Volume object.
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
      *
-     * @param             Volume $v
-     * @return Title The current object (for fluent API support)
-     * @throws PropelException
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
      */
-    public function setVolume(Volume $v = null)
+    public function getPublicationsJoinPublishingcompany($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
-        if ($v === null) {
-            $this->setVolumeId(NULL);
-        } else {
-            $this->setVolumeId($v->getId());
-        }
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Publishingcompany', $join_behavior);
 
-        $this->aVolume = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Volume object, it will not be re-added.
-        if ($v !== null) {
-            $v->addTitle($this);
-        }
-
-
-        return $this;
+        return $this->getPublications($query, $con);
     }
 
 
     /**
-     * Get the associated Volume object
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Publications from storage.
      *
-     * @param PropelPDO $con Optional Connection object.
-     * @return Volume The associated Volume object.
-     * @throws PropelException
-     */
-    public function getVolume(PropelPDO $con = null)
-    {
-        if ($this->aVolume === null && ($this->volume_id !== null)) {
-            $this->aVolume = VolumeQuery::create()->findPk($this->volume_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aVolume->addTitles($this);
-             */
-        }
-
-        return $this->aVolume;
-    }
-
-    /**
-     * Declares an association between this object and a Work object.
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
      *
-     * @param             Work $v
-     * @return Title The current object (for fluent API support)
-     * @throws PropelException
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
      */
-    public function setWork(Work $v = null)
+    public function getPublicationsJoinPlace($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
-        if ($v === null) {
-            $this->setWorkId(NULL);
-        } else {
-            $this->setWorkId($v->getId());
-        }
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Place', $join_behavior);
 
-        $this->aWork = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Work object, it will not be re-added.
-        if ($v !== null) {
-            $v->addTitle($this);
-        }
-
-
-        return $this;
+        return $this->getPublications($query, $con);
     }
 
 
     /**
-     * Get the associated Work object
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Publications from storage.
      *
-     * @param PropelPDO $con Optional Connection object.
-     * @return Work The associated Work object.
-     * @throws PropelException
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
      */
-    public function getWork(PropelPDO $con = null)
+    public function getPublicationsJoinDatespecification($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
-        if ($this->aWork === null && ($this->work_id !== null)) {
-            $this->aWork = WorkQuery::create()->findPk($this->work_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aWork->addTitles($this);
-             */
-        }
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Datespecification', $join_behavior);
 
-        return $this->aWork;
+        return $this->getPublications($query, $con);
     }
 
     /**
@@ -1390,12 +1378,6 @@ abstract class BaseTitle extends BaseObject implements Persistent
     public function clear()
     {
         $this->id = null;
-        $this->sequenceindex = null;
-        $this->title = null;
-        $this->work_id = null;
-        $this->publication_id = null;
-        $this->volume_id = null;
-        $this->titletype_id = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->clearAllReferences();
@@ -1416,12 +1398,26 @@ abstract class BaseTitle extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collTitlefragments) {
+                foreach ($this->collTitlefragments as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collPublications) {
+                foreach ($this->collPublications as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        $this->aTitletype = null;
-        $this->aPublication = null;
-        $this->aVolume = null;
-        $this->aWork = null;
+        if ($this->collTitlefragments instanceof PropelCollection) {
+            $this->collTitlefragments->clearIterator();
+        }
+        $this->collTitlefragments = null;
+        if ($this->collPublications instanceof PropelCollection) {
+            $this->collPublications->clearIterator();
+        }
+        $this->collPublications = null;
     }
 
     /**

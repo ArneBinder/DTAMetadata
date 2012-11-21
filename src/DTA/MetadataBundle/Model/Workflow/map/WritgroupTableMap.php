@@ -16,7 +16,7 @@ use \TableMap;
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package    propel.generator.src.Workflow.map
+ * @package    propel.generator.src.DTA.MetadataBundle.Model.Workflow.map
  */
 class WritgroupTableMap extends TableMap
 {
@@ -24,7 +24,7 @@ class WritgroupTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'src.Workflow.map.WritgroupTableMap';
+    const CLASS_NAME = 'src.DTA.MetadataBundle.Model.Workflow.map.WritgroupTableMap';
 
     /**
      * Initialize the table attributes, columns and validators
@@ -39,7 +39,7 @@ class WritgroupTableMap extends TableMap
         $this->setName('writGroup');
         $this->setPhpName('Writgroup');
         $this->setClassname('DTA\\MetadataBundle\\Model\\Workflow\\Writgroup');
-        $this->setPackage('src.Workflow');
+        $this->setPackage('src.DTA.MetadataBundle.Model.Workflow');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
@@ -52,8 +52,8 @@ class WritgroupTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('WritWritgroup', 'DTA\\MetadataBundle\\Model\\Publication\\WritWritgroup', RelationMap::ONE_TO_MANY, array('id' => 'writGroup_id', ), null, null, 'WritWritgroups');
         $this->addRelation('Task', 'DTA\\MetadataBundle\\Model\\Workflow\\Task', RelationMap::ONE_TO_MANY, array('id' => 'writGroup_id', ), null, null, 'Tasks');
-        $this->addRelation('WritWritgroup', 'DTA\\MetadataBundle\\Model\\WritWritgroup', RelationMap::ONE_TO_MANY, array('id' => 'writGroup_id', ), null, null, 'WritWritgroups');
         $this->addRelation('Writ', 'DTA\\MetadataBundle\\Model\\Publication\\Writ', RelationMap::MANY_TO_MANY, array(), null, null, 'Writs');
     } // buildRelations()
 

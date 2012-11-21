@@ -21,13 +21,13 @@ use DTA\MetadataBundle\Model\Publication\Work;
 /**
  * @method DatespecificationQuery orderById($order = Criteria::ASC) Order by the id column
  * @method DatespecificationQuery orderByYear($order = Criteria::ASC) Order by the year column
- * @method DatespecificationQuery orderByYearisreconstructed($order = Criteria::ASC) Order by the yearIsReconstructed column
  * @method DatespecificationQuery orderByComments($order = Criteria::ASC) Order by the comments column
+ * @method DatespecificationQuery orderByYearIsReconstructed($order = Criteria::ASC) Order by the year_is_reconstructed column
  *
  * @method DatespecificationQuery groupById() Group by the id column
  * @method DatespecificationQuery groupByYear() Group by the year column
- * @method DatespecificationQuery groupByYearisreconstructed() Group by the yearIsReconstructed column
  * @method DatespecificationQuery groupByComments() Group by the comments column
+ * @method DatespecificationQuery groupByYearIsReconstructed() Group by the year_is_reconstructed column
  *
  * @method DatespecificationQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method DatespecificationQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -45,13 +45,13 @@ use DTA\MetadataBundle\Model\Publication\Work;
  * @method Datespecification findOneOrCreate(PropelPDO $con = null) Return the first Datespecification matching the query, or a new Datespecification object populated from the query conditions when no match is found
  *
  * @method Datespecification findOneByYear(int $year) Return the first Datespecification filtered by the year column
- * @method Datespecification findOneByYearisreconstructed(boolean $yearIsReconstructed) Return the first Datespecification filtered by the yearIsReconstructed column
  * @method Datespecification findOneByComments(string $comments) Return the first Datespecification filtered by the comments column
+ * @method Datespecification findOneByYearIsReconstructed(boolean $year_is_reconstructed) Return the first Datespecification filtered by the year_is_reconstructed column
  *
  * @method array findById(int $id) Return Datespecification objects filtered by the id column
  * @method array findByYear(int $year) Return Datespecification objects filtered by the year column
- * @method array findByYearisreconstructed(boolean $yearIsReconstructed) Return Datespecification objects filtered by the yearIsReconstructed column
  * @method array findByComments(string $comments) Return Datespecification objects filtered by the comments column
+ * @method array findByYearIsReconstructed(boolean $year_is_reconstructed) Return Datespecification objects filtered by the year_is_reconstructed column
  */
 abstract class BaseDatespecificationQuery extends ModelCriteria
 {
@@ -153,7 +153,7 @@ abstract class BaseDatespecificationQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `YEAR`, `YEARISRECONSTRUCTED`, `COMMENTS` FROM `dateSpecification` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `YEAR`, `COMMENTS`, `YEAR_IS_RECONSTRUCTED` FROM `dateSpecification` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -311,33 +311,6 @@ abstract class BaseDatespecificationQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the yearIsReconstructed column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByYearisreconstructed(true); // WHERE yearIsReconstructed = true
-     * $query->filterByYearisreconstructed('yes'); // WHERE yearIsReconstructed = true
-     * </code>
-     *
-     * @param     boolean|string $yearisreconstructed The value to use as filter.
-     *              Non-boolean arguments are converted using the following rules:
-     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
-     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
-     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return DatespecificationQuery The current query, for fluid interface
-     */
-    public function filterByYearisreconstructed($yearisreconstructed = null, $comparison = null)
-    {
-        if (is_string($yearisreconstructed)) {
-            $yearIsReconstructed = in_array(strtolower($yearisreconstructed), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
-        }
-
-        return $this->addUsingAlias(DatespecificationPeer::YEARISRECONSTRUCTED, $yearisreconstructed, $comparison);
-    }
-
-    /**
      * Filter the query on the comments column
      *
      * Example usage:
@@ -364,6 +337,33 @@ abstract class BaseDatespecificationQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(DatespecificationPeer::COMMENTS, $comments, $comparison);
+    }
+
+    /**
+     * Filter the query on the year_is_reconstructed column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByYearIsReconstructed(true); // WHERE year_is_reconstructed = true
+     * $query->filterByYearIsReconstructed('yes'); // WHERE year_is_reconstructed = true
+     * </code>
+     *
+     * @param     boolean|string $yearIsReconstructed The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return DatespecificationQuery The current query, for fluid interface
+     */
+    public function filterByYearIsReconstructed($yearIsReconstructed = null, $comparison = null)
+    {
+        if (is_string($yearIsReconstructed)) {
+            $year_is_reconstructed = in_array(strtolower($yearIsReconstructed), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(DatespecificationPeer::YEAR_IS_RECONSTRUCTED, $yearIsReconstructed, $comparison);
     }
 
     /**

@@ -13,18 +13,16 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
-use DTA\MetadataBundle\Model\AuthorWork;
-use DTA\MetadataBundle\Model\AuthorWorkQuery;
 use DTA\MetadataBundle\Model\Classification\Dwdsgenre;
 use DTA\MetadataBundle\Model\Classification\DwdsgenreQuery;
 use DTA\MetadataBundle\Model\Classification\Genre;
 use DTA\MetadataBundle\Model\Classification\GenreQuery;
 use DTA\MetadataBundle\Model\Description\Datespecification;
 use DTA\MetadataBundle\Model\Description\DatespecificationQuery;
-use DTA\MetadataBundle\Model\Description\Title;
-use DTA\MetadataBundle\Model\Description\TitleQuery;
 use DTA\MetadataBundle\Model\HistoricalPerson\Author;
 use DTA\MetadataBundle\Model\HistoricalPerson\AuthorQuery;
+use DTA\MetadataBundle\Model\HistoricalPerson\AuthorWork;
+use DTA\MetadataBundle\Model\HistoricalPerson\AuthorWorkQuery;
 use DTA\MetadataBundle\Model\Publication\Work;
 use DTA\MetadataBundle\Model\Publication\WorkPeer;
 use DTA\MetadataBundle\Model\Publication\WorkQuery;
@@ -157,12 +155,6 @@ abstract class BaseWork extends BaseObject implements Persistent
     protected $collAuthorWorksPartial;
 
     /**
-     * @var        PropelObjectCollection|Title[] Collection to store aggregation of Title objects.
-     */
-    protected $collTitles;
-    protected $collTitlesPartial;
-
-    /**
      * @var        PropelObjectCollection|Writ[] Collection to store aggregation of Writ objects.
      */
     protected $collWrits;
@@ -198,12 +190,6 @@ abstract class BaseWork extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $authorWorksScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $titlesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -715,8 +701,6 @@ abstract class BaseWork extends BaseObject implements Persistent
             $this->aDatespecification = null;
             $this->collAuthorWorks = null;
 
-            $this->collTitles = null;
-
             $this->collWrits = null;
 
             $this->collAuthors = null;
@@ -922,24 +906,6 @@ abstract class BaseWork extends BaseObject implements Persistent
 
             if ($this->collAuthorWorks !== null) {
                 foreach ($this->collAuthorWorks as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
-            if ($this->titlesScheduledForDeletion !== null) {
-                if (!$this->titlesScheduledForDeletion->isEmpty()) {
-                    foreach ($this->titlesScheduledForDeletion as $title) {
-                        // need to save related object because we set the relation to null
-                        $title->save($con);
-                    }
-                    $this->titlesScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collTitles !== null) {
-                foreach ($this->collTitles as $referrerFK) {
                     if (!$referrerFK->isDeleted()) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1215,14 +1181,6 @@ abstract class BaseWork extends BaseObject implements Persistent
                     }
                 }
 
-                if ($this->collTitles !== null) {
-                    foreach ($this->collTitles as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
                 if ($this->collWrits !== null) {
                     foreach ($this->collWrits as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -1361,9 +1319,6 @@ abstract class BaseWork extends BaseObject implements Persistent
             }
             if (null !== $this->collAuthorWorks) {
                 $result['AuthorWorks'] = $this->collAuthorWorks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
-            if (null !== $this->collTitles) {
-                $result['Titles'] = $this->collTitles->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collWrits) {
                 $result['Writs'] = $this->collWrits->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1576,12 +1531,6 @@ abstract class BaseWork extends BaseObject implements Persistent
             foreach ($this->getAuthorWorks() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addAuthorWork($relObj->copy($deepCopy));
-                }
-            }
-
-            foreach ($this->getTitles() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addTitle($relObj->copy($deepCopy));
                 }
             }
 
@@ -1961,9 +1910,6 @@ abstract class BaseWork extends BaseObject implements Persistent
         if ('AuthorWork' == $relationName) {
             $this->initAuthorWorks();
         }
-        if ('Title' == $relationName) {
-            $this->initTitles();
-        }
         if ('Writ' == $relationName) {
             $this->initWrits();
         }
@@ -2207,296 +2153,6 @@ abstract class BaseWork extends BaseObject implements Persistent
         $query->joinWith('Author', $join_behavior);
 
         return $this->getAuthorWorks($query, $con);
-    }
-
-    /**
-     * Clears out the collTitles collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return Work The current object (for fluent API support)
-     * @see        addTitles()
-     */
-    public function clearTitles()
-    {
-        $this->collTitles = null; // important to set this to null since that means it is uninitialized
-        $this->collTitlesPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * reset is the collTitles collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialTitles($v = true)
-    {
-        $this->collTitlesPartial = $v;
-    }
-
-    /**
-     * Initializes the collTitles collection.
-     *
-     * By default this just sets the collTitles collection to an empty array (like clearcollTitles());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initTitles($overrideExisting = true)
-    {
-        if (null !== $this->collTitles && !$overrideExisting) {
-            return;
-        }
-        $this->collTitles = new PropelObjectCollection();
-        $this->collTitles->setModel('Title');
-    }
-
-    /**
-     * Gets an array of Title objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Work is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|Title[] List of Title objects
-     * @throws PropelException
-     */
-    public function getTitles($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collTitlesPartial && !$this->isNew();
-        if (null === $this->collTitles || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collTitles) {
-                // return empty collection
-                $this->initTitles();
-            } else {
-                $collTitles = TitleQuery::create(null, $criteria)
-                    ->filterByWork($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collTitlesPartial && count($collTitles)) {
-                      $this->initTitles(false);
-
-                      foreach($collTitles as $obj) {
-                        if (false == $this->collTitles->contains($obj)) {
-                          $this->collTitles->append($obj);
-                        }
-                      }
-
-                      $this->collTitlesPartial = true;
-                    }
-
-                    return $collTitles;
-                }
-
-                if($partial && $this->collTitles) {
-                    foreach($this->collTitles as $obj) {
-                        if($obj->isNew()) {
-                            $collTitles[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collTitles = $collTitles;
-                $this->collTitlesPartial = false;
-            }
-        }
-
-        return $this->collTitles;
-    }
-
-    /**
-     * Sets a collection of Title objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $titles A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     * @return Work The current object (for fluent API support)
-     */
-    public function setTitles(PropelCollection $titles, PropelPDO $con = null)
-    {
-        $this->titlesScheduledForDeletion = $this->getTitles(new Criteria(), $con)->diff($titles);
-
-        foreach ($this->titlesScheduledForDeletion as $titleRemoved) {
-            $titleRemoved->setWork(null);
-        }
-
-        $this->collTitles = null;
-        foreach ($titles as $title) {
-            $this->addTitle($title);
-        }
-
-        $this->collTitles = $titles;
-        $this->collTitlesPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related Title objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related Title objects.
-     * @throws PropelException
-     */
-    public function countTitles(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collTitlesPartial && !$this->isNew();
-        if (null === $this->collTitles || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collTitles) {
-                return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getTitles());
-                }
-                $query = TitleQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByWork($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collTitles);
-        }
-    }
-
-    /**
-     * Method called to associate a Title object to this object
-     * through the Title foreign key attribute.
-     *
-     * @param    Title $l Title
-     * @return Work The current object (for fluent API support)
-     */
-    public function addTitle(Title $l)
-    {
-        if ($this->collTitles === null) {
-            $this->initTitles();
-            $this->collTitlesPartial = true;
-        }
-        if (!in_array($l, $this->collTitles->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddTitle($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	Title $title The title object to add.
-     */
-    protected function doAddTitle($title)
-    {
-        $this->collTitles[]= $title;
-        $title->setWork($this);
-    }
-
-    /**
-     * @param	Title $title The title object to remove.
-     * @return Work The current object (for fluent API support)
-     */
-    public function removeTitle($title)
-    {
-        if ($this->getTitles()->contains($title)) {
-            $this->collTitles->remove($this->collTitles->search($title));
-            if (null === $this->titlesScheduledForDeletion) {
-                $this->titlesScheduledForDeletion = clone $this->collTitles;
-                $this->titlesScheduledForDeletion->clear();
-            }
-            $this->titlesScheduledForDeletion[]= $title;
-            $title->setWork(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Work is new, it will return
-     * an empty collection; or if this Work has previously
-     * been saved, it will retrieve related Titles from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Work.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Title[] List of Title objects
-     */
-    public function getTitlesJoinTitletype($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = TitleQuery::create(null, $criteria);
-        $query->joinWith('Titletype', $join_behavior);
-
-        return $this->getTitles($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Work is new, it will return
-     * an empty collection; or if this Work has previously
-     * been saved, it will retrieve related Titles from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Work.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Title[] List of Title objects
-     */
-    public function getTitlesJoinPublication($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = TitleQuery::create(null, $criteria);
-        $query->joinWith('Publication', $join_behavior);
-
-        return $this->getTitles($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Work is new, it will return
-     * an empty collection; or if this Work has previously
-     * been saved, it will retrieve related Titles from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Work.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Title[] List of Title objects
-     */
-    public function getTitlesJoinVolume($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = TitleQuery::create(null, $criteria);
-        $query->joinWith('Volume', $join_behavior);
-
-        return $this->getTitles($query, $con);
     }
 
     /**
@@ -3057,11 +2713,6 @@ abstract class BaseWork extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collTitles) {
-                foreach ($this->collTitles as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collWrits) {
                 foreach ($this->collWrits as $o) {
                     $o->clearAllReferences($deep);
@@ -3078,10 +2729,6 @@ abstract class BaseWork extends BaseObject implements Persistent
             $this->collAuthorWorks->clearIterator();
         }
         $this->collAuthorWorks = null;
-        if ($this->collTitles instanceof PropelCollection) {
-            $this->collTitles->clearIterator();
-        }
-        $this->collTitles = null;
         if ($this->collWrits instanceof PropelCollection) {
             $this->collWrits->clearIterator();
         }

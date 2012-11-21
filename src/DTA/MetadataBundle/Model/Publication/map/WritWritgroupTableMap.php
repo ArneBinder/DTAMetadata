@@ -1,6 +1,6 @@
 <?php
 
-namespace DTA\MetadataBundle\Model\map;
+namespace DTA\MetadataBundle\Model\Publication\map;
 
 use \RelationMap;
 use \TableMap;
@@ -16,7 +16,7 @@ use \TableMap;
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package    propel.generator.src.DTA.MetadataBundle.Model.map
+ * @package    propel.generator.src.DTA.MetadataBundle.Model.Publication.map
  */
 class WritWritgroupTableMap extends TableMap
 {
@@ -24,7 +24,7 @@ class WritWritgroupTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'src.DTA.MetadataBundle.Model.map.WritWritgroupTableMap';
+    const CLASS_NAME = 'src.DTA.MetadataBundle.Model.Publication.map.WritWritgroupTableMap';
 
     /**
      * Initialize the table attributes, columns and validators
@@ -38,8 +38,8 @@ class WritWritgroupTableMap extends TableMap
         // attributes
         $this->setName('writ_writGroup');
         $this->setPhpName('WritWritgroup');
-        $this->setClassname('DTA\\MetadataBundle\\Model\\WritWritgroup');
-        $this->setPackage('src.DTA.MetadataBundle.Model');
+        $this->setClassname('DTA\\MetadataBundle\\Model\\Publication\\WritWritgroup');
+        $this->setPackage('src.DTA.MetadataBundle.Model.Publication');
         $this->setUseIdGenerator(false);
         $this->setIsCrossRef(true);
         // columns

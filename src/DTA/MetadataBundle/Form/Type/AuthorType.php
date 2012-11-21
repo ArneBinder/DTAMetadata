@@ -21,7 +21,7 @@ class AuthorType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'DTA\MetadataBundle\Model\Author',
+            'data_class' => 'DTA\MetadataBundle\Model\HistoricalPerson\Author',
         ));
     }
 

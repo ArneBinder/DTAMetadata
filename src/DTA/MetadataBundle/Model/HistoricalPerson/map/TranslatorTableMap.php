@@ -16,7 +16,7 @@ use \TableMap;
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package    propel.generator.src.HistoricalPerson.map
+ * @package    propel.generator.src.DTA.MetadataBundle.Model.HistoricalPerson.map
  */
 class TranslatorTableMap extends TableMap
 {
@@ -24,7 +24,7 @@ class TranslatorTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'src.HistoricalPerson.map.TranslatorTableMap';
+    const CLASS_NAME = 'src.DTA.MetadataBundle.Model.HistoricalPerson.map.TranslatorTableMap';
 
     /**
      * Initialize the table attributes, columns and validators
@@ -39,7 +39,7 @@ class TranslatorTableMap extends TableMap
         $this->setName('translator');
         $this->setPhpName('Translator');
         $this->setClassname('DTA\\MetadataBundle\\Model\\HistoricalPerson\\Translator');
-        $this->setPackage('src.HistoricalPerson');
+        $this->setPackage('src.DTA.MetadataBundle.Model.HistoricalPerson');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);

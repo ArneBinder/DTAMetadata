@@ -55,17 +55,17 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
     protected $year;
 
     /**
-     * The value for the yearisreconstructed field.
-     * Note: this column has a database default value of: false
-     * @var        boolean
-     */
-    protected $yearisreconstructed;
-
-    /**
      * The value for the comments field.
      * @var        string
      */
     protected $comments;
+
+    /**
+     * The value for the year_is_reconstructed field.
+     * Note: this column has a database default value of: false
+     * @var        boolean
+     */
+    protected $year_is_reconstructed;
 
     /**
      * @var        PropelObjectCollection|Publication[] Collection to store aggregation of Publication objects.
@@ -113,7 +113,7 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
      */
     public function applyDefaultValues()
     {
-        $this->yearisreconstructed = false;
+        $this->year_is_reconstructed = false;
     }
 
     /**
@@ -147,16 +147,6 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
     }
 
     /**
-     * Get the [yearisreconstructed] column value.
-     *
-     * @return boolean
-     */
-    public function getYearisreconstructed()
-    {
-        return $this->yearisreconstructed;
-    }
-
-    /**
      * Get the [comments] column value.
      *
      * @return string
@@ -164,6 +154,16 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
     public function getComments()
     {
         return $this->comments;
+    }
+
+    /**
+     * Get the [year_is_reconstructed] column value.
+     *
+     * @return boolean
+     */
+    public function getYearIsReconstructed()
+    {
+        return $this->year_is_reconstructed;
     }
 
     /**
@@ -209,35 +209,6 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
     } // setYear()
 
     /**
-     * Sets the value of the [yearisreconstructed] column.
-     * Non-boolean arguments are converted using the following rules:
-     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
-     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
-     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
-     *
-     * @param boolean|integer|string $v The new value
-     * @return Datespecification The current object (for fluent API support)
-     */
-    public function setYearisreconstructed($v)
-    {
-        if ($v !== null) {
-            if (is_string($v)) {
-                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
-            } else {
-                $v = (boolean) $v;
-            }
-        }
-
-        if ($this->yearisreconstructed !== $v) {
-            $this->yearisreconstructed = $v;
-            $this->modifiedColumns[] = DatespecificationPeer::YEARISRECONSTRUCTED;
-        }
-
-
-        return $this;
-    } // setYearisreconstructed()
-
-    /**
      * Set the value of [comments] column.
      *
      * @param string $v new value
@@ -259,6 +230,35 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
     } // setComments()
 
     /**
+     * Sets the value of the [year_is_reconstructed] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param boolean|integer|string $v The new value
+     * @return Datespecification The current object (for fluent API support)
+     */
+    public function setYearIsReconstructed($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->year_is_reconstructed !== $v) {
+            $this->year_is_reconstructed = $v;
+            $this->modifiedColumns[] = DatespecificationPeer::YEAR_IS_RECONSTRUCTED;
+        }
+
+
+        return $this;
+    } // setYearIsReconstructed()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -268,7 +268,7 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->yearisreconstructed !== false) {
+            if ($this->year_is_reconstructed !== false) {
                 return false;
             }
 
@@ -296,8 +296,8 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->year = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-            $this->yearisreconstructed = ($row[$startcol + 2] !== null) ? (boolean) $row[$startcol + 2] : null;
-            $this->comments = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+            $this->comments = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+            $this->year_is_reconstructed = ($row[$startcol + 3] !== null) ? (boolean) $row[$startcol + 3] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -564,11 +564,11 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
         if ($this->isColumnModified(DatespecificationPeer::YEAR)) {
             $modifiedColumns[':p' . $index++]  = '`YEAR`';
         }
-        if ($this->isColumnModified(DatespecificationPeer::YEARISRECONSTRUCTED)) {
-            $modifiedColumns[':p' . $index++]  = '`YEARISRECONSTRUCTED`';
-        }
         if ($this->isColumnModified(DatespecificationPeer::COMMENTS)) {
             $modifiedColumns[':p' . $index++]  = '`COMMENTS`';
+        }
+        if ($this->isColumnModified(DatespecificationPeer::YEAR_IS_RECONSTRUCTED)) {
+            $modifiedColumns[':p' . $index++]  = '`YEAR_IS_RECONSTRUCTED`';
         }
 
         $sql = sprintf(
@@ -587,11 +587,11 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
                     case '`YEAR`':
                         $stmt->bindValue($identifier, $this->year, PDO::PARAM_INT);
                         break;
-                    case '`YEARISRECONSTRUCTED`':
-                        $stmt->bindValue($identifier, (int) $this->yearisreconstructed, PDO::PARAM_INT);
-                        break;
                     case '`COMMENTS`':
                         $stmt->bindValue($identifier, $this->comments, PDO::PARAM_STR);
+                        break;
+                    case '`YEAR_IS_RECONSTRUCTED`':
+                        $stmt->bindValue($identifier, (int) $this->year_is_reconstructed, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -750,10 +750,10 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
                 return $this->getYear();
                 break;
             case 2:
-                return $this->getYearisreconstructed();
+                return $this->getComments();
                 break;
             case 3:
-                return $this->getComments();
+                return $this->getYearIsReconstructed();
                 break;
             default:
                 return null;
@@ -786,8 +786,8 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getYear(),
-            $keys[2] => $this->getYearisreconstructed(),
-            $keys[3] => $this->getComments(),
+            $keys[2] => $this->getComments(),
+            $keys[3] => $this->getYearIsReconstructed(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->collPublications) {
@@ -837,10 +837,10 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
                 $this->setYear($value);
                 break;
             case 2:
-                $this->setYearisreconstructed($value);
+                $this->setComments($value);
                 break;
             case 3:
-                $this->setComments($value);
+                $this->setYearIsReconstructed($value);
                 break;
         } // switch()
     }
@@ -868,8 +868,8 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setYear($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setYearisreconstructed($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setComments($arr[$keys[3]]);
+        if (array_key_exists($keys[2], $arr)) $this->setComments($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setYearIsReconstructed($arr[$keys[3]]);
     }
 
     /**
@@ -883,8 +883,8 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
 
         if ($this->isColumnModified(DatespecificationPeer::ID)) $criteria->add(DatespecificationPeer::ID, $this->id);
         if ($this->isColumnModified(DatespecificationPeer::YEAR)) $criteria->add(DatespecificationPeer::YEAR, $this->year);
-        if ($this->isColumnModified(DatespecificationPeer::YEARISRECONSTRUCTED)) $criteria->add(DatespecificationPeer::YEARISRECONSTRUCTED, $this->yearisreconstructed);
         if ($this->isColumnModified(DatespecificationPeer::COMMENTS)) $criteria->add(DatespecificationPeer::COMMENTS, $this->comments);
+        if ($this->isColumnModified(DatespecificationPeer::YEAR_IS_RECONSTRUCTED)) $criteria->add(DatespecificationPeer::YEAR_IS_RECONSTRUCTED, $this->year_is_reconstructed);
 
         return $criteria;
     }
@@ -949,8 +949,8 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setYear($this->getYear());
-        $copyObj->setYearisreconstructed($this->getYearisreconstructed());
         $copyObj->setComments($this->getComments());
+        $copyObj->setYearIsReconstructed($this->getYearIsReconstructed());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1253,6 +1253,31 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
         }
 
         return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Datespecification is new, it will return
+     * an empty collection; or if this Datespecification has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Datespecification.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinTitle($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Title', $join_behavior);
+
+        return $this->getPublications($query, $con);
     }
 
 
@@ -1652,8 +1677,8 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
     {
         $this->id = null;
         $this->year = null;
-        $this->yearisreconstructed = null;
         $this->comments = null;
+        $this->year_is_reconstructed = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->clearAllReferences();
@@ -1715,6 +1740,35 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
+    }
+
+    // reconstructed_flaggable behavior
+    /**
+    * Returns all columns that can be flagged as reconstructed.
+    */
+    public function getReconstructedFlaggableColumns(){
+        return array('Year', );
+    }
+
+    /**
+    * Returns whether a column is flagged as reconstructed.
+    * @param $column the PHP name of the column as defined in the schema
+    */
+    public function isReconstructedByName($column){
+        return $this->getByName($column."IsReconstructed");
+    }
+
+    /**
+    * Returns all columns that actually are flagged as reconstructed.
+    */
+    public function getReconstructedFlaggedColumns(){
+        $flaggableColumns = $this->getReconstructedFlaggableColumns();
+        $flaggedColumns = array();
+        foreach($flaggableColumns as $column){
+            if($this->isReconstructedByName($column))
+            $flaggedColumns[] = $column;
+        }
+        return $flaggedColumns;
     }
 
 }

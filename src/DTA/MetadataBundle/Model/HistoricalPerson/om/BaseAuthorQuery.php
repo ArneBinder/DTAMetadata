@@ -12,10 +12,10 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
-use DTA\MetadataBundle\Model\AuthorWork;
 use DTA\MetadataBundle\Model\HistoricalPerson\Author;
 use DTA\MetadataBundle\Model\HistoricalPerson\AuthorPeer;
 use DTA\MetadataBundle\Model\HistoricalPerson\AuthorQuery;
+use DTA\MetadataBundle\Model\HistoricalPerson\AuthorWork;
 use DTA\MetadataBundle\Model\HistoricalPerson\Person;
 use DTA\MetadataBundle\Model\Publication\Work;
 
@@ -428,13 +428,13 @@ abstract class BaseAuthorQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \DTA\MetadataBundle\Model\AuthorWorkQuery A secondary query class using the current class as primary query
+     * @return   \DTA\MetadataBundle\Model\HistoricalPerson\AuthorWorkQuery A secondary query class using the current class as primary query
      */
     public function useAuthorWorkQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
             ->joinAuthorWork($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'AuthorWork', '\DTA\MetadataBundle\Model\AuthorWorkQuery');
+            ->useQuery($relationAlias ? $relationAlias : 'AuthorWork', '\DTA\MetadataBundle\Model\HistoricalPerson\AuthorWorkQuery');
     }
 
     /**

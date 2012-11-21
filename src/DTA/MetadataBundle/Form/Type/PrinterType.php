@@ -21,7 +21,7 @@ class PrinterType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'DTA\MetadataBundle\Model\Printer',
+            'data_class' => 'DTA\MetadataBundle\Model\HistoricalPerson\Printer',
         ));
     }
 

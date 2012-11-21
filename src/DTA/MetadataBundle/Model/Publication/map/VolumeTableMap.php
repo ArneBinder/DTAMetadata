@@ -16,7 +16,7 @@ use \TableMap;
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  *
- * @package    propel.generator.src.Publication.map
+ * @package    propel.generator.src.DTA.MetadataBundle.Model.Publication.map
  */
 class VolumeTableMap extends TableMap
 {
@@ -24,7 +24,7 @@ class VolumeTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'src.Publication.map.VolumeTableMap';
+    const CLASS_NAME = 'src.DTA.MetadataBundle.Model.Publication.map.VolumeTableMap';
 
     /**
      * Initialize the table attributes, columns and validators
@@ -39,7 +39,7 @@ class VolumeTableMap extends TableMap
         $this->setName('volume');
         $this->setPhpName('Volume');
         $this->setClassname('DTA\\MetadataBundle\\Model\\Publication\\Volume');
-        $this->setPackage('src.Publication');
+        $this->setPackage('src.DTA.MetadataBundle.Model.Publication');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
@@ -57,7 +57,6 @@ class VolumeTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Monograph', 'DTA\\MetadataBundle\\Model\\Publication\\Monograph', RelationMap::MANY_TO_ONE, array('monograph_id' => 'id', 'monograph_publication_id' => 'publication_id', ), null, null);
-        $this->addRelation('Title', 'DTA\\MetadataBundle\\Model\\Description\\Title', RelationMap::ONE_TO_MANY, array('id' => 'volume_id', ), null, null, 'Titles');
     } // buildRelations()
 
 } // VolumeTableMap

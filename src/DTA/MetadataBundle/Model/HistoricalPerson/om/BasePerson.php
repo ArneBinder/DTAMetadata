@@ -61,16 +61,16 @@ abstract class BasePerson extends BaseObject implements Persistent
     protected $gnd;
 
     /**
-     * @var        PropelObjectCollection|Author[] Collection to store aggregation of Author objects.
-     */
-    protected $collAuthors;
-    protected $collAuthorsPartial;
-
-    /**
      * @var        PropelObjectCollection|Personalname[] Collection to store aggregation of Personalname objects.
      */
     protected $collPersonalnames;
     protected $collPersonalnamesPartial;
+
+    /**
+     * @var        PropelObjectCollection|Author[] Collection to store aggregation of Author objects.
+     */
+    protected $collAuthors;
+    protected $collAuthorsPartial;
 
     /**
      * @var        PropelObjectCollection|Printer[] Collection to store aggregation of Printer objects.
@@ -108,13 +108,13 @@ abstract class BasePerson extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $authorsScheduledForDeletion = null;
+    protected $personalnamesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $personalnamesScheduledForDeletion = null;
+    protected $authorsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -300,9 +300,9 @@ abstract class BasePerson extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collAuthors = null;
-
             $this->collPersonalnames = null;
+
+            $this->collAuthors = null;
 
             $this->collPrinters = null;
 
@@ -434,23 +434,6 @@ abstract class BasePerson extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
-            if ($this->authorsScheduledForDeletion !== null) {
-                if (!$this->authorsScheduledForDeletion->isEmpty()) {
-                    AuthorQuery::create()
-                        ->filterByPrimaryKeys($this->authorsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->authorsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collAuthors !== null) {
-                foreach ($this->collAuthors as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             if ($this->personalnamesScheduledForDeletion !== null) {
                 if (!$this->personalnamesScheduledForDeletion->isEmpty()) {
                     PersonalnameQuery::create()
@@ -462,6 +445,23 @@ abstract class BasePerson extends BaseObject implements Persistent
 
             if ($this->collPersonalnames !== null) {
                 foreach ($this->collPersonalnames as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->authorsScheduledForDeletion !== null) {
+                if (!$this->authorsScheduledForDeletion->isEmpty()) {
+                    AuthorQuery::create()
+                        ->filterByPrimaryKeys($this->authorsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->authorsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collAuthors !== null) {
+                foreach ($this->collAuthors as $referrerFK) {
                     if (!$referrerFK->isDeleted()) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -667,16 +667,16 @@ abstract class BasePerson extends BaseObject implements Persistent
             }
 
 
-                if ($this->collAuthors !== null) {
-                    foreach ($this->collAuthors as $referrerFK) {
+                if ($this->collPersonalnames !== null) {
+                    foreach ($this->collPersonalnames as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
                     }
                 }
 
-                if ($this->collPersonalnames !== null) {
-                    foreach ($this->collPersonalnames as $referrerFK) {
+                if ($this->collAuthors !== null) {
+                    foreach ($this->collAuthors as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -781,11 +781,11 @@ abstract class BasePerson extends BaseObject implements Persistent
             $keys[1] => $this->getGnd(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->collAuthors) {
-                $result['Authors'] = $this->collAuthors->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
             if (null !== $this->collPersonalnames) {
                 $result['Personalnames'] = $this->collPersonalnames->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collAuthors) {
+                $result['Authors'] = $this->collAuthors->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collPrinters) {
                 $result['Printers'] = $this->collPrinters->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -947,15 +947,15 @@ abstract class BasePerson extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getAuthors() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addAuthor($relObj->copy($deepCopy));
-                }
-            }
-
             foreach ($this->getPersonalnames() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addPersonalname($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getAuthors() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addAuthor($relObj->copy($deepCopy));
                 }
             }
 
@@ -1038,11 +1038,11 @@ abstract class BasePerson extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
-        if ('Author' == $relationName) {
-            $this->initAuthors();
-        }
         if ('Personalname' == $relationName) {
             $this->initPersonalnames();
+        }
+        if ('Author' == $relationName) {
+            $this->initAuthors();
         }
         if ('Printer' == $relationName) {
             $this->initPrinters();
@@ -1053,221 +1053,6 @@ abstract class BasePerson extends BaseObject implements Persistent
         if ('Translator' == $relationName) {
             $this->initTranslators();
         }
-    }
-
-    /**
-     * Clears out the collAuthors collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return Person The current object (for fluent API support)
-     * @see        addAuthors()
-     */
-    public function clearAuthors()
-    {
-        $this->collAuthors = null; // important to set this to null since that means it is uninitialized
-        $this->collAuthorsPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * reset is the collAuthors collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialAuthors($v = true)
-    {
-        $this->collAuthorsPartial = $v;
-    }
-
-    /**
-     * Initializes the collAuthors collection.
-     *
-     * By default this just sets the collAuthors collection to an empty array (like clearcollAuthors());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initAuthors($overrideExisting = true)
-    {
-        if (null !== $this->collAuthors && !$overrideExisting) {
-            return;
-        }
-        $this->collAuthors = new PropelObjectCollection();
-        $this->collAuthors->setModel('Author');
-    }
-
-    /**
-     * Gets an array of Author objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Person is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|Author[] List of Author objects
-     * @throws PropelException
-     */
-    public function getAuthors($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collAuthorsPartial && !$this->isNew();
-        if (null === $this->collAuthors || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collAuthors) {
-                // return empty collection
-                $this->initAuthors();
-            } else {
-                $collAuthors = AuthorQuery::create(null, $criteria)
-                    ->filterByPerson($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collAuthorsPartial && count($collAuthors)) {
-                      $this->initAuthors(false);
-
-                      foreach($collAuthors as $obj) {
-                        if (false == $this->collAuthors->contains($obj)) {
-                          $this->collAuthors->append($obj);
-                        }
-                      }
-
-                      $this->collAuthorsPartial = true;
-                    }
-
-                    return $collAuthors;
-                }
-
-                if($partial && $this->collAuthors) {
-                    foreach($this->collAuthors as $obj) {
-                        if($obj->isNew()) {
-                            $collAuthors[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collAuthors = $collAuthors;
-                $this->collAuthorsPartial = false;
-            }
-        }
-
-        return $this->collAuthors;
-    }
-
-    /**
-     * Sets a collection of Author objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $authors A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     * @return Person The current object (for fluent API support)
-     */
-    public function setAuthors(PropelCollection $authors, PropelPDO $con = null)
-    {
-        $this->authorsScheduledForDeletion = $this->getAuthors(new Criteria(), $con)->diff($authors);
-
-        foreach ($this->authorsScheduledForDeletion as $authorRemoved) {
-            $authorRemoved->setPerson(null);
-        }
-
-        $this->collAuthors = null;
-        foreach ($authors as $author) {
-            $this->addAuthor($author);
-        }
-
-        $this->collAuthors = $authors;
-        $this->collAuthorsPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related Author objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related Author objects.
-     * @throws PropelException
-     */
-    public function countAuthors(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collAuthorsPartial && !$this->isNew();
-        if (null === $this->collAuthors || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collAuthors) {
-                return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getAuthors());
-                }
-                $query = AuthorQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByPerson($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collAuthors);
-        }
-    }
-
-    /**
-     * Method called to associate a Author object to this object
-     * through the Author foreign key attribute.
-     *
-     * @param    Author $l Author
-     * @return Person The current object (for fluent API support)
-     */
-    public function addAuthor(Author $l)
-    {
-        if ($this->collAuthors === null) {
-            $this->initAuthors();
-            $this->collAuthorsPartial = true;
-        }
-        if (!in_array($l, $this->collAuthors->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddAuthor($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	Author $author The author object to add.
-     */
-    protected function doAddAuthor($author)
-    {
-        $this->collAuthors[]= $author;
-        $author->setPerson($this);
-    }
-
-    /**
-     * @param	Author $author The author object to remove.
-     * @return Person The current object (for fluent API support)
-     */
-    public function removeAuthor($author)
-    {
-        if ($this->getAuthors()->contains($author)) {
-            $this->collAuthors->remove($this->collAuthors->search($author));
-            if (null === $this->authorsScheduledForDeletion) {
-                $this->authorsScheduledForDeletion = clone $this->collAuthors;
-                $this->authorsScheduledForDeletion->clear();
-            }
-            $this->authorsScheduledForDeletion[]= $author;
-            $author->setPerson(null);
-        }
-
-        return $this;
     }
 
     /**
@@ -1480,6 +1265,221 @@ abstract class BasePerson extends BaseObject implements Persistent
             }
             $this->personalnamesScheduledForDeletion[]= $personalname;
             $personalname->setPerson(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Clears out the collAuthors collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Person The current object (for fluent API support)
+     * @see        addAuthors()
+     */
+    public function clearAuthors()
+    {
+        $this->collAuthors = null; // important to set this to null since that means it is uninitialized
+        $this->collAuthorsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collAuthors collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialAuthors($v = true)
+    {
+        $this->collAuthorsPartial = $v;
+    }
+
+    /**
+     * Initializes the collAuthors collection.
+     *
+     * By default this just sets the collAuthors collection to an empty array (like clearcollAuthors());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initAuthors($overrideExisting = true)
+    {
+        if (null !== $this->collAuthors && !$overrideExisting) {
+            return;
+        }
+        $this->collAuthors = new PropelObjectCollection();
+        $this->collAuthors->setModel('Author');
+    }
+
+    /**
+     * Gets an array of Author objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Person is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Author[] List of Author objects
+     * @throws PropelException
+     */
+    public function getAuthors($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collAuthorsPartial && !$this->isNew();
+        if (null === $this->collAuthors || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collAuthors) {
+                // return empty collection
+                $this->initAuthors();
+            } else {
+                $collAuthors = AuthorQuery::create(null, $criteria)
+                    ->filterByPerson($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collAuthorsPartial && count($collAuthors)) {
+                      $this->initAuthors(false);
+
+                      foreach($collAuthors as $obj) {
+                        if (false == $this->collAuthors->contains($obj)) {
+                          $this->collAuthors->append($obj);
+                        }
+                      }
+
+                      $this->collAuthorsPartial = true;
+                    }
+
+                    return $collAuthors;
+                }
+
+                if($partial && $this->collAuthors) {
+                    foreach($this->collAuthors as $obj) {
+                        if($obj->isNew()) {
+                            $collAuthors[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collAuthors = $collAuthors;
+                $this->collAuthorsPartial = false;
+            }
+        }
+
+        return $this->collAuthors;
+    }
+
+    /**
+     * Sets a collection of Author objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $authors A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Person The current object (for fluent API support)
+     */
+    public function setAuthors(PropelCollection $authors, PropelPDO $con = null)
+    {
+        $this->authorsScheduledForDeletion = $this->getAuthors(new Criteria(), $con)->diff($authors);
+
+        foreach ($this->authorsScheduledForDeletion as $authorRemoved) {
+            $authorRemoved->setPerson(null);
+        }
+
+        $this->collAuthors = null;
+        foreach ($authors as $author) {
+            $this->addAuthor($author);
+        }
+
+        $this->collAuthors = $authors;
+        $this->collAuthorsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Author objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Author objects.
+     * @throws PropelException
+     */
+    public function countAuthors(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collAuthorsPartial && !$this->isNew();
+        if (null === $this->collAuthors || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collAuthors) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getAuthors());
+                }
+                $query = AuthorQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByPerson($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collAuthors);
+        }
+    }
+
+    /**
+     * Method called to associate a Author object to this object
+     * through the Author foreign key attribute.
+     *
+     * @param    Author $l Author
+     * @return Person The current object (for fluent API support)
+     */
+    public function addAuthor(Author $l)
+    {
+        if ($this->collAuthors === null) {
+            $this->initAuthors();
+            $this->collAuthorsPartial = true;
+        }
+        if (!in_array($l, $this->collAuthors->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddAuthor($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Author $author The author object to add.
+     */
+    protected function doAddAuthor($author)
+    {
+        $this->collAuthors[]= $author;
+        $author->setPerson($this);
+    }
+
+    /**
+     * @param	Author $author The author object to remove.
+     * @return Person The current object (for fluent API support)
+     */
+    public function removeAuthor($author)
+    {
+        if ($this->getAuthors()->contains($author)) {
+            $this->collAuthors->remove($this->collAuthors->search($author));
+            if (null === $this->authorsScheduledForDeletion) {
+                $this->authorsScheduledForDeletion = clone $this->collAuthors;
+                $this->authorsScheduledForDeletion->clear();
+            }
+            $this->authorsScheduledForDeletion[]= $author;
+            $author->setPerson(null);
         }
 
         return $this;
@@ -2157,13 +2157,13 @@ abstract class BasePerson extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collAuthors) {
-                foreach ($this->collAuthors as $o) {
+            if ($this->collPersonalnames) {
+                foreach ($this->collPersonalnames as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collPersonalnames) {
-                foreach ($this->collPersonalnames as $o) {
+            if ($this->collAuthors) {
+                foreach ($this->collAuthors as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -2184,14 +2184,14 @@ abstract class BasePerson extends BaseObject implements Persistent
             }
         } // if ($deep)
 
-        if ($this->collAuthors instanceof PropelCollection) {
-            $this->collAuthors->clearIterator();
-        }
-        $this->collAuthors = null;
         if ($this->collPersonalnames instanceof PropelCollection) {
             $this->collPersonalnames->clearIterator();
         }
         $this->collPersonalnames = null;
+        if ($this->collAuthors instanceof PropelCollection) {
+            $this->collAuthors->clearIterator();
+        }
+        $this->collAuthors = null;
         if ($this->collPrinters instanceof PropelCollection) {
             $this->collPrinters->clearIterator();
         }

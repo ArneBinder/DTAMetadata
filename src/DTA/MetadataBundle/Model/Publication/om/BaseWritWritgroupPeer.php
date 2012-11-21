@@ -1,6 +1,6 @@
 <?php
 
-namespace DTA\MetadataBundle\Model\om;
+namespace DTA\MetadataBundle\Model\Publication\om;
 
 use \BasePeer;
 use \Criteria;
@@ -9,11 +9,11 @@ use \PDOStatement;
 use \Propel;
 use \PropelException;
 use \PropelPDO;
-use DTA\MetadataBundle\Model\WritWritgroup;
-use DTA\MetadataBundle\Model\WritWritgroupPeer;
 use DTA\MetadataBundle\Model\Publication\WritPeer;
+use DTA\MetadataBundle\Model\Publication\WritWritgroup;
+use DTA\MetadataBundle\Model\Publication\WritWritgroupPeer;
+use DTA\MetadataBundle\Model\Publication\map\WritWritgroupTableMap;
 use DTA\MetadataBundle\Model\Workflow\WritgroupPeer;
-use DTA\MetadataBundle\Model\map\WritWritgroupTableMap;
 
 abstract class BaseWritWritgroupPeer
 {
@@ -25,7 +25,7 @@ abstract class BaseWritWritgroupPeer
     const TABLE_NAME = 'writ_writGroup';
 
     /** the related Propel class for this table */
-    const OM_CLASS = 'DTA\\MetadataBundle\\Model\\WritWritgroup';
+    const OM_CLASS = 'DTA\\MetadataBundle\\Model\\Publication\\WritWritgroup';
 
     /** the related TableMap class for this table */
     const TM_CLASS = 'WritWritgroupTableMap';

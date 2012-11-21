@@ -12,7 +12,6 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
-use DTA\MetadataBundle\Model\WritWritgroup;
 use DTA\MetadataBundle\Model\Classification\Corpus;
 use DTA\MetadataBundle\Model\HistoricalPerson\Printer;
 use DTA\MetadataBundle\Model\HistoricalPerson\Publisher;
@@ -22,6 +21,7 @@ use DTA\MetadataBundle\Model\Publication\Work;
 use DTA\MetadataBundle\Model\Publication\Writ;
 use DTA\MetadataBundle\Model\Publication\WritPeer;
 use DTA\MetadataBundle\Model\Publication\WritQuery;
+use DTA\MetadataBundle\Model\Publication\WritWritgroup;
 use DTA\MetadataBundle\Model\Workflow\Relatedset;
 use DTA\MetadataBundle\Model\Workflow\Source;
 use DTA\MetadataBundle\Model\Workflow\Task;
@@ -78,6 +78,10 @@ use DTA\MetadataBundle\Model\Workflow\Writgroup;
  * @method WritQuery rightJoinCorpus($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Corpus relation
  * @method WritQuery innerJoinCorpus($relationAlias = null) Adds a INNER JOIN clause to the query using the Corpus relation
  *
+ * @method WritQuery leftJoinWritWritgroup($relationAlias = null) Adds a LEFT JOIN clause to the query using the WritWritgroup relation
+ * @method WritQuery rightJoinWritWritgroup($relationAlias = null) Adds a RIGHT JOIN clause to the query using the WritWritgroup relation
+ * @method WritQuery innerJoinWritWritgroup($relationAlias = null) Adds a INNER JOIN clause to the query using the WritWritgroup relation
+ *
  * @method WritQuery leftJoinSource($relationAlias = null) Adds a LEFT JOIN clause to the query using the Source relation
  * @method WritQuery rightJoinSource($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Source relation
  * @method WritQuery innerJoinSource($relationAlias = null) Adds a INNER JOIN clause to the query using the Source relation
@@ -85,10 +89,6 @@ use DTA\MetadataBundle\Model\Workflow\Writgroup;
  * @method WritQuery leftJoinTask($relationAlias = null) Adds a LEFT JOIN clause to the query using the Task relation
  * @method WritQuery rightJoinTask($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Task relation
  * @method WritQuery innerJoinTask($relationAlias = null) Adds a INNER JOIN clause to the query using the Task relation
- *
- * @method WritQuery leftJoinWritWritgroup($relationAlias = null) Adds a LEFT JOIN clause to the query using the WritWritgroup relation
- * @method WritQuery rightJoinWritWritgroup($relationAlias = null) Adds a RIGHT JOIN clause to the query using the WritWritgroup relation
- * @method WritQuery innerJoinWritWritgroup($relationAlias = null) Adds a INNER JOIN clause to the query using the WritWritgroup relation
  *
  * @method Writ findOne(PropelPDO $con = null) Return the first Writ matching the query
  * @method Writ findOneOrCreate(PropelPDO $con = null) Return the first Writ matching the query, or a new Writ object populated from the query conditions when no match is found
@@ -1156,6 +1156,80 @@ abstract class BaseWritQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related WritWritgroup object
+     *
+     * @param   WritWritgroup|PropelObjectCollection $writWritgroup  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   WritQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByWritWritgroup($writWritgroup, $comparison = null)
+    {
+        if ($writWritgroup instanceof WritWritgroup) {
+            return $this
+                ->addUsingAlias(WritPeer::ID, $writWritgroup->getWritId(), $comparison);
+        } elseif ($writWritgroup instanceof PropelObjectCollection) {
+            return $this
+                ->useWritWritgroupQuery()
+                ->filterByPrimaryKeys($writWritgroup->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByWritWritgroup() only accepts arguments of type WritWritgroup or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the WritWritgroup relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return WritQuery The current query, for fluid interface
+     */
+    public function joinWritWritgroup($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('WritWritgroup');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'WritWritgroup');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the WritWritgroup relation WritWritgroup object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\Publication\WritWritgroupQuery A secondary query class using the current class as primary query
+     */
+    public function useWritWritgroupQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinWritWritgroup($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'WritWritgroup', '\DTA\MetadataBundle\Model\Publication\WritWritgroupQuery');
+    }
+
+    /**
      * Filter the query by a related Source object
      *
      * @param   Source|PropelObjectCollection $source  the related object to use as filter
@@ -1301,80 +1375,6 @@ abstract class BaseWritQuery extends ModelCriteria
         return $this
             ->joinTask($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Task', '\DTA\MetadataBundle\Model\Workflow\TaskQuery');
-    }
-
-    /**
-     * Filter the query by a related WritWritgroup object
-     *
-     * @param   WritWritgroup|PropelObjectCollection $writWritgroup  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   WritQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByWritWritgroup($writWritgroup, $comparison = null)
-    {
-        if ($writWritgroup instanceof WritWritgroup) {
-            return $this
-                ->addUsingAlias(WritPeer::ID, $writWritgroup->getWritId(), $comparison);
-        } elseif ($writWritgroup instanceof PropelObjectCollection) {
-            return $this
-                ->useWritWritgroupQuery()
-                ->filterByPrimaryKeys($writWritgroup->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByWritWritgroup() only accepts arguments of type WritWritgroup or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the WritWritgroup relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return WritQuery The current query, for fluid interface
-     */
-    public function joinWritWritgroup($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('WritWritgroup');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'WritWritgroup');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the WritWritgroup relation WritWritgroup object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\WritWritgroupQuery A secondary query class using the current class as primary query
-     */
-    public function useWritWritgroupQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinWritWritgroup($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'WritWritgroup', '\DTA\MetadataBundle\Model\WritWritgroupQuery');
     }
 
     /**
