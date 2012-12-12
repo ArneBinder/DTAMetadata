@@ -70,12 +70,10 @@ class HomeController extends DTABaseController {
     }
 
     /**
-     * @param type $className
      * @Route("/newTitle", name="newTitle")
      */
     public function newTitleAction(Request $request) {
 
-//        var_dump($className);
         $objClassName = "DTA\\MetadataBundle\\Model\\Title";
         $objFormClassName = "DTA\\MetadataBundle\\Form\\Type\\TitleType";
         $obj = new $objClassName;
@@ -93,7 +91,7 @@ class HomeController extends DTABaseController {
                     'form' => $form->createView(),
                 ));
     }
-    
+
     /**
      * @param type $className
      * @Route("/home/genericNew/{className}", name="genericNew")
@@ -104,7 +102,7 @@ class HomeController extends DTABaseController {
         $objClassName = "DTA\\MetadataBundle\\Model\\" . $className;
         $objFormTypeClassName = "DTA\\MetadataBundle\\Form\\Type\\" . $className . "Type";
         $obj = new $objClassName;
-        
+
 //        $titlefragment = new Model\Titlefragment();
 //        $titlefragment->setName("Fragmente einer Sprache der Liebe");
 //        $titlefragment->setTitlefragmenttypeId(1);
@@ -133,12 +131,12 @@ class HomeController extends DTABaseController {
 
         if ($request->isMethod("POST")) {
             $form->bind($request);
-            $bindTest = $form->getData();//$obj->getTitlefragments();
+            $bindTest = $form->getData(); //$obj->getTitlefragments();
 //            $tf = new Model\Titlefragment();
-            if ($form->isValid()){
+            if ($form->isValid()) {
                 $obj->save();
             }
-                
+
 //            $bindTest = $bindTest[0]->getTitleId();
         }
 

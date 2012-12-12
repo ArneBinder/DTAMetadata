@@ -11,11 +11,15 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class SortableCollectionType extends \Symfony\Component\Form\Extension\Core\Type\CollectionType {
     
+    public function getName() {
+        return 'mess';
+    }
     /**
      * {@inheritdoc}
      */
 //    public function buildForm(FormBuilderInterface $builder, array $options)
-//    {
+//    {   
+//        var_dump($options);
 //        if ($options['allow_add'] && $options['prototype']) {
 //            $prototype = $builder->create($options['prototype_name'], $options['type'], array_replace(array(
 //                'label' => $options['prototype_name'] . 'label__',
@@ -89,9 +93,6 @@ class SortableCollectionType extends \Symfony\Component\Form\Extension\Core\Type
      * in the sortableCollection_widget block (block name by convention)
      * {@inheritdoc}
      */
-    public function getName() {
-        return 'mess';
-    }
 
 }
 

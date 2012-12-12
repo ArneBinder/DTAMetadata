@@ -1,3 +1,19 @@
+    {% block messy_widget %}
+    {#  #}
+
+    {% set propertyName = 'titleFragments' %}
+    {% set prototypeElement = form_widget(attribute(form,propertyName).vars.prototype) %}
+     <ol class="collection-editor collection-sortable" data-prototype="{{ prototypeElement }}">
+        {% for collectionElement in attribute(form,propertyName) %}
+            <li>
+            {{ form_widget(collectionElement) }}
+            </li>
+        {% endfor %}
+        {{ form_rest(form) }}
+      </ol>
+
+    {% endblock %}
+
 
     {% block sortableCollection_widget %}
     {% spaceless %}

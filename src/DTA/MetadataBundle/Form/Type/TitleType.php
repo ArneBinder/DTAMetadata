@@ -19,7 +19,8 @@ class TitleType extends BaseAbstractType {
      */
     public function buildForm(FormBuilderInterface $builder, array $options) {
         //new Form\DerivedType\SortableCollectionType()
-        $builder->add('titleFragments', 'collection', array( 
+        $builder->add('titleFragments', new Form\DerivedType\SortableCollectionType(), array( 
+            'label' => ' ',
             'type' => new TitlefragmentType(),
             'allow_add' => true,
             'by_reference' => false,
