@@ -58,6 +58,176 @@ CREATE TABLE `genre`
 ) ENGINE=MyISAM;
 
 -- ---------------------------------------------------------------------
+-- partner
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `partner`;
+
+CREATE TABLE `partner`
+(
+    `id` INTEGER(10) NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(255),
+    `adress` VARCHAR(255),
+    `person` VARCHAR(255),
+    `mail` VARCHAR(100),
+    `web` VARCHAR(255),
+    `comments` TEXT,
+    `phone1` VARCHAR(50),
+    `phone2` VARCHAR(50),
+    `phone3` VARCHAR(50),
+    `fax` VARCHAR(50),
+    `log_last_change` DATETIME NOT NULL,
+    `log_last_user` INTEGER,
+    PRIMARY KEY (`id`),
+    INDEX `AI_id_book_locations` (`id`),
+    INDEX `id_book_locations_2` (`id`),
+    INDEX `name` (`name`)
+) ENGINE=MyISAM;
+
+-- ---------------------------------------------------------------------
+-- relatedSet
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `relatedSet`;
+
+CREATE TABLE `relatedSet`
+(
+    `id` INTEGER NOT NULL,
+    `name` TEXT NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=MyISAM;
+
+-- ---------------------------------------------------------------------
+-- source
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `source`;
+
+CREATE TABLE `source`
+(
+    `id` INTEGER(10) NOT NULL AUTO_INCREMENT,
+    `writ_id` INTEGER NOT NULL,
+    `quality` TEXT,
+    `name` TEXT,
+    `comments` TEXT,
+    `available` TINYINT(1),
+    `signatur` VARCHAR(512),
+    `library` TEXT,
+    `libraryGnd` VARCHAR(1024),
+    PRIMARY KEY (`id`),
+    INDEX `AI_id_Fundstellen` (`id`),
+    INDEX `id_Fundstellen_2` (`id`),
+    INDEX `fk_quelle_edition1` (`writ_id`),
+    CONSTRAINT `fk_quelle_edition1`
+        FOREIGN KEY (`writ_id`)
+        REFERENCES `writ` (`id`)
+) ENGINE=MyISAM;
+
+-- ---------------------------------------------------------------------
+-- status
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `status`;
+
+CREATE TABLE `status`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` TEXT NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=MyISAM;
+
+-- ---------------------------------------------------------------------
+-- task
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `task`;
+
+CREATE TABLE `task`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `taskType_id` INTEGER NOT NULL,
+    `done` TINYINT(1),
+    `start` DATETIME,
+    `end` DATETIME,
+    `comments` TEXT,
+    `writGroup_id` INTEGER,
+    `writ_id` INTEGER,
+    `responsibleUser_id` INTEGER,
+    PRIMARY KEY (`id`),
+    INDEX `id_task_2` (`id`),
+    INDEX `endtime` (`end`),
+    INDEX `starttime` (`start`),
+    INDEX `active` (`done`),
+    INDEX `closed_2` (`done`),
+    INDEX `fk_aufgabe_arbeitsschritt1` (`taskType_id`),
+    INDEX `fk_aufgabe_buchGruppe1` (`writGroup_id`),
+    INDEX `fk_aufgabe_schriftstueck1` (`writ_id`),
+    INDEX `fk_task_name1` (`responsibleUser_id`),
+    CONSTRAINT `fk_aufgabe_arbeitsschritt1`
+        FOREIGN KEY (`taskType_id`)
+        REFERENCES `taskType` (`id`),
+    CONSTRAINT `fk_aufgabe_buchGruppe1`
+        FOREIGN KEY (`writGroup_id`)
+        REFERENCES `writGroup` (`id`),
+    CONSTRAINT `fk_aufgabe_schriftstueck1`
+        FOREIGN KEY (`writ_id`)
+        REFERENCES `writ` (`id`),
+    CONSTRAINT `fk_task_name1`
+        FOREIGN KEY (`responsibleUser_id`)
+        REFERENCES `user` (`id`)
+) ENGINE=MyISAM;
+
+-- ---------------------------------------------------------------------
+-- taskType
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `taskType`;
+
+CREATE TABLE `taskType`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` TEXT NOT NULL,
+    `tree_left` INTEGER,
+    `tree_right` INTEGER,
+    `tree_level` INTEGER,
+    PRIMARY KEY (`id`)
+) ENGINE=MyISAM;
+
+-- ---------------------------------------------------------------------
+-- user
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `user`;
+
+CREATE TABLE `user`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `userName` VARCHAR(255),
+    `passwordHash` TEXT,
+    `name_id` INTEGER NOT NULL,
+    `mail` TEXT,
+    `phone` TEXT,
+    PRIMARY KEY (`id`),
+    INDEX `AI_id_user` (`id`),
+    INDEX `id_user_2` (`id`),
+    INDEX `name` (`userName`)
+) ENGINE=MyISAM;
+
+-- ---------------------------------------------------------------------
+-- writGroup
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `writGroup`;
+
+CREATE TABLE `writGroup`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` TEXT NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `AI_id_group` (`id`)
+) ENGINE=MyISAM;
+
+-- ---------------------------------------------------------------------
 -- dateSpecification
 -- ---------------------------------------------------------------------
 
@@ -190,111 +360,6 @@ CREATE TABLE `titleFragmentType`
 ) ENGINE=MyISAM;
 
 -- ---------------------------------------------------------------------
--- author
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `author`;
-
-CREATE TABLE `author`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `person_id` INTEGER NOT NULL,
-    PRIMARY KEY (`id`,`person_id`),
-    INDEX `fk_autor_person1` (`person_id`),
-    CONSTRAINT `fk_autor_person1`
-        FOREIGN KEY (`person_id`)
-        REFERENCES `person` (`id`)
-) ENGINE=MyISAM;
-
--- ---------------------------------------------------------------------
--- author_work
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `author_work`;
-
-CREATE TABLE `author_work`
-(
-    `work_id` INTEGER NOT NULL,
-    `author_id` INTEGER NOT NULL,
-    `author_person_id` INTEGER NOT NULL,
-    `name_id` INTEGER NOT NULL,
-    PRIMARY KEY (`work_id`,`author_id`,`author_person_id`),
-    INDEX `fk_werk_has_autor_autor1` (`author_id`, `author_person_id`),
-    INDEX `fk_werk_has_autor_werk1` (`work_id`),
-    CONSTRAINT `fk_werk_has_autor_werk1`
-        FOREIGN KEY (`work_id`)
-        REFERENCES `work` (`id`),
-    CONSTRAINT `fk_werk_has_autor_autor1`
-        FOREIGN KEY (`author_id`,`author_person_id`)
-        REFERENCES `author` (`id`,`person_id`)
-) ENGINE=MyISAM;
-
--- ---------------------------------------------------------------------
--- person
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `person`;
-
-CREATE TABLE `person`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `gnd` VARCHAR(100),
-    PRIMARY KEY (`id`),
-    UNIQUE INDEX `dnb_UNIQUE` (`gnd`)
-) ENGINE=MyISAM;
-
--- ---------------------------------------------------------------------
--- printer
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `printer`;
-
-CREATE TABLE `printer`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `person_id` INTEGER NOT NULL,
-    PRIMARY KEY (`id`,`person_id`),
-    INDEX `fk_drucker_person1` (`person_id`),
-    CONSTRAINT `fk_drucker_person1`
-        FOREIGN KEY (`person_id`)
-        REFERENCES `person` (`id`)
-) ENGINE=MyISAM;
-
--- ---------------------------------------------------------------------
--- publisher
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `publisher`;
-
-CREATE TABLE `publisher`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `person_id` INTEGER NOT NULL,
-    PRIMARY KEY (`id`,`person_id`),
-    INDEX `fk_herausgeber_ist_person` (`person_id`),
-    CONSTRAINT `fk_herausgeber_ist_person`
-        FOREIGN KEY (`person_id`)
-        REFERENCES `person` (`id`)
-) ENGINE=MyISAM;
-
--- ---------------------------------------------------------------------
--- translator
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `translator`;
-
-CREATE TABLE `translator`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `person_id` INTEGER NOT NULL,
-    PRIMARY KEY (`id`,`person_id`),
-    INDEX `fk_translator_person1` (`person_id`),
-    CONSTRAINT `fk_translator_person1`
-        FOREIGN KEY (`person_id`)
-        REFERENCES `person` (`id`)
-) ENGINE=MyISAM;
-
--- ---------------------------------------------------------------------
 -- essay
 -- ---------------------------------------------------------------------
 
@@ -358,7 +423,7 @@ CREATE TABLE `publication`
     `publishingCompany_id` INTEGER,
     `place_id` INTEGER,
     `dateSpecification_id` INTEGER,
-    `printRun` TEXT,
+    `printRun` TEXT COMMENT 'Auflage',
     `printRunComment` TEXT,
     `edition` TEXT,
     `numPages` INTEGER,
@@ -547,175 +612,108 @@ CREATE TABLE `writ_writGroup`
 ) ENGINE=MyISAM;
 
 -- ---------------------------------------------------------------------
--- partner
+-- author
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `partner`;
+DROP TABLE IF EXISTS `author`;
 
-CREATE TABLE `partner`
-(
-    `id` INTEGER(10) NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(255),
-    `adress` VARCHAR(255),
-    `person` VARCHAR(255),
-    `mail` VARCHAR(100),
-    `web` VARCHAR(255),
-    `comments` TEXT,
-    `phone1` VARCHAR(50),
-    `phone2` VARCHAR(50),
-    `phone3` VARCHAR(50),
-    `fax` VARCHAR(50),
-    `log_last_change` DATETIME NOT NULL,
-    `log_last_user` INTEGER,
-    PRIMARY KEY (`id`),
-    INDEX `AI_id_book_locations` (`id`),
-    INDEX `id_book_locations_2` (`id`),
-    INDEX `name` (`name`)
-) ENGINE=MyISAM;
-
--- ---------------------------------------------------------------------
--- relatedSet
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `relatedSet`;
-
-CREATE TABLE `relatedSet`
-(
-    `id` INTEGER NOT NULL,
-    `name` TEXT NOT NULL,
-    PRIMARY KEY (`id`)
-) ENGINE=MyISAM;
-
--- ---------------------------------------------------------------------
--- source
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `source`;
-
-CREATE TABLE `source`
-(
-    `id` INTEGER(10) NOT NULL AUTO_INCREMENT,
-    `writ_id` INTEGER NOT NULL,
-    `quality` TEXT,
-    `name` TEXT,
-    `comments` TEXT,
-    `available` TINYINT(1),
-    `signatur` VARCHAR(512),
-    `library` TEXT,
-    `libraryGnd` VARCHAR(1024),
-    PRIMARY KEY (`id`),
-    INDEX `AI_id_Fundstellen` (`id`),
-    INDEX `id_Fundstellen_2` (`id`),
-    INDEX `fk_quelle_edition1` (`writ_id`),
-    CONSTRAINT `fk_quelle_edition1`
-        FOREIGN KEY (`writ_id`)
-        REFERENCES `writ` (`id`)
-) ENGINE=MyISAM;
-
--- ---------------------------------------------------------------------
--- status
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `status`;
-
-CREATE TABLE `status`
+CREATE TABLE `author`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `name` TEXT NOT NULL,
-    PRIMARY KEY (`id`)
+    `person_id` INTEGER NOT NULL,
+    PRIMARY KEY (`id`,`person_id`),
+    INDEX `fk_autor_person1` (`person_id`),
+    CONSTRAINT `fk_autor_person1`
+        FOREIGN KEY (`person_id`)
+        REFERENCES `person` (`id`)
 ) ENGINE=MyISAM;
 
 -- ---------------------------------------------------------------------
--- task
+-- author_work
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `task`;
+DROP TABLE IF EXISTS `author_work`;
 
-CREATE TABLE `task`
+CREATE TABLE `author_work`
 (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `taskType_id` INTEGER NOT NULL,
-    `done` TINYINT(1),
-    `start` DATETIME,
-    `end` DATETIME,
-    `comments` TEXT,
-    `writGroup_id` INTEGER,
-    `writ_id` INTEGER,
-    `responsibleUser_id` INTEGER,
-    PRIMARY KEY (`id`),
-    INDEX `id_task_2` (`id`),
-    INDEX `endtime` (`end`),
-    INDEX `starttime` (`start`),
-    INDEX `active` (`done`),
-    INDEX `closed_2` (`done`),
-    INDEX `fk_aufgabe_arbeitsschritt1` (`taskType_id`),
-    INDEX `fk_aufgabe_buchGruppe1` (`writGroup_id`),
-    INDEX `fk_aufgabe_schriftstueck1` (`writ_id`),
-    INDEX `fk_task_name1` (`responsibleUser_id`),
-    CONSTRAINT `fk_aufgabe_arbeitsschritt1`
-        FOREIGN KEY (`taskType_id`)
-        REFERENCES `taskType` (`id`),
-    CONSTRAINT `fk_aufgabe_buchGruppe1`
-        FOREIGN KEY (`writGroup_id`)
-        REFERENCES `writGroup` (`id`),
-    CONSTRAINT `fk_aufgabe_schriftstueck1`
-        FOREIGN KEY (`writ_id`)
-        REFERENCES `writ` (`id`),
-    CONSTRAINT `fk_task_name1`
-        FOREIGN KEY (`responsibleUser_id`)
-        REFERENCES `user` (`id`)
-) ENGINE=MyISAM;
-
--- ---------------------------------------------------------------------
--- taskType
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `taskType`;
-
-CREATE TABLE `taskType`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `name` TEXT NOT NULL,
-    `tree_left` INTEGER,
-    `tree_right` INTEGER,
-    `tree_level` INTEGER,
-    PRIMARY KEY (`id`)
-) ENGINE=MyISAM;
-
--- ---------------------------------------------------------------------
--- user
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `user`;
-
-CREATE TABLE `user`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `userName` VARCHAR(255),
-    `passwordHash` TEXT,
+    `work_id` INTEGER NOT NULL,
+    `author_id` INTEGER NOT NULL,
+    `author_person_id` INTEGER NOT NULL,
     `name_id` INTEGER NOT NULL,
-    `mail` TEXT,
-    `phone` TEXT,
-    `created` DATETIME,
-    `modified` DATETIME,
-    PRIMARY KEY (`id`),
-    INDEX `AI_id_user` (`id`),
-    INDEX `id_user_2` (`id`),
-    INDEX `name` (`userName`)
+    PRIMARY KEY (`work_id`,`author_id`,`author_person_id`),
+    INDEX `fk_werk_has_autor_autor1` (`author_id`, `author_person_id`),
+    INDEX `fk_werk_has_autor_werk1` (`work_id`),
+    CONSTRAINT `fk_werk_has_autor_werk1`
+        FOREIGN KEY (`work_id`)
+        REFERENCES `work` (`id`),
+    CONSTRAINT `fk_werk_has_autor_autor1`
+        FOREIGN KEY (`author_id`,`author_person_id`)
+        REFERENCES `author` (`id`,`person_id`)
 ) ENGINE=MyISAM;
 
 -- ---------------------------------------------------------------------
--- writGroup
+-- person
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `writGroup`;
+DROP TABLE IF EXISTS `person`;
 
-CREATE TABLE `writGroup`
+CREATE TABLE `person`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `name` TEXT NOT NULL,
+    `gnd` VARCHAR(100),
     PRIMARY KEY (`id`),
-    INDEX `AI_id_group` (`id`)
+    UNIQUE INDEX `dnb_UNIQUE` (`gnd`)
+) ENGINE=MyISAM;
+
+-- ---------------------------------------------------------------------
+-- printer
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `printer`;
+
+CREATE TABLE `printer`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `person_id` INTEGER NOT NULL,
+    PRIMARY KEY (`id`,`person_id`),
+    INDEX `fk_drucker_person1` (`person_id`),
+    CONSTRAINT `fk_drucker_person1`
+        FOREIGN KEY (`person_id`)
+        REFERENCES `person` (`id`)
+) ENGINE=MyISAM;
+
+-- ---------------------------------------------------------------------
+-- publisher
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `publisher`;
+
+CREATE TABLE `publisher`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `person_id` INTEGER NOT NULL,
+    PRIMARY KEY (`id`,`person_id`),
+    INDEX `fk_herausgeber_ist_person` (`person_id`),
+    CONSTRAINT `fk_herausgeber_ist_person`
+        FOREIGN KEY (`person_id`)
+        REFERENCES `person` (`id`)
+) ENGINE=MyISAM;
+
+-- ---------------------------------------------------------------------
+-- translator
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `translator`;
+
+CREATE TABLE `translator`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `person_id` INTEGER NOT NULL,
+    PRIMARY KEY (`id`,`person_id`),
+    INDEX `fk_translator_person1` (`person_id`),
+    CONSTRAINT `fk_translator_person1`
+        FOREIGN KEY (`person_id`)
+        REFERENCES `person` (`id`)
 ) ENGINE=MyISAM;
 
 # This restores the fkey checks, after having unset them earlier

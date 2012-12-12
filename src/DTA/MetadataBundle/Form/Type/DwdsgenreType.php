@@ -2,12 +2,16 @@
 
 namespace DTA\MetadataBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
+use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class DwdsgenreType extends AbstractType
+class DwdsgenreType extends BaseAbstractType
 {
+    protected $options = array(
+        'data_class' => 'DTA\MetadataBundle\Model\Dwdsgenre',
+        'name'       => 'dwdsgenre',
+    );
+
     /**
      * {@inheritdoc}
      */
@@ -15,23 +19,5 @@ class DwdsgenreType extends AbstractType
     {
         $builder->add('name');
         $builder->add('childof');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(array(
-            'data_class' => 'DTA\MetadataBundle\Model\Dwdsgenre',
-        ));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'dwdsgenre';
     }
 }

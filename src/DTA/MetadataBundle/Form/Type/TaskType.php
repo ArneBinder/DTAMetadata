@@ -2,12 +2,16 @@
 
 namespace DTA\MetadataBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
+use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class TaskType extends AbstractType
+class TaskType extends BaseAbstractType
 {
+    protected $options = array(
+        'data_class' => 'DTA\MetadataBundle\Model\Task',
+        'name'       => 'task',
+    );
+
     /**
      * {@inheritdoc}
      */
@@ -21,23 +25,5 @@ class TaskType extends AbstractType
         $builder->add('writgroupId');
         $builder->add('writId');
         $builder->add('responsibleuserId');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(array(
-            'data_class' => 'DTA\MetadataBundle\Model\Task',
-        ));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'task';
     }
 }

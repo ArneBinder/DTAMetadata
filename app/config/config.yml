@@ -11,7 +11,7 @@ framework:
         strict_requirements: %kernel.debug%
     form:            true
     csrf_protection: true
-    validation:      { enable_annotations: true }
+    validation:      { enabled: true, enable_annotations: true }
     templating:      { engines: ['twig'] } #assets_version: SomeVersionScheme
     default_locale:  %locale%
     trust_proxy_headers: false # Whether or not the Request object should trust proxy headers (X_FORWARDED_FOR/HTTP_CLIENT_IP)
@@ -21,6 +21,9 @@ framework:
 twig:
     debug:            %kernel.debug%
     strict_variables: %kernel.debug%
+    form:
+        resources:
+            - 'DTAMetadataBundle:Form:sortableCollection.html.twig'
 
 # Assetic Configuration
 assetic:
@@ -54,7 +57,8 @@ propel:
     build_properties:
       propel.packageObjectModel: true
       propel.namespace.autoPackage: true
-      propel.behavior.reconstructed_flaggable.class: src.DTA.MetadataBundle.Model.CustomBehaviors.ReconstructedFlaggableBehavior
+      propel.behavior.reconstructed_flaggable.class: src.DTA.MetadataBundle.Model.reconstructed_flaggable.ReconstructedFlaggableBehavior
+      # propel.behavior.reconstructed_flaggable.class: vendor.propel-reconstructed_flaggable-behavior.ReconstructedFlaggableBehavior
 #      propel.database: "%database_driver%"
 #      propel.database.url: "%database_driver%:host=%database_host%;dbname=%database_name%;charset=%database_charset%"
 #      propel.database.user: "%database_user%"

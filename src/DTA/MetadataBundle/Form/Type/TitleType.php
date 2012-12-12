@@ -2,40 +2,28 @@
 
 namespace DTA\MetadataBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
+use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class TitleType extends AbstractType
-{
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        $builder->add('sequenceindex');
-        $builder->add('title');
-        $builder->add('workId');
-        $builder->add('publicationId');
-        $builder->add('volumeId');
-        $builder->add('titletypeId');
-    }
+use \DTA\MetadataBundle\Form;
+
+class TitleType extends BaseAbstractType {
+
+    protected $options = array(
+        'data_class' => 'DTA\MetadataBundle\Model\Title',
+        'name' => 'title',
+    );
 
     /**
-     * {@inheritdoc}
+     *  {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(array(
-            'data_class' => 'DTA\MetadataBundle\Model\Title',
+    public function buildForm(FormBuilderInterface $builder, array $options) {
+        //new Form\DerivedType\SortableCollectionType()
+        $builder->add('titleFragments', 'collection', array( 
+            'type' => new TitlefragmentType(),
+            'allow_add' => true,
+            'by_reference' => false,
         ));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'title';
-    }
 }

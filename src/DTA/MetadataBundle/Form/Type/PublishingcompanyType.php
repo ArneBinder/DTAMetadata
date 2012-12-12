@@ -2,12 +2,16 @@
 
 namespace DTA\MetadataBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
+use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class PublishingcompanyType extends AbstractType
+class PublishingcompanyType extends BaseAbstractType
 {
+    protected $options = array(
+        'data_class' => 'DTA\MetadataBundle\Model\Publishingcompany',
+        'name'       => 'publishingcompany',
+    );
+
     /**
      * {@inheritdoc}
      */
@@ -15,23 +19,5 @@ class PublishingcompanyType extends AbstractType
     {
         $builder->add('name');
         $builder->add('gnd');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(array(
-            'data_class' => 'DTA\MetadataBundle\Model\Publishingcompany',
-        ));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'publishingcompany';
     }
 }

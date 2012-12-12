@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<database name="DTAMetadata" namespace="DTA\MetadataBundle\Model\Classification" defaultIdMethod="native">
+ 
+    <!--CLASSIFICATION   
+    ________________________________________________________-->
+
+  <table name="corpus" phpName="Corpus" idMethod="native">
+    <column name="id" phpName="Id" type="INTEGER" size="10" sqlType="int(10) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="name" phpName="Name" type="LONGVARCHAR" required="true"/>
+    <column name="writ_id" phpName="WritId" type="INTEGER" required="false"/>
+    <foreign-key foreignTable="writ" name="fk_korpus_edition1">
+      <reference local="writ_id" foreign="id"/>
+    </foreign-key>
+    <index name="fk_korpus_edition1">
+      <index-column name="writ_id"/>
+    </index>
+  </table>
+
+  <table name="dwdsGenre" phpName="Dwdsgenre" idMethod="native">
+    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="name" phpName="Name" type="LONGVARCHAR" required="true"/>
+    <column name="childOf" phpName="Childof" type="INTEGER" required="false"/>
+    <foreign-key foreignTable="dwdsGenre" name="fk_subgenre0">
+      <reference local="childOf" foreign="id"/>
+    </foreign-key>
+    <index name="fk_nachfolgender_arbeitsschritt">
+      <index-column name="childOf"/>
+    </index>
+  </table>
+
+  <table name="genre" phpName="Genre" idMethod="native">
+    <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="name" phpName="Name" type="LONGVARCHAR" required="true"/>
+    <column name="childOf" phpName="Childof" type="INTEGER" required="false"/>
+    <foreign-key foreignTable="genre" name="fk_subgenre">
+      <reference local="childOf" foreign="id"/>
+    </foreign-key>
+    <index name="fk_nachfolgender_arbeitsschritt">
+      <index-column name="childOf"/>
+    </index>
+  </table>
+
+</database>

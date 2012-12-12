@@ -2,12 +2,16 @@
 
 namespace DTA\MetadataBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
+use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class PartnerType extends AbstractType
+class PartnerType extends BaseAbstractType
 {
+    protected $options = array(
+        'data_class' => 'DTA\MetadataBundle\Model\Partner',
+        'name'       => 'partner',
+    );
+
     /**
      * {@inheritdoc}
      */
@@ -25,23 +29,5 @@ class PartnerType extends AbstractType
         $builder->add('fax');
         $builder->add('logLastChange');
         $builder->add('logLastUser');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(array(
-            'data_class' => 'DTA\MetadataBundle\Model\Partner',
-        ));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'partner';
     }
 }

@@ -2,12 +2,16 @@
 
 namespace DTA\MetadataBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
+use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class SourceType extends AbstractType
+class SourceType extends BaseAbstractType
 {
+    protected $options = array(
+        'data_class' => 'DTA\MetadataBundle\Model\Source',
+        'name'       => 'source',
+    );
+
     /**
      * {@inheritdoc}
      */
@@ -21,23 +25,5 @@ class SourceType extends AbstractType
         $builder->add('signatur');
         $builder->add('library');
         $builder->add('librarygnd');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(array(
-            'data_class' => 'DTA\MetadataBundle\Model\Source',
-        ));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'source';
     }
 }

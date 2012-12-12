@@ -1,0 +1,8 @@
+DTA\MetadataBundle\Model\Publication:
+    properties:
+      numpages:
+        - Type:
+              type: integer
+        - Range:
+              min: 1
+              minMessage: "Wenn keine Seitenzahl bekannt ist, bitte leerlassen."              

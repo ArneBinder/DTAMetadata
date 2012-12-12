@@ -1,0 +1,68 @@
+{% extends 'DTAMetadataBundle:'~ domainKey ~':base.html.twig' %}
+
+{# The dynamic extend is for extending the template of the currently active domain, 
+    (the domainKey value is usually passed by the renderWithDomainMenu method
+    within the DTABaseController that expects that the current domain controller
+    has overwritten it.
+    The according template files are located in 
+        src/DTA/MetadataBundle/Resources/views/domainKey/base.html.twig
+    Template inheritance is basically for inheriting the correct domain menu.
+#}
+
+{#% form_theme form 'DTAMetadataBundle:Form:sortableCollection.html.twig' %#}
+
+{% block core %}
+    {{domainKey}}
+    <h3>{{className}}</h3>
+    <pre>{%if persistedObject is defined %}{{dump(persistedObject)}}{%endif%}</pre>
+    <form action="{{ path('genericNew', {'className':className}) }}" method="post" {{ form_enctype(form) }}>
+         
+        {{ form_rest(form) }}
+         <input type="submit"/>
+    </form>
+   {# The actual code
+
+#}
+
+    
+{% endblock %}
+
+{# Some fragments
+
+ <form action="{{ path('genericNew', {'className':className}) }}" method="post" {{ form_enctype(form) }}>
+     <ol class="zebra collection-editor collection-sortable" data-prototype="{{ form_widget(form.titleFragments.vars.prototype)|e }}">
+        {% for titlefragment in form.titleFragments %}
+            <li>
+            {{ form_errors(titlefragment.titlefragmenttype) }}
+            {{ form_widget(titlefragment.titlefragmenttype) }}
+            {{ form_row(titlefragment.name) }}       
+            {{ form_row(titlefragment.sortableRank) }}          
+            </li>
+        {% endfor %}
+      </ol>
+        {{ form_rest(form) }}
+        <input type="submit"/>
+    </form>
+
+<form action="{{ path('genericNew', {'className':className, 'recordId': recordId}) }}" method="post" {{ form_enctype(form) }}>
+        {{ form_rest(form) }}
+         <input type="submit"/>
+    </form>
+
+
+    <form action="{{ path('genericNew', {'className':className, 'recordId':0}) }}" method="post" {{ form_enctype(form) }}>
+     <ol class="collection-editor collection-sortable" data-prototype="{{ form_widget(form.titleFragments.vars.prototype)|e }}">
+        {% for titlefragment in form.titleFragments %}
+            <li>
+            {{ form_errors(titlefragment.titlefragmenttype) }}
+            {{ form_widget(titlefragment.titlefragmenttype) }}
+            {{ form_row(titlefragment.name) }}       
+            {{ form_row(titlefragment.sortableRank) }}          
+            </li>
+        {% endfor %}
+      </ol>
+        {{ form_rest(form) }}
+        <input type="submit"/>
+    </form>
+
+#}

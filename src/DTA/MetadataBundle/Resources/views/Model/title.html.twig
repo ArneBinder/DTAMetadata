@@ -1,0 +1,23 @@
+{% extends 'DTAMetadataBundle:'~ domainKey ~':base.html.twig' %}
+
+{% block core %}
+    <h3>Neuen Titel anlegen</h3>
+     <form action="{{ path('newTitle') }}" method="post" {{ form_enctype(form) }}>
+     <ol class="collection-editor collection-sortable" data-prototype="{{ form_widget(form.titleFragments.vars.prototype)|e }}">
+        {% for titlefragment in form.titleFragments %}
+            <li>
+            {{ form_errors(titlefragment.titlefragmenttype) }}
+            {{ form_widget(titlefragment.titlefragmenttype) }}
+            {{ form_row(titlefragment.name) }}       
+            {{ form_row(titlefragment.sortableRank) }}          
+            {#
+            {{ form_widget(titlefragment) }}
+            #}
+            </li>
+        {% endfor %}
+      </ol>
+        {{ form_rest(form) }}
+        <input type="submit"/>
+    </form>
+    <pre>{%if persistedObject is defined %}{{dump(persistedObject)}}{%endif%}</pre>
+{% endblock %}

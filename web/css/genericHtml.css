@@ -1,0 +1,16 @@
+/* 
+    Document   : genericHtml
+    Created on : 04.12.2012, 15:17:30
+    Author     : stud
+    Description:
+        Styles generic html elements, independently of context.
+*/
+
+body {
+    padding-top: 100px;
+    padding-bottom: 40px;
+}
+textarea{
+    /*width: 500px;*/
+}
+

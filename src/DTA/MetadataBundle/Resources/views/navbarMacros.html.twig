@@ -1,0 +1,27 @@
+{# Used to create navbar hierrachies and clickable options #}
+{% macro beginDropDown(topLevel, item) %}
+
+    {% set dropdownClass = topLevel ? 'dropdown' : 'dropdown-submenu' %}
+    <li class="{{dropdownClass}}">
+
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 
+        {{ item.caption }} 
+        <b class="caret"></b> 
+    </a>
+        <ul class="dropdown-menu">
+{% endmacro %}
+{% macro endDropDown() %}
+        </ul>
+    </li>
+{% endmacro %}
+ 
+{# Used to generate the click options for a menu item that represents a table in the database #}
+{% macro modelUIOptions(topLevel, child) %}
+    
+    {% import _self as macros %}
+    
+    {{ macros.beginDropDown(topLevel, child) }}
+    <li><a href="{{ path('home') }}">Anzeigen und suchen</a></li>
+    <li><a href="{{ path('genericNew', child.modelClass) }}">Neu anlegen</a></li>
+    {{ macros.endDropDown() }}
+{% endmacro %}

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<database name="DTAMetadata" namespace="DTA\MetadataBundle\Model\HistoricalPerson" defaultIdMethod="native">
+    
+    <!-- HISTORICAL PERSON
+    ________________________________________________________-->
+    
+    <table name="author" phpName="Author" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="person_id" phpName="PersonId" type="INTEGER" primaryKey="true" required="true"/>
+        <foreign-key foreignTable="person" name="fk_autor_person1">
+            <reference local="person_id" foreign="id"/>
+        </foreign-key>
+        <index name="fk_autor_person1">
+            <index-column name="person_id"/>
+        </index>
+    </table>
+
+    <table name="author_work" phpName="AuthorWork" isCrossRef="true" idMethod="native">
+        <column name="work_id" phpName="WorkId" type="INTEGER" primaryKey="true" required="true"/>
+        <column name="author_id" phpName="AuthorId" type="INTEGER" primaryKey="true" required="true"/>
+        <column name="author_person_id" phpName="AuthorPersonId" type="INTEGER" primaryKey="true" required="true"/>
+        <column name="name_id" phpName="NameId" type="INTEGER" required="true"/>
+        <foreign-key foreignTable="work" name="fk_werk_has_autor_werk1">
+            <reference local="work_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="author" name="fk_werk_has_autor_autor1">
+            <reference local="author_id" foreign="id"/>
+            <reference local="author_person_id" foreign="person_id"/>
+        </foreign-key>
+        <index name="fk_werk_has_autor_autor1">
+            <index-column name="author_id"/>
+            <index-column name="author_person_id"/>
+        </index>
+        <index name="fk_werk_has_autor_werk1">
+            <index-column name="work_id"/>
+        </index>
+    </table>
+
+    <table name="person" phpName="Person" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="gnd" phpName="Gnd" type="VARCHAR" size="100" required="false"/>
+        <unique name="dnb_UNIQUE">
+            <unique-column name="gnd"/>
+        </unique>
+    </table>
+
+    <table name="printer" phpName="Printer" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="person_id" phpName="PersonId" type="INTEGER" primaryKey="true" required="true"/>
+        <foreign-key foreignTable="person" name="fk_drucker_person1">
+            <reference local="person_id" foreign="id"/>
+        </foreign-key>
+        <index name="fk_drucker_person1">
+            <index-column name="person_id"/>
+        </index>
+    </table>
+
+    <table name="publisher" phpName="Publisher" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="person_id" phpName="PersonId" type="INTEGER" primaryKey="true" required="true"/>
+        <foreign-key foreignTable="person" name="fk_herausgeber_ist_person">
+            <reference local="person_id" foreign="id"/>
+        </foreign-key>
+        <index name="fk_herausgeber_ist_person">
+            <index-column name="person_id"/>
+        </index>
+    </table>
+
+    <table name="translator" phpName="Translator" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="person_id" phpName="PersonId" type="INTEGER" primaryKey="true" required="true"/>
+        <foreign-key foreignTable="person" name="fk_translator_person1">
+            <reference local="person_id" foreign="id"/>
+        </foreign-key>
+        <index name="fk_translator_person1">
+            <index-column name="person_id"/>
+        </index>
+    </table>
+
+</database>

@@ -2,38 +2,27 @@
 
 namespace DTA\MetadataBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
+use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class NamefragmentType extends AbstractType
-{
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        $builder->add('personalnameId');
-        $builder->add('name');
-        $builder->add('sequenceindex');
-        $builder->add('namefragmenttypeid');
-    }
+class NamefragmentType extends BaseAbstractType {
+
+    protected $options = array(
+        'data_class' => 'DTA\MetadataBundle\Model\Namefragment',
+        'name' => 'titleFragment', // TODO convenience. rename the titleFragment to something more generic.
+    );
 
     /**
-     * {@inheritdoc}
+     *  {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(array(
-            'data_class' => 'DTA\MetadataBundle\Model\Namefragment',
+    public function buildForm(FormBuilderInterface $builder, array $options) {
+        $builder->add('namefragmenttype', 'model', array(
+            'label' => ' ',
+            'property' => 'name',
+            'class' => 'DTA\MetadataBundle\Model\Namefragmenttype',
         ));
+        $builder->add('name', null, array('label' => ' '));
+        $builder->add('sortableRank', 'hidden');     
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'namefragment';
-    }
 }

@@ -2,34 +2,24 @@
 
 namespace DTA\MetadataBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
+use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class AuthorType extends AbstractType
+class AuthorType extends BaseAbstractType
 {
+    protected $options = array(
+        'data_class' => 'DTA\MetadataBundle\Model\Author',
+        'name'       => 'author',
+    );
+
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(array(
-            'data_class' => 'DTA\MetadataBundle\Model\HistoricalPerson\Author',
-        ));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'author';
+        $builder->add('person',new \DTA\MetadataBundle\Form\Type\PersonType());
+//        $builder->add('name', null, array('label'=>' '));
+//        $builder->add('sortableRank','hidden');             // this is controlled via javascript generated ui elements    
+        
     }
 }

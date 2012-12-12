@@ -2,35 +2,28 @@
 
 namespace DTA\MetadataBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
+use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class PersonalnameType extends AbstractType
-{
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        $builder->add('personId');
-    }
+use \DTA\MetadataBundle\Form;
+
+class PersonalnameType extends BaseAbstractType {
+
+    protected $options = array(
+        'data_class' => 'DTA\MetadataBundle\Model\Personalname',
+        'name' => 'personalname',
+    );
 
     /**
-     * {@inheritdoc}
+     *  {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(array(
-            'data_class' => 'DTA\MetadataBundle\Model\Personalname',
+    public function buildForm(FormBuilderInterface $builder, array $options) {
+//        $builder->add('nameFragments', new Form\DerivedType\SortableCollectionType(), array(
+        $builder->add('nameFragments', 'collection', array(
+        'allow_add' => true,
+        'by_reference' => false,
+            'type' => new NamefragmentType(),
         ));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'personalname';
-    }
 }

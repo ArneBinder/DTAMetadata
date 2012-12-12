@@ -6,7 +6,6 @@ test_class_introspection:
     pattern:  /class/{className}
     defaults: { _controller: DTAMetadataBundle:Home:index }
 
-
 dataDomain:
     pattern: /daten
     defaults: { _controller: DTAMetadataBundle:DataDomain:index }

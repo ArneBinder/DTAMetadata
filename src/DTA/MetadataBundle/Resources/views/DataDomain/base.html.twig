@@ -1,0 +1,69 @@
+{% extends 'DTAMetadataBundle::base.html.twig' %}
+
+{# Data Domain Base Template 
+    Fills the current domain menu template slot with the special option structure 
+    for the data domain (view and search, create options for each model class).
+    The other data domain templates extend this one (this saves includes for the domain menu all the time).
+#}
+
+{% block title %}Daten{% endblock %}
+
+{% block currentDomainMenu %}
+                      
+    {% for item in domainMenu %}
+    {% if item.children is defined %}
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 
+                {{ item.caption }} 
+                <b class="caret"></b> 
+            </a>
+            <ul class="dropdown-menu">
+            {% for child in item.children%}
+            
+            {# Element is a model class #}
+            {% if child.modelClass is defined %}
+                <li class="dropdown-submenu">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 
+                    {{ child.caption }} 
+                </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{{ path('home') }}"> 
+                                <i class="icon-list"></i> 
+                                Anzeigen und suchen
+                        </a></li>
+                        <li><a href="{{ path('dataDomainNew', {'className':child.modelClass, 'recordId':0}) }}">
+                                <i class="icon-plus"></i> 
+                                Neu anlegen
+                        </a></li>
+                    </ul>
+                </li>
+            {% else %}
+                <li><a href="{{ path(child.path) }}">{{ child.caption }}</a></li>
+            {% endif %}
+            {% endfor %}
+            </ul>
+        </li>
+    {% else %} {# item has no children #}
+        {% if item.modelClass is defined %}
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 
+                    {{ item.caption }} 
+                    <b class="caret"></b> 
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="{{ path('home') }}">
+                            <i class="icon-list"></i> 
+                            Anzeigen und suchen</a></li>
+                    <li><a href="{{ path('home') }}">
+                            <i class="icon-plus"></i> 
+                            Neu anlegen
+                    </a></li>
+                 </ul>
+            </li>
+        {% else %}
+            <li><a href="{{ path(child.path) }}">{{ child.caption }}</a></li>
+        {% endif %}
+    {% endif %}
+    {% endfor %}
+
+{% endblock %}
