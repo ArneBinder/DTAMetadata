@@ -12,6 +12,7 @@ use \PropelPDO;
 use DTA\MetadataBundle\Model\TitlePeer;
 use DTA\MetadataBundle\Model\Titlefragment;
 use DTA\MetadataBundle\Model\TitlefragmentPeer;
+use DTA\MetadataBundle\Model\TitlefragmentQuery;
 use DTA\MetadataBundle\Model\TitlefragmenttypePeer;
 use DTA\MetadataBundle\Model\map\TitlefragmentTableMap;
 
@@ -31,13 +32,13 @@ abstract class BaseTitlefragmentPeer
     const TM_CLASS = 'TitlefragmentTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 5;
+    const NUM_COLUMNS = 6;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 5;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /** the column name for the id field */
     const ID = 'titleFragment.id';
@@ -53,6 +54,9 @@ abstract class BaseTitlefragmentPeer
 
     /** the column name for the sortable_rank field */
     const SORTABLE_RANK = 'titleFragment.sortable_rank';
+
+    /** the column name for the name_is_reconstructed field */
+    const NAME_IS_RECONSTRUCTED = 'titleFragment.name_is_reconstructed';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -85,12 +89,12 @@ abstract class BaseTitlefragmentPeer
      * e.g. TitlefragmentPeer::$fieldNames[TitlefragmentPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'TitleId', 'TitlefragmenttypeId', 'SortableRank', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'titleId', 'titlefragmenttypeId', 'sortableRank', ),
-        BasePeer::TYPE_COLNAME => array (TitlefragmentPeer::ID, TitlefragmentPeer::NAME, TitlefragmentPeer::TITLE_ID, TitlefragmentPeer::TITLEFRAGMENTTYPE_ID, TitlefragmentPeer::SORTABLE_RANK, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'TITLE_ID', 'TITLEFRAGMENTTYPE_ID', 'SORTABLE_RANK', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'title_id', 'titleFragmentType_id', 'sortable_rank', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'TitleId', 'TitlefragmenttypeId', 'SortableRank', 'NameIsReconstructed', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'titleId', 'titlefragmenttypeId', 'sortableRank', 'nameIsReconstructed', ),
+        BasePeer::TYPE_COLNAME => array (TitlefragmentPeer::ID, TitlefragmentPeer::NAME, TitlefragmentPeer::TITLE_ID, TitlefragmentPeer::TITLEFRAGMENTTYPE_ID, TitlefragmentPeer::SORTABLE_RANK, TitlefragmentPeer::NAME_IS_RECONSTRUCTED, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'TITLE_ID', 'TITLEFRAGMENTTYPE_ID', 'SORTABLE_RANK', 'NAME_IS_RECONSTRUCTED', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'title_id', 'titleFragmentType_id', 'sortable_rank', 'name_is_reconstructed', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -100,12 +104,12 @@ abstract class BaseTitlefragmentPeer
      * e.g. TitlefragmentPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'TitleId' => 2, 'TitlefragmenttypeId' => 3, 'SortableRank' => 4, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'titleId' => 2, 'titlefragmenttypeId' => 3, 'sortableRank' => 4, ),
-        BasePeer::TYPE_COLNAME => array (TitlefragmentPeer::ID => 0, TitlefragmentPeer::NAME => 1, TitlefragmentPeer::TITLE_ID => 2, TitlefragmentPeer::TITLEFRAGMENTTYPE_ID => 3, TitlefragmentPeer::SORTABLE_RANK => 4, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'TITLE_ID' => 2, 'TITLEFRAGMENTTYPE_ID' => 3, 'SORTABLE_RANK' => 4, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'title_id' => 2, 'titleFragmentType_id' => 3, 'sortable_rank' => 4, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'TitleId' => 2, 'TitlefragmenttypeId' => 3, 'SortableRank' => 4, 'NameIsReconstructed' => 5, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'titleId' => 2, 'titlefragmenttypeId' => 3, 'sortableRank' => 4, 'nameIsReconstructed' => 5, ),
+        BasePeer::TYPE_COLNAME => array (TitlefragmentPeer::ID => 0, TitlefragmentPeer::NAME => 1, TitlefragmentPeer::TITLE_ID => 2, TitlefragmentPeer::TITLEFRAGMENTTYPE_ID => 3, TitlefragmentPeer::SORTABLE_RANK => 4, TitlefragmentPeer::NAME_IS_RECONSTRUCTED => 5, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'TITLE_ID' => 2, 'TITLEFRAGMENTTYPE_ID' => 3, 'SORTABLE_RANK' => 4, 'NAME_IS_RECONSTRUCTED' => 5, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'title_id' => 2, 'titleFragmentType_id' => 3, 'sortable_rank' => 4, 'name_is_reconstructed' => 5, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -184,12 +188,14 @@ abstract class BaseTitlefragmentPeer
             $criteria->addSelectColumn(TitlefragmentPeer::TITLE_ID);
             $criteria->addSelectColumn(TitlefragmentPeer::TITLEFRAGMENTTYPE_ID);
             $criteria->addSelectColumn(TitlefragmentPeer::SORTABLE_RANK);
+            $criteria->addSelectColumn(TitlefragmentPeer::NAME_IS_RECONSTRUCTED);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.name');
             $criteria->addSelectColumn($alias . '.title_id');
             $criteria->addSelectColumn($alias . '.titleFragmentType_id');
             $criteria->addSelectColumn($alias . '.sortable_rank');
+            $criteria->addSelectColumn($alias . '.name_is_reconstructed');
         }
     }
 

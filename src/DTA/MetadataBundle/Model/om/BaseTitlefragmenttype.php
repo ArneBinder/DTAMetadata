@@ -381,7 +381,7 @@ abstract class BaseTitlefragmenttype extends BaseObject implements Persistent
 
             if ($this->collTitlefragments !== null) {
                 foreach ($this->collTitlefragments as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -504,11 +504,11 @@ abstract class BaseTitlefragmenttype extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -992,22 +992,22 @@ abstract class BaseTitlefragmenttype extends BaseObject implements Persistent
         if (null === $this->collTitlefragments || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collTitlefragments) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getTitlefragments());
-                }
-                $query = TitlefragmentQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByTitlefragmenttype($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collTitlefragments);
+
+            if($partial && !$criteria) {
+                return count($this->getTitlefragments());
+            }
+            $query = TitlefragmentQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByTitlefragmenttype($this)
+                ->count($con);
         }
+
+        return count($this->collTitlefragments);
     }
 
     /**

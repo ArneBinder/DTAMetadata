@@ -71,6 +71,13 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent
     protected $sortable_rank;
 
     /**
+     * The value for the name_is_reconstructed field.
+     * Note: this column has a database default value of: false
+     * @var        boolean
+     */
+    protected $name_is_reconstructed;
+
+    /**
      * @var        Title
      */
     protected $aTitle;
@@ -107,6 +114,27 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent
      * @var        int
      */
     protected $oldScope;
+
+    /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see        __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->name_is_reconstructed = false;
+    }
+
+    /**
+     * Initializes internal state of BaseTitlefragment object.
+     * @see        applyDefaults()
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->applyDefaultValues();
+    }
 
     /**
      * Get the [id] column value.
@@ -156,6 +184,16 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent
     public function getSortableRank()
     {
         return $this->sortable_rank;
+    }
+
+    /**
+     * Get the [name_is_reconstructed] column value.
+     *
+     * @return boolean
+     */
+    public function getNameIsReconstructed()
+    {
+        return $this->name_is_reconstructed;
     }
 
     /**
@@ -275,6 +313,35 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent
     } // setSortableRank()
 
     /**
+     * Sets the value of the [name_is_reconstructed] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param boolean|integer|string $v The new value
+     * @return Titlefragment The current object (for fluent API support)
+     */
+    public function setNameIsReconstructed($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->name_is_reconstructed !== $v) {
+            $this->name_is_reconstructed = $v;
+            $this->modifiedColumns[] = TitlefragmentPeer::NAME_IS_RECONSTRUCTED;
+        }
+
+
+        return $this;
+    } // setNameIsReconstructed()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -284,6 +351,10 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->name_is_reconstructed !== false) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return true
         return true;
     } // hasOnlyDefaultValues()
@@ -311,6 +382,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent
             $this->title_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
             $this->titlefragmenttype_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
             $this->sortable_rank = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
+            $this->name_is_reconstructed = ($row[$startcol + 5] !== null) ? (boolean) $row[$startcol + 5] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -319,7 +391,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 5; // 5 = TitlefragmentPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = TitlefragmentPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Titlefragment object", $e);
@@ -593,6 +665,9 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent
         if ($this->isColumnModified(TitlefragmentPeer::SORTABLE_RANK)) {
             $modifiedColumns[':p' . $index++]  = '`sortable_rank`';
         }
+        if ($this->isColumnModified(TitlefragmentPeer::NAME_IS_RECONSTRUCTED)) {
+            $modifiedColumns[':p' . $index++]  = '`name_is_reconstructed`';
+        }
 
         $sql = sprintf(
             'INSERT INTO `titleFragment` (%s) VALUES (%s)',
@@ -618,6 +693,9 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent
                         break;
                     case '`sortable_rank`':
                         $stmt->bindValue($identifier, $this->sortable_rank, PDO::PARAM_INT);
+                        break;
+                    case '`name_is_reconstructed`':
+                        $stmt->bindValue($identifier, (int) $this->name_is_reconstructed, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -687,11 +765,11 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -786,6 +864,9 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent
             case 4:
                 return $this->getSortableRank();
                 break;
+            case 5:
+                return $this->getNameIsReconstructed();
+                break;
             default:
                 return null;
                 break;
@@ -820,6 +901,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent
             $keys[2] => $this->getTitleId(),
             $keys[3] => $this->getTitlefragmenttypeId(),
             $keys[4] => $this->getSortableRank(),
+            $keys[5] => $this->getNameIsReconstructed(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aTitle) {
@@ -877,6 +959,9 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent
             case 4:
                 $this->setSortableRank($value);
                 break;
+            case 5:
+                $this->setNameIsReconstructed($value);
+                break;
         } // switch()
     }
 
@@ -906,6 +991,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent
         if (array_key_exists($keys[2], $arr)) $this->setTitleId($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setTitlefragmenttypeId($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setSortableRank($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setNameIsReconstructed($arr[$keys[5]]);
     }
 
     /**
@@ -922,6 +1008,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent
         if ($this->isColumnModified(TitlefragmentPeer::TITLE_ID)) $criteria->add(TitlefragmentPeer::TITLE_ID, $this->title_id);
         if ($this->isColumnModified(TitlefragmentPeer::TITLEFRAGMENTTYPE_ID)) $criteria->add(TitlefragmentPeer::TITLEFRAGMENTTYPE_ID, $this->titlefragmenttype_id);
         if ($this->isColumnModified(TitlefragmentPeer::SORTABLE_RANK)) $criteria->add(TitlefragmentPeer::SORTABLE_RANK, $this->sortable_rank);
+        if ($this->isColumnModified(TitlefragmentPeer::NAME_IS_RECONSTRUCTED)) $criteria->add(TitlefragmentPeer::NAME_IS_RECONSTRUCTED, $this->name_is_reconstructed);
 
         return $criteria;
     }
@@ -989,6 +1076,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent
         $copyObj->setTitleId($this->getTitleId());
         $copyObj->setTitlefragmenttypeId($this->getTitlefragmenttypeId());
         $copyObj->setSortableRank($this->getSortableRank());
+        $copyObj->setNameIsReconstructed($this->getNameIsReconstructed());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1161,9 +1249,11 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent
         $this->title_id = null;
         $this->titlefragmenttype_id = null;
         $this->sortable_rank = null;
+        $this->name_is_reconstructed = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -1575,6 +1665,35 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent
             call_user_func_array($query['callable'], $query['arguments']);
         }
         $this->sortableQueries = array();
+    }
+
+    // reconstructed_flaggable behavior
+    /**
+    * Returns all columns that can be flagged as reconstructed.
+    */
+    public function getReconstructedFlaggableColumns(){
+        return array('Name', );
+    }
+
+    /**
+    * Returns whether a column is flagged as reconstructed.
+    * @param $column the PHP name of the column as defined in the schema
+    */
+    public function isReconstructedByName($column){
+        return $this->getByName($column."IsReconstructed");
+    }
+
+    /**
+    * Returns all columns that actually are flagged as reconstructed.
+    */
+    public function getReconstructedFlaggedColumns(){
+        $flaggableColumns = $this->getReconstructedFlaggableColumns();
+        $flaggedColumns = array();
+        foreach($flaggableColumns as $column){
+            if($this->isReconstructedByName($column))
+            $flaggedColumns[] = $column;
+        }
+        return $flaggedColumns;
     }
 
 }

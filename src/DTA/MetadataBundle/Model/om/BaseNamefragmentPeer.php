@@ -11,6 +11,7 @@ use \PropelException;
 use \PropelPDO;
 use DTA\MetadataBundle\Model\Namefragment;
 use DTA\MetadataBundle\Model\NamefragmentPeer;
+use DTA\MetadataBundle\Model\NamefragmentQuery;
 use DTA\MetadataBundle\Model\NamefragmenttypePeer;
 use DTA\MetadataBundle\Model\PersonalnamePeer;
 use DTA\MetadataBundle\Model\map\NamefragmentTableMap;

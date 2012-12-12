@@ -68,7 +68,11 @@ class NamefragmentTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'sortable' => array('rank_column' => 'sortable_rank', 'use_scope' => 'true', 'scope_column' => 'personalName_id', ),
+            'sortable' =>  array (
+  'rank_column' => 'sortable_rank',
+  'use_scope' => 'true',
+  'scope_column' => 'personalName_id',
+),
         );
     } // getBehaviors()
 

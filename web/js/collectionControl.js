@@ -41,8 +41,8 @@ function addFormElement(){
         return false;
     }            
         
-    var elementId = collectionHolder.children().length-1; // ignore the add link when counting the next ID
-    console.log(collectionHolder.children());
+    var elementId = collectionHolder.children("li").length; 
+    console.log(elementId);
     var newForm = prototype
                     .replace(/<label class="required">__name__label__<\/label>/g, '')   // TODO finalization. Ugly workaround. Use theming.
                     .replace(/label__/g, '')

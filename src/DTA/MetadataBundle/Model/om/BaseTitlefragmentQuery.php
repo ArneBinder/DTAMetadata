@@ -24,12 +24,14 @@ use DTA\MetadataBundle\Model\Titlefragmenttype;
  * @method TitlefragmentQuery orderByTitleId($order = Criteria::ASC) Order by the title_id column
  * @method TitlefragmentQuery orderByTitlefragmenttypeId($order = Criteria::ASC) Order by the titleFragmentType_id column
  * @method TitlefragmentQuery orderBySortableRank($order = Criteria::ASC) Order by the sortable_rank column
+ * @method TitlefragmentQuery orderByNameIsReconstructed($order = Criteria::ASC) Order by the name_is_reconstructed column
  *
  * @method TitlefragmentQuery groupById() Group by the id column
  * @method TitlefragmentQuery groupByName() Group by the name column
  * @method TitlefragmentQuery groupByTitleId() Group by the title_id column
  * @method TitlefragmentQuery groupByTitlefragmenttypeId() Group by the titleFragmentType_id column
  * @method TitlefragmentQuery groupBySortableRank() Group by the sortable_rank column
+ * @method TitlefragmentQuery groupByNameIsReconstructed() Group by the name_is_reconstructed column
  *
  * @method TitlefragmentQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method TitlefragmentQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -50,12 +52,14 @@ use DTA\MetadataBundle\Model\Titlefragmenttype;
  * @method Titlefragment findOneByTitleId(int $title_id) Return the first Titlefragment filtered by the title_id column
  * @method Titlefragment findOneByTitlefragmenttypeId(int $titleFragmentType_id) Return the first Titlefragment filtered by the titleFragmentType_id column
  * @method Titlefragment findOneBySortableRank(int $sortable_rank) Return the first Titlefragment filtered by the sortable_rank column
+ * @method Titlefragment findOneByNameIsReconstructed(boolean $name_is_reconstructed) Return the first Titlefragment filtered by the name_is_reconstructed column
  *
  * @method array findById(int $id) Return Titlefragment objects filtered by the id column
  * @method array findByName(string $name) Return Titlefragment objects filtered by the name column
  * @method array findByTitleId(int $title_id) Return Titlefragment objects filtered by the title_id column
  * @method array findByTitlefragmenttypeId(int $titleFragmentType_id) Return Titlefragment objects filtered by the titleFragmentType_id column
  * @method array findBySortableRank(int $sortable_rank) Return Titlefragment objects filtered by the sortable_rank column
+ * @method array findByNameIsReconstructed(boolean $name_is_reconstructed) Return Titlefragment objects filtered by the name_is_reconstructed column
  */
 abstract class BaseTitlefragmentQuery extends ModelCriteria
 {
@@ -157,7 +161,7 @@ abstract class BaseTitlefragmentQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `name`, `title_id`, `titleFragmentType_id`, `sortable_rank` FROM `titleFragment` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `name`, `title_id`, `titleFragmentType_id`, `sortable_rank`, `name_is_reconstructed` FROM `titleFragment` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -427,6 +431,33 @@ abstract class BaseTitlefragmentQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(TitlefragmentPeer::SORTABLE_RANK, $sortableRank, $comparison);
+    }
+
+    /**
+     * Filter the query on the name_is_reconstructed column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByNameIsReconstructed(true); // WHERE name_is_reconstructed = true
+     * $query->filterByNameIsReconstructed('yes'); // WHERE name_is_reconstructed = true
+     * </code>
+     *
+     * @param     boolean|string $nameIsReconstructed The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return TitlefragmentQuery The current query, for fluid interface
+     */
+    public function filterByNameIsReconstructed($nameIsReconstructed = null, $comparison = null)
+    {
+        if (is_string($nameIsReconstructed)) {
+            $name_is_reconstructed = in_array(strtolower($nameIsReconstructed), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(TitlefragmentPeer::NAME_IS_RECONSTRUCTED, $nameIsReconstructed, $comparison);
     }
 
     /**

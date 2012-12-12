@@ -408,7 +408,7 @@ abstract class BaseMonograph extends BaseObject implements Persistent
 
             if ($this->collVolumes !== null) {
                 foreach ($this->collVolumes as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -531,11 +531,11 @@ abstract class BaseMonograph extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1093,22 +1093,22 @@ abstract class BaseMonograph extends BaseObject implements Persistent
         if (null === $this->collVolumes || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collVolumes) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getVolumes());
-                }
-                $query = VolumeQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByMonograph($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collVolumes);
+
+            if($partial && !$criteria) {
+                return count($this->getVolumes());
+            }
+            $query = VolumeQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByMonograph($this)
+                ->count($con);
         }
+
+        return count($this->collVolumes);
     }
 
     /**

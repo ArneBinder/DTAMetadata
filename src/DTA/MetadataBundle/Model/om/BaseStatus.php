@@ -381,7 +381,7 @@ abstract class BaseStatus extends BaseObject implements Persistent
 
             if ($this->collWorks !== null) {
                 foreach ($this->collWorks as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -504,11 +504,11 @@ abstract class BaseStatus extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -992,22 +992,22 @@ abstract class BaseStatus extends BaseObject implements Persistent
         if (null === $this->collWorks || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collWorks) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getWorks());
-                }
-                $query = WorkQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByStatus($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collWorks);
+
+            if($partial && !$criteria) {
+                return count($this->getWorks());
+            }
+            $query = WorkQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByStatus($this)
+                ->count($con);
         }
+
+        return count($this->collWorks);
     }
 
     /**

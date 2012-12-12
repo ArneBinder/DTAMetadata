@@ -829,7 +829,7 @@ abstract class BaseWrit extends BaseObject implements Persistent
 
             if ($this->collCorpuses !== null) {
                 foreach ($this->collCorpuses as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -846,7 +846,7 @@ abstract class BaseWrit extends BaseObject implements Persistent
 
             if ($this->collSources !== null) {
                 foreach ($this->collSources as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -864,7 +864,7 @@ abstract class BaseWrit extends BaseObject implements Persistent
 
             if ($this->collTasks !== null) {
                 foreach ($this->collTasks as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -881,7 +881,7 @@ abstract class BaseWrit extends BaseObject implements Persistent
 
             if ($this->collWritWritgroups !== null) {
                 foreach ($this->collWritWritgroups as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -1040,11 +1040,11 @@ abstract class BaseWrit extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -2026,22 +2026,22 @@ abstract class BaseWrit extends BaseObject implements Persistent
         if (null === $this->collCorpuses || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collCorpuses) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getCorpuses());
-                }
-                $query = CorpusQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByWrit($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collCorpuses);
+
+            if($partial && !$criteria) {
+                return count($this->getCorpuses());
+            }
+            $query = CorpusQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByWrit($this)
+                ->count($con);
         }
+
+        return count($this->collCorpuses);
     }
 
     /**
@@ -2241,22 +2241,22 @@ abstract class BaseWrit extends BaseObject implements Persistent
         if (null === $this->collSources || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collSources) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getSources());
-                }
-                $query = SourceQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByWrit($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collSources);
+
+            if($partial && !$criteria) {
+                return count($this->getSources());
+            }
+            $query = SourceQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByWrit($this)
+                ->count($con);
         }
+
+        return count($this->collSources);
     }
 
     /**
@@ -2456,22 +2456,22 @@ abstract class BaseWrit extends BaseObject implements Persistent
         if (null === $this->collTasks || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collTasks) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getTasks());
-                }
-                $query = TaskQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByWrit($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collTasks);
+
+            if($partial && !$criteria) {
+                return count($this->getTasks());
+            }
+            $query = TaskQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByWrit($this)
+                ->count($con);
         }
+
+        return count($this->collTasks);
     }
 
     /**
@@ -2746,22 +2746,22 @@ abstract class BaseWrit extends BaseObject implements Persistent
         if (null === $this->collWritWritgroups || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collWritWritgroups) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getWritWritgroups());
-                }
-                $query = WritWritgroupQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByWrit($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collWritWritgroups);
+
+            if($partial && !$criteria) {
+                return count($this->getWritWritgroups());
+            }
+            $query = WritWritgroupQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByWrit($this)
+                ->count($con);
         }
+
+        return count($this->collWritWritgroups);
     }
 
     /**

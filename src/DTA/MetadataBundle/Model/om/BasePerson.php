@@ -445,7 +445,7 @@ abstract class BasePerson extends BaseObject implements Persistent
 
             if ($this->collPersonalnames !== null) {
                 foreach ($this->collPersonalnames as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -462,7 +462,7 @@ abstract class BasePerson extends BaseObject implements Persistent
 
             if ($this->collAuthors !== null) {
                 foreach ($this->collAuthors as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -479,7 +479,7 @@ abstract class BasePerson extends BaseObject implements Persistent
 
             if ($this->collPrinters !== null) {
                 foreach ($this->collPrinters as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -496,7 +496,7 @@ abstract class BasePerson extends BaseObject implements Persistent
 
             if ($this->collPublishers !== null) {
                 foreach ($this->collPublishers as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -513,7 +513,7 @@ abstract class BasePerson extends BaseObject implements Persistent
 
             if ($this->collTranslators !== null) {
                 foreach ($this->collTranslators as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -636,11 +636,11 @@ abstract class BasePerson extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1204,22 +1204,22 @@ abstract class BasePerson extends BaseObject implements Persistent
         if (null === $this->collPersonalnames || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collPersonalnames) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getPersonalnames());
-                }
-                $query = PersonalnameQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByPerson($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collPersonalnames);
+
+            if($partial && !$criteria) {
+                return count($this->getPersonalnames());
+            }
+            $query = PersonalnameQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPerson($this)
+                ->count($con);
         }
+
+        return count($this->collPersonalnames);
     }
 
     /**
@@ -1419,22 +1419,22 @@ abstract class BasePerson extends BaseObject implements Persistent
         if (null === $this->collAuthors || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collAuthors) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getAuthors());
-                }
-                $query = AuthorQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByPerson($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collAuthors);
+
+            if($partial && !$criteria) {
+                return count($this->getAuthors());
+            }
+            $query = AuthorQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPerson($this)
+                ->count($con);
         }
+
+        return count($this->collAuthors);
     }
 
     /**
@@ -1634,22 +1634,22 @@ abstract class BasePerson extends BaseObject implements Persistent
         if (null === $this->collPrinters || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collPrinters) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getPrinters());
-                }
-                $query = PrinterQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByPerson($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collPrinters);
+
+            if($partial && !$criteria) {
+                return count($this->getPrinters());
+            }
+            $query = PrinterQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPerson($this)
+                ->count($con);
         }
+
+        return count($this->collPrinters);
     }
 
     /**
@@ -1849,22 +1849,22 @@ abstract class BasePerson extends BaseObject implements Persistent
         if (null === $this->collPublishers || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collPublishers) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getPublishers());
-                }
-                $query = PublisherQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByPerson($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collPublishers);
+
+            if($partial && !$criteria) {
+                return count($this->getPublishers());
+            }
+            $query = PublisherQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPerson($this)
+                ->count($con);
         }
+
+        return count($this->collPublishers);
     }
 
     /**
@@ -2064,22 +2064,22 @@ abstract class BasePerson extends BaseObject implements Persistent
         if (null === $this->collTranslators || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collTranslators) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getTranslators());
-                }
-                $query = TranslatorQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByPerson($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collTranslators);
+
+            if($partial && !$criteria) {
+                return count($this->getTranslators());
+            }
+            $query = TranslatorQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPerson($this)
+                ->count($con);
         }
+
+        return count($this->collTranslators);
     }
 
     /**

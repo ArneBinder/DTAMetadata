@@ -442,7 +442,7 @@ abstract class BaseAuthor extends BaseObject implements Persistent
 
             if ($this->collAuthorWorks !== null) {
                 foreach ($this->collAuthorWorks as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -565,11 +565,11 @@ abstract class BaseAuthor extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1127,22 +1127,22 @@ abstract class BaseAuthor extends BaseObject implements Persistent
         if (null === $this->collAuthorWorks || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collAuthorWorks) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getAuthorWorks());
-                }
-                $query = AuthorWorkQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByAuthor($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collAuthorWorks);
+
+            if($partial && !$criteria) {
+                return count($this->getAuthorWorks());
+            }
+            $query = AuthorWorkQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByAuthor($this)
+                ->count($con);
         }
+
+        return count($this->collAuthorWorks);
     }
 
     /**

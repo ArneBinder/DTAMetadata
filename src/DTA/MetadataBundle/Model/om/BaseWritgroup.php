@@ -432,7 +432,7 @@ abstract class BaseWritgroup extends BaseObject implements Persistent
 
             if ($this->collTasks !== null) {
                 foreach ($this->collTasks as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -449,7 +449,7 @@ abstract class BaseWritgroup extends BaseObject implements Persistent
 
             if ($this->collWritWritgroups !== null) {
                 foreach ($this->collWritWritgroups as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -572,11 +572,11 @@ abstract class BaseWritgroup extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1080,22 +1080,22 @@ abstract class BaseWritgroup extends BaseObject implements Persistent
         if (null === $this->collTasks || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collTasks) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getTasks());
-                }
-                $query = TaskQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByWritgroup($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collTasks);
+
+            if($partial && !$criteria) {
+                return count($this->getTasks());
+            }
+            $query = TaskQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByWritgroup($this)
+                ->count($con);
         }
+
+        return count($this->collTasks);
     }
 
     /**
@@ -1370,22 +1370,22 @@ abstract class BaseWritgroup extends BaseObject implements Persistent
         if (null === $this->collWritWritgroups || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collWritWritgroups) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getWritWritgroups());
-                }
-                $query = WritWritgroupQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByWritgroup($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collWritWritgroups);
+
+            if($partial && !$criteria) {
+                return count($this->getWritWritgroups());
+            }
+            $query = WritWritgroupQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByWritgroup($this)
+                ->count($con);
         }
+
+        return count($this->collWritWritgroups);
     }
 
     /**

@@ -47,6 +47,7 @@ class TitlefragmentTableMap extends TableMap
         $this->addForeignKey('title_id', 'TitleId', 'INTEGER', 'title', 'id', true, null, null);
         $this->addForeignKey('titleFragmentType_id', 'TitlefragmenttypeId', 'INTEGER', 'titleFragmentType', 'id', true, null, null);
         $this->addColumn('sortable_rank', 'SortableRank', 'INTEGER', false, null, null);
+        $this->addColumn('name_is_reconstructed', 'NameIsReconstructed', 'BOOLEAN', false, 1, false);
         // validators
     } // initialize()
 
@@ -68,7 +69,14 @@ class TitlefragmentTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'sortable' => array('rank_column' => 'sortable_rank', 'use_scope' => 'true', 'scope_column' => 'title_id', ),
+            'sortable' =>  array (
+  'rank_column' => 'sortable_rank',
+  'use_scope' => 'true',
+  'scope_column' => 'title_id',
+),
+            'reconstructed_flaggable' =>  array (
+  'column' => 'name',
+),
         );
     } // getBehaviors()
 

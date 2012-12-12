@@ -67,7 +67,9 @@ class DatespecificationTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'reconstructed_flaggable' => array('column' => 'year', ),
+            'reconstructed_flaggable' =>  array (
+  'column' => 'year',
+),
         );
     } // getBehaviors()
 

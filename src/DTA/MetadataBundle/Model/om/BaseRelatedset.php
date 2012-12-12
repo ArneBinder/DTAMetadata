@@ -382,7 +382,7 @@ abstract class BaseRelatedset extends BaseObject implements Persistent
 
             if ($this->collWrits !== null) {
                 foreach ($this->collWrits as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -494,11 +494,11 @@ abstract class BaseRelatedset extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -982,22 +982,22 @@ abstract class BaseRelatedset extends BaseObject implements Persistent
         if (null === $this->collWrits || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collWrits) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getWrits());
-                }
-                $query = WritQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByRelatedset($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collWrits);
+
+            if($partial && !$criteria) {
+                return count($this->getWrits());
+            }
+            $query = WritQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByRelatedset($this)
+                ->count($con);
         }
+
+        return count($this->collWrits);
     }
 
     /**

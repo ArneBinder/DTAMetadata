@@ -473,7 +473,7 @@ abstract class BaseGenre extends BaseObject implements Persistent
 
             if ($this->collGenresRelatedById !== null) {
                 foreach ($this->collGenresRelatedById as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -491,7 +491,7 @@ abstract class BaseGenre extends BaseObject implements Persistent
 
             if ($this->collWorksRelatedByGenreId !== null) {
                 foreach ($this->collWorksRelatedByGenreId as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -509,7 +509,7 @@ abstract class BaseGenre extends BaseObject implements Persistent
 
             if ($this->collWorksRelatedBySubgenreId !== null) {
                 foreach ($this->collWorksRelatedBySubgenreId as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -638,11 +638,11 @@ abstract class BaseGenre extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1243,22 +1243,22 @@ abstract class BaseGenre extends BaseObject implements Persistent
         if (null === $this->collGenresRelatedById || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collGenresRelatedById) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getGenresRelatedById());
-                }
-                $query = GenreQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByGenreRelatedByChildof($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collGenresRelatedById);
+
+            if($partial && !$criteria) {
+                return count($this->getGenresRelatedById());
+            }
+            $query = GenreQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByGenreRelatedByChildof($this)
+                ->count($con);
         }
+
+        return count($this->collGenresRelatedById);
     }
 
     /**
@@ -1458,22 +1458,22 @@ abstract class BaseGenre extends BaseObject implements Persistent
         if (null === $this->collWorksRelatedByGenreId || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collWorksRelatedByGenreId) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getWorksRelatedByGenreId());
-                }
-                $query = WorkQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByGenreRelatedByGenreId($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collWorksRelatedByGenreId);
+
+            if($partial && !$criteria) {
+                return count($this->getWorksRelatedByGenreId());
+            }
+            $query = WorkQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByGenreRelatedByGenreId($this)
+                ->count($con);
         }
+
+        return count($this->collWorksRelatedByGenreId);
     }
 
     /**
@@ -1773,22 +1773,22 @@ abstract class BaseGenre extends BaseObject implements Persistent
         if (null === $this->collWorksRelatedBySubgenreId || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collWorksRelatedBySubgenreId) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getWorksRelatedBySubgenreId());
-                }
-                $query = WorkQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByGenreRelatedBySubgenreId($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collWorksRelatedBySubgenreId);
+
+            if($partial && !$criteria) {
+                return count($this->getWorksRelatedBySubgenreId());
+            }
+            $query = WorkQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByGenreRelatedBySubgenreId($this)
+                ->count($con);
         }
+
+        return count($this->collWorksRelatedBySubgenreId);
     }
 
     /**

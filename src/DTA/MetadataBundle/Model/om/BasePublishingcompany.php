@@ -420,7 +420,7 @@ abstract class BasePublishingcompany extends BaseObject implements Persistent
 
             if ($this->collPublications !== null) {
                 foreach ($this->collPublications as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -549,11 +549,11 @@ abstract class BasePublishingcompany extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1047,22 +1047,22 @@ abstract class BasePublishingcompany extends BaseObject implements Persistent
         if (null === $this->collPublications || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collPublications) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getPublications());
-                }
-                $query = PublicationQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByPublishingcompany($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collPublications);
+
+            if($partial && !$criteria) {
+                return count($this->getPublications());
+            }
+            $query = PublicationQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPublishingcompany($this)
+                ->count($con);
         }
+
+        return count($this->collPublications);
     }
 
     /**

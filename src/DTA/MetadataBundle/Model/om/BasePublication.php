@@ -268,7 +268,7 @@ abstract class BasePublication extends BaseObject implements Persistent
 
     /**
      * Get the [printrun] column value.
-     *
+     * Auflage
      * @return string
      */
     public function getPrintrun()
@@ -449,7 +449,7 @@ abstract class BasePublication extends BaseObject implements Persistent
 
     /**
      * Set the value of [printrun] column.
-     *
+     * Auflage
      * @param string $v new value
      * @return Publication The current object (for fluent API support)
      */
@@ -880,7 +880,7 @@ abstract class BasePublication extends BaseObject implements Persistent
 
             if ($this->collEssays !== null) {
                 foreach ($this->collEssays as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -897,7 +897,7 @@ abstract class BasePublication extends BaseObject implements Persistent
 
             if ($this->collMagazines !== null) {
                 foreach ($this->collMagazines as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -914,7 +914,7 @@ abstract class BasePublication extends BaseObject implements Persistent
 
             if ($this->collMonographs !== null) {
                 foreach ($this->collMonographs as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -931,7 +931,7 @@ abstract class BasePublication extends BaseObject implements Persistent
 
             if ($this->collSeries !== null) {
                 foreach ($this->collSeries as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -948,7 +948,7 @@ abstract class BasePublication extends BaseObject implements Persistent
 
             if ($this->collWrits !== null) {
                 foreach ($this->collWrits as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -1125,11 +1125,11 @@ abstract class BasePublication extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -2033,22 +2033,22 @@ abstract class BasePublication extends BaseObject implements Persistent
         if (null === $this->collEssays || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collEssays) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getEssays());
-                }
-                $query = EssayQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByPublication($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collEssays);
+
+            if($partial && !$criteria) {
+                return count($this->getEssays());
+            }
+            $query = EssayQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPublication($this)
+                ->count($con);
         }
+
+        return count($this->collEssays);
     }
 
     /**
@@ -2248,22 +2248,22 @@ abstract class BasePublication extends BaseObject implements Persistent
         if (null === $this->collMagazines || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collMagazines) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getMagazines());
-                }
-                $query = MagazineQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByPublication($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collMagazines);
+
+            if($partial && !$criteria) {
+                return count($this->getMagazines());
+            }
+            $query = MagazineQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPublication($this)
+                ->count($con);
         }
+
+        return count($this->collMagazines);
     }
 
     /**
@@ -2463,22 +2463,22 @@ abstract class BasePublication extends BaseObject implements Persistent
         if (null === $this->collMonographs || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collMonographs) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getMonographs());
-                }
-                $query = MonographQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByPublication($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collMonographs);
+
+            if($partial && !$criteria) {
+                return count($this->getMonographs());
+            }
+            $query = MonographQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPublication($this)
+                ->count($con);
         }
+
+        return count($this->collMonographs);
     }
 
     /**
@@ -2678,22 +2678,22 @@ abstract class BasePublication extends BaseObject implements Persistent
         if (null === $this->collSeries || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collSeries) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getSeries());
-                }
-                $query = SeriesQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByPublication($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collSeries);
+
+            if($partial && !$criteria) {
+                return count($this->getSeries());
+            }
+            $query = SeriesQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPublication($this)
+                ->count($con);
         }
+
+        return count($this->collSeries);
     }
 
     /**
@@ -2893,22 +2893,22 @@ abstract class BasePublication extends BaseObject implements Persistent
         if (null === $this->collWrits || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collWrits) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getWrits());
-                }
-                $query = WritQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByPublication($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collWrits);
+
+            if($partial && !$criteria) {
+                return count($this->getWrits());
+            }
+            $query = WritQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPublication($this)
+                ->count($con);
         }
+
+        return count($this->collWrits);
     }
 
     /**

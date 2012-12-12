@@ -250,10 +250,7 @@
     </table>
     
     <table name="titleFragment" idMethod="native">
-        <behavior name="sortable">
-            <parameter name="use_scope" value="true"/>
-            <parameter name="scope_column" value="title_id"/>
-        </behavior>
+        
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
         <column name="title_id" type="INTEGER" required="true"/>
@@ -270,6 +267,15 @@
         <index name="fk_titleFragmentType_type2">
             <index-column name="titleFragmentType_id"/>
         </index>
+        
+        <behavior name="sortable">
+            <parameter name="use_scope" value="true"/>
+            <parameter name="scope_column" value="title_id"/>
+        </behavior>
+        <behavior name="reconstructed_flaggable">
+            <parameter name="column" value="name"/>
+        </behavior>
+        
     </table>
     
     <table name="titleFragmentType" idMethod="native">
