@@ -18,11 +18,11 @@ class PersonalnameType extends BaseAbstractType {
      *  {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options) {
-//        $builder->add('nameFragments', new Form\DerivedType\SortableCollectionType(), array(
-        $builder->add('nameFragments', 'collection', array(
+        $builder->add('nameFragments', new Form\DerivedType\SortableCollectionType(), array(
+//        $builder->add('nameFragments', 'collection', array(
         'allow_add' => true,
         'by_reference' => false,
-            'type' => new NamefragmentType(),
+        'type' => new NamefragmentType(),
         ));
     }
 

@@ -134,7 +134,7 @@ abstract class BasePublicationQuery extends ModelCriteria
      * Returns a new PublicationQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     PublicationQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   PublicationQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return PublicationQuery
      */
@@ -196,8 +196,8 @@ abstract class BasePublicationQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Publication A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Publication A model object, or null if the key is not found
+     * @throws PropelException
      */
      public function findOneById($key, $con = null)
      {
@@ -211,8 +211,8 @@ abstract class BasePublicationQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Publication A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Publication A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -312,8 +312,17 @@ abstract class BasePublicationQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
+     *
+     * @see       filterByEssay()
+     *
+     * @see       filterByMagazine()
+     *
+     * @see       filterByMonograph()
+     *
+     * @see       filterBySeries()
      *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
@@ -325,8 +334,22 @@ abstract class BasePublicationQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(PublicationPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(PublicationPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(PublicationPeer::ID, $id, $comparison);
@@ -339,7 +362,8 @@ abstract class BasePublicationQuery extends ModelCriteria
      * <code>
      * $query->filterByTitleId(1234); // WHERE title_id = 1234
      * $query->filterByTitleId(array(12, 34)); // WHERE title_id IN (12, 34)
-     * $query->filterByTitleId(array('min' => 12)); // WHERE title_id > 12
+     * $query->filterByTitleId(array('min' => 12)); // WHERE title_id >= 12
+     * $query->filterByTitleId(array('max' => 12)); // WHERE title_id <= 12
      * </code>
      *
      * @see       filterByTitle()
@@ -382,7 +406,8 @@ abstract class BasePublicationQuery extends ModelCriteria
      * <code>
      * $query->filterByPublishingcompanyId(1234); // WHERE publishingCompany_id = 1234
      * $query->filterByPublishingcompanyId(array(12, 34)); // WHERE publishingCompany_id IN (12, 34)
-     * $query->filterByPublishingcompanyId(array('min' => 12)); // WHERE publishingCompany_id > 12
+     * $query->filterByPublishingcompanyId(array('min' => 12)); // WHERE publishingCompany_id >= 12
+     * $query->filterByPublishingcompanyId(array('max' => 12)); // WHERE publishingCompany_id <= 12
      * </code>
      *
      * @see       filterByPublishingcompany()
@@ -425,7 +450,8 @@ abstract class BasePublicationQuery extends ModelCriteria
      * <code>
      * $query->filterByPlaceId(1234); // WHERE place_id = 1234
      * $query->filterByPlaceId(array(12, 34)); // WHERE place_id IN (12, 34)
-     * $query->filterByPlaceId(array('min' => 12)); // WHERE place_id > 12
+     * $query->filterByPlaceId(array('min' => 12)); // WHERE place_id >= 12
+     * $query->filterByPlaceId(array('max' => 12)); // WHERE place_id <= 12
      * </code>
      *
      * @see       filterByPlace()
@@ -468,7 +494,8 @@ abstract class BasePublicationQuery extends ModelCriteria
      * <code>
      * $query->filterByDatespecificationId(1234); // WHERE dateSpecification_id = 1234
      * $query->filterByDatespecificationId(array(12, 34)); // WHERE dateSpecification_id IN (12, 34)
-     * $query->filterByDatespecificationId(array('min' => 12)); // WHERE dateSpecification_id > 12
+     * $query->filterByDatespecificationId(array('min' => 12)); // WHERE dateSpecification_id >= 12
+     * $query->filterByDatespecificationId(array('max' => 12)); // WHERE dateSpecification_id <= 12
      * </code>
      *
      * @see       filterByDatespecification()
@@ -598,7 +625,8 @@ abstract class BasePublicationQuery extends ModelCriteria
      * <code>
      * $query->filterByNumpages(1234); // WHERE numPages = 1234
      * $query->filterByNumpages(array(12, 34)); // WHERE numPages IN (12, 34)
-     * $query->filterByNumpages(array('min' => 12)); // WHERE numPages > 12
+     * $query->filterByNumpages(array('min' => 12)); // WHERE numPages >= 12
+     * $query->filterByNumpages(array('max' => 12)); // WHERE numPages <= 12
      * </code>
      *
      * @param     mixed $numpages The value to use as filter.
@@ -639,7 +667,8 @@ abstract class BasePublicationQuery extends ModelCriteria
      * <code>
      * $query->filterByNumpagesnormed(1234); // WHERE numPagesNormed = 1234
      * $query->filterByNumpagesnormed(array(12, 34)); // WHERE numPagesNormed IN (12, 34)
-     * $query->filterByNumpagesnormed(array('min' => 12)); // WHERE numPagesNormed > 12
+     * $query->filterByNumpagesnormed(array('min' => 12)); // WHERE numPagesNormed >= 12
+     * $query->filterByNumpagesnormed(array('max' => 12)); // WHERE numPagesNormed <= 12
      * </code>
      *
      * @param     mixed $numpagesnormed The value to use as filter.
@@ -708,8 +737,8 @@ abstract class BasePublicationQuery extends ModelCriteria
      * @param   Title|PropelObjectCollection $title The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   PublicationQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 PublicationQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByTitle($title, $comparison = null)
     {
@@ -784,8 +813,8 @@ abstract class BasePublicationQuery extends ModelCriteria
      * @param   Publishingcompany|PropelObjectCollection $publishingcompany The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   PublicationQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 PublicationQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByPublishingcompany($publishingcompany, $comparison = null)
     {
@@ -860,8 +889,8 @@ abstract class BasePublicationQuery extends ModelCriteria
      * @param   Place|PropelObjectCollection $place The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   PublicationQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 PublicationQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByPlace($place, $comparison = null)
     {
@@ -936,8 +965,8 @@ abstract class BasePublicationQuery extends ModelCriteria
      * @param   Datespecification|PropelObjectCollection $datespecification The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   PublicationQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 PublicationQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByDatespecification($datespecification, $comparison = null)
     {
@@ -1009,22 +1038,24 @@ abstract class BasePublicationQuery extends ModelCriteria
     /**
      * Filter the query by a related Essay object
      *
-     * @param   Essay|PropelObjectCollection $essay  the related object to use as filter
+     * @param   Essay|PropelObjectCollection $essay The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   PublicationQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 PublicationQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByEssay($essay, $comparison = null)
     {
         if ($essay instanceof Essay) {
             return $this
-                ->addUsingAlias(PublicationPeer::ID, $essay->getPublicationId(), $comparison);
+                ->addUsingAlias(PublicationPeer::ID, $essay->getId(), $comparison);
         } elseif ($essay instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useEssayQuery()
-                ->filterByPrimaryKeys($essay->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(PublicationPeer::ID, $essay->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByEssay() only accepts arguments of type Essay or PropelCollection');
         }
@@ -1038,7 +1069,7 @@ abstract class BasePublicationQuery extends ModelCriteria
      *
      * @return PublicationQuery The current query, for fluid interface
      */
-    public function joinEssay($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinEssay($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Essay');
@@ -1073,7 +1104,7 @@ abstract class BasePublicationQuery extends ModelCriteria
      *
      * @return   \DTA\MetadataBundle\Model\EssayQuery A secondary query class using the current class as primary query
      */
-    public function useEssayQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useEssayQuery($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         return $this
             ->joinEssay($relationAlias, $joinType)
@@ -1083,22 +1114,24 @@ abstract class BasePublicationQuery extends ModelCriteria
     /**
      * Filter the query by a related Magazine object
      *
-     * @param   Magazine|PropelObjectCollection $magazine  the related object to use as filter
+     * @param   Magazine|PropelObjectCollection $magazine The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   PublicationQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 PublicationQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByMagazine($magazine, $comparison = null)
     {
         if ($magazine instanceof Magazine) {
             return $this
-                ->addUsingAlias(PublicationPeer::ID, $magazine->getPublicationId(), $comparison);
+                ->addUsingAlias(PublicationPeer::ID, $magazine->getId(), $comparison);
         } elseif ($magazine instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useMagazineQuery()
-                ->filterByPrimaryKeys($magazine->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(PublicationPeer::ID, $magazine->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByMagazine() only accepts arguments of type Magazine or PropelCollection');
         }
@@ -1112,7 +1145,7 @@ abstract class BasePublicationQuery extends ModelCriteria
      *
      * @return PublicationQuery The current query, for fluid interface
      */
-    public function joinMagazine($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinMagazine($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Magazine');
@@ -1147,7 +1180,7 @@ abstract class BasePublicationQuery extends ModelCriteria
      *
      * @return   \DTA\MetadataBundle\Model\MagazineQuery A secondary query class using the current class as primary query
      */
-    public function useMagazineQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useMagazineQuery($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         return $this
             ->joinMagazine($relationAlias, $joinType)
@@ -1157,22 +1190,24 @@ abstract class BasePublicationQuery extends ModelCriteria
     /**
      * Filter the query by a related Monograph object
      *
-     * @param   Monograph|PropelObjectCollection $monograph  the related object to use as filter
+     * @param   Monograph|PropelObjectCollection $monograph The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   PublicationQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 PublicationQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByMonograph($monograph, $comparison = null)
     {
         if ($monograph instanceof Monograph) {
             return $this
-                ->addUsingAlias(PublicationPeer::ID, $monograph->getPublicationId(), $comparison);
+                ->addUsingAlias(PublicationPeer::ID, $monograph->getId(), $comparison);
         } elseif ($monograph instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useMonographQuery()
-                ->filterByPrimaryKeys($monograph->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(PublicationPeer::ID, $monograph->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByMonograph() only accepts arguments of type Monograph or PropelCollection');
         }
@@ -1186,7 +1221,7 @@ abstract class BasePublicationQuery extends ModelCriteria
      *
      * @return PublicationQuery The current query, for fluid interface
      */
-    public function joinMonograph($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinMonograph($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Monograph');
@@ -1221,7 +1256,7 @@ abstract class BasePublicationQuery extends ModelCriteria
      *
      * @return   \DTA\MetadataBundle\Model\MonographQuery A secondary query class using the current class as primary query
      */
-    public function useMonographQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useMonographQuery($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         return $this
             ->joinMonograph($relationAlias, $joinType)
@@ -1231,22 +1266,24 @@ abstract class BasePublicationQuery extends ModelCriteria
     /**
      * Filter the query by a related Series object
      *
-     * @param   Series|PropelObjectCollection $series  the related object to use as filter
+     * @param   Series|PropelObjectCollection $series The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   PublicationQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 PublicationQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterBySeries($series, $comparison = null)
     {
         if ($series instanceof Series) {
             return $this
-                ->addUsingAlias(PublicationPeer::ID, $series->getPublicationId(), $comparison);
+                ->addUsingAlias(PublicationPeer::ID, $series->getId(), $comparison);
         } elseif ($series instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useSeriesQuery()
-                ->filterByPrimaryKeys($series->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(PublicationPeer::ID, $series->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterBySeries() only accepts arguments of type Series or PropelCollection');
         }
@@ -1260,7 +1297,7 @@ abstract class BasePublicationQuery extends ModelCriteria
      *
      * @return PublicationQuery The current query, for fluid interface
      */
-    public function joinSeries($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinSeries($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Series');
@@ -1295,7 +1332,7 @@ abstract class BasePublicationQuery extends ModelCriteria
      *
      * @return   \DTA\MetadataBundle\Model\SeriesQuery A secondary query class using the current class as primary query
      */
-    public function useSeriesQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useSeriesQuery($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         return $this
             ->joinSeries($relationAlias, $joinType)
@@ -1308,8 +1345,8 @@ abstract class BasePublicationQuery extends ModelCriteria
      * @param   Writ|PropelObjectCollection $writ  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   PublicationQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 PublicationQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByWrit($writ, $comparison = null)
     {

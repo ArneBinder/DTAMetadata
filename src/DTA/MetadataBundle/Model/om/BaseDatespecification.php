@@ -94,6 +94,12 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
@@ -174,7 +180,7 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -195,7 +201,7 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
      */
     public function setYear($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -216,7 +222,7 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
      */
     public function setComments($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -1126,6 +1132,7 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
                       $this->collPublicationsPartial = true;
                     }
 
+                    $collPublications->getInternalIterator()->rewind();
                     return $collPublications;
                 }
 
@@ -1157,9 +1164,11 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
      */
     public function setPublications(PropelCollection $publications, PropelPDO $con = null)
     {
-        $this->publicationsScheduledForDeletion = $this->getPublications(new Criteria(), $con)->diff($publications);
+        $publicationsToDelete = $this->getPublications(new Criteria(), $con)->diff($publications);
 
-        foreach ($this->publicationsScheduledForDeletion as $publicationRemoved) {
+        $this->publicationsScheduledForDeletion = unserialize(serialize($publicationsToDelete));
+
+        foreach ($publicationsToDelete as $publicationRemoved) {
             $publicationRemoved->setDatespecification(null);
         }
 
@@ -1330,6 +1339,106 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
         return $this->getPublications($query, $con);
     }
 
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Datespecification is new, it will return
+     * an empty collection; or if this Datespecification has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Datespecification.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinEssay($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Essay', $join_behavior);
+
+        return $this->getPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Datespecification is new, it will return
+     * an empty collection; or if this Datespecification has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Datespecification.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinMagazine($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Magazine', $join_behavior);
+
+        return $this->getPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Datespecification is new, it will return
+     * an empty collection; or if this Datespecification has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Datespecification.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinMonograph($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Monograph', $join_behavior);
+
+        return $this->getPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Datespecification is new, it will return
+     * an empty collection; or if this Datespecification has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Datespecification.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinSeries($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Series', $join_behavior);
+
+        return $this->getPublications($query, $con);
+    }
+
     /**
      * Clears out the collWorks collection
      *
@@ -1416,6 +1525,7 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
                       $this->collWorksPartial = true;
                     }
 
+                    $collWorks->getInternalIterator()->rewind();
                     return $collWorks;
                 }
 
@@ -1447,9 +1557,11 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
      */
     public function setWorks(PropelCollection $works, PropelPDO $con = null)
     {
-        $this->worksScheduledForDeletion = $this->getWorks(new Criteria(), $con)->diff($works);
+        $worksToDelete = $this->getWorks(new Criteria(), $con)->diff($works);
 
-        foreach ($this->worksScheduledForDeletion as $workRemoved) {
+        $this->worksScheduledForDeletion = unserialize(serialize($worksToDelete));
+
+        foreach ($worksToDelete as $workRemoved) {
             $workRemoved->setDatespecification(null);
         }
 
@@ -1681,6 +1793,7 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
         $this->year_is_reconstructed = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->applyDefaultValues();
         $this->resetModified();
@@ -1699,7 +1812,8 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collPublications) {
                 foreach ($this->collPublications as $o) {
                     $o->clearAllReferences($deep);
@@ -1710,6 +1824,8 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         if ($this->collPublications instanceof PropelCollection) {

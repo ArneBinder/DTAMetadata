@@ -71,7 +71,7 @@ abstract class BaseDatespecificationQuery extends ModelCriteria
      * Returns a new DatespecificationQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     DatespecificationQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   DatespecificationQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return DatespecificationQuery
      */
@@ -133,8 +133,8 @@ abstract class BaseDatespecificationQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Datespecification A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Datespecification A model object, or null if the key is not found
+     * @throws PropelException
      */
      public function findOneById($key, $con = null)
      {
@@ -148,8 +148,8 @@ abstract class BaseDatespecificationQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Datespecification A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Datespecification A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -249,7 +249,8 @@ abstract class BaseDatespecificationQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -262,8 +263,22 @@ abstract class BaseDatespecificationQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(DatespecificationPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(DatespecificationPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(DatespecificationPeer::ID, $id, $comparison);
@@ -276,7 +291,8 @@ abstract class BaseDatespecificationQuery extends ModelCriteria
      * <code>
      * $query->filterByYear(1234); // WHERE year = 1234
      * $query->filterByYear(array(12, 34)); // WHERE year IN (12, 34)
-     * $query->filterByYear(array('min' => 12)); // WHERE year > 12
+     * $query->filterByYear(array('min' => 12)); // WHERE year >= 12
+     * $query->filterByYear(array('max' => 12)); // WHERE year <= 12
      * </code>
      *
      * @param     mixed $year The value to use as filter.
@@ -360,7 +376,7 @@ abstract class BaseDatespecificationQuery extends ModelCriteria
     public function filterByYearIsReconstructed($yearIsReconstructed = null, $comparison = null)
     {
         if (is_string($yearIsReconstructed)) {
-            $year_is_reconstructed = in_array(strtolower($yearIsReconstructed), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            $yearIsReconstructed = in_array(strtolower($yearIsReconstructed), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
         }
 
         return $this->addUsingAlias(DatespecificationPeer::YEAR_IS_RECONSTRUCTED, $yearIsReconstructed, $comparison);
@@ -372,8 +388,8 @@ abstract class BaseDatespecificationQuery extends ModelCriteria
      * @param   Publication|PropelObjectCollection $publication  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   DatespecificationQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 DatespecificationQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByPublication($publication, $comparison = null)
     {
@@ -446,8 +462,8 @@ abstract class BaseDatespecificationQuery extends ModelCriteria
      * @param   Work|PropelObjectCollection $work  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   DatespecificationQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 DatespecificationQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByWork($work, $comparison = null)
     {

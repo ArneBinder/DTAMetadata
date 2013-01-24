@@ -64,7 +64,7 @@ abstract class BaseWritWritgroupQuery extends ModelCriteria
      * Returns a new WritWritgroupQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     WritWritgroupQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   WritWritgroupQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return WritWritgroupQuery
      */
@@ -128,8 +128,8 @@ abstract class BaseWritWritgroupQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   WritWritgroup A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 WritWritgroup A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -241,7 +241,8 @@ abstract class BaseWritWritgroupQuery extends ModelCriteria
      * <code>
      * $query->filterByWritgroupId(1234); // WHERE writGroup_id = 1234
      * $query->filterByWritgroupId(array(12, 34)); // WHERE writGroup_id IN (12, 34)
-     * $query->filterByWritgroupId(array('min' => 12)); // WHERE writGroup_id > 12
+     * $query->filterByWritgroupId(array('min' => 12)); // WHERE writGroup_id >= 12
+     * $query->filterByWritgroupId(array('max' => 12)); // WHERE writGroup_id <= 12
      * </code>
      *
      * @see       filterByWritgroup()
@@ -256,8 +257,22 @@ abstract class BaseWritWritgroupQuery extends ModelCriteria
      */
     public function filterByWritgroupId($writgroupId = null, $comparison = null)
     {
-        if (is_array($writgroupId) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($writgroupId)) {
+            $useMinMax = false;
+            if (isset($writgroupId['min'])) {
+                $this->addUsingAlias(WritWritgroupPeer::WRITGROUP_ID, $writgroupId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($writgroupId['max'])) {
+                $this->addUsingAlias(WritWritgroupPeer::WRITGROUP_ID, $writgroupId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(WritWritgroupPeer::WRITGROUP_ID, $writgroupId, $comparison);
@@ -270,7 +285,8 @@ abstract class BaseWritWritgroupQuery extends ModelCriteria
      * <code>
      * $query->filterByWritId(1234); // WHERE writ_id = 1234
      * $query->filterByWritId(array(12, 34)); // WHERE writ_id IN (12, 34)
-     * $query->filterByWritId(array('min' => 12)); // WHERE writ_id > 12
+     * $query->filterByWritId(array('min' => 12)); // WHERE writ_id >= 12
+     * $query->filterByWritId(array('max' => 12)); // WHERE writ_id <= 12
      * </code>
      *
      * @see       filterByWrit()
@@ -285,8 +301,22 @@ abstract class BaseWritWritgroupQuery extends ModelCriteria
      */
     public function filterByWritId($writId = null, $comparison = null)
     {
-        if (is_array($writId) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($writId)) {
+            $useMinMax = false;
+            if (isset($writId['min'])) {
+                $this->addUsingAlias(WritWritgroupPeer::WRIT_ID, $writId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($writId['max'])) {
+                $this->addUsingAlias(WritWritgroupPeer::WRIT_ID, $writId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(WritWritgroupPeer::WRIT_ID, $writId, $comparison);
@@ -298,8 +328,8 @@ abstract class BaseWritWritgroupQuery extends ModelCriteria
      * @param   Writgroup|PropelObjectCollection $writgroup The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   WritWritgroupQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 WritWritgroupQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByWritgroup($writgroup, $comparison = null)
     {
@@ -374,8 +404,8 @@ abstract class BaseWritWritgroupQuery extends ModelCriteria
      * @param   Writ|PropelObjectCollection $writ The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   WritWritgroupQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 WritWritgroupQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByWrit($writ, $comparison = null)
     {

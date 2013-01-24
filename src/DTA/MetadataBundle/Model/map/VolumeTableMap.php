@@ -47,7 +47,7 @@ class VolumeTableMap extends TableMap
         $this->addColumn('volumeIndexNumerical', 'Volumeindexnumerical', 'INTEGER', false, null, null);
         $this->addColumn('totalVolumes', 'Totalvolumes', 'INTEGER', false, null, null);
         $this->addForeignKey('monograph_id', 'MonographId', 'INTEGER', 'monograph', 'id', true, null, null);
-        $this->addForeignKey('monograph_publication_id', 'MonographPublicationId', 'INTEGER', 'monograph', 'publication_id', true, null, null);
+        $this->addColumn('monograph_publication_id', 'MonographPublicationId', 'INTEGER', true, null, null);
         // validators
     } // initialize()
 
@@ -56,7 +56,7 @@ class VolumeTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Monograph', 'DTA\\MetadataBundle\\Model\\Monograph', RelationMap::MANY_TO_ONE, array('monograph_id' => 'id', 'monograph_publication_id' => 'publication_id', ), null, null);
+        $this->addRelation('Monograph', 'DTA\\MetadataBundle\\Model\\Monograph', RelationMap::MANY_TO_ONE, array('monograph_id' => 'id', ), null, null);
     } // buildRelations()
 
 } // VolumeTableMap

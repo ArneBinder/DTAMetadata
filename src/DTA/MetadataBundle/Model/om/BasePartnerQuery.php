@@ -95,7 +95,7 @@ abstract class BasePartnerQuery extends ModelCriteria
      * Returns a new PartnerQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     PartnerQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   PartnerQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return PartnerQuery
      */
@@ -157,8 +157,8 @@ abstract class BasePartnerQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Partner A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Partner A model object, or null if the key is not found
+     * @throws PropelException
      */
      public function findOneById($key, $con = null)
      {
@@ -172,8 +172,8 @@ abstract class BasePartnerQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Partner A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Partner A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -273,7 +273,8 @@ abstract class BasePartnerQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -286,8 +287,22 @@ abstract class BasePartnerQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(PartnerPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(PartnerPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(PartnerPeer::ID, $id, $comparison);
@@ -633,7 +648,8 @@ abstract class BasePartnerQuery extends ModelCriteria
      * <code>
      * $query->filterByLogLastUser(1234); // WHERE log_last_user = 1234
      * $query->filterByLogLastUser(array(12, 34)); // WHERE log_last_user IN (12, 34)
-     * $query->filterByLogLastUser(array('min' => 12)); // WHERE log_last_user > 12
+     * $query->filterByLogLastUser(array('min' => 12)); // WHERE log_last_user >= 12
+     * $query->filterByLogLastUser(array('max' => 12)); // WHERE log_last_user <= 12
      * </code>
      *
      * @param     mixed $logLastUser The value to use as filter.

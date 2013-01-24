@@ -280,7 +280,7 @@ abstract class BaseSourcePeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -385,8 +385,15 @@ abstract class BaseSourcePeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (SourcePeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         SourcePeer::$instances = array();
     }
 

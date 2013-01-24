@@ -80,6 +80,12 @@ abstract class BasePersonalname extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
@@ -113,7 +119,7 @@ abstract class BasePersonalname extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -134,7 +140,7 @@ abstract class BasePersonalname extends BaseObject implements Persistent
      */
     public function setPersonId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -1023,6 +1029,7 @@ abstract class BasePersonalname extends BaseObject implements Persistent
                       $this->collNamefragmentsPartial = true;
                     }
 
+                    $collNamefragments->getInternalIterator()->rewind();
                     return $collNamefragments;
                 }
 
@@ -1054,9 +1061,11 @@ abstract class BasePersonalname extends BaseObject implements Persistent
      */
     public function setNamefragments(PropelCollection $namefragments, PropelPDO $con = null)
     {
-        $this->namefragmentsScheduledForDeletion = $this->getNamefragments(new Criteria(), $con)->diff($namefragments);
+        $namefragmentsToDelete = $this->getNamefragments(new Criteria(), $con)->diff($namefragments);
 
-        foreach ($this->namefragmentsScheduledForDeletion as $namefragmentRemoved) {
+        $this->namefragmentsScheduledForDeletion = unserialize(serialize($namefragmentsToDelete));
+
+        foreach ($namefragmentsToDelete as $namefragmentRemoved) {
             $namefragmentRemoved->setPersonalname(null);
         }
 
@@ -1145,7 +1154,7 @@ abstract class BasePersonalname extends BaseObject implements Persistent
                 $this->namefragmentsScheduledForDeletion = clone $this->collNamefragments;
                 $this->namefragmentsScheduledForDeletion->clear();
             }
-            $this->namefragmentsScheduledForDeletion[]= $namefragment;
+            $this->namefragmentsScheduledForDeletion[]= clone $namefragment;
             $namefragment->setPersonalname(null);
         }
 
@@ -1186,6 +1195,7 @@ abstract class BasePersonalname extends BaseObject implements Persistent
         $this->person_id = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1203,12 +1213,18 @@ abstract class BasePersonalname extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collNamefragments) {
                 foreach ($this->collNamefragments as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->aPerson instanceof Persistent) {
+              $this->aPerson->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         if ($this->collNamefragments instanceof PropelCollection) {

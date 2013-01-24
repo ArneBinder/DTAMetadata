@@ -112,6 +112,12 @@ abstract class BaseSource extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * Get the [id] column value.
      *
      * @return int
@@ -209,7 +215,7 @@ abstract class BaseSource extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -230,7 +236,7 @@ abstract class BaseSource extends BaseObject implements Persistent
      */
     public function setWritId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -255,7 +261,7 @@ abstract class BaseSource extends BaseObject implements Persistent
      */
     public function setQuality($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -276,7 +282,7 @@ abstract class BaseSource extends BaseObject implements Persistent
      */
     public function setName($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -297,7 +303,7 @@ abstract class BaseSource extends BaseObject implements Persistent
      */
     public function setComments($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -347,7 +353,7 @@ abstract class BaseSource extends BaseObject implements Persistent
      */
     public function setSignatur($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -368,7 +374,7 @@ abstract class BaseSource extends BaseObject implements Persistent
      */
     public function setLibrary($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -389,7 +395,7 @@ abstract class BaseSource extends BaseObject implements Persistent
      */
     public function setLibrarygnd($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -1271,6 +1277,7 @@ abstract class BaseSource extends BaseObject implements Persistent
         $this->librarygnd = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1288,7 +1295,13 @@ abstract class BaseSource extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->aWrit instanceof Persistent) {
+              $this->aWrit->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         $this->aWrit = null;

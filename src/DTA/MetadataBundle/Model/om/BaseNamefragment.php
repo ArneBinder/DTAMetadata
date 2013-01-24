@@ -94,6 +94,12 @@ abstract class BaseNamefragment extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
     // sortable behavior
 
     /**
@@ -166,7 +172,7 @@ abstract class BaseNamefragment extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -187,7 +193,7 @@ abstract class BaseNamefragment extends BaseObject implements Persistent
      */
     public function setPersonalnameId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -215,7 +221,7 @@ abstract class BaseNamefragment extends BaseObject implements Persistent
      */
     public function setName($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -236,7 +242,7 @@ abstract class BaseNamefragment extends BaseObject implements Persistent
      */
     public function setNamefragmenttypeid($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -261,7 +267,7 @@ abstract class BaseNamefragment extends BaseObject implements Persistent
      */
     public function setSortableRank($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -1163,6 +1169,7 @@ abstract class BaseNamefragment extends BaseObject implements Persistent
         $this->sortable_rank = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1180,7 +1187,16 @@ abstract class BaseNamefragment extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->aNamefragmenttype instanceof Persistent) {
+              $this->aNamefragmenttype->clearAllReferences($deep);
+            }
+            if ($this->aPersonalname instanceof Persistent) {
+              $this->aPersonalname->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         $this->aNamefragmenttype = null;

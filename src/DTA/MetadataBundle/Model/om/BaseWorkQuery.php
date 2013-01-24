@@ -128,7 +128,7 @@ abstract class BaseWorkQuery extends ModelCriteria
      * Returns a new WorkQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     WorkQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   WorkQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return WorkQuery
      */
@@ -190,8 +190,8 @@ abstract class BaseWorkQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Work A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Work A model object, or null if the key is not found
+     * @throws PropelException
      */
      public function findOneById($key, $con = null)
      {
@@ -205,8 +205,8 @@ abstract class BaseWorkQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Work A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Work A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -306,7 +306,8 @@ abstract class BaseWorkQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -319,8 +320,22 @@ abstract class BaseWorkQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(WorkPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(WorkPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(WorkPeer::ID, $id, $comparison);
@@ -333,7 +348,8 @@ abstract class BaseWorkQuery extends ModelCriteria
      * <code>
      * $query->filterByStatusId(1234); // WHERE status_id = 1234
      * $query->filterByStatusId(array(12, 34)); // WHERE status_id IN (12, 34)
-     * $query->filterByStatusId(array('min' => 12)); // WHERE status_id > 12
+     * $query->filterByStatusId(array('min' => 12)); // WHERE status_id >= 12
+     * $query->filterByStatusId(array('max' => 12)); // WHERE status_id <= 12
      * </code>
      *
      * @see       filterByStatus()
@@ -376,7 +392,8 @@ abstract class BaseWorkQuery extends ModelCriteria
      * <code>
      * $query->filterByDatespecificationId(1234); // WHERE dateSpecification_id = 1234
      * $query->filterByDatespecificationId(array(12, 34)); // WHERE dateSpecification_id IN (12, 34)
-     * $query->filterByDatespecificationId(array('min' => 12)); // WHERE dateSpecification_id > 12
+     * $query->filterByDatespecificationId(array('min' => 12)); // WHERE dateSpecification_id >= 12
+     * $query->filterByDatespecificationId(array('max' => 12)); // WHERE dateSpecification_id <= 12
      * </code>
      *
      * @see       filterByDatespecification()
@@ -419,7 +436,8 @@ abstract class BaseWorkQuery extends ModelCriteria
      * <code>
      * $query->filterByGenreId(1234); // WHERE genre_id = 1234
      * $query->filterByGenreId(array(12, 34)); // WHERE genre_id IN (12, 34)
-     * $query->filterByGenreId(array('min' => 12)); // WHERE genre_id > 12
+     * $query->filterByGenreId(array('min' => 12)); // WHERE genre_id >= 12
+     * $query->filterByGenreId(array('max' => 12)); // WHERE genre_id <= 12
      * </code>
      *
      * @see       filterByGenreRelatedByGenreId()
@@ -462,7 +480,8 @@ abstract class BaseWorkQuery extends ModelCriteria
      * <code>
      * $query->filterBySubgenreId(1234); // WHERE subgenre_id = 1234
      * $query->filterBySubgenreId(array(12, 34)); // WHERE subgenre_id IN (12, 34)
-     * $query->filterBySubgenreId(array('min' => 12)); // WHERE subgenre_id > 12
+     * $query->filterBySubgenreId(array('min' => 12)); // WHERE subgenre_id >= 12
+     * $query->filterBySubgenreId(array('max' => 12)); // WHERE subgenre_id <= 12
      * </code>
      *
      * @see       filterByGenreRelatedBySubgenreId()
@@ -505,7 +524,8 @@ abstract class BaseWorkQuery extends ModelCriteria
      * <code>
      * $query->filterByDwdsgenreId(1234); // WHERE dwdsGenre_id = 1234
      * $query->filterByDwdsgenreId(array(12, 34)); // WHERE dwdsGenre_id IN (12, 34)
-     * $query->filterByDwdsgenreId(array('min' => 12)); // WHERE dwdsGenre_id > 12
+     * $query->filterByDwdsgenreId(array('min' => 12)); // WHERE dwdsGenre_id >= 12
+     * $query->filterByDwdsgenreId(array('max' => 12)); // WHERE dwdsGenre_id <= 12
      * </code>
      *
      * @see       filterByDwdsgenreRelatedByDwdsgenreId()
@@ -548,7 +568,8 @@ abstract class BaseWorkQuery extends ModelCriteria
      * <code>
      * $query->filterByDwdssubgenreId(1234); // WHERE dwdsSubgenre_id = 1234
      * $query->filterByDwdssubgenreId(array(12, 34)); // WHERE dwdsSubgenre_id IN (12, 34)
-     * $query->filterByDwdssubgenreId(array('min' => 12)); // WHERE dwdsSubgenre_id > 12
+     * $query->filterByDwdssubgenreId(array('min' => 12)); // WHERE dwdsSubgenre_id >= 12
+     * $query->filterByDwdssubgenreId(array('max' => 12)); // WHERE dwdsSubgenre_id <= 12
      * </code>
      *
      * @see       filterByDwdsgenreRelatedByDwdssubgenreId()
@@ -706,8 +727,8 @@ abstract class BaseWorkQuery extends ModelCriteria
      * @param   Status|PropelObjectCollection $status The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   WorkQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 WorkQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByStatus($status, $comparison = null)
     {
@@ -782,8 +803,8 @@ abstract class BaseWorkQuery extends ModelCriteria
      * @param   Genre|PropelObjectCollection $genre The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   WorkQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 WorkQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByGenreRelatedByGenreId($genre, $comparison = null)
     {
@@ -858,8 +879,8 @@ abstract class BaseWorkQuery extends ModelCriteria
      * @param   Genre|PropelObjectCollection $genre The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   WorkQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 WorkQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByGenreRelatedBySubgenreId($genre, $comparison = null)
     {
@@ -934,8 +955,8 @@ abstract class BaseWorkQuery extends ModelCriteria
      * @param   Dwdsgenre|PropelObjectCollection $dwdsgenre The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   WorkQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 WorkQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByDwdsgenreRelatedByDwdsgenreId($dwdsgenre, $comparison = null)
     {
@@ -1010,8 +1031,8 @@ abstract class BaseWorkQuery extends ModelCriteria
      * @param   Dwdsgenre|PropelObjectCollection $dwdsgenre The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   WorkQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 WorkQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByDwdsgenreRelatedByDwdssubgenreId($dwdsgenre, $comparison = null)
     {
@@ -1086,8 +1107,8 @@ abstract class BaseWorkQuery extends ModelCriteria
      * @param   Datespecification|PropelObjectCollection $datespecification The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   WorkQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 WorkQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByDatespecification($datespecification, $comparison = null)
     {
@@ -1162,8 +1183,8 @@ abstract class BaseWorkQuery extends ModelCriteria
      * @param   Writ|PropelObjectCollection $writ  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   WorkQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 WorkQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByWrit($writ, $comparison = null)
     {
@@ -1236,8 +1257,8 @@ abstract class BaseWorkQuery extends ModelCriteria
      * @param   AuthorWork|PropelObjectCollection $authorWork  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   WorkQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 WorkQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByAuthorWork($authorWork, $comparison = null)
     {

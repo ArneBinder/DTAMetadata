@@ -29,7 +29,7 @@ class WorkflowDomainController extends DTABaseController {
         $writ = new \DTA\MetadataBundle\Model\Writ();
         $writ->setNumpages(3);
         $writ->save();
-        return $this->renderWithDomainMenu('DTAMetadataBundle:WorkflowDomain:index.html.twig', array(
+        return $this->renderDomainSpecific('DTAMetadataBundle:WorkflowDomain:index.html.twig', array(
                     'persistedObject' => $writ,
                     ));
     }

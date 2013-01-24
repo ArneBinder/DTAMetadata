@@ -135,6 +135,12 @@ abstract class BaseTask extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * Get the [id] column value.
      *
      * @return int
@@ -292,7 +298,7 @@ abstract class BaseTask extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -313,7 +319,7 @@ abstract class BaseTask extends BaseObject implements Persistent
      */
     public function setTasktypeId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -413,7 +419,7 @@ abstract class BaseTask extends BaseObject implements Persistent
      */
     public function setComments($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -434,7 +440,7 @@ abstract class BaseTask extends BaseObject implements Persistent
      */
     public function setWritgroupId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -459,7 +465,7 @@ abstract class BaseTask extends BaseObject implements Persistent
      */
     public function setWritId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -484,7 +490,7 @@ abstract class BaseTask extends BaseObject implements Persistent
      */
     public function setResponsibleuserId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -1586,6 +1592,7 @@ abstract class BaseTask extends BaseObject implements Persistent
         $this->responsibleuser_id = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1603,7 +1610,22 @@ abstract class BaseTask extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->aTasktype instanceof Persistent) {
+              $this->aTasktype->clearAllReferences($deep);
+            }
+            if ($this->aWritgroup instanceof Persistent) {
+              $this->aWritgroup->clearAllReferences($deep);
+            }
+            if ($this->aWrit instanceof Persistent) {
+              $this->aWrit->clearAllReferences($deep);
+            }
+            if ($this->aUser instanceof Persistent) {
+              $this->aUser->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         $this->aTasktype = null;

@@ -89,6 +89,12 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * Get the [work_id] column value.
      *
      * @return int
@@ -136,7 +142,7 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
      */
     public function setWorkId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -161,7 +167,7 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
      */
     public function setAuthorId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -186,7 +192,7 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
      */
     public function setAuthorPersonId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -211,7 +217,7 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
      */
     public function setNameId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -1083,6 +1089,7 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
         $this->name_id = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1100,7 +1107,16 @@ abstract class BaseAuthorWork extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->aWork instanceof Persistent) {
+              $this->aWork->clearAllReferences($deep);
+            }
+            if ($this->aAuthor instanceof Persistent) {
+              $this->aAuthor->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         $this->aWork = null;

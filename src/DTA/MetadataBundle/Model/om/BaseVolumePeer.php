@@ -265,7 +265,7 @@ abstract class BaseVolumePeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -370,8 +370,15 @@ abstract class BaseVolumePeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (VolumePeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         VolumePeer::$instances = array();
     }
 
@@ -514,10 +521,7 @@ abstract class BaseVolumePeer
             $con = Propel::getConnection(VolumePeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addMultipleJoin(array(
-        array(VolumePeer::MONOGRAPH_ID, MonographPeer::ID),
-        array(VolumePeer::MONOGRAPH_PUBLICATION_ID, MonographPeer::PUBLICATION_ID),
-      ), $join_behavior);
+        $criteria->addJoin(VolumePeer::MONOGRAPH_ID, MonographPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -554,10 +558,7 @@ abstract class BaseVolumePeer
         $startcol = VolumePeer::NUM_HYDRATE_COLUMNS;
         MonographPeer::addSelectColumns($criteria);
 
-        $criteria->addMultipleJoin(array(
-        array(VolumePeer::MONOGRAPH_ID, MonographPeer::ID),
-        array(VolumePeer::MONOGRAPH_PUBLICATION_ID, MonographPeer::PUBLICATION_ID),
-      ), $join_behavior);
+        $criteria->addJoin(VolumePeer::MONOGRAPH_ID, MonographPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
@@ -638,10 +639,7 @@ abstract class BaseVolumePeer
             $con = Propel::getConnection(VolumePeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addMultipleJoin(array(
-        array(VolumePeer::MONOGRAPH_ID, MonographPeer::ID),
-        array(VolumePeer::MONOGRAPH_PUBLICATION_ID, MonographPeer::PUBLICATION_ID),
-      ), $join_behavior);
+        $criteria->addJoin(VolumePeer::MONOGRAPH_ID, MonographPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -680,10 +678,7 @@ abstract class BaseVolumePeer
         MonographPeer::addSelectColumns($criteria);
         $startcol3 = $startcol2 + MonographPeer::NUM_HYDRATE_COLUMNS;
 
-        $criteria->addMultipleJoin(array(
-        array(VolumePeer::MONOGRAPH_ID, MonographPeer::ID),
-        array(VolumePeer::MONOGRAPH_PUBLICATION_ID, MonographPeer::PUBLICATION_ID),
-      ), $join_behavior);
+        $criteria->addJoin(VolumePeer::MONOGRAPH_ID, MonographPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();

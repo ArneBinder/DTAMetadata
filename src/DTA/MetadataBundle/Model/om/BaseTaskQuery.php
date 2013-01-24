@@ -101,7 +101,7 @@ abstract class BaseTaskQuery extends ModelCriteria
      * Returns a new TaskQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     TaskQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   TaskQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return TaskQuery
      */
@@ -163,8 +163,8 @@ abstract class BaseTaskQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Task A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Task A model object, or null if the key is not found
+     * @throws PropelException
      */
      public function findOneById($key, $con = null)
      {
@@ -178,8 +178,8 @@ abstract class BaseTaskQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Task A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Task A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -279,7 +279,8 @@ abstract class BaseTaskQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -292,8 +293,22 @@ abstract class BaseTaskQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(TaskPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(TaskPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(TaskPeer::ID, $id, $comparison);
@@ -306,7 +321,8 @@ abstract class BaseTaskQuery extends ModelCriteria
      * <code>
      * $query->filterByTasktypeId(1234); // WHERE taskType_id = 1234
      * $query->filterByTasktypeId(array(12, 34)); // WHERE taskType_id IN (12, 34)
-     * $query->filterByTasktypeId(array('min' => 12)); // WHERE taskType_id > 12
+     * $query->filterByTasktypeId(array('min' => 12)); // WHERE taskType_id >= 12
+     * $query->filterByTasktypeId(array('max' => 12)); // WHERE taskType_id <= 12
      * </code>
      *
      * @see       filterByTasktype()
@@ -491,7 +507,8 @@ abstract class BaseTaskQuery extends ModelCriteria
      * <code>
      * $query->filterByWritgroupId(1234); // WHERE writGroup_id = 1234
      * $query->filterByWritgroupId(array(12, 34)); // WHERE writGroup_id IN (12, 34)
-     * $query->filterByWritgroupId(array('min' => 12)); // WHERE writGroup_id > 12
+     * $query->filterByWritgroupId(array('min' => 12)); // WHERE writGroup_id >= 12
+     * $query->filterByWritgroupId(array('max' => 12)); // WHERE writGroup_id <= 12
      * </code>
      *
      * @see       filterByWritgroup()
@@ -534,7 +551,8 @@ abstract class BaseTaskQuery extends ModelCriteria
      * <code>
      * $query->filterByWritId(1234); // WHERE writ_id = 1234
      * $query->filterByWritId(array(12, 34)); // WHERE writ_id IN (12, 34)
-     * $query->filterByWritId(array('min' => 12)); // WHERE writ_id > 12
+     * $query->filterByWritId(array('min' => 12)); // WHERE writ_id >= 12
+     * $query->filterByWritId(array('max' => 12)); // WHERE writ_id <= 12
      * </code>
      *
      * @see       filterByWrit()
@@ -577,7 +595,8 @@ abstract class BaseTaskQuery extends ModelCriteria
      * <code>
      * $query->filterByResponsibleuserId(1234); // WHERE responsibleUser_id = 1234
      * $query->filterByResponsibleuserId(array(12, 34)); // WHERE responsibleUser_id IN (12, 34)
-     * $query->filterByResponsibleuserId(array('min' => 12)); // WHERE responsibleUser_id > 12
+     * $query->filterByResponsibleuserId(array('min' => 12)); // WHERE responsibleUser_id >= 12
+     * $query->filterByResponsibleuserId(array('max' => 12)); // WHERE responsibleUser_id <= 12
      * </code>
      *
      * @see       filterByUser()
@@ -619,8 +638,8 @@ abstract class BaseTaskQuery extends ModelCriteria
      * @param   Tasktype|PropelObjectCollection $tasktype The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   TaskQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 TaskQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByTasktype($tasktype, $comparison = null)
     {
@@ -695,8 +714,8 @@ abstract class BaseTaskQuery extends ModelCriteria
      * @param   Writgroup|PropelObjectCollection $writgroup The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   TaskQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 TaskQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByWritgroup($writgroup, $comparison = null)
     {
@@ -771,8 +790,8 @@ abstract class BaseTaskQuery extends ModelCriteria
      * @param   Writ|PropelObjectCollection $writ The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   TaskQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 TaskQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByWrit($writ, $comparison = null)
     {
@@ -847,8 +866,8 @@ abstract class BaseTaskQuery extends ModelCriteria
      * @param   User|PropelObjectCollection $user The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   TaskQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 TaskQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByUser($user, $comparison = null)
     {

@@ -42,7 +42,10 @@ class PublicationTableMap extends TableMap
         $this->setPackage('src.DTA.MetadataBundle.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addForeignPrimaryKey('id', 'Id', 'INTEGER' , 'essay', 'id', true, null, null);
+        $this->addForeignPrimaryKey('id', 'Id', 'INTEGER' , 'magazine', 'id', true, null, null);
+        $this->addForeignPrimaryKey('id', 'Id', 'INTEGER' , 'monograph', 'id', true, null, null);
+        $this->addForeignPrimaryKey('id', 'Id', 'INTEGER' , 'series', 'id', true, null, null);
         $this->addForeignKey('title_id', 'TitleId', 'INTEGER', 'title', 'id', true, null, null);
         $this->addForeignKey('publishingCompany_id', 'PublishingcompanyId', 'INTEGER', 'publishingCompany', 'id', false, null, null);
         $this->addForeignKey('place_id', 'PlaceId', 'INTEGER', 'place', 'id', false, null, null);
@@ -65,10 +68,10 @@ class PublicationTableMap extends TableMap
         $this->addRelation('Publishingcompany', 'DTA\\MetadataBundle\\Model\\Publishingcompany', RelationMap::MANY_TO_ONE, array('publishingCompany_id' => 'id', ), null, null);
         $this->addRelation('Place', 'DTA\\MetadataBundle\\Model\\Place', RelationMap::MANY_TO_ONE, array('place_id' => 'id', ), null, null);
         $this->addRelation('Datespecification', 'DTA\\MetadataBundle\\Model\\Datespecification', RelationMap::MANY_TO_ONE, array('dateSpecification_id' => 'id', ), null, null);
-        $this->addRelation('Essay', 'DTA\\MetadataBundle\\Model\\Essay', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Essays');
-        $this->addRelation('Magazine', 'DTA\\MetadataBundle\\Model\\Magazine', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Magazines');
-        $this->addRelation('Monograph', 'DTA\\MetadataBundle\\Model\\Monograph', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Monographs');
-        $this->addRelation('Series', 'DTA\\MetadataBundle\\Model\\Series', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Series');
+        $this->addRelation('Essay', 'DTA\\MetadataBundle\\Model\\Essay', RelationMap::MANY_TO_ONE, array('id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('Magazine', 'DTA\\MetadataBundle\\Model\\Magazine', RelationMap::MANY_TO_ONE, array('id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('Monograph', 'DTA\\MetadataBundle\\Model\\Monograph', RelationMap::MANY_TO_ONE, array('id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('Series', 'DTA\\MetadataBundle\\Model\\Series', RelationMap::MANY_TO_ONE, array('id' => 'id', ), 'CASCADE', null);
         $this->addRelation('Writ', 'DTA\\MetadataBundle\\Model\\Writ', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Writs');
     } // buildRelations()
 

@@ -78,7 +78,7 @@ abstract class BasePersonQuery extends ModelCriteria
      * Returns a new PersonQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     PersonQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   PersonQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return PersonQuery
      */
@@ -140,8 +140,8 @@ abstract class BasePersonQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Person A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Person A model object, or null if the key is not found
+     * @throws PropelException
      */
      public function findOneById($key, $con = null)
      {
@@ -155,8 +155,8 @@ abstract class BasePersonQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Person A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Person A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -256,7 +256,8 @@ abstract class BasePersonQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -269,8 +270,22 @@ abstract class BasePersonQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(PersonPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(PersonPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(PersonPeer::ID, $id, $comparison);
@@ -311,8 +326,8 @@ abstract class BasePersonQuery extends ModelCriteria
      * @param   Personalname|PropelObjectCollection $personalname  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   PersonQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 PersonQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByPersonalname($personalname, $comparison = null)
     {
@@ -385,8 +400,8 @@ abstract class BasePersonQuery extends ModelCriteria
      * @param   Author|PropelObjectCollection $author  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   PersonQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 PersonQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByAuthor($author, $comparison = null)
     {
@@ -459,8 +474,8 @@ abstract class BasePersonQuery extends ModelCriteria
      * @param   Printer|PropelObjectCollection $printer  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   PersonQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 PersonQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByPrinter($printer, $comparison = null)
     {
@@ -533,8 +548,8 @@ abstract class BasePersonQuery extends ModelCriteria
      * @param   Publisher|PropelObjectCollection $publisher  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   PersonQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 PersonQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByPublisher($publisher, $comparison = null)
     {
@@ -607,8 +622,8 @@ abstract class BasePersonQuery extends ModelCriteria
      * @param   Translator|PropelObjectCollection $translator  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   PersonQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 PersonQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByTranslator($translator, $comparison = null)
     {

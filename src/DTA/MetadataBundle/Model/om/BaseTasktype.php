@@ -90,6 +90,12 @@ abstract class BaseTasktype extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
     // nested_set behavior
 
     /**
@@ -175,7 +181,7 @@ abstract class BaseTasktype extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -196,7 +202,7 @@ abstract class BaseTasktype extends BaseObject implements Persistent
      */
     public function setName($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -217,7 +223,7 @@ abstract class BaseTasktype extends BaseObject implements Persistent
      */
     public function setTreeLeft($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -238,7 +244,7 @@ abstract class BaseTasktype extends BaseObject implements Persistent
      */
     public function setTreeRight($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -259,7 +265,7 @@ abstract class BaseTasktype extends BaseObject implements Persistent
      */
     public function setTreeLevel($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -1138,6 +1144,7 @@ abstract class BaseTasktype extends BaseObject implements Persistent
                       $this->collTasksPartial = true;
                     }
 
+                    $collTasks->getInternalIterator()->rewind();
                     return $collTasks;
                 }
 
@@ -1169,9 +1176,11 @@ abstract class BaseTasktype extends BaseObject implements Persistent
      */
     public function setTasks(PropelCollection $tasks, PropelPDO $con = null)
     {
-        $this->tasksScheduledForDeletion = $this->getTasks(new Criteria(), $con)->diff($tasks);
+        $tasksToDelete = $this->getTasks(new Criteria(), $con)->diff($tasks);
 
-        foreach ($this->tasksScheduledForDeletion as $taskRemoved) {
+        $this->tasksScheduledForDeletion = unserialize(serialize($tasksToDelete));
+
+        foreach ($tasksToDelete as $taskRemoved) {
             $taskRemoved->setTasktype(null);
         }
 
@@ -1260,7 +1269,7 @@ abstract class BaseTasktype extends BaseObject implements Persistent
                 $this->tasksScheduledForDeletion = clone $this->collTasks;
                 $this->tasksScheduledForDeletion->clear();
             }
-            $this->tasksScheduledForDeletion[]= $task;
+            $this->tasksScheduledForDeletion[]= clone $task;
             $task->setTasktype(null);
         }
 
@@ -1354,6 +1363,7 @@ abstract class BaseTasktype extends BaseObject implements Persistent
         $this->tree_level = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1371,12 +1381,15 @@ abstract class BaseTasktype extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collTasks) {
                 foreach ($this->collTasks as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         // nested_set behavior

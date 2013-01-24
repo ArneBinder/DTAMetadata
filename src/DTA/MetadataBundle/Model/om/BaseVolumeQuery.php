@@ -8,6 +8,7 @@ use \ModelCriteria;
 use \ModelJoin;
 use \PDO;
 use \Propel;
+use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
@@ -73,7 +74,7 @@ abstract class BaseVolumeQuery extends ModelCriteria
      * Returns a new VolumeQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     VolumeQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   VolumeQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return VolumeQuery
      */
@@ -135,8 +136,8 @@ abstract class BaseVolumeQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Volume A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Volume A model object, or null if the key is not found
+     * @throws PropelException
      */
      public function findOneById($key, $con = null)
      {
@@ -150,8 +151,8 @@ abstract class BaseVolumeQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Volume A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Volume A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -251,7 +252,8 @@ abstract class BaseVolumeQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -264,8 +266,22 @@ abstract class BaseVolumeQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(VolumePeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(VolumePeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(VolumePeer::ID, $id, $comparison);
@@ -307,7 +323,8 @@ abstract class BaseVolumeQuery extends ModelCriteria
      * <code>
      * $query->filterByVolumeindexnumerical(1234); // WHERE volumeIndexNumerical = 1234
      * $query->filterByVolumeindexnumerical(array(12, 34)); // WHERE volumeIndexNumerical IN (12, 34)
-     * $query->filterByVolumeindexnumerical(array('min' => 12)); // WHERE volumeIndexNumerical > 12
+     * $query->filterByVolumeindexnumerical(array('min' => 12)); // WHERE volumeIndexNumerical >= 12
+     * $query->filterByVolumeindexnumerical(array('max' => 12)); // WHERE volumeIndexNumerical <= 12
      * </code>
      *
      * @param     mixed $volumeindexnumerical The value to use as filter.
@@ -348,7 +365,8 @@ abstract class BaseVolumeQuery extends ModelCriteria
      * <code>
      * $query->filterByTotalvolumes(1234); // WHERE totalVolumes = 1234
      * $query->filterByTotalvolumes(array(12, 34)); // WHERE totalVolumes IN (12, 34)
-     * $query->filterByTotalvolumes(array('min' => 12)); // WHERE totalVolumes > 12
+     * $query->filterByTotalvolumes(array('min' => 12)); // WHERE totalVolumes >= 12
+     * $query->filterByTotalvolumes(array('max' => 12)); // WHERE totalVolumes <= 12
      * </code>
      *
      * @param     mixed $totalvolumes The value to use as filter.
@@ -389,7 +407,8 @@ abstract class BaseVolumeQuery extends ModelCriteria
      * <code>
      * $query->filterByMonographId(1234); // WHERE monograph_id = 1234
      * $query->filterByMonographId(array(12, 34)); // WHERE monograph_id IN (12, 34)
-     * $query->filterByMonographId(array('min' => 12)); // WHERE monograph_id > 12
+     * $query->filterByMonographId(array('min' => 12)); // WHERE monograph_id >= 12
+     * $query->filterByMonographId(array('max' => 12)); // WHERE monograph_id <= 12
      * </code>
      *
      * @see       filterByMonograph()
@@ -432,10 +451,9 @@ abstract class BaseVolumeQuery extends ModelCriteria
      * <code>
      * $query->filterByMonographPublicationId(1234); // WHERE monograph_publication_id = 1234
      * $query->filterByMonographPublicationId(array(12, 34)); // WHERE monograph_publication_id IN (12, 34)
-     * $query->filterByMonographPublicationId(array('min' => 12)); // WHERE monograph_publication_id > 12
+     * $query->filterByMonographPublicationId(array('min' => 12)); // WHERE monograph_publication_id >= 12
+     * $query->filterByMonographPublicationId(array('max' => 12)); // WHERE monograph_publication_id <= 12
      * </code>
-     *
-     * @see       filterByMonograph()
      *
      * @param     mixed $monographPublicationId The value to use as filter.
      *              Use scalar values for equality.
@@ -471,20 +489,26 @@ abstract class BaseVolumeQuery extends ModelCriteria
     /**
      * Filter the query by a related Monograph object
      *
-     * @param   Monograph $monograph The related object to use as filter
+     * @param   Monograph|PropelObjectCollection $monograph The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   VolumeQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 VolumeQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByMonograph($monograph, $comparison = null)
     {
         if ($monograph instanceof Monograph) {
             return $this
-                ->addUsingAlias(VolumePeer::MONOGRAPH_ID, $monograph->getId(), $comparison)
-                ->addUsingAlias(VolumePeer::MONOGRAPH_PUBLICATION_ID, $monograph->getPublicationId(), $comparison);
+                ->addUsingAlias(VolumePeer::MONOGRAPH_ID, $monograph->getId(), $comparison);
+        } elseif ($monograph instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(VolumePeer::MONOGRAPH_ID, $monograph->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByMonograph() only accepts arguments of type Monograph');
+            throw new PropelException('filterByMonograph() only accepts arguments of type Monograph or PropelCollection');
         }
     }
 

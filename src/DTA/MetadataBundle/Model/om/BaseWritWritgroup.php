@@ -77,6 +77,12 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * Get the [writgroup_id] column value.
      *
      * @return int
@@ -104,7 +110,7 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
      */
     public function setWritgroupId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -129,7 +135,7 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
      */
     public function setWritId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -957,6 +963,7 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
         $this->writ_id = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -974,7 +981,16 @@ abstract class BaseWritWritgroup extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->aWritgroup instanceof Persistent) {
+              $this->aWritgroup->clearAllReferences($deep);
+            }
+            if ($this->aWrit instanceof Persistent) {
+              $this->aWrit->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         $this->aWritgroup = null;

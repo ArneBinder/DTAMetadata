@@ -96,6 +96,12 @@ abstract class BaseGenre extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
@@ -151,7 +157,7 @@ abstract class BaseGenre extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -172,7 +178,7 @@ abstract class BaseGenre extends BaseObject implements Persistent
      */
     public function setName($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -193,7 +199,7 @@ abstract class BaseGenre extends BaseObject implements Persistent
      */
     public function setChildof($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -1180,6 +1186,7 @@ abstract class BaseGenre extends BaseObject implements Persistent
                       $this->collGenresRelatedByIdPartial = true;
                     }
 
+                    $collGenresRelatedById->getInternalIterator()->rewind();
                     return $collGenresRelatedById;
                 }
 
@@ -1211,9 +1218,11 @@ abstract class BaseGenre extends BaseObject implements Persistent
      */
     public function setGenresRelatedById(PropelCollection $genresRelatedById, PropelPDO $con = null)
     {
-        $this->genresRelatedByIdScheduledForDeletion = $this->getGenresRelatedById(new Criteria(), $con)->diff($genresRelatedById);
+        $genresRelatedByIdToDelete = $this->getGenresRelatedById(new Criteria(), $con)->diff($genresRelatedById);
 
-        foreach ($this->genresRelatedByIdScheduledForDeletion as $genreRelatedByIdRemoved) {
+        $this->genresRelatedByIdScheduledForDeletion = unserialize(serialize($genresRelatedByIdToDelete));
+
+        foreach ($genresRelatedByIdToDelete as $genreRelatedByIdRemoved) {
             $genreRelatedByIdRemoved->setGenreRelatedByChildof(null);
         }
 
@@ -1395,6 +1404,7 @@ abstract class BaseGenre extends BaseObject implements Persistent
                       $this->collWorksRelatedByGenreIdPartial = true;
                     }
 
+                    $collWorksRelatedByGenreId->getInternalIterator()->rewind();
                     return $collWorksRelatedByGenreId;
                 }
 
@@ -1426,9 +1436,11 @@ abstract class BaseGenre extends BaseObject implements Persistent
      */
     public function setWorksRelatedByGenreId(PropelCollection $worksRelatedByGenreId, PropelPDO $con = null)
     {
-        $this->worksRelatedByGenreIdScheduledForDeletion = $this->getWorksRelatedByGenreId(new Criteria(), $con)->diff($worksRelatedByGenreId);
+        $worksRelatedByGenreIdToDelete = $this->getWorksRelatedByGenreId(new Criteria(), $con)->diff($worksRelatedByGenreId);
 
-        foreach ($this->worksRelatedByGenreIdScheduledForDeletion as $workRelatedByGenreIdRemoved) {
+        $this->worksRelatedByGenreIdScheduledForDeletion = unserialize(serialize($worksRelatedByGenreIdToDelete));
+
+        foreach ($worksRelatedByGenreIdToDelete as $workRelatedByGenreIdRemoved) {
             $workRelatedByGenreIdRemoved->setGenreRelatedByGenreId(null);
         }
 
@@ -1710,6 +1722,7 @@ abstract class BaseGenre extends BaseObject implements Persistent
                       $this->collWorksRelatedBySubgenreIdPartial = true;
                     }
 
+                    $collWorksRelatedBySubgenreId->getInternalIterator()->rewind();
                     return $collWorksRelatedBySubgenreId;
                 }
 
@@ -1741,9 +1754,11 @@ abstract class BaseGenre extends BaseObject implements Persistent
      */
     public function setWorksRelatedBySubgenreId(PropelCollection $worksRelatedBySubgenreId, PropelPDO $con = null)
     {
-        $this->worksRelatedBySubgenreIdScheduledForDeletion = $this->getWorksRelatedBySubgenreId(new Criteria(), $con)->diff($worksRelatedBySubgenreId);
+        $worksRelatedBySubgenreIdToDelete = $this->getWorksRelatedBySubgenreId(new Criteria(), $con)->diff($worksRelatedBySubgenreId);
 
-        foreach ($this->worksRelatedBySubgenreIdScheduledForDeletion as $workRelatedBySubgenreIdRemoved) {
+        $this->worksRelatedBySubgenreIdScheduledForDeletion = unserialize(serialize($worksRelatedBySubgenreIdToDelete));
+
+        foreach ($worksRelatedBySubgenreIdToDelete as $workRelatedBySubgenreIdRemoved) {
             $workRelatedBySubgenreIdRemoved->setGenreRelatedBySubgenreId(null);
         }
 
@@ -1949,6 +1964,7 @@ abstract class BaseGenre extends BaseObject implements Persistent
         $this->childof = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1966,7 +1982,8 @@ abstract class BaseGenre extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collGenresRelatedById) {
                 foreach ($this->collGenresRelatedById as $o) {
                     $o->clearAllReferences($deep);
@@ -1982,6 +1999,11 @@ abstract class BaseGenre extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->aGenreRelatedByChildof instanceof Persistent) {
+              $this->aGenreRelatedByChildof->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         if ($this->collGenresRelatedById instanceof PropelCollection) {

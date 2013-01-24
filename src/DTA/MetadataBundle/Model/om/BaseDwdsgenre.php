@@ -96,6 +96,12 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
@@ -151,7 +157,7 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -172,7 +178,7 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
      */
     public function setName($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -193,7 +199,7 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
      */
     public function setChildof($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -1180,6 +1186,7 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
                       $this->collDwdsgenresRelatedByIdPartial = true;
                     }
 
+                    $collDwdsgenresRelatedById->getInternalIterator()->rewind();
                     return $collDwdsgenresRelatedById;
                 }
 
@@ -1211,9 +1218,11 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
      */
     public function setDwdsgenresRelatedById(PropelCollection $dwdsgenresRelatedById, PropelPDO $con = null)
     {
-        $this->dwdsgenresRelatedByIdScheduledForDeletion = $this->getDwdsgenresRelatedById(new Criteria(), $con)->diff($dwdsgenresRelatedById);
+        $dwdsgenresRelatedByIdToDelete = $this->getDwdsgenresRelatedById(new Criteria(), $con)->diff($dwdsgenresRelatedById);
 
-        foreach ($this->dwdsgenresRelatedByIdScheduledForDeletion as $dwdsgenreRelatedByIdRemoved) {
+        $this->dwdsgenresRelatedByIdScheduledForDeletion = unserialize(serialize($dwdsgenresRelatedByIdToDelete));
+
+        foreach ($dwdsgenresRelatedByIdToDelete as $dwdsgenreRelatedByIdRemoved) {
             $dwdsgenreRelatedByIdRemoved->setDwdsgenreRelatedByChildof(null);
         }
 
@@ -1395,6 +1404,7 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
                       $this->collWorksRelatedByDwdsgenreIdPartial = true;
                     }
 
+                    $collWorksRelatedByDwdsgenreId->getInternalIterator()->rewind();
                     return $collWorksRelatedByDwdsgenreId;
                 }
 
@@ -1426,9 +1436,11 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
      */
     public function setWorksRelatedByDwdsgenreId(PropelCollection $worksRelatedByDwdsgenreId, PropelPDO $con = null)
     {
-        $this->worksRelatedByDwdsgenreIdScheduledForDeletion = $this->getWorksRelatedByDwdsgenreId(new Criteria(), $con)->diff($worksRelatedByDwdsgenreId);
+        $worksRelatedByDwdsgenreIdToDelete = $this->getWorksRelatedByDwdsgenreId(new Criteria(), $con)->diff($worksRelatedByDwdsgenreId);
 
-        foreach ($this->worksRelatedByDwdsgenreIdScheduledForDeletion as $workRelatedByDwdsgenreIdRemoved) {
+        $this->worksRelatedByDwdsgenreIdScheduledForDeletion = unserialize(serialize($worksRelatedByDwdsgenreIdToDelete));
+
+        foreach ($worksRelatedByDwdsgenreIdToDelete as $workRelatedByDwdsgenreIdRemoved) {
             $workRelatedByDwdsgenreIdRemoved->setDwdsgenreRelatedByDwdsgenreId(null);
         }
 
@@ -1710,6 +1722,7 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
                       $this->collWorksRelatedByDwdssubgenreIdPartial = true;
                     }
 
+                    $collWorksRelatedByDwdssubgenreId->getInternalIterator()->rewind();
                     return $collWorksRelatedByDwdssubgenreId;
                 }
 
@@ -1741,9 +1754,11 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
      */
     public function setWorksRelatedByDwdssubgenreId(PropelCollection $worksRelatedByDwdssubgenreId, PropelPDO $con = null)
     {
-        $this->worksRelatedByDwdssubgenreIdScheduledForDeletion = $this->getWorksRelatedByDwdssubgenreId(new Criteria(), $con)->diff($worksRelatedByDwdssubgenreId);
+        $worksRelatedByDwdssubgenreIdToDelete = $this->getWorksRelatedByDwdssubgenreId(new Criteria(), $con)->diff($worksRelatedByDwdssubgenreId);
 
-        foreach ($this->worksRelatedByDwdssubgenreIdScheduledForDeletion as $workRelatedByDwdssubgenreIdRemoved) {
+        $this->worksRelatedByDwdssubgenreIdScheduledForDeletion = unserialize(serialize($worksRelatedByDwdssubgenreIdToDelete));
+
+        foreach ($worksRelatedByDwdssubgenreIdToDelete as $workRelatedByDwdssubgenreIdRemoved) {
             $workRelatedByDwdssubgenreIdRemoved->setDwdsgenreRelatedByDwdssubgenreId(null);
         }
 
@@ -1949,6 +1964,7 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
         $this->childof = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1966,7 +1982,8 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collDwdsgenresRelatedById) {
                 foreach ($this->collDwdsgenresRelatedById as $o) {
                     $o->clearAllReferences($deep);
@@ -1982,6 +1999,11 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->aDwdsgenreRelatedByChildof instanceof Persistent) {
+              $this->aDwdsgenreRelatedByChildof->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         if ($this->collDwdsgenresRelatedById instanceof PropelCollection) {

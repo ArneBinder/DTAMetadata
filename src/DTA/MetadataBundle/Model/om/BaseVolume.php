@@ -94,6 +94,12 @@ abstract class BaseVolume extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * Get the [id] column value.
      *
      * @return int
@@ -161,7 +167,7 @@ abstract class BaseVolume extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -182,7 +188,7 @@ abstract class BaseVolume extends BaseObject implements Persistent
      */
     public function setVolumeindex($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -203,7 +209,7 @@ abstract class BaseVolume extends BaseObject implements Persistent
      */
     public function setVolumeindexnumerical($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -224,7 +230,7 @@ abstract class BaseVolume extends BaseObject implements Persistent
      */
     public function setTotalvolumes($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -245,7 +251,7 @@ abstract class BaseVolume extends BaseObject implements Persistent
      */
     public function setMonographId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -270,17 +276,13 @@ abstract class BaseVolume extends BaseObject implements Persistent
      */
     public function setMonographPublicationId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
         if ($this->monograph_publication_id !== $v) {
             $this->monograph_publication_id = $v;
             $this->modifiedColumns[] = VolumePeer::MONOGRAPH_PUBLICATION_ID;
-        }
-
-        if ($this->aMonograph !== null && $this->aMonograph->getPublicationId() !== $v) {
-            $this->aMonograph = null;
         }
 
 
@@ -357,9 +359,6 @@ abstract class BaseVolume extends BaseObject implements Persistent
     {
 
         if ($this->aMonograph !== null && $this->monograph_id !== $this->aMonograph->getId()) {
-            $this->aMonograph = null;
-        }
-        if ($this->aMonograph !== null && $this->monograph_publication_id !== $this->aMonograph->getPublicationId()) {
             $this->aMonograph = null;
         }
     } // ensureConsistency
@@ -1055,12 +1054,6 @@ abstract class BaseVolume extends BaseObject implements Persistent
             $this->setMonographId($v->getId());
         }
 
-        if ($v === null) {
-            $this->setMonographPublicationId(NULL);
-        } else {
-            $this->setMonographPublicationId($v->getPublicationId());
-        }
-
         $this->aMonograph = $v;
 
         // Add binding for other direction of this n:n relationship.
@@ -1084,8 +1077,8 @@ abstract class BaseVolume extends BaseObject implements Persistent
      */
     public function getMonograph(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aMonograph === null && ($this->monograph_id !== null && $this->monograph_publication_id !== null) && $doQuery) {
-            $this->aMonograph = MonographQuery::create()->findPk(array($this->monograph_id, $this->monograph_publication_id), $con);
+        if ($this->aMonograph === null && ($this->monograph_id !== null) && $doQuery) {
+            $this->aMonograph = MonographQuery::create()->findPk($this->monograph_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
@@ -1111,6 +1104,7 @@ abstract class BaseVolume extends BaseObject implements Persistent
         $this->monograph_publication_id = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1128,7 +1122,13 @@ abstract class BaseVolume extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->aMonograph instanceof Persistent) {
+              $this->aMonograph->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         $this->aMonograph = null;

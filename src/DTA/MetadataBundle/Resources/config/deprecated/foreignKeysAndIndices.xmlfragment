@@ -1,0 +1,30 @@
+<-- these have been sorted out when they were replaced with the propel delegate behavior. -->
+
+<-- for all -->
+        <column name="publication_id" type="INTEGER" primaryKey="true" required="true"/>
+
+<-- for specific -->
+        <foreign-key foreignTable="publication" name="fk_reihe_publikation1">
+            <reference local="publication_id" foreign="id"/>
+        </foreign-key>
+        <index name="fk_reihe_publikation1">
+            <index-column name="publication_id"/>
+        </index>
+        <foreign-key foreignTable="publication" name="fk_aufsatz_publikation1">
+            <reference local="publication_id" foreign="id"/>
+        </foreign-key>
+        <index name="fk_aufsatz_publikation1">
+            <index-column name="publication_id"/>
+        </index>
+         <foreign-key foreignTable="publication" name="fk_zeitschrift_publikation1">
+            <reference local="publication_id" foreign="id"/>
+        </foreign-key>
+        <index name="fk_zeitschrift_publikation1">
+            <index-column name="publication_id"/>
+        </index>
+        <foreign-key foreignTable="publication" name="fk_monografie_publikation1">
+            <reference local="publication_id" foreign="id"/>
+        </foreign-key>
+        <index name="fk_monografie_publikation1">
+            <index-column name="publication_id"/>
+        </index>

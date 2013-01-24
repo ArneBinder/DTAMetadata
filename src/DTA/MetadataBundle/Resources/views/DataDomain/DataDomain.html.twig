@@ -1,9 +1,12 @@
 {% extends 'DTAMetadataBundle::base.html.twig' %}
 
 {# Data Domain Base Template 
-    Fills the current domain menu template slot with the special option structure 
+    Fills the domain menu template slot with the special option structure 
     for the data domain (view and search, create options for each model class).
     The other data domain templates extend this one (this saves includes for the domain menu all the time).
+
+    
+
 #}
 
 {% block title %}Daten{% endblock %}
@@ -20,7 +23,7 @@
             <ul class="dropdown-menu">
             {% for child in item.children%}
             
-            {# Element is a model class #}
+            {# If the menu element is a model class, add view and create options #}
             {% if child.modelClass is defined %}
                 <li class="dropdown-submenu">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 
@@ -31,7 +34,7 @@
                                 <i class="icon-list"></i> 
                                 Anzeigen und suchen
                         </a></li>
-                        <li><a href="{{ path('dataDomainNew', {'className':child.modelClass, 'recordId':0}) }}">
+                        <li><a href="{{ path(domainKey~'NewRecord', {'className':child.modelClass}) }}"> {#, 'recordId':0, 'domainKey': domainKey#}
                                 <i class="icon-plus"></i> 
                                 Neu anlegen
                         </a></li>
@@ -44,6 +47,7 @@
             </ul>
         </li>
     {% else %} {# item has no children #}
+        {# If the menu element is a model class, add view and create options #}
         {% if item.modelClass is defined %}
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 
@@ -54,14 +58,15 @@
                     <li><a href="{{ path('home') }}">
                             <i class="icon-list"></i> 
                             Anzeigen und suchen</a></li>
-                    <li><a href="{{ path('home') }}">
+                    <li><a href="{{ path(domainKey~'NewRecord', {'className':item.modelClass}) }}"> {#, 'recordId':0, 'domainKey': domainKey#}
                             <i class="icon-plus"></i> 
                             Neu anlegen
                     </a></li>
                  </ul>
             </li>
+        {# The menu element is a simple link #}
         {% else %}
-            <li><a href="{{ path(child.path) }}">{{ child.caption }}</a></li>
+            <li><a href="{{ path(item.path) }}">{{ item.caption }}</a></li>
         {% endif %}
     {% endif %}
     {% endfor %}

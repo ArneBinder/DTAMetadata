@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <database name="DTAMetadata" namespace="DTA\MetadataBundle\Model" defaultIdMethod="native">
  
-<!--CLASSIFICATION   
+<!-- conceptual entities   
     ________________________________________________________-->
     
   <table name="corpus" phpName="Corpus" idMethod="native">
@@ -40,7 +40,7 @@
     </index>
   </table>
   
-  <!-- WORKFLOW
+  <!-- workflow
     ________________________________________________________-->
 
   <table name="partner" phpName="Partner" idMethod="native">
@@ -185,7 +185,7 @@
     </index>
   </table>
   
-  <!-- DESCRIPTION
+  <!-- data / descriptive
     ________________________________________________________-->
     
     <table name="dateSpecification" idMethod="native">
@@ -284,43 +284,10 @@
     </table>
 
  
-    <!-- PUBLICATION and WORK
+    <!-- data / publications 
     ________________________________________________________-->
     
-    <table name="essay" idMethod="native">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="publication_id" type="INTEGER" primaryKey="true" required="true"/>
-        <foreign-key foreignTable="publication" name="fk_aufsatz_publikation1">
-            <reference local="publication_id" foreign="id"/>
-        </foreign-key>
-        <index name="fk_aufsatz_publikation1">
-            <index-column name="publication_id"/>
-        </index>
-    </table>
-
-    <table name="magazine" idMethod="native">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="publication_id" type="INTEGER" primaryKey="true" required="true"/>
-        <foreign-key foreignTable="publication" name="fk_zeitschrift_publikation1">
-            <reference local="publication_id" foreign="id"/>
-        </foreign-key>
-        <index name="fk_zeitschrift_publikation1">
-            <index-column name="publication_id"/>
-        </index>
-    </table>
-
-    <table name="monograph" idMethod="native">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="publication_id" type="INTEGER" primaryKey="true" required="true"/>
-        <foreign-key foreignTable="publication" name="fk_monografie_publikation1">
-            <reference local="publication_id" foreign="id"/>
-        </foreign-key>
-        <index name="fk_monografie_publikation1">
-            <index-column name="publication_id"/>
-        </index>
-    </table>
-
-    <!-- The base class for all publications. -->
+     <!-- The base class for all publications. -->
     <table name="publication" idMethod="native">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="title_id" type="INTEGER" required="true"/>
@@ -355,6 +322,36 @@
             <index-column name="dateSpecification_id"/>
         </index>
     </table>
+    
+    <table name="essay" idMethod="native">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <behavior name="delegate">
+            <parameter name="to" value="publication" />
+        </behavior>
+    </table>
+
+    <table name="magazine" idMethod="native">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <behavior name="delegate">
+            <parameter name="to" value="publication" />
+        </behavior>
+    </table>
+
+    <table name="monograph" idMethod="native">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <behavior name="delegate">
+            <parameter name="to" value="publication" />
+        </behavior>
+        
+    </table>
+    
+    <table name="series" idMethod="native">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="volume" type="LONGVARCHAR" required="false"/>
+        <behavior name="delegate">
+            <parameter name="to" value="publication" />
+        </behavior>
+    </table>
 
     <table name="publishingCompany" idMethod="native">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
@@ -362,17 +359,6 @@
         <column name="gnd" type="LONGVARCHAR" required="false"/>
     </table>
 
-    <table name="series" idMethod="native">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="publication_id" type="INTEGER" primaryKey="true" required="true"/>
-        <column name="volume" type="LONGVARCHAR" required="false"/>
-        <foreign-key foreignTable="publication" name="fk_reihe_publikation1">
-            <reference local="publication_id" foreign="id"/>
-        </foreign-key>
-        <index name="fk_reihe_publikation1">
-            <index-column name="publication_id"/>
-        </index>
-    </table>
 
     <!--    Intended for monographs that consist i.e. of several books.-->
     <table name="volume" idMethod="native">
@@ -384,11 +370,9 @@
         <column name="monograph_publication_id" type="INTEGER" required="true"/>
         <foreign-key foreignTable="monograph" name="fk_volume_monograph1">
             <reference local="monograph_id" foreign="id"/>
-            <reference local="monograph_publication_id" foreign="publication_id"/>
         </foreign-key>
         <index name="fk_volume_monograph1">
             <index-column name="monograph_id"/>
-            <index-column name="monograph_publication_id"/>
         </index>
     </table>
 
@@ -509,7 +493,7 @@
         </index>
     </table>
     
-     <!-- HISTORICAL PERSON
+     <!-- data / persons
     ________________________________________________________-->
     
     <table name="author" phpName="Author" idMethod="native">

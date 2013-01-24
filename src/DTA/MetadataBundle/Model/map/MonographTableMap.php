@@ -43,7 +43,6 @@ class MonographTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignPrimaryKey('publication_id', 'PublicationId', 'INTEGER' , 'publication', 'id', true, null, null);
         // validators
     } // initialize()
 
@@ -52,8 +51,23 @@ class MonographTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Publication', RelationMap::MANY_TO_ONE, array('publication_id' => 'id', ), null, null);
-        $this->addRelation('Volume', 'DTA\\MetadataBundle\\Model\\Volume', RelationMap::ONE_TO_MANY, array('id' => 'monograph_id', 'publication_id' => 'monograph_publication_id', ), null, null, 'Volumes');
+        $this->addRelation('Volume', 'DTA\\MetadataBundle\\Model\\Volume', RelationMap::ONE_TO_MANY, array('id' => 'monograph_id', ), null, null, 'Volumes');
+        $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Publication', RelationMap::ONE_TO_ONE, array('id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'delegate' =>  array (
+  'to' => 'publication',
+),
+        );
+    } // getBehaviors()
 
 } // MonographTableMap

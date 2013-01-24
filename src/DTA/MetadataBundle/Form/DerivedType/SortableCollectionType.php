@@ -12,8 +12,13 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class SortableCollectionType extends \Symfony\Component\Form\Extension\Core\Type\CollectionType {
     
     public function getName() {
-        return 'mess';
+        return 'sortableCollection';
     }
+
+}
+
+// the basic collection form type code, inherited and hopefully not necessary to change.
+
     /**
      * {@inheritdoc}
      */
@@ -93,7 +98,4 @@ class SortableCollectionType extends \Symfony\Component\Form\Extension\Core\Type
      * in the sortableCollection_widget block (block name by convention)
      * {@inheritdoc}
      */
-
-}
-
 ?>

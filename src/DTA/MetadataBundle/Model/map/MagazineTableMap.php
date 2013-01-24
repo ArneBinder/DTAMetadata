@@ -43,7 +43,6 @@ class MagazineTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignPrimaryKey('publication_id', 'PublicationId', 'INTEGER' , 'publication', 'id', true, null, null);
         // validators
     } // initialize()
 
@@ -52,7 +51,22 @@ class MagazineTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Publication', RelationMap::MANY_TO_ONE, array('publication_id' => 'id', ), null, null);
+        $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Publication', RelationMap::ONE_TO_ONE, array('id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'delegate' =>  array (
+  'to' => 'publication',
+),
+        );
+    } // getBehaviors()
 
 } // MagazineTableMap

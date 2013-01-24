@@ -75,7 +75,7 @@ abstract class BaseNamefragmentQuery extends ModelCriteria
      * Returns a new NamefragmentQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     NamefragmentQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   NamefragmentQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return NamefragmentQuery
      */
@@ -137,8 +137,8 @@ abstract class BaseNamefragmentQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Namefragment A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Namefragment A model object, or null if the key is not found
+     * @throws PropelException
      */
      public function findOneById($key, $con = null)
      {
@@ -152,8 +152,8 @@ abstract class BaseNamefragmentQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Namefragment A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Namefragment A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -253,7 +253,8 @@ abstract class BaseNamefragmentQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -266,8 +267,22 @@ abstract class BaseNamefragmentQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(NamefragmentPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(NamefragmentPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(NamefragmentPeer::ID, $id, $comparison);
@@ -280,7 +295,8 @@ abstract class BaseNamefragmentQuery extends ModelCriteria
      * <code>
      * $query->filterByPersonalnameId(1234); // WHERE personalName_id = 1234
      * $query->filterByPersonalnameId(array(12, 34)); // WHERE personalName_id IN (12, 34)
-     * $query->filterByPersonalnameId(array('min' => 12)); // WHERE personalName_id > 12
+     * $query->filterByPersonalnameId(array('min' => 12)); // WHERE personalName_id >= 12
+     * $query->filterByPersonalnameId(array('max' => 12)); // WHERE personalName_id <= 12
      * </code>
      *
      * @see       filterByPersonalname()
@@ -352,7 +368,8 @@ abstract class BaseNamefragmentQuery extends ModelCriteria
      * <code>
      * $query->filterByNamefragmenttypeid(1234); // WHERE nameFragmentTypeId = 1234
      * $query->filterByNamefragmenttypeid(array(12, 34)); // WHERE nameFragmentTypeId IN (12, 34)
-     * $query->filterByNamefragmenttypeid(array('min' => 12)); // WHERE nameFragmentTypeId > 12
+     * $query->filterByNamefragmenttypeid(array('min' => 12)); // WHERE nameFragmentTypeId >= 12
+     * $query->filterByNamefragmenttypeid(array('max' => 12)); // WHERE nameFragmentTypeId <= 12
      * </code>
      *
      * @see       filterByNamefragmenttype()
@@ -395,7 +412,8 @@ abstract class BaseNamefragmentQuery extends ModelCriteria
      * <code>
      * $query->filterBySortableRank(1234); // WHERE sortable_rank = 1234
      * $query->filterBySortableRank(array(12, 34)); // WHERE sortable_rank IN (12, 34)
-     * $query->filterBySortableRank(array('min' => 12)); // WHERE sortable_rank > 12
+     * $query->filterBySortableRank(array('min' => 12)); // WHERE sortable_rank >= 12
+     * $query->filterBySortableRank(array('max' => 12)); // WHERE sortable_rank <= 12
      * </code>
      *
      * @param     mixed $sortableRank The value to use as filter.
@@ -435,8 +453,8 @@ abstract class BaseNamefragmentQuery extends ModelCriteria
      * @param   Namefragmenttype|PropelObjectCollection $namefragmenttype The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   NamefragmentQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 NamefragmentQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByNamefragmenttype($namefragmenttype, $comparison = null)
     {
@@ -511,8 +529,8 @@ abstract class BaseNamefragmentQuery extends ModelCriteria
      * @param   Personalname|PropelObjectCollection $personalname The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   NamefragmentQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 NamefragmentQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByPersonalname($personalname, $comparison = null)
     {

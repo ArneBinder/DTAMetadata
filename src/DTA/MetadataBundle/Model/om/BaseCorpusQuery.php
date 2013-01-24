@@ -62,7 +62,7 @@ abstract class BaseCorpusQuery extends ModelCriteria
      * Returns a new CorpusQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     CorpusQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   CorpusQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return CorpusQuery
      */
@@ -124,8 +124,8 @@ abstract class BaseCorpusQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Corpus A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Corpus A model object, or null if the key is not found
+     * @throws PropelException
      */
      public function findOneById($key, $con = null)
      {
@@ -139,8 +139,8 @@ abstract class BaseCorpusQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Corpus A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Corpus A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -240,7 +240,8 @@ abstract class BaseCorpusQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -253,8 +254,22 @@ abstract class BaseCorpusQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(CorpusPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(CorpusPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(CorpusPeer::ID, $id, $comparison);
@@ -296,7 +311,8 @@ abstract class BaseCorpusQuery extends ModelCriteria
      * <code>
      * $query->filterByWritId(1234); // WHERE writ_id = 1234
      * $query->filterByWritId(array(12, 34)); // WHERE writ_id IN (12, 34)
-     * $query->filterByWritId(array('min' => 12)); // WHERE writ_id > 12
+     * $query->filterByWritId(array('min' => 12)); // WHERE writ_id >= 12
+     * $query->filterByWritId(array('max' => 12)); // WHERE writ_id <= 12
      * </code>
      *
      * @see       filterByWrit()
@@ -338,8 +354,8 @@ abstract class BaseCorpusQuery extends ModelCriteria
      * @param   Writ|PropelObjectCollection $writ The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   CorpusQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 CorpusQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByWrit($writ, $comparison = null)
     {

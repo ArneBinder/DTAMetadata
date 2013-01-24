@@ -75,6 +75,12 @@ abstract class BaseTitle extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
@@ -104,7 +110,7 @@ abstract class BaseTitle extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -928,6 +934,7 @@ abstract class BaseTitle extends BaseObject implements Persistent
                       $this->collTitlefragmentsPartial = true;
                     }
 
+                    $collTitlefragments->getInternalIterator()->rewind();
                     return $collTitlefragments;
                 }
 
@@ -959,9 +966,11 @@ abstract class BaseTitle extends BaseObject implements Persistent
      */
     public function setTitlefragments(PropelCollection $titlefragments, PropelPDO $con = null)
     {
-        $this->titlefragmentsScheduledForDeletion = $this->getTitlefragments(new Criteria(), $con)->diff($titlefragments);
+        $titlefragmentsToDelete = $this->getTitlefragments(new Criteria(), $con)->diff($titlefragments);
 
-        foreach ($this->titlefragmentsScheduledForDeletion as $titlefragmentRemoved) {
+        $this->titlefragmentsScheduledForDeletion = unserialize(serialize($titlefragmentsToDelete));
+
+        foreach ($titlefragmentsToDelete as $titlefragmentRemoved) {
             $titlefragmentRemoved->setTitle(null);
         }
 
@@ -1050,7 +1059,7 @@ abstract class BaseTitle extends BaseObject implements Persistent
                 $this->titlefragmentsScheduledForDeletion = clone $this->collTitlefragments;
                 $this->titlefragmentsScheduledForDeletion->clear();
             }
-            $this->titlefragmentsScheduledForDeletion[]= $titlefragment;
+            $this->titlefragmentsScheduledForDeletion[]= clone $titlefragment;
             $titlefragment->setTitle(null);
         }
 
@@ -1168,6 +1177,7 @@ abstract class BaseTitle extends BaseObject implements Persistent
                       $this->collPublicationsPartial = true;
                     }
 
+                    $collPublications->getInternalIterator()->rewind();
                     return $collPublications;
                 }
 
@@ -1199,9 +1209,11 @@ abstract class BaseTitle extends BaseObject implements Persistent
      */
     public function setPublications(PropelCollection $publications, PropelPDO $con = null)
     {
-        $this->publicationsScheduledForDeletion = $this->getPublications(new Criteria(), $con)->diff($publications);
+        $publicationsToDelete = $this->getPublications(new Criteria(), $con)->diff($publications);
 
-        foreach ($this->publicationsScheduledForDeletion as $publicationRemoved) {
+        $this->publicationsScheduledForDeletion = unserialize(serialize($publicationsToDelete));
+
+        foreach ($publicationsToDelete as $publicationRemoved) {
             $publicationRemoved->setTitle(null);
         }
 
@@ -1290,7 +1302,7 @@ abstract class BaseTitle extends BaseObject implements Persistent
                 $this->publicationsScheduledForDeletion = clone $this->collPublications;
                 $this->publicationsScheduledForDeletion->clear();
             }
-            $this->publicationsScheduledForDeletion[]= $publication;
+            $this->publicationsScheduledForDeletion[]= clone $publication;
             $publication->setTitle(null);
         }
 
@@ -1372,6 +1384,106 @@ abstract class BaseTitle extends BaseObject implements Persistent
         return $this->getPublications($query, $con);
     }
 
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinEssay($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Essay', $join_behavior);
+
+        return $this->getPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinMagazine($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Magazine', $join_behavior);
+
+        return $this->getPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinMonograph($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Monograph', $join_behavior);
+
+        return $this->getPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinSeries($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Series', $join_behavior);
+
+        return $this->getPublications($query, $con);
+    }
+
     /**
      * Clears the current object and sets all attributes to their default values
      */
@@ -1380,6 +1492,7 @@ abstract class BaseTitle extends BaseObject implements Persistent
         $this->id = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1397,7 +1510,8 @@ abstract class BaseTitle extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collTitlefragments) {
                 foreach ($this->collTitlefragments as $o) {
                     $o->clearAllReferences($deep);
@@ -1408,6 +1522,8 @@ abstract class BaseTitle extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         if ($this->collTitlefragments instanceof PropelCollection) {

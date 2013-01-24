@@ -1,61 +1,49 @@
-    {% block messy_widget %}
-    {#  #}
+{# This defines how to render the sortable collection form type widget.
+    Its structure is derived from the collection form type, basically
+    removing the labels and adding javascript indicator classes to it.
+ #}
 
-    {% set propertyName = 'titleFragments' %}
-    {% set prototypeElement = form_widget(attribute(form,propertyName).vars.prototype) %}
-     <ol class="collection-editor collection-sortable" data-prototype="{{ prototypeElement }}">
-        {% for collectionElement in attribute(form,propertyName) %}
-            <li>
-            {{ form_widget(collectionElement) }}
-            </li>
-        {% endfor %}
-        {{ form_rest(form) }}
-      </ol>
-
-    {% endblock %}
-
-
-    {% block sortableCollection_widget %}
-    {% spaceless %}
-        {% if prototype is defined %}
-            {# Add prototype for dynamically adding forms with JS #}
-            {% set attr = attr|merge({'data-prototype': form_row(prototype) }) %}
-            {# Set marker classes for the JS (collectionControl.js) to add the corresponding buttons #}
-            {% set attr = attr|merge({'class': "collection-editor collection-sortable" }) %}
+{% block sortableCollection_widget %}
+{% spaceless %}
+    {% if prototype is defined %}
+        {# Add prototype for dynamically adding forms with JS #}
+        {% set attr = attr|merge({'data-prototype': form_row(prototype) }) %}
+        {# Set marker classes for the JS (collectionControl.js) to add the corresponding buttons #}
+        {% set attr = attr|merge({'class': "collection-editor collection-sortable" }) %}
+    {% endif %}
+    <ol {{ block('widget_container_attributes') }}>
+        {% if form.parent is empty %}
+            {{ form_errors(form) }}
         {% endif %}
-        <ol {{ block('widget_container_attributes') }}>
-            {% if form.parent is empty %}
-                {{ form_errors(form) }}
-            {% endif %}
-            {{ block('sortableCollection_rows') }}
-            {{ form_rest(form) }}
-        </ol>
-    {% endspaceless %}
-    {% endblock %}
+        {{ block('sortableCollection_rows') }}
+        {{ form_rest(form) }}
+    </ol>
+{% endspaceless %}
+{% endblock %}
 
-    {% block sortableCollection_rows %}
-    {% spaceless %}
-        {% for child in form %}
-        <li>
-            {# omit the default label (just a zero-based index) #}
-            {{ form_errors(child) }}
-            {{ form_widget(child) }}
-            {#{ form_rest(child) }#}
-        </li>
-        {% endfor %}
-    {% endspaceless %}
-    {% endblock sortableCollection_rows %}
+{% block sortableCollection_rows %}
+{% spaceless %}
+    {% for child in form %}
+    <li>
+        {{ form_errors(child) }}
+        {{ form_widget(child) }}
+        {# omit the default label (just a zero-based index) #}
+        {#{ form_rest(child) }#}
+    </li>
+    {% endfor %}
+{% endspaceless %}
+{% endblock sortableCollection_rows %}
 
-    {% block titleFragment_widget %}
-    {% spaceless %}
-        <div {{ block('widget_container_attributes') }}>
-           {% if form.parent is empty %}
-               {{ form_errors(form) }}
-           {% endif %}
-           {{ block('form_rows') }}
-           {{ form_rest(form) }}
-       </div>
-    {% endspaceless %}
-    {% endblock titleFragment_widget %}
-        
-       
+{% block titleFragment_widget %}
+{% spaceless %}
+    <div {{ block('widget_container_attributes') }}>
+       {% if form.parent is empty %}
+           {{ form_errors(form) }}
+       {% endif %}
+       {{ block('form_rows') }}
+       {{ form_rest(form) }}
+   </div>
+{% endspaceless %}
+{% endblock titleFragment_widget %}
+
+

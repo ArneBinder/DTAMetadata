@@ -105,6 +105,12 @@ abstract class BasePerson extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
@@ -162,7 +168,7 @@ abstract class BasePerson extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -183,7 +189,7 @@ abstract class BasePerson extends BaseObject implements Persistent
      */
     public function setGnd($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -1141,6 +1147,7 @@ abstract class BasePerson extends BaseObject implements Persistent
                       $this->collPersonalnamesPartial = true;
                     }
 
+                    $collPersonalnames->getInternalIterator()->rewind();
                     return $collPersonalnames;
                 }
 
@@ -1172,9 +1179,11 @@ abstract class BasePerson extends BaseObject implements Persistent
      */
     public function setPersonalnames(PropelCollection $personalnames, PropelPDO $con = null)
     {
-        $this->personalnamesScheduledForDeletion = $this->getPersonalnames(new Criteria(), $con)->diff($personalnames);
+        $personalnamesToDelete = $this->getPersonalnames(new Criteria(), $con)->diff($personalnames);
 
-        foreach ($this->personalnamesScheduledForDeletion as $personalnameRemoved) {
+        $this->personalnamesScheduledForDeletion = unserialize(serialize($personalnamesToDelete));
+
+        foreach ($personalnamesToDelete as $personalnameRemoved) {
             $personalnameRemoved->setPerson(null);
         }
 
@@ -1263,7 +1272,7 @@ abstract class BasePerson extends BaseObject implements Persistent
                 $this->personalnamesScheduledForDeletion = clone $this->collPersonalnames;
                 $this->personalnamesScheduledForDeletion->clear();
             }
-            $this->personalnamesScheduledForDeletion[]= $personalname;
+            $this->personalnamesScheduledForDeletion[]= clone $personalname;
             $personalname->setPerson(null);
         }
 
@@ -1356,6 +1365,7 @@ abstract class BasePerson extends BaseObject implements Persistent
                       $this->collAuthorsPartial = true;
                     }
 
+                    $collAuthors->getInternalIterator()->rewind();
                     return $collAuthors;
                 }
 
@@ -1387,9 +1397,11 @@ abstract class BasePerson extends BaseObject implements Persistent
      */
     public function setAuthors(PropelCollection $authors, PropelPDO $con = null)
     {
-        $this->authorsScheduledForDeletion = $this->getAuthors(new Criteria(), $con)->diff($authors);
+        $authorsToDelete = $this->getAuthors(new Criteria(), $con)->diff($authors);
 
-        foreach ($this->authorsScheduledForDeletion as $authorRemoved) {
+        $this->authorsScheduledForDeletion = unserialize(serialize($authorsToDelete));
+
+        foreach ($authorsToDelete as $authorRemoved) {
             $authorRemoved->setPerson(null);
         }
 
@@ -1478,7 +1490,7 @@ abstract class BasePerson extends BaseObject implements Persistent
                 $this->authorsScheduledForDeletion = clone $this->collAuthors;
                 $this->authorsScheduledForDeletion->clear();
             }
-            $this->authorsScheduledForDeletion[]= $author;
+            $this->authorsScheduledForDeletion[]= clone $author;
             $author->setPerson(null);
         }
 
@@ -1571,6 +1583,7 @@ abstract class BasePerson extends BaseObject implements Persistent
                       $this->collPrintersPartial = true;
                     }
 
+                    $collPrinters->getInternalIterator()->rewind();
                     return $collPrinters;
                 }
 
@@ -1602,9 +1615,11 @@ abstract class BasePerson extends BaseObject implements Persistent
      */
     public function setPrinters(PropelCollection $printers, PropelPDO $con = null)
     {
-        $this->printersScheduledForDeletion = $this->getPrinters(new Criteria(), $con)->diff($printers);
+        $printersToDelete = $this->getPrinters(new Criteria(), $con)->diff($printers);
 
-        foreach ($this->printersScheduledForDeletion as $printerRemoved) {
+        $this->printersScheduledForDeletion = unserialize(serialize($printersToDelete));
+
+        foreach ($printersToDelete as $printerRemoved) {
             $printerRemoved->setPerson(null);
         }
 
@@ -1693,7 +1708,7 @@ abstract class BasePerson extends BaseObject implements Persistent
                 $this->printersScheduledForDeletion = clone $this->collPrinters;
                 $this->printersScheduledForDeletion->clear();
             }
-            $this->printersScheduledForDeletion[]= $printer;
+            $this->printersScheduledForDeletion[]= clone $printer;
             $printer->setPerson(null);
         }
 
@@ -1786,6 +1801,7 @@ abstract class BasePerson extends BaseObject implements Persistent
                       $this->collPublishersPartial = true;
                     }
 
+                    $collPublishers->getInternalIterator()->rewind();
                     return $collPublishers;
                 }
 
@@ -1817,9 +1833,11 @@ abstract class BasePerson extends BaseObject implements Persistent
      */
     public function setPublishers(PropelCollection $publishers, PropelPDO $con = null)
     {
-        $this->publishersScheduledForDeletion = $this->getPublishers(new Criteria(), $con)->diff($publishers);
+        $publishersToDelete = $this->getPublishers(new Criteria(), $con)->diff($publishers);
 
-        foreach ($this->publishersScheduledForDeletion as $publisherRemoved) {
+        $this->publishersScheduledForDeletion = unserialize(serialize($publishersToDelete));
+
+        foreach ($publishersToDelete as $publisherRemoved) {
             $publisherRemoved->setPerson(null);
         }
 
@@ -1908,7 +1926,7 @@ abstract class BasePerson extends BaseObject implements Persistent
                 $this->publishersScheduledForDeletion = clone $this->collPublishers;
                 $this->publishersScheduledForDeletion->clear();
             }
-            $this->publishersScheduledForDeletion[]= $publisher;
+            $this->publishersScheduledForDeletion[]= clone $publisher;
             $publisher->setPerson(null);
         }
 
@@ -2001,6 +2019,7 @@ abstract class BasePerson extends BaseObject implements Persistent
                       $this->collTranslatorsPartial = true;
                     }
 
+                    $collTranslators->getInternalIterator()->rewind();
                     return $collTranslators;
                 }
 
@@ -2032,9 +2051,11 @@ abstract class BasePerson extends BaseObject implements Persistent
      */
     public function setTranslators(PropelCollection $translators, PropelPDO $con = null)
     {
-        $this->translatorsScheduledForDeletion = $this->getTranslators(new Criteria(), $con)->diff($translators);
+        $translatorsToDelete = $this->getTranslators(new Criteria(), $con)->diff($translators);
 
-        foreach ($this->translatorsScheduledForDeletion as $translatorRemoved) {
+        $this->translatorsScheduledForDeletion = unserialize(serialize($translatorsToDelete));
+
+        foreach ($translatorsToDelete as $translatorRemoved) {
             $translatorRemoved->setPerson(null);
         }
 
@@ -2123,7 +2144,7 @@ abstract class BasePerson extends BaseObject implements Persistent
                 $this->translatorsScheduledForDeletion = clone $this->collTranslators;
                 $this->translatorsScheduledForDeletion->clear();
             }
-            $this->translatorsScheduledForDeletion[]= $translator;
+            $this->translatorsScheduledForDeletion[]= clone $translator;
             $translator->setPerson(null);
         }
 
@@ -2139,6 +2160,7 @@ abstract class BasePerson extends BaseObject implements Persistent
         $this->gnd = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -2156,7 +2178,8 @@ abstract class BasePerson extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collPersonalnames) {
                 foreach ($this->collPersonalnames as $o) {
                     $o->clearAllReferences($deep);
@@ -2182,6 +2205,8 @@ abstract class BasePerson extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         if ($this->collPersonalnames instanceof PropelCollection) {

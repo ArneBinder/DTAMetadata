@@ -9,7 +9,9 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
+use \PropelCollection;
 use \PropelException;
+use \PropelObjectCollection;
 use \PropelPDO;
 use DTA\MetadataBundle\Model\Magazine;
 use DTA\MetadataBundle\Model\MagazinePeer;
@@ -45,15 +47,9 @@ abstract class BaseMagazine extends BaseObject implements Persistent
     protected $id;
 
     /**
-     * The value for the publication_id field.
-     * @var        int
+     * @var        Publication one-to-one related Publication object
      */
-    protected $publication_id;
-
-    /**
-     * @var        Publication
-     */
-    protected $aPublication;
+    protected $singlePublication;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -70,6 +66,18 @@ abstract class BaseMagazine extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $publicationsScheduledForDeletion = null;
+
+    /**
      * Get the [id] column value.
      *
      * @return int
@@ -80,16 +88,6 @@ abstract class BaseMagazine extends BaseObject implements Persistent
     }
 
     /**
-     * Get the [publication_id] column value.
-     *
-     * @return int
-     */
-    public function getPublicationId()
-    {
-        return $this->publication_id;
-    }
-
-    /**
      * Set the value of [id] column.
      *
      * @param int $v new value
@@ -97,7 +95,7 @@ abstract class BaseMagazine extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -109,31 +107,6 @@ abstract class BaseMagazine extends BaseObject implements Persistent
 
         return $this;
     } // setId()
-
-    /**
-     * Set the value of [publication_id] column.
-     *
-     * @param int $v new value
-     * @return Magazine The current object (for fluent API support)
-     */
-    public function setPublicationId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->publication_id !== $v) {
-            $this->publication_id = $v;
-            $this->modifiedColumns[] = MagazinePeer::PUBLICATION_ID;
-        }
-
-        if ($this->aPublication !== null && $this->aPublication->getId() !== $v) {
-            $this->aPublication = null;
-        }
-
-
-        return $this;
-    } // setPublicationId()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -168,7 +141,6 @@ abstract class BaseMagazine extends BaseObject implements Persistent
         try {
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-            $this->publication_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -177,7 +149,7 @@ abstract class BaseMagazine extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 2; // 2 = MagazinePeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 1; // 1 = MagazinePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Magazine object", $e);
@@ -200,9 +172,6 @@ abstract class BaseMagazine extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
-        if ($this->aPublication !== null && $this->publication_id !== $this->aPublication->getId()) {
-            $this->aPublication = null;
-        }
     } // ensureConsistency
 
     /**
@@ -242,7 +211,8 @@ abstract class BaseMagazine extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aPublication = null;
+            $this->singlePublication = null;
+
         } // if (deep)
     }
 
@@ -356,18 +326,6 @@ abstract class BaseMagazine extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
-            // We call the save method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aPublication !== null) {
-                if ($this->aPublication->isModified() || $this->aPublication->isNew()) {
-                    $affectedRows += $this->aPublication->save($con);
-                }
-                $this->setPublication($this->aPublication);
-            }
-
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -377,6 +335,21 @@ abstract class BaseMagazine extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->publicationsScheduledForDeletion !== null) {
+                if (!$this->publicationsScheduledForDeletion->isEmpty()) {
+                    PublicationQuery::create()
+                        ->filterByPrimaryKeys($this->publicationsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->publicationsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->singlePublication !== null) {
+                if (!$this->singlePublication->isDeleted() && ($this->singlePublication->isNew() || $this->singlePublication->isModified())) {
+                        $affectedRows += $this->singlePublication->save($con);
+                }
             }
 
             $this->alreadyInSave = false;
@@ -408,9 +381,6 @@ abstract class BaseMagazine extends BaseObject implements Persistent
         if ($this->isColumnModified(MagazinePeer::ID)) {
             $modifiedColumns[':p' . $index++]  = '`id`';
         }
-        if ($this->isColumnModified(MagazinePeer::PUBLICATION_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`publication_id`';
-        }
 
         $sql = sprintf(
             'INSERT INTO `magazine` (%s) VALUES (%s)',
@@ -424,9 +394,6 @@ abstract class BaseMagazine extends BaseObject implements Persistent
                 switch ($columnName) {
                     case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
-                        break;
-                    case '`publication_id`':
-                        $stmt->bindValue($identifier, $this->publication_id, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -522,22 +489,16 @@ abstract class BaseMagazine extends BaseObject implements Persistent
             $failureMap = array();
 
 
-            // We call the validate method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aPublication !== null) {
-                if (!$this->aPublication->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aPublication->getValidationFailures());
-                }
-            }
-
-
             if (($retval = MagazinePeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
+
+                if ($this->singlePublication !== null) {
+                    if (!$this->singlePublication->validate($columns)) {
+                        $failureMap = array_merge($failureMap, $this->singlePublication->getValidationFailures());
+                    }
+                }
 
 
             $this->alreadyInValidation = false;
@@ -577,9 +538,6 @@ abstract class BaseMagazine extends BaseObject implements Persistent
             case 0:
                 return $this->getId();
                 break;
-            case 1:
-                return $this->getPublicationId();
-                break;
             default:
                 return null;
                 break;
@@ -603,18 +561,17 @@ abstract class BaseMagazine extends BaseObject implements Persistent
      */
     public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['Magazine'][serialize($this->getPrimaryKey())])) {
+        if (isset($alreadyDumpedObjects['Magazine'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['Magazine'][serialize($this->getPrimaryKey())] = true;
+        $alreadyDumpedObjects['Magazine'][$this->getPrimaryKey()] = true;
         $keys = MagazinePeer::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getPublicationId(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aPublication) {
-                $result['Publication'] = $this->aPublication->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->singlePublication) {
+                $result['Publication'] = $this->singlePublication->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
             }
         }
 
@@ -653,9 +610,6 @@ abstract class BaseMagazine extends BaseObject implements Persistent
             case 0:
                 $this->setId($value);
                 break;
-            case 1:
-                $this->setPublicationId($value);
-                break;
         } // switch()
     }
 
@@ -681,7 +635,6 @@ abstract class BaseMagazine extends BaseObject implements Persistent
         $keys = MagazinePeer::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setPublicationId($arr[$keys[1]]);
     }
 
     /**
@@ -694,7 +647,6 @@ abstract class BaseMagazine extends BaseObject implements Persistent
         $criteria = new Criteria(MagazinePeer::DATABASE_NAME);
 
         if ($this->isColumnModified(MagazinePeer::ID)) $criteria->add(MagazinePeer::ID, $this->id);
-        if ($this->isColumnModified(MagazinePeer::PUBLICATION_ID)) $criteria->add(MagazinePeer::PUBLICATION_ID, $this->publication_id);
 
         return $criteria;
     }
@@ -711,35 +663,28 @@ abstract class BaseMagazine extends BaseObject implements Persistent
     {
         $criteria = new Criteria(MagazinePeer::DATABASE_NAME);
         $criteria->add(MagazinePeer::ID, $this->id);
-        $criteria->add(MagazinePeer::PUBLICATION_ID, $this->publication_id);
 
         return $criteria;
     }
 
     /**
-     * Returns the composite primary key for this object.
-     * The array elements will be in same order as specified in XML.
-     * @return array
+     * Returns the primary key for this object (row).
+     * @return int
      */
     public function getPrimaryKey()
     {
-        $pks = array();
-        $pks[0] = $this->getId();
-        $pks[1] = $this->getPublicationId();
-
-        return $pks;
+        return $this->getId();
     }
 
     /**
-     * Set the [composite] primary key.
+     * Generic method to set the primary key (id column).
      *
-     * @param array $keys The elements of the composite key (order must match the order in XML file).
+     * @param  int $key Primary key.
      * @return void
      */
-    public function setPrimaryKey($keys)
+    public function setPrimaryKey($key)
     {
-        $this->setId($keys[0]);
-        $this->setPublicationId($keys[1]);
+        $this->setId($key);
     }
 
     /**
@@ -749,7 +694,7 @@ abstract class BaseMagazine extends BaseObject implements Persistent
     public function isPrimaryKeyNull()
     {
 
-        return (null === $this->getId()) && (null === $this->getPublicationId());
+        return null === $this->getId();
     }
 
     /**
@@ -765,7 +710,6 @@ abstract class BaseMagazine extends BaseObject implements Persistent
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setPublicationId($this->getPublicationId());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -773,6 +717,11 @@ abstract class BaseMagazine extends BaseObject implements Persistent
             $copyObj->setNew(false);
             // store object hash to prevent cycle
             $this->startCopy = true;
+
+            $relObj = $this->getPublication();
+            if ($relObj) {
+                $copyObj->setPublication($relObj->copy($deepCopy));
+            }
 
             //unflag object copy
             $this->startCopy = false;
@@ -824,56 +773,53 @@ abstract class BaseMagazine extends BaseObject implements Persistent
         return self::$peer;
     }
 
+
     /**
-     * Declares an association between this object and a Publication object.
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param             Publication $v
+     * @param string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+    }
+
+    /**
+     * Gets a single Publication object, which is related to this object by a one-to-one relationship.
+     *
+     * @param PropelPDO $con optional connection object
+     * @return Publication
+     * @throws PropelException
+     */
+    public function getPublication(PropelPDO $con = null)
+    {
+
+        if ($this->singlePublication === null && !$this->isNew()) {
+            $this->singlePublication = PublicationQuery::create()->findPk($this->getPrimaryKey(), $con);
+        }
+
+        return $this->singlePublication;
+    }
+
+    /**
+     * Sets a single Publication object as related to this object by a one-to-one relationship.
+     *
+     * @param             Publication $v Publication
      * @return Magazine The current object (for fluent API support)
      * @throws PropelException
      */
     public function setPublication(Publication $v = null)
     {
-        if ($v === null) {
-            $this->setPublicationId(NULL);
-        } else {
-            $this->setPublicationId($v->getId());
+        $this->singlePublication = $v;
+
+        // Make sure that that the passed-in Publication isn't already associated with this object
+        if ($v !== null && $v->getMagazine(null, false) === null) {
+            $v->setMagazine($this);
         }
-
-        $this->aPublication = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Publication object, it will not be re-added.
-        if ($v !== null) {
-            $v->addMagazine($this);
-        }
-
 
         return $this;
-    }
-
-
-    /**
-     * Get the associated Publication object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @param $doQuery Executes a query to get the object if required
-     * @return Publication The associated Publication object.
-     * @throws PropelException
-     */
-    public function getPublication(PropelPDO $con = null, $doQuery = true)
-    {
-        if ($this->aPublication === null && ($this->publication_id !== null) && $doQuery) {
-            $this->aPublication = PublicationQuery::create()->findPk($this->publication_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aPublication->addMagazines($this);
-             */
-        }
-
-        return $this->aPublication;
     }
 
     /**
@@ -882,9 +828,9 @@ abstract class BaseMagazine extends BaseObject implements Persistent
     public function clear()
     {
         $this->id = null;
-        $this->publication_id = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -902,10 +848,19 @@ abstract class BaseMagazine extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->singlePublication) {
+                $this->singlePublication->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
-        $this->aPublication = null;
+        if ($this->singlePublication instanceof PropelCollection) {
+            $this->singlePublication->clearIterator();
+        }
+        $this->singlePublication = null;
     }
 
     /**
@@ -926,6 +881,26 @@ abstract class BaseMagazine extends BaseObject implements Persistent
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
+    }
+
+    /**
+     * Catches calls to virtual methods
+     */
+    public function __call($name, $params)
+    {
+
+        // delegate behavior
+
+        if (is_callable(array('DTA\MetadataBundle\Model\Publication', $name))) {
+            if (!$delegate = $this->getPublication()) {
+                $delegate = new Publication();
+                $this->setPublication($delegate);
+            }
+
+            return call_user_func_array(array($delegate, $name), $params);
+        }
+
+        return parent::__call($name, $params);
     }
 
 }

@@ -80,6 +80,12 @@ abstract class BasePublisher extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
@@ -113,7 +119,7 @@ abstract class BasePublisher extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -134,7 +140,7 @@ abstract class BasePublisher extends BaseObject implements Persistent
      */
     public function setPersonId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -1031,6 +1037,7 @@ abstract class BasePublisher extends BaseObject implements Persistent
                       $this->collWritsPartial = true;
                     }
 
+                    $collWrits->getInternalIterator()->rewind();
                     return $collWrits;
                 }
 
@@ -1062,9 +1069,11 @@ abstract class BasePublisher extends BaseObject implements Persistent
      */
     public function setWrits(PropelCollection $writs, PropelPDO $con = null)
     {
-        $this->writsScheduledForDeletion = $this->getWrits(new Criteria(), $con)->diff($writs);
+        $writsToDelete = $this->getWrits(new Criteria(), $con)->diff($writs);
 
-        foreach ($this->writsScheduledForDeletion as $writRemoved) {
+        $this->writsScheduledForDeletion = unserialize(serialize($writsToDelete));
+
+        foreach ($writsToDelete as $writRemoved) {
             $writRemoved->setPublisher(null);
         }
 
@@ -1294,6 +1303,7 @@ abstract class BasePublisher extends BaseObject implements Persistent
         $this->person_id = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1311,12 +1321,18 @@ abstract class BasePublisher extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collWrits) {
                 foreach ($this->collWrits as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->aPerson instanceof Persistent) {
+              $this->aPerson->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         if ($this->collWrits instanceof PropelCollection) {

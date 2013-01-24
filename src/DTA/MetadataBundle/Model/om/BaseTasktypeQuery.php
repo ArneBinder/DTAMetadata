@@ -70,7 +70,7 @@ abstract class BaseTasktypeQuery extends ModelCriteria
      * Returns a new TasktypeQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     TasktypeQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   TasktypeQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return TasktypeQuery
      */
@@ -132,8 +132,8 @@ abstract class BaseTasktypeQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Tasktype A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Tasktype A model object, or null if the key is not found
+     * @throws PropelException
      */
      public function findOneById($key, $con = null)
      {
@@ -147,8 +147,8 @@ abstract class BaseTasktypeQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Tasktype A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Tasktype A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -248,7 +248,8 @@ abstract class BaseTasktypeQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -261,8 +262,22 @@ abstract class BaseTasktypeQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(TasktypePeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(TasktypePeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(TasktypePeer::ID, $id, $comparison);
@@ -304,7 +319,8 @@ abstract class BaseTasktypeQuery extends ModelCriteria
      * <code>
      * $query->filterByTreeLeft(1234); // WHERE tree_left = 1234
      * $query->filterByTreeLeft(array(12, 34)); // WHERE tree_left IN (12, 34)
-     * $query->filterByTreeLeft(array('min' => 12)); // WHERE tree_left > 12
+     * $query->filterByTreeLeft(array('min' => 12)); // WHERE tree_left >= 12
+     * $query->filterByTreeLeft(array('max' => 12)); // WHERE tree_left <= 12
      * </code>
      *
      * @param     mixed $treeLeft The value to use as filter.
@@ -345,7 +361,8 @@ abstract class BaseTasktypeQuery extends ModelCriteria
      * <code>
      * $query->filterByTreeRight(1234); // WHERE tree_right = 1234
      * $query->filterByTreeRight(array(12, 34)); // WHERE tree_right IN (12, 34)
-     * $query->filterByTreeRight(array('min' => 12)); // WHERE tree_right > 12
+     * $query->filterByTreeRight(array('min' => 12)); // WHERE tree_right >= 12
+     * $query->filterByTreeRight(array('max' => 12)); // WHERE tree_right <= 12
      * </code>
      *
      * @param     mixed $treeRight The value to use as filter.
@@ -386,7 +403,8 @@ abstract class BaseTasktypeQuery extends ModelCriteria
      * <code>
      * $query->filterByTreeLevel(1234); // WHERE tree_level = 1234
      * $query->filterByTreeLevel(array(12, 34)); // WHERE tree_level IN (12, 34)
-     * $query->filterByTreeLevel(array('min' => 12)); // WHERE tree_level > 12
+     * $query->filterByTreeLevel(array('min' => 12)); // WHERE tree_level >= 12
+     * $query->filterByTreeLevel(array('max' => 12)); // WHERE tree_level <= 12
      * </code>
      *
      * @param     mixed $treeLevel The value to use as filter.
@@ -426,8 +444,8 @@ abstract class BaseTasktypeQuery extends ModelCriteria
      * @param   Task|PropelObjectCollection $task  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   TasktypeQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 TasktypeQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByTask($task, $comparison = null)
     {

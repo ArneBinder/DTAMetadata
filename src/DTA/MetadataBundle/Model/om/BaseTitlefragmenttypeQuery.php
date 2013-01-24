@@ -58,7 +58,7 @@ abstract class BaseTitlefragmenttypeQuery extends ModelCriteria
      * Returns a new TitlefragmenttypeQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     TitlefragmenttypeQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   TitlefragmenttypeQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return TitlefragmenttypeQuery
      */
@@ -120,8 +120,8 @@ abstract class BaseTitlefragmenttypeQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Titlefragmenttype A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Titlefragmenttype A model object, or null if the key is not found
+     * @throws PropelException
      */
      public function findOneById($key, $con = null)
      {
@@ -135,8 +135,8 @@ abstract class BaseTitlefragmenttypeQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Titlefragmenttype A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Titlefragmenttype A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -236,7 +236,8 @@ abstract class BaseTitlefragmenttypeQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -249,8 +250,22 @@ abstract class BaseTitlefragmenttypeQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(TitlefragmenttypePeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(TitlefragmenttypePeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(TitlefragmenttypePeer::ID, $id, $comparison);
@@ -291,8 +306,8 @@ abstract class BaseTitlefragmenttypeQuery extends ModelCriteria
      * @param   Titlefragment|PropelObjectCollection $titlefragment  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   TitlefragmenttypeQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 TitlefragmenttypeQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByTitlefragment($titlefragment, $comparison = null)
     {

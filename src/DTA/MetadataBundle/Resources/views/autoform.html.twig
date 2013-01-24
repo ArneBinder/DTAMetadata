@@ -1,29 +1,36 @@
-{% extends 'DTAMetadataBundle:'~ domainKey ~':base.html.twig' %}
+{# 
+    Template for rendering forms of any type.
 
-{# The dynamic extend is for extending the template of the currently active domain, 
-    (the domainKey value is usually passed by the renderWithDomainMenu method
-    within the DTABaseController that expects that the current domain controller
-    has overwritten it.
+The dynamic extend is for extending the template of the currently active domain, 
+    (the overridden domainKey value is passed by the renderWithDomainMenu method
+    within the DTABaseController.
     The according template files are located in 
         src/DTA/MetadataBundle/Resources/views/domainKey/base.html.twig
     Template inheritance is basically for inheriting the correct domain menu.
 #}
+{% extends 'DTAMetadataBundle:'~ domainKey ~':' ~ domainKey ~ '.html.twig' %}
 
-{#% form_theme form 'DTAMetadataBundle:Form:sortableCollection.html.twig' %#}
+
+
+{% form_theme form 'DTAMetadataBundle:Form:sortableCollection.html.twig' %}
 
 {% block core %}
-    {{domainKey}}
+
     <h3>{{className}}</h3>
-    <pre>{%if persistedObject is defined %}{{dump(persistedObject)}}{%endif%}</pre>
-    <form action="{{ path('genericNew', {'className':className}) }}" method="post" {{ form_enctype(form) }}>
-         
+
+    {{domainKey}}
+    
+    <hr/>
+    
+    <form action="{{ path('genericNew', {'className':className, 'domainKey': domainKey}) }}" method="post" {{ form_enctype(form) }}>
         {{ form_rest(form) }}
          <input type="submit"/>
     </form>
-   {# The actual code
-
-#}
-
+    
+    <hr/>
+    
+    <pre>{%if persistedObject is defined %}{{dump(persistedObject)}}{%endif%}</pre>
+   
     
 {% endblock %}
 

@@ -63,7 +63,7 @@ abstract class BasePersonalnameQuery extends ModelCriteria
      * Returns a new PersonalnameQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     PersonalnameQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   PersonalnameQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return PersonalnameQuery
      */
@@ -125,8 +125,8 @@ abstract class BasePersonalnameQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Personalname A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Personalname A model object, or null if the key is not found
+     * @throws PropelException
      */
      public function findOneById($key, $con = null)
      {
@@ -140,8 +140,8 @@ abstract class BasePersonalnameQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Personalname A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Personalname A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -241,7 +241,8 @@ abstract class BasePersonalnameQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -254,8 +255,22 @@ abstract class BasePersonalnameQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(PersonalnamePeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(PersonalnamePeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(PersonalnamePeer::ID, $id, $comparison);
@@ -268,7 +283,8 @@ abstract class BasePersonalnameQuery extends ModelCriteria
      * <code>
      * $query->filterByPersonId(1234); // WHERE person_id = 1234
      * $query->filterByPersonId(array(12, 34)); // WHERE person_id IN (12, 34)
-     * $query->filterByPersonId(array('min' => 12)); // WHERE person_id > 12
+     * $query->filterByPersonId(array('min' => 12)); // WHERE person_id >= 12
+     * $query->filterByPersonId(array('max' => 12)); // WHERE person_id <= 12
      * </code>
      *
      * @see       filterByPerson()
@@ -310,8 +326,8 @@ abstract class BasePersonalnameQuery extends ModelCriteria
      * @param   Person|PropelObjectCollection $person The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   PersonalnameQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 PersonalnameQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByPerson($person, $comparison = null)
     {
@@ -386,8 +402,8 @@ abstract class BasePersonalnameQuery extends ModelCriteria
      * @param   Namefragment|PropelObjectCollection $namefragment  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   PersonalnameQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 PersonalnameQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByNamefragment($namefragment, $comparison = null)
     {

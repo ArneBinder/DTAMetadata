@@ -72,7 +72,7 @@ abstract class BaseAuthorWorkQuery extends ModelCriteria
      * Returns a new AuthorWorkQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     AuthorWorkQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   AuthorWorkQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return AuthorWorkQuery
      */
@@ -136,8 +136,8 @@ abstract class BaseAuthorWorkQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   AuthorWork A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 AuthorWork A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -253,7 +253,8 @@ abstract class BaseAuthorWorkQuery extends ModelCriteria
      * <code>
      * $query->filterByWorkId(1234); // WHERE work_id = 1234
      * $query->filterByWorkId(array(12, 34)); // WHERE work_id IN (12, 34)
-     * $query->filterByWorkId(array('min' => 12)); // WHERE work_id > 12
+     * $query->filterByWorkId(array('min' => 12)); // WHERE work_id >= 12
+     * $query->filterByWorkId(array('max' => 12)); // WHERE work_id <= 12
      * </code>
      *
      * @see       filterByWork()
@@ -268,8 +269,22 @@ abstract class BaseAuthorWorkQuery extends ModelCriteria
      */
     public function filterByWorkId($workId = null, $comparison = null)
     {
-        if (is_array($workId) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($workId)) {
+            $useMinMax = false;
+            if (isset($workId['min'])) {
+                $this->addUsingAlias(AuthorWorkPeer::WORK_ID, $workId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($workId['max'])) {
+                $this->addUsingAlias(AuthorWorkPeer::WORK_ID, $workId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(AuthorWorkPeer::WORK_ID, $workId, $comparison);
@@ -282,7 +297,8 @@ abstract class BaseAuthorWorkQuery extends ModelCriteria
      * <code>
      * $query->filterByAuthorId(1234); // WHERE author_id = 1234
      * $query->filterByAuthorId(array(12, 34)); // WHERE author_id IN (12, 34)
-     * $query->filterByAuthorId(array('min' => 12)); // WHERE author_id > 12
+     * $query->filterByAuthorId(array('min' => 12)); // WHERE author_id >= 12
+     * $query->filterByAuthorId(array('max' => 12)); // WHERE author_id <= 12
      * </code>
      *
      * @see       filterByAuthor()
@@ -297,8 +313,22 @@ abstract class BaseAuthorWorkQuery extends ModelCriteria
      */
     public function filterByAuthorId($authorId = null, $comparison = null)
     {
-        if (is_array($authorId) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($authorId)) {
+            $useMinMax = false;
+            if (isset($authorId['min'])) {
+                $this->addUsingAlias(AuthorWorkPeer::AUTHOR_ID, $authorId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($authorId['max'])) {
+                $this->addUsingAlias(AuthorWorkPeer::AUTHOR_ID, $authorId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(AuthorWorkPeer::AUTHOR_ID, $authorId, $comparison);
@@ -311,7 +341,8 @@ abstract class BaseAuthorWorkQuery extends ModelCriteria
      * <code>
      * $query->filterByAuthorPersonId(1234); // WHERE author_person_id = 1234
      * $query->filterByAuthorPersonId(array(12, 34)); // WHERE author_person_id IN (12, 34)
-     * $query->filterByAuthorPersonId(array('min' => 12)); // WHERE author_person_id > 12
+     * $query->filterByAuthorPersonId(array('min' => 12)); // WHERE author_person_id >= 12
+     * $query->filterByAuthorPersonId(array('max' => 12)); // WHERE author_person_id <= 12
      * </code>
      *
      * @see       filterByAuthor()
@@ -326,8 +357,22 @@ abstract class BaseAuthorWorkQuery extends ModelCriteria
      */
     public function filterByAuthorPersonId($authorPersonId = null, $comparison = null)
     {
-        if (is_array($authorPersonId) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($authorPersonId)) {
+            $useMinMax = false;
+            if (isset($authorPersonId['min'])) {
+                $this->addUsingAlias(AuthorWorkPeer::AUTHOR_PERSON_ID, $authorPersonId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($authorPersonId['max'])) {
+                $this->addUsingAlias(AuthorWorkPeer::AUTHOR_PERSON_ID, $authorPersonId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(AuthorWorkPeer::AUTHOR_PERSON_ID, $authorPersonId, $comparison);
@@ -340,7 +385,8 @@ abstract class BaseAuthorWorkQuery extends ModelCriteria
      * <code>
      * $query->filterByNameId(1234); // WHERE name_id = 1234
      * $query->filterByNameId(array(12, 34)); // WHERE name_id IN (12, 34)
-     * $query->filterByNameId(array('min' => 12)); // WHERE name_id > 12
+     * $query->filterByNameId(array('min' => 12)); // WHERE name_id >= 12
+     * $query->filterByNameId(array('max' => 12)); // WHERE name_id <= 12
      * </code>
      *
      * @param     mixed $nameId The value to use as filter.
@@ -380,8 +426,8 @@ abstract class BaseAuthorWorkQuery extends ModelCriteria
      * @param   Work|PropelObjectCollection $work The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   AuthorWorkQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 AuthorWorkQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByWork($work, $comparison = null)
     {
@@ -456,8 +502,8 @@ abstract class BaseAuthorWorkQuery extends ModelCriteria
      * @param   Author $author The related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   AuthorWorkQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 AuthorWorkQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByAuthor($author, $comparison = null)
     {

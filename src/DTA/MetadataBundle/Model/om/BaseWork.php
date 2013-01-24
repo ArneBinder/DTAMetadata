@@ -180,6 +180,12 @@ abstract class BaseWork extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
@@ -315,7 +321,7 @@ abstract class BaseWork extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -336,7 +342,7 @@ abstract class BaseWork extends BaseObject implements Persistent
      */
     public function setStatusId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -361,7 +367,7 @@ abstract class BaseWork extends BaseObject implements Persistent
      */
     public function setDatespecificationId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -386,7 +392,7 @@ abstract class BaseWork extends BaseObject implements Persistent
      */
     public function setGenreId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -411,7 +417,7 @@ abstract class BaseWork extends BaseObject implements Persistent
      */
     public function setSubgenreId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -436,7 +442,7 @@ abstract class BaseWork extends BaseObject implements Persistent
      */
     public function setDwdsgenreId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -461,7 +467,7 @@ abstract class BaseWork extends BaseObject implements Persistent
      */
     public function setDwdssubgenreId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -486,7 +492,7 @@ abstract class BaseWork extends BaseObject implements Persistent
      */
     public function setDoi($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -507,7 +513,7 @@ abstract class BaseWork extends BaseObject implements Persistent
      */
     public function setComments($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -528,7 +534,7 @@ abstract class BaseWork extends BaseObject implements Persistent
      */
     public function setFormat($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -549,7 +555,7 @@ abstract class BaseWork extends BaseObject implements Persistent
      */
     public function setDirectoryname($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -889,6 +895,12 @@ abstract class BaseWork extends BaseObject implements Persistent
                 }
 
                 foreach ($this->getAuthors() as $author) {
+                    if ($author->isModified()) {
+                        $author->save($con);
+                    }
+                }
+            } elseif ($this->collAuthors) {
+                foreach ($this->collAuthors as $author) {
                     if ($author->isModified()) {
                         $author->save($con);
                     }
@@ -2007,6 +2019,7 @@ abstract class BaseWork extends BaseObject implements Persistent
                       $this->collWritsPartial = true;
                     }
 
+                    $collWrits->getInternalIterator()->rewind();
                     return $collWrits;
                 }
 
@@ -2038,9 +2051,11 @@ abstract class BaseWork extends BaseObject implements Persistent
      */
     public function setWrits(PropelCollection $writs, PropelPDO $con = null)
     {
-        $this->writsScheduledForDeletion = $this->getWrits(new Criteria(), $con)->diff($writs);
+        $writsToDelete = $this->getWrits(new Criteria(), $con)->diff($writs);
 
-        foreach ($this->writsScheduledForDeletion as $writRemoved) {
+        $this->writsScheduledForDeletion = unserialize(serialize($writsToDelete));
+
+        foreach ($writsToDelete as $writRemoved) {
             $writRemoved->setWork(null);
         }
 
@@ -2129,7 +2144,7 @@ abstract class BaseWork extends BaseObject implements Persistent
                 $this->writsScheduledForDeletion = clone $this->collWrits;
                 $this->writsScheduledForDeletion->clear();
             }
-            $this->writsScheduledForDeletion[]= $writ;
+            $this->writsScheduledForDeletion[]= clone $writ;
             $writ->setWork(null);
         }
 
@@ -2347,6 +2362,7 @@ abstract class BaseWork extends BaseObject implements Persistent
                       $this->collAuthorWorksPartial = true;
                     }
 
+                    $collAuthorWorks->getInternalIterator()->rewind();
                     return $collAuthorWorks;
                 }
 
@@ -2378,9 +2394,11 @@ abstract class BaseWork extends BaseObject implements Persistent
      */
     public function setAuthorWorks(PropelCollection $authorWorks, PropelPDO $con = null)
     {
-        $this->authorWorksScheduledForDeletion = $this->getAuthorWorks(new Criteria(), $con)->diff($authorWorks);
+        $authorWorksToDelete = $this->getAuthorWorks(new Criteria(), $con)->diff($authorWorks);
 
-        foreach ($this->authorWorksScheduledForDeletion as $authorWorkRemoved) {
+        $this->authorWorksScheduledForDeletion = unserialize(serialize($authorWorksToDelete));
+
+        foreach ($authorWorksToDelete as $authorWorkRemoved) {
             $authorWorkRemoved->setWork(null);
         }
 
@@ -2469,7 +2487,7 @@ abstract class BaseWork extends BaseObject implements Persistent
                 $this->authorWorksScheduledForDeletion = clone $this->collAuthorWorks;
                 $this->authorWorksScheduledForDeletion->clear();
             }
-            $this->authorWorksScheduledForDeletion[]= $authorWork;
+            $this->authorWorksScheduledForDeletion[]= clone $authorWork;
             $authorWork->setWork(null);
         }
 
@@ -2696,6 +2714,7 @@ abstract class BaseWork extends BaseObject implements Persistent
         $this->directoryname = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -2713,7 +2732,8 @@ abstract class BaseWork extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collWrits) {
                 foreach ($this->collWrits as $o) {
                     $o->clearAllReferences($deep);
@@ -2729,6 +2749,26 @@ abstract class BaseWork extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->aStatus instanceof Persistent) {
+              $this->aStatus->clearAllReferences($deep);
+            }
+            if ($this->aGenreRelatedByGenreId instanceof Persistent) {
+              $this->aGenreRelatedByGenreId->clearAllReferences($deep);
+            }
+            if ($this->aGenreRelatedBySubgenreId instanceof Persistent) {
+              $this->aGenreRelatedBySubgenreId->clearAllReferences($deep);
+            }
+            if ($this->aDwdsgenreRelatedByDwdsgenreId instanceof Persistent) {
+              $this->aDwdsgenreRelatedByDwdsgenreId->clearAllReferences($deep);
+            }
+            if ($this->aDwdsgenreRelatedByDwdssubgenreId instanceof Persistent) {
+              $this->aDwdsgenreRelatedByDwdssubgenreId->clearAllReferences($deep);
+            }
+            if ($this->aDatespecification instanceof Persistent) {
+              $this->aDatespecification->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         if ($this->collWrits instanceof PropelCollection) {

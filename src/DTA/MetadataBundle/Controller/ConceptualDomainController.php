@@ -29,7 +29,7 @@ class ConceptualDomainController extends DTABaseController {
         $writ = new \DTA\MetadataBundle\Model\Writ();
         $writ->setNumpages(3);
         $writ->save();
-        return $this->renderWithDomainMenu('DTAMetadataBundle:ConceptualDomain:index.html.twig', array(
+        return $this->renderDomainSpecific('DTAMetadataBundle:ConceptualDomain:index.html.twig', array(
                     'persistedObject' => $writ,
                     ));
     }

@@ -131,6 +131,12 @@ abstract class BasePartner extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * Get the [id] column value.
      *
      * @return int
@@ -298,7 +304,7 @@ abstract class BasePartner extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -319,7 +325,7 @@ abstract class BasePartner extends BaseObject implements Persistent
      */
     public function setName($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -340,7 +346,7 @@ abstract class BasePartner extends BaseObject implements Persistent
      */
     public function setAdress($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -361,7 +367,7 @@ abstract class BasePartner extends BaseObject implements Persistent
      */
     public function setPerson($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -382,7 +388,7 @@ abstract class BasePartner extends BaseObject implements Persistent
      */
     public function setMail($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -403,7 +409,7 @@ abstract class BasePartner extends BaseObject implements Persistent
      */
     public function setWeb($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -424,7 +430,7 @@ abstract class BasePartner extends BaseObject implements Persistent
      */
     public function setComments($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -445,7 +451,7 @@ abstract class BasePartner extends BaseObject implements Persistent
      */
     public function setPhone1($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -466,7 +472,7 @@ abstract class BasePartner extends BaseObject implements Persistent
      */
     public function setPhone2($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -487,7 +493,7 @@ abstract class BasePartner extends BaseObject implements Persistent
      */
     public function setPhone3($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -508,7 +514,7 @@ abstract class BasePartner extends BaseObject implements Persistent
      */
     public function setFax($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -552,7 +558,7 @@ abstract class BasePartner extends BaseObject implements Persistent
      */
     public function setLogLastUser($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -1408,6 +1414,7 @@ abstract class BasePartner extends BaseObject implements Persistent
         $this->log_last_user = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1425,7 +1432,10 @@ abstract class BasePartner extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
     }

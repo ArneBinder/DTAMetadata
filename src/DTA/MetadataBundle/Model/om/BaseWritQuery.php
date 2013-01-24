@@ -128,7 +128,7 @@ abstract class BaseWritQuery extends ModelCriteria
      * Returns a new WritQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     WritQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   WritQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return WritQuery
      */
@@ -190,8 +190,8 @@ abstract class BaseWritQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Writ A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Writ A model object, or null if the key is not found
+     * @throws PropelException
      */
      public function findOneById($key, $con = null)
      {
@@ -205,8 +205,8 @@ abstract class BaseWritQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Writ A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Writ A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
@@ -306,7 +306,8 @@ abstract class BaseWritQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -319,8 +320,22 @@ abstract class BaseWritQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(WritPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(WritPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(WritPeer::ID, $id, $comparison);
@@ -333,7 +348,8 @@ abstract class BaseWritQuery extends ModelCriteria
      * <code>
      * $query->filterByWorkId(1234); // WHERE work_id = 1234
      * $query->filterByWorkId(array(12, 34)); // WHERE work_id IN (12, 34)
-     * $query->filterByWorkId(array('min' => 12)); // WHERE work_id > 12
+     * $query->filterByWorkId(array('min' => 12)); // WHERE work_id >= 12
+     * $query->filterByWorkId(array('max' => 12)); // WHERE work_id <= 12
      * </code>
      *
      * @see       filterByWork()
@@ -376,7 +392,8 @@ abstract class BaseWritQuery extends ModelCriteria
      * <code>
      * $query->filterByPublicationId(1234); // WHERE publication_id = 1234
      * $query->filterByPublicationId(array(12, 34)); // WHERE publication_id IN (12, 34)
-     * $query->filterByPublicationId(array('min' => 12)); // WHERE publication_id > 12
+     * $query->filterByPublicationId(array('min' => 12)); // WHERE publication_id >= 12
+     * $query->filterByPublicationId(array('max' => 12)); // WHERE publication_id <= 12
      * </code>
      *
      * @see       filterByPublication()
@@ -419,7 +436,8 @@ abstract class BaseWritQuery extends ModelCriteria
      * <code>
      * $query->filterByPublisherId(1234); // WHERE publisher_id = 1234
      * $query->filterByPublisherId(array(12, 34)); // WHERE publisher_id IN (12, 34)
-     * $query->filterByPublisherId(array('min' => 12)); // WHERE publisher_id > 12
+     * $query->filterByPublisherId(array('min' => 12)); // WHERE publisher_id >= 12
+     * $query->filterByPublisherId(array('max' => 12)); // WHERE publisher_id <= 12
      * </code>
      *
      * @see       filterByPublisher()
@@ -462,7 +480,8 @@ abstract class BaseWritQuery extends ModelCriteria
      * <code>
      * $query->filterByPrinterId(1234); // WHERE printer_id = 1234
      * $query->filterByPrinterId(array(12, 34)); // WHERE printer_id IN (12, 34)
-     * $query->filterByPrinterId(array('min' => 12)); // WHERE printer_id > 12
+     * $query->filterByPrinterId(array('min' => 12)); // WHERE printer_id >= 12
+     * $query->filterByPrinterId(array('max' => 12)); // WHERE printer_id <= 12
      * </code>
      *
      * @see       filterByPrinter()
@@ -505,7 +524,8 @@ abstract class BaseWritQuery extends ModelCriteria
      * <code>
      * $query->filterByTranslatorId(1234); // WHERE translator_id = 1234
      * $query->filterByTranslatorId(array(12, 34)); // WHERE translator_id IN (12, 34)
-     * $query->filterByTranslatorId(array('min' => 12)); // WHERE translator_id > 12
+     * $query->filterByTranslatorId(array('min' => 12)); // WHERE translator_id >= 12
+     * $query->filterByTranslatorId(array('max' => 12)); // WHERE translator_id <= 12
      * </code>
      *
      * @see       filterByTranslator()
@@ -548,7 +568,8 @@ abstract class BaseWritQuery extends ModelCriteria
      * <code>
      * $query->filterByNumpages(1234); // WHERE numPages = 1234
      * $query->filterByNumpages(array(12, 34)); // WHERE numPages IN (12, 34)
-     * $query->filterByNumpages(array('min' => 12)); // WHERE numPages > 12
+     * $query->filterByNumpages(array('min' => 12)); // WHERE numPages >= 12
+     * $query->filterByNumpages(array('max' => 12)); // WHERE numPages <= 12
      * </code>
      *
      * @param     mixed $numpages The value to use as filter.
@@ -589,7 +610,8 @@ abstract class BaseWritQuery extends ModelCriteria
      * <code>
      * $query->filterByRelatedsetId(1234); // WHERE relatedSet_id = 1234
      * $query->filterByRelatedsetId(array(12, 34)); // WHERE relatedSet_id IN (12, 34)
-     * $query->filterByRelatedsetId(array('min' => 12)); // WHERE relatedSet_id > 12
+     * $query->filterByRelatedsetId(array('min' => 12)); // WHERE relatedSet_id >= 12
+     * $query->filterByRelatedsetId(array('max' => 12)); // WHERE relatedSet_id <= 12
      * </code>
      *
      * @see       filterByRelatedset()
@@ -631,8 +653,8 @@ abstract class BaseWritQuery extends ModelCriteria
      * @param   Work|PropelObjectCollection $work The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   WritQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 WritQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByWork($work, $comparison = null)
     {
@@ -707,8 +729,8 @@ abstract class BaseWritQuery extends ModelCriteria
      * @param   Publisher|PropelObjectCollection $publisher The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   WritQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 WritQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByPublisher($publisher, $comparison = null)
     {
@@ -783,8 +805,8 @@ abstract class BaseWritQuery extends ModelCriteria
      * @param   Printer|PropelObjectCollection $printer The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   WritQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 WritQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByPrinter($printer, $comparison = null)
     {
@@ -859,8 +881,8 @@ abstract class BaseWritQuery extends ModelCriteria
      * @param   Translator|PropelObjectCollection $translator The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   WritQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 WritQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByTranslator($translator, $comparison = null)
     {
@@ -935,8 +957,8 @@ abstract class BaseWritQuery extends ModelCriteria
      * @param   Publication|PropelObjectCollection $publication The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   WritQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 WritQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByPublication($publication, $comparison = null)
     {
@@ -1011,8 +1033,8 @@ abstract class BaseWritQuery extends ModelCriteria
      * @param   Relatedset|PropelObjectCollection $relatedset The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   WritQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 WritQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByRelatedset($relatedset, $comparison = null)
     {
@@ -1087,8 +1109,8 @@ abstract class BaseWritQuery extends ModelCriteria
      * @param   Corpus|PropelObjectCollection $corpus  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   WritQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 WritQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByCorpus($corpus, $comparison = null)
     {
@@ -1161,8 +1183,8 @@ abstract class BaseWritQuery extends ModelCriteria
      * @param   Source|PropelObjectCollection $source  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   WritQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 WritQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterBySource($source, $comparison = null)
     {
@@ -1235,8 +1257,8 @@ abstract class BaseWritQuery extends ModelCriteria
      * @param   Task|PropelObjectCollection $task  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   WritQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 WritQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByTask($task, $comparison = null)
     {
@@ -1309,8 +1331,8 @@ abstract class BaseWritQuery extends ModelCriteria
      * @param   WritWritgroup|PropelObjectCollection $writWritgroup  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   WritQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 WritQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByWritWritgroup($writWritgroup, $comparison = null)
     {

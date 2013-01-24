@@ -182,6 +182,12 @@ abstract class BaseWrit extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
@@ -299,7 +305,7 @@ abstract class BaseWrit extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -320,7 +326,7 @@ abstract class BaseWrit extends BaseObject implements Persistent
      */
     public function setWorkId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -345,7 +351,7 @@ abstract class BaseWrit extends BaseObject implements Persistent
      */
     public function setPublicationId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -370,7 +376,7 @@ abstract class BaseWrit extends BaseObject implements Persistent
      */
     public function setPublisherId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -395,7 +401,7 @@ abstract class BaseWrit extends BaseObject implements Persistent
      */
     public function setPrinterId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -420,7 +426,7 @@ abstract class BaseWrit extends BaseObject implements Persistent
      */
     public function setTranslatorId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -445,7 +451,7 @@ abstract class BaseWrit extends BaseObject implements Persistent
      */
     public function setNumpages($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -466,7 +472,7 @@ abstract class BaseWrit extends BaseObject implements Persistent
      */
     public function setRelatedsetId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -811,6 +817,12 @@ abstract class BaseWrit extends BaseObject implements Persistent
                 }
 
                 foreach ($this->getWritgroups() as $writgroup) {
+                    if ($writgroup->isModified()) {
+                        $writgroup->save($con);
+                    }
+                }
+            } elseif ($this->collWritgroups) {
+                foreach ($this->collWritgroups as $writgroup) {
                     if ($writgroup->isModified()) {
                         $writgroup->save($con);
                     }
@@ -1963,6 +1975,7 @@ abstract class BaseWrit extends BaseObject implements Persistent
                       $this->collCorpusesPartial = true;
                     }
 
+                    $collCorpuses->getInternalIterator()->rewind();
                     return $collCorpuses;
                 }
 
@@ -1994,9 +2007,11 @@ abstract class BaseWrit extends BaseObject implements Persistent
      */
     public function setCorpuses(PropelCollection $corpuses, PropelPDO $con = null)
     {
-        $this->corpusesScheduledForDeletion = $this->getCorpuses(new Criteria(), $con)->diff($corpuses);
+        $corpusesToDelete = $this->getCorpuses(new Criteria(), $con)->diff($corpuses);
 
-        foreach ($this->corpusesScheduledForDeletion as $corpusRemoved) {
+        $this->corpusesScheduledForDeletion = unserialize(serialize($corpusesToDelete));
+
+        foreach ($corpusesToDelete as $corpusRemoved) {
             $corpusRemoved->setWrit(null);
         }
 
@@ -2178,6 +2193,7 @@ abstract class BaseWrit extends BaseObject implements Persistent
                       $this->collSourcesPartial = true;
                     }
 
+                    $collSources->getInternalIterator()->rewind();
                     return $collSources;
                 }
 
@@ -2209,9 +2225,11 @@ abstract class BaseWrit extends BaseObject implements Persistent
      */
     public function setSources(PropelCollection $sources, PropelPDO $con = null)
     {
-        $this->sourcesScheduledForDeletion = $this->getSources(new Criteria(), $con)->diff($sources);
+        $sourcesToDelete = $this->getSources(new Criteria(), $con)->diff($sources);
 
-        foreach ($this->sourcesScheduledForDeletion as $sourceRemoved) {
+        $this->sourcesScheduledForDeletion = unserialize(serialize($sourcesToDelete));
+
+        foreach ($sourcesToDelete as $sourceRemoved) {
             $sourceRemoved->setWrit(null);
         }
 
@@ -2300,7 +2318,7 @@ abstract class BaseWrit extends BaseObject implements Persistent
                 $this->sourcesScheduledForDeletion = clone $this->collSources;
                 $this->sourcesScheduledForDeletion->clear();
             }
-            $this->sourcesScheduledForDeletion[]= $source;
+            $this->sourcesScheduledForDeletion[]= clone $source;
             $source->setWrit(null);
         }
 
@@ -2393,6 +2411,7 @@ abstract class BaseWrit extends BaseObject implements Persistent
                       $this->collTasksPartial = true;
                     }
 
+                    $collTasks->getInternalIterator()->rewind();
                     return $collTasks;
                 }
 
@@ -2424,9 +2443,11 @@ abstract class BaseWrit extends BaseObject implements Persistent
      */
     public function setTasks(PropelCollection $tasks, PropelPDO $con = null)
     {
-        $this->tasksScheduledForDeletion = $this->getTasks(new Criteria(), $con)->diff($tasks);
+        $tasksToDelete = $this->getTasks(new Criteria(), $con)->diff($tasks);
 
-        foreach ($this->tasksScheduledForDeletion as $taskRemoved) {
+        $this->tasksScheduledForDeletion = unserialize(serialize($tasksToDelete));
+
+        foreach ($tasksToDelete as $taskRemoved) {
             $taskRemoved->setWrit(null);
         }
 
@@ -2683,6 +2704,7 @@ abstract class BaseWrit extends BaseObject implements Persistent
                       $this->collWritWritgroupsPartial = true;
                     }
 
+                    $collWritWritgroups->getInternalIterator()->rewind();
                     return $collWritWritgroups;
                 }
 
@@ -2714,9 +2736,11 @@ abstract class BaseWrit extends BaseObject implements Persistent
      */
     public function setWritWritgroups(PropelCollection $writWritgroups, PropelPDO $con = null)
     {
-        $this->writWritgroupsScheduledForDeletion = $this->getWritWritgroups(new Criteria(), $con)->diff($writWritgroups);
+        $writWritgroupsToDelete = $this->getWritWritgroups(new Criteria(), $con)->diff($writWritgroups);
 
-        foreach ($this->writWritgroupsScheduledForDeletion as $writWritgroupRemoved) {
+        $this->writWritgroupsScheduledForDeletion = unserialize(serialize($writWritgroupsToDelete));
+
+        foreach ($writWritgroupsToDelete as $writWritgroupRemoved) {
             $writWritgroupRemoved->setWrit(null);
         }
 
@@ -2805,7 +2829,7 @@ abstract class BaseWrit extends BaseObject implements Persistent
                 $this->writWritgroupsScheduledForDeletion = clone $this->collWritWritgroups;
                 $this->writWritgroupsScheduledForDeletion->clear();
             }
-            $this->writWritgroupsScheduledForDeletion[]= $writWritgroup;
+            $this->writWritgroupsScheduledForDeletion[]= clone $writWritgroup;
             $writWritgroup->setWrit(null);
         }
 
@@ -3029,6 +3053,7 @@ abstract class BaseWrit extends BaseObject implements Persistent
         $this->relatedset_id = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -3046,7 +3071,8 @@ abstract class BaseWrit extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collCorpuses) {
                 foreach ($this->collCorpuses as $o) {
                     $o->clearAllReferences($deep);
@@ -3072,6 +3098,26 @@ abstract class BaseWrit extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->aWork instanceof Persistent) {
+              $this->aWork->clearAllReferences($deep);
+            }
+            if ($this->aPublisher instanceof Persistent) {
+              $this->aPublisher->clearAllReferences($deep);
+            }
+            if ($this->aPrinter instanceof Persistent) {
+              $this->aPrinter->clearAllReferences($deep);
+            }
+            if ($this->aTranslator instanceof Persistent) {
+              $this->aTranslator->clearAllReferences($deep);
+            }
+            if ($this->aPublication instanceof Persistent) {
+              $this->aPublication->clearAllReferences($deep);
+            }
+            if ($this->aRelatedset instanceof Persistent) {
+              $this->aRelatedset->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         if ($this->collCorpuses instanceof PropelCollection) {
