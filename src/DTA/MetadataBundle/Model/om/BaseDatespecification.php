@@ -20,8 +20,6 @@ use DTA\MetadataBundle\Model\Essay;
 use DTA\MetadataBundle\Model\EssayQuery;
 use DTA\MetadataBundle\Model\Magazine;
 use DTA\MetadataBundle\Model\MagazineQuery;
-use DTA\MetadataBundle\Model\Monograph;
-use DTA\MetadataBundle\Model\MonographQuery;
 use DTA\MetadataBundle\Model\Publication;
 use DTA\MetadataBundle\Model\PublicationQuery;
 use DTA\MetadataBundle\Model\Series;
@@ -88,12 +86,6 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
     protected $collWorksPartial;
 
     /**
-     * @var        PropelObjectCollection|Monograph[] Collection to store aggregation of Monograph objects.
-     */
-    protected $collMonographs;
-    protected $collMonographsPartial;
-
-    /**
      * @var        PropelObjectCollection|Essay[] Collection to store aggregation of Essay objects.
      */
     protected $collEssays;
@@ -142,12 +134,6 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $worksScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $monographsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -434,8 +420,6 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
 
             $this->collWorks = null;
 
-            $this->collMonographs = null;
-
             $this->collEssays = null;
 
             $this->collMagazines = null;
@@ -596,24 +580,6 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
 
             if ($this->collWorks !== null) {
                 foreach ($this->collWorks as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
-            if ($this->monographsScheduledForDeletion !== null) {
-                if (!$this->monographsScheduledForDeletion->isEmpty()) {
-                    foreach ($this->monographsScheduledForDeletion as $monograph) {
-                        // need to save related object because we set the relation to null
-                        $monograph->save($con);
-                    }
-                    $this->monographsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collMonographs !== null) {
-                foreach ($this->collMonographs as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -850,14 +816,6 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
                     }
                 }
 
-                if ($this->collMonographs !== null) {
-                    foreach ($this->collMonographs as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
                 if ($this->collEssays !== null) {
                     foreach ($this->collEssays as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -969,9 +927,6 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
             }
             if (null !== $this->collWorks) {
                 $result['Works'] = $this->collWorks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
-            if (null !== $this->collMonographs) {
-                $result['Monographs'] = $this->collMonographs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collEssays) {
                 $result['Essays'] = $this->collEssays->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1157,12 +1112,6 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
                 }
             }
 
-            foreach ($this->getMonographs() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addMonograph($relObj->copy($deepCopy));
-                }
-            }
-
             foreach ($this->getEssays() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addEssay($relObj->copy($deepCopy));
@@ -1247,9 +1196,6 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
         }
         if ('Work' == $relationName) {
             $this->initWorks();
-        }
-        if ('Monograph' == $relationName) {
-            $this->initMonographs();
         }
         if ('Essay' == $relationName) {
             $this->initEssays();
@@ -2021,424 +1967,6 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
         $query->joinWith('DwdsgenreRelatedByDwdssubgenreId', $join_behavior);
 
         return $this->getWorks($query, $con);
-    }
-
-    /**
-     * Clears out the collMonographs collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return Datespecification The current object (for fluent API support)
-     * @see        addMonographs()
-     */
-    public function clearMonographs()
-    {
-        $this->collMonographs = null; // important to set this to null since that means it is uninitialized
-        $this->collMonographsPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * reset is the collMonographs collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialMonographs($v = true)
-    {
-        $this->collMonographsPartial = $v;
-    }
-
-    /**
-     * Initializes the collMonographs collection.
-     *
-     * By default this just sets the collMonographs collection to an empty array (like clearcollMonographs());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initMonographs($overrideExisting = true)
-    {
-        if (null !== $this->collMonographs && !$overrideExisting) {
-            return;
-        }
-        $this->collMonographs = new PropelObjectCollection();
-        $this->collMonographs->setModel('Monograph');
-    }
-
-    /**
-     * Gets an array of Monograph objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Datespecification is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|Monograph[] List of Monograph objects
-     * @throws PropelException
-     */
-    public function getMonographs($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collMonographsPartial && !$this->isNew();
-        if (null === $this->collMonographs || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collMonographs) {
-                // return empty collection
-                $this->initMonographs();
-            } else {
-                $collMonographs = MonographQuery::create(null, $criteria)
-                    ->filterByDatespecification($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collMonographsPartial && count($collMonographs)) {
-                      $this->initMonographs(false);
-
-                      foreach($collMonographs as $obj) {
-                        if (false == $this->collMonographs->contains($obj)) {
-                          $this->collMonographs->append($obj);
-                        }
-                      }
-
-                      $this->collMonographsPartial = true;
-                    }
-
-                    $collMonographs->getInternalIterator()->rewind();
-                    return $collMonographs;
-                }
-
-                if($partial && $this->collMonographs) {
-                    foreach($this->collMonographs as $obj) {
-                        if($obj->isNew()) {
-                            $collMonographs[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collMonographs = $collMonographs;
-                $this->collMonographsPartial = false;
-            }
-        }
-
-        return $this->collMonographs;
-    }
-
-    /**
-     * Sets a collection of Monograph objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $monographs A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     * @return Datespecification The current object (for fluent API support)
-     */
-    public function setMonographs(PropelCollection $monographs, PropelPDO $con = null)
-    {
-        $monographsToDelete = $this->getMonographs(new Criteria(), $con)->diff($monographs);
-
-        $this->monographsScheduledForDeletion = unserialize(serialize($monographsToDelete));
-
-        foreach ($monographsToDelete as $monographRemoved) {
-            $monographRemoved->setDatespecification(null);
-        }
-
-        $this->collMonographs = null;
-        foreach ($monographs as $monograph) {
-            $this->addMonograph($monograph);
-        }
-
-        $this->collMonographs = $monographs;
-        $this->collMonographsPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related Monograph objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related Monograph objects.
-     * @throws PropelException
-     */
-    public function countMonographs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collMonographsPartial && !$this->isNew();
-        if (null === $this->collMonographs || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collMonographs) {
-                return 0;
-            }
-
-            if($partial && !$criteria) {
-                return count($this->getMonographs());
-            }
-            $query = MonographQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByDatespecification($this)
-                ->count($con);
-        }
-
-        return count($this->collMonographs);
-    }
-
-    /**
-     * Method called to associate a Monograph object to this object
-     * through the Monograph foreign key attribute.
-     *
-     * @param    Monograph $l Monograph
-     * @return Datespecification The current object (for fluent API support)
-     */
-    public function addMonograph(Monograph $l)
-    {
-        if ($this->collMonographs === null) {
-            $this->initMonographs();
-            $this->collMonographsPartial = true;
-        }
-        if (!in_array($l, $this->collMonographs->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddMonograph($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	Monograph $monograph The monograph object to add.
-     */
-    protected function doAddMonograph($monograph)
-    {
-        $this->collMonographs[]= $monograph;
-        $monograph->setDatespecification($this);
-    }
-
-    /**
-     * @param	Monograph $monograph The monograph object to remove.
-     * @return Datespecification The current object (for fluent API support)
-     */
-    public function removeMonograph($monograph)
-    {
-        if ($this->getMonographs()->contains($monograph)) {
-            $this->collMonographs->remove($this->collMonographs->search($monograph));
-            if (null === $this->monographsScheduledForDeletion) {
-                $this->monographsScheduledForDeletion = clone $this->collMonographs;
-                $this->monographsScheduledForDeletion->clear();
-            }
-            $this->monographsScheduledForDeletion[]= $monograph;
-            $monograph->setDatespecification(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Datespecification is new, it will return
-     * an empty collection; or if this Datespecification has previously
-     * been saved, it will retrieve related Monographs from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Datespecification.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Monograph[] List of Monograph objects
-     */
-    public function getMonographsJoinWork($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = MonographQuery::create(null, $criteria);
-        $query->joinWith('Work', $join_behavior);
-
-        return $this->getMonographs($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Datespecification is new, it will return
-     * an empty collection; or if this Datespecification has previously
-     * been saved, it will retrieve related Monographs from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Datespecification.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Monograph[] List of Monograph objects
-     */
-    public function getMonographsJoinPublisher($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = MonographQuery::create(null, $criteria);
-        $query->joinWith('Publisher', $join_behavior);
-
-        return $this->getMonographs($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Datespecification is new, it will return
-     * an empty collection; or if this Datespecification has previously
-     * been saved, it will retrieve related Monographs from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Datespecification.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Monograph[] List of Monograph objects
-     */
-    public function getMonographsJoinPrinter($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = MonographQuery::create(null, $criteria);
-        $query->joinWith('Printer', $join_behavior);
-
-        return $this->getMonographs($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Datespecification is new, it will return
-     * an empty collection; or if this Datespecification has previously
-     * been saved, it will retrieve related Monographs from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Datespecification.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Monograph[] List of Monograph objects
-     */
-    public function getMonographsJoinTranslator($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = MonographQuery::create(null, $criteria);
-        $query->joinWith('Translator', $join_behavior);
-
-        return $this->getMonographs($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Datespecification is new, it will return
-     * an empty collection; or if this Datespecification has previously
-     * been saved, it will retrieve related Monographs from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Datespecification.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Monograph[] List of Monograph objects
-     */
-    public function getMonographsJoinRelatedset($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = MonographQuery::create(null, $criteria);
-        $query->joinWith('Relatedset', $join_behavior);
-
-        return $this->getMonographs($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Datespecification is new, it will return
-     * an empty collection; or if this Datespecification has previously
-     * been saved, it will retrieve related Monographs from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Datespecification.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Monograph[] List of Monograph objects
-     */
-    public function getMonographsJoinTitle($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = MonographQuery::create(null, $criteria);
-        $query->joinWith('Title', $join_behavior);
-
-        return $this->getMonographs($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Datespecification is new, it will return
-     * an empty collection; or if this Datespecification has previously
-     * been saved, it will retrieve related Monographs from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Datespecification.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Monograph[] List of Monograph objects
-     */
-    public function getMonographsJoinPublishingcompany($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = MonographQuery::create(null, $criteria);
-        $query->joinWith('Publishingcompany', $join_behavior);
-
-        return $this->getMonographs($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Datespecification is new, it will return
-     * an empty collection; or if this Datespecification has previously
-     * been saved, it will retrieve related Monographs from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Datespecification.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Monograph[] List of Monograph objects
-     */
-    public function getMonographsJoinPlace($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = MonographQuery::create(null, $criteria);
-        $query->joinWith('Place', $join_behavior);
-
-        return $this->getMonographs($query, $con);
     }
 
     /**
@@ -3737,11 +3265,6 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collMonographs) {
-                foreach ($this->collMonographs as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collEssays) {
                 foreach ($this->collEssays as $o) {
                     $o->clearAllReferences($deep);
@@ -3769,10 +3292,6 @@ abstract class BaseDatespecification extends BaseObject implements Persistent
             $this->collWorks->clearIterator();
         }
         $this->collWorks = null;
-        if ($this->collMonographs instanceof PropelCollection) {
-            $this->collMonographs->clearIterator();
-        }
-        $this->collMonographs = null;
         if ($this->collEssays instanceof PropelCollection) {
             $this->collEssays->clearIterator();
         }

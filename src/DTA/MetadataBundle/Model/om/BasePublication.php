@@ -16,6 +16,8 @@ use \PropelPDO;
 use \PropelQuery;
 use DTA\MetadataBundle\Model\Datespecification;
 use DTA\MetadataBundle\Model\DatespecificationQuery;
+use DTA\MetadataBundle\Model\Monograph;
+use DTA\MetadataBundle\Model\MonographQuery;
 use DTA\MetadataBundle\Model\Place;
 use DTA\MetadataBundle\Model\PlaceQuery;
 use DTA\MetadataBundle\Model\Printer;
@@ -213,6 +215,12 @@ abstract class BasePublication extends BaseObject implements Persistent
     protected $aDatespecification;
 
     /**
+     * @var        PropelObjectCollection|Monograph[] Collection to store aggregation of Monograph objects.
+     */
+    protected $collMonographs;
+    protected $collMonographsPartial;
+
+    /**
      * @var        PropelObjectCollection|PublicationPublicationgroup[] Collection to store aggregation of PublicationPublicationgroup objects.
      */
     protected $collPublicationPublicationgroups;
@@ -260,6 +268,12 @@ abstract class BasePublication extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $publicationgroupsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $monographsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -997,6 +1011,8 @@ abstract class BasePublication extends BaseObject implements Persistent
             $this->aPublishingcompany = null;
             $this->aPlace = null;
             $this->aDatespecification = null;
+            $this->collMonographs = null;
+
             $this->collPublicationPublicationgroups = null;
 
             $this->collSources = null;
@@ -1218,6 +1234,23 @@ abstract class BasePublication extends BaseObject implements Persistent
                 foreach ($this->collPublicationgroups as $publicationgroup) {
                     if ($publicationgroup->isModified()) {
                         $publicationgroup->save($con);
+                    }
+                }
+            }
+
+            if ($this->monographsScheduledForDeletion !== null) {
+                if (!$this->monographsScheduledForDeletion->isEmpty()) {
+                    MonographQuery::create()
+                        ->filterByPrimaryKeys($this->monographsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->monographsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collMonographs !== null) {
+                foreach ($this->collMonographs as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
                     }
                 }
             }
@@ -1572,6 +1605,14 @@ abstract class BasePublication extends BaseObject implements Persistent
             }
 
 
+                if ($this->collMonographs !== null) {
+                    foreach ($this->collMonographs as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
                 if ($this->collPublicationPublicationgroups !== null) {
                     foreach ($this->collPublicationPublicationgroups as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -1756,6 +1797,9 @@ abstract class BasePublication extends BaseObject implements Persistent
             }
             if (null !== $this->aDatespecification) {
                 $result['Datespecification'] = $this->aDatespecification->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->collMonographs) {
+                $result['Monographs'] = $this->collMonographs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collPublicationPublicationgroups) {
                 $result['PublicationPublicationgroups'] = $this->collPublicationPublicationgroups->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -2006,6 +2050,12 @@ abstract class BasePublication extends BaseObject implements Persistent
             $copyObj->setNew(false);
             // store object hash to prevent cycle
             $this->startCopy = true;
+
+            foreach ($this->getMonographs() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addMonograph($relObj->copy($deepCopy));
+                }
+            }
 
             foreach ($this->getPublicationPublicationgroups() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
@@ -2560,6 +2610,9 @@ abstract class BasePublication extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
+        if ('Monograph' == $relationName) {
+            $this->initMonographs();
+        }
         if ('PublicationPublicationgroup' == $relationName) {
             $this->initPublicationPublicationgroups();
         }
@@ -2569,6 +2622,224 @@ abstract class BasePublication extends BaseObject implements Persistent
         if ('Task' == $relationName) {
             $this->initTasks();
         }
+    }
+
+    /**
+     * Clears out the collMonographs collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Publication The current object (for fluent API support)
+     * @see        addMonographs()
+     */
+    public function clearMonographs()
+    {
+        $this->collMonographs = null; // important to set this to null since that means it is uninitialized
+        $this->collMonographsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collMonographs collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialMonographs($v = true)
+    {
+        $this->collMonographsPartial = $v;
+    }
+
+    /**
+     * Initializes the collMonographs collection.
+     *
+     * By default this just sets the collMonographs collection to an empty array (like clearcollMonographs());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initMonographs($overrideExisting = true)
+    {
+        if (null !== $this->collMonographs && !$overrideExisting) {
+            return;
+        }
+        $this->collMonographs = new PropelObjectCollection();
+        $this->collMonographs->setModel('Monograph');
+    }
+
+    /**
+     * Gets an array of Monograph objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Publication is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Monograph[] List of Monograph objects
+     * @throws PropelException
+     */
+    public function getMonographs($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collMonographsPartial && !$this->isNew();
+        if (null === $this->collMonographs || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collMonographs) {
+                // return empty collection
+                $this->initMonographs();
+            } else {
+                $collMonographs = MonographQuery::create(null, $criteria)
+                    ->filterByPublication($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collMonographsPartial && count($collMonographs)) {
+                      $this->initMonographs(false);
+
+                      foreach($collMonographs as $obj) {
+                        if (false == $this->collMonographs->contains($obj)) {
+                          $this->collMonographs->append($obj);
+                        }
+                      }
+
+                      $this->collMonographsPartial = true;
+                    }
+
+                    $collMonographs->getInternalIterator()->rewind();
+                    return $collMonographs;
+                }
+
+                if($partial && $this->collMonographs) {
+                    foreach($this->collMonographs as $obj) {
+                        if($obj->isNew()) {
+                            $collMonographs[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collMonographs = $collMonographs;
+                $this->collMonographsPartial = false;
+            }
+        }
+
+        return $this->collMonographs;
+    }
+
+    /**
+     * Sets a collection of Monograph objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $monographs A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setMonographs(PropelCollection $monographs, PropelPDO $con = null)
+    {
+        $monographsToDelete = $this->getMonographs(new Criteria(), $con)->diff($monographs);
+
+        $this->monographsScheduledForDeletion = unserialize(serialize($monographsToDelete));
+
+        foreach ($monographsToDelete as $monographRemoved) {
+            $monographRemoved->setPublication(null);
+        }
+
+        $this->collMonographs = null;
+        foreach ($monographs as $monograph) {
+            $this->addMonograph($monograph);
+        }
+
+        $this->collMonographs = $monographs;
+        $this->collMonographsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Monograph objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Monograph objects.
+     * @throws PropelException
+     */
+    public function countMonographs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collMonographsPartial && !$this->isNew();
+        if (null === $this->collMonographs || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collMonographs) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getMonographs());
+            }
+            $query = MonographQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPublication($this)
+                ->count($con);
+        }
+
+        return count($this->collMonographs);
+    }
+
+    /**
+     * Method called to associate a Monograph object to this object
+     * through the Monograph foreign key attribute.
+     *
+     * @param    Monograph $l Monograph
+     * @return Publication The current object (for fluent API support)
+     */
+    public function addMonograph(Monograph $l)
+    {
+        if ($this->collMonographs === null) {
+            $this->initMonographs();
+            $this->collMonographsPartial = true;
+        }
+        if (!in_array($l, $this->collMonographs->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddMonograph($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Monograph $monograph The monograph object to add.
+     */
+    protected function doAddMonograph($monograph)
+    {
+        $this->collMonographs[]= $monograph;
+        $monograph->setPublication($this);
+    }
+
+    /**
+     * @param	Monograph $monograph The monograph object to remove.
+     * @return Publication The current object (for fluent API support)
+     */
+    public function removeMonograph($monograph)
+    {
+        if ($this->getMonographs()->contains($monograph)) {
+            $this->collMonographs->remove($this->collMonographs->search($monograph));
+            if (null === $this->monographsScheduledForDeletion) {
+                $this->monographsScheduledForDeletion = clone $this->collMonographs;
+                $this->monographsScheduledForDeletion->clear();
+            }
+            $this->monographsScheduledForDeletion[]= clone $monograph;
+            $monograph->setPublication(null);
+        }
+
+        return $this;
     }
 
     /**
@@ -3546,6 +3817,11 @@ abstract class BasePublication extends BaseObject implements Persistent
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->collMonographs) {
+                foreach ($this->collMonographs as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collPublicationPublicationgroups) {
                 foreach ($this->collPublicationPublicationgroups as $o) {
                     $o->clearAllReferences($deep);
@@ -3597,6 +3873,10 @@ abstract class BasePublication extends BaseObject implements Persistent
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
+        if ($this->collMonographs instanceof PropelCollection) {
+            $this->collMonographs->clearIterator();
+        }
+        $this->collMonographs = null;
         if ($this->collPublicationPublicationgroups instanceof PropelCollection) {
             $this->collPublicationPublicationgroups->clearIterator();
         }

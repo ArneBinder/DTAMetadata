@@ -14,7 +14,6 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use DTA\MetadataBundle\Model\Essay;
 use DTA\MetadataBundle\Model\Magazine;
-use DTA\MetadataBundle\Model\Monograph;
 use DTA\MetadataBundle\Model\Publication;
 use DTA\MetadataBundle\Model\Series;
 use DTA\MetadataBundle\Model\Title;
@@ -38,10 +37,6 @@ use DTA\MetadataBundle\Model\Titlefragment;
  * @method TitleQuery leftJoinTitlefragment($relationAlias = null) Adds a LEFT JOIN clause to the query using the Titlefragment relation
  * @method TitleQuery rightJoinTitlefragment($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Titlefragment relation
  * @method TitleQuery innerJoinTitlefragment($relationAlias = null) Adds a INNER JOIN clause to the query using the Titlefragment relation
- *
- * @method TitleQuery leftJoinMonograph($relationAlias = null) Adds a LEFT JOIN clause to the query using the Monograph relation
- * @method TitleQuery rightJoinMonograph($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Monograph relation
- * @method TitleQuery innerJoinMonograph($relationAlias = null) Adds a INNER JOIN clause to the query using the Monograph relation
  *
  * @method TitleQuery leftJoinEssay($relationAlias = null) Adds a LEFT JOIN clause to the query using the Essay relation
  * @method TitleQuery rightJoinEssay($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Essay relation
@@ -438,80 +433,6 @@ abstract class BaseTitleQuery extends ModelCriteria
         return $this
             ->joinTitlefragment($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Titlefragment', '\DTA\MetadataBundle\Model\TitlefragmentQuery');
-    }
-
-    /**
-     * Filter the query by a related Monograph object
-     *
-     * @param   Monograph|PropelObjectCollection $monograph  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 TitleQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByMonograph($monograph, $comparison = null)
-    {
-        if ($monograph instanceof Monograph) {
-            return $this
-                ->addUsingAlias(TitlePeer::ID, $monograph->getTitleId(), $comparison);
-        } elseif ($monograph instanceof PropelObjectCollection) {
-            return $this
-                ->useMonographQuery()
-                ->filterByPrimaryKeys($monograph->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByMonograph() only accepts arguments of type Monograph or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Monograph relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return TitleQuery The current query, for fluid interface
-     */
-    public function joinMonograph($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Monograph');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Monograph');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Monograph relation Monograph object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\MonographQuery A secondary query class using the current class as primary query
-     */
-    public function useMonographQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinMonograph($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Monograph', '\DTA\MetadataBundle\Model\MonographQuery');
     }
 
     /**

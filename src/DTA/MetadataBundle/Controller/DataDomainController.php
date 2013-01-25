@@ -5,6 +5,8 @@ namespace DTA\MetadataBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
+use \DTA\MetadataBundle\Model;
+
 /**
  * Route prefix for all action routes, i.e. this page.
  * @Route("/daten")

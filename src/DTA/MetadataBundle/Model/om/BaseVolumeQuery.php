@@ -506,7 +506,7 @@ abstract class BaseVolumeQuery extends ModelCriteria
             }
 
             return $this
-                ->addUsingAlias(VolumePeer::MONOGRAPH_ID, $monograph->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(VolumePeer::MONOGRAPH_ID, $monograph->toKeyValue('Id', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByMonograph() only accepts arguments of type Monograph or PropelCollection');
         }

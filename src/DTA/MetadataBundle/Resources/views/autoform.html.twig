@@ -18,9 +18,7 @@ The dynamic extend is for extending the template of the currently active domain,
 
     <h3>{{className}}</h3>
 
-    {{domainKey}}
-    
-    <hr/>
+    {#{domainKey}#}
     
     <form action="{{ path('genericNew', {'className':className, 'domainKey': domainKey}) }}" method="post" {{ form_enctype(form) }}>
         {{ form_rest(form) }}

@@ -53,7 +53,6 @@ class TitleTableMap extends TableMap
     {
         $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Publication', RelationMap::ONE_TO_MANY, array('id' => 'title_id', ), null, null, 'Publications');
         $this->addRelation('Titlefragment', 'DTA\\MetadataBundle\\Model\\Titlefragment', RelationMap::ONE_TO_MANY, array('id' => 'title_id', ), null, null, 'Titlefragments');
-        $this->addRelation('Monograph', 'DTA\\MetadataBundle\\Model\\Monograph', RelationMap::ONE_TO_MANY, array('id' => 'title_id', ), null, null, 'Monographs');
         $this->addRelation('Essay', 'DTA\\MetadataBundle\\Model\\Essay', RelationMap::ONE_TO_MANY, array('id' => 'title_id', ), null, null, 'Essays');
         $this->addRelation('Magazine', 'DTA\\MetadataBundle\\Model\\Magazine', RelationMap::ONE_TO_MANY, array('id' => 'title_id', ), null, null, 'Magazines');
         $this->addRelation('Series', 'DTA\\MetadataBundle\\Model\\Series', RelationMap::ONE_TO_MANY, array('id' => 'title_id', ), null, null, 'Series');

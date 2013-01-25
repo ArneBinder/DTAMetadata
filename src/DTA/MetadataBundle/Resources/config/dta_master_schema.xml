@@ -84,9 +84,13 @@
 
     <table name="monograph">
        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-       <behavior name="concrete_inheritance">
-            <parameter name="extends" value="publication" />
-        </behavior>
+       <column name="publication_id" type="INTEGER" primaryKey="true" required="true"/>
+       <foreign-key foreignTable="publication" name="fk_publicationValid">
+           <reference local="publication_id" foreign="id"/>
+       </foreign-key>
+       <index name="fk_publicationId">
+           <index-column name="publication_id"/>
+       </index>
     </table>
     
     <table name="essay">

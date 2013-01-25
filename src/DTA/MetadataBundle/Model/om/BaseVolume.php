@@ -1078,7 +1078,9 @@ abstract class BaseVolume extends BaseObject implements Persistent
     public function getMonograph(PropelPDO $con = null, $doQuery = true)
     {
         if ($this->aMonograph === null && ($this->monograph_id !== null) && $doQuery) {
-            $this->aMonograph = MonographQuery::create()->findPk($this->monograph_id, $con);
+            $this->aMonograph = MonographQuery::create()
+                ->filterByVolume($this) // here
+                ->findOne($con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be

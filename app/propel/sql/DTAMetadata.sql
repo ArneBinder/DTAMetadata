@@ -49,31 +49,9 @@ DROP TABLE IF EXISTS `monograph`;
 CREATE TABLE `monograph`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `printRun` TEXT COMMENT 'Auflage',
-    `printRunComment` TEXT,
-    `edition` TEXT,
-    `numPages` INTEGER,
-    `numPagesNormed` INTEGER,
-    `bibliographicCitation` TEXT,
-    `title_id` INTEGER NOT NULL,
-    `publishingCompany_id` INTEGER,
-    `place_id` INTEGER,
-    `dateSpecification_id` INTEGER,
-    `relatedSet_id` INTEGER,
-    `work_id` INTEGER NOT NULL,
-    `publisher_id` INTEGER,
-    `printer_id` INTEGER,
-    `translator_id` INTEGER,
-    PRIMARY KEY (`id`),
-    INDEX `monograph_I_1` (`work_id`),
-    INDEX `monograph_I_2` (`publisher_id`),
-    INDEX `monograph_I_3` (`printer_id`),
-    INDEX `monograph_I_4` (`translator_id`),
-    INDEX `monograph_I_5` (`relatedSet_id`),
-    INDEX `monograph_I_6` (`publishingCompany_id`),
-    INDEX `monograph_I_7` (`place_id`),
-    INDEX `monograph_I_8` (`dateSpecification_id`),
-    INDEX `monograph_I_9` (`title_id`)
+    `publication_id` INTEGER NOT NULL,
+    PRIMARY KEY (`id`,`publication_id`),
+    INDEX `fk_publicationId` (`publication_id`)
 ) ENGINE=MyISAM;
 
 -- ---------------------------------------------------------------------

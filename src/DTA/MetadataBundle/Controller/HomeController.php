@@ -27,12 +27,11 @@ class HomeController extends DTABaseController {
      * @Route("/home", name="home")
      */
     public function indexAction(Request $request) {
-        $k = new Model\Monograph();
-        $k->setNumpages(32);
-        
-        $k->save();
+        $p = new Model\Publication();
+        $p->setNumpages(101);
+        $p->save();
         return $this->renderDomainSpecific('DTAMetadataBundle:Home:Home.html.twig', array(
-            'testData' => $k->getNumpages(),            
+//            'testData' => $k->getNumpages(),            
         ));
     }
 
@@ -104,11 +103,6 @@ class HomeController extends DTABaseController {
                 $obj->save();
         }
 
-        $mono = new Model\Monograph();
-        
-//        $mono = new Model\Monograph();
-//        $mono->num
-        
         return $this->renderDomainSpecific('DTAMetadataBundle::autoform.html.twig', array(
                     'className' => $className,
                     'persistedObject' => 'persisted.',
