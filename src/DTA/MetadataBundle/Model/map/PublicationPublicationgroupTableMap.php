@@ -7,7 +7,7 @@ use \TableMap;
 
 
 /**
- * This class defines the structure of the 'source' table.
+ * This class defines the structure of the 'publication_publicationGroup' table.
  *
  *
  *
@@ -18,13 +18,13 @@ use \TableMap;
  *
  * @package    propel.generator.src.DTA.MetadataBundle.Model.map
  */
-class SourceTableMap extends TableMap
+class PublicationPublicationgroupTableMap extends TableMap
 {
 
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'src.DTA.MetadataBundle.Model.map.SourceTableMap';
+    const CLASS_NAME = 'src.DTA.MetadataBundle.Model.map.PublicationPublicationgroupTableMap';
 
     /**
      * Initialize the table attributes, columns and validators
@@ -36,21 +36,15 @@ class SourceTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('source');
-        $this->setPhpName('Source');
-        $this->setClassname('DTA\\MetadataBundle\\Model\\Source');
+        $this->setName('publication_publicationGroup');
+        $this->setPhpName('PublicationPublicationgroup');
+        $this->setClassname('DTA\\MetadataBundle\\Model\\PublicationPublicationgroup');
         $this->setPackage('src.DTA.MetadataBundle.Model');
-        $this->setUseIdGenerator(true);
+        $this->setUseIdGenerator(false);
+        $this->setIsCrossRef(true);
         // columns
-        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, 10, null);
-        $this->addForeignKey('publication_id', 'PublicationId', 'INTEGER', 'publication', 'id', true, null, null);
-        $this->addColumn('quality', 'Quality', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('name', 'Name', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('comments', 'Comments', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('available', 'Available', 'BOOLEAN', false, 1, null);
-        $this->addColumn('signatur', 'Signatur', 'VARCHAR', false, 512, null);
-        $this->addColumn('library', 'Library', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('libraryGnd', 'Librarygnd', 'VARCHAR', false, 1024, null);
+        $this->addForeignPrimaryKey('publicationGroup_id', 'PublicationgroupId', 'INTEGER' , 'publicationGroup', 'id', true, null, null);
+        $this->addForeignPrimaryKey('publication_id', 'PublicationId', 'INTEGER' , 'publication', 'id', true, null, null);
         // validators
     } // initialize()
 
@@ -59,7 +53,8 @@ class SourceTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('Publicationgroup', 'DTA\\MetadataBundle\\Model\\Publicationgroup', RelationMap::MANY_TO_ONE, array('publicationGroup_id' => 'id', ), null, null);
         $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Publication', RelationMap::MANY_TO_ONE, array('publication_id' => 'id', ), null, null);
     } // buildRelations()
 
-} // SourceTableMap
+} // PublicationPublicationgroupTableMap

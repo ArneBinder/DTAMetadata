@@ -12,23 +12,25 @@ use \Propel;
 use \PropelException;
 use \PropelPDO;
 use DTA\MetadataBundle\Model\Publication;
+use DTA\MetadataBundle\Model\PublicationPublicationgroup;
+use DTA\MetadataBundle\Model\PublicationPublicationgroupPeer;
+use DTA\MetadataBundle\Model\PublicationPublicationgroupQuery;
 use DTA\MetadataBundle\Model\PublicationQuery;
-use DTA\MetadataBundle\Model\Source;
-use DTA\MetadataBundle\Model\SourcePeer;
-use DTA\MetadataBundle\Model\SourceQuery;
+use DTA\MetadataBundle\Model\Publicationgroup;
+use DTA\MetadataBundle\Model\PublicationgroupQuery;
 
-abstract class BaseSource extends BaseObject implements Persistent
+abstract class BasePublicationPublicationgroup extends BaseObject implements Persistent
 {
     /**
      * Peer class name
      */
-    const PEER = 'DTA\\MetadataBundle\\Model\\SourcePeer';
+    const PEER = 'DTA\\MetadataBundle\\Model\\PublicationPublicationgroupPeer';
 
     /**
      * The Peer class.
      * Instance provides a convenient way of calling static methods on a class
      * that calling code may not be able to identify.
-     * @var        SourcePeer
+     * @var        PublicationPublicationgroupPeer
      */
     protected static $peer;
 
@@ -39,10 +41,10 @@ abstract class BaseSource extends BaseObject implements Persistent
     protected $startCopy = false;
 
     /**
-     * The value for the id field.
+     * The value for the publicationgroup_id field.
      * @var        int
      */
-    protected $id;
+    protected $publicationgroup_id;
 
     /**
      * The value for the publication_id field.
@@ -51,46 +53,9 @@ abstract class BaseSource extends BaseObject implements Persistent
     protected $publication_id;
 
     /**
-     * The value for the quality field.
-     * @var        string
+     * @var        Publicationgroup
      */
-    protected $quality;
-
-    /**
-     * The value for the name field.
-     * @var        string
-     */
-    protected $name;
-
-    /**
-     * The value for the comments field.
-     * @var        string
-     */
-    protected $comments;
-
-    /**
-     * The value for the available field.
-     * @var        boolean
-     */
-    protected $available;
-
-    /**
-     * The value for the signatur field.
-     * @var        string
-     */
-    protected $signatur;
-
-    /**
-     * The value for the library field.
-     * @var        string
-     */
-    protected $library;
-
-    /**
-     * The value for the librarygnd field.
-     * @var        string
-     */
-    protected $librarygnd;
+    protected $aPublicationgroup;
 
     /**
      * @var        Publication
@@ -118,13 +83,13 @@ abstract class BaseSource extends BaseObject implements Persistent
     protected $alreadyInClearAllReferencesDeep = false;
 
     /**
-     * Get the [id] column value.
+     * Get the [publicationgroup_id] column value.
      *
      * @return int
      */
-    public function getId()
+    public function getPublicationgroupId()
     {
-        return $this->id;
+        return $this->publicationgroup_id;
     }
 
     /**
@@ -138,101 +103,35 @@ abstract class BaseSource extends BaseObject implements Persistent
     }
 
     /**
-     * Get the [quality] column value.
-     *
-     * @return string
-     */
-    public function getQuality()
-    {
-        return $this->quality;
-    }
-
-    /**
-     * Get the [name] column value.
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * Get the [comments] column value.
-     *
-     * @return string
-     */
-    public function getComments()
-    {
-        return $this->comments;
-    }
-
-    /**
-     * Get the [available] column value.
-     *
-     * @return boolean
-     */
-    public function getAvailable()
-    {
-        return $this->available;
-    }
-
-    /**
-     * Get the [signatur] column value.
-     *
-     * @return string
-     */
-    public function getSignatur()
-    {
-        return $this->signatur;
-    }
-
-    /**
-     * Get the [library] column value.
-     *
-     * @return string
-     */
-    public function getLibrary()
-    {
-        return $this->library;
-    }
-
-    /**
-     * Get the [librarygnd] column value.
-     *
-     * @return string
-     */
-    public function getLibrarygnd()
-    {
-        return $this->librarygnd;
-    }
-
-    /**
-     * Set the value of [id] column.
+     * Set the value of [publicationgroup_id] column.
      *
      * @param int $v new value
-     * @return Source The current object (for fluent API support)
+     * @return PublicationPublicationgroup The current object (for fluent API support)
      */
-    public function setId($v)
+    public function setPublicationgroupId($v)
     {
         if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
-        if ($this->id !== $v) {
-            $this->id = $v;
-            $this->modifiedColumns[] = SourcePeer::ID;
+        if ($this->publicationgroup_id !== $v) {
+            $this->publicationgroup_id = $v;
+            $this->modifiedColumns[] = PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID;
+        }
+
+        if ($this->aPublicationgroup !== null && $this->aPublicationgroup->getId() !== $v) {
+            $this->aPublicationgroup = null;
         }
 
 
         return $this;
-    } // setId()
+    } // setPublicationgroupId()
 
     /**
      * Set the value of [publication_id] column.
      *
      * @param int $v new value
-     * @return Source The current object (for fluent API support)
+     * @return PublicationPublicationgroup The current object (for fluent API support)
      */
     public function setPublicationId($v)
     {
@@ -242,7 +141,7 @@ abstract class BaseSource extends BaseObject implements Persistent
 
         if ($this->publication_id !== $v) {
             $this->publication_id = $v;
-            $this->modifiedColumns[] = SourcePeer::PUBLICATION_ID;
+            $this->modifiedColumns[] = PublicationPublicationgroupPeer::PUBLICATION_ID;
         }
 
         if ($this->aPublication !== null && $this->aPublication->getId() !== $v) {
@@ -252,161 +151,6 @@ abstract class BaseSource extends BaseObject implements Persistent
 
         return $this;
     } // setPublicationId()
-
-    /**
-     * Set the value of [quality] column.
-     *
-     * @param string $v new value
-     * @return Source The current object (for fluent API support)
-     */
-    public function setQuality($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
-        }
-
-        if ($this->quality !== $v) {
-            $this->quality = $v;
-            $this->modifiedColumns[] = SourcePeer::QUALITY;
-        }
-
-
-        return $this;
-    } // setQuality()
-
-    /**
-     * Set the value of [name] column.
-     *
-     * @param string $v new value
-     * @return Source The current object (for fluent API support)
-     */
-    public function setName($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
-        }
-
-        if ($this->name !== $v) {
-            $this->name = $v;
-            $this->modifiedColumns[] = SourcePeer::NAME;
-        }
-
-
-        return $this;
-    } // setName()
-
-    /**
-     * Set the value of [comments] column.
-     *
-     * @param string $v new value
-     * @return Source The current object (for fluent API support)
-     */
-    public function setComments($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
-        }
-
-        if ($this->comments !== $v) {
-            $this->comments = $v;
-            $this->modifiedColumns[] = SourcePeer::COMMENTS;
-        }
-
-
-        return $this;
-    } // setComments()
-
-    /**
-     * Sets the value of the [available] column.
-     * Non-boolean arguments are converted using the following rules:
-     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
-     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
-     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
-     *
-     * @param boolean|integer|string $v The new value
-     * @return Source The current object (for fluent API support)
-     */
-    public function setAvailable($v)
-    {
-        if ($v !== null) {
-            if (is_string($v)) {
-                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
-            } else {
-                $v = (boolean) $v;
-            }
-        }
-
-        if ($this->available !== $v) {
-            $this->available = $v;
-            $this->modifiedColumns[] = SourcePeer::AVAILABLE;
-        }
-
-
-        return $this;
-    } // setAvailable()
-
-    /**
-     * Set the value of [signatur] column.
-     *
-     * @param string $v new value
-     * @return Source The current object (for fluent API support)
-     */
-    public function setSignatur($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
-        }
-
-        if ($this->signatur !== $v) {
-            $this->signatur = $v;
-            $this->modifiedColumns[] = SourcePeer::SIGNATUR;
-        }
-
-
-        return $this;
-    } // setSignatur()
-
-    /**
-     * Set the value of [library] column.
-     *
-     * @param string $v new value
-     * @return Source The current object (for fluent API support)
-     */
-    public function setLibrary($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
-        }
-
-        if ($this->library !== $v) {
-            $this->library = $v;
-            $this->modifiedColumns[] = SourcePeer::LIBRARY;
-        }
-
-
-        return $this;
-    } // setLibrary()
-
-    /**
-     * Set the value of [librarygnd] column.
-     *
-     * @param string $v new value
-     * @return Source The current object (for fluent API support)
-     */
-    public function setLibrarygnd($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
-        }
-
-        if ($this->librarygnd !== $v) {
-            $this->librarygnd = $v;
-            $this->modifiedColumns[] = SourcePeer::LIBRARYGND;
-        }
-
-
-        return $this;
-    } // setLibrarygnd()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -440,15 +184,8 @@ abstract class BaseSource extends BaseObject implements Persistent
     {
         try {
 
-            $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
+            $this->publicationgroup_id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->publication_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-            $this->quality = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-            $this->name = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-            $this->comments = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-            $this->available = ($row[$startcol + 5] !== null) ? (boolean) $row[$startcol + 5] : null;
-            $this->signatur = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-            $this->library = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
-            $this->librarygnd = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -457,10 +194,10 @@ abstract class BaseSource extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 9; // 9 = SourcePeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 2; // 2 = PublicationPublicationgroupPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating Source object", $e);
+            throw new PropelException("Error populating PublicationPublicationgroup object", $e);
         }
     }
 
@@ -480,6 +217,9 @@ abstract class BaseSource extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aPublicationgroup !== null && $this->publicationgroup_id !== $this->aPublicationgroup->getId()) {
+            $this->aPublicationgroup = null;
+        }
         if ($this->aPublication !== null && $this->publication_id !== $this->aPublication->getId()) {
             $this->aPublication = null;
         }
@@ -506,13 +246,13 @@ abstract class BaseSource extends BaseObject implements Persistent
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(SourcePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(PublicationPublicationgroupPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $stmt = SourcePeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+        $stmt = PublicationPublicationgroupPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
         $row = $stmt->fetch(PDO::FETCH_NUM);
         $stmt->closeCursor();
         if (!$row) {
@@ -522,6 +262,7 @@ abstract class BaseSource extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->aPublicationgroup = null;
             $this->aPublication = null;
         } // if (deep)
     }
@@ -543,12 +284,12 @@ abstract class BaseSource extends BaseObject implements Persistent
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(SourcePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(PublicationPublicationgroupPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = SourceQuery::create()
+            $deleteQuery = PublicationPublicationgroupQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -586,7 +327,7 @@ abstract class BaseSource extends BaseObject implements Persistent
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(SourcePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(PublicationPublicationgroupPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         $con->beginTransaction();
@@ -606,7 +347,7 @@ abstract class BaseSource extends BaseObject implements Persistent
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                SourcePeer::addInstanceToPool($this);
+                PublicationPublicationgroupPeer::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -640,6 +381,13 @@ abstract class BaseSource extends BaseObject implements Persistent
             // were passed to this object by their coresponding set
             // method.  This object relates to these object(s) by a
             // foreign key reference.
+
+            if ($this->aPublicationgroup !== null) {
+                if ($this->aPublicationgroup->isModified() || $this->aPublicationgroup->isNew()) {
+                    $affectedRows += $this->aPublicationgroup->save($con);
+                }
+                $this->setPublicationgroup($this->aPublicationgroup);
+            }
 
             if ($this->aPublication !== null) {
                 if ($this->aPublication->isModified() || $this->aPublication->isNew()) {
@@ -679,42 +427,17 @@ abstract class BaseSource extends BaseObject implements Persistent
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = SourcePeer::ID;
-        if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . SourcePeer::ID . ')');
-        }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(SourcePeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`id`';
+        if ($this->isColumnModified(PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`publicationGroup_id`';
         }
-        if ($this->isColumnModified(SourcePeer::PUBLICATION_ID)) {
+        if ($this->isColumnModified(PublicationPublicationgroupPeer::PUBLICATION_ID)) {
             $modifiedColumns[':p' . $index++]  = '`publication_id`';
-        }
-        if ($this->isColumnModified(SourcePeer::QUALITY)) {
-            $modifiedColumns[':p' . $index++]  = '`quality`';
-        }
-        if ($this->isColumnModified(SourcePeer::NAME)) {
-            $modifiedColumns[':p' . $index++]  = '`name`';
-        }
-        if ($this->isColumnModified(SourcePeer::COMMENTS)) {
-            $modifiedColumns[':p' . $index++]  = '`comments`';
-        }
-        if ($this->isColumnModified(SourcePeer::AVAILABLE)) {
-            $modifiedColumns[':p' . $index++]  = '`available`';
-        }
-        if ($this->isColumnModified(SourcePeer::SIGNATUR)) {
-            $modifiedColumns[':p' . $index++]  = '`signatur`';
-        }
-        if ($this->isColumnModified(SourcePeer::LIBRARY)) {
-            $modifiedColumns[':p' . $index++]  = '`library`';
-        }
-        if ($this->isColumnModified(SourcePeer::LIBRARYGND)) {
-            $modifiedColumns[':p' . $index++]  = '`libraryGnd`';
         }
 
         $sql = sprintf(
-            'INSERT INTO `source` (%s) VALUES (%s)',
+            'INSERT INTO `publication_publicationGroup` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -723,32 +446,11 @@ abstract class BaseSource extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`id`':
-                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
+                    case '`publicationGroup_id`':
+                        $stmt->bindValue($identifier, $this->publicationgroup_id, PDO::PARAM_INT);
                         break;
                     case '`publication_id`':
                         $stmt->bindValue($identifier, $this->publication_id, PDO::PARAM_INT);
-                        break;
-                    case '`quality`':
-                        $stmt->bindValue($identifier, $this->quality, PDO::PARAM_STR);
-                        break;
-                    case '`name`':
-                        $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
-                        break;
-                    case '`comments`':
-                        $stmt->bindValue($identifier, $this->comments, PDO::PARAM_STR);
-                        break;
-                    case '`available`':
-                        $stmt->bindValue($identifier, (int) $this->available, PDO::PARAM_INT);
-                        break;
-                    case '`signatur`':
-                        $stmt->bindValue($identifier, $this->signatur, PDO::PARAM_STR);
-                        break;
-                    case '`library`':
-                        $stmt->bindValue($identifier, $this->library, PDO::PARAM_STR);
-                        break;
-                    case '`libraryGnd`':
-                        $stmt->bindValue($identifier, $this->librarygnd, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -757,13 +459,6 @@ abstract class BaseSource extends BaseObject implements Persistent
             Propel::log($e->getMessage(), Propel::LOG_ERR);
             throw new PropelException(sprintf('Unable to execute INSERT statement [%s]', $sql), $e);
         }
-
-        try {
-            $pk = $con->lastInsertId();
-        } catch (Exception $e) {
-            throw new PropelException('Unable to get autoincrement id.', $e);
-        }
-        $this->setId($pk);
 
         $this->setNew(false);
     }
@@ -849,6 +544,12 @@ abstract class BaseSource extends BaseObject implements Persistent
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
+            if ($this->aPublicationgroup !== null) {
+                if (!$this->aPublicationgroup->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aPublicationgroup->getValidationFailures());
+                }
+            }
+
             if ($this->aPublication !== null) {
                 if (!$this->aPublication->validate($columns)) {
                     $failureMap = array_merge($failureMap, $this->aPublication->getValidationFailures());
@@ -856,7 +557,7 @@ abstract class BaseSource extends BaseObject implements Persistent
             }
 
 
-            if (($retval = SourcePeer::doValidate($this, $columns)) !== true) {
+            if (($retval = PublicationPublicationgroupPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
@@ -880,7 +581,7 @@ abstract class BaseSource extends BaseObject implements Persistent
      */
     public function getByName($name, $type = BasePeer::TYPE_PHPNAME)
     {
-        $pos = SourcePeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+        $pos = PublicationPublicationgroupPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -897,31 +598,10 @@ abstract class BaseSource extends BaseObject implements Persistent
     {
         switch ($pos) {
             case 0:
-                return $this->getId();
+                return $this->getPublicationgroupId();
                 break;
             case 1:
                 return $this->getPublicationId();
-                break;
-            case 2:
-                return $this->getQuality();
-                break;
-            case 3:
-                return $this->getName();
-                break;
-            case 4:
-                return $this->getComments();
-                break;
-            case 5:
-                return $this->getAvailable();
-                break;
-            case 6:
-                return $this->getSignatur();
-                break;
-            case 7:
-                return $this->getLibrary();
-                break;
-            case 8:
-                return $this->getLibrarygnd();
                 break;
             default:
                 return null;
@@ -946,23 +626,19 @@ abstract class BaseSource extends BaseObject implements Persistent
      */
     public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['Source'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['PublicationPublicationgroup'][serialize($this->getPrimaryKey())])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['Source'][$this->getPrimaryKey()] = true;
-        $keys = SourcePeer::getFieldNames($keyType);
+        $alreadyDumpedObjects['PublicationPublicationgroup'][serialize($this->getPrimaryKey())] = true;
+        $keys = PublicationPublicationgroupPeer::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getId(),
+            $keys[0] => $this->getPublicationgroupId(),
             $keys[1] => $this->getPublicationId(),
-            $keys[2] => $this->getQuality(),
-            $keys[3] => $this->getName(),
-            $keys[4] => $this->getComments(),
-            $keys[5] => $this->getAvailable(),
-            $keys[6] => $this->getSignatur(),
-            $keys[7] => $this->getLibrary(),
-            $keys[8] => $this->getLibrarygnd(),
         );
         if ($includeForeignObjects) {
+            if (null !== $this->aPublicationgroup) {
+                $result['Publicationgroup'] = $this->aPublicationgroup->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
             if (null !== $this->aPublication) {
                 $result['Publication'] = $this->aPublication->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
@@ -984,7 +660,7 @@ abstract class BaseSource extends BaseObject implements Persistent
      */
     public function setByName($name, $value, $type = BasePeer::TYPE_PHPNAME)
     {
-        $pos = SourcePeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+        $pos = PublicationPublicationgroupPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 
         $this->setByPosition($pos, $value);
     }
@@ -1001,31 +677,10 @@ abstract class BaseSource extends BaseObject implements Persistent
     {
         switch ($pos) {
             case 0:
-                $this->setId($value);
+                $this->setPublicationgroupId($value);
                 break;
             case 1:
                 $this->setPublicationId($value);
-                break;
-            case 2:
-                $this->setQuality($value);
-                break;
-            case 3:
-                $this->setName($value);
-                break;
-            case 4:
-                $this->setComments($value);
-                break;
-            case 5:
-                $this->setAvailable($value);
-                break;
-            case 6:
-                $this->setSignatur($value);
-                break;
-            case 7:
-                $this->setLibrary($value);
-                break;
-            case 8:
-                $this->setLibrarygnd($value);
                 break;
         } // switch()
     }
@@ -1049,17 +704,10 @@ abstract class BaseSource extends BaseObject implements Persistent
      */
     public function fromArray($arr, $keyType = BasePeer::TYPE_PHPNAME)
     {
-        $keys = SourcePeer::getFieldNames($keyType);
+        $keys = PublicationPublicationgroupPeer::getFieldNames($keyType);
 
-        if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
+        if (array_key_exists($keys[0], $arr)) $this->setPublicationgroupId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setPublicationId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setQuality($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setName($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setComments($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setAvailable($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setSignatur($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setLibrary($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setLibrarygnd($arr[$keys[8]]);
     }
 
     /**
@@ -1069,17 +717,10 @@ abstract class BaseSource extends BaseObject implements Persistent
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(SourcePeer::DATABASE_NAME);
+        $criteria = new Criteria(PublicationPublicationgroupPeer::DATABASE_NAME);
 
-        if ($this->isColumnModified(SourcePeer::ID)) $criteria->add(SourcePeer::ID, $this->id);
-        if ($this->isColumnModified(SourcePeer::PUBLICATION_ID)) $criteria->add(SourcePeer::PUBLICATION_ID, $this->publication_id);
-        if ($this->isColumnModified(SourcePeer::QUALITY)) $criteria->add(SourcePeer::QUALITY, $this->quality);
-        if ($this->isColumnModified(SourcePeer::NAME)) $criteria->add(SourcePeer::NAME, $this->name);
-        if ($this->isColumnModified(SourcePeer::COMMENTS)) $criteria->add(SourcePeer::COMMENTS, $this->comments);
-        if ($this->isColumnModified(SourcePeer::AVAILABLE)) $criteria->add(SourcePeer::AVAILABLE, $this->available);
-        if ($this->isColumnModified(SourcePeer::SIGNATUR)) $criteria->add(SourcePeer::SIGNATUR, $this->signatur);
-        if ($this->isColumnModified(SourcePeer::LIBRARY)) $criteria->add(SourcePeer::LIBRARY, $this->library);
-        if ($this->isColumnModified(SourcePeer::LIBRARYGND)) $criteria->add(SourcePeer::LIBRARYGND, $this->librarygnd);
+        if ($this->isColumnModified(PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID)) $criteria->add(PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID, $this->publicationgroup_id);
+        if ($this->isColumnModified(PublicationPublicationgroupPeer::PUBLICATION_ID)) $criteria->add(PublicationPublicationgroupPeer::PUBLICATION_ID, $this->publication_id);
 
         return $criteria;
     }
@@ -1094,30 +735,37 @@ abstract class BaseSource extends BaseObject implements Persistent
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(SourcePeer::DATABASE_NAME);
-        $criteria->add(SourcePeer::ID, $this->id);
+        $criteria = new Criteria(PublicationPublicationgroupPeer::DATABASE_NAME);
+        $criteria->add(PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID, $this->publicationgroup_id);
+        $criteria->add(PublicationPublicationgroupPeer::PUBLICATION_ID, $this->publication_id);
 
         return $criteria;
     }
 
     /**
-     * Returns the primary key for this object (row).
-     * @return int
+     * Returns the composite primary key for this object.
+     * The array elements will be in same order as specified in XML.
+     * @return array
      */
     public function getPrimaryKey()
     {
-        return $this->getId();
+        $pks = array();
+        $pks[0] = $this->getPublicationgroupId();
+        $pks[1] = $this->getPublicationId();
+
+        return $pks;
     }
 
     /**
-     * Generic method to set the primary key (id column).
+     * Set the [composite] primary key.
      *
-     * @param  int $key Primary key.
+     * @param array $keys The elements of the composite key (order must match the order in XML file).
      * @return void
      */
-    public function setPrimaryKey($key)
+    public function setPrimaryKey($keys)
     {
-        $this->setId($key);
+        $this->setPublicationgroupId($keys[0]);
+        $this->setPublicationId($keys[1]);
     }
 
     /**
@@ -1127,7 +775,7 @@ abstract class BaseSource extends BaseObject implements Persistent
     public function isPrimaryKeyNull()
     {
 
-        return null === $this->getId();
+        return (null === $this->getPublicationgroupId()) && (null === $this->getPublicationId());
     }
 
     /**
@@ -1136,21 +784,15 @@ abstract class BaseSource extends BaseObject implements Persistent
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param object $copyObj An object of Source (or compatible) type.
+     * @param object $copyObj An object of PublicationPublicationgroup (or compatible) type.
      * @param boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
+        $copyObj->setPublicationgroupId($this->getPublicationgroupId());
         $copyObj->setPublicationId($this->getPublicationId());
-        $copyObj->setQuality($this->getQuality());
-        $copyObj->setName($this->getName());
-        $copyObj->setComments($this->getComments());
-        $copyObj->setAvailable($this->getAvailable());
-        $copyObj->setSignatur($this->getSignatur());
-        $copyObj->setLibrary($this->getLibrary());
-        $copyObj->setLibrarygnd($this->getLibrarygnd());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1165,7 +807,6 @@ abstract class BaseSource extends BaseObject implements Persistent
 
         if ($makeNew) {
             $copyObj->setNew(true);
-            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1178,7 +819,7 @@ abstract class BaseSource extends BaseObject implements Persistent
      * objects.
      *
      * @param boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return Source Clone of current object.
+     * @return PublicationPublicationgroup Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1198,22 +839,74 @@ abstract class BaseSource extends BaseObject implements Persistent
      * same instance for all member of this class. The method could therefore
      * be static, but this would prevent one from overriding the behavior.
      *
-     * @return SourcePeer
+     * @return PublicationPublicationgroupPeer
      */
     public function getPeer()
     {
         if (self::$peer === null) {
-            self::$peer = new SourcePeer();
+            self::$peer = new PublicationPublicationgroupPeer();
         }
 
         return self::$peer;
     }
 
     /**
+     * Declares an association between this object and a Publicationgroup object.
+     *
+     * @param             Publicationgroup $v
+     * @return PublicationPublicationgroup The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setPublicationgroup(Publicationgroup $v = null)
+    {
+        if ($v === null) {
+            $this->setPublicationgroupId(NULL);
+        } else {
+            $this->setPublicationgroupId($v->getId());
+        }
+
+        $this->aPublicationgroup = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Publicationgroup object, it will not be re-added.
+        if ($v !== null) {
+            $v->addPublicationPublicationgroup($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Publicationgroup object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return Publicationgroup The associated Publicationgroup object.
+     * @throws PropelException
+     */
+    public function getPublicationgroup(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aPublicationgroup === null && ($this->publicationgroup_id !== null) && $doQuery) {
+            $this->aPublicationgroup = PublicationgroupQuery::create()->findPk($this->publicationgroup_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aPublicationgroup->addPublicationPublicationgroups($this);
+             */
+        }
+
+        return $this->aPublicationgroup;
+    }
+
+    /**
      * Declares an association between this object and a Publication object.
      *
      * @param             Publication $v
-     * @return Source The current object (for fluent API support)
+     * @return PublicationPublicationgroup The current object (for fluent API support)
      * @throws PropelException
      */
     public function setPublication(Publication $v = null)
@@ -1229,7 +922,7 @@ abstract class BaseSource extends BaseObject implements Persistent
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the Publication object, it will not be re-added.
         if ($v !== null) {
-            $v->addSource($this);
+            $v->addPublicationPublicationgroup($this);
         }
 
 
@@ -1254,7 +947,7 @@ abstract class BaseSource extends BaseObject implements Persistent
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aPublication->addSources($this);
+                $this->aPublication->addPublicationPublicationgroups($this);
              */
         }
 
@@ -1266,15 +959,8 @@ abstract class BaseSource extends BaseObject implements Persistent
      */
     public function clear()
     {
-        $this->id = null;
+        $this->publicationgroup_id = null;
         $this->publication_id = null;
-        $this->quality = null;
-        $this->name = null;
-        $this->comments = null;
-        $this->available = null;
-        $this->signatur = null;
-        $this->library = null;
-        $this->librarygnd = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
@@ -1297,6 +983,9 @@ abstract class BaseSource extends BaseObject implements Persistent
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->aPublicationgroup instanceof Persistent) {
+              $this->aPublicationgroup->clearAllReferences($deep);
+            }
             if ($this->aPublication instanceof Persistent) {
               $this->aPublication->clearAllReferences($deep);
             }
@@ -1304,6 +993,7 @@ abstract class BaseSource extends BaseObject implements Persistent
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
+        $this->aPublicationgroup = null;
         $this->aPublication = null;
     }
 
@@ -1314,7 +1004,7 @@ abstract class BaseSource extends BaseObject implements Persistent
      */
     public function __toString()
     {
-        return (string) $this->exportTo(SourcePeer::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(PublicationPublicationgroupPeer::DEFAULT_STRING_FORMAT);
     }
 
     /**

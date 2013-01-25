@@ -11,7 +11,6 @@ use \PropelException;
 use \PropelPDO;
 use DTA\MetadataBundle\Model\Corpus;
 use DTA\MetadataBundle\Model\CorpusPeer;
-use DTA\MetadataBundle\Model\WritPeer;
 use DTA\MetadataBundle\Model\map\CorpusTableMap;
 
 abstract class BaseCorpusPeer
@@ -30,22 +29,19 @@ abstract class BaseCorpusPeer
     const TM_CLASS = 'CorpusTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 2;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 3;
+    const NUM_HYDRATE_COLUMNS = 2;
 
     /** the column name for the id field */
     const ID = 'corpus.id';
 
     /** the column name for the name field */
     const NAME = 'corpus.name';
-
-    /** the column name for the writ_id field */
-    const WRIT_ID = 'corpus.writ_id';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -66,12 +62,12 @@ abstract class BaseCorpusPeer
      * e.g. CorpusPeer::$fieldNames[CorpusPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'WritId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'writId', ),
-        BasePeer::TYPE_COLNAME => array (CorpusPeer::ID, CorpusPeer::NAME, CorpusPeer::WRIT_ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'WRIT_ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'writ_id', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', ),
+        BasePeer::TYPE_COLNAME => array (CorpusPeer::ID, CorpusPeer::NAME, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'name', ),
+        BasePeer::TYPE_NUM => array (0, 1, )
     );
 
     /**
@@ -81,12 +77,12 @@ abstract class BaseCorpusPeer
      * e.g. CorpusPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'WritId' => 2, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'writId' => 2, ),
-        BasePeer::TYPE_COLNAME => array (CorpusPeer::ID => 0, CorpusPeer::NAME => 1, CorpusPeer::WRIT_ID => 2, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'WRIT_ID' => 2, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'writ_id' => 2, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, ),
+        BasePeer::TYPE_COLNAME => array (CorpusPeer::ID => 0, CorpusPeer::NAME => 1, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, ),
+        BasePeer::TYPE_NUM => array (0, 1, )
     );
 
     /**
@@ -162,11 +158,9 @@ abstract class BaseCorpusPeer
         if (null === $alias) {
             $criteria->addSelectColumn(CorpusPeer::ID);
             $criteria->addSelectColumn(CorpusPeer::NAME);
-            $criteria->addSelectColumn(CorpusPeer::WRIT_ID);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.name');
-            $criteria->addSelectColumn($alias . '.writ_id');
         }
     }
 
@@ -467,244 +461,6 @@ abstract class BaseCorpusPeer
         }
 
         return array($obj, $col);
-    }
-
-
-    /**
-     * Returns the number of rows matching criteria, joining the related Writ table
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return int Number of matching rows.
-     */
-    public static function doCountJoinWrit(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        // we're going to modify criteria, so copy it first
-        $criteria = clone $criteria;
-
-        // We need to set the primary table name, since in the case that there are no WHERE columns
-        // it will be impossible for the BasePeer::createSelectSql() method to determine which
-        // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(CorpusPeer::TABLE_NAME);
-
-        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-            $criteria->setDistinct();
-        }
-
-        if (!$criteria->hasSelectClause()) {
-            CorpusPeer::addSelectColumns($criteria);
-        }
-
-        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
-
-        // Set the correct dbName
-        $criteria->setDbName(CorpusPeer::DATABASE_NAME);
-
-        if ($con === null) {
-            $con = Propel::getConnection(CorpusPeer::DATABASE_NAME, Propel::CONNECTION_READ);
-        }
-
-        $criteria->addJoin(CorpusPeer::WRIT_ID, WritPeer::ID, $join_behavior);
-
-        $stmt = BasePeer::doCount($criteria, $con);
-
-        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $count = (int) $row[0];
-        } else {
-            $count = 0; // no rows returned; we infer that means 0 matches.
-        }
-        $stmt->closeCursor();
-
-        return $count;
-    }
-
-
-    /**
-     * Selects a collection of Corpus objects pre-filled with their Writ objects.
-     * @param      Criteria  $criteria
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of Corpus objects.
-     * @throws PropelException Any exceptions caught during processing will be
-     *		 rethrown wrapped into a PropelException.
-     */
-    public static function doSelectJoinWrit(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $criteria = clone $criteria;
-
-        // Set the correct dbName if it has not been overridden
-        if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(CorpusPeer::DATABASE_NAME);
-        }
-
-        CorpusPeer::addSelectColumns($criteria);
-        $startcol = CorpusPeer::NUM_HYDRATE_COLUMNS;
-        WritPeer::addSelectColumns($criteria);
-
-        $criteria->addJoin(CorpusPeer::WRIT_ID, WritPeer::ID, $join_behavior);
-
-        $stmt = BasePeer::doSelect($criteria, $con);
-        $results = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = CorpusPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = CorpusPeer::getInstanceFromPool($key1))) {
-                // We no longer rehydrate the object, since this can cause data loss.
-                // See http://www.propelorm.org/ticket/509
-                // $obj1->hydrate($row, 0, true); // rehydrate
-            } else {
-
-                $cls = CorpusPeer::getOMClass();
-
-                $obj1 = new $cls();
-                $obj1->hydrate($row);
-                CorpusPeer::addInstanceToPool($obj1, $key1);
-            } // if $obj1 already loaded
-
-            $key2 = WritPeer::getPrimaryKeyHashFromRow($row, $startcol);
-            if ($key2 !== null) {
-                $obj2 = WritPeer::getInstanceFromPool($key2);
-                if (!$obj2) {
-
-                    $cls = WritPeer::getOMClass();
-
-                    $obj2 = new $cls();
-                    $obj2->hydrate($row, $startcol);
-                    WritPeer::addInstanceToPool($obj2, $key2);
-                } // if obj2 already loaded
-
-                // Add the $obj1 (Corpus) to $obj2 (Writ)
-                $obj2->addCorpus($obj1);
-
-            } // if joined row was not null
-
-            $results[] = $obj1;
-        }
-        $stmt->closeCursor();
-
-        return $results;
-    }
-
-
-    /**
-     * Returns the number of rows matching criteria, joining all related tables
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return int Number of matching rows.
-     */
-    public static function doCountJoinAll(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        // we're going to modify criteria, so copy it first
-        $criteria = clone $criteria;
-
-        // We need to set the primary table name, since in the case that there are no WHERE columns
-        // it will be impossible for the BasePeer::createSelectSql() method to determine which
-        // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(CorpusPeer::TABLE_NAME);
-
-        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-            $criteria->setDistinct();
-        }
-
-        if (!$criteria->hasSelectClause()) {
-            CorpusPeer::addSelectColumns($criteria);
-        }
-
-        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
-
-        // Set the correct dbName
-        $criteria->setDbName(CorpusPeer::DATABASE_NAME);
-
-        if ($con === null) {
-            $con = Propel::getConnection(CorpusPeer::DATABASE_NAME, Propel::CONNECTION_READ);
-        }
-
-        $criteria->addJoin(CorpusPeer::WRIT_ID, WritPeer::ID, $join_behavior);
-
-        $stmt = BasePeer::doCount($criteria, $con);
-
-        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $count = (int) $row[0];
-        } else {
-            $count = 0; // no rows returned; we infer that means 0 matches.
-        }
-        $stmt->closeCursor();
-
-        return $count;
-    }
-
-    /**
-     * Selects a collection of Corpus objects pre-filled with all related objects.
-     *
-     * @param      Criteria  $criteria
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of Corpus objects.
-     * @throws PropelException Any exceptions caught during processing will be
-     *		 rethrown wrapped into a PropelException.
-     */
-    public static function doSelectJoinAll(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $criteria = clone $criteria;
-
-        // Set the correct dbName if it has not been overridden
-        if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(CorpusPeer::DATABASE_NAME);
-        }
-
-        CorpusPeer::addSelectColumns($criteria);
-        $startcol2 = CorpusPeer::NUM_HYDRATE_COLUMNS;
-
-        WritPeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + WritPeer::NUM_HYDRATE_COLUMNS;
-
-        $criteria->addJoin(CorpusPeer::WRIT_ID, WritPeer::ID, $join_behavior);
-
-        $stmt = BasePeer::doSelect($criteria, $con);
-        $results = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = CorpusPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = CorpusPeer::getInstanceFromPool($key1))) {
-                // We no longer rehydrate the object, since this can cause data loss.
-                // See http://www.propelorm.org/ticket/509
-                // $obj1->hydrate($row, 0, true); // rehydrate
-            } else {
-                $cls = CorpusPeer::getOMClass();
-
-                $obj1 = new $cls();
-                $obj1->hydrate($row);
-                CorpusPeer::addInstanceToPool($obj1, $key1);
-            } // if obj1 already loaded
-
-            // Add objects for joined Writ rows
-
-            $key2 = WritPeer::getPrimaryKeyHashFromRow($row, $startcol2);
-            if ($key2 !== null) {
-                $obj2 = WritPeer::getInstanceFromPool($key2);
-                if (!$obj2) {
-
-                    $cls = WritPeer::getOMClass();
-
-                    $obj2 = new $cls();
-                    $obj2->hydrate($row, $startcol2);
-                    WritPeer::addInstanceToPool($obj2, $key2);
-                } // if obj2 loaded
-
-                // Add the $obj1 (Corpus) to the collection in $obj2 (Writ)
-                $obj2->addCorpus($obj1);
-            } // if joined row not null
-
-            $results[] = $obj1;
-        }
-        $stmt->closeCursor();
-
-        return $results;
     }
 
     /**

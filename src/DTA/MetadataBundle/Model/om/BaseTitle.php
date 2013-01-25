@@ -63,6 +63,12 @@ abstract class BaseTitle extends BaseObject implements Persistent
     protected $collPublicationsPartial;
 
     /**
+     * @var        PropelObjectCollection|Titlefragment[] Collection to store aggregation of Titlefragment objects.
+     */
+    protected $collTitlefragments;
+    protected $collTitlefragmentsPartial;
+
+    /**
      * @var        PropelObjectCollection|Monograph[] Collection to store aggregation of Monograph objects.
      */
     protected $collMonographs;
@@ -85,12 +91,6 @@ abstract class BaseTitle extends BaseObject implements Persistent
      */
     protected $collSeries;
     protected $collSeriesPartial;
-
-    /**
-     * @var        PropelObjectCollection|Titlefragment[] Collection to store aggregation of Titlefragment objects.
-     */
-    protected $collTitlefragments;
-    protected $collTitlefragmentsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -122,6 +122,12 @@ abstract class BaseTitle extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
+    protected $titlefragmentsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
     protected $monographsScheduledForDeletion = null;
 
     /**
@@ -141,12 +147,6 @@ abstract class BaseTitle extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $seriesScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $titlefragmentsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -284,6 +284,8 @@ abstract class BaseTitle extends BaseObject implements Persistent
 
             $this->collPublications = null;
 
+            $this->collTitlefragments = null;
+
             $this->collMonographs = null;
 
             $this->collEssays = null;
@@ -291,8 +293,6 @@ abstract class BaseTitle extends BaseObject implements Persistent
             $this->collMagazines = null;
 
             $this->collSeries = null;
-
-            $this->collTitlefragments = null;
 
         } // if (deep)
     }
@@ -435,6 +435,23 @@ abstract class BaseTitle extends BaseObject implements Persistent
                 }
             }
 
+            if ($this->titlefragmentsScheduledForDeletion !== null) {
+                if (!$this->titlefragmentsScheduledForDeletion->isEmpty()) {
+                    TitlefragmentQuery::create()
+                        ->filterByPrimaryKeys($this->titlefragmentsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->titlefragmentsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collTitlefragments !== null) {
+                foreach ($this->collTitlefragments as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             if ($this->monographsScheduledForDeletion !== null) {
                 if (!$this->monographsScheduledForDeletion->isEmpty()) {
                     MonographQuery::create()
@@ -497,23 +514,6 @@ abstract class BaseTitle extends BaseObject implements Persistent
 
             if ($this->collSeries !== null) {
                 foreach ($this->collSeries as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
-            if ($this->titlefragmentsScheduledForDeletion !== null) {
-                if (!$this->titlefragmentsScheduledForDeletion->isEmpty()) {
-                    TitlefragmentQuery::create()
-                        ->filterByPrimaryKeys($this->titlefragmentsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->titlefragmentsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collTitlefragments !== null) {
-                foreach ($this->collTitlefragments as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -670,6 +670,14 @@ abstract class BaseTitle extends BaseObject implements Persistent
                     }
                 }
 
+                if ($this->collTitlefragments !== null) {
+                    foreach ($this->collTitlefragments as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
                 if ($this->collMonographs !== null) {
                     foreach ($this->collMonographs as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -696,14 +704,6 @@ abstract class BaseTitle extends BaseObject implements Persistent
 
                 if ($this->collSeries !== null) {
                     foreach ($this->collSeries as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
-                if ($this->collTitlefragments !== null) {
-                    foreach ($this->collTitlefragments as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -783,6 +783,9 @@ abstract class BaseTitle extends BaseObject implements Persistent
             if (null !== $this->collPublications) {
                 $result['Publications'] = $this->collPublications->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
+            if (null !== $this->collTitlefragments) {
+                $result['Titlefragments'] = $this->collTitlefragments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collMonographs) {
                 $result['Monographs'] = $this->collMonographs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -794,9 +797,6 @@ abstract class BaseTitle extends BaseObject implements Persistent
             }
             if (null !== $this->collSeries) {
                 $result['Series'] = $this->collSeries->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
-            if (null !== $this->collTitlefragments) {
-                $result['Titlefragments'] = $this->collTitlefragments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -949,6 +949,12 @@ abstract class BaseTitle extends BaseObject implements Persistent
                 }
             }
 
+            foreach ($this->getTitlefragments() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addTitlefragment($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getMonographs() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addMonograph($relObj->copy($deepCopy));
@@ -970,12 +976,6 @@ abstract class BaseTitle extends BaseObject implements Persistent
             foreach ($this->getSeries() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addSeries($relObj->copy($deepCopy));
-                }
-            }
-
-            foreach ($this->getTitlefragments() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addTitlefragment($relObj->copy($deepCopy));
                 }
             }
 
@@ -1043,6 +1043,9 @@ abstract class BaseTitle extends BaseObject implements Persistent
         if ('Publication' == $relationName) {
             $this->initPublications();
         }
+        if ('Titlefragment' == $relationName) {
+            $this->initTitlefragments();
+        }
         if ('Monograph' == $relationName) {
             $this->initMonographs();
         }
@@ -1054,9 +1057,6 @@ abstract class BaseTitle extends BaseObject implements Persistent
         }
         if ('Series' == $relationName) {
             $this->initSeries();
-        }
-        if ('Titlefragment' == $relationName) {
-            $this->initTitlefragments();
         }
     }
 
@@ -1295,6 +1295,131 @@ abstract class BaseTitle extends BaseObject implements Persistent
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Publication[] List of Publication objects
      */
+    public function getPublicationsJoinWork($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Work', $join_behavior);
+
+        return $this->getPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinPublisher($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Publisher', $join_behavior);
+
+        return $this->getPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinPrinter($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Printer', $join_behavior);
+
+        return $this->getPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinTranslator($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Translator', $join_behavior);
+
+        return $this->getPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinRelatedset($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Relatedset', $join_behavior);
+
+        return $this->getPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
     public function getPublicationsJoinPublishingcompany($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = PublicationQuery::create(null, $criteria);
@@ -1351,6 +1476,249 @@ abstract class BaseTitle extends BaseObject implements Persistent
         $query->joinWith('Datespecification', $join_behavior);
 
         return $this->getPublications($query, $con);
+    }
+
+    /**
+     * Clears out the collTitlefragments collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Title The current object (for fluent API support)
+     * @see        addTitlefragments()
+     */
+    public function clearTitlefragments()
+    {
+        $this->collTitlefragments = null; // important to set this to null since that means it is uninitialized
+        $this->collTitlefragmentsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collTitlefragments collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialTitlefragments($v = true)
+    {
+        $this->collTitlefragmentsPartial = $v;
+    }
+
+    /**
+     * Initializes the collTitlefragments collection.
+     *
+     * By default this just sets the collTitlefragments collection to an empty array (like clearcollTitlefragments());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initTitlefragments($overrideExisting = true)
+    {
+        if (null !== $this->collTitlefragments && !$overrideExisting) {
+            return;
+        }
+        $this->collTitlefragments = new PropelObjectCollection();
+        $this->collTitlefragments->setModel('Titlefragment');
+    }
+
+    /**
+     * Gets an array of Titlefragment objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Title is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Titlefragment[] List of Titlefragment objects
+     * @throws PropelException
+     */
+    public function getTitlefragments($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collTitlefragmentsPartial && !$this->isNew();
+        if (null === $this->collTitlefragments || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collTitlefragments) {
+                // return empty collection
+                $this->initTitlefragments();
+            } else {
+                $collTitlefragments = TitlefragmentQuery::create(null, $criteria)
+                    ->filterByTitle($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collTitlefragmentsPartial && count($collTitlefragments)) {
+                      $this->initTitlefragments(false);
+
+                      foreach($collTitlefragments as $obj) {
+                        if (false == $this->collTitlefragments->contains($obj)) {
+                          $this->collTitlefragments->append($obj);
+                        }
+                      }
+
+                      $this->collTitlefragmentsPartial = true;
+                    }
+
+                    $collTitlefragments->getInternalIterator()->rewind();
+                    return $collTitlefragments;
+                }
+
+                if($partial && $this->collTitlefragments) {
+                    foreach($this->collTitlefragments as $obj) {
+                        if($obj->isNew()) {
+                            $collTitlefragments[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collTitlefragments = $collTitlefragments;
+                $this->collTitlefragmentsPartial = false;
+            }
+        }
+
+        return $this->collTitlefragments;
+    }
+
+    /**
+     * Sets a collection of Titlefragment objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $titlefragments A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Title The current object (for fluent API support)
+     */
+    public function setTitlefragments(PropelCollection $titlefragments, PropelPDO $con = null)
+    {
+        $titlefragmentsToDelete = $this->getTitlefragments(new Criteria(), $con)->diff($titlefragments);
+
+        $this->titlefragmentsScheduledForDeletion = unserialize(serialize($titlefragmentsToDelete));
+
+        foreach ($titlefragmentsToDelete as $titlefragmentRemoved) {
+            $titlefragmentRemoved->setTitle(null);
+        }
+
+        $this->collTitlefragments = null;
+        foreach ($titlefragments as $titlefragment) {
+            $this->addTitlefragment($titlefragment);
+        }
+
+        $this->collTitlefragments = $titlefragments;
+        $this->collTitlefragmentsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Titlefragment objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Titlefragment objects.
+     * @throws PropelException
+     */
+    public function countTitlefragments(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collTitlefragmentsPartial && !$this->isNew();
+        if (null === $this->collTitlefragments || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collTitlefragments) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getTitlefragments());
+            }
+            $query = TitlefragmentQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByTitle($this)
+                ->count($con);
+        }
+
+        return count($this->collTitlefragments);
+    }
+
+    /**
+     * Method called to associate a Titlefragment object to this object
+     * through the Titlefragment foreign key attribute.
+     *
+     * @param    Titlefragment $l Titlefragment
+     * @return Title The current object (for fluent API support)
+     */
+    public function addTitlefragment(Titlefragment $l)
+    {
+        if ($this->collTitlefragments === null) {
+            $this->initTitlefragments();
+            $this->collTitlefragmentsPartial = true;
+        }
+        if (!in_array($l, $this->collTitlefragments->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddTitlefragment($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Titlefragment $titlefragment The titlefragment object to add.
+     */
+    protected function doAddTitlefragment($titlefragment)
+    {
+        $this->collTitlefragments[]= $titlefragment;
+        $titlefragment->setTitle($this);
+    }
+
+    /**
+     * @param	Titlefragment $titlefragment The titlefragment object to remove.
+     * @return Title The current object (for fluent API support)
+     */
+    public function removeTitlefragment($titlefragment)
+    {
+        if ($this->getTitlefragments()->contains($titlefragment)) {
+            $this->collTitlefragments->remove($this->collTitlefragments->search($titlefragment));
+            if (null === $this->titlefragmentsScheduledForDeletion) {
+                $this->titlefragmentsScheduledForDeletion = clone $this->collTitlefragments;
+                $this->titlefragmentsScheduledForDeletion->clear();
+            }
+            $this->titlefragmentsScheduledForDeletion[]= clone $titlefragment;
+            $titlefragment->setTitle(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Titlefragments from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Titlefragment[] List of Titlefragment objects
+     */
+    public function getTitlefragmentsJoinTitlefragmenttype($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = TitlefragmentQuery::create(null, $criteria);
+        $query->joinWith('Titlefragmenttype', $join_behavior);
+
+        return $this->getTitlefragments($query, $con);
     }
 
     /**
@@ -1569,6 +1937,131 @@ abstract class BaseTitle extends BaseObject implements Persistent
         }
 
         return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Monographs from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Monograph[] List of Monograph objects
+     */
+    public function getMonographsJoinWork($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MonographQuery::create(null, $criteria);
+        $query->joinWith('Work', $join_behavior);
+
+        return $this->getMonographs($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Monographs from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Monograph[] List of Monograph objects
+     */
+    public function getMonographsJoinPublisher($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MonographQuery::create(null, $criteria);
+        $query->joinWith('Publisher', $join_behavior);
+
+        return $this->getMonographs($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Monographs from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Monograph[] List of Monograph objects
+     */
+    public function getMonographsJoinPrinter($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MonographQuery::create(null, $criteria);
+        $query->joinWith('Printer', $join_behavior);
+
+        return $this->getMonographs($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Monographs from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Monograph[] List of Monograph objects
+     */
+    public function getMonographsJoinTranslator($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MonographQuery::create(null, $criteria);
+        $query->joinWith('Translator', $join_behavior);
+
+        return $this->getMonographs($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Monographs from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Monograph[] List of Monograph objects
+     */
+    public function getMonographsJoinRelatedset($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MonographQuery::create(null, $criteria);
+        $query->joinWith('Relatedset', $join_behavior);
+
+        return $this->getMonographs($query, $con);
     }
 
 
@@ -1881,6 +2374,131 @@ abstract class BaseTitle extends BaseObject implements Persistent
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Essay[] List of Essay objects
      */
+    public function getEssaysJoinWork($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = EssayQuery::create(null, $criteria);
+        $query->joinWith('Work', $join_behavior);
+
+        return $this->getEssays($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Essays from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Essay[] List of Essay objects
+     */
+    public function getEssaysJoinPublisher($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = EssayQuery::create(null, $criteria);
+        $query->joinWith('Publisher', $join_behavior);
+
+        return $this->getEssays($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Essays from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Essay[] List of Essay objects
+     */
+    public function getEssaysJoinPrinter($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = EssayQuery::create(null, $criteria);
+        $query->joinWith('Printer', $join_behavior);
+
+        return $this->getEssays($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Essays from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Essay[] List of Essay objects
+     */
+    public function getEssaysJoinTranslator($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = EssayQuery::create(null, $criteria);
+        $query->joinWith('Translator', $join_behavior);
+
+        return $this->getEssays($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Essays from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Essay[] List of Essay objects
+     */
+    public function getEssaysJoinRelatedset($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = EssayQuery::create(null, $criteria);
+        $query->joinWith('Relatedset', $join_behavior);
+
+        return $this->getEssays($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Essays from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Essay[] List of Essay objects
+     */
     public function getEssaysJoinPublishingcompany($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = EssayQuery::create(null, $criteria);
@@ -2155,6 +2773,131 @@ abstract class BaseTitle extends BaseObject implements Persistent
         }
 
         return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Magazines from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Magazine[] List of Magazine objects
+     */
+    public function getMagazinesJoinWork($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MagazineQuery::create(null, $criteria);
+        $query->joinWith('Work', $join_behavior);
+
+        return $this->getMagazines($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Magazines from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Magazine[] List of Magazine objects
+     */
+    public function getMagazinesJoinPublisher($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MagazineQuery::create(null, $criteria);
+        $query->joinWith('Publisher', $join_behavior);
+
+        return $this->getMagazines($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Magazines from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Magazine[] List of Magazine objects
+     */
+    public function getMagazinesJoinPrinter($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MagazineQuery::create(null, $criteria);
+        $query->joinWith('Printer', $join_behavior);
+
+        return $this->getMagazines($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Magazines from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Magazine[] List of Magazine objects
+     */
+    public function getMagazinesJoinTranslator($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MagazineQuery::create(null, $criteria);
+        $query->joinWith('Translator', $join_behavior);
+
+        return $this->getMagazines($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Magazines from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Magazine[] List of Magazine objects
+     */
+    public function getMagazinesJoinRelatedset($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MagazineQuery::create(null, $criteria);
+        $query->joinWith('Relatedset', $join_behavior);
+
+        return $this->getMagazines($query, $con);
     }
 
 
@@ -2467,6 +3210,131 @@ abstract class BaseTitle extends BaseObject implements Persistent
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Series[] List of Series objects
      */
+    public function getSeriesJoinWork($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = SeriesQuery::create(null, $criteria);
+        $query->joinWith('Work', $join_behavior);
+
+        return $this->getSeries($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Series from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Series[] List of Series objects
+     */
+    public function getSeriesJoinPublisher($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = SeriesQuery::create(null, $criteria);
+        $query->joinWith('Publisher', $join_behavior);
+
+        return $this->getSeries($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Series from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Series[] List of Series objects
+     */
+    public function getSeriesJoinPrinter($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = SeriesQuery::create(null, $criteria);
+        $query->joinWith('Printer', $join_behavior);
+
+        return $this->getSeries($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Series from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Series[] List of Series objects
+     */
+    public function getSeriesJoinTranslator($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = SeriesQuery::create(null, $criteria);
+        $query->joinWith('Translator', $join_behavior);
+
+        return $this->getSeries($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Series from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Series[] List of Series objects
+     */
+    public function getSeriesJoinRelatedset($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = SeriesQuery::create(null, $criteria);
+        $query->joinWith('Relatedset', $join_behavior);
+
+        return $this->getSeries($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Series from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Series[] List of Series objects
+     */
     public function getSeriesJoinPublishingcompany($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = SeriesQuery::create(null, $criteria);
@@ -2526,249 +3394,6 @@ abstract class BaseTitle extends BaseObject implements Persistent
     }
 
     /**
-     * Clears out the collTitlefragments collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return Title The current object (for fluent API support)
-     * @see        addTitlefragments()
-     */
-    public function clearTitlefragments()
-    {
-        $this->collTitlefragments = null; // important to set this to null since that means it is uninitialized
-        $this->collTitlefragmentsPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * reset is the collTitlefragments collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialTitlefragments($v = true)
-    {
-        $this->collTitlefragmentsPartial = $v;
-    }
-
-    /**
-     * Initializes the collTitlefragments collection.
-     *
-     * By default this just sets the collTitlefragments collection to an empty array (like clearcollTitlefragments());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initTitlefragments($overrideExisting = true)
-    {
-        if (null !== $this->collTitlefragments && !$overrideExisting) {
-            return;
-        }
-        $this->collTitlefragments = new PropelObjectCollection();
-        $this->collTitlefragments->setModel('Titlefragment');
-    }
-
-    /**
-     * Gets an array of Titlefragment objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Title is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|Titlefragment[] List of Titlefragment objects
-     * @throws PropelException
-     */
-    public function getTitlefragments($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collTitlefragmentsPartial && !$this->isNew();
-        if (null === $this->collTitlefragments || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collTitlefragments) {
-                // return empty collection
-                $this->initTitlefragments();
-            } else {
-                $collTitlefragments = TitlefragmentQuery::create(null, $criteria)
-                    ->filterByTitle($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collTitlefragmentsPartial && count($collTitlefragments)) {
-                      $this->initTitlefragments(false);
-
-                      foreach($collTitlefragments as $obj) {
-                        if (false == $this->collTitlefragments->contains($obj)) {
-                          $this->collTitlefragments->append($obj);
-                        }
-                      }
-
-                      $this->collTitlefragmentsPartial = true;
-                    }
-
-                    $collTitlefragments->getInternalIterator()->rewind();
-                    return $collTitlefragments;
-                }
-
-                if($partial && $this->collTitlefragments) {
-                    foreach($this->collTitlefragments as $obj) {
-                        if($obj->isNew()) {
-                            $collTitlefragments[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collTitlefragments = $collTitlefragments;
-                $this->collTitlefragmentsPartial = false;
-            }
-        }
-
-        return $this->collTitlefragments;
-    }
-
-    /**
-     * Sets a collection of Titlefragment objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $titlefragments A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     * @return Title The current object (for fluent API support)
-     */
-    public function setTitlefragments(PropelCollection $titlefragments, PropelPDO $con = null)
-    {
-        $titlefragmentsToDelete = $this->getTitlefragments(new Criteria(), $con)->diff($titlefragments);
-
-        $this->titlefragmentsScheduledForDeletion = unserialize(serialize($titlefragmentsToDelete));
-
-        foreach ($titlefragmentsToDelete as $titlefragmentRemoved) {
-            $titlefragmentRemoved->setTitle(null);
-        }
-
-        $this->collTitlefragments = null;
-        foreach ($titlefragments as $titlefragment) {
-            $this->addTitlefragment($titlefragment);
-        }
-
-        $this->collTitlefragments = $titlefragments;
-        $this->collTitlefragmentsPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related Titlefragment objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related Titlefragment objects.
-     * @throws PropelException
-     */
-    public function countTitlefragments(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collTitlefragmentsPartial && !$this->isNew();
-        if (null === $this->collTitlefragments || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collTitlefragments) {
-                return 0;
-            }
-
-            if($partial && !$criteria) {
-                return count($this->getTitlefragments());
-            }
-            $query = TitlefragmentQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByTitle($this)
-                ->count($con);
-        }
-
-        return count($this->collTitlefragments);
-    }
-
-    /**
-     * Method called to associate a Titlefragment object to this object
-     * through the Titlefragment foreign key attribute.
-     *
-     * @param    Titlefragment $l Titlefragment
-     * @return Title The current object (for fluent API support)
-     */
-    public function addTitlefragment(Titlefragment $l)
-    {
-        if ($this->collTitlefragments === null) {
-            $this->initTitlefragments();
-            $this->collTitlefragmentsPartial = true;
-        }
-        if (!in_array($l, $this->collTitlefragments->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddTitlefragment($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	Titlefragment $titlefragment The titlefragment object to add.
-     */
-    protected function doAddTitlefragment($titlefragment)
-    {
-        $this->collTitlefragments[]= $titlefragment;
-        $titlefragment->setTitle($this);
-    }
-
-    /**
-     * @param	Titlefragment $titlefragment The titlefragment object to remove.
-     * @return Title The current object (for fluent API support)
-     */
-    public function removeTitlefragment($titlefragment)
-    {
-        if ($this->getTitlefragments()->contains($titlefragment)) {
-            $this->collTitlefragments->remove($this->collTitlefragments->search($titlefragment));
-            if (null === $this->titlefragmentsScheduledForDeletion) {
-                $this->titlefragmentsScheduledForDeletion = clone $this->collTitlefragments;
-                $this->titlefragmentsScheduledForDeletion->clear();
-            }
-            $this->titlefragmentsScheduledForDeletion[]= clone $titlefragment;
-            $titlefragment->setTitle(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Title is new, it will return
-     * an empty collection; or if this Title has previously
-     * been saved, it will retrieve related Titlefragments from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Title.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Titlefragment[] List of Titlefragment objects
-     */
-    public function getTitlefragmentsJoinTitlefragmenttype($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = TitlefragmentQuery::create(null, $criteria);
-        $query->joinWith('Titlefragmenttype', $join_behavior);
-
-        return $this->getTitlefragments($query, $con);
-    }
-
-    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -2801,6 +3426,11 @@ abstract class BaseTitle extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collTitlefragments) {
+                foreach ($this->collTitlefragments as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collMonographs) {
                 foreach ($this->collMonographs as $o) {
                     $o->clearAllReferences($deep);
@@ -2821,11 +3451,6 @@ abstract class BaseTitle extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collTitlefragments) {
-                foreach ($this->collTitlefragments as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
 
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
@@ -2834,6 +3459,10 @@ abstract class BaseTitle extends BaseObject implements Persistent
             $this->collPublications->clearIterator();
         }
         $this->collPublications = null;
+        if ($this->collTitlefragments instanceof PropelCollection) {
+            $this->collTitlefragments->clearIterator();
+        }
+        $this->collTitlefragments = null;
         if ($this->collMonographs instanceof PropelCollection) {
             $this->collMonographs->clearIterator();
         }
@@ -2850,10 +3479,6 @@ abstract class BaseTitle extends BaseObject implements Persistent
             $this->collSeries->clearIterator();
         }
         $this->collSeries = null;
-        if ($this->collTitlefragments instanceof PropelCollection) {
-            $this->collTitlefragments->clearIterator();
-        }
-        $this->collTitlefragments = null;
     }
 
     /**

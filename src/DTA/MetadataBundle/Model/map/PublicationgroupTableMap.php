@@ -7,7 +7,7 @@ use \TableMap;
 
 
 /**
- * This class defines the structure of the 'corpus' table.
+ * This class defines the structure of the 'publicationGroup' table.
  *
  *
  *
@@ -18,13 +18,13 @@ use \TableMap;
  *
  * @package    propel.generator.src.DTA.MetadataBundle.Model.map
  */
-class CorpusTableMap extends TableMap
+class PublicationgroupTableMap extends TableMap
 {
 
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'src.DTA.MetadataBundle.Model.map.CorpusTableMap';
+    const CLASS_NAME = 'src.DTA.MetadataBundle.Model.map.PublicationgroupTableMap';
 
     /**
      * Initialize the table attributes, columns and validators
@@ -36,13 +36,13 @@ class CorpusTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('corpus');
-        $this->setPhpName('Corpus');
-        $this->setClassname('DTA\\MetadataBundle\\Model\\Corpus');
+        $this->setName('publicationGroup');
+        $this->setPhpName('Publicationgroup');
+        $this->setClassname('DTA\\MetadataBundle\\Model\\Publicationgroup');
         $this->setPackage('src.DTA.MetadataBundle.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, 10, null);
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('name', 'Name', 'LONGVARCHAR', true, null, null);
         // validators
     } // initialize()
@@ -52,6 +52,9 @@ class CorpusTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('PublicationPublicationgroup', 'DTA\\MetadataBundle\\Model\\PublicationPublicationgroup', RelationMap::ONE_TO_MANY, array('id' => 'publicationGroup_id', ), null, null, 'PublicationPublicationgroups');
+        $this->addRelation('Task', 'DTA\\MetadataBundle\\Model\\Task', RelationMap::ONE_TO_MANY, array('id' => 'publicationGroup_id', ), null, null, 'Tasks');
+        $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Publication', RelationMap::MANY_TO_MANY, array(), null, null, 'Publications');
     } // buildRelations()
 
-} // CorpusTableMap
+} // PublicationgroupTableMap

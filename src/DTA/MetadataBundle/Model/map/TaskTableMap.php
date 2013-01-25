@@ -48,8 +48,8 @@ class TaskTableMap extends TableMap
         $this->addColumn('start', 'Start', 'TIMESTAMP', false, null, null);
         $this->addColumn('end', 'End', 'TIMESTAMP', false, null, null);
         $this->addColumn('comments', 'Comments', 'LONGVARCHAR', false, null, null);
-        $this->addForeignKey('writGroup_id', 'WritgroupId', 'INTEGER', 'writGroup', 'id', false, null, null);
-        $this->addForeignKey('writ_id', 'WritId', 'INTEGER', 'writ', 'id', false, null, null);
+        $this->addForeignKey('publicationGroup_id', 'PublicationgroupId', 'INTEGER', 'publicationGroup', 'id', false, null, null);
+        $this->addForeignKey('publication_id', 'PublicationId', 'INTEGER', 'publication', 'id', false, null, null);
         $this->addForeignKey('responsibleUser_id', 'ResponsibleuserId', 'INTEGER', 'user', 'id', false, null, null);
         // validators
     } // initialize()
@@ -60,8 +60,8 @@ class TaskTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Tasktype', 'DTA\\MetadataBundle\\Model\\Tasktype', RelationMap::MANY_TO_ONE, array('taskType_id' => 'id', ), null, null);
-        $this->addRelation('Writgroup', 'DTA\\MetadataBundle\\Model\\Writgroup', RelationMap::MANY_TO_ONE, array('writGroup_id' => 'id', ), null, null);
-        $this->addRelation('Writ', 'DTA\\MetadataBundle\\Model\\Writ', RelationMap::MANY_TO_ONE, array('writ_id' => 'id', ), null, null);
+        $this->addRelation('Publicationgroup', 'DTA\\MetadataBundle\\Model\\Publicationgroup', RelationMap::MANY_TO_ONE, array('publicationGroup_id' => 'id', ), null, null);
+        $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Publication', RelationMap::MANY_TO_ONE, array('publication_id' => 'id', ), null, null);
         $this->addRelation('User', 'DTA\\MetadataBundle\\Model\\User', RelationMap::MANY_TO_ONE, array('responsibleUser_id' => 'id', ), null, null);
     } // buildRelations()
 

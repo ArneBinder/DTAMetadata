@@ -13,24 +13,28 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use DTA\MetadataBundle\Model\Publication;
+use DTA\MetadataBundle\Model\PublicationPublicationgroup;
+use DTA\MetadataBundle\Model\PublicationPublicationgroupQuery;
+use DTA\MetadataBundle\Model\PublicationQuery;
+use DTA\MetadataBundle\Model\Publicationgroup;
+use DTA\MetadataBundle\Model\PublicationgroupPeer;
+use DTA\MetadataBundle\Model\PublicationgroupQuery;
 use DTA\MetadataBundle\Model\Task;
 use DTA\MetadataBundle\Model\TaskQuery;
-use DTA\MetadataBundle\Model\User;
-use DTA\MetadataBundle\Model\UserPeer;
-use DTA\MetadataBundle\Model\UserQuery;
 
-abstract class BaseUser extends BaseObject implements Persistent
+abstract class BasePublicationgroup extends BaseObject implements Persistent
 {
     /**
      * Peer class name
      */
-    const PEER = 'DTA\\MetadataBundle\\Model\\UserPeer';
+    const PEER = 'DTA\\MetadataBundle\\Model\\PublicationgroupPeer';
 
     /**
      * The Peer class.
      * Instance provides a convenient way of calling static methods on a class
      * that calling code may not be able to identify.
-     * @var        UserPeer
+     * @var        PublicationgroupPeer
      */
     protected static $peer;
 
@@ -47,40 +51,27 @@ abstract class BaseUser extends BaseObject implements Persistent
     protected $id;
 
     /**
-     * The value for the username field.
+     * The value for the name field.
      * @var        string
      */
-    protected $username;
+    protected $name;
 
     /**
-     * The value for the passwordhash field.
-     * @var        string
+     * @var        PropelObjectCollection|PublicationPublicationgroup[] Collection to store aggregation of PublicationPublicationgroup objects.
      */
-    protected $passwordhash;
-
-    /**
-     * The value for the name_id field.
-     * @var        int
-     */
-    protected $name_id;
-
-    /**
-     * The value for the mail field.
-     * @var        string
-     */
-    protected $mail;
-
-    /**
-     * The value for the phone field.
-     * @var        string
-     */
-    protected $phone;
+    protected $collPublicationPublicationgroups;
+    protected $collPublicationPublicationgroupsPartial;
 
     /**
      * @var        PropelObjectCollection|Task[] Collection to store aggregation of Task objects.
      */
     protected $collTasks;
     protected $collTasksPartial;
+
+    /**
+     * @var        PropelObjectCollection|Publication[] Collection to store aggregation of Publication objects.
+     */
+    protected $collPublications;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -106,6 +97,18 @@ abstract class BaseUser extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
+    protected $publicationsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $publicationPublicationgroupsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
     protected $tasksScheduledForDeletion = null;
 
     /**
@@ -119,60 +122,20 @@ abstract class BaseUser extends BaseObject implements Persistent
     }
 
     /**
-     * Get the [username] column value.
+     * Get the [name] column value.
      *
      * @return string
      */
-    public function getUsername()
+    public function getName()
     {
-        return $this->username;
-    }
-
-    /**
-     * Get the [passwordhash] column value.
-     *
-     * @return string
-     */
-    public function getPasswordhash()
-    {
-        return $this->passwordhash;
-    }
-
-    /**
-     * Get the [name_id] column value.
-     *
-     * @return int
-     */
-    public function getNameId()
-    {
-        return $this->name_id;
-    }
-
-    /**
-     * Get the [mail] column value.
-     *
-     * @return string
-     */
-    public function getMail()
-    {
-        return $this->mail;
-    }
-
-    /**
-     * Get the [phone] column value.
-     *
-     * @return string
-     */
-    public function getPhone()
-    {
-        return $this->phone;
+        return $this->name;
     }
 
     /**
      * Set the value of [id] column.
      *
      * @param int $v new value
-     * @return User The current object (for fluent API support)
+     * @return Publicationgroup The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -182,7 +145,7 @@ abstract class BaseUser extends BaseObject implements Persistent
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = UserPeer::ID;
+            $this->modifiedColumns[] = PublicationgroupPeer::ID;
         }
 
 
@@ -190,109 +153,25 @@ abstract class BaseUser extends BaseObject implements Persistent
     } // setId()
 
     /**
-     * Set the value of [username] column.
+     * Set the value of [name] column.
      *
      * @param string $v new value
-     * @return User The current object (for fluent API support)
+     * @return Publicationgroup The current object (for fluent API support)
      */
-    public function setUsername($v)
+    public function setName($v)
     {
         if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
-        if ($this->username !== $v) {
-            $this->username = $v;
-            $this->modifiedColumns[] = UserPeer::USERNAME;
+        if ($this->name !== $v) {
+            $this->name = $v;
+            $this->modifiedColumns[] = PublicationgroupPeer::NAME;
         }
 
 
         return $this;
-    } // setUsername()
-
-    /**
-     * Set the value of [passwordhash] column.
-     *
-     * @param string $v new value
-     * @return User The current object (for fluent API support)
-     */
-    public function setPasswordhash($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
-        }
-
-        if ($this->passwordhash !== $v) {
-            $this->passwordhash = $v;
-            $this->modifiedColumns[] = UserPeer::PASSWORDHASH;
-        }
-
-
-        return $this;
-    } // setPasswordhash()
-
-    /**
-     * Set the value of [name_id] column.
-     *
-     * @param int $v new value
-     * @return User The current object (for fluent API support)
-     */
-    public function setNameId($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->name_id !== $v) {
-            $this->name_id = $v;
-            $this->modifiedColumns[] = UserPeer::NAME_ID;
-        }
-
-
-        return $this;
-    } // setNameId()
-
-    /**
-     * Set the value of [mail] column.
-     *
-     * @param string $v new value
-     * @return User The current object (for fluent API support)
-     */
-    public function setMail($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
-        }
-
-        if ($this->mail !== $v) {
-            $this->mail = $v;
-            $this->modifiedColumns[] = UserPeer::MAIL;
-        }
-
-
-        return $this;
-    } // setMail()
-
-    /**
-     * Set the value of [phone] column.
-     *
-     * @param string $v new value
-     * @return User The current object (for fluent API support)
-     */
-    public function setPhone($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
-        }
-
-        if ($this->phone !== $v) {
-            $this->phone = $v;
-            $this->modifiedColumns[] = UserPeer::PHONE;
-        }
-
-
-        return $this;
-    } // setPhone()
+    } // setName()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -327,11 +206,7 @@ abstract class BaseUser extends BaseObject implements Persistent
         try {
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-            $this->username = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
-            $this->passwordhash = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-            $this->name_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
-            $this->mail = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-            $this->phone = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+            $this->name = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -340,10 +215,10 @@ abstract class BaseUser extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 6; // 6 = UserPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 2; // 2 = PublicationgroupPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating User object", $e);
+            throw new PropelException("Error populating Publicationgroup object", $e);
         }
     }
 
@@ -386,13 +261,13 @@ abstract class BaseUser extends BaseObject implements Persistent
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(UserPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(PublicationgroupPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $stmt = UserPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+        $stmt = PublicationgroupPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
         $row = $stmt->fetch(PDO::FETCH_NUM);
         $stmt->closeCursor();
         if (!$row) {
@@ -402,8 +277,11 @@ abstract class BaseUser extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->collPublicationPublicationgroups = null;
+
             $this->collTasks = null;
 
+            $this->collPublications = null;
         } // if (deep)
     }
 
@@ -424,12 +302,12 @@ abstract class BaseUser extends BaseObject implements Persistent
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(UserPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(PublicationgroupPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = UserQuery::create()
+            $deleteQuery = PublicationgroupQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -467,7 +345,7 @@ abstract class BaseUser extends BaseObject implements Persistent
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(UserPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(PublicationgroupPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         $con->beginTransaction();
@@ -487,7 +365,7 @@ abstract class BaseUser extends BaseObject implements Persistent
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                UserPeer::addInstanceToPool($this);
+                PublicationgroupPeer::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -528,6 +406,49 @@ abstract class BaseUser extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
+            if ($this->publicationsScheduledForDeletion !== null) {
+                if (!$this->publicationsScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->publicationsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($pk, $remotePk);
+                    }
+                    PublicationPublicationgroupQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->publicationsScheduledForDeletion = null;
+                }
+
+                foreach ($this->getPublications() as $publication) {
+                    if ($publication->isModified()) {
+                        $publication->save($con);
+                    }
+                }
+            } elseif ($this->collPublications) {
+                foreach ($this->collPublications as $publication) {
+                    if ($publication->isModified()) {
+                        $publication->save($con);
+                    }
+                }
+            }
+
+            if ($this->publicationPublicationgroupsScheduledForDeletion !== null) {
+                if (!$this->publicationPublicationgroupsScheduledForDeletion->isEmpty()) {
+                    PublicationPublicationgroupQuery::create()
+                        ->filterByPrimaryKeys($this->publicationPublicationgroupsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->publicationPublicationgroupsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collPublicationPublicationgroups !== null) {
+                foreach ($this->collPublicationPublicationgroups as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             if ($this->tasksScheduledForDeletion !== null) {
                 if (!$this->tasksScheduledForDeletion->isEmpty()) {
                     foreach ($this->tasksScheduledForDeletion as $task) {
@@ -566,33 +487,21 @@ abstract class BaseUser extends BaseObject implements Persistent
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = UserPeer::ID;
+        $this->modifiedColumns[] = PublicationgroupPeer::ID;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . UserPeer::ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . PublicationgroupPeer::ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(UserPeer::ID)) {
+        if ($this->isColumnModified(PublicationgroupPeer::ID)) {
             $modifiedColumns[':p' . $index++]  = '`id`';
         }
-        if ($this->isColumnModified(UserPeer::USERNAME)) {
-            $modifiedColumns[':p' . $index++]  = '`userName`';
-        }
-        if ($this->isColumnModified(UserPeer::PASSWORDHASH)) {
-            $modifiedColumns[':p' . $index++]  = '`passwordHash`';
-        }
-        if ($this->isColumnModified(UserPeer::NAME_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`name_id`';
-        }
-        if ($this->isColumnModified(UserPeer::MAIL)) {
-            $modifiedColumns[':p' . $index++]  = '`mail`';
-        }
-        if ($this->isColumnModified(UserPeer::PHONE)) {
-            $modifiedColumns[':p' . $index++]  = '`phone`';
+        if ($this->isColumnModified(PublicationgroupPeer::NAME)) {
+            $modifiedColumns[':p' . $index++]  = '`name`';
         }
 
         $sql = sprintf(
-            'INSERT INTO `user` (%s) VALUES (%s)',
+            'INSERT INTO `publicationGroup` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -604,20 +513,8 @@ abstract class BaseUser extends BaseObject implements Persistent
                     case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`userName`':
-                        $stmt->bindValue($identifier, $this->username, PDO::PARAM_STR);
-                        break;
-                    case '`passwordHash`':
-                        $stmt->bindValue($identifier, $this->passwordhash, PDO::PARAM_STR);
-                        break;
-                    case '`name_id`':
-                        $stmt->bindValue($identifier, $this->name_id, PDO::PARAM_INT);
-                        break;
-                    case '`mail`':
-                        $stmt->bindValue($identifier, $this->mail, PDO::PARAM_STR);
-                        break;
-                    case '`phone`':
-                        $stmt->bindValue($identifier, $this->phone, PDO::PARAM_STR);
+                    case '`name`':
+                        $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -713,10 +610,18 @@ abstract class BaseUser extends BaseObject implements Persistent
             $failureMap = array();
 
 
-            if (($retval = UserPeer::doValidate($this, $columns)) !== true) {
+            if (($retval = PublicationgroupPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
+
+                if ($this->collPublicationPublicationgroups !== null) {
+                    foreach ($this->collPublicationPublicationgroups as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
 
                 if ($this->collTasks !== null) {
                     foreach ($this->collTasks as $referrerFK) {
@@ -745,7 +650,7 @@ abstract class BaseUser extends BaseObject implements Persistent
      */
     public function getByName($name, $type = BasePeer::TYPE_PHPNAME)
     {
-        $pos = UserPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+        $pos = PublicationgroupPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -765,19 +670,7 @@ abstract class BaseUser extends BaseObject implements Persistent
                 return $this->getId();
                 break;
             case 1:
-                return $this->getUsername();
-                break;
-            case 2:
-                return $this->getPasswordhash();
-                break;
-            case 3:
-                return $this->getNameId();
-                break;
-            case 4:
-                return $this->getMail();
-                break;
-            case 5:
-                return $this->getPhone();
+                return $this->getName();
                 break;
             default:
                 return null;
@@ -802,20 +695,19 @@ abstract class BaseUser extends BaseObject implements Persistent
      */
     public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['User'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['Publicationgroup'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['User'][$this->getPrimaryKey()] = true;
-        $keys = UserPeer::getFieldNames($keyType);
+        $alreadyDumpedObjects['Publicationgroup'][$this->getPrimaryKey()] = true;
+        $keys = PublicationgroupPeer::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getUsername(),
-            $keys[2] => $this->getPasswordhash(),
-            $keys[3] => $this->getNameId(),
-            $keys[4] => $this->getMail(),
-            $keys[5] => $this->getPhone(),
+            $keys[1] => $this->getName(),
         );
         if ($includeForeignObjects) {
+            if (null !== $this->collPublicationPublicationgroups) {
+                $result['PublicationPublicationgroups'] = $this->collPublicationPublicationgroups->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collTasks) {
                 $result['Tasks'] = $this->collTasks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -837,7 +729,7 @@ abstract class BaseUser extends BaseObject implements Persistent
      */
     public function setByName($name, $value, $type = BasePeer::TYPE_PHPNAME)
     {
-        $pos = UserPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+        $pos = PublicationgroupPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 
         $this->setByPosition($pos, $value);
     }
@@ -857,19 +749,7 @@ abstract class BaseUser extends BaseObject implements Persistent
                 $this->setId($value);
                 break;
             case 1:
-                $this->setUsername($value);
-                break;
-            case 2:
-                $this->setPasswordhash($value);
-                break;
-            case 3:
-                $this->setNameId($value);
-                break;
-            case 4:
-                $this->setMail($value);
-                break;
-            case 5:
-                $this->setPhone($value);
+                $this->setName($value);
                 break;
         } // switch()
     }
@@ -893,14 +773,10 @@ abstract class BaseUser extends BaseObject implements Persistent
      */
     public function fromArray($arr, $keyType = BasePeer::TYPE_PHPNAME)
     {
-        $keys = UserPeer::getFieldNames($keyType);
+        $keys = PublicationgroupPeer::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setUsername($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setPasswordhash($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setNameId($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setMail($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setPhone($arr[$keys[5]]);
+        if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
     }
 
     /**
@@ -910,14 +786,10 @@ abstract class BaseUser extends BaseObject implements Persistent
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(UserPeer::DATABASE_NAME);
+        $criteria = new Criteria(PublicationgroupPeer::DATABASE_NAME);
 
-        if ($this->isColumnModified(UserPeer::ID)) $criteria->add(UserPeer::ID, $this->id);
-        if ($this->isColumnModified(UserPeer::USERNAME)) $criteria->add(UserPeer::USERNAME, $this->username);
-        if ($this->isColumnModified(UserPeer::PASSWORDHASH)) $criteria->add(UserPeer::PASSWORDHASH, $this->passwordhash);
-        if ($this->isColumnModified(UserPeer::NAME_ID)) $criteria->add(UserPeer::NAME_ID, $this->name_id);
-        if ($this->isColumnModified(UserPeer::MAIL)) $criteria->add(UserPeer::MAIL, $this->mail);
-        if ($this->isColumnModified(UserPeer::PHONE)) $criteria->add(UserPeer::PHONE, $this->phone);
+        if ($this->isColumnModified(PublicationgroupPeer::ID)) $criteria->add(PublicationgroupPeer::ID, $this->id);
+        if ($this->isColumnModified(PublicationgroupPeer::NAME)) $criteria->add(PublicationgroupPeer::NAME, $this->name);
 
         return $criteria;
     }
@@ -932,8 +804,8 @@ abstract class BaseUser extends BaseObject implements Persistent
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(UserPeer::DATABASE_NAME);
-        $criteria->add(UserPeer::ID, $this->id);
+        $criteria = new Criteria(PublicationgroupPeer::DATABASE_NAME);
+        $criteria->add(PublicationgroupPeer::ID, $this->id);
 
         return $criteria;
     }
@@ -974,18 +846,14 @@ abstract class BaseUser extends BaseObject implements Persistent
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param object $copyObj An object of User (or compatible) type.
+     * @param object $copyObj An object of Publicationgroup (or compatible) type.
      * @param boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setUsername($this->getUsername());
-        $copyObj->setPasswordhash($this->getPasswordhash());
-        $copyObj->setNameId($this->getNameId());
-        $copyObj->setMail($this->getMail());
-        $copyObj->setPhone($this->getPhone());
+        $copyObj->setName($this->getName());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -993,6 +861,12 @@ abstract class BaseUser extends BaseObject implements Persistent
             $copyObj->setNew(false);
             // store object hash to prevent cycle
             $this->startCopy = true;
+
+            foreach ($this->getPublicationPublicationgroups() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addPublicationPublicationgroup($relObj->copy($deepCopy));
+                }
+            }
 
             foreach ($this->getTasks() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
@@ -1019,7 +893,7 @@ abstract class BaseUser extends BaseObject implements Persistent
      * objects.
      *
      * @param boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return User Clone of current object.
+     * @return Publicationgroup Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1039,12 +913,12 @@ abstract class BaseUser extends BaseObject implements Persistent
      * same instance for all member of this class. The method could therefore
      * be static, but this would prevent one from overriding the behavior.
      *
-     * @return UserPeer
+     * @return PublicationgroupPeer
      */
     public function getPeer()
     {
         if (self::$peer === null) {
-            self::$peer = new UserPeer();
+            self::$peer = new PublicationgroupPeer();
         }
 
         return self::$peer;
@@ -1061,9 +935,255 @@ abstract class BaseUser extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
+        if ('PublicationPublicationgroup' == $relationName) {
+            $this->initPublicationPublicationgroups();
+        }
         if ('Task' == $relationName) {
             $this->initTasks();
         }
+    }
+
+    /**
+     * Clears out the collPublicationPublicationgroups collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Publicationgroup The current object (for fluent API support)
+     * @see        addPublicationPublicationgroups()
+     */
+    public function clearPublicationPublicationgroups()
+    {
+        $this->collPublicationPublicationgroups = null; // important to set this to null since that means it is uninitialized
+        $this->collPublicationPublicationgroupsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collPublicationPublicationgroups collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialPublicationPublicationgroups($v = true)
+    {
+        $this->collPublicationPublicationgroupsPartial = $v;
+    }
+
+    /**
+     * Initializes the collPublicationPublicationgroups collection.
+     *
+     * By default this just sets the collPublicationPublicationgroups collection to an empty array (like clearcollPublicationPublicationgroups());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initPublicationPublicationgroups($overrideExisting = true)
+    {
+        if (null !== $this->collPublicationPublicationgroups && !$overrideExisting) {
+            return;
+        }
+        $this->collPublicationPublicationgroups = new PropelObjectCollection();
+        $this->collPublicationPublicationgroups->setModel('PublicationPublicationgroup');
+    }
+
+    /**
+     * Gets an array of PublicationPublicationgroup objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Publicationgroup is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|PublicationPublicationgroup[] List of PublicationPublicationgroup objects
+     * @throws PropelException
+     */
+    public function getPublicationPublicationgroups($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collPublicationPublicationgroupsPartial && !$this->isNew();
+        if (null === $this->collPublicationPublicationgroups || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collPublicationPublicationgroups) {
+                // return empty collection
+                $this->initPublicationPublicationgroups();
+            } else {
+                $collPublicationPublicationgroups = PublicationPublicationgroupQuery::create(null, $criteria)
+                    ->filterByPublicationgroup($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collPublicationPublicationgroupsPartial && count($collPublicationPublicationgroups)) {
+                      $this->initPublicationPublicationgroups(false);
+
+                      foreach($collPublicationPublicationgroups as $obj) {
+                        if (false == $this->collPublicationPublicationgroups->contains($obj)) {
+                          $this->collPublicationPublicationgroups->append($obj);
+                        }
+                      }
+
+                      $this->collPublicationPublicationgroupsPartial = true;
+                    }
+
+                    $collPublicationPublicationgroups->getInternalIterator()->rewind();
+                    return $collPublicationPublicationgroups;
+                }
+
+                if($partial && $this->collPublicationPublicationgroups) {
+                    foreach($this->collPublicationPublicationgroups as $obj) {
+                        if($obj->isNew()) {
+                            $collPublicationPublicationgroups[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collPublicationPublicationgroups = $collPublicationPublicationgroups;
+                $this->collPublicationPublicationgroupsPartial = false;
+            }
+        }
+
+        return $this->collPublicationPublicationgroups;
+    }
+
+    /**
+     * Sets a collection of PublicationPublicationgroup objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $publicationPublicationgroups A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Publicationgroup The current object (for fluent API support)
+     */
+    public function setPublicationPublicationgroups(PropelCollection $publicationPublicationgroups, PropelPDO $con = null)
+    {
+        $publicationPublicationgroupsToDelete = $this->getPublicationPublicationgroups(new Criteria(), $con)->diff($publicationPublicationgroups);
+
+        $this->publicationPublicationgroupsScheduledForDeletion = unserialize(serialize($publicationPublicationgroupsToDelete));
+
+        foreach ($publicationPublicationgroupsToDelete as $publicationPublicationgroupRemoved) {
+            $publicationPublicationgroupRemoved->setPublicationgroup(null);
+        }
+
+        $this->collPublicationPublicationgroups = null;
+        foreach ($publicationPublicationgroups as $publicationPublicationgroup) {
+            $this->addPublicationPublicationgroup($publicationPublicationgroup);
+        }
+
+        $this->collPublicationPublicationgroups = $publicationPublicationgroups;
+        $this->collPublicationPublicationgroupsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related PublicationPublicationgroup objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related PublicationPublicationgroup objects.
+     * @throws PropelException
+     */
+    public function countPublicationPublicationgroups(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collPublicationPublicationgroupsPartial && !$this->isNew();
+        if (null === $this->collPublicationPublicationgroups || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collPublicationPublicationgroups) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getPublicationPublicationgroups());
+            }
+            $query = PublicationPublicationgroupQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPublicationgroup($this)
+                ->count($con);
+        }
+
+        return count($this->collPublicationPublicationgroups);
+    }
+
+    /**
+     * Method called to associate a PublicationPublicationgroup object to this object
+     * through the PublicationPublicationgroup foreign key attribute.
+     *
+     * @param    PublicationPublicationgroup $l PublicationPublicationgroup
+     * @return Publicationgroup The current object (for fluent API support)
+     */
+    public function addPublicationPublicationgroup(PublicationPublicationgroup $l)
+    {
+        if ($this->collPublicationPublicationgroups === null) {
+            $this->initPublicationPublicationgroups();
+            $this->collPublicationPublicationgroupsPartial = true;
+        }
+        if (!in_array($l, $this->collPublicationPublicationgroups->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddPublicationPublicationgroup($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	PublicationPublicationgroup $publicationPublicationgroup The publicationPublicationgroup object to add.
+     */
+    protected function doAddPublicationPublicationgroup($publicationPublicationgroup)
+    {
+        $this->collPublicationPublicationgroups[]= $publicationPublicationgroup;
+        $publicationPublicationgroup->setPublicationgroup($this);
+    }
+
+    /**
+     * @param	PublicationPublicationgroup $publicationPublicationgroup The publicationPublicationgroup object to remove.
+     * @return Publicationgroup The current object (for fluent API support)
+     */
+    public function removePublicationPublicationgroup($publicationPublicationgroup)
+    {
+        if ($this->getPublicationPublicationgroups()->contains($publicationPublicationgroup)) {
+            $this->collPublicationPublicationgroups->remove($this->collPublicationPublicationgroups->search($publicationPublicationgroup));
+            if (null === $this->publicationPublicationgroupsScheduledForDeletion) {
+                $this->publicationPublicationgroupsScheduledForDeletion = clone $this->collPublicationPublicationgroups;
+                $this->publicationPublicationgroupsScheduledForDeletion->clear();
+            }
+            $this->publicationPublicationgroupsScheduledForDeletion[]= clone $publicationPublicationgroup;
+            $publicationPublicationgroup->setPublicationgroup(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Publicationgroup is new, it will return
+     * an empty collection; or if this Publicationgroup has previously
+     * been saved, it will retrieve related PublicationPublicationgroups from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Publicationgroup.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|PublicationPublicationgroup[] List of PublicationPublicationgroup objects
+     */
+    public function getPublicationPublicationgroupsJoinPublication($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationPublicationgroupQuery::create(null, $criteria);
+        $query->joinWith('Publication', $join_behavior);
+
+        return $this->getPublicationPublicationgroups($query, $con);
     }
 
     /**
@@ -1072,7 +1192,7 @@ abstract class BaseUser extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return User The current object (for fluent API support)
+     * @return Publicationgroup The current object (for fluent API support)
      * @see        addTasks()
      */
     public function clearTasks()
@@ -1120,7 +1240,7 @@ abstract class BaseUser extends BaseObject implements Persistent
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
      * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this User is new, it will return
+     * If this Publicationgroup is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
@@ -1137,7 +1257,7 @@ abstract class BaseUser extends BaseObject implements Persistent
                 $this->initTasks();
             } else {
                 $collTasks = TaskQuery::create(null, $criteria)
-                    ->filterByUser($this)
+                    ->filterByPublicationgroup($this)
                     ->find($con);
                 if (null !== $criteria) {
                     if (false !== $this->collTasksPartial && count($collTasks)) {
@@ -1180,7 +1300,7 @@ abstract class BaseUser extends BaseObject implements Persistent
      *
      * @param PropelCollection $tasks A Propel collection.
      * @param PropelPDO $con Optional connection object
-     * @return User The current object (for fluent API support)
+     * @return Publicationgroup The current object (for fluent API support)
      */
     public function setTasks(PropelCollection $tasks, PropelPDO $con = null)
     {
@@ -1189,7 +1309,7 @@ abstract class BaseUser extends BaseObject implements Persistent
         $this->tasksScheduledForDeletion = unserialize(serialize($tasksToDelete));
 
         foreach ($tasksToDelete as $taskRemoved) {
-            $taskRemoved->setUser(null);
+            $taskRemoved->setPublicationgroup(null);
         }
 
         $this->collTasks = null;
@@ -1229,7 +1349,7 @@ abstract class BaseUser extends BaseObject implements Persistent
             }
 
             return $query
-                ->filterByUser($this)
+                ->filterByPublicationgroup($this)
                 ->count($con);
         }
 
@@ -1241,7 +1361,7 @@ abstract class BaseUser extends BaseObject implements Persistent
      * through the Task foreign key attribute.
      *
      * @param    Task $l Task
-     * @return User The current object (for fluent API support)
+     * @return Publicationgroup The current object (for fluent API support)
      */
     public function addTask(Task $l)
     {
@@ -1262,12 +1382,12 @@ abstract class BaseUser extends BaseObject implements Persistent
     protected function doAddTask($task)
     {
         $this->collTasks[]= $task;
-        $task->setUser($this);
+        $task->setPublicationgroup($this);
     }
 
     /**
      * @param	Task $task The task object to remove.
-     * @return User The current object (for fluent API support)
+     * @return Publicationgroup The current object (for fluent API support)
      */
     public function removeTask($task)
     {
@@ -1278,7 +1398,7 @@ abstract class BaseUser extends BaseObject implements Persistent
                 $this->tasksScheduledForDeletion->clear();
             }
             $this->tasksScheduledForDeletion[]= $task;
-            $task->setUser(null);
+            $task->setPublicationgroup(null);
         }
 
         return $this;
@@ -1288,13 +1408,13 @@ abstract class BaseUser extends BaseObject implements Persistent
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
-     * Otherwise if this User is new, it will return
-     * an empty collection; or if this User has previously
+     * Otherwise if this Publicationgroup is new, it will return
+     * an empty collection; or if this Publicationgroup has previously
      * been saved, it will retrieve related Tasks from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
-     * actually need in User.
+     * actually need in Publicationgroup.
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
@@ -1313,38 +1433,13 @@ abstract class BaseUser extends BaseObject implements Persistent
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
-     * Otherwise if this User is new, it will return
-     * an empty collection; or if this User has previously
+     * Otherwise if this Publicationgroup is new, it will return
+     * an empty collection; or if this Publicationgroup has previously
      * been saved, it will retrieve related Tasks from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
-     * actually need in User.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Task[] List of Task objects
-     */
-    public function getTasksJoinPublicationgroup($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = TaskQuery::create(null, $criteria);
-        $query->joinWith('Publicationgroup', $join_behavior);
-
-        return $this->getTasks($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this User is new, it will return
-     * an empty collection; or if this User has previously
-     * been saved, it will retrieve related Tasks from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in User.
+     * actually need in Publicationgroup.
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
@@ -1359,17 +1454,215 @@ abstract class BaseUser extends BaseObject implements Persistent
         return $this->getTasks($query, $con);
     }
 
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Publicationgroup is new, it will return
+     * an empty collection; or if this Publicationgroup has previously
+     * been saved, it will retrieve related Tasks from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Publicationgroup.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Task[] List of Task objects
+     */
+    public function getTasksJoinUser($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = TaskQuery::create(null, $criteria);
+        $query->joinWith('User', $join_behavior);
+
+        return $this->getTasks($query, $con);
+    }
+
+    /**
+     * Clears out the collPublications collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Publicationgroup The current object (for fluent API support)
+     * @see        addPublications()
+     */
+    public function clearPublications()
+    {
+        $this->collPublications = null; // important to set this to null since that means it is uninitialized
+        $this->collPublicationsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * Initializes the collPublications collection.
+     *
+     * By default this just sets the collPublications collection to an empty collection (like clearPublications());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initPublications()
+    {
+        $this->collPublications = new PropelObjectCollection();
+        $this->collPublications->setModel('Publication');
+    }
+
+    /**
+     * Gets a collection of Publication objects related by a many-to-many relationship
+     * to the current object by way of the publication_publicationGroup cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Publicationgroup is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublications($criteria = null, PropelPDO $con = null)
+    {
+        if (null === $this->collPublications || null !== $criteria) {
+            if ($this->isNew() && null === $this->collPublications) {
+                // return empty collection
+                $this->initPublications();
+            } else {
+                $collPublications = PublicationQuery::create(null, $criteria)
+                    ->filterByPublicationgroup($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collPublications;
+                }
+                $this->collPublications = $collPublications;
+            }
+        }
+
+        return $this->collPublications;
+    }
+
+    /**
+     * Sets a collection of Publication objects related by a many-to-many relationship
+     * to the current object by way of the publication_publicationGroup cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $publications A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Publicationgroup The current object (for fluent API support)
+     */
+    public function setPublications(PropelCollection $publications, PropelPDO $con = null)
+    {
+        $this->clearPublications();
+        $currentPublications = $this->getPublications();
+
+        $this->publicationsScheduledForDeletion = $currentPublications->diff($publications);
+
+        foreach ($publications as $publication) {
+            if (!$currentPublications->contains($publication)) {
+                $this->doAddPublication($publication);
+            }
+        }
+
+        $this->collPublications = $publications;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Publication objects related by a many-to-many relationship
+     * to the current object by way of the publication_publicationGroup cross-reference table.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related Publication objects
+     */
+    public function countPublications($criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        if (null === $this->collPublications || null !== $criteria) {
+            if ($this->isNew() && null === $this->collPublications) {
+                return 0;
+            } else {
+                $query = PublicationQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByPublicationgroup($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collPublications);
+        }
+    }
+
+    /**
+     * Associate a Publication object to this object
+     * through the publication_publicationGroup cross reference table.
+     *
+     * @param  Publication $publication The PublicationPublicationgroup object to relate
+     * @return Publicationgroup The current object (for fluent API support)
+     */
+    public function addPublication(Publication $publication)
+    {
+        if ($this->collPublications === null) {
+            $this->initPublications();
+        }
+        if (!$this->collPublications->contains($publication)) { // only add it if the **same** object is not already associated
+            $this->doAddPublication($publication);
+
+            $this->collPublications[]= $publication;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Publication $publication The publication object to add.
+     */
+    protected function doAddPublication($publication)
+    {
+        $publicationPublicationgroup = new PublicationPublicationgroup();
+        $publicationPublicationgroup->setPublication($publication);
+        $this->addPublicationPublicationgroup($publicationPublicationgroup);
+    }
+
+    /**
+     * Remove a Publication object to this object
+     * through the publication_publicationGroup cross reference table.
+     *
+     * @param Publication $publication The PublicationPublicationgroup object to relate
+     * @return Publicationgroup The current object (for fluent API support)
+     */
+    public function removePublication(Publication $publication)
+    {
+        if ($this->getPublications()->contains($publication)) {
+            $this->collPublications->remove($this->collPublications->search($publication));
+            if (null === $this->publicationsScheduledForDeletion) {
+                $this->publicationsScheduledForDeletion = clone $this->collPublications;
+                $this->publicationsScheduledForDeletion->clear();
+            }
+            $this->publicationsScheduledForDeletion[]= $publication;
+        }
+
+        return $this;
+    }
+
     /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
     {
         $this->id = null;
-        $this->username = null;
-        $this->passwordhash = null;
-        $this->name_id = null;
-        $this->mail = null;
-        $this->phone = null;
+        $this->name = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
@@ -1392,8 +1685,18 @@ abstract class BaseUser extends BaseObject implements Persistent
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->collPublicationPublicationgroups) {
+                foreach ($this->collPublicationPublicationgroups as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collTasks) {
                 foreach ($this->collTasks as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collPublications) {
+                foreach ($this->collPublications as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -1401,10 +1704,18 @@ abstract class BaseUser extends BaseObject implements Persistent
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
+        if ($this->collPublicationPublicationgroups instanceof PropelCollection) {
+            $this->collPublicationPublicationgroups->clearIterator();
+        }
+        $this->collPublicationPublicationgroups = null;
         if ($this->collTasks instanceof PropelCollection) {
             $this->collTasks->clearIterator();
         }
         $this->collTasks = null;
+        if ($this->collPublications instanceof PropelCollection) {
+            $this->collPublications->clearIterator();
+        }
+        $this->collPublications = null;
     }
 
     /**
@@ -1414,7 +1725,7 @@ abstract class BaseUser extends BaseObject implements Persistent
      */
     public function __toString()
     {
-        return (string) $this->exportTo(UserPeer::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(PublicationgroupPeer::DEFAULT_STRING_FORMAT);
     }
 
     /**

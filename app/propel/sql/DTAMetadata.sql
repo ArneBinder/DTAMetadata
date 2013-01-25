@@ -4,34 +4,6 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ---------------------------------------------------------------------
--- konto
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `konto`;
-
-CREATE TABLE `konto`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `login` VARCHAR(255) NOT NULL,
-    `password` VARCHAR(255) NOT NULL,
-    PRIMARY KEY (`id`)
-) ENGINE=MyISAM;
-
--- ---------------------------------------------------------------------
--- profil
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `profil`;
-
-CREATE TABLE `profil`
-(
-    `email` VARCHAR(255),
-    `telephone` VARCHAR(255),
-    `id` INTEGER NOT NULL,
-    PRIMARY KEY (`id`)
-) ENGINE=MyISAM;
-
--- ---------------------------------------------------------------------
 -- publication
 -- ---------------------------------------------------------------------
 
@@ -40,17 +12,28 @@ DROP TABLE IF EXISTS `publication`;
 CREATE TABLE `publication`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `title_id` INTEGER NOT NULL,
-    `publishingCompany_id` INTEGER,
-    `place_id` INTEGER,
-    `dateSpecification_id` INTEGER,
     `printRun` TEXT COMMENT 'Auflage',
     `printRunComment` TEXT,
     `edition` TEXT,
     `numPages` INTEGER,
     `numPagesNormed` INTEGER,
     `bibliographicCitation` TEXT,
+    `title_id` INTEGER NOT NULL,
+    `publishingCompany_id` INTEGER,
+    `place_id` INTEGER,
+    `dateSpecification_id` INTEGER,
+    `relatedSet_id` INTEGER,
+    `work_id` INTEGER NOT NULL,
+    `publisher_id` INTEGER,
+    `printer_id` INTEGER,
+    `translator_id` INTEGER,
+    `descendant_class` VARCHAR(100),
     PRIMARY KEY (`id`),
+    INDEX `editionVon` (`work_id`),
+    INDEX `fk_edition_herausgeber1` (`publisher_id`),
+    INDEX `fk_edition_drucker1` (`printer_id`),
+    INDEX `fk_schriftstueck_uebersetzer1` (`translator_id`),
+    INDEX `fk_pub_relatedSet1` (`relatedSet_id`),
     INDEX `fk_publikation_verlag1` (`publishingCompany_id`),
     INDEX `fk_publikation_ort1` (`place_id`),
     INDEX `fk_publication_dateSpecification1` (`dateSpecification_id`),
@@ -66,21 +49,31 @@ DROP TABLE IF EXISTS `monograph`;
 CREATE TABLE `monograph`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `title_id` INTEGER NOT NULL,
-    `publishingCompany_id` INTEGER,
-    `place_id` INTEGER,
-    `dateSpecification_id` INTEGER,
     `printRun` TEXT COMMENT 'Auflage',
     `printRunComment` TEXT,
     `edition` TEXT,
     `numPages` INTEGER,
     `numPagesNormed` INTEGER,
     `bibliographicCitation` TEXT,
+    `title_id` INTEGER NOT NULL,
+    `publishingCompany_id` INTEGER,
+    `place_id` INTEGER,
+    `dateSpecification_id` INTEGER,
+    `relatedSet_id` INTEGER,
+    `work_id` INTEGER NOT NULL,
+    `publisher_id` INTEGER,
+    `printer_id` INTEGER,
+    `translator_id` INTEGER,
     PRIMARY KEY (`id`),
-    INDEX `fk_publikation_verlag1` (`publishingCompany_id`),
-    INDEX `fk_publikation_ort1` (`place_id`),
-    INDEX `fk_publication_dateSpecification1` (`dateSpecification_id`),
-    INDEX `FI_publikation_titel12` (`title_id`)
+    INDEX `monograph_I_1` (`work_id`),
+    INDEX `monograph_I_2` (`publisher_id`),
+    INDEX `monograph_I_3` (`printer_id`),
+    INDEX `monograph_I_4` (`translator_id`),
+    INDEX `monograph_I_5` (`relatedSet_id`),
+    INDEX `monograph_I_6` (`publishingCompany_id`),
+    INDEX `monograph_I_7` (`place_id`),
+    INDEX `monograph_I_8` (`dateSpecification_id`),
+    INDEX `monograph_I_9` (`title_id`)
 ) ENGINE=MyISAM;
 
 -- ---------------------------------------------------------------------
@@ -92,21 +85,31 @@ DROP TABLE IF EXISTS `essay`;
 CREATE TABLE `essay`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `title_id` INTEGER NOT NULL,
-    `publishingCompany_id` INTEGER,
-    `place_id` INTEGER,
-    `dateSpecification_id` INTEGER,
     `printRun` TEXT COMMENT 'Auflage',
     `printRunComment` TEXT,
     `edition` TEXT,
     `numPages` INTEGER,
     `numPagesNormed` INTEGER,
     `bibliographicCitation` TEXT,
+    `title_id` INTEGER NOT NULL,
+    `publishingCompany_id` INTEGER,
+    `place_id` INTEGER,
+    `dateSpecification_id` INTEGER,
+    `relatedSet_id` INTEGER,
+    `work_id` INTEGER NOT NULL,
+    `publisher_id` INTEGER,
+    `printer_id` INTEGER,
+    `translator_id` INTEGER,
     PRIMARY KEY (`id`),
-    INDEX `fk_publikation_verlag1` (`publishingCompany_id`),
-    INDEX `fk_publikation_ort1` (`place_id`),
-    INDEX `fk_publication_dateSpecification1` (`dateSpecification_id`),
-    INDEX `FI_publikation_titel12` (`title_id`)
+    INDEX `essay_I_1` (`work_id`),
+    INDEX `essay_I_2` (`publisher_id`),
+    INDEX `essay_I_3` (`printer_id`),
+    INDEX `essay_I_4` (`translator_id`),
+    INDEX `essay_I_5` (`relatedSet_id`),
+    INDEX `essay_I_6` (`publishingCompany_id`),
+    INDEX `essay_I_7` (`place_id`),
+    INDEX `essay_I_8` (`dateSpecification_id`),
+    INDEX `essay_I_9` (`title_id`)
 ) ENGINE=MyISAM;
 
 -- ---------------------------------------------------------------------
@@ -118,21 +121,31 @@ DROP TABLE IF EXISTS `magazine`;
 CREATE TABLE `magazine`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `title_id` INTEGER NOT NULL,
-    `publishingCompany_id` INTEGER,
-    `place_id` INTEGER,
-    `dateSpecification_id` INTEGER,
     `printRun` TEXT COMMENT 'Auflage',
     `printRunComment` TEXT,
     `edition` TEXT,
     `numPages` INTEGER,
     `numPagesNormed` INTEGER,
     `bibliographicCitation` TEXT,
+    `title_id` INTEGER NOT NULL,
+    `publishingCompany_id` INTEGER,
+    `place_id` INTEGER,
+    `dateSpecification_id` INTEGER,
+    `relatedSet_id` INTEGER,
+    `work_id` INTEGER NOT NULL,
+    `publisher_id` INTEGER,
+    `printer_id` INTEGER,
+    `translator_id` INTEGER,
     PRIMARY KEY (`id`),
-    INDEX `fk_publikation_verlag1` (`publishingCompany_id`),
-    INDEX `fk_publikation_ort1` (`place_id`),
-    INDEX `fk_publication_dateSpecification1` (`dateSpecification_id`),
-    INDEX `FI_publikation_titel12` (`title_id`)
+    INDEX `magazine_I_1` (`work_id`),
+    INDEX `magazine_I_2` (`publisher_id`),
+    INDEX `magazine_I_3` (`printer_id`),
+    INDEX `magazine_I_4` (`translator_id`),
+    INDEX `magazine_I_5` (`relatedSet_id`),
+    INDEX `magazine_I_6` (`publishingCompany_id`),
+    INDEX `magazine_I_7` (`place_id`),
+    INDEX `magazine_I_8` (`dateSpecification_id`),
+    INDEX `magazine_I_9` (`title_id`)
 ) ENGINE=MyISAM;
 
 -- ---------------------------------------------------------------------
@@ -145,21 +158,31 @@ CREATE TABLE `series`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `volume` TEXT,
-    `title_id` INTEGER NOT NULL,
-    `publishingCompany_id` INTEGER,
-    `place_id` INTEGER,
-    `dateSpecification_id` INTEGER,
     `printRun` TEXT COMMENT 'Auflage',
     `printRunComment` TEXT,
     `edition` TEXT,
     `numPages` INTEGER,
     `numPagesNormed` INTEGER,
     `bibliographicCitation` TEXT,
+    `title_id` INTEGER NOT NULL,
+    `publishingCompany_id` INTEGER,
+    `place_id` INTEGER,
+    `dateSpecification_id` INTEGER,
+    `relatedSet_id` INTEGER,
+    `work_id` INTEGER NOT NULL,
+    `publisher_id` INTEGER,
+    `printer_id` INTEGER,
+    `translator_id` INTEGER,
     PRIMARY KEY (`id`),
-    INDEX `fk_publikation_verlag1` (`publishingCompany_id`),
-    INDEX `fk_publikation_ort1` (`place_id`),
-    INDEX `fk_publication_dateSpecification1` (`dateSpecification_id`),
-    INDEX `FI_publikation_titel12` (`title_id`)
+    INDEX `series_I_1` (`work_id`),
+    INDEX `series_I_2` (`publisher_id`),
+    INDEX `series_I_3` (`printer_id`),
+    INDEX `series_I_4` (`translator_id`),
+    INDEX `series_I_5` (`relatedSet_id`),
+    INDEX `series_I_6` (`publishingCompany_id`),
+    INDEX `series_I_7` (`place_id`),
+    INDEX `series_I_8` (`dateSpecification_id`),
+    INDEX `series_I_9` (`title_id`)
 ) ENGINE=MyISAM;
 
 -- ---------------------------------------------------------------------
@@ -223,43 +246,18 @@ CREATE TABLE `work`
 ) ENGINE=MyISAM;
 
 -- ---------------------------------------------------------------------
--- writ
+-- publication_publicationGroup
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `writ`;
+DROP TABLE IF EXISTS `publication_publicationGroup`;
 
-CREATE TABLE `writ`
+CREATE TABLE `publication_publicationGroup`
 (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `work_id` INTEGER NOT NULL,
+    `publicationGroup_id` INTEGER NOT NULL,
     `publication_id` INTEGER NOT NULL,
-    `publisher_id` INTEGER,
-    `printer_id` INTEGER,
-    `translator_id` INTEGER,
-    `numPages` INTEGER,
-    `relatedSet_id` INTEGER,
-    PRIMARY KEY (`id`),
-    INDEX `editionVon` (`work_id`),
-    INDEX `fk_edition_herausgeber1` (`publisher_id`),
-    INDEX `fk_edition_drucker1` (`printer_id`),
-    INDEX `fk_schriftstueck_uebersetzer1` (`translator_id`),
-    INDEX `fk_schriftstueck_publikation1` (`publication_id`),
-    INDEX `fk_writ_relatedSet1` (`relatedSet_id`)
-) ENGINE=MyISAM;
-
--- ---------------------------------------------------------------------
--- writ_writGroup
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `writ_writGroup`;
-
-CREATE TABLE `writ_writGroup`
-(
-    `writGroup_id` INTEGER NOT NULL,
-    `writ_id` INTEGER NOT NULL,
-    PRIMARY KEY (`writGroup_id`,`writ_id`),
-    INDEX `fk_writGroup_has_writ_writ1` (`writ_id`),
-    INDEX `fk_writGroup_has_writ_writGroup1` (`writGroup_id`)
+    PRIMARY KEY (`publicationGroup_id`,`publication_id`),
+    INDEX `fk_publicationGroupValid` (`publication_id`),
+    INDEX `fk_publicationValid` (`publicationGroup_id`)
 ) ENGINE=MyISAM;
 
 -- ---------------------------------------------------------------------
@@ -272,9 +270,7 @@ CREATE TABLE `corpus`
 (
     `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
     `name` TEXT NOT NULL,
-    `writ_id` INTEGER,
-    PRIMARY KEY (`id`),
-    INDEX `fk_korpus_edition1` (`writ_id`)
+    PRIMARY KEY (`id`)
 ) ENGINE=MyISAM;
 
 -- ---------------------------------------------------------------------
@@ -356,7 +352,7 @@ DROP TABLE IF EXISTS `source`;
 CREATE TABLE `source`
 (
     `id` INTEGER(10) NOT NULL AUTO_INCREMENT,
-    `writ_id` INTEGER NOT NULL,
+    `publication_id` INTEGER NOT NULL,
     `quality` TEXT,
     `name` TEXT,
     `comments` TEXT,
@@ -367,7 +363,7 @@ CREATE TABLE `source`
     PRIMARY KEY (`id`),
     INDEX `AI_id_Fundstellen` (`id`),
     INDEX `id_Fundstellen_2` (`id`),
-    INDEX `fk_quelle_edition1` (`writ_id`)
+    INDEX `fk_quelle_edition1` (`publication_id`)
 ) ENGINE=MyISAM;
 
 -- ---------------------------------------------------------------------
@@ -397,8 +393,8 @@ CREATE TABLE `task`
     `start` DATETIME,
     `end` DATETIME,
     `comments` TEXT,
-    `writGroup_id` INTEGER,
-    `writ_id` INTEGER,
+    `publicationGroup_id` INTEGER,
+    `publication_id` INTEGER,
     `responsibleUser_id` INTEGER,
     PRIMARY KEY (`id`),
     INDEX `id_task_2` (`id`),
@@ -407,8 +403,8 @@ CREATE TABLE `task`
     INDEX `active` (`done`),
     INDEX `closed_2` (`done`),
     INDEX `fk_aufgabe_arbeitsschritt1` (`taskType_id`),
-    INDEX `fk_aufgabe_buchGruppe1` (`writGroup_id`),
-    INDEX `fk_aufgabe_schriftstueck1` (`writ_id`),
+    INDEX `fk_aufgabe_buchGruppe1` (`publicationGroup_id`),
+    INDEX `fk_aufgabe_schriftstueck1` (`publication_id`),
     INDEX `fk_task_name1` (`responsibleUser_id`)
 ) ENGINE=MyISAM;
 
@@ -449,12 +445,12 @@ CREATE TABLE `user`
 ) ENGINE=MyISAM;
 
 -- ---------------------------------------------------------------------
--- writGroup
+-- publicationGroup
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `writGroup`;
+DROP TABLE IF EXISTS `publicationGroup`;
 
-CREATE TABLE `writGroup`
+CREATE TABLE `publicationGroup`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` TEXT NOT NULL,

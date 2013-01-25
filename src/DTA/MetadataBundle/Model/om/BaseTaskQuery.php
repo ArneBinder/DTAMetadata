@@ -12,13 +12,13 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use DTA\MetadataBundle\Model\Publication;
+use DTA\MetadataBundle\Model\Publicationgroup;
 use DTA\MetadataBundle\Model\Task;
 use DTA\MetadataBundle\Model\TaskPeer;
 use DTA\MetadataBundle\Model\TaskQuery;
 use DTA\MetadataBundle\Model\Tasktype;
 use DTA\MetadataBundle\Model\User;
-use DTA\MetadataBundle\Model\Writ;
-use DTA\MetadataBundle\Model\Writgroup;
 
 /**
  * @method TaskQuery orderById($order = Criteria::ASC) Order by the id column
@@ -27,8 +27,8 @@ use DTA\MetadataBundle\Model\Writgroup;
  * @method TaskQuery orderByStart($order = Criteria::ASC) Order by the start column
  * @method TaskQuery orderByEnd($order = Criteria::ASC) Order by the end column
  * @method TaskQuery orderByComments($order = Criteria::ASC) Order by the comments column
- * @method TaskQuery orderByWritgroupId($order = Criteria::ASC) Order by the writGroup_id column
- * @method TaskQuery orderByWritId($order = Criteria::ASC) Order by the writ_id column
+ * @method TaskQuery orderByPublicationgroupId($order = Criteria::ASC) Order by the publicationGroup_id column
+ * @method TaskQuery orderByPublicationId($order = Criteria::ASC) Order by the publication_id column
  * @method TaskQuery orderByResponsibleuserId($order = Criteria::ASC) Order by the responsibleUser_id column
  *
  * @method TaskQuery groupById() Group by the id column
@@ -37,8 +37,8 @@ use DTA\MetadataBundle\Model\Writgroup;
  * @method TaskQuery groupByStart() Group by the start column
  * @method TaskQuery groupByEnd() Group by the end column
  * @method TaskQuery groupByComments() Group by the comments column
- * @method TaskQuery groupByWritgroupId() Group by the writGroup_id column
- * @method TaskQuery groupByWritId() Group by the writ_id column
+ * @method TaskQuery groupByPublicationgroupId() Group by the publicationGroup_id column
+ * @method TaskQuery groupByPublicationId() Group by the publication_id column
  * @method TaskQuery groupByResponsibleuserId() Group by the responsibleUser_id column
  *
  * @method TaskQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
@@ -49,13 +49,13 @@ use DTA\MetadataBundle\Model\Writgroup;
  * @method TaskQuery rightJoinTasktype($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Tasktype relation
  * @method TaskQuery innerJoinTasktype($relationAlias = null) Adds a INNER JOIN clause to the query using the Tasktype relation
  *
- * @method TaskQuery leftJoinWritgroup($relationAlias = null) Adds a LEFT JOIN clause to the query using the Writgroup relation
- * @method TaskQuery rightJoinWritgroup($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Writgroup relation
- * @method TaskQuery innerJoinWritgroup($relationAlias = null) Adds a INNER JOIN clause to the query using the Writgroup relation
+ * @method TaskQuery leftJoinPublicationgroup($relationAlias = null) Adds a LEFT JOIN clause to the query using the Publicationgroup relation
+ * @method TaskQuery rightJoinPublicationgroup($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Publicationgroup relation
+ * @method TaskQuery innerJoinPublicationgroup($relationAlias = null) Adds a INNER JOIN clause to the query using the Publicationgroup relation
  *
- * @method TaskQuery leftJoinWrit($relationAlias = null) Adds a LEFT JOIN clause to the query using the Writ relation
- * @method TaskQuery rightJoinWrit($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Writ relation
- * @method TaskQuery innerJoinWrit($relationAlias = null) Adds a INNER JOIN clause to the query using the Writ relation
+ * @method TaskQuery leftJoinPublication($relationAlias = null) Adds a LEFT JOIN clause to the query using the Publication relation
+ * @method TaskQuery rightJoinPublication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Publication relation
+ * @method TaskQuery innerJoinPublication($relationAlias = null) Adds a INNER JOIN clause to the query using the Publication relation
  *
  * @method TaskQuery leftJoinUser($relationAlias = null) Adds a LEFT JOIN clause to the query using the User relation
  * @method TaskQuery rightJoinUser($relationAlias = null) Adds a RIGHT JOIN clause to the query using the User relation
@@ -69,8 +69,8 @@ use DTA\MetadataBundle\Model\Writgroup;
  * @method Task findOneByStart(string $start) Return the first Task filtered by the start column
  * @method Task findOneByEnd(string $end) Return the first Task filtered by the end column
  * @method Task findOneByComments(string $comments) Return the first Task filtered by the comments column
- * @method Task findOneByWritgroupId(int $writGroup_id) Return the first Task filtered by the writGroup_id column
- * @method Task findOneByWritId(int $writ_id) Return the first Task filtered by the writ_id column
+ * @method Task findOneByPublicationgroupId(int $publicationGroup_id) Return the first Task filtered by the publicationGroup_id column
+ * @method Task findOneByPublicationId(int $publication_id) Return the first Task filtered by the publication_id column
  * @method Task findOneByResponsibleuserId(int $responsibleUser_id) Return the first Task filtered by the responsibleUser_id column
  *
  * @method array findById(int $id) Return Task objects filtered by the id column
@@ -79,8 +79,8 @@ use DTA\MetadataBundle\Model\Writgroup;
  * @method array findByStart(string $start) Return Task objects filtered by the start column
  * @method array findByEnd(string $end) Return Task objects filtered by the end column
  * @method array findByComments(string $comments) Return Task objects filtered by the comments column
- * @method array findByWritgroupId(int $writGroup_id) Return Task objects filtered by the writGroup_id column
- * @method array findByWritId(int $writ_id) Return Task objects filtered by the writ_id column
+ * @method array findByPublicationgroupId(int $publicationGroup_id) Return Task objects filtered by the publicationGroup_id column
+ * @method array findByPublicationId(int $publication_id) Return Task objects filtered by the publication_id column
  * @method array findByResponsibleuserId(int $responsibleUser_id) Return Task objects filtered by the responsibleUser_id column
  */
 abstract class BaseTaskQuery extends ModelCriteria
@@ -183,7 +183,7 @@ abstract class BaseTaskQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `taskType_id`, `done`, `start`, `end`, `comments`, `writGroup_id`, `writ_id`, `responsibleUser_id` FROM `task` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `taskType_id`, `done`, `start`, `end`, `comments`, `publicationGroup_id`, `publication_id`, `responsibleUser_id` FROM `task` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -501,19 +501,19 @@ abstract class BaseTaskQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the writGroup_id column
+     * Filter the query on the publicationGroup_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByWritgroupId(1234); // WHERE writGroup_id = 1234
-     * $query->filterByWritgroupId(array(12, 34)); // WHERE writGroup_id IN (12, 34)
-     * $query->filterByWritgroupId(array('min' => 12)); // WHERE writGroup_id >= 12
-     * $query->filterByWritgroupId(array('max' => 12)); // WHERE writGroup_id <= 12
+     * $query->filterByPublicationgroupId(1234); // WHERE publicationGroup_id = 1234
+     * $query->filterByPublicationgroupId(array(12, 34)); // WHERE publicationGroup_id IN (12, 34)
+     * $query->filterByPublicationgroupId(array('min' => 12)); // WHERE publicationGroup_id >= 12
+     * $query->filterByPublicationgroupId(array('max' => 12)); // WHERE publicationGroup_id <= 12
      * </code>
      *
-     * @see       filterByWritgroup()
+     * @see       filterByPublicationgroup()
      *
-     * @param     mixed $writgroupId The value to use as filter.
+     * @param     mixed $publicationgroupId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -521,16 +521,16 @@ abstract class BaseTaskQuery extends ModelCriteria
      *
      * @return TaskQuery The current query, for fluid interface
      */
-    public function filterByWritgroupId($writgroupId = null, $comparison = null)
+    public function filterByPublicationgroupId($publicationgroupId = null, $comparison = null)
     {
-        if (is_array($writgroupId)) {
+        if (is_array($publicationgroupId)) {
             $useMinMax = false;
-            if (isset($writgroupId['min'])) {
-                $this->addUsingAlias(TaskPeer::WRITGROUP_ID, $writgroupId['min'], Criteria::GREATER_EQUAL);
+            if (isset($publicationgroupId['min'])) {
+                $this->addUsingAlias(TaskPeer::PUBLICATIONGROUP_ID, $publicationgroupId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($writgroupId['max'])) {
-                $this->addUsingAlias(TaskPeer::WRITGROUP_ID, $writgroupId['max'], Criteria::LESS_EQUAL);
+            if (isset($publicationgroupId['max'])) {
+                $this->addUsingAlias(TaskPeer::PUBLICATIONGROUP_ID, $publicationgroupId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -541,23 +541,23 @@ abstract class BaseTaskQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(TaskPeer::WRITGROUP_ID, $writgroupId, $comparison);
+        return $this->addUsingAlias(TaskPeer::PUBLICATIONGROUP_ID, $publicationgroupId, $comparison);
     }
 
     /**
-     * Filter the query on the writ_id column
+     * Filter the query on the publication_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByWritId(1234); // WHERE writ_id = 1234
-     * $query->filterByWritId(array(12, 34)); // WHERE writ_id IN (12, 34)
-     * $query->filterByWritId(array('min' => 12)); // WHERE writ_id >= 12
-     * $query->filterByWritId(array('max' => 12)); // WHERE writ_id <= 12
+     * $query->filterByPublicationId(1234); // WHERE publication_id = 1234
+     * $query->filterByPublicationId(array(12, 34)); // WHERE publication_id IN (12, 34)
+     * $query->filterByPublicationId(array('min' => 12)); // WHERE publication_id >= 12
+     * $query->filterByPublicationId(array('max' => 12)); // WHERE publication_id <= 12
      * </code>
      *
-     * @see       filterByWrit()
+     * @see       filterByPublication()
      *
-     * @param     mixed $writId The value to use as filter.
+     * @param     mixed $publicationId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -565,16 +565,16 @@ abstract class BaseTaskQuery extends ModelCriteria
      *
      * @return TaskQuery The current query, for fluid interface
      */
-    public function filterByWritId($writId = null, $comparison = null)
+    public function filterByPublicationId($publicationId = null, $comparison = null)
     {
-        if (is_array($writId)) {
+        if (is_array($publicationId)) {
             $useMinMax = false;
-            if (isset($writId['min'])) {
-                $this->addUsingAlias(TaskPeer::WRIT_ID, $writId['min'], Criteria::GREATER_EQUAL);
+            if (isset($publicationId['min'])) {
+                $this->addUsingAlias(TaskPeer::PUBLICATION_ID, $publicationId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($writId['max'])) {
-                $this->addUsingAlias(TaskPeer::WRIT_ID, $writId['max'], Criteria::LESS_EQUAL);
+            if (isset($publicationId['max'])) {
+                $this->addUsingAlias(TaskPeer::PUBLICATION_ID, $publicationId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -585,7 +585,7 @@ abstract class BaseTaskQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(TaskPeer::WRIT_ID, $writId, $comparison);
+        return $this->addUsingAlias(TaskPeer::PUBLICATION_ID, $publicationId, $comparison);
     }
 
     /**
@@ -709,43 +709,43 @@ abstract class BaseTaskQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Writgroup object
+     * Filter the query by a related Publicationgroup object
      *
-     * @param   Writgroup|PropelObjectCollection $writgroup The related object(s) to use as filter
+     * @param   Publicationgroup|PropelObjectCollection $publicationgroup The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return                 TaskQuery The current query, for fluid interface
      * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterByWritgroup($writgroup, $comparison = null)
+    public function filterByPublicationgroup($publicationgroup, $comparison = null)
     {
-        if ($writgroup instanceof Writgroup) {
+        if ($publicationgroup instanceof Publicationgroup) {
             return $this
-                ->addUsingAlias(TaskPeer::WRITGROUP_ID, $writgroup->getId(), $comparison);
-        } elseif ($writgroup instanceof PropelObjectCollection) {
+                ->addUsingAlias(TaskPeer::PUBLICATIONGROUP_ID, $publicationgroup->getId(), $comparison);
+        } elseif ($publicationgroup instanceof PropelObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(TaskPeer::WRITGROUP_ID, $writgroup->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(TaskPeer::PUBLICATIONGROUP_ID, $publicationgroup->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByWritgroup() only accepts arguments of type Writgroup or PropelCollection');
+            throw new PropelException('filterByPublicationgroup() only accepts arguments of type Publicationgroup or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Writgroup relation
+     * Adds a JOIN clause to the query using the Publicationgroup relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return TaskQuery The current query, for fluid interface
      */
-    public function joinWritgroup($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinPublicationgroup($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Writgroup');
+        $relationMap = $tableMap->getRelation('Publicationgroup');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -760,14 +760,14 @@ abstract class BaseTaskQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Writgroup');
+            $this->addJoinObject($join, 'Publicationgroup');
         }
 
         return $this;
     }
 
     /**
-     * Use the Writgroup relation Writgroup object
+     * Use the Publicationgroup relation Publicationgroup object
      *
      * @see       useQuery()
      *
@@ -775,53 +775,53 @@ abstract class BaseTaskQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \DTA\MetadataBundle\Model\WritgroupQuery A secondary query class using the current class as primary query
+     * @return   \DTA\MetadataBundle\Model\PublicationgroupQuery A secondary query class using the current class as primary query
      */
-    public function useWritgroupQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function usePublicationgroupQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
-            ->joinWritgroup($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Writgroup', '\DTA\MetadataBundle\Model\WritgroupQuery');
+            ->joinPublicationgroup($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Publicationgroup', '\DTA\MetadataBundle\Model\PublicationgroupQuery');
     }
 
     /**
-     * Filter the query by a related Writ object
+     * Filter the query by a related Publication object
      *
-     * @param   Writ|PropelObjectCollection $writ The related object(s) to use as filter
+     * @param   Publication|PropelObjectCollection $publication The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return                 TaskQuery The current query, for fluid interface
      * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterByWrit($writ, $comparison = null)
+    public function filterByPublication($publication, $comparison = null)
     {
-        if ($writ instanceof Writ) {
+        if ($publication instanceof Publication) {
             return $this
-                ->addUsingAlias(TaskPeer::WRIT_ID, $writ->getId(), $comparison);
-        } elseif ($writ instanceof PropelObjectCollection) {
+                ->addUsingAlias(TaskPeer::PUBLICATION_ID, $publication->getId(), $comparison);
+        } elseif ($publication instanceof PropelObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(TaskPeer::WRIT_ID, $writ->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(TaskPeer::PUBLICATION_ID, $publication->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByWrit() only accepts arguments of type Writ or PropelCollection');
+            throw new PropelException('filterByPublication() only accepts arguments of type Publication or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Writ relation
+     * Adds a JOIN clause to the query using the Publication relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return TaskQuery The current query, for fluid interface
      */
-    public function joinWrit($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinPublication($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Writ');
+        $relationMap = $tableMap->getRelation('Publication');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -836,14 +836,14 @@ abstract class BaseTaskQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Writ');
+            $this->addJoinObject($join, 'Publication');
         }
 
         return $this;
     }
 
     /**
-     * Use the Writ relation Writ object
+     * Use the Publication relation Publication object
      *
      * @see       useQuery()
      *
@@ -851,13 +851,13 @@ abstract class BaseTaskQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \DTA\MetadataBundle\Model\WritQuery A secondary query class using the current class as primary query
+     * @return   \DTA\MetadataBundle\Model\PublicationQuery A secondary query class using the current class as primary query
      */
-    public function useWritQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function usePublicationQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
-            ->joinWrit($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Writ', '\DTA\MetadataBundle\Model\WritQuery');
+            ->joinPublication($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Publication', '\DTA\MetadataBundle\Model\PublicationQuery');
     }
 
     /**

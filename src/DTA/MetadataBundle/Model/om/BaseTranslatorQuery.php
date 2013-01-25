@@ -12,11 +12,15 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use DTA\MetadataBundle\Model\Essay;
+use DTA\MetadataBundle\Model\Magazine;
+use DTA\MetadataBundle\Model\Monograph;
 use DTA\MetadataBundle\Model\Person;
+use DTA\MetadataBundle\Model\Publication;
+use DTA\MetadataBundle\Model\Series;
 use DTA\MetadataBundle\Model\Translator;
 use DTA\MetadataBundle\Model\TranslatorPeer;
 use DTA\MetadataBundle\Model\TranslatorQuery;
-use DTA\MetadataBundle\Model\Writ;
 
 /**
  * @method TranslatorQuery orderById($order = Criteria::ASC) Order by the id column
@@ -33,9 +37,25 @@ use DTA\MetadataBundle\Model\Writ;
  * @method TranslatorQuery rightJoinPerson($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Person relation
  * @method TranslatorQuery innerJoinPerson($relationAlias = null) Adds a INNER JOIN clause to the query using the Person relation
  *
- * @method TranslatorQuery leftJoinWrit($relationAlias = null) Adds a LEFT JOIN clause to the query using the Writ relation
- * @method TranslatorQuery rightJoinWrit($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Writ relation
- * @method TranslatorQuery innerJoinWrit($relationAlias = null) Adds a INNER JOIN clause to the query using the Writ relation
+ * @method TranslatorQuery leftJoinPublication($relationAlias = null) Adds a LEFT JOIN clause to the query using the Publication relation
+ * @method TranslatorQuery rightJoinPublication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Publication relation
+ * @method TranslatorQuery innerJoinPublication($relationAlias = null) Adds a INNER JOIN clause to the query using the Publication relation
+ *
+ * @method TranslatorQuery leftJoinMonograph($relationAlias = null) Adds a LEFT JOIN clause to the query using the Monograph relation
+ * @method TranslatorQuery rightJoinMonograph($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Monograph relation
+ * @method TranslatorQuery innerJoinMonograph($relationAlias = null) Adds a INNER JOIN clause to the query using the Monograph relation
+ *
+ * @method TranslatorQuery leftJoinEssay($relationAlias = null) Adds a LEFT JOIN clause to the query using the Essay relation
+ * @method TranslatorQuery rightJoinEssay($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Essay relation
+ * @method TranslatorQuery innerJoinEssay($relationAlias = null) Adds a INNER JOIN clause to the query using the Essay relation
+ *
+ * @method TranslatorQuery leftJoinMagazine($relationAlias = null) Adds a LEFT JOIN clause to the query using the Magazine relation
+ * @method TranslatorQuery rightJoinMagazine($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Magazine relation
+ * @method TranslatorQuery innerJoinMagazine($relationAlias = null) Adds a INNER JOIN clause to the query using the Magazine relation
+ *
+ * @method TranslatorQuery leftJoinSeries($relationAlias = null) Adds a LEFT JOIN clause to the query using the Series relation
+ * @method TranslatorQuery rightJoinSeries($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Series relation
+ * @method TranslatorQuery innerJoinSeries($relationAlias = null) Adds a INNER JOIN clause to the query using the Series relation
  *
  * @method Translator findOne(PropelPDO $con = null) Return the first Translator matching the query
  * @method Translator findOneOrCreate(PropelPDO $con = null) Return the first Translator matching the query, or a new Translator object populated from the query conditions when no match is found
@@ -397,41 +417,41 @@ abstract class BaseTranslatorQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Writ object
+     * Filter the query by a related Publication object
      *
-     * @param   Writ|PropelObjectCollection $writ  the related object to use as filter
+     * @param   Publication|PropelObjectCollection $publication  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return                 TranslatorQuery The current query, for fluid interface
      * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterByWrit($writ, $comparison = null)
+    public function filterByPublication($publication, $comparison = null)
     {
-        if ($writ instanceof Writ) {
+        if ($publication instanceof Publication) {
             return $this
-                ->addUsingAlias(TranslatorPeer::ID, $writ->getTranslatorId(), $comparison);
-        } elseif ($writ instanceof PropelObjectCollection) {
+                ->addUsingAlias(TranslatorPeer::ID, $publication->getTranslatorId(), $comparison);
+        } elseif ($publication instanceof PropelObjectCollection) {
             return $this
-                ->useWritQuery()
-                ->filterByPrimaryKeys($writ->getPrimaryKeys())
+                ->usePublicationQuery()
+                ->filterByPrimaryKeys($publication->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByWrit() only accepts arguments of type Writ or PropelCollection');
+            throw new PropelException('filterByPublication() only accepts arguments of type Publication or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Writ relation
+     * Adds a JOIN clause to the query using the Publication relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return TranslatorQuery The current query, for fluid interface
      */
-    public function joinWrit($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinPublication($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Writ');
+        $relationMap = $tableMap->getRelation('Publication');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -446,14 +466,14 @@ abstract class BaseTranslatorQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Writ');
+            $this->addJoinObject($join, 'Publication');
         }
 
         return $this;
     }
 
     /**
-     * Use the Writ relation Writ object
+     * Use the Publication relation Publication object
      *
      * @see       useQuery()
      *
@@ -461,13 +481,309 @@ abstract class BaseTranslatorQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \DTA\MetadataBundle\Model\WritQuery A secondary query class using the current class as primary query
+     * @return   \DTA\MetadataBundle\Model\PublicationQuery A secondary query class using the current class as primary query
      */
-    public function useWritQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function usePublicationQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
-            ->joinWrit($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Writ', '\DTA\MetadataBundle\Model\WritQuery');
+            ->joinPublication($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Publication', '\DTA\MetadataBundle\Model\PublicationQuery');
+    }
+
+    /**
+     * Filter the query by a related Monograph object
+     *
+     * @param   Monograph|PropelObjectCollection $monograph  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 TranslatorQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByMonograph($monograph, $comparison = null)
+    {
+        if ($monograph instanceof Monograph) {
+            return $this
+                ->addUsingAlias(TranslatorPeer::ID, $monograph->getTranslatorId(), $comparison);
+        } elseif ($monograph instanceof PropelObjectCollection) {
+            return $this
+                ->useMonographQuery()
+                ->filterByPrimaryKeys($monograph->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByMonograph() only accepts arguments of type Monograph or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Monograph relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return TranslatorQuery The current query, for fluid interface
+     */
+    public function joinMonograph($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Monograph');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Monograph');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Monograph relation Monograph object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\MonographQuery A secondary query class using the current class as primary query
+     */
+    public function useMonographQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinMonograph($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Monograph', '\DTA\MetadataBundle\Model\MonographQuery');
+    }
+
+    /**
+     * Filter the query by a related Essay object
+     *
+     * @param   Essay|PropelObjectCollection $essay  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 TranslatorQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByEssay($essay, $comparison = null)
+    {
+        if ($essay instanceof Essay) {
+            return $this
+                ->addUsingAlias(TranslatorPeer::ID, $essay->getTranslatorId(), $comparison);
+        } elseif ($essay instanceof PropelObjectCollection) {
+            return $this
+                ->useEssayQuery()
+                ->filterByPrimaryKeys($essay->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByEssay() only accepts arguments of type Essay or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Essay relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return TranslatorQuery The current query, for fluid interface
+     */
+    public function joinEssay($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Essay');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Essay');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Essay relation Essay object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\EssayQuery A secondary query class using the current class as primary query
+     */
+    public function useEssayQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinEssay($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Essay', '\DTA\MetadataBundle\Model\EssayQuery');
+    }
+
+    /**
+     * Filter the query by a related Magazine object
+     *
+     * @param   Magazine|PropelObjectCollection $magazine  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 TranslatorQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByMagazine($magazine, $comparison = null)
+    {
+        if ($magazine instanceof Magazine) {
+            return $this
+                ->addUsingAlias(TranslatorPeer::ID, $magazine->getTranslatorId(), $comparison);
+        } elseif ($magazine instanceof PropelObjectCollection) {
+            return $this
+                ->useMagazineQuery()
+                ->filterByPrimaryKeys($magazine->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByMagazine() only accepts arguments of type Magazine or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Magazine relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return TranslatorQuery The current query, for fluid interface
+     */
+    public function joinMagazine($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Magazine');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Magazine');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Magazine relation Magazine object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\MagazineQuery A secondary query class using the current class as primary query
+     */
+    public function useMagazineQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinMagazine($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Magazine', '\DTA\MetadataBundle\Model\MagazineQuery');
+    }
+
+    /**
+     * Filter the query by a related Series object
+     *
+     * @param   Series|PropelObjectCollection $series  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 TranslatorQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterBySeries($series, $comparison = null)
+    {
+        if ($series instanceof Series) {
+            return $this
+                ->addUsingAlias(TranslatorPeer::ID, $series->getTranslatorId(), $comparison);
+        } elseif ($series instanceof PropelObjectCollection) {
+            return $this
+                ->useSeriesQuery()
+                ->filterByPrimaryKeys($series->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterBySeries() only accepts arguments of type Series or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Series relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return TranslatorQuery The current query, for fluid interface
+     */
+    public function joinSeries($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Series');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Series');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Series relation Series object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\SeriesQuery A secondary query class using the current class as primary query
+     */
+    public function useSeriesQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinSeries($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Series', '\DTA\MetadataBundle\Model\SeriesQuery');
     }
 
     /**

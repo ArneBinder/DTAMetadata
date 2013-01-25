@@ -41,6 +41,10 @@ use DTA\MetadataBundle\Model\Work;
  * @method DatespecificationQuery rightJoinPublication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Publication relation
  * @method DatespecificationQuery innerJoinPublication($relationAlias = null) Adds a INNER JOIN clause to the query using the Publication relation
  *
+ * @method DatespecificationQuery leftJoinWork($relationAlias = null) Adds a LEFT JOIN clause to the query using the Work relation
+ * @method DatespecificationQuery rightJoinWork($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Work relation
+ * @method DatespecificationQuery innerJoinWork($relationAlias = null) Adds a INNER JOIN clause to the query using the Work relation
+ *
  * @method DatespecificationQuery leftJoinMonograph($relationAlias = null) Adds a LEFT JOIN clause to the query using the Monograph relation
  * @method DatespecificationQuery rightJoinMonograph($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Monograph relation
  * @method DatespecificationQuery innerJoinMonograph($relationAlias = null) Adds a INNER JOIN clause to the query using the Monograph relation
@@ -56,10 +60,6 @@ use DTA\MetadataBundle\Model\Work;
  * @method DatespecificationQuery leftJoinSeries($relationAlias = null) Adds a LEFT JOIN clause to the query using the Series relation
  * @method DatespecificationQuery rightJoinSeries($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Series relation
  * @method DatespecificationQuery innerJoinSeries($relationAlias = null) Adds a INNER JOIN clause to the query using the Series relation
- *
- * @method DatespecificationQuery leftJoinWork($relationAlias = null) Adds a LEFT JOIN clause to the query using the Work relation
- * @method DatespecificationQuery rightJoinWork($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Work relation
- * @method DatespecificationQuery innerJoinWork($relationAlias = null) Adds a INNER JOIN clause to the query using the Work relation
  *
  * @method Datespecification findOne(PropelPDO $con = null) Return the first Datespecification matching the query
  * @method Datespecification findOneOrCreate(PropelPDO $con = null) Return the first Datespecification matching the query, or a new Datespecification object populated from the query conditions when no match is found
@@ -477,6 +477,80 @@ abstract class BaseDatespecificationQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related Work object
+     *
+     * @param   Work|PropelObjectCollection $work  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 DatespecificationQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByWork($work, $comparison = null)
+    {
+        if ($work instanceof Work) {
+            return $this
+                ->addUsingAlias(DatespecificationPeer::ID, $work->getDatespecificationId(), $comparison);
+        } elseif ($work instanceof PropelObjectCollection) {
+            return $this
+                ->useWorkQuery()
+                ->filterByPrimaryKeys($work->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByWork() only accepts arguments of type Work or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Work relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return DatespecificationQuery The current query, for fluid interface
+     */
+    public function joinWork($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Work');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Work');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Work relation Work object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\WorkQuery A secondary query class using the current class as primary query
+     */
+    public function useWorkQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinWork($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Work', '\DTA\MetadataBundle\Model\WorkQuery');
+    }
+
+    /**
      * Filter the query by a related Monograph object
      *
      * @param   Monograph|PropelObjectCollection $monograph  the related object to use as filter
@@ -770,80 +844,6 @@ abstract class BaseDatespecificationQuery extends ModelCriteria
         return $this
             ->joinSeries($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Series', '\DTA\MetadataBundle\Model\SeriesQuery');
-    }
-
-    /**
-     * Filter the query by a related Work object
-     *
-     * @param   Work|PropelObjectCollection $work  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 DatespecificationQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByWork($work, $comparison = null)
-    {
-        if ($work instanceof Work) {
-            return $this
-                ->addUsingAlias(DatespecificationPeer::ID, $work->getDatespecificationId(), $comparison);
-        } elseif ($work instanceof PropelObjectCollection) {
-            return $this
-                ->useWorkQuery()
-                ->filterByPrimaryKeys($work->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByWork() only accepts arguments of type Work or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Work relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return DatespecificationQuery The current query, for fluid interface
-     */
-    public function joinWork($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Work');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Work');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Work relation Work object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\WorkQuery A secondary query class using the current class as primary query
-     */
-    public function useWorkQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinWork($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Work', '\DTA\MetadataBundle\Model\WorkQuery');
     }
 
     /**

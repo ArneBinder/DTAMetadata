@@ -13,19 +13,36 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use \PropelQuery;
 use DTA\MetadataBundle\Model\Datespecification;
 use DTA\MetadataBundle\Model\DatespecificationQuery;
 use DTA\MetadataBundle\Model\Place;
 use DTA\MetadataBundle\Model\PlaceQuery;
+use DTA\MetadataBundle\Model\Printer;
+use DTA\MetadataBundle\Model\PrinterQuery;
 use DTA\MetadataBundle\Model\Publication;
 use DTA\MetadataBundle\Model\PublicationPeer;
+use DTA\MetadataBundle\Model\PublicationPublicationgroup;
+use DTA\MetadataBundle\Model\PublicationPublicationgroupQuery;
 use DTA\MetadataBundle\Model\PublicationQuery;
+use DTA\MetadataBundle\Model\Publicationgroup;
+use DTA\MetadataBundle\Model\PublicationgroupQuery;
+use DTA\MetadataBundle\Model\Publisher;
+use DTA\MetadataBundle\Model\PublisherQuery;
 use DTA\MetadataBundle\Model\Publishingcompany;
 use DTA\MetadataBundle\Model\PublishingcompanyQuery;
+use DTA\MetadataBundle\Model\Relatedset;
+use DTA\MetadataBundle\Model\RelatedsetQuery;
+use DTA\MetadataBundle\Model\Source;
+use DTA\MetadataBundle\Model\SourceQuery;
+use DTA\MetadataBundle\Model\Task;
+use DTA\MetadataBundle\Model\TaskQuery;
 use DTA\MetadataBundle\Model\Title;
 use DTA\MetadataBundle\Model\TitleQuery;
-use DTA\MetadataBundle\Model\Writ;
-use DTA\MetadataBundle\Model\WritQuery;
+use DTA\MetadataBundle\Model\Translator;
+use DTA\MetadataBundle\Model\TranslatorQuery;
+use DTA\MetadataBundle\Model\Work;
+use DTA\MetadataBundle\Model\WorkQuery;
 
 abstract class BasePublication extends BaseObject implements Persistent
 {
@@ -53,30 +70,6 @@ abstract class BasePublication extends BaseObject implements Persistent
      * @var        int
      */
     protected $id;
-
-    /**
-     * The value for the title_id field.
-     * @var        int
-     */
-    protected $title_id;
-
-    /**
-     * The value for the publishingcompany_id field.
-     * @var        int
-     */
-    protected $publishingcompany_id;
-
-    /**
-     * The value for the place_id field.
-     * @var        int
-     */
-    protected $place_id;
-
-    /**
-     * The value for the datespecification_id field.
-     * @var        int
-     */
-    protected $datespecification_id;
 
     /**
      * The value for the printrun field.
@@ -115,6 +108,91 @@ abstract class BasePublication extends BaseObject implements Persistent
     protected $bibliographiccitation;
 
     /**
+     * The value for the title_id field.
+     * @var        int
+     */
+    protected $title_id;
+
+    /**
+     * The value for the publishingcompany_id field.
+     * @var        int
+     */
+    protected $publishingcompany_id;
+
+    /**
+     * The value for the place_id field.
+     * @var        int
+     */
+    protected $place_id;
+
+    /**
+     * The value for the datespecification_id field.
+     * @var        int
+     */
+    protected $datespecification_id;
+
+    /**
+     * The value for the relatedset_id field.
+     * @var        int
+     */
+    protected $relatedset_id;
+
+    /**
+     * The value for the work_id field.
+     * @var        int
+     */
+    protected $work_id;
+
+    /**
+     * The value for the publisher_id field.
+     * @var        int
+     */
+    protected $publisher_id;
+
+    /**
+     * The value for the printer_id field.
+     * @var        int
+     */
+    protected $printer_id;
+
+    /**
+     * The value for the translator_id field.
+     * @var        int
+     */
+    protected $translator_id;
+
+    /**
+     * The value for the descendant_class field.
+     * @var        string
+     */
+    protected $descendant_class;
+
+    /**
+     * @var        Work
+     */
+    protected $aWork;
+
+    /**
+     * @var        Publisher
+     */
+    protected $aPublisher;
+
+    /**
+     * @var        Printer
+     */
+    protected $aPrinter;
+
+    /**
+     * @var        Translator
+     */
+    protected $aTranslator;
+
+    /**
+     * @var        Relatedset
+     */
+    protected $aRelatedset;
+
+    /**
      * @var        Title
      */
     protected $aTitle;
@@ -135,10 +213,27 @@ abstract class BasePublication extends BaseObject implements Persistent
     protected $aDatespecification;
 
     /**
-     * @var        PropelObjectCollection|Writ[] Collection to store aggregation of Writ objects.
+     * @var        PropelObjectCollection|PublicationPublicationgroup[] Collection to store aggregation of PublicationPublicationgroup objects.
      */
-    protected $collWrits;
-    protected $collWritsPartial;
+    protected $collPublicationPublicationgroups;
+    protected $collPublicationPublicationgroupsPartial;
+
+    /**
+     * @var        PropelObjectCollection|Source[] Collection to store aggregation of Source objects.
+     */
+    protected $collSources;
+    protected $collSourcesPartial;
+
+    /**
+     * @var        PropelObjectCollection|Task[] Collection to store aggregation of Task objects.
+     */
+    protected $collTasks;
+    protected $collTasksPartial;
+
+    /**
+     * @var        PropelObjectCollection|Publicationgroup[] Collection to store aggregation of Publicationgroup objects.
+     */
+    protected $collPublicationgroups;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -164,7 +259,25 @@ abstract class BasePublication extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $writsScheduledForDeletion = null;
+    protected $publicationgroupsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $publicationPublicationgroupsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $sourcesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $tasksScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -174,46 +287,6 @@ abstract class BasePublication extends BaseObject implements Persistent
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * Get the [title_id] column value.
-     *
-     * @return int
-     */
-    public function getTitleId()
-    {
-        return $this->title_id;
-    }
-
-    /**
-     * Get the [publishingcompany_id] column value.
-     *
-     * @return int
-     */
-    public function getPublishingcompanyId()
-    {
-        return $this->publishingcompany_id;
-    }
-
-    /**
-     * Get the [place_id] column value.
-     *
-     * @return int
-     */
-    public function getPlaceId()
-    {
-        return $this->place_id;
-    }
-
-    /**
-     * Get the [datespecification_id] column value.
-     *
-     * @return int
-     */
-    public function getDatespecificationId()
-    {
-        return $this->datespecification_id;
     }
 
     /**
@@ -277,6 +350,106 @@ abstract class BasePublication extends BaseObject implements Persistent
     }
 
     /**
+     * Get the [title_id] column value.
+     *
+     * @return int
+     */
+    public function getTitleId()
+    {
+        return $this->title_id;
+    }
+
+    /**
+     * Get the [publishingcompany_id] column value.
+     *
+     * @return int
+     */
+    public function getPublishingcompanyId()
+    {
+        return $this->publishingcompany_id;
+    }
+
+    /**
+     * Get the [place_id] column value.
+     *
+     * @return int
+     */
+    public function getPlaceId()
+    {
+        return $this->place_id;
+    }
+
+    /**
+     * Get the [datespecification_id] column value.
+     *
+     * @return int
+     */
+    public function getDatespecificationId()
+    {
+        return $this->datespecification_id;
+    }
+
+    /**
+     * Get the [relatedset_id] column value.
+     *
+     * @return int
+     */
+    public function getRelatedsetId()
+    {
+        return $this->relatedset_id;
+    }
+
+    /**
+     * Get the [work_id] column value.
+     *
+     * @return int
+     */
+    public function getWorkId()
+    {
+        return $this->work_id;
+    }
+
+    /**
+     * Get the [publisher_id] column value.
+     *
+     * @return int
+     */
+    public function getPublisherId()
+    {
+        return $this->publisher_id;
+    }
+
+    /**
+     * Get the [printer_id] column value.
+     *
+     * @return int
+     */
+    public function getPrinterId()
+    {
+        return $this->printer_id;
+    }
+
+    /**
+     * Get the [translator_id] column value.
+     *
+     * @return int
+     */
+    public function getTranslatorId()
+    {
+        return $this->translator_id;
+    }
+
+    /**
+     * Get the [descendant_class] column value.
+     *
+     * @return string
+     */
+    public function getDescendantClass()
+    {
+        return $this->descendant_class;
+    }
+
+    /**
      * Set the value of [id] column.
      *
      * @param int $v new value
@@ -296,106 +469,6 @@ abstract class BasePublication extends BaseObject implements Persistent
 
         return $this;
     } // setId()
-
-    /**
-     * Set the value of [title_id] column.
-     *
-     * @param int $v new value
-     * @return Publication The current object (for fluent API support)
-     */
-    public function setTitleId($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->title_id !== $v) {
-            $this->title_id = $v;
-            $this->modifiedColumns[] = PublicationPeer::TITLE_ID;
-        }
-
-        if ($this->aTitle !== null && $this->aTitle->getId() !== $v) {
-            $this->aTitle = null;
-        }
-
-
-        return $this;
-    } // setTitleId()
-
-    /**
-     * Set the value of [publishingcompany_id] column.
-     *
-     * @param int $v new value
-     * @return Publication The current object (for fluent API support)
-     */
-    public function setPublishingcompanyId($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->publishingcompany_id !== $v) {
-            $this->publishingcompany_id = $v;
-            $this->modifiedColumns[] = PublicationPeer::PUBLISHINGCOMPANY_ID;
-        }
-
-        if ($this->aPublishingcompany !== null && $this->aPublishingcompany->getId() !== $v) {
-            $this->aPublishingcompany = null;
-        }
-
-
-        return $this;
-    } // setPublishingcompanyId()
-
-    /**
-     * Set the value of [place_id] column.
-     *
-     * @param int $v new value
-     * @return Publication The current object (for fluent API support)
-     */
-    public function setPlaceId($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->place_id !== $v) {
-            $this->place_id = $v;
-            $this->modifiedColumns[] = PublicationPeer::PLACE_ID;
-        }
-
-        if ($this->aPlace !== null && $this->aPlace->getId() !== $v) {
-            $this->aPlace = null;
-        }
-
-
-        return $this;
-    } // setPlaceId()
-
-    /**
-     * Set the value of [datespecification_id] column.
-     *
-     * @param int $v new value
-     * @return Publication The current object (for fluent API support)
-     */
-    public function setDatespecificationId($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->datespecification_id !== $v) {
-            $this->datespecification_id = $v;
-            $this->modifiedColumns[] = PublicationPeer::DATESPECIFICATION_ID;
-        }
-
-        if ($this->aDatespecification !== null && $this->aDatespecification->getId() !== $v) {
-            $this->aDatespecification = null;
-        }
-
-
-        return $this;
-    } // setDatespecificationId()
 
     /**
      * Set the value of [printrun] column.
@@ -524,6 +597,252 @@ abstract class BasePublication extends BaseObject implements Persistent
     } // setBibliographiccitation()
 
     /**
+     * Set the value of [title_id] column.
+     *
+     * @param int $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setTitleId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->title_id !== $v) {
+            $this->title_id = $v;
+            $this->modifiedColumns[] = PublicationPeer::TITLE_ID;
+        }
+
+        if ($this->aTitle !== null && $this->aTitle->getId() !== $v) {
+            $this->aTitle = null;
+        }
+
+
+        return $this;
+    } // setTitleId()
+
+    /**
+     * Set the value of [publishingcompany_id] column.
+     *
+     * @param int $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setPublishingcompanyId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->publishingcompany_id !== $v) {
+            $this->publishingcompany_id = $v;
+            $this->modifiedColumns[] = PublicationPeer::PUBLISHINGCOMPANY_ID;
+        }
+
+        if ($this->aPublishingcompany !== null && $this->aPublishingcompany->getId() !== $v) {
+            $this->aPublishingcompany = null;
+        }
+
+
+        return $this;
+    } // setPublishingcompanyId()
+
+    /**
+     * Set the value of [place_id] column.
+     *
+     * @param int $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setPlaceId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->place_id !== $v) {
+            $this->place_id = $v;
+            $this->modifiedColumns[] = PublicationPeer::PLACE_ID;
+        }
+
+        if ($this->aPlace !== null && $this->aPlace->getId() !== $v) {
+            $this->aPlace = null;
+        }
+
+
+        return $this;
+    } // setPlaceId()
+
+    /**
+     * Set the value of [datespecification_id] column.
+     *
+     * @param int $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setDatespecificationId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->datespecification_id !== $v) {
+            $this->datespecification_id = $v;
+            $this->modifiedColumns[] = PublicationPeer::DATESPECIFICATION_ID;
+        }
+
+        if ($this->aDatespecification !== null && $this->aDatespecification->getId() !== $v) {
+            $this->aDatespecification = null;
+        }
+
+
+        return $this;
+    } // setDatespecificationId()
+
+    /**
+     * Set the value of [relatedset_id] column.
+     *
+     * @param int $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setRelatedsetId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->relatedset_id !== $v) {
+            $this->relatedset_id = $v;
+            $this->modifiedColumns[] = PublicationPeer::RELATEDSET_ID;
+        }
+
+        if ($this->aRelatedset !== null && $this->aRelatedset->getId() !== $v) {
+            $this->aRelatedset = null;
+        }
+
+
+        return $this;
+    } // setRelatedsetId()
+
+    /**
+     * Set the value of [work_id] column.
+     *
+     * @param int $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setWorkId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->work_id !== $v) {
+            $this->work_id = $v;
+            $this->modifiedColumns[] = PublicationPeer::WORK_ID;
+        }
+
+        if ($this->aWork !== null && $this->aWork->getId() !== $v) {
+            $this->aWork = null;
+        }
+
+
+        return $this;
+    } // setWorkId()
+
+    /**
+     * Set the value of [publisher_id] column.
+     *
+     * @param int $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setPublisherId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->publisher_id !== $v) {
+            $this->publisher_id = $v;
+            $this->modifiedColumns[] = PublicationPeer::PUBLISHER_ID;
+        }
+
+        if ($this->aPublisher !== null && $this->aPublisher->getId() !== $v) {
+            $this->aPublisher = null;
+        }
+
+
+        return $this;
+    } // setPublisherId()
+
+    /**
+     * Set the value of [printer_id] column.
+     *
+     * @param int $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setPrinterId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->printer_id !== $v) {
+            $this->printer_id = $v;
+            $this->modifiedColumns[] = PublicationPeer::PRINTER_ID;
+        }
+
+        if ($this->aPrinter !== null && $this->aPrinter->getId() !== $v) {
+            $this->aPrinter = null;
+        }
+
+
+        return $this;
+    } // setPrinterId()
+
+    /**
+     * Set the value of [translator_id] column.
+     *
+     * @param int $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setTranslatorId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->translator_id !== $v) {
+            $this->translator_id = $v;
+            $this->modifiedColumns[] = PublicationPeer::TRANSLATOR_ID;
+        }
+
+        if ($this->aTranslator !== null && $this->aTranslator->getId() !== $v) {
+            $this->aTranslator = null;
+        }
+
+
+        return $this;
+    } // setTranslatorId()
+
+    /**
+     * Set the value of [descendant_class] column.
+     *
+     * @param string $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setDescendantClass($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->descendant_class !== $v) {
+            $this->descendant_class = $v;
+            $this->modifiedColumns[] = PublicationPeer::DESCENDANT_CLASS;
+        }
+
+
+        return $this;
+    } // setDescendantClass()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -556,16 +875,22 @@ abstract class BasePublication extends BaseObject implements Persistent
         try {
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-            $this->title_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-            $this->publishingcompany_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
-            $this->place_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
-            $this->datespecification_id = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
-            $this->printrun = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-            $this->printruncomment = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-            $this->edition = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
-            $this->numpages = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
-            $this->numpagesnormed = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
-            $this->bibliographiccitation = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+            $this->printrun = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
+            $this->printruncomment = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+            $this->edition = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+            $this->numpages = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
+            $this->numpagesnormed = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+            $this->bibliographiccitation = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+            $this->title_id = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
+            $this->publishingcompany_id = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+            $this->place_id = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+            $this->datespecification_id = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
+            $this->relatedset_id = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
+            $this->work_id = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
+            $this->publisher_id = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
+            $this->printer_id = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
+            $this->translator_id = ($row[$startcol + 15] !== null) ? (int) $row[$startcol + 15] : null;
+            $this->descendant_class = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -574,7 +899,7 @@ abstract class BasePublication extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 11; // 11 = PublicationPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 17; // 17 = PublicationPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Publication object", $e);
@@ -608,6 +933,21 @@ abstract class BasePublication extends BaseObject implements Persistent
         }
         if ($this->aDatespecification !== null && $this->datespecification_id !== $this->aDatespecification->getId()) {
             $this->aDatespecification = null;
+        }
+        if ($this->aRelatedset !== null && $this->relatedset_id !== $this->aRelatedset->getId()) {
+            $this->aRelatedset = null;
+        }
+        if ($this->aWork !== null && $this->work_id !== $this->aWork->getId()) {
+            $this->aWork = null;
+        }
+        if ($this->aPublisher !== null && $this->publisher_id !== $this->aPublisher->getId()) {
+            $this->aPublisher = null;
+        }
+        if ($this->aPrinter !== null && $this->printer_id !== $this->aPrinter->getId()) {
+            $this->aPrinter = null;
+        }
+        if ($this->aTranslator !== null && $this->translator_id !== $this->aTranslator->getId()) {
+            $this->aTranslator = null;
         }
     } // ensureConsistency
 
@@ -648,12 +988,22 @@ abstract class BasePublication extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->aWork = null;
+            $this->aPublisher = null;
+            $this->aPrinter = null;
+            $this->aTranslator = null;
+            $this->aRelatedset = null;
             $this->aTitle = null;
             $this->aPublishingcompany = null;
             $this->aPlace = null;
             $this->aDatespecification = null;
-            $this->collWrits = null;
+            $this->collPublicationPublicationgroups = null;
 
+            $this->collSources = null;
+
+            $this->collTasks = null;
+
+            $this->collPublicationgroups = null;
         } // if (deep)
     }
 
@@ -772,6 +1122,41 @@ abstract class BasePublication extends BaseObject implements Persistent
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
+            if ($this->aWork !== null) {
+                if ($this->aWork->isModified() || $this->aWork->isNew()) {
+                    $affectedRows += $this->aWork->save($con);
+                }
+                $this->setWork($this->aWork);
+            }
+
+            if ($this->aPublisher !== null) {
+                if ($this->aPublisher->isModified() || $this->aPublisher->isNew()) {
+                    $affectedRows += $this->aPublisher->save($con);
+                }
+                $this->setPublisher($this->aPublisher);
+            }
+
+            if ($this->aPrinter !== null) {
+                if ($this->aPrinter->isModified() || $this->aPrinter->isNew()) {
+                    $affectedRows += $this->aPrinter->save($con);
+                }
+                $this->setPrinter($this->aPrinter);
+            }
+
+            if ($this->aTranslator !== null) {
+                if ($this->aTranslator->isModified() || $this->aTranslator->isNew()) {
+                    $affectedRows += $this->aTranslator->save($con);
+                }
+                $this->setTranslator($this->aTranslator);
+            }
+
+            if ($this->aRelatedset !== null) {
+                if ($this->aRelatedset->isModified() || $this->aRelatedset->isNew()) {
+                    $affectedRows += $this->aRelatedset->save($con);
+                }
+                $this->setRelatedset($this->aRelatedset);
+            }
+
             if ($this->aTitle !== null) {
                 if ($this->aTitle->isModified() || $this->aTitle->isNew()) {
                     $affectedRows += $this->aTitle->save($con);
@@ -811,17 +1196,78 @@ abstract class BasePublication extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
-            if ($this->writsScheduledForDeletion !== null) {
-                if (!$this->writsScheduledForDeletion->isEmpty()) {
-                    WritQuery::create()
-                        ->filterByPrimaryKeys($this->writsScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->publicationgroupsScheduledForDeletion !== null) {
+                if (!$this->publicationgroupsScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->publicationgroupsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($remotePk, $pk);
+                    }
+                    PublicationPublicationgroupQuery::create()
+                        ->filterByPrimaryKeys($pks)
                         ->delete($con);
-                    $this->writsScheduledForDeletion = null;
+                    $this->publicationgroupsScheduledForDeletion = null;
+                }
+
+                foreach ($this->getPublicationgroups() as $publicationgroup) {
+                    if ($publicationgroup->isModified()) {
+                        $publicationgroup->save($con);
+                    }
+                }
+            } elseif ($this->collPublicationgroups) {
+                foreach ($this->collPublicationgroups as $publicationgroup) {
+                    if ($publicationgroup->isModified()) {
+                        $publicationgroup->save($con);
+                    }
                 }
             }
 
-            if ($this->collWrits !== null) {
-                foreach ($this->collWrits as $referrerFK) {
+            if ($this->publicationPublicationgroupsScheduledForDeletion !== null) {
+                if (!$this->publicationPublicationgroupsScheduledForDeletion->isEmpty()) {
+                    PublicationPublicationgroupQuery::create()
+                        ->filterByPrimaryKeys($this->publicationPublicationgroupsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->publicationPublicationgroupsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collPublicationPublicationgroups !== null) {
+                foreach ($this->collPublicationPublicationgroups as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->sourcesScheduledForDeletion !== null) {
+                if (!$this->sourcesScheduledForDeletion->isEmpty()) {
+                    SourceQuery::create()
+                        ->filterByPrimaryKeys($this->sourcesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->sourcesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collSources !== null) {
+                foreach ($this->collSources as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->tasksScheduledForDeletion !== null) {
+                if (!$this->tasksScheduledForDeletion->isEmpty()) {
+                    foreach ($this->tasksScheduledForDeletion as $task) {
+                        // need to save related object because we set the relation to null
+                        $task->save($con);
+                    }
+                    $this->tasksScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collTasks !== null) {
+                foreach ($this->collTasks as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -857,18 +1303,6 @@ abstract class BasePublication extends BaseObject implements Persistent
         if ($this->isColumnModified(PublicationPeer::ID)) {
             $modifiedColumns[':p' . $index++]  = '`id`';
         }
-        if ($this->isColumnModified(PublicationPeer::TITLE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`title_id`';
-        }
-        if ($this->isColumnModified(PublicationPeer::PUBLISHINGCOMPANY_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`publishingCompany_id`';
-        }
-        if ($this->isColumnModified(PublicationPeer::PLACE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`place_id`';
-        }
-        if ($this->isColumnModified(PublicationPeer::DATESPECIFICATION_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`dateSpecification_id`';
-        }
         if ($this->isColumnModified(PublicationPeer::PRINTRUN)) {
             $modifiedColumns[':p' . $index++]  = '`printRun`';
         }
@@ -887,6 +1321,36 @@ abstract class BasePublication extends BaseObject implements Persistent
         if ($this->isColumnModified(PublicationPeer::BIBLIOGRAPHICCITATION)) {
             $modifiedColumns[':p' . $index++]  = '`bibliographicCitation`';
         }
+        if ($this->isColumnModified(PublicationPeer::TITLE_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`title_id`';
+        }
+        if ($this->isColumnModified(PublicationPeer::PUBLISHINGCOMPANY_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`publishingCompany_id`';
+        }
+        if ($this->isColumnModified(PublicationPeer::PLACE_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`place_id`';
+        }
+        if ($this->isColumnModified(PublicationPeer::DATESPECIFICATION_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`dateSpecification_id`';
+        }
+        if ($this->isColumnModified(PublicationPeer::RELATEDSET_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`relatedSet_id`';
+        }
+        if ($this->isColumnModified(PublicationPeer::WORK_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`work_id`';
+        }
+        if ($this->isColumnModified(PublicationPeer::PUBLISHER_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`publisher_id`';
+        }
+        if ($this->isColumnModified(PublicationPeer::PRINTER_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`printer_id`';
+        }
+        if ($this->isColumnModified(PublicationPeer::TRANSLATOR_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`translator_id`';
+        }
+        if ($this->isColumnModified(PublicationPeer::DESCENDANT_CLASS)) {
+            $modifiedColumns[':p' . $index++]  = '`descendant_class`';
+        }
 
         $sql = sprintf(
             'INSERT INTO `publication` (%s) VALUES (%s)',
@@ -900,18 +1364,6 @@ abstract class BasePublication extends BaseObject implements Persistent
                 switch ($columnName) {
                     case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
-                        break;
-                    case '`title_id`':
-                        $stmt->bindValue($identifier, $this->title_id, PDO::PARAM_INT);
-                        break;
-                    case '`publishingCompany_id`':
-                        $stmt->bindValue($identifier, $this->publishingcompany_id, PDO::PARAM_INT);
-                        break;
-                    case '`place_id`':
-                        $stmt->bindValue($identifier, $this->place_id, PDO::PARAM_INT);
-                        break;
-                    case '`dateSpecification_id`':
-                        $stmt->bindValue($identifier, $this->datespecification_id, PDO::PARAM_INT);
                         break;
                     case '`printRun`':
                         $stmt->bindValue($identifier, $this->printrun, PDO::PARAM_STR);
@@ -930,6 +1382,36 @@ abstract class BasePublication extends BaseObject implements Persistent
                         break;
                     case '`bibliographicCitation`':
                         $stmt->bindValue($identifier, $this->bibliographiccitation, PDO::PARAM_STR);
+                        break;
+                    case '`title_id`':
+                        $stmt->bindValue($identifier, $this->title_id, PDO::PARAM_INT);
+                        break;
+                    case '`publishingCompany_id`':
+                        $stmt->bindValue($identifier, $this->publishingcompany_id, PDO::PARAM_INT);
+                        break;
+                    case '`place_id`':
+                        $stmt->bindValue($identifier, $this->place_id, PDO::PARAM_INT);
+                        break;
+                    case '`dateSpecification_id`':
+                        $stmt->bindValue($identifier, $this->datespecification_id, PDO::PARAM_INT);
+                        break;
+                    case '`relatedSet_id`':
+                        $stmt->bindValue($identifier, $this->relatedset_id, PDO::PARAM_INT);
+                        break;
+                    case '`work_id`':
+                        $stmt->bindValue($identifier, $this->work_id, PDO::PARAM_INT);
+                        break;
+                    case '`publisher_id`':
+                        $stmt->bindValue($identifier, $this->publisher_id, PDO::PARAM_INT);
+                        break;
+                    case '`printer_id`':
+                        $stmt->bindValue($identifier, $this->printer_id, PDO::PARAM_INT);
+                        break;
+                    case '`translator_id`':
+                        $stmt->bindValue($identifier, $this->translator_id, PDO::PARAM_INT);
+                        break;
+                    case '`descendant_class`':
+                        $stmt->bindValue($identifier, $this->descendant_class, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -1030,6 +1512,36 @@ abstract class BasePublication extends BaseObject implements Persistent
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
+            if ($this->aWork !== null) {
+                if (!$this->aWork->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aWork->getValidationFailures());
+                }
+            }
+
+            if ($this->aPublisher !== null) {
+                if (!$this->aPublisher->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aPublisher->getValidationFailures());
+                }
+            }
+
+            if ($this->aPrinter !== null) {
+                if (!$this->aPrinter->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aPrinter->getValidationFailures());
+                }
+            }
+
+            if ($this->aTranslator !== null) {
+                if (!$this->aTranslator->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aTranslator->getValidationFailures());
+                }
+            }
+
+            if ($this->aRelatedset !== null) {
+                if (!$this->aRelatedset->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aRelatedset->getValidationFailures());
+                }
+            }
+
             if ($this->aTitle !== null) {
                 if (!$this->aTitle->validate($columns)) {
                     $failureMap = array_merge($failureMap, $this->aTitle->getValidationFailures());
@@ -1060,8 +1572,24 @@ abstract class BasePublication extends BaseObject implements Persistent
             }
 
 
-                if ($this->collWrits !== null) {
-                    foreach ($this->collWrits as $referrerFK) {
+                if ($this->collPublicationPublicationgroups !== null) {
+                    foreach ($this->collPublicationPublicationgroups as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collSources !== null) {
+                    foreach ($this->collSources as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collTasks !== null) {
+                    foreach ($this->collTasks as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -1107,34 +1635,52 @@ abstract class BasePublication extends BaseObject implements Persistent
                 return $this->getId();
                 break;
             case 1:
-                return $this->getTitleId();
-                break;
-            case 2:
-                return $this->getPublishingcompanyId();
-                break;
-            case 3:
-                return $this->getPlaceId();
-                break;
-            case 4:
-                return $this->getDatespecificationId();
-                break;
-            case 5:
                 return $this->getPrintrun();
                 break;
-            case 6:
+            case 2:
                 return $this->getPrintruncomment();
                 break;
-            case 7:
+            case 3:
                 return $this->getEdition();
                 break;
-            case 8:
+            case 4:
                 return $this->getNumpages();
                 break;
-            case 9:
+            case 5:
                 return $this->getNumpagesnormed();
                 break;
-            case 10:
+            case 6:
                 return $this->getBibliographiccitation();
+                break;
+            case 7:
+                return $this->getTitleId();
+                break;
+            case 8:
+                return $this->getPublishingcompanyId();
+                break;
+            case 9:
+                return $this->getPlaceId();
+                break;
+            case 10:
+                return $this->getDatespecificationId();
+                break;
+            case 11:
+                return $this->getRelatedsetId();
+                break;
+            case 12:
+                return $this->getWorkId();
+                break;
+            case 13:
+                return $this->getPublisherId();
+                break;
+            case 14:
+                return $this->getPrinterId();
+                break;
+            case 15:
+                return $this->getTranslatorId();
+                break;
+            case 16:
+                return $this->getDescendantClass();
                 break;
             default:
                 return null;
@@ -1166,18 +1712,39 @@ abstract class BasePublication extends BaseObject implements Persistent
         $keys = PublicationPeer::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getTitleId(),
-            $keys[2] => $this->getPublishingcompanyId(),
-            $keys[3] => $this->getPlaceId(),
-            $keys[4] => $this->getDatespecificationId(),
-            $keys[5] => $this->getPrintrun(),
-            $keys[6] => $this->getPrintruncomment(),
-            $keys[7] => $this->getEdition(),
-            $keys[8] => $this->getNumpages(),
-            $keys[9] => $this->getNumpagesnormed(),
-            $keys[10] => $this->getBibliographiccitation(),
+            $keys[1] => $this->getPrintrun(),
+            $keys[2] => $this->getPrintruncomment(),
+            $keys[3] => $this->getEdition(),
+            $keys[4] => $this->getNumpages(),
+            $keys[5] => $this->getNumpagesnormed(),
+            $keys[6] => $this->getBibliographiccitation(),
+            $keys[7] => $this->getTitleId(),
+            $keys[8] => $this->getPublishingcompanyId(),
+            $keys[9] => $this->getPlaceId(),
+            $keys[10] => $this->getDatespecificationId(),
+            $keys[11] => $this->getRelatedsetId(),
+            $keys[12] => $this->getWorkId(),
+            $keys[13] => $this->getPublisherId(),
+            $keys[14] => $this->getPrinterId(),
+            $keys[15] => $this->getTranslatorId(),
+            $keys[16] => $this->getDescendantClass(),
         );
         if ($includeForeignObjects) {
+            if (null !== $this->aWork) {
+                $result['Work'] = $this->aWork->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aPublisher) {
+                $result['Publisher'] = $this->aPublisher->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aPrinter) {
+                $result['Printer'] = $this->aPrinter->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aTranslator) {
+                $result['Translator'] = $this->aTranslator->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aRelatedset) {
+                $result['Relatedset'] = $this->aRelatedset->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
             if (null !== $this->aTitle) {
                 $result['Title'] = $this->aTitle->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
@@ -1190,8 +1757,14 @@ abstract class BasePublication extends BaseObject implements Persistent
             if (null !== $this->aDatespecification) {
                 $result['Datespecification'] = $this->aDatespecification->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->collWrits) {
-                $result['Writs'] = $this->collWrits->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collPublicationPublicationgroups) {
+                $result['PublicationPublicationgroups'] = $this->collPublicationPublicationgroups->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collSources) {
+                $result['Sources'] = $this->collSources->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collTasks) {
+                $result['Tasks'] = $this->collTasks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1231,34 +1804,52 @@ abstract class BasePublication extends BaseObject implements Persistent
                 $this->setId($value);
                 break;
             case 1:
-                $this->setTitleId($value);
-                break;
-            case 2:
-                $this->setPublishingcompanyId($value);
-                break;
-            case 3:
-                $this->setPlaceId($value);
-                break;
-            case 4:
-                $this->setDatespecificationId($value);
-                break;
-            case 5:
                 $this->setPrintrun($value);
                 break;
-            case 6:
+            case 2:
                 $this->setPrintruncomment($value);
                 break;
-            case 7:
+            case 3:
                 $this->setEdition($value);
                 break;
-            case 8:
+            case 4:
                 $this->setNumpages($value);
                 break;
-            case 9:
+            case 5:
                 $this->setNumpagesnormed($value);
                 break;
-            case 10:
+            case 6:
                 $this->setBibliographiccitation($value);
+                break;
+            case 7:
+                $this->setTitleId($value);
+                break;
+            case 8:
+                $this->setPublishingcompanyId($value);
+                break;
+            case 9:
+                $this->setPlaceId($value);
+                break;
+            case 10:
+                $this->setDatespecificationId($value);
+                break;
+            case 11:
+                $this->setRelatedsetId($value);
+                break;
+            case 12:
+                $this->setWorkId($value);
+                break;
+            case 13:
+                $this->setPublisherId($value);
+                break;
+            case 14:
+                $this->setPrinterId($value);
+                break;
+            case 15:
+                $this->setTranslatorId($value);
+                break;
+            case 16:
+                $this->setDescendantClass($value);
                 break;
         } // switch()
     }
@@ -1285,16 +1876,22 @@ abstract class BasePublication extends BaseObject implements Persistent
         $keys = PublicationPeer::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setTitleId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setPublishingcompanyId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setPlaceId($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setDatespecificationId($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setPrintrun($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setPrintruncomment($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setEdition($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setNumpages($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setNumpagesnormed($arr[$keys[9]]);
-        if (array_key_exists($keys[10], $arr)) $this->setBibliographiccitation($arr[$keys[10]]);
+        if (array_key_exists($keys[1], $arr)) $this->setPrintrun($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setPrintruncomment($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setEdition($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setNumpages($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setNumpagesnormed($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setBibliographiccitation($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setTitleId($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setPublishingcompanyId($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setPlaceId($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setDatespecificationId($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setRelatedsetId($arr[$keys[11]]);
+        if (array_key_exists($keys[12], $arr)) $this->setWorkId($arr[$keys[12]]);
+        if (array_key_exists($keys[13], $arr)) $this->setPublisherId($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setPrinterId($arr[$keys[14]]);
+        if (array_key_exists($keys[15], $arr)) $this->setTranslatorId($arr[$keys[15]]);
+        if (array_key_exists($keys[16], $arr)) $this->setDescendantClass($arr[$keys[16]]);
     }
 
     /**
@@ -1307,16 +1904,22 @@ abstract class BasePublication extends BaseObject implements Persistent
         $criteria = new Criteria(PublicationPeer::DATABASE_NAME);
 
         if ($this->isColumnModified(PublicationPeer::ID)) $criteria->add(PublicationPeer::ID, $this->id);
-        if ($this->isColumnModified(PublicationPeer::TITLE_ID)) $criteria->add(PublicationPeer::TITLE_ID, $this->title_id);
-        if ($this->isColumnModified(PublicationPeer::PUBLISHINGCOMPANY_ID)) $criteria->add(PublicationPeer::PUBLISHINGCOMPANY_ID, $this->publishingcompany_id);
-        if ($this->isColumnModified(PublicationPeer::PLACE_ID)) $criteria->add(PublicationPeer::PLACE_ID, $this->place_id);
-        if ($this->isColumnModified(PublicationPeer::DATESPECIFICATION_ID)) $criteria->add(PublicationPeer::DATESPECIFICATION_ID, $this->datespecification_id);
         if ($this->isColumnModified(PublicationPeer::PRINTRUN)) $criteria->add(PublicationPeer::PRINTRUN, $this->printrun);
         if ($this->isColumnModified(PublicationPeer::PRINTRUNCOMMENT)) $criteria->add(PublicationPeer::PRINTRUNCOMMENT, $this->printruncomment);
         if ($this->isColumnModified(PublicationPeer::EDITION)) $criteria->add(PublicationPeer::EDITION, $this->edition);
         if ($this->isColumnModified(PublicationPeer::NUMPAGES)) $criteria->add(PublicationPeer::NUMPAGES, $this->numpages);
         if ($this->isColumnModified(PublicationPeer::NUMPAGESNORMED)) $criteria->add(PublicationPeer::NUMPAGESNORMED, $this->numpagesnormed);
         if ($this->isColumnModified(PublicationPeer::BIBLIOGRAPHICCITATION)) $criteria->add(PublicationPeer::BIBLIOGRAPHICCITATION, $this->bibliographiccitation);
+        if ($this->isColumnModified(PublicationPeer::TITLE_ID)) $criteria->add(PublicationPeer::TITLE_ID, $this->title_id);
+        if ($this->isColumnModified(PublicationPeer::PUBLISHINGCOMPANY_ID)) $criteria->add(PublicationPeer::PUBLISHINGCOMPANY_ID, $this->publishingcompany_id);
+        if ($this->isColumnModified(PublicationPeer::PLACE_ID)) $criteria->add(PublicationPeer::PLACE_ID, $this->place_id);
+        if ($this->isColumnModified(PublicationPeer::DATESPECIFICATION_ID)) $criteria->add(PublicationPeer::DATESPECIFICATION_ID, $this->datespecification_id);
+        if ($this->isColumnModified(PublicationPeer::RELATEDSET_ID)) $criteria->add(PublicationPeer::RELATEDSET_ID, $this->relatedset_id);
+        if ($this->isColumnModified(PublicationPeer::WORK_ID)) $criteria->add(PublicationPeer::WORK_ID, $this->work_id);
+        if ($this->isColumnModified(PublicationPeer::PUBLISHER_ID)) $criteria->add(PublicationPeer::PUBLISHER_ID, $this->publisher_id);
+        if ($this->isColumnModified(PublicationPeer::PRINTER_ID)) $criteria->add(PublicationPeer::PRINTER_ID, $this->printer_id);
+        if ($this->isColumnModified(PublicationPeer::TRANSLATOR_ID)) $criteria->add(PublicationPeer::TRANSLATOR_ID, $this->translator_id);
+        if ($this->isColumnModified(PublicationPeer::DESCENDANT_CLASS)) $criteria->add(PublicationPeer::DESCENDANT_CLASS, $this->descendant_class);
 
         return $criteria;
     }
@@ -1380,16 +1983,22 @@ abstract class BasePublication extends BaseObject implements Persistent
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setTitleId($this->getTitleId());
-        $copyObj->setPublishingcompanyId($this->getPublishingcompanyId());
-        $copyObj->setPlaceId($this->getPlaceId());
-        $copyObj->setDatespecificationId($this->getDatespecificationId());
         $copyObj->setPrintrun($this->getPrintrun());
         $copyObj->setPrintruncomment($this->getPrintruncomment());
         $copyObj->setEdition($this->getEdition());
         $copyObj->setNumpages($this->getNumpages());
         $copyObj->setNumpagesnormed($this->getNumpagesnormed());
         $copyObj->setBibliographiccitation($this->getBibliographiccitation());
+        $copyObj->setTitleId($this->getTitleId());
+        $copyObj->setPublishingcompanyId($this->getPublishingcompanyId());
+        $copyObj->setPlaceId($this->getPlaceId());
+        $copyObj->setDatespecificationId($this->getDatespecificationId());
+        $copyObj->setRelatedsetId($this->getRelatedsetId());
+        $copyObj->setWorkId($this->getWorkId());
+        $copyObj->setPublisherId($this->getPublisherId());
+        $copyObj->setPrinterId($this->getPrinterId());
+        $copyObj->setTranslatorId($this->getTranslatorId());
+        $copyObj->setDescendantClass($this->getDescendantClass());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1398,9 +2007,21 @@ abstract class BasePublication extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getWrits() as $relObj) {
+            foreach ($this->getPublicationPublicationgroups() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addWrit($relObj->copy($deepCopy));
+                    $copyObj->addPublicationPublicationgroup($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getSources() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addSource($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getTasks() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addTask($relObj->copy($deepCopy));
                 }
             }
 
@@ -1452,6 +2073,272 @@ abstract class BasePublication extends BaseObject implements Persistent
         }
 
         return self::$peer;
+    }
+
+    /**
+     * Declares an association between this object and a Work object.
+     *
+     * @param             Work $v
+     * @return Publication The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setWork(Work $v = null)
+    {
+        if ($v === null) {
+            $this->setWorkId(NULL);
+        } else {
+            $this->setWorkId($v->getId());
+        }
+
+        $this->aWork = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Work object, it will not be re-added.
+        if ($v !== null) {
+            $v->addPublication($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Work object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return Work The associated Work object.
+     * @throws PropelException
+     */
+    public function getWork(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aWork === null && ($this->work_id !== null) && $doQuery) {
+            $this->aWork = WorkQuery::create()->findPk($this->work_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aWork->addPublications($this);
+             */
+        }
+
+        return $this->aWork;
+    }
+
+    /**
+     * Declares an association between this object and a Publisher object.
+     *
+     * @param             Publisher $v
+     * @return Publication The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setPublisher(Publisher $v = null)
+    {
+        if ($v === null) {
+            $this->setPublisherId(NULL);
+        } else {
+            $this->setPublisherId($v->getId());
+        }
+
+        $this->aPublisher = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Publisher object, it will not be re-added.
+        if ($v !== null) {
+            $v->addPublication($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Publisher object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return Publisher The associated Publisher object.
+     * @throws PropelException
+     */
+    public function getPublisher(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aPublisher === null && ($this->publisher_id !== null) && $doQuery) {
+            $this->aPublisher = PublisherQuery::create()
+                ->filterByPublication($this) // here
+                ->findOne($con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aPublisher->addPublications($this);
+             */
+        }
+
+        return $this->aPublisher;
+    }
+
+    /**
+     * Declares an association between this object and a Printer object.
+     *
+     * @param             Printer $v
+     * @return Publication The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setPrinter(Printer $v = null)
+    {
+        if ($v === null) {
+            $this->setPrinterId(NULL);
+        } else {
+            $this->setPrinterId($v->getId());
+        }
+
+        $this->aPrinter = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Printer object, it will not be re-added.
+        if ($v !== null) {
+            $v->addPublication($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Printer object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return Printer The associated Printer object.
+     * @throws PropelException
+     */
+    public function getPrinter(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aPrinter === null && ($this->printer_id !== null) && $doQuery) {
+            $this->aPrinter = PrinterQuery::create()
+                ->filterByPublication($this) // here
+                ->findOne($con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aPrinter->addPublications($this);
+             */
+        }
+
+        return $this->aPrinter;
+    }
+
+    /**
+     * Declares an association between this object and a Translator object.
+     *
+     * @param             Translator $v
+     * @return Publication The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setTranslator(Translator $v = null)
+    {
+        if ($v === null) {
+            $this->setTranslatorId(NULL);
+        } else {
+            $this->setTranslatorId($v->getId());
+        }
+
+        $this->aTranslator = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Translator object, it will not be re-added.
+        if ($v !== null) {
+            $v->addPublication($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Translator object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return Translator The associated Translator object.
+     * @throws PropelException
+     */
+    public function getTranslator(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aTranslator === null && ($this->translator_id !== null) && $doQuery) {
+            $this->aTranslator = TranslatorQuery::create()
+                ->filterByPublication($this) // here
+                ->findOne($con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aTranslator->addPublications($this);
+             */
+        }
+
+        return $this->aTranslator;
+    }
+
+    /**
+     * Declares an association between this object and a Relatedset object.
+     *
+     * @param             Relatedset $v
+     * @return Publication The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setRelatedset(Relatedset $v = null)
+    {
+        if ($v === null) {
+            $this->setRelatedsetId(NULL);
+        } else {
+            $this->setRelatedsetId($v->getId());
+        }
+
+        $this->aRelatedset = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Relatedset object, it will not be re-added.
+        if ($v !== null) {
+            $v->addPublication($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Relatedset object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return Relatedset The associated Relatedset object.
+     * @throws PropelException
+     */
+    public function getRelatedset(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aRelatedset === null && ($this->relatedset_id !== null) && $doQuery) {
+            $this->aRelatedset = RelatedsetQuery::create()->findPk($this->relatedset_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aRelatedset->addPublications($this);
+             */
+        }
+
+        return $this->aRelatedset;
     }
 
     /**
@@ -1673,42 +2560,48 @@ abstract class BasePublication extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
-        if ('Writ' == $relationName) {
-            $this->initWrits();
+        if ('PublicationPublicationgroup' == $relationName) {
+            $this->initPublicationPublicationgroups();
+        }
+        if ('Source' == $relationName) {
+            $this->initSources();
+        }
+        if ('Task' == $relationName) {
+            $this->initTasks();
         }
     }
 
     /**
-     * Clears out the collWrits collection
+     * Clears out the collPublicationPublicationgroups collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return Publication The current object (for fluent API support)
-     * @see        addWrits()
+     * @see        addPublicationPublicationgroups()
      */
-    public function clearWrits()
+    public function clearPublicationPublicationgroups()
     {
-        $this->collWrits = null; // important to set this to null since that means it is uninitialized
-        $this->collWritsPartial = null;
+        $this->collPublicationPublicationgroups = null; // important to set this to null since that means it is uninitialized
+        $this->collPublicationPublicationgroupsPartial = null;
 
         return $this;
     }
 
     /**
-     * reset is the collWrits collection loaded partially
+     * reset is the collPublicationPublicationgroups collection loaded partially
      *
      * @return void
      */
-    public function resetPartialWrits($v = true)
+    public function resetPartialPublicationPublicationgroups($v = true)
     {
-        $this->collWritsPartial = $v;
+        $this->collPublicationPublicationgroupsPartial = $v;
     }
 
     /**
-     * Initializes the collWrits collection.
+     * Initializes the collPublicationPublicationgroups collection.
      *
-     * By default this just sets the collWrits collection to an empty array (like clearcollWrits());
+     * By default this just sets the collPublicationPublicationgroups collection to an empty array (like clearcollPublicationPublicationgroups());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1717,17 +2610,17 @@ abstract class BasePublication extends BaseObject implements Persistent
      *
      * @return void
      */
-    public function initWrits($overrideExisting = true)
+    public function initPublicationPublicationgroups($overrideExisting = true)
     {
-        if (null !== $this->collWrits && !$overrideExisting) {
+        if (null !== $this->collPublicationPublicationgroups && !$overrideExisting) {
             return;
         }
-        $this->collWrits = new PropelObjectCollection();
-        $this->collWrits->setModel('Writ');
+        $this->collPublicationPublicationgroups = new PropelObjectCollection();
+        $this->collPublicationPublicationgroups->setModel('PublicationPublicationgroup');
     }
 
     /**
-     * Gets an array of Writ objects which contain a foreign key that references this object.
+     * Gets an array of PublicationPublicationgroup objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1737,105 +2630,105 @@ abstract class BasePublication extends BaseObject implements Persistent
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|Writ[] List of Writ objects
+     * @return PropelObjectCollection|PublicationPublicationgroup[] List of PublicationPublicationgroup objects
      * @throws PropelException
      */
-    public function getWrits($criteria = null, PropelPDO $con = null)
+    public function getPublicationPublicationgroups($criteria = null, PropelPDO $con = null)
     {
-        $partial = $this->collWritsPartial && !$this->isNew();
-        if (null === $this->collWrits || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collWrits) {
+        $partial = $this->collPublicationPublicationgroupsPartial && !$this->isNew();
+        if (null === $this->collPublicationPublicationgroups || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collPublicationPublicationgroups) {
                 // return empty collection
-                $this->initWrits();
+                $this->initPublicationPublicationgroups();
             } else {
-                $collWrits = WritQuery::create(null, $criteria)
+                $collPublicationPublicationgroups = PublicationPublicationgroupQuery::create(null, $criteria)
                     ->filterByPublication($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    if (false !== $this->collWritsPartial && count($collWrits)) {
-                      $this->initWrits(false);
+                    if (false !== $this->collPublicationPublicationgroupsPartial && count($collPublicationPublicationgroups)) {
+                      $this->initPublicationPublicationgroups(false);
 
-                      foreach($collWrits as $obj) {
-                        if (false == $this->collWrits->contains($obj)) {
-                          $this->collWrits->append($obj);
+                      foreach($collPublicationPublicationgroups as $obj) {
+                        if (false == $this->collPublicationPublicationgroups->contains($obj)) {
+                          $this->collPublicationPublicationgroups->append($obj);
                         }
                       }
 
-                      $this->collWritsPartial = true;
+                      $this->collPublicationPublicationgroupsPartial = true;
                     }
 
-                    $collWrits->getInternalIterator()->rewind();
-                    return $collWrits;
+                    $collPublicationPublicationgroups->getInternalIterator()->rewind();
+                    return $collPublicationPublicationgroups;
                 }
 
-                if($partial && $this->collWrits) {
-                    foreach($this->collWrits as $obj) {
+                if($partial && $this->collPublicationPublicationgroups) {
+                    foreach($this->collPublicationPublicationgroups as $obj) {
                         if($obj->isNew()) {
-                            $collWrits[] = $obj;
+                            $collPublicationPublicationgroups[] = $obj;
                         }
                     }
                 }
 
-                $this->collWrits = $collWrits;
-                $this->collWritsPartial = false;
+                $this->collPublicationPublicationgroups = $collPublicationPublicationgroups;
+                $this->collPublicationPublicationgroupsPartial = false;
             }
         }
 
-        return $this->collWrits;
+        return $this->collPublicationPublicationgroups;
     }
 
     /**
-     * Sets a collection of Writ objects related by a one-to-many relationship
+     * Sets a collection of PublicationPublicationgroup objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $writs A Propel collection.
+     * @param PropelCollection $publicationPublicationgroups A Propel collection.
      * @param PropelPDO $con Optional connection object
      * @return Publication The current object (for fluent API support)
      */
-    public function setWrits(PropelCollection $writs, PropelPDO $con = null)
+    public function setPublicationPublicationgroups(PropelCollection $publicationPublicationgroups, PropelPDO $con = null)
     {
-        $writsToDelete = $this->getWrits(new Criteria(), $con)->diff($writs);
+        $publicationPublicationgroupsToDelete = $this->getPublicationPublicationgroups(new Criteria(), $con)->diff($publicationPublicationgroups);
 
-        $this->writsScheduledForDeletion = unserialize(serialize($writsToDelete));
+        $this->publicationPublicationgroupsScheduledForDeletion = unserialize(serialize($publicationPublicationgroupsToDelete));
 
-        foreach ($writsToDelete as $writRemoved) {
-            $writRemoved->setPublication(null);
+        foreach ($publicationPublicationgroupsToDelete as $publicationPublicationgroupRemoved) {
+            $publicationPublicationgroupRemoved->setPublication(null);
         }
 
-        $this->collWrits = null;
-        foreach ($writs as $writ) {
-            $this->addWrit($writ);
+        $this->collPublicationPublicationgroups = null;
+        foreach ($publicationPublicationgroups as $publicationPublicationgroup) {
+            $this->addPublicationPublicationgroup($publicationPublicationgroup);
         }
 
-        $this->collWrits = $writs;
-        $this->collWritsPartial = false;
+        $this->collPublicationPublicationgroups = $publicationPublicationgroups;
+        $this->collPublicationPublicationgroupsPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related Writ objects.
+     * Returns the number of related PublicationPublicationgroup objects.
      *
      * @param Criteria $criteria
      * @param boolean $distinct
      * @param PropelPDO $con
-     * @return int             Count of related Writ objects.
+     * @return int             Count of related PublicationPublicationgroup objects.
      * @throws PropelException
      */
-    public function countWrits(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countPublicationPublicationgroups(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $partial = $this->collWritsPartial && !$this->isNew();
-        if (null === $this->collWrits || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collWrits) {
+        $partial = $this->collPublicationPublicationgroupsPartial && !$this->isNew();
+        if (null === $this->collPublicationPublicationgroups || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collPublicationPublicationgroups) {
                 return 0;
             }
 
             if($partial && !$criteria) {
-                return count($this->getWrits());
+                return count($this->getPublicationPublicationgroups());
             }
-            $query = WritQuery::create(null, $criteria);
+            $query = PublicationPublicationgroupQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
@@ -1845,52 +2738,52 @@ abstract class BasePublication extends BaseObject implements Persistent
                 ->count($con);
         }
 
-        return count($this->collWrits);
+        return count($this->collPublicationPublicationgroups);
     }
 
     /**
-     * Method called to associate a Writ object to this object
-     * through the Writ foreign key attribute.
+     * Method called to associate a PublicationPublicationgroup object to this object
+     * through the PublicationPublicationgroup foreign key attribute.
      *
-     * @param    Writ $l Writ
+     * @param    PublicationPublicationgroup $l PublicationPublicationgroup
      * @return Publication The current object (for fluent API support)
      */
-    public function addWrit(Writ $l)
+    public function addPublicationPublicationgroup(PublicationPublicationgroup $l)
     {
-        if ($this->collWrits === null) {
-            $this->initWrits();
-            $this->collWritsPartial = true;
+        if ($this->collPublicationPublicationgroups === null) {
+            $this->initPublicationPublicationgroups();
+            $this->collPublicationPublicationgroupsPartial = true;
         }
-        if (!in_array($l, $this->collWrits->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddWrit($l);
+        if (!in_array($l, $this->collPublicationPublicationgroups->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddPublicationPublicationgroup($l);
         }
 
         return $this;
     }
 
     /**
-     * @param	Writ $writ The writ object to add.
+     * @param	PublicationPublicationgroup $publicationPublicationgroup The publicationPublicationgroup object to add.
      */
-    protected function doAddWrit($writ)
+    protected function doAddPublicationPublicationgroup($publicationPublicationgroup)
     {
-        $this->collWrits[]= $writ;
-        $writ->setPublication($this);
+        $this->collPublicationPublicationgroups[]= $publicationPublicationgroup;
+        $publicationPublicationgroup->setPublication($this);
     }
 
     /**
-     * @param	Writ $writ The writ object to remove.
+     * @param	PublicationPublicationgroup $publicationPublicationgroup The publicationPublicationgroup object to remove.
      * @return Publication The current object (for fluent API support)
      */
-    public function removeWrit($writ)
+    public function removePublicationPublicationgroup($publicationPublicationgroup)
     {
-        if ($this->getWrits()->contains($writ)) {
-            $this->collWrits->remove($this->collWrits->search($writ));
-            if (null === $this->writsScheduledForDeletion) {
-                $this->writsScheduledForDeletion = clone $this->collWrits;
-                $this->writsScheduledForDeletion->clear();
+        if ($this->getPublicationPublicationgroups()->contains($publicationPublicationgroup)) {
+            $this->collPublicationPublicationgroups->remove($this->collPublicationPublicationgroups->search($publicationPublicationgroup));
+            if (null === $this->publicationPublicationgroupsScheduledForDeletion) {
+                $this->publicationPublicationgroupsScheduledForDeletion = clone $this->collPublicationPublicationgroups;
+                $this->publicationPublicationgroupsScheduledForDeletion->clear();
             }
-            $this->writsScheduledForDeletion[]= clone $writ;
-            $writ->setPublication(null);
+            $this->publicationPublicationgroupsScheduledForDeletion[]= clone $publicationPublicationgroup;
+            $publicationPublicationgroup->setPublication(null);
         }
 
         return $this;
@@ -1902,7 +2795,7 @@ abstract class BasePublication extends BaseObject implements Persistent
      * an identical criteria, it returns the collection.
      * Otherwise if this Publication is new, it will return
      * an empty collection; or if this Publication has previously
-     * been saved, it will retrieve related Writs from storage.
+     * been saved, it will retrieve related PublicationPublicationgroups from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1911,14 +2804,450 @@ abstract class BasePublication extends BaseObject implements Persistent
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Writ[] List of Writ objects
+     * @return PropelObjectCollection|PublicationPublicationgroup[] List of PublicationPublicationgroup objects
      */
-    public function getWritsJoinWork($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getPublicationPublicationgroupsJoinPublicationgroup($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
-        $query = WritQuery::create(null, $criteria);
-        $query->joinWith('Work', $join_behavior);
+        $query = PublicationPublicationgroupQuery::create(null, $criteria);
+        $query->joinWith('Publicationgroup', $join_behavior);
 
-        return $this->getWrits($query, $con);
+        return $this->getPublicationPublicationgroups($query, $con);
+    }
+
+    /**
+     * Clears out the collSources collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Publication The current object (for fluent API support)
+     * @see        addSources()
+     */
+    public function clearSources()
+    {
+        $this->collSources = null; // important to set this to null since that means it is uninitialized
+        $this->collSourcesPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collSources collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialSources($v = true)
+    {
+        $this->collSourcesPartial = $v;
+    }
+
+    /**
+     * Initializes the collSources collection.
+     *
+     * By default this just sets the collSources collection to an empty array (like clearcollSources());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initSources($overrideExisting = true)
+    {
+        if (null !== $this->collSources && !$overrideExisting) {
+            return;
+        }
+        $this->collSources = new PropelObjectCollection();
+        $this->collSources->setModel('Source');
+    }
+
+    /**
+     * Gets an array of Source objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Publication is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Source[] List of Source objects
+     * @throws PropelException
+     */
+    public function getSources($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collSourcesPartial && !$this->isNew();
+        if (null === $this->collSources || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collSources) {
+                // return empty collection
+                $this->initSources();
+            } else {
+                $collSources = SourceQuery::create(null, $criteria)
+                    ->filterByPublication($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collSourcesPartial && count($collSources)) {
+                      $this->initSources(false);
+
+                      foreach($collSources as $obj) {
+                        if (false == $this->collSources->contains($obj)) {
+                          $this->collSources->append($obj);
+                        }
+                      }
+
+                      $this->collSourcesPartial = true;
+                    }
+
+                    $collSources->getInternalIterator()->rewind();
+                    return $collSources;
+                }
+
+                if($partial && $this->collSources) {
+                    foreach($this->collSources as $obj) {
+                        if($obj->isNew()) {
+                            $collSources[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collSources = $collSources;
+                $this->collSourcesPartial = false;
+            }
+        }
+
+        return $this->collSources;
+    }
+
+    /**
+     * Sets a collection of Source objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $sources A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setSources(PropelCollection $sources, PropelPDO $con = null)
+    {
+        $sourcesToDelete = $this->getSources(new Criteria(), $con)->diff($sources);
+
+        $this->sourcesScheduledForDeletion = unserialize(serialize($sourcesToDelete));
+
+        foreach ($sourcesToDelete as $sourceRemoved) {
+            $sourceRemoved->setPublication(null);
+        }
+
+        $this->collSources = null;
+        foreach ($sources as $source) {
+            $this->addSource($source);
+        }
+
+        $this->collSources = $sources;
+        $this->collSourcesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Source objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Source objects.
+     * @throws PropelException
+     */
+    public function countSources(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collSourcesPartial && !$this->isNew();
+        if (null === $this->collSources || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collSources) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getSources());
+            }
+            $query = SourceQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPublication($this)
+                ->count($con);
+        }
+
+        return count($this->collSources);
+    }
+
+    /**
+     * Method called to associate a Source object to this object
+     * through the Source foreign key attribute.
+     *
+     * @param    Source $l Source
+     * @return Publication The current object (for fluent API support)
+     */
+    public function addSource(Source $l)
+    {
+        if ($this->collSources === null) {
+            $this->initSources();
+            $this->collSourcesPartial = true;
+        }
+        if (!in_array($l, $this->collSources->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddSource($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Source $source The source object to add.
+     */
+    protected function doAddSource($source)
+    {
+        $this->collSources[]= $source;
+        $source->setPublication($this);
+    }
+
+    /**
+     * @param	Source $source The source object to remove.
+     * @return Publication The current object (for fluent API support)
+     */
+    public function removeSource($source)
+    {
+        if ($this->getSources()->contains($source)) {
+            $this->collSources->remove($this->collSources->search($source));
+            if (null === $this->sourcesScheduledForDeletion) {
+                $this->sourcesScheduledForDeletion = clone $this->collSources;
+                $this->sourcesScheduledForDeletion->clear();
+            }
+            $this->sourcesScheduledForDeletion[]= clone $source;
+            $source->setPublication(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Clears out the collTasks collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Publication The current object (for fluent API support)
+     * @see        addTasks()
+     */
+    public function clearTasks()
+    {
+        $this->collTasks = null; // important to set this to null since that means it is uninitialized
+        $this->collTasksPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collTasks collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialTasks($v = true)
+    {
+        $this->collTasksPartial = $v;
+    }
+
+    /**
+     * Initializes the collTasks collection.
+     *
+     * By default this just sets the collTasks collection to an empty array (like clearcollTasks());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initTasks($overrideExisting = true)
+    {
+        if (null !== $this->collTasks && !$overrideExisting) {
+            return;
+        }
+        $this->collTasks = new PropelObjectCollection();
+        $this->collTasks->setModel('Task');
+    }
+
+    /**
+     * Gets an array of Task objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Publication is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Task[] List of Task objects
+     * @throws PropelException
+     */
+    public function getTasks($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collTasksPartial && !$this->isNew();
+        if (null === $this->collTasks || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collTasks) {
+                // return empty collection
+                $this->initTasks();
+            } else {
+                $collTasks = TaskQuery::create(null, $criteria)
+                    ->filterByPublication($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collTasksPartial && count($collTasks)) {
+                      $this->initTasks(false);
+
+                      foreach($collTasks as $obj) {
+                        if (false == $this->collTasks->contains($obj)) {
+                          $this->collTasks->append($obj);
+                        }
+                      }
+
+                      $this->collTasksPartial = true;
+                    }
+
+                    $collTasks->getInternalIterator()->rewind();
+                    return $collTasks;
+                }
+
+                if($partial && $this->collTasks) {
+                    foreach($this->collTasks as $obj) {
+                        if($obj->isNew()) {
+                            $collTasks[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collTasks = $collTasks;
+                $this->collTasksPartial = false;
+            }
+        }
+
+        return $this->collTasks;
+    }
+
+    /**
+     * Sets a collection of Task objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $tasks A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setTasks(PropelCollection $tasks, PropelPDO $con = null)
+    {
+        $tasksToDelete = $this->getTasks(new Criteria(), $con)->diff($tasks);
+
+        $this->tasksScheduledForDeletion = unserialize(serialize($tasksToDelete));
+
+        foreach ($tasksToDelete as $taskRemoved) {
+            $taskRemoved->setPublication(null);
+        }
+
+        $this->collTasks = null;
+        foreach ($tasks as $task) {
+            $this->addTask($task);
+        }
+
+        $this->collTasks = $tasks;
+        $this->collTasksPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Task objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Task objects.
+     * @throws PropelException
+     */
+    public function countTasks(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collTasksPartial && !$this->isNew();
+        if (null === $this->collTasks || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collTasks) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getTasks());
+            }
+            $query = TaskQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPublication($this)
+                ->count($con);
+        }
+
+        return count($this->collTasks);
+    }
+
+    /**
+     * Method called to associate a Task object to this object
+     * through the Task foreign key attribute.
+     *
+     * @param    Task $l Task
+     * @return Publication The current object (for fluent API support)
+     */
+    public function addTask(Task $l)
+    {
+        if ($this->collTasks === null) {
+            $this->initTasks();
+            $this->collTasksPartial = true;
+        }
+        if (!in_array($l, $this->collTasks->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddTask($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Task $task The task object to add.
+     */
+    protected function doAddTask($task)
+    {
+        $this->collTasks[]= $task;
+        $task->setPublication($this);
+    }
+
+    /**
+     * @param	Task $task The task object to remove.
+     * @return Publication The current object (for fluent API support)
+     */
+    public function removeTask($task)
+    {
+        if ($this->getTasks()->contains($task)) {
+            $this->collTasks->remove($this->collTasks->search($task));
+            if (null === $this->tasksScheduledForDeletion) {
+                $this->tasksScheduledForDeletion = clone $this->collTasks;
+                $this->tasksScheduledForDeletion->clear();
+            }
+            $this->tasksScheduledForDeletion[]= $task;
+            $task->setPublication(null);
+        }
+
+        return $this;
     }
 
 
@@ -1927,7 +3256,7 @@ abstract class BasePublication extends BaseObject implements Persistent
      * an identical criteria, it returns the collection.
      * Otherwise if this Publication is new, it will return
      * an empty collection; or if this Publication has previously
-     * been saved, it will retrieve related Writs from storage.
+     * been saved, it will retrieve related Tasks from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1936,14 +3265,14 @@ abstract class BasePublication extends BaseObject implements Persistent
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Writ[] List of Writ objects
+     * @return PropelObjectCollection|Task[] List of Task objects
      */
-    public function getWritsJoinPublisher($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getTasksJoinTasktype($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
-        $query = WritQuery::create(null, $criteria);
-        $query->joinWith('Publisher', $join_behavior);
+        $query = TaskQuery::create(null, $criteria);
+        $query->joinWith('Tasktype', $join_behavior);
 
-        return $this->getWrits($query, $con);
+        return $this->getTasks($query, $con);
     }
 
 
@@ -1952,7 +3281,7 @@ abstract class BasePublication extends BaseObject implements Persistent
      * an identical criteria, it returns the collection.
      * Otherwise if this Publication is new, it will return
      * an empty collection; or if this Publication has previously
-     * been saved, it will retrieve related Writs from storage.
+     * been saved, it will retrieve related Tasks from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1961,14 +3290,14 @@ abstract class BasePublication extends BaseObject implements Persistent
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Writ[] List of Writ objects
+     * @return PropelObjectCollection|Task[] List of Task objects
      */
-    public function getWritsJoinPrinter($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getTasksJoinPublicationgroup($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
-        $query = WritQuery::create(null, $criteria);
-        $query->joinWith('Printer', $join_behavior);
+        $query = TaskQuery::create(null, $criteria);
+        $query->joinWith('Publicationgroup', $join_behavior);
 
-        return $this->getWrits($query, $con);
+        return $this->getTasks($query, $con);
     }
 
 
@@ -1977,7 +3306,7 @@ abstract class BasePublication extends BaseObject implements Persistent
      * an identical criteria, it returns the collection.
      * Otherwise if this Publication is new, it will return
      * an empty collection; or if this Publication has previously
-     * been saved, it will retrieve related Writs from storage.
+     * been saved, it will retrieve related Tasks from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1986,39 +3315,191 @@ abstract class BasePublication extends BaseObject implements Persistent
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Writ[] List of Writ objects
+     * @return PropelObjectCollection|Task[] List of Task objects
      */
-    public function getWritsJoinTranslator($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getTasksJoinUser($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
-        $query = WritQuery::create(null, $criteria);
-        $query->joinWith('Translator', $join_behavior);
+        $query = TaskQuery::create(null, $criteria);
+        $query->joinWith('User', $join_behavior);
 
-        return $this->getWrits($query, $con);
+        return $this->getTasks($query, $con);
     }
 
+    /**
+     * Clears out the collPublicationgroups collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Publication The current object (for fluent API support)
+     * @see        addPublicationgroups()
+     */
+    public function clearPublicationgroups()
+    {
+        $this->collPublicationgroups = null; // important to set this to null since that means it is uninitialized
+        $this->collPublicationgroupsPartial = null;
+
+        return $this;
+    }
 
     /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Publication is new, it will return
-     * an empty collection; or if this Publication has previously
-     * been saved, it will retrieve related Writs from storage.
+     * Initializes the collPublicationgroups collection.
      *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Publication.
+     * By default this just sets the collPublicationgroups collection to an empty collection (like clearPublicationgroups());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Writ[] List of Writ objects
+     * @return void
      */
-    public function getWritsJoinRelatedset($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function initPublicationgroups()
     {
-        $query = WritQuery::create(null, $criteria);
-        $query->joinWith('Relatedset', $join_behavior);
+        $this->collPublicationgroups = new PropelObjectCollection();
+        $this->collPublicationgroups->setModel('Publicationgroup');
+    }
 
-        return $this->getWrits($query, $con);
+    /**
+     * Gets a collection of Publicationgroup objects related by a many-to-many relationship
+     * to the current object by way of the publication_publicationGroup cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Publication is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return PropelObjectCollection|Publicationgroup[] List of Publicationgroup objects
+     */
+    public function getPublicationgroups($criteria = null, PropelPDO $con = null)
+    {
+        if (null === $this->collPublicationgroups || null !== $criteria) {
+            if ($this->isNew() && null === $this->collPublicationgroups) {
+                // return empty collection
+                $this->initPublicationgroups();
+            } else {
+                $collPublicationgroups = PublicationgroupQuery::create(null, $criteria)
+                    ->filterByPublication($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collPublicationgroups;
+                }
+                $this->collPublicationgroups = $collPublicationgroups;
+            }
+        }
+
+        return $this->collPublicationgroups;
+    }
+
+    /**
+     * Sets a collection of Publicationgroup objects related by a many-to-many relationship
+     * to the current object by way of the publication_publicationGroup cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $publicationgroups A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setPublicationgroups(PropelCollection $publicationgroups, PropelPDO $con = null)
+    {
+        $this->clearPublicationgroups();
+        $currentPublicationgroups = $this->getPublicationgroups();
+
+        $this->publicationgroupsScheduledForDeletion = $currentPublicationgroups->diff($publicationgroups);
+
+        foreach ($publicationgroups as $publicationgroup) {
+            if (!$currentPublicationgroups->contains($publicationgroup)) {
+                $this->doAddPublicationgroup($publicationgroup);
+            }
+        }
+
+        $this->collPublicationgroups = $publicationgroups;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Publicationgroup objects related by a many-to-many relationship
+     * to the current object by way of the publication_publicationGroup cross-reference table.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related Publicationgroup objects
+     */
+    public function countPublicationgroups($criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        if (null === $this->collPublicationgroups || null !== $criteria) {
+            if ($this->isNew() && null === $this->collPublicationgroups) {
+                return 0;
+            } else {
+                $query = PublicationgroupQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByPublication($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collPublicationgroups);
+        }
+    }
+
+    /**
+     * Associate a Publicationgroup object to this object
+     * through the publication_publicationGroup cross reference table.
+     *
+     * @param  Publicationgroup $publicationgroup The PublicationPublicationgroup object to relate
+     * @return Publication The current object (for fluent API support)
+     */
+    public function addPublicationgroup(Publicationgroup $publicationgroup)
+    {
+        if ($this->collPublicationgroups === null) {
+            $this->initPublicationgroups();
+        }
+        if (!$this->collPublicationgroups->contains($publicationgroup)) { // only add it if the **same** object is not already associated
+            $this->doAddPublicationgroup($publicationgroup);
+
+            $this->collPublicationgroups[]= $publicationgroup;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Publicationgroup $publicationgroup The publicationgroup object to add.
+     */
+    protected function doAddPublicationgroup($publicationgroup)
+    {
+        $publicationPublicationgroup = new PublicationPublicationgroup();
+        $publicationPublicationgroup->setPublicationgroup($publicationgroup);
+        $this->addPublicationPublicationgroup($publicationPublicationgroup);
+    }
+
+    /**
+     * Remove a Publicationgroup object to this object
+     * through the publication_publicationGroup cross reference table.
+     *
+     * @param Publicationgroup $publicationgroup The PublicationPublicationgroup object to relate
+     * @return Publication The current object (for fluent API support)
+     */
+    public function removePublicationgroup(Publicationgroup $publicationgroup)
+    {
+        if ($this->getPublicationgroups()->contains($publicationgroup)) {
+            $this->collPublicationgroups->remove($this->collPublicationgroups->search($publicationgroup));
+            if (null === $this->publicationgroupsScheduledForDeletion) {
+                $this->publicationgroupsScheduledForDeletion = clone $this->collPublicationgroups;
+                $this->publicationgroupsScheduledForDeletion->clear();
+            }
+            $this->publicationgroupsScheduledForDeletion[]= $publicationgroup;
+        }
+
+        return $this;
     }
 
     /**
@@ -2027,16 +3508,22 @@ abstract class BasePublication extends BaseObject implements Persistent
     public function clear()
     {
         $this->id = null;
-        $this->title_id = null;
-        $this->publishingcompany_id = null;
-        $this->place_id = null;
-        $this->datespecification_id = null;
         $this->printrun = null;
         $this->printruncomment = null;
         $this->edition = null;
         $this->numpages = null;
         $this->numpagesnormed = null;
         $this->bibliographiccitation = null;
+        $this->title_id = null;
+        $this->publishingcompany_id = null;
+        $this->place_id = null;
+        $this->datespecification_id = null;
+        $this->relatedset_id = null;
+        $this->work_id = null;
+        $this->publisher_id = null;
+        $this->printer_id = null;
+        $this->translator_id = null;
+        $this->descendant_class = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
@@ -2059,10 +3546,40 @@ abstract class BasePublication extends BaseObject implements Persistent
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
-            if ($this->collWrits) {
-                foreach ($this->collWrits as $o) {
+            if ($this->collPublicationPublicationgroups) {
+                foreach ($this->collPublicationPublicationgroups as $o) {
                     $o->clearAllReferences($deep);
                 }
+            }
+            if ($this->collSources) {
+                foreach ($this->collSources as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collTasks) {
+                foreach ($this->collTasks as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collPublicationgroups) {
+                foreach ($this->collPublicationgroups as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->aWork instanceof Persistent) {
+              $this->aWork->clearAllReferences($deep);
+            }
+            if ($this->aPublisher instanceof Persistent) {
+              $this->aPublisher->clearAllReferences($deep);
+            }
+            if ($this->aPrinter instanceof Persistent) {
+              $this->aPrinter->clearAllReferences($deep);
+            }
+            if ($this->aTranslator instanceof Persistent) {
+              $this->aTranslator->clearAllReferences($deep);
+            }
+            if ($this->aRelatedset instanceof Persistent) {
+              $this->aRelatedset->clearAllReferences($deep);
             }
             if ($this->aTitle instanceof Persistent) {
               $this->aTitle->clearAllReferences($deep);
@@ -2080,10 +3597,27 @@ abstract class BasePublication extends BaseObject implements Persistent
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
-        if ($this->collWrits instanceof PropelCollection) {
-            $this->collWrits->clearIterator();
+        if ($this->collPublicationPublicationgroups instanceof PropelCollection) {
+            $this->collPublicationPublicationgroups->clearIterator();
         }
-        $this->collWrits = null;
+        $this->collPublicationPublicationgroups = null;
+        if ($this->collSources instanceof PropelCollection) {
+            $this->collSources->clearIterator();
+        }
+        $this->collSources = null;
+        if ($this->collTasks instanceof PropelCollection) {
+            $this->collTasks->clearIterator();
+        }
+        $this->collTasks = null;
+        if ($this->collPublicationgroups instanceof PropelCollection) {
+            $this->collPublicationgroups->clearIterator();
+        }
+        $this->collPublicationgroups = null;
+        $this->aWork = null;
+        $this->aPublisher = null;
+        $this->aPrinter = null;
+        $this->aTranslator = null;
+        $this->aRelatedset = null;
         $this->aTitle = null;
         $this->aPublishingcompany = null;
         $this->aPlace = null;
@@ -2108,6 +3642,34 @@ abstract class BasePublication extends BaseObject implements Persistent
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
+    }
+
+    // concrete_inheritance_parent behavior
+
+    /**
+     * Whether or not this object is the parent of a child object
+     *
+     * @return    bool
+     */
+    public function hasChildObject()
+    {
+        return $this->getDescendantClass() !== null;
+    }
+
+    /**
+     * Get the child object of this object
+     *
+     * @return    mixed
+     */
+    public function getChildObject()
+    {
+        if (!$this->hasChildObject()) {
+            return null;
+        }
+        $childObjectClass = $this->getDescendantClass();
+        $childObject = PropelQuery::from($childObjectClass)->findPk($this->getPrimaryKey());
+
+        return $childObject->hasChildObject() ? $childObject->getChildObject() : $childObject;
     }
 
 }

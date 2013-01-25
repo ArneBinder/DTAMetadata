@@ -3,6 +3,5 @@
 {% block title %}DTA Metadatenbank{% endblock %}
 
 {% block core %}
-    {{ testData }}
+    {{ testData|default('No test value given.') }}
 {% endblock %}
-

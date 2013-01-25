@@ -53,7 +53,11 @@ class PrinterTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Person', 'DTA\\MetadataBundle\\Model\\Person', RelationMap::MANY_TO_ONE, array('person_id' => 'id', ), null, null);
-        $this->addRelation('Writ', 'DTA\\MetadataBundle\\Model\\Writ', RelationMap::ONE_TO_MANY, array('id' => 'printer_id', ), null, null, 'Writs');
+        $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Publication', RelationMap::ONE_TO_MANY, array('id' => 'printer_id', ), null, null, 'Publications');
+        $this->addRelation('Monograph', 'DTA\\MetadataBundle\\Model\\Monograph', RelationMap::ONE_TO_MANY, array('id' => 'printer_id', ), null, null, 'Monographs');
+        $this->addRelation('Essay', 'DTA\\MetadataBundle\\Model\\Essay', RelationMap::ONE_TO_MANY, array('id' => 'printer_id', ), null, null, 'Essays');
+        $this->addRelation('Magazine', 'DTA\\MetadataBundle\\Model\\Magazine', RelationMap::ONE_TO_MANY, array('id' => 'printer_id', ), null, null, 'Magazines');
+        $this->addRelation('Series', 'DTA\\MetadataBundle\\Model\\Series', RelationMap::ONE_TO_MANY, array('id' => 'printer_id', ), null, null, 'Series');
     } // buildRelations()
 
 } // PrinterTableMap

@@ -9,12 +9,12 @@ use \PDOStatement;
 use \Propel;
 use \PropelException;
 use \PropelPDO;
+use DTA\MetadataBundle\Model\PublicationPeer;
+use DTA\MetadataBundle\Model\PublicationgroupPeer;
 use DTA\MetadataBundle\Model\Task;
 use DTA\MetadataBundle\Model\TaskPeer;
 use DTA\MetadataBundle\Model\TasktypePeer;
 use DTA\MetadataBundle\Model\UserPeer;
-use DTA\MetadataBundle\Model\WritPeer;
-use DTA\MetadataBundle\Model\WritgroupPeer;
 use DTA\MetadataBundle\Model\map\TaskTableMap;
 
 abstract class BaseTaskPeer
@@ -59,11 +59,11 @@ abstract class BaseTaskPeer
     /** the column name for the comments field */
     const COMMENTS = 'task.comments';
 
-    /** the column name for the writGroup_id field */
-    const WRITGROUP_ID = 'task.writGroup_id';
+    /** the column name for the publicationGroup_id field */
+    const PUBLICATIONGROUP_ID = 'task.publicationGroup_id';
 
-    /** the column name for the writ_id field */
-    const WRIT_ID = 'task.writ_id';
+    /** the column name for the publication_id field */
+    const PUBLICATION_ID = 'task.publication_id';
 
     /** the column name for the responsibleUser_id field */
     const RESPONSIBLEUSER_ID = 'task.responsibleUser_id';
@@ -87,11 +87,11 @@ abstract class BaseTaskPeer
      * e.g. TaskPeer::$fieldNames[TaskPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'TasktypeId', 'Done', 'Start', 'End', 'Comments', 'WritgroupId', 'WritId', 'ResponsibleuserId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'tasktypeId', 'done', 'start', 'end', 'comments', 'writgroupId', 'writId', 'responsibleuserId', ),
-        BasePeer::TYPE_COLNAME => array (TaskPeer::ID, TaskPeer::TASKTYPE_ID, TaskPeer::DONE, TaskPeer::START, TaskPeer::END, TaskPeer::COMMENTS, TaskPeer::WRITGROUP_ID, TaskPeer::WRIT_ID, TaskPeer::RESPONSIBLEUSER_ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TASKTYPE_ID', 'DONE', 'START', 'END', 'COMMENTS', 'WRITGROUP_ID', 'WRIT_ID', 'RESPONSIBLEUSER_ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'taskType_id', 'done', 'start', 'end', 'comments', 'writGroup_id', 'writ_id', 'responsibleUser_id', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'TasktypeId', 'Done', 'Start', 'End', 'Comments', 'PublicationgroupId', 'PublicationId', 'ResponsibleuserId', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'tasktypeId', 'done', 'start', 'end', 'comments', 'publicationgroupId', 'publicationId', 'responsibleuserId', ),
+        BasePeer::TYPE_COLNAME => array (TaskPeer::ID, TaskPeer::TASKTYPE_ID, TaskPeer::DONE, TaskPeer::START, TaskPeer::END, TaskPeer::COMMENTS, TaskPeer::PUBLICATIONGROUP_ID, TaskPeer::PUBLICATION_ID, TaskPeer::RESPONSIBLEUSER_ID, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TASKTYPE_ID', 'DONE', 'START', 'END', 'COMMENTS', 'PUBLICATIONGROUP_ID', 'PUBLICATION_ID', 'RESPONSIBLEUSER_ID', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'taskType_id', 'done', 'start', 'end', 'comments', 'publicationGroup_id', 'publication_id', 'responsibleUser_id', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
     );
 
@@ -102,11 +102,11 @@ abstract class BaseTaskPeer
      * e.g. TaskPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'TasktypeId' => 1, 'Done' => 2, 'Start' => 3, 'End' => 4, 'Comments' => 5, 'WritgroupId' => 6, 'WritId' => 7, 'ResponsibleuserId' => 8, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'tasktypeId' => 1, 'done' => 2, 'start' => 3, 'end' => 4, 'comments' => 5, 'writgroupId' => 6, 'writId' => 7, 'responsibleuserId' => 8, ),
-        BasePeer::TYPE_COLNAME => array (TaskPeer::ID => 0, TaskPeer::TASKTYPE_ID => 1, TaskPeer::DONE => 2, TaskPeer::START => 3, TaskPeer::END => 4, TaskPeer::COMMENTS => 5, TaskPeer::WRITGROUP_ID => 6, TaskPeer::WRIT_ID => 7, TaskPeer::RESPONSIBLEUSER_ID => 8, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TASKTYPE_ID' => 1, 'DONE' => 2, 'START' => 3, 'END' => 4, 'COMMENTS' => 5, 'WRITGROUP_ID' => 6, 'WRIT_ID' => 7, 'RESPONSIBLEUSER_ID' => 8, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'taskType_id' => 1, 'done' => 2, 'start' => 3, 'end' => 4, 'comments' => 5, 'writGroup_id' => 6, 'writ_id' => 7, 'responsibleUser_id' => 8, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'TasktypeId' => 1, 'Done' => 2, 'Start' => 3, 'End' => 4, 'Comments' => 5, 'PublicationgroupId' => 6, 'PublicationId' => 7, 'ResponsibleuserId' => 8, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'tasktypeId' => 1, 'done' => 2, 'start' => 3, 'end' => 4, 'comments' => 5, 'publicationgroupId' => 6, 'publicationId' => 7, 'responsibleuserId' => 8, ),
+        BasePeer::TYPE_COLNAME => array (TaskPeer::ID => 0, TaskPeer::TASKTYPE_ID => 1, TaskPeer::DONE => 2, TaskPeer::START => 3, TaskPeer::END => 4, TaskPeer::COMMENTS => 5, TaskPeer::PUBLICATIONGROUP_ID => 6, TaskPeer::PUBLICATION_ID => 7, TaskPeer::RESPONSIBLEUSER_ID => 8, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TASKTYPE_ID' => 1, 'DONE' => 2, 'START' => 3, 'END' => 4, 'COMMENTS' => 5, 'PUBLICATIONGROUP_ID' => 6, 'PUBLICATION_ID' => 7, 'RESPONSIBLEUSER_ID' => 8, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'taskType_id' => 1, 'done' => 2, 'start' => 3, 'end' => 4, 'comments' => 5, 'publicationGroup_id' => 6, 'publication_id' => 7, 'responsibleUser_id' => 8, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
     );
 
@@ -187,8 +187,8 @@ abstract class BaseTaskPeer
             $criteria->addSelectColumn(TaskPeer::START);
             $criteria->addSelectColumn(TaskPeer::END);
             $criteria->addSelectColumn(TaskPeer::COMMENTS);
-            $criteria->addSelectColumn(TaskPeer::WRITGROUP_ID);
-            $criteria->addSelectColumn(TaskPeer::WRIT_ID);
+            $criteria->addSelectColumn(TaskPeer::PUBLICATIONGROUP_ID);
+            $criteria->addSelectColumn(TaskPeer::PUBLICATION_ID);
             $criteria->addSelectColumn(TaskPeer::RESPONSIBLEUSER_ID);
         } else {
             $criteria->addSelectColumn($alias . '.id');
@@ -197,8 +197,8 @@ abstract class BaseTaskPeer
             $criteria->addSelectColumn($alias . '.start');
             $criteria->addSelectColumn($alias . '.end');
             $criteria->addSelectColumn($alias . '.comments');
-            $criteria->addSelectColumn($alias . '.writGroup_id');
-            $criteria->addSelectColumn($alias . '.writ_id');
+            $criteria->addSelectColumn($alias . '.publicationGroup_id');
+            $criteria->addSelectColumn($alias . '.publication_id');
             $criteria->addSelectColumn($alias . '.responsibleUser_id');
         }
     }
@@ -555,7 +555,7 @@ abstract class BaseTaskPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related Writgroup table
+     * Returns the number of rows matching criteria, joining the related Publicationgroup table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -563,7 +563,7 @@ abstract class BaseTaskPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinWritgroup(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinPublicationgroup(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -590,7 +590,7 @@ abstract class BaseTaskPeer
             $con = Propel::getConnection(TaskPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(TaskPeer::WRITGROUP_ID, WritgroupPeer::ID, $join_behavior);
+        $criteria->addJoin(TaskPeer::PUBLICATIONGROUP_ID, PublicationgroupPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -606,7 +606,7 @@ abstract class BaseTaskPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related Writ table
+     * Returns the number of rows matching criteria, joining the related Publication table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -614,7 +614,7 @@ abstract class BaseTaskPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinWrit(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinPublication(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -641,7 +641,7 @@ abstract class BaseTaskPeer
             $con = Propel::getConnection(TaskPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(TaskPeer::WRIT_ID, WritPeer::ID, $join_behavior);
+        $criteria->addJoin(TaskPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -775,7 +775,7 @@ abstract class BaseTaskPeer
 
 
     /**
-     * Selects a collection of Task objects pre-filled with their Writgroup objects.
+     * Selects a collection of Task objects pre-filled with their Publicationgroup objects.
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
@@ -783,7 +783,7 @@ abstract class BaseTaskPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinWritgroup(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinPublicationgroup(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -794,9 +794,9 @@ abstract class BaseTaskPeer
 
         TaskPeer::addSelectColumns($criteria);
         $startcol = TaskPeer::NUM_HYDRATE_COLUMNS;
-        WritgroupPeer::addSelectColumns($criteria);
+        PublicationgroupPeer::addSelectColumns($criteria);
 
-        $criteria->addJoin(TaskPeer::WRITGROUP_ID, WritgroupPeer::ID, $join_behavior);
+        $criteria->addJoin(TaskPeer::PUBLICATIONGROUP_ID, PublicationgroupPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
@@ -816,19 +816,19 @@ abstract class BaseTaskPeer
                 TaskPeer::addInstanceToPool($obj1, $key1);
             } // if $obj1 already loaded
 
-            $key2 = WritgroupPeer::getPrimaryKeyHashFromRow($row, $startcol);
+            $key2 = PublicationgroupPeer::getPrimaryKeyHashFromRow($row, $startcol);
             if ($key2 !== null) {
-                $obj2 = WritgroupPeer::getInstanceFromPool($key2);
+                $obj2 = PublicationgroupPeer::getInstanceFromPool($key2);
                 if (!$obj2) {
 
-                    $cls = WritgroupPeer::getOMClass();
+                    $cls = PublicationgroupPeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol);
-                    WritgroupPeer::addInstanceToPool($obj2, $key2);
+                    PublicationgroupPeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 already loaded
 
-                // Add the $obj1 (Task) to $obj2 (Writgroup)
+                // Add the $obj1 (Task) to $obj2 (Publicationgroup)
                 $obj2->addTask($obj1);
 
             } // if joined row was not null
@@ -842,7 +842,7 @@ abstract class BaseTaskPeer
 
 
     /**
-     * Selects a collection of Task objects pre-filled with their Writ objects.
+     * Selects a collection of Task objects pre-filled with their Publication objects.
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
@@ -850,7 +850,7 @@ abstract class BaseTaskPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinWrit(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinPublication(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -861,9 +861,9 @@ abstract class BaseTaskPeer
 
         TaskPeer::addSelectColumns($criteria);
         $startcol = TaskPeer::NUM_HYDRATE_COLUMNS;
-        WritPeer::addSelectColumns($criteria);
+        PublicationPeer::addSelectColumns($criteria);
 
-        $criteria->addJoin(TaskPeer::WRIT_ID, WritPeer::ID, $join_behavior);
+        $criteria->addJoin(TaskPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
@@ -883,19 +883,19 @@ abstract class BaseTaskPeer
                 TaskPeer::addInstanceToPool($obj1, $key1);
             } // if $obj1 already loaded
 
-            $key2 = WritPeer::getPrimaryKeyHashFromRow($row, $startcol);
+            $key2 = PublicationPeer::getPrimaryKeyHashFromRow($row, $startcol);
             if ($key2 !== null) {
-                $obj2 = WritPeer::getInstanceFromPool($key2);
+                $obj2 = PublicationPeer::getInstanceFromPool($key2);
                 if (!$obj2) {
 
-                    $cls = WritPeer::getOMClass();
+                    $cls = PublicationPeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol);
-                    WritPeer::addInstanceToPool($obj2, $key2);
+                    PublicationPeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 already loaded
 
-                // Add the $obj1 (Task) to $obj2 (Writ)
+                // Add the $obj1 (Task) to $obj2 (Publication)
                 $obj2->addTask($obj1);
 
             } // if joined row was not null
@@ -1013,9 +1013,9 @@ abstract class BaseTaskPeer
 
         $criteria->addJoin(TaskPeer::TASKTYPE_ID, TasktypePeer::ID, $join_behavior);
 
-        $criteria->addJoin(TaskPeer::WRITGROUP_ID, WritgroupPeer::ID, $join_behavior);
+        $criteria->addJoin(TaskPeer::PUBLICATIONGROUP_ID, PublicationgroupPeer::ID, $join_behavior);
 
-        $criteria->addJoin(TaskPeer::WRIT_ID, WritPeer::ID, $join_behavior);
+        $criteria->addJoin(TaskPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
 
         $criteria->addJoin(TaskPeer::RESPONSIBLEUSER_ID, UserPeer::ID, $join_behavior);
 
@@ -1056,20 +1056,20 @@ abstract class BaseTaskPeer
         TasktypePeer::addSelectColumns($criteria);
         $startcol3 = $startcol2 + TasktypePeer::NUM_HYDRATE_COLUMNS;
 
-        WritgroupPeer::addSelectColumns($criteria);
-        $startcol4 = $startcol3 + WritgroupPeer::NUM_HYDRATE_COLUMNS;
+        PublicationgroupPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + PublicationgroupPeer::NUM_HYDRATE_COLUMNS;
 
-        WritPeer::addSelectColumns($criteria);
-        $startcol5 = $startcol4 + WritPeer::NUM_HYDRATE_COLUMNS;
+        PublicationPeer::addSelectColumns($criteria);
+        $startcol5 = $startcol4 + PublicationPeer::NUM_HYDRATE_COLUMNS;
 
         UserPeer::addSelectColumns($criteria);
         $startcol6 = $startcol5 + UserPeer::NUM_HYDRATE_COLUMNS;
 
         $criteria->addJoin(TaskPeer::TASKTYPE_ID, TasktypePeer::ID, $join_behavior);
 
-        $criteria->addJoin(TaskPeer::WRITGROUP_ID, WritgroupPeer::ID, $join_behavior);
+        $criteria->addJoin(TaskPeer::PUBLICATIONGROUP_ID, PublicationgroupPeer::ID, $join_behavior);
 
-        $criteria->addJoin(TaskPeer::WRIT_ID, WritPeer::ID, $join_behavior);
+        $criteria->addJoin(TaskPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
 
         $criteria->addJoin(TaskPeer::RESPONSIBLEUSER_ID, UserPeer::ID, $join_behavior);
 
@@ -1108,39 +1108,39 @@ abstract class BaseTaskPeer
                 $obj2->addTask($obj1);
             } // if joined row not null
 
-            // Add objects for joined Writgroup rows
+            // Add objects for joined Publicationgroup rows
 
-            $key3 = WritgroupPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+            $key3 = PublicationgroupPeer::getPrimaryKeyHashFromRow($row, $startcol3);
             if ($key3 !== null) {
-                $obj3 = WritgroupPeer::getInstanceFromPool($key3);
+                $obj3 = PublicationgroupPeer::getInstanceFromPool($key3);
                 if (!$obj3) {
 
-                    $cls = WritgroupPeer::getOMClass();
+                    $cls = PublicationgroupPeer::getOMClass();
 
                     $obj3 = new $cls();
                     $obj3->hydrate($row, $startcol3);
-                    WritgroupPeer::addInstanceToPool($obj3, $key3);
+                    PublicationgroupPeer::addInstanceToPool($obj3, $key3);
                 } // if obj3 loaded
 
-                // Add the $obj1 (Task) to the collection in $obj3 (Writgroup)
+                // Add the $obj1 (Task) to the collection in $obj3 (Publicationgroup)
                 $obj3->addTask($obj1);
             } // if joined row not null
 
-            // Add objects for joined Writ rows
+            // Add objects for joined Publication rows
 
-            $key4 = WritPeer::getPrimaryKeyHashFromRow($row, $startcol4);
+            $key4 = PublicationPeer::getPrimaryKeyHashFromRow($row, $startcol4);
             if ($key4 !== null) {
-                $obj4 = WritPeer::getInstanceFromPool($key4);
+                $obj4 = PublicationPeer::getInstanceFromPool($key4);
                 if (!$obj4) {
 
-                    $cls = WritPeer::getOMClass();
+                    $cls = PublicationPeer::getOMClass();
 
                     $obj4 = new $cls();
                     $obj4->hydrate($row, $startcol4);
-                    WritPeer::addInstanceToPool($obj4, $key4);
+                    PublicationPeer::addInstanceToPool($obj4, $key4);
                 } // if obj4 loaded
 
-                // Add the $obj1 (Task) to the collection in $obj4 (Writ)
+                // Add the $obj1 (Task) to the collection in $obj4 (Publication)
                 $obj4->addTask($obj1);
             } // if joined row not null
 
@@ -1206,9 +1206,9 @@ abstract class BaseTaskPeer
             $con = Propel::getConnection(TaskPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(TaskPeer::WRITGROUP_ID, WritgroupPeer::ID, $join_behavior);
+        $criteria->addJoin(TaskPeer::PUBLICATIONGROUP_ID, PublicationgroupPeer::ID, $join_behavior);
 
-        $criteria->addJoin(TaskPeer::WRIT_ID, WritPeer::ID, $join_behavior);
+        $criteria->addJoin(TaskPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
 
         $criteria->addJoin(TaskPeer::RESPONSIBLEUSER_ID, UserPeer::ID, $join_behavior);
 
@@ -1226,7 +1226,7 @@ abstract class BaseTaskPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related Writgroup table
+     * Returns the number of rows matching criteria, joining the related Publicationgroup table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -1234,7 +1234,7 @@ abstract class BaseTaskPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinAllExceptWritgroup(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinAllExceptPublicationgroup(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -1263,7 +1263,7 @@ abstract class BaseTaskPeer
 
         $criteria->addJoin(TaskPeer::TASKTYPE_ID, TasktypePeer::ID, $join_behavior);
 
-        $criteria->addJoin(TaskPeer::WRIT_ID, WritPeer::ID, $join_behavior);
+        $criteria->addJoin(TaskPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
 
         $criteria->addJoin(TaskPeer::RESPONSIBLEUSER_ID, UserPeer::ID, $join_behavior);
 
@@ -1281,7 +1281,7 @@ abstract class BaseTaskPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related Writ table
+     * Returns the number of rows matching criteria, joining the related Publication table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -1289,7 +1289,7 @@ abstract class BaseTaskPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinAllExceptWrit(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinAllExceptPublication(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -1318,7 +1318,7 @@ abstract class BaseTaskPeer
 
         $criteria->addJoin(TaskPeer::TASKTYPE_ID, TasktypePeer::ID, $join_behavior);
 
-        $criteria->addJoin(TaskPeer::WRITGROUP_ID, WritgroupPeer::ID, $join_behavior);
+        $criteria->addJoin(TaskPeer::PUBLICATIONGROUP_ID, PublicationgroupPeer::ID, $join_behavior);
 
         $criteria->addJoin(TaskPeer::RESPONSIBLEUSER_ID, UserPeer::ID, $join_behavior);
 
@@ -1373,9 +1373,9 @@ abstract class BaseTaskPeer
 
         $criteria->addJoin(TaskPeer::TASKTYPE_ID, TasktypePeer::ID, $join_behavior);
 
-        $criteria->addJoin(TaskPeer::WRITGROUP_ID, WritgroupPeer::ID, $join_behavior);
+        $criteria->addJoin(TaskPeer::PUBLICATIONGROUP_ID, PublicationgroupPeer::ID, $join_behavior);
 
-        $criteria->addJoin(TaskPeer::WRIT_ID, WritPeer::ID, $join_behavior);
+        $criteria->addJoin(TaskPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -1414,18 +1414,18 @@ abstract class BaseTaskPeer
         TaskPeer::addSelectColumns($criteria);
         $startcol2 = TaskPeer::NUM_HYDRATE_COLUMNS;
 
-        WritgroupPeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + WritgroupPeer::NUM_HYDRATE_COLUMNS;
+        PublicationgroupPeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + PublicationgroupPeer::NUM_HYDRATE_COLUMNS;
 
-        WritPeer::addSelectColumns($criteria);
-        $startcol4 = $startcol3 + WritPeer::NUM_HYDRATE_COLUMNS;
+        PublicationPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + PublicationPeer::NUM_HYDRATE_COLUMNS;
 
         UserPeer::addSelectColumns($criteria);
         $startcol5 = $startcol4 + UserPeer::NUM_HYDRATE_COLUMNS;
 
-        $criteria->addJoin(TaskPeer::WRITGROUP_ID, WritgroupPeer::ID, $join_behavior);
+        $criteria->addJoin(TaskPeer::PUBLICATIONGROUP_ID, PublicationgroupPeer::ID, $join_behavior);
 
-        $criteria->addJoin(TaskPeer::WRIT_ID, WritPeer::ID, $join_behavior);
+        $criteria->addJoin(TaskPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
 
         $criteria->addJoin(TaskPeer::RESPONSIBLEUSER_ID, UserPeer::ID, $join_behavior);
 
@@ -1447,40 +1447,40 @@ abstract class BaseTaskPeer
                 TaskPeer::addInstanceToPool($obj1, $key1);
             } // if obj1 already loaded
 
-                // Add objects for joined Writgroup rows
+                // Add objects for joined Publicationgroup rows
 
-                $key2 = WritgroupPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                $key2 = PublicationgroupPeer::getPrimaryKeyHashFromRow($row, $startcol2);
                 if ($key2 !== null) {
-                    $obj2 = WritgroupPeer::getInstanceFromPool($key2);
+                    $obj2 = PublicationgroupPeer::getInstanceFromPool($key2);
                     if (!$obj2) {
 
-                        $cls = WritgroupPeer::getOMClass();
+                        $cls = PublicationgroupPeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol2);
-                    WritgroupPeer::addInstanceToPool($obj2, $key2);
+                    PublicationgroupPeer::addInstanceToPool($obj2, $key2);
                 } // if $obj2 already loaded
 
-                // Add the $obj1 (Task) to the collection in $obj2 (Writgroup)
+                // Add the $obj1 (Task) to the collection in $obj2 (Publicationgroup)
                 $obj2->addTask($obj1);
 
             } // if joined row is not null
 
-                // Add objects for joined Writ rows
+                // Add objects for joined Publication rows
 
-                $key3 = WritPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+                $key3 = PublicationPeer::getPrimaryKeyHashFromRow($row, $startcol3);
                 if ($key3 !== null) {
-                    $obj3 = WritPeer::getInstanceFromPool($key3);
+                    $obj3 = PublicationPeer::getInstanceFromPool($key3);
                     if (!$obj3) {
 
-                        $cls = WritPeer::getOMClass();
+                        $cls = PublicationPeer::getOMClass();
 
                     $obj3 = new $cls();
                     $obj3->hydrate($row, $startcol3);
-                    WritPeer::addInstanceToPool($obj3, $key3);
+                    PublicationPeer::addInstanceToPool($obj3, $key3);
                 } // if $obj3 already loaded
 
-                // Add the $obj1 (Task) to the collection in $obj3 (Writ)
+                // Add the $obj1 (Task) to the collection in $obj3 (Publication)
                 $obj3->addTask($obj1);
 
             } // if joined row is not null
@@ -1513,7 +1513,7 @@ abstract class BaseTaskPeer
 
 
     /**
-     * Selects a collection of Task objects pre-filled with all related objects except Writgroup.
+     * Selects a collection of Task objects pre-filled with all related objects except Publicationgroup.
      *
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
@@ -1522,7 +1522,7 @@ abstract class BaseTaskPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinAllExceptWritgroup(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinAllExceptPublicationgroup(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -1539,15 +1539,15 @@ abstract class BaseTaskPeer
         TasktypePeer::addSelectColumns($criteria);
         $startcol3 = $startcol2 + TasktypePeer::NUM_HYDRATE_COLUMNS;
 
-        WritPeer::addSelectColumns($criteria);
-        $startcol4 = $startcol3 + WritPeer::NUM_HYDRATE_COLUMNS;
+        PublicationPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + PublicationPeer::NUM_HYDRATE_COLUMNS;
 
         UserPeer::addSelectColumns($criteria);
         $startcol5 = $startcol4 + UserPeer::NUM_HYDRATE_COLUMNS;
 
         $criteria->addJoin(TaskPeer::TASKTYPE_ID, TasktypePeer::ID, $join_behavior);
 
-        $criteria->addJoin(TaskPeer::WRIT_ID, WritPeer::ID, $join_behavior);
+        $criteria->addJoin(TaskPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
 
         $criteria->addJoin(TaskPeer::RESPONSIBLEUSER_ID, UserPeer::ID, $join_behavior);
 
@@ -1588,21 +1588,21 @@ abstract class BaseTaskPeer
 
             } // if joined row is not null
 
-                // Add objects for joined Writ rows
+                // Add objects for joined Publication rows
 
-                $key3 = WritPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+                $key3 = PublicationPeer::getPrimaryKeyHashFromRow($row, $startcol3);
                 if ($key3 !== null) {
-                    $obj3 = WritPeer::getInstanceFromPool($key3);
+                    $obj3 = PublicationPeer::getInstanceFromPool($key3);
                     if (!$obj3) {
 
-                        $cls = WritPeer::getOMClass();
+                        $cls = PublicationPeer::getOMClass();
 
                     $obj3 = new $cls();
                     $obj3->hydrate($row, $startcol3);
-                    WritPeer::addInstanceToPool($obj3, $key3);
+                    PublicationPeer::addInstanceToPool($obj3, $key3);
                 } // if $obj3 already loaded
 
-                // Add the $obj1 (Task) to the collection in $obj3 (Writ)
+                // Add the $obj1 (Task) to the collection in $obj3 (Publication)
                 $obj3->addTask($obj1);
 
             } // if joined row is not null
@@ -1635,7 +1635,7 @@ abstract class BaseTaskPeer
 
 
     /**
-     * Selects a collection of Task objects pre-filled with all related objects except Writ.
+     * Selects a collection of Task objects pre-filled with all related objects except Publication.
      *
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
@@ -1644,7 +1644,7 @@ abstract class BaseTaskPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinAllExceptWrit(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinAllExceptPublication(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -1661,15 +1661,15 @@ abstract class BaseTaskPeer
         TasktypePeer::addSelectColumns($criteria);
         $startcol3 = $startcol2 + TasktypePeer::NUM_HYDRATE_COLUMNS;
 
-        WritgroupPeer::addSelectColumns($criteria);
-        $startcol4 = $startcol3 + WritgroupPeer::NUM_HYDRATE_COLUMNS;
+        PublicationgroupPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + PublicationgroupPeer::NUM_HYDRATE_COLUMNS;
 
         UserPeer::addSelectColumns($criteria);
         $startcol5 = $startcol4 + UserPeer::NUM_HYDRATE_COLUMNS;
 
         $criteria->addJoin(TaskPeer::TASKTYPE_ID, TasktypePeer::ID, $join_behavior);
 
-        $criteria->addJoin(TaskPeer::WRITGROUP_ID, WritgroupPeer::ID, $join_behavior);
+        $criteria->addJoin(TaskPeer::PUBLICATIONGROUP_ID, PublicationgroupPeer::ID, $join_behavior);
 
         $criteria->addJoin(TaskPeer::RESPONSIBLEUSER_ID, UserPeer::ID, $join_behavior);
 
@@ -1710,21 +1710,21 @@ abstract class BaseTaskPeer
 
             } // if joined row is not null
 
-                // Add objects for joined Writgroup rows
+                // Add objects for joined Publicationgroup rows
 
-                $key3 = WritgroupPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+                $key3 = PublicationgroupPeer::getPrimaryKeyHashFromRow($row, $startcol3);
                 if ($key3 !== null) {
-                    $obj3 = WritgroupPeer::getInstanceFromPool($key3);
+                    $obj3 = PublicationgroupPeer::getInstanceFromPool($key3);
                     if (!$obj3) {
 
-                        $cls = WritgroupPeer::getOMClass();
+                        $cls = PublicationgroupPeer::getOMClass();
 
                     $obj3 = new $cls();
                     $obj3->hydrate($row, $startcol3);
-                    WritgroupPeer::addInstanceToPool($obj3, $key3);
+                    PublicationgroupPeer::addInstanceToPool($obj3, $key3);
                 } // if $obj3 already loaded
 
-                // Add the $obj1 (Task) to the collection in $obj3 (Writgroup)
+                // Add the $obj1 (Task) to the collection in $obj3 (Publicationgroup)
                 $obj3->addTask($obj1);
 
             } // if joined row is not null
@@ -1783,17 +1783,17 @@ abstract class BaseTaskPeer
         TasktypePeer::addSelectColumns($criteria);
         $startcol3 = $startcol2 + TasktypePeer::NUM_HYDRATE_COLUMNS;
 
-        WritgroupPeer::addSelectColumns($criteria);
-        $startcol4 = $startcol3 + WritgroupPeer::NUM_HYDRATE_COLUMNS;
+        PublicationgroupPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + PublicationgroupPeer::NUM_HYDRATE_COLUMNS;
 
-        WritPeer::addSelectColumns($criteria);
-        $startcol5 = $startcol4 + WritPeer::NUM_HYDRATE_COLUMNS;
+        PublicationPeer::addSelectColumns($criteria);
+        $startcol5 = $startcol4 + PublicationPeer::NUM_HYDRATE_COLUMNS;
 
         $criteria->addJoin(TaskPeer::TASKTYPE_ID, TasktypePeer::ID, $join_behavior);
 
-        $criteria->addJoin(TaskPeer::WRITGROUP_ID, WritgroupPeer::ID, $join_behavior);
+        $criteria->addJoin(TaskPeer::PUBLICATIONGROUP_ID, PublicationgroupPeer::ID, $join_behavior);
 
-        $criteria->addJoin(TaskPeer::WRIT_ID, WritPeer::ID, $join_behavior);
+        $criteria->addJoin(TaskPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
 
 
         $stmt = BasePeer::doSelect($criteria, $con);
@@ -1832,40 +1832,40 @@ abstract class BaseTaskPeer
 
             } // if joined row is not null
 
-                // Add objects for joined Writgroup rows
+                // Add objects for joined Publicationgroup rows
 
-                $key3 = WritgroupPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+                $key3 = PublicationgroupPeer::getPrimaryKeyHashFromRow($row, $startcol3);
                 if ($key3 !== null) {
-                    $obj3 = WritgroupPeer::getInstanceFromPool($key3);
+                    $obj3 = PublicationgroupPeer::getInstanceFromPool($key3);
                     if (!$obj3) {
 
-                        $cls = WritgroupPeer::getOMClass();
+                        $cls = PublicationgroupPeer::getOMClass();
 
                     $obj3 = new $cls();
                     $obj3->hydrate($row, $startcol3);
-                    WritgroupPeer::addInstanceToPool($obj3, $key3);
+                    PublicationgroupPeer::addInstanceToPool($obj3, $key3);
                 } // if $obj3 already loaded
 
-                // Add the $obj1 (Task) to the collection in $obj3 (Writgroup)
+                // Add the $obj1 (Task) to the collection in $obj3 (Publicationgroup)
                 $obj3->addTask($obj1);
 
             } // if joined row is not null
 
-                // Add objects for joined Writ rows
+                // Add objects for joined Publication rows
 
-                $key4 = WritPeer::getPrimaryKeyHashFromRow($row, $startcol4);
+                $key4 = PublicationPeer::getPrimaryKeyHashFromRow($row, $startcol4);
                 if ($key4 !== null) {
-                    $obj4 = WritPeer::getInstanceFromPool($key4);
+                    $obj4 = PublicationPeer::getInstanceFromPool($key4);
                     if (!$obj4) {
 
-                        $cls = WritPeer::getOMClass();
+                        $cls = PublicationPeer::getOMClass();
 
                     $obj4 = new $cls();
                     $obj4->hydrate($row, $startcol4);
-                    WritPeer::addInstanceToPool($obj4, $key4);
+                    PublicationPeer::addInstanceToPool($obj4, $key4);
                 } // if $obj4 already loaded
 
-                // Add the $obj1 (Task) to the collection in $obj4 (Writ)
+                // Add the $obj1 (Task) to the collection in $obj4 (Publication)
                 $obj4->addTask($obj1);
 
             } // if joined row is not null

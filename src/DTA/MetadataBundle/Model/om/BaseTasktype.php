@@ -1293,10 +1293,10 @@ abstract class BaseTasktype extends BaseObject implements Persistent
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Task[] List of Task objects
      */
-    public function getTasksJoinWritgroup($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getTasksJoinPublicationgroup($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = TaskQuery::create(null, $criteria);
-        $query->joinWith('Writgroup', $join_behavior);
+        $query->joinWith('Publicationgroup', $join_behavior);
 
         return $this->getTasks($query, $con);
     }
@@ -1318,10 +1318,10 @@ abstract class BaseTasktype extends BaseObject implements Persistent
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Task[] List of Task objects
      */
-    public function getTasksJoinWrit($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getTasksJoinPublication($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = TaskQuery::create(null, $criteria);
-        $query->joinWith('Writ', $join_behavior);
+        $query->joinWith('Publication', $join_behavior);
 
         return $this->getTasks($query, $con);
     }

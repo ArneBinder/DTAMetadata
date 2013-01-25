@@ -13,6 +13,10 @@ use \Propel;
 use \PropelDateTime;
 use \PropelException;
 use \PropelPDO;
+use DTA\MetadataBundle\Model\Publication;
+use DTA\MetadataBundle\Model\PublicationQuery;
+use DTA\MetadataBundle\Model\Publicationgroup;
+use DTA\MetadataBundle\Model\PublicationgroupQuery;
 use DTA\MetadataBundle\Model\Task;
 use DTA\MetadataBundle\Model\TaskPeer;
 use DTA\MetadataBundle\Model\TaskQuery;
@@ -20,10 +24,6 @@ use DTA\MetadataBundle\Model\Tasktype;
 use DTA\MetadataBundle\Model\TasktypeQuery;
 use DTA\MetadataBundle\Model\User;
 use DTA\MetadataBundle\Model\UserQuery;
-use DTA\MetadataBundle\Model\Writ;
-use DTA\MetadataBundle\Model\WritQuery;
-use DTA\MetadataBundle\Model\Writgroup;
-use DTA\MetadataBundle\Model\WritgroupQuery;
 
 abstract class BaseTask extends BaseObject implements Persistent
 {
@@ -83,16 +83,16 @@ abstract class BaseTask extends BaseObject implements Persistent
     protected $comments;
 
     /**
-     * The value for the writgroup_id field.
+     * The value for the publicationgroup_id field.
      * @var        int
      */
-    protected $writgroup_id;
+    protected $publicationgroup_id;
 
     /**
-     * The value for the writ_id field.
+     * The value for the publication_id field.
      * @var        int
      */
-    protected $writ_id;
+    protected $publication_id;
 
     /**
      * The value for the responsibleuser_id field.
@@ -106,14 +106,14 @@ abstract class BaseTask extends BaseObject implements Persistent
     protected $aTasktype;
 
     /**
-     * @var        Writgroup
+     * @var        Publicationgroup
      */
-    protected $aWritgroup;
+    protected $aPublicationgroup;
 
     /**
-     * @var        Writ
+     * @var        Publication
      */
-    protected $aWrit;
+    protected $aPublication;
 
     /**
      * @var        User
@@ -261,23 +261,23 @@ abstract class BaseTask extends BaseObject implements Persistent
     }
 
     /**
-     * Get the [writgroup_id] column value.
+     * Get the [publicationgroup_id] column value.
      *
      * @return int
      */
-    public function getWritgroupId()
+    public function getPublicationgroupId()
     {
-        return $this->writgroup_id;
+        return $this->publicationgroup_id;
     }
 
     /**
-     * Get the [writ_id] column value.
+     * Get the [publication_id] column value.
      *
      * @return int
      */
-    public function getWritId()
+    public function getPublicationId()
     {
-        return $this->writ_id;
+        return $this->publication_id;
     }
 
     /**
@@ -433,54 +433,54 @@ abstract class BaseTask extends BaseObject implements Persistent
     } // setComments()
 
     /**
-     * Set the value of [writgroup_id] column.
+     * Set the value of [publicationgroup_id] column.
      *
      * @param int $v new value
      * @return Task The current object (for fluent API support)
      */
-    public function setWritgroupId($v)
+    public function setPublicationgroupId($v)
     {
         if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
-        if ($this->writgroup_id !== $v) {
-            $this->writgroup_id = $v;
-            $this->modifiedColumns[] = TaskPeer::WRITGROUP_ID;
+        if ($this->publicationgroup_id !== $v) {
+            $this->publicationgroup_id = $v;
+            $this->modifiedColumns[] = TaskPeer::PUBLICATIONGROUP_ID;
         }
 
-        if ($this->aWritgroup !== null && $this->aWritgroup->getId() !== $v) {
-            $this->aWritgroup = null;
+        if ($this->aPublicationgroup !== null && $this->aPublicationgroup->getId() !== $v) {
+            $this->aPublicationgroup = null;
         }
 
 
         return $this;
-    } // setWritgroupId()
+    } // setPublicationgroupId()
 
     /**
-     * Set the value of [writ_id] column.
+     * Set the value of [publication_id] column.
      *
      * @param int $v new value
      * @return Task The current object (for fluent API support)
      */
-    public function setWritId($v)
+    public function setPublicationId($v)
     {
         if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
-        if ($this->writ_id !== $v) {
-            $this->writ_id = $v;
-            $this->modifiedColumns[] = TaskPeer::WRIT_ID;
+        if ($this->publication_id !== $v) {
+            $this->publication_id = $v;
+            $this->modifiedColumns[] = TaskPeer::PUBLICATION_ID;
         }
 
-        if ($this->aWrit !== null && $this->aWrit->getId() !== $v) {
-            $this->aWrit = null;
+        if ($this->aPublication !== null && $this->aPublication->getId() !== $v) {
+            $this->aPublication = null;
         }
 
 
         return $this;
-    } // setWritId()
+    } // setPublicationId()
 
     /**
      * Set the value of [responsibleuser_id] column.
@@ -545,8 +545,8 @@ abstract class BaseTask extends BaseObject implements Persistent
             $this->start = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
             $this->end = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
             $this->comments = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-            $this->writgroup_id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-            $this->writ_id = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
+            $this->publicationgroup_id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
+            $this->publication_id = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
             $this->responsibleuser_id = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
             $this->resetModified();
 
@@ -582,11 +582,11 @@ abstract class BaseTask extends BaseObject implements Persistent
         if ($this->aTasktype !== null && $this->tasktype_id !== $this->aTasktype->getId()) {
             $this->aTasktype = null;
         }
-        if ($this->aWritgroup !== null && $this->writgroup_id !== $this->aWritgroup->getId()) {
-            $this->aWritgroup = null;
+        if ($this->aPublicationgroup !== null && $this->publicationgroup_id !== $this->aPublicationgroup->getId()) {
+            $this->aPublicationgroup = null;
         }
-        if ($this->aWrit !== null && $this->writ_id !== $this->aWrit->getId()) {
-            $this->aWrit = null;
+        if ($this->aPublication !== null && $this->publication_id !== $this->aPublication->getId()) {
+            $this->aPublication = null;
         }
         if ($this->aUser !== null && $this->responsibleuser_id !== $this->aUser->getId()) {
             $this->aUser = null;
@@ -631,8 +631,8 @@ abstract class BaseTask extends BaseObject implements Persistent
         if ($deep) {  // also de-associate any related objects?
 
             $this->aTasktype = null;
-            $this->aWritgroup = null;
-            $this->aWrit = null;
+            $this->aPublicationgroup = null;
+            $this->aPublication = null;
             $this->aUser = null;
         } // if (deep)
     }
@@ -759,18 +759,18 @@ abstract class BaseTask extends BaseObject implements Persistent
                 $this->setTasktype($this->aTasktype);
             }
 
-            if ($this->aWritgroup !== null) {
-                if ($this->aWritgroup->isModified() || $this->aWritgroup->isNew()) {
-                    $affectedRows += $this->aWritgroup->save($con);
+            if ($this->aPublicationgroup !== null) {
+                if ($this->aPublicationgroup->isModified() || $this->aPublicationgroup->isNew()) {
+                    $affectedRows += $this->aPublicationgroup->save($con);
                 }
-                $this->setWritgroup($this->aWritgroup);
+                $this->setPublicationgroup($this->aPublicationgroup);
             }
 
-            if ($this->aWrit !== null) {
-                if ($this->aWrit->isModified() || $this->aWrit->isNew()) {
-                    $affectedRows += $this->aWrit->save($con);
+            if ($this->aPublication !== null) {
+                if ($this->aPublication->isModified() || $this->aPublication->isNew()) {
+                    $affectedRows += $this->aPublication->save($con);
                 }
-                $this->setWrit($this->aWrit);
+                $this->setPublication($this->aPublication);
             }
 
             if ($this->aUser !== null) {
@@ -835,11 +835,11 @@ abstract class BaseTask extends BaseObject implements Persistent
         if ($this->isColumnModified(TaskPeer::COMMENTS)) {
             $modifiedColumns[':p' . $index++]  = '`comments`';
         }
-        if ($this->isColumnModified(TaskPeer::WRITGROUP_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`writGroup_id`';
+        if ($this->isColumnModified(TaskPeer::PUBLICATIONGROUP_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`publicationGroup_id`';
         }
-        if ($this->isColumnModified(TaskPeer::WRIT_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`writ_id`';
+        if ($this->isColumnModified(TaskPeer::PUBLICATION_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`publication_id`';
         }
         if ($this->isColumnModified(TaskPeer::RESPONSIBLEUSER_ID)) {
             $modifiedColumns[':p' . $index++]  = '`responsibleUser_id`';
@@ -873,11 +873,11 @@ abstract class BaseTask extends BaseObject implements Persistent
                     case '`comments`':
                         $stmt->bindValue($identifier, $this->comments, PDO::PARAM_STR);
                         break;
-                    case '`writGroup_id`':
-                        $stmt->bindValue($identifier, $this->writgroup_id, PDO::PARAM_INT);
+                    case '`publicationGroup_id`':
+                        $stmt->bindValue($identifier, $this->publicationgroup_id, PDO::PARAM_INT);
                         break;
-                    case '`writ_id`':
-                        $stmt->bindValue($identifier, $this->writ_id, PDO::PARAM_INT);
+                    case '`publication_id`':
+                        $stmt->bindValue($identifier, $this->publication_id, PDO::PARAM_INT);
                         break;
                     case '`responsibleUser_id`':
                         $stmt->bindValue($identifier, $this->responsibleuser_id, PDO::PARAM_INT);
@@ -987,15 +987,15 @@ abstract class BaseTask extends BaseObject implements Persistent
                 }
             }
 
-            if ($this->aWritgroup !== null) {
-                if (!$this->aWritgroup->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aWritgroup->getValidationFailures());
+            if ($this->aPublicationgroup !== null) {
+                if (!$this->aPublicationgroup->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aPublicationgroup->getValidationFailures());
                 }
             }
 
-            if ($this->aWrit !== null) {
-                if (!$this->aWrit->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aWrit->getValidationFailures());
+            if ($this->aPublication !== null) {
+                if (!$this->aPublication->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aPublication->getValidationFailures());
                 }
             }
 
@@ -1065,10 +1065,10 @@ abstract class BaseTask extends BaseObject implements Persistent
                 return $this->getComments();
                 break;
             case 6:
-                return $this->getWritgroupId();
+                return $this->getPublicationgroupId();
                 break;
             case 7:
-                return $this->getWritId();
+                return $this->getPublicationId();
                 break;
             case 8:
                 return $this->getResponsibleuserId();
@@ -1108,19 +1108,19 @@ abstract class BaseTask extends BaseObject implements Persistent
             $keys[3] => $this->getStart(),
             $keys[4] => $this->getEnd(),
             $keys[5] => $this->getComments(),
-            $keys[6] => $this->getWritgroupId(),
-            $keys[7] => $this->getWritId(),
+            $keys[6] => $this->getPublicationgroupId(),
+            $keys[7] => $this->getPublicationId(),
             $keys[8] => $this->getResponsibleuserId(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aTasktype) {
                 $result['Tasktype'] = $this->aTasktype->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aWritgroup) {
-                $result['Writgroup'] = $this->aWritgroup->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aPublicationgroup) {
+                $result['Publicationgroup'] = $this->aPublicationgroup->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aWrit) {
-                $result['Writ'] = $this->aWrit->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aPublication) {
+                $result['Publication'] = $this->aPublication->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->aUser) {
                 $result['User'] = $this->aUser->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
@@ -1178,10 +1178,10 @@ abstract class BaseTask extends BaseObject implements Persistent
                 $this->setComments($value);
                 break;
             case 6:
-                $this->setWritgroupId($value);
+                $this->setPublicationgroupId($value);
                 break;
             case 7:
-                $this->setWritId($value);
+                $this->setPublicationId($value);
                 break;
             case 8:
                 $this->setResponsibleuserId($value);
@@ -1216,8 +1216,8 @@ abstract class BaseTask extends BaseObject implements Persistent
         if (array_key_exists($keys[3], $arr)) $this->setStart($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setEnd($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setComments($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setWritgroupId($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setWritId($arr[$keys[7]]);
+        if (array_key_exists($keys[6], $arr)) $this->setPublicationgroupId($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setPublicationId($arr[$keys[7]]);
         if (array_key_exists($keys[8], $arr)) $this->setResponsibleuserId($arr[$keys[8]]);
     }
 
@@ -1236,8 +1236,8 @@ abstract class BaseTask extends BaseObject implements Persistent
         if ($this->isColumnModified(TaskPeer::START)) $criteria->add(TaskPeer::START, $this->start);
         if ($this->isColumnModified(TaskPeer::END)) $criteria->add(TaskPeer::END, $this->end);
         if ($this->isColumnModified(TaskPeer::COMMENTS)) $criteria->add(TaskPeer::COMMENTS, $this->comments);
-        if ($this->isColumnModified(TaskPeer::WRITGROUP_ID)) $criteria->add(TaskPeer::WRITGROUP_ID, $this->writgroup_id);
-        if ($this->isColumnModified(TaskPeer::WRIT_ID)) $criteria->add(TaskPeer::WRIT_ID, $this->writ_id);
+        if ($this->isColumnModified(TaskPeer::PUBLICATIONGROUP_ID)) $criteria->add(TaskPeer::PUBLICATIONGROUP_ID, $this->publicationgroup_id);
+        if ($this->isColumnModified(TaskPeer::PUBLICATION_ID)) $criteria->add(TaskPeer::PUBLICATION_ID, $this->publication_id);
         if ($this->isColumnModified(TaskPeer::RESPONSIBLEUSER_ID)) $criteria->add(TaskPeer::RESPONSIBLEUSER_ID, $this->responsibleuser_id);
 
         return $criteria;
@@ -1307,8 +1307,8 @@ abstract class BaseTask extends BaseObject implements Persistent
         $copyObj->setStart($this->getStart());
         $copyObj->setEnd($this->getEnd());
         $copyObj->setComments($this->getComments());
-        $copyObj->setWritgroupId($this->getWritgroupId());
-        $copyObj->setWritId($this->getWritId());
+        $copyObj->setPublicationgroupId($this->getPublicationgroupId());
+        $copyObj->setPublicationId($this->getPublicationId());
         $copyObj->setResponsibleuserId($this->getResponsibleuserId());
 
         if ($deepCopy && !$this->startCopy) {
@@ -1421,24 +1421,24 @@ abstract class BaseTask extends BaseObject implements Persistent
     }
 
     /**
-     * Declares an association between this object and a Writgroup object.
+     * Declares an association between this object and a Publicationgroup object.
      *
-     * @param             Writgroup $v
+     * @param             Publicationgroup $v
      * @return Task The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setWritgroup(Writgroup $v = null)
+    public function setPublicationgroup(Publicationgroup $v = null)
     {
         if ($v === null) {
-            $this->setWritgroupId(NULL);
+            $this->setPublicationgroupId(NULL);
         } else {
-            $this->setWritgroupId($v->getId());
+            $this->setPublicationgroupId($v->getId());
         }
 
-        $this->aWritgroup = $v;
+        $this->aPublicationgroup = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Writgroup object, it will not be re-added.
+        // If this object has already been added to the Publicationgroup object, it will not be re-added.
         if ($v !== null) {
             $v->addTask($this);
         }
@@ -1449,48 +1449,48 @@ abstract class BaseTask extends BaseObject implements Persistent
 
 
     /**
-     * Get the associated Writgroup object
+     * Get the associated Publicationgroup object
      *
      * @param PropelPDO $con Optional Connection object.
      * @param $doQuery Executes a query to get the object if required
-     * @return Writgroup The associated Writgroup object.
+     * @return Publicationgroup The associated Publicationgroup object.
      * @throws PropelException
      */
-    public function getWritgroup(PropelPDO $con = null, $doQuery = true)
+    public function getPublicationgroup(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aWritgroup === null && ($this->writgroup_id !== null) && $doQuery) {
-            $this->aWritgroup = WritgroupQuery::create()->findPk($this->writgroup_id, $con);
+        if ($this->aPublicationgroup === null && ($this->publicationgroup_id !== null) && $doQuery) {
+            $this->aPublicationgroup = PublicationgroupQuery::create()->findPk($this->publicationgroup_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aWritgroup->addTasks($this);
+                $this->aPublicationgroup->addTasks($this);
              */
         }
 
-        return $this->aWritgroup;
+        return $this->aPublicationgroup;
     }
 
     /**
-     * Declares an association between this object and a Writ object.
+     * Declares an association between this object and a Publication object.
      *
-     * @param             Writ $v
+     * @param             Publication $v
      * @return Task The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setWrit(Writ $v = null)
+    public function setPublication(Publication $v = null)
     {
         if ($v === null) {
-            $this->setWritId(NULL);
+            $this->setPublicationId(NULL);
         } else {
-            $this->setWritId($v->getId());
+            $this->setPublicationId($v->getId());
         }
 
-        $this->aWrit = $v;
+        $this->aPublication = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Writ object, it will not be re-added.
+        // If this object has already been added to the Publication object, it will not be re-added.
         if ($v !== null) {
             $v->addTask($this);
         }
@@ -1501,27 +1501,27 @@ abstract class BaseTask extends BaseObject implements Persistent
 
 
     /**
-     * Get the associated Writ object
+     * Get the associated Publication object
      *
      * @param PropelPDO $con Optional Connection object.
      * @param $doQuery Executes a query to get the object if required
-     * @return Writ The associated Writ object.
+     * @return Publication The associated Publication object.
      * @throws PropelException
      */
-    public function getWrit(PropelPDO $con = null, $doQuery = true)
+    public function getPublication(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aWrit === null && ($this->writ_id !== null) && $doQuery) {
-            $this->aWrit = WritQuery::create()->findPk($this->writ_id, $con);
+        if ($this->aPublication === null && ($this->publication_id !== null) && $doQuery) {
+            $this->aPublication = PublicationQuery::create()->findPk($this->publication_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aWrit->addTasks($this);
+                $this->aPublication->addTasks($this);
              */
         }
 
-        return $this->aWrit;
+        return $this->aPublication;
     }
 
     /**
@@ -1587,8 +1587,8 @@ abstract class BaseTask extends BaseObject implements Persistent
         $this->start = null;
         $this->end = null;
         $this->comments = null;
-        $this->writgroup_id = null;
-        $this->writ_id = null;
+        $this->publicationgroup_id = null;
+        $this->publication_id = null;
         $this->responsibleuser_id = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
@@ -1615,11 +1615,11 @@ abstract class BaseTask extends BaseObject implements Persistent
             if ($this->aTasktype instanceof Persistent) {
               $this->aTasktype->clearAllReferences($deep);
             }
-            if ($this->aWritgroup instanceof Persistent) {
-              $this->aWritgroup->clearAllReferences($deep);
+            if ($this->aPublicationgroup instanceof Persistent) {
+              $this->aPublicationgroup->clearAllReferences($deep);
             }
-            if ($this->aWrit instanceof Persistent) {
-              $this->aWrit->clearAllReferences($deep);
+            if ($this->aPublication instanceof Persistent) {
+              $this->aPublication->clearAllReferences($deep);
             }
             if ($this->aUser instanceof Persistent) {
               $this->aUser->clearAllReferences($deep);
@@ -1629,8 +1629,8 @@ abstract class BaseTask extends BaseObject implements Persistent
         } // if ($deep)
 
         $this->aTasktype = null;
-        $this->aWritgroup = null;
-        $this->aWrit = null;
+        $this->aPublicationgroup = null;
+        $this->aPublication = null;
         $this->aUser = null;
     }
 

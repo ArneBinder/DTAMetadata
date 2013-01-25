@@ -14,8 +14,6 @@ use \PropelPDO;
 use DTA\MetadataBundle\Model\Corpus;
 use DTA\MetadataBundle\Model\CorpusPeer;
 use DTA\MetadataBundle\Model\CorpusQuery;
-use DTA\MetadataBundle\Model\Writ;
-use DTA\MetadataBundle\Model\WritQuery;
 
 abstract class BaseCorpus extends BaseObject implements Persistent
 {
@@ -49,17 +47,6 @@ abstract class BaseCorpus extends BaseObject implements Persistent
      * @var        string
      */
     protected $name;
-
-    /**
-     * The value for the writ_id field.
-     * @var        int
-     */
-    protected $writ_id;
-
-    /**
-     * @var        Writ
-     */
-    protected $aWrit;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -99,16 +86,6 @@ abstract class BaseCorpus extends BaseObject implements Persistent
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * Get the [writ_id] column value.
-     *
-     * @return int
-     */
-    public function getWritId()
-    {
-        return $this->writ_id;
     }
 
     /**
@@ -154,31 +131,6 @@ abstract class BaseCorpus extends BaseObject implements Persistent
     } // setName()
 
     /**
-     * Set the value of [writ_id] column.
-     *
-     * @param int $v new value
-     * @return Corpus The current object (for fluent API support)
-     */
-    public function setWritId($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->writ_id !== $v) {
-            $this->writ_id = $v;
-            $this->modifiedColumns[] = CorpusPeer::WRIT_ID;
-        }
-
-        if ($this->aWrit !== null && $this->aWrit->getId() !== $v) {
-            $this->aWrit = null;
-        }
-
-
-        return $this;
-    } // setWritId()
-
-    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -212,7 +164,6 @@ abstract class BaseCorpus extends BaseObject implements Persistent
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->name = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
-            $this->writ_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -221,7 +172,7 @@ abstract class BaseCorpus extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 3; // 3 = CorpusPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 2; // 2 = CorpusPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Corpus object", $e);
@@ -244,9 +195,6 @@ abstract class BaseCorpus extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
-        if ($this->aWrit !== null && $this->writ_id !== $this->aWrit->getId()) {
-            $this->aWrit = null;
-        }
     } // ensureConsistency
 
     /**
@@ -286,7 +234,6 @@ abstract class BaseCorpus extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aWrit = null;
         } // if (deep)
     }
 
@@ -400,18 +347,6 @@ abstract class BaseCorpus extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
-            // We call the save method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aWrit !== null) {
-                if ($this->aWrit->isModified() || $this->aWrit->isNew()) {
-                    $affectedRows += $this->aWrit->save($con);
-                }
-                $this->setWrit($this->aWrit);
-            }
-
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -455,9 +390,6 @@ abstract class BaseCorpus extends BaseObject implements Persistent
         if ($this->isColumnModified(CorpusPeer::NAME)) {
             $modifiedColumns[':p' . $index++]  = '`name`';
         }
-        if ($this->isColumnModified(CorpusPeer::WRIT_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`writ_id`';
-        }
 
         $sql = sprintf(
             'INSERT INTO `corpus` (%s) VALUES (%s)',
@@ -474,9 +406,6 @@ abstract class BaseCorpus extends BaseObject implements Persistent
                         break;
                     case '`name`':
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
-                        break;
-                    case '`writ_id`':
-                        $stmt->bindValue($identifier, $this->writ_id, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -572,18 +501,6 @@ abstract class BaseCorpus extends BaseObject implements Persistent
             $failureMap = array();
 
 
-            // We call the validate method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aWrit !== null) {
-                if (!$this->aWrit->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aWrit->getValidationFailures());
-                }
-            }
-
-
             if (($retval = CorpusPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
@@ -630,9 +547,6 @@ abstract class BaseCorpus extends BaseObject implements Persistent
             case 1:
                 return $this->getName();
                 break;
-            case 2:
-                return $this->getWritId();
-                break;
             default:
                 return null;
                 break;
@@ -650,11 +564,10 @@ abstract class BaseCorpus extends BaseObject implements Persistent
      *                    Defaults to BasePeer::TYPE_PHPNAME.
      * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to true.
      * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
-     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
-    public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
+    public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array())
     {
         if (isset($alreadyDumpedObjects['Corpus'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
@@ -664,13 +577,7 @@ abstract class BaseCorpus extends BaseObject implements Persistent
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getName(),
-            $keys[2] => $this->getWritId(),
         );
-        if ($includeForeignObjects) {
-            if (null !== $this->aWrit) {
-                $result['Writ'] = $this->aWrit->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-        }
 
         return $result;
     }
@@ -710,9 +617,6 @@ abstract class BaseCorpus extends BaseObject implements Persistent
             case 1:
                 $this->setName($value);
                 break;
-            case 2:
-                $this->setWritId($value);
-                break;
         } // switch()
     }
 
@@ -739,7 +643,6 @@ abstract class BaseCorpus extends BaseObject implements Persistent
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setWritId($arr[$keys[2]]);
     }
 
     /**
@@ -753,7 +656,6 @@ abstract class BaseCorpus extends BaseObject implements Persistent
 
         if ($this->isColumnModified(CorpusPeer::ID)) $criteria->add(CorpusPeer::ID, $this->id);
         if ($this->isColumnModified(CorpusPeer::NAME)) $criteria->add(CorpusPeer::NAME, $this->name);
-        if ($this->isColumnModified(CorpusPeer::WRIT_ID)) $criteria->add(CorpusPeer::WRIT_ID, $this->writ_id);
 
         return $criteria;
     }
@@ -818,19 +720,6 @@ abstract class BaseCorpus extends BaseObject implements Persistent
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setName($this->getName());
-        $copyObj->setWritId($this->getWritId());
-
-        if ($deepCopy && !$this->startCopy) {
-            // important: temporarily setNew(false) because this affects the behavior of
-            // the getter/setter methods for fkey referrer objects.
-            $copyObj->setNew(false);
-            // store object hash to prevent cycle
-            $this->startCopy = true;
-
-            //unflag object copy
-            $this->startCopy = false;
-        } // if ($deepCopy)
-
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -878,65 +767,12 @@ abstract class BaseCorpus extends BaseObject implements Persistent
     }
 
     /**
-     * Declares an association between this object and a Writ object.
-     *
-     * @param             Writ $v
-     * @return Corpus The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setWrit(Writ $v = null)
-    {
-        if ($v === null) {
-            $this->setWritId(NULL);
-        } else {
-            $this->setWritId($v->getId());
-        }
-
-        $this->aWrit = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Writ object, it will not be re-added.
-        if ($v !== null) {
-            $v->addCorpus($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated Writ object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @param $doQuery Executes a query to get the object if required
-     * @return Writ The associated Writ object.
-     * @throws PropelException
-     */
-    public function getWrit(PropelPDO $con = null, $doQuery = true)
-    {
-        if ($this->aWrit === null && ($this->writ_id !== null) && $doQuery) {
-            $this->aWrit = WritQuery::create()->findPk($this->writ_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aWrit->addCorpuses($this);
-             */
-        }
-
-        return $this->aWrit;
-    }
-
-    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
     {
         $this->id = null;
         $this->name = null;
-        $this->writ_id = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
@@ -959,14 +795,10 @@ abstract class BaseCorpus extends BaseObject implements Persistent
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
-            if ($this->aWrit instanceof Persistent) {
-              $this->aWrit->clearAllReferences($deep);
-            }
 
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
-        $this->aWrit = null;
     }
 
     /**

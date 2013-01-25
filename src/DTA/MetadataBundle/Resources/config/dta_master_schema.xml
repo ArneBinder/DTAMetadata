@@ -1,35 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <database name="DTAMetadata" namespace="DTA\MetadataBundle\Model" defaultIdMethod="native">
- 
-    <table name="konto">
-        <column name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
-        <column name="login" type="VARCHAR" required="true" />
-        <column name="password" type="VARCHAR" required="true" />
-        <behavior name="delegate">
-          <parameter name="to" value="profil" />
-        </behavior>
-    </table>
-    <table name="profil">
-        <column name="email" type="VARCHAR" />
-        <column name="telephone" type="VARCHAR" />
-    </table>
-    
+  
     <!-- data / publications 
     ________________________________________________________-->
     
-    <!-- The base class for all publications. 
+    <!-- The base class for all publications. -->
     <table name="publication">
        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-       <column name="title_id" type="INTEGER" required="true"/>
-       <column name="publishingCompany_id" type="INTEGER" required="false"/>
-       <column name="place_id" type="INTEGER" required="false"/>
-       <column name="dateSpecification_id" type="INTEGER" required="false"/>
+
+       <!-- atomic attributes -->
        <column name="printRun" description="Auflage" type="LONGVARCHAR" required="false"/>
        <column name="printRunComment" type="LONGVARCHAR" required="false"/>
        <column name="edition" type="LONGVARCHAR" required="false"/>
        <column name="numPages" type="INTEGER" required="false"/>
        <column name="numPagesNormed" type="INTEGER" required="false"/>
        <column name="bibliographicCitation" type="LONGVARCHAR" required="false"/>
+       
+       <!-- non atomic attributes -->       
+       <column name="title_id" type="INTEGER" required="true"/>
+       <column name="publishingCompany_id" type="INTEGER" required="false"/>
+       <column name="place_id" type="INTEGER" required="false"/>
+       <column name="dateSpecification_id" type="INTEGER" required="false"/>
+       <column name="relatedSet_id" type="INTEGER" required="false"/>
+       
+       <!-- Relations to other persons -->       
+        <column name="work_id" type="INTEGER" required="true"/>
+        <column name="publisher_id" type="INTEGER" required="false"/>
+        <column name="printer_id" type="INTEGER" required="false"/>
+        <column name="translator_id" type="INTEGER" required="false"/>
+       
+        <foreign-key foreignTable="work" name="editionVon">
+            <reference local="work_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="publisher" name="fk_edition_herausgeber1">
+            <reference local="publisher_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="printer" name="fk_edition_drucker1">
+            <reference local="printer_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="translator" name="fk_schriftstueck_uebersetzer1">
+            <reference local="translator_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="relatedSet" name="fk_publication_relatedSet1">
+            <reference local="relatedSet_id" foreign="id"/>
+        </foreign-key>
        <foreign-key foreignTable="title" name="fk_publikation_titel12">
            <reference local="title_id" foreign="id"/>
        </foreign-key>
@@ -42,6 +56,21 @@
        <foreign-key foreignTable="dateSpecification" name="fk_publication_dateSpecification1">
            <reference local="dateSpecification_id" foreign="id"/>
        </foreign-key>
+        <index name="editionVon">
+            <index-column name="work_id"/>
+        </index>
+        <index name="fk_edition_herausgeber1">
+            <index-column name="publisher_id"/>
+        </index>
+        <index name="fk_edition_drucker1">
+            <index-column name="printer_id"/>
+        </index>
+        <index name="fk_schriftstueck_uebersetzer1">
+            <index-column name="translator_id"/>
+        </index>
+        <index name="fk_pub_relatedSet1">
+            <index-column name="relatedSet_id"/>
+        </index>
        <index name="fk_publikation_verlag1">
            <index-column name="publishingCompany_id"/>
        </index>
@@ -51,150 +80,35 @@
        <index name="fk_publication_dateSpecification1">
            <index-column name="dateSpecification_id"/>
        </index>
-    </table>-->
+    </table>
 
     <table name="monograph">
        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-       <column name="title_id" type="INTEGER" required="true"/>
-       <column name="publishingCompany_id" type="INTEGER" required="false"/>
-       <column name="place_id" type="INTEGER" required="false"/>
-       <column name="dateSpecification_id" type="INTEGER" required="false"/>
-       <column name="printRun" description="Auflage" type="LONGVARCHAR" required="false"/>
-       <column name="printRunComment" type="LONGVARCHAR" required="false"/>
-       <column name="edition" type="LONGVARCHAR" required="false"/>
-       <column name="numPages" type="INTEGER" required="false"/>
-       <column name="numPagesNormed" type="INTEGER" required="false"/>
-       <column name="bibliographicCitation" type="LONGVARCHAR" required="false"/>
-       <foreign-key foreignTable="title" name="fk_publikation_titel12">
-           <reference local="title_id" foreign="id"/>
-       </foreign-key>
-       <foreign-key foreignTable="publishingCompany" name="fk_publikation_verlag1">
-           <reference local="publishingCompany_id" foreign="id"/>
-       </foreign-key>
-       <foreign-key foreignTable="place" name="fk_publikation_ort1">
-           <reference local="place_id" foreign="id"/>
-       </foreign-key>
-       <foreign-key foreignTable="dateSpecification" name="fk_publication_dateSpecification1">
-           <reference local="dateSpecification_id" foreign="id"/>
-       </foreign-key>
-       <index name="fk_publikation_verlag1">
-           <index-column name="publishingCompany_id"/>
-       </index>
-       <index name="fk_publikation_ort1">
-           <index-column name="place_id"/>
-       </index>
-       <index name="fk_publication_dateSpecification1">
-           <index-column name="dateSpecification_id"/>
-       </index>
-       <!-- <behavior name="concrete_inheritance">
+       <behavior name="concrete_inheritance">
             <parameter name="extends" value="publication" />
-        </behavior> -->
+        </behavior>
     </table>
     
     <table name="essay">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="title_id" type="INTEGER" required="true"/>
-       <column name="publishingCompany_id" type="INTEGER" required="false"/>
-       <column name="place_id" type="INTEGER" required="false"/>
-       <column name="dateSpecification_id" type="INTEGER" required="false"/>
-       <column name="printRun" description="Auflage" type="LONGVARCHAR" required="false"/>
-       <column name="printRunComment" type="LONGVARCHAR" required="false"/>
-       <column name="edition" type="LONGVARCHAR" required="false"/>
-       <column name="numPages" type="INTEGER" required="false"/>
-       <column name="numPagesNormed" type="INTEGER" required="false"/>
-       <column name="bibliographicCitation" type="LONGVARCHAR" required="false"/>
-       <foreign-key foreignTable="title" name="fk_publikation_titel12">
-           <reference local="title_id" foreign="id"/>
-       </foreign-key>
-       <foreign-key foreignTable="publishingCompany" name="fk_publikation_verlag1">
-           <reference local="publishingCompany_id" foreign="id"/>
-       </foreign-key>
-       <foreign-key foreignTable="place" name="fk_publikation_ort1">
-           <reference local="place_id" foreign="id"/>
-       </foreign-key>
-       <foreign-key foreignTable="dateSpecification" name="fk_publication_dateSpecification1">
-           <reference local="dateSpecification_id" foreign="id"/>
-       </foreign-key>
-       <index name="fk_publikation_verlag1">
-           <index-column name="publishingCompany_id"/>
-       </index>
-       <index name="fk_publikation_ort1">
-           <index-column name="place_id"/>
-       </index>
-       <index name="fk_publication_dateSpecification1">
-           <index-column name="dateSpecification_id"/>
-       </index>
+        <behavior name="concrete_inheritance">
+            <parameter name="extends" value="publication" />
+        </behavior>
     </table>
 
     <table name="magazine">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="title_id" type="INTEGER" required="true"/>
-       <column name="publishingCompany_id" type="INTEGER" required="false"/>
-       <column name="place_id" type="INTEGER" required="false"/>
-       <column name="dateSpecification_id" type="INTEGER" required="false"/>
-       <column name="printRun" description="Auflage" type="LONGVARCHAR" required="false"/>
-       <column name="printRunComment" type="LONGVARCHAR" required="false"/>
-       <column name="edition" type="LONGVARCHAR" required="false"/>
-       <column name="numPages" type="INTEGER" required="false"/>
-       <column name="numPagesNormed" type="INTEGER" required="false"/>
-       <column name="bibliographicCitation" type="LONGVARCHAR" required="false"/>
-       <foreign-key foreignTable="title" name="fk_publikation_titel12">
-           <reference local="title_id" foreign="id"/>
-       </foreign-key>
-       <foreign-key foreignTable="publishingCompany" name="fk_publikation_verlag1">
-           <reference local="publishingCompany_id" foreign="id"/>
-       </foreign-key>
-       <foreign-key foreignTable="place" name="fk_publikation_ort1">
-           <reference local="place_id" foreign="id"/>
-       </foreign-key>
-       <foreign-key foreignTable="dateSpecification" name="fk_publication_dateSpecification1">
-           <reference local="dateSpecification_id" foreign="id"/>
-       </foreign-key>
-       <index name="fk_publikation_verlag1">
-           <index-column name="publishingCompany_id"/>
-       </index>
-       <index name="fk_publikation_ort1">
-           <index-column name="place_id"/>
-       </index>
-       <index name="fk_publication_dateSpecification1">
-           <index-column name="dateSpecification_id"/>
-       </index>
+        <behavior name="concrete_inheritance">
+            <parameter name="extends" value="publication" />
+        </behavior>
     </table>
 
     <table name="series">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="volume" type="LONGVARCHAR" required="false"/>
-        <column name="title_id" type="INTEGER" required="true"/>
-       <column name="publishingCompany_id" type="INTEGER" required="false"/>
-       <column name="place_id" type="INTEGER" required="false"/>
-       <column name="dateSpecification_id" type="INTEGER" required="false"/>
-       <column name="printRun" description="Auflage" type="LONGVARCHAR" required="false"/>
-       <column name="printRunComment" type="LONGVARCHAR" required="false"/>
-       <column name="edition" type="LONGVARCHAR" required="false"/>
-       <column name="numPages" type="INTEGER" required="false"/>
-       <column name="numPagesNormed" type="INTEGER" required="false"/>
-       <column name="bibliographicCitation" type="LONGVARCHAR" required="false"/>
-       <foreign-key foreignTable="title" name="fk_publikation_titel12">
-           <reference local="title_id" foreign="id"/>
-       </foreign-key>
-       <foreign-key foreignTable="publishingCompany" name="fk_publikation_verlag1">
-           <reference local="publishingCompany_id" foreign="id"/>
-       </foreign-key>
-       <foreign-key foreignTable="place" name="fk_publikation_ort1">
-           <reference local="place_id" foreign="id"/>
-       </foreign-key>
-       <foreign-key foreignTable="dateSpecification" name="fk_publication_dateSpecification1">
-           <reference local="dateSpecification_id" foreign="id"/>
-       </foreign-key>
-       <index name="fk_publikation_verlag1">
-           <index-column name="publishingCompany_id"/>
-       </index>
-       <index name="fk_publikation_ort1">
-           <index-column name="place_id"/>
-       </index>
-       <index name="fk_publication_dateSpecification1">
-           <index-column name="dateSpecification_id"/>
-       </index>
+        <behavior name="concrete_inheritance">
+            <parameter name="extends" value="publication" />
+        </behavior>
     </table>
 
     <table name="publishingCompany">
@@ -202,7 +116,6 @@
         <column name="name" type="LONGVARCHAR" required="true"/>
         <column name="gnd" type="LONGVARCHAR" required="false"/>
     </table>
-
 
     <!--    Intended for monographs that consist i.e. of several books.-->
     <table name="volume">
@@ -220,7 +133,7 @@
         </index>
     </table>
 
-    <!-- The core class representing an authors work. This is independent of the actual written form of the work which is represented in the Writ class. -->
+    <!-- The core class representing an authors work. This is independent of the actual written form of the work which is represented by the Publication class. -->
     <table name="work">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="status_id" type="INTEGER" required="true"/>
@@ -270,70 +183,21 @@
             <index-column name="dateSpecification_id"/>
         </index>
     </table>
-
-    <!--Represents the written form of an authors work. It is the base of any publication.-->
-    <table name="writ">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="work_id" type="INTEGER" required="true"/>
-        <column name="publication_id" type="INTEGER" required="true"/>
-        <column name="publisher_id" type="INTEGER" required="false"/>
-        <column name="printer_id" type="INTEGER" required="false"/>
-        <column name="translator_id" type="INTEGER" required="false"/>
-        <column name="numPages" type="INTEGER" required="false"/>
-        <column name="relatedSet_id" type="INTEGER" required="false"/>
-        <foreign-key foreignTable="work" name="editionVon">
-            <reference local="work_id" foreign="id"/>
+ 
+    <table name="publication_publicationGroup" isCrossRef="true">
+        <column name="publicationGroup_id" type="INTEGER" primaryKey="true" required="true"/>
+        <column name="publication_id" type="INTEGER" primaryKey="true" required="true"/>
+        <foreign-key foreignTable="publicationGroup" name="fk_publicationGroupValid">
+            <reference local="publicationGroup_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="publisher" name="fk_edition_herausgeber1">
-            <reference local="publisher_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="printer" name="fk_edition_drucker1">
-            <reference local="printer_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="translator" name="fk_schriftstueck_uebersetzer1">
-            <reference local="translator_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="publication" name="fk_schriftstueck_publikation1">
+        <foreign-key foreignTable="publication" name="fk_publicationValid">
             <reference local="publication_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="relatedSet" name="fk_writ_relatedSet1">
-            <reference local="relatedSet_id" foreign="id"/>
-        </foreign-key>
-        <index name="editionVon">
-            <index-column name="work_id"/>
-        </index>
-        <index name="fk_edition_herausgeber1">
-            <index-column name="publisher_id"/>
-        </index>
-        <index name="fk_edition_drucker1">
-            <index-column name="printer_id"/>
-        </index>
-        <index name="fk_schriftstueck_uebersetzer1">
-            <index-column name="translator_id"/>
-        </index>
-        <index name="fk_schriftstueck_publikation1">
+        <index name="fk_publicationGroupValid">
             <index-column name="publication_id"/>
         </index>
-        <index name="fk_writ_relatedSet1">
-            <index-column name="relatedSet_id"/>
-        </index>
-    </table>
-
-  
-    <table name="writ_writGroup" isCrossRef="true">
-        <column name="writGroup_id" type="INTEGER" primaryKey="true" required="true"/>
-        <column name="writ_id" type="INTEGER" primaryKey="true" required="true"/>
-        <foreign-key foreignTable="writGroup" name="fk_writGroup_has_writ_writGroup1">
-            <reference local="writGroup_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="writ" name="fk_writGroup_has_writ_writ1">
-            <reference local="writ_id" foreign="id"/>
-        </foreign-key>
-        <index name="fk_writGroup_has_writ_writ1">
-            <index-column name="writ_id"/>
-        </index>
-        <index name="fk_writGroup_has_writ_writGroup1">
-            <index-column name="writGroup_id"/>
+        <index name="fk_publicationValid">
+            <index-column name="publicationGroup_id"/>
         </index>
     </table>
     
@@ -343,13 +207,6 @@
   <table name="corpus" phpName="Corpus">
     <column name="id" phpName="Id" type="INTEGER" size="10" sqlType="int(10) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
     <column name="name" phpName="Name" type="LONGVARCHAR" required="true"/>
-    <column name="writ_id" phpName="WritId" type="INTEGER" required="false"/>
-    <foreign-key foreignTable="writ" name="fk_korpus_edition1">
-      <reference local="writ_id" foreign="id"/>
-    </foreign-key>
-    <index name="fk_korpus_edition1">
-      <index-column name="writ_id"/>
-    </index>
   </table>
 
   <table name="dwdsGenre" phpName="Dwdsgenre">
@@ -411,7 +268,7 @@
 
   <table name="source" phpName="Source">
     <column name="id" phpName="Id" type="INTEGER" size="10" primaryKey="true" autoIncrement="true" required="true"/>
-    <column name="writ_id" phpName="WritId" type="INTEGER" required="true"/>
+    <column name="publication_id" phpName="PublicationId" type="INTEGER" required="true"/>
     <column name="quality" phpName="Quality" type="LONGVARCHAR" required="false"/>
     <column name="name" phpName="Name" type="LONGVARCHAR" required="false"/>
     <column name="comments" phpName="Comments" type="LONGVARCHAR" required="false"/>
@@ -419,8 +276,8 @@
     <column name="signatur" phpName="Signatur" type="VARCHAR" size="512" required="false"/>
     <column name="library" phpName="Library" type="LONGVARCHAR" required="false"/>
     <column name="libraryGnd" phpName="Librarygnd" type="VARCHAR" size="1024" required="false"/>
-    <foreign-key foreignTable="writ" name="fk_quelle_edition1">
-      <reference local="writ_id" foreign="id"/>
+    <foreign-key foreignTable="publication" name="fk_quelle_edition1">
+      <reference local="publication_id" foreign="id"/>
     </foreign-key>
     <index name="AI_id_Fundstellen">
       <index-column name="id"/>
@@ -429,7 +286,7 @@
       <index-column name="id"/>
     </index>
     <index name="fk_quelle_edition1">
-      <index-column name="writ_id"/>
+      <index-column name="publication_id"/>
     </index>
   </table>
 
@@ -445,17 +302,17 @@
     <column name="start" phpName="Start" type="TIMESTAMP" required="false"/>
     <column name="end" phpName="End" type="TIMESTAMP" required="false"/>
     <column name="comments" phpName="Comments" type="LONGVARCHAR" required="false"/>
-    <column name="writGroup_id" phpName="WritgroupId" type="INTEGER" required="false"/>
-    <column name="writ_id" phpName="WritId" type="INTEGER" required="false"/>
+    <column name="publicationGroup_id" phpName="PublicationgroupId" type="INTEGER" required="false"/>
+    <column name="publication_id" phpName="PublicationId" type="INTEGER" required="false"/>
     <column name="responsibleUser_id" phpName="ResponsibleuserId" type="INTEGER" required="false"/>
     <foreign-key foreignTable="taskType" name="fk_aufgabe_arbeitsschritt1">
       <reference local="taskType_id" foreign="id"/>
     </foreign-key>
-    <foreign-key foreignTable="writGroup" name="fk_aufgabe_buchGruppe1">
-      <reference local="writGroup_id" foreign="id"/>
+    <foreign-key foreignTable="publicationGroup" name="fk_aufgabe_buchGruppe1">
+      <reference local="publicationGroup_id" foreign="id"/>
     </foreign-key>
-    <foreign-key foreignTable="writ" name="fk_aufgabe_schriftstueck1">
-      <reference local="writ_id" foreign="id"/>
+    <foreign-key foreignTable="publication" name="fk_aufgabe_schriftstueck1">
+      <reference local="publication_id" foreign="id"/>
     </foreign-key>
     <foreign-key foreignTable="user" name="fk_task_name1">
       <reference local="responsibleUser_id" foreign="id"/>
@@ -479,10 +336,10 @@
       <index-column name="taskType_id"/>
     </index>
     <index name="fk_aufgabe_buchGruppe1">
-      <index-column name="writGroup_id"/>
+      <index-column name="publicationGroup_id"/>
     </index>
     <index name="fk_aufgabe_schriftstueck1">
-      <index-column name="writ_id"/>
+      <index-column name="publication_id"/>
     </index>
     <index name="fk_task_name1">
       <index-column name="responsibleUser_id"/>
@@ -513,7 +370,7 @@
     </index>
   </table>
 
-  <table name="writGroup" phpName="Writgroup">
+  <table name="publicationGroup" phpName="Publicationgroup">
     <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
     <column name="name" phpName="Name" type="LONGVARCHAR" required="true"/>
     <index name="AI_id_group">

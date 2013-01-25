@@ -2,7 +2,6 @@
 
 namespace DTA\MetadataBundle\Model\om;
 
-use \BaseObject;
 use \BasePeer;
 use \Criteria;
 use \Exception;
@@ -18,12 +17,23 @@ use DTA\MetadataBundle\Model\EssayPeer;
 use DTA\MetadataBundle\Model\EssayQuery;
 use DTA\MetadataBundle\Model\Place;
 use DTA\MetadataBundle\Model\PlaceQuery;
+use DTA\MetadataBundle\Model\Printer;
+use DTA\MetadataBundle\Model\PrinterQuery;
+use DTA\MetadataBundle\Model\Publication;
+use DTA\MetadataBundle\Model\Publisher;
+use DTA\MetadataBundle\Model\PublisherQuery;
 use DTA\MetadataBundle\Model\Publishingcompany;
 use DTA\MetadataBundle\Model\PublishingcompanyQuery;
+use DTA\MetadataBundle\Model\Relatedset;
+use DTA\MetadataBundle\Model\RelatedsetQuery;
 use DTA\MetadataBundle\Model\Title;
 use DTA\MetadataBundle\Model\TitleQuery;
+use DTA\MetadataBundle\Model\Translator;
+use DTA\MetadataBundle\Model\TranslatorQuery;
+use DTA\MetadataBundle\Model\Work;
+use DTA\MetadataBundle\Model\WorkQuery;
 
-abstract class BaseEssay extends BaseObject implements Persistent
+abstract class BaseEssay extends Publication implements Persistent
 {
     /**
      * Peer class name
@@ -49,30 +59,6 @@ abstract class BaseEssay extends BaseObject implements Persistent
      * @var        int
      */
     protected $id;
-
-    /**
-     * The value for the title_id field.
-     * @var        int
-     */
-    protected $title_id;
-
-    /**
-     * The value for the publishingcompany_id field.
-     * @var        int
-     */
-    protected $publishingcompany_id;
-
-    /**
-     * The value for the place_id field.
-     * @var        int
-     */
-    protected $place_id;
-
-    /**
-     * The value for the datespecification_id field.
-     * @var        int
-     */
-    protected $datespecification_id;
 
     /**
      * The value for the printrun field.
@@ -109,6 +95,85 @@ abstract class BaseEssay extends BaseObject implements Persistent
      * @var        string
      */
     protected $bibliographiccitation;
+
+    /**
+     * The value for the title_id field.
+     * @var        int
+     */
+    protected $title_id;
+
+    /**
+     * The value for the publishingcompany_id field.
+     * @var        int
+     */
+    protected $publishingcompany_id;
+
+    /**
+     * The value for the place_id field.
+     * @var        int
+     */
+    protected $place_id;
+
+    /**
+     * The value for the datespecification_id field.
+     * @var        int
+     */
+    protected $datespecification_id;
+
+    /**
+     * The value for the relatedset_id field.
+     * @var        int
+     */
+    protected $relatedset_id;
+
+    /**
+     * The value for the work_id field.
+     * @var        int
+     */
+    protected $work_id;
+
+    /**
+     * The value for the publisher_id field.
+     * @var        int
+     */
+    protected $publisher_id;
+
+    /**
+     * The value for the printer_id field.
+     * @var        int
+     */
+    protected $printer_id;
+
+    /**
+     * The value for the translator_id field.
+     * @var        int
+     */
+    protected $translator_id;
+
+    /**
+     * @var        Work
+     */
+    protected $aWork;
+
+    /**
+     * @var        Publisher
+     */
+    protected $aPublisher;
+
+    /**
+     * @var        Printer
+     */
+    protected $aPrinter;
+
+    /**
+     * @var        Translator
+     */
+    protected $aTranslator;
+
+    /**
+     * @var        Relatedset
+     */
+    protected $aRelatedset;
 
     /**
      * @var        Title
@@ -158,46 +223,6 @@ abstract class BaseEssay extends BaseObject implements Persistent
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * Get the [title_id] column value.
-     *
-     * @return int
-     */
-    public function getTitleId()
-    {
-        return $this->title_id;
-    }
-
-    /**
-     * Get the [publishingcompany_id] column value.
-     *
-     * @return int
-     */
-    public function getPublishingcompanyId()
-    {
-        return $this->publishingcompany_id;
-    }
-
-    /**
-     * Get the [place_id] column value.
-     *
-     * @return int
-     */
-    public function getPlaceId()
-    {
-        return $this->place_id;
-    }
-
-    /**
-     * Get the [datespecification_id] column value.
-     *
-     * @return int
-     */
-    public function getDatespecificationId()
-    {
-        return $this->datespecification_id;
     }
 
     /**
@@ -261,6 +286,96 @@ abstract class BaseEssay extends BaseObject implements Persistent
     }
 
     /**
+     * Get the [title_id] column value.
+     *
+     * @return int
+     */
+    public function getTitleId()
+    {
+        return $this->title_id;
+    }
+
+    /**
+     * Get the [publishingcompany_id] column value.
+     *
+     * @return int
+     */
+    public function getPublishingcompanyId()
+    {
+        return $this->publishingcompany_id;
+    }
+
+    /**
+     * Get the [place_id] column value.
+     *
+     * @return int
+     */
+    public function getPlaceId()
+    {
+        return $this->place_id;
+    }
+
+    /**
+     * Get the [datespecification_id] column value.
+     *
+     * @return int
+     */
+    public function getDatespecificationId()
+    {
+        return $this->datespecification_id;
+    }
+
+    /**
+     * Get the [relatedset_id] column value.
+     *
+     * @return int
+     */
+    public function getRelatedsetId()
+    {
+        return $this->relatedset_id;
+    }
+
+    /**
+     * Get the [work_id] column value.
+     *
+     * @return int
+     */
+    public function getWorkId()
+    {
+        return $this->work_id;
+    }
+
+    /**
+     * Get the [publisher_id] column value.
+     *
+     * @return int
+     */
+    public function getPublisherId()
+    {
+        return $this->publisher_id;
+    }
+
+    /**
+     * Get the [printer_id] column value.
+     *
+     * @return int
+     */
+    public function getPrinterId()
+    {
+        return $this->printer_id;
+    }
+
+    /**
+     * Get the [translator_id] column value.
+     *
+     * @return int
+     */
+    public function getTranslatorId()
+    {
+        return $this->translator_id;
+    }
+
+    /**
      * Set the value of [id] column.
      *
      * @param int $v new value
@@ -280,106 +395,6 @@ abstract class BaseEssay extends BaseObject implements Persistent
 
         return $this;
     } // setId()
-
-    /**
-     * Set the value of [title_id] column.
-     *
-     * @param int $v new value
-     * @return Essay The current object (for fluent API support)
-     */
-    public function setTitleId($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->title_id !== $v) {
-            $this->title_id = $v;
-            $this->modifiedColumns[] = EssayPeer::TITLE_ID;
-        }
-
-        if ($this->aTitle !== null && $this->aTitle->getId() !== $v) {
-            $this->aTitle = null;
-        }
-
-
-        return $this;
-    } // setTitleId()
-
-    /**
-     * Set the value of [publishingcompany_id] column.
-     *
-     * @param int $v new value
-     * @return Essay The current object (for fluent API support)
-     */
-    public function setPublishingcompanyId($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->publishingcompany_id !== $v) {
-            $this->publishingcompany_id = $v;
-            $this->modifiedColumns[] = EssayPeer::PUBLISHINGCOMPANY_ID;
-        }
-
-        if ($this->aPublishingcompany !== null && $this->aPublishingcompany->getId() !== $v) {
-            $this->aPublishingcompany = null;
-        }
-
-
-        return $this;
-    } // setPublishingcompanyId()
-
-    /**
-     * Set the value of [place_id] column.
-     *
-     * @param int $v new value
-     * @return Essay The current object (for fluent API support)
-     */
-    public function setPlaceId($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->place_id !== $v) {
-            $this->place_id = $v;
-            $this->modifiedColumns[] = EssayPeer::PLACE_ID;
-        }
-
-        if ($this->aPlace !== null && $this->aPlace->getId() !== $v) {
-            $this->aPlace = null;
-        }
-
-
-        return $this;
-    } // setPlaceId()
-
-    /**
-     * Set the value of [datespecification_id] column.
-     *
-     * @param int $v new value
-     * @return Essay The current object (for fluent API support)
-     */
-    public function setDatespecificationId($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->datespecification_id !== $v) {
-            $this->datespecification_id = $v;
-            $this->modifiedColumns[] = EssayPeer::DATESPECIFICATION_ID;
-        }
-
-        if ($this->aDatespecification !== null && $this->aDatespecification->getId() !== $v) {
-            $this->aDatespecification = null;
-        }
-
-
-        return $this;
-    } // setDatespecificationId()
 
     /**
      * Set the value of [printrun] column.
@@ -508,6 +523,231 @@ abstract class BaseEssay extends BaseObject implements Persistent
     } // setBibliographiccitation()
 
     /**
+     * Set the value of [title_id] column.
+     *
+     * @param int $v new value
+     * @return Essay The current object (for fluent API support)
+     */
+    public function setTitleId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->title_id !== $v) {
+            $this->title_id = $v;
+            $this->modifiedColumns[] = EssayPeer::TITLE_ID;
+        }
+
+        if ($this->aTitle !== null && $this->aTitle->getId() !== $v) {
+            $this->aTitle = null;
+        }
+
+
+        return $this;
+    } // setTitleId()
+
+    /**
+     * Set the value of [publishingcompany_id] column.
+     *
+     * @param int $v new value
+     * @return Essay The current object (for fluent API support)
+     */
+    public function setPublishingcompanyId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->publishingcompany_id !== $v) {
+            $this->publishingcompany_id = $v;
+            $this->modifiedColumns[] = EssayPeer::PUBLISHINGCOMPANY_ID;
+        }
+
+        if ($this->aPublishingcompany !== null && $this->aPublishingcompany->getId() !== $v) {
+            $this->aPublishingcompany = null;
+        }
+
+
+        return $this;
+    } // setPublishingcompanyId()
+
+    /**
+     * Set the value of [place_id] column.
+     *
+     * @param int $v new value
+     * @return Essay The current object (for fluent API support)
+     */
+    public function setPlaceId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->place_id !== $v) {
+            $this->place_id = $v;
+            $this->modifiedColumns[] = EssayPeer::PLACE_ID;
+        }
+
+        if ($this->aPlace !== null && $this->aPlace->getId() !== $v) {
+            $this->aPlace = null;
+        }
+
+
+        return $this;
+    } // setPlaceId()
+
+    /**
+     * Set the value of [datespecification_id] column.
+     *
+     * @param int $v new value
+     * @return Essay The current object (for fluent API support)
+     */
+    public function setDatespecificationId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->datespecification_id !== $v) {
+            $this->datespecification_id = $v;
+            $this->modifiedColumns[] = EssayPeer::DATESPECIFICATION_ID;
+        }
+
+        if ($this->aDatespecification !== null && $this->aDatespecification->getId() !== $v) {
+            $this->aDatespecification = null;
+        }
+
+
+        return $this;
+    } // setDatespecificationId()
+
+    /**
+     * Set the value of [relatedset_id] column.
+     *
+     * @param int $v new value
+     * @return Essay The current object (for fluent API support)
+     */
+    public function setRelatedsetId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->relatedset_id !== $v) {
+            $this->relatedset_id = $v;
+            $this->modifiedColumns[] = EssayPeer::RELATEDSET_ID;
+        }
+
+        if ($this->aRelatedset !== null && $this->aRelatedset->getId() !== $v) {
+            $this->aRelatedset = null;
+        }
+
+
+        return $this;
+    } // setRelatedsetId()
+
+    /**
+     * Set the value of [work_id] column.
+     *
+     * @param int $v new value
+     * @return Essay The current object (for fluent API support)
+     */
+    public function setWorkId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->work_id !== $v) {
+            $this->work_id = $v;
+            $this->modifiedColumns[] = EssayPeer::WORK_ID;
+        }
+
+        if ($this->aWork !== null && $this->aWork->getId() !== $v) {
+            $this->aWork = null;
+        }
+
+
+        return $this;
+    } // setWorkId()
+
+    /**
+     * Set the value of [publisher_id] column.
+     *
+     * @param int $v new value
+     * @return Essay The current object (for fluent API support)
+     */
+    public function setPublisherId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->publisher_id !== $v) {
+            $this->publisher_id = $v;
+            $this->modifiedColumns[] = EssayPeer::PUBLISHER_ID;
+        }
+
+        if ($this->aPublisher !== null && $this->aPublisher->getId() !== $v) {
+            $this->aPublisher = null;
+        }
+
+
+        return $this;
+    } // setPublisherId()
+
+    /**
+     * Set the value of [printer_id] column.
+     *
+     * @param int $v new value
+     * @return Essay The current object (for fluent API support)
+     */
+    public function setPrinterId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->printer_id !== $v) {
+            $this->printer_id = $v;
+            $this->modifiedColumns[] = EssayPeer::PRINTER_ID;
+        }
+
+        if ($this->aPrinter !== null && $this->aPrinter->getId() !== $v) {
+            $this->aPrinter = null;
+        }
+
+
+        return $this;
+    } // setPrinterId()
+
+    /**
+     * Set the value of [translator_id] column.
+     *
+     * @param int $v new value
+     * @return Essay The current object (for fluent API support)
+     */
+    public function setTranslatorId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->translator_id !== $v) {
+            $this->translator_id = $v;
+            $this->modifiedColumns[] = EssayPeer::TRANSLATOR_ID;
+        }
+
+        if ($this->aTranslator !== null && $this->aTranslator->getId() !== $v) {
+            $this->aTranslator = null;
+        }
+
+
+        return $this;
+    } // setTranslatorId()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -540,16 +780,21 @@ abstract class BaseEssay extends BaseObject implements Persistent
         try {
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-            $this->title_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-            $this->publishingcompany_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
-            $this->place_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
-            $this->datespecification_id = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
-            $this->printrun = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-            $this->printruncomment = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-            $this->edition = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
-            $this->numpages = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
-            $this->numpagesnormed = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
-            $this->bibliographiccitation = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+            $this->printrun = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
+            $this->printruncomment = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+            $this->edition = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+            $this->numpages = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
+            $this->numpagesnormed = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+            $this->bibliographiccitation = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+            $this->title_id = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
+            $this->publishingcompany_id = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+            $this->place_id = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+            $this->datespecification_id = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
+            $this->relatedset_id = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
+            $this->work_id = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
+            $this->publisher_id = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
+            $this->printer_id = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
+            $this->translator_id = ($row[$startcol + 15] !== null) ? (int) $row[$startcol + 15] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -558,7 +803,7 @@ abstract class BaseEssay extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 11; // 11 = EssayPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 16; // 16 = EssayPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Essay object", $e);
@@ -592,6 +837,21 @@ abstract class BaseEssay extends BaseObject implements Persistent
         }
         if ($this->aDatespecification !== null && $this->datespecification_id !== $this->aDatespecification->getId()) {
             $this->aDatespecification = null;
+        }
+        if ($this->aRelatedset !== null && $this->relatedset_id !== $this->aRelatedset->getId()) {
+            $this->aRelatedset = null;
+        }
+        if ($this->aWork !== null && $this->work_id !== $this->aWork->getId()) {
+            $this->aWork = null;
+        }
+        if ($this->aPublisher !== null && $this->publisher_id !== $this->aPublisher->getId()) {
+            $this->aPublisher = null;
+        }
+        if ($this->aPrinter !== null && $this->printer_id !== $this->aPrinter->getId()) {
+            $this->aPrinter = null;
+        }
+        if ($this->aTranslator !== null && $this->translator_id !== $this->aTranslator->getId()) {
+            $this->aTranslator = null;
         }
     } // ensureConsistency
 
@@ -632,6 +892,11 @@ abstract class BaseEssay extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->aWork = null;
+            $this->aPublisher = null;
+            $this->aPrinter = null;
+            $this->aTranslator = null;
+            $this->aRelatedset = null;
             $this->aTitle = null;
             $this->aPublishingcompany = null;
             $this->aPlace = null;
@@ -667,6 +932,9 @@ abstract class BaseEssay extends BaseObject implements Persistent
             if ($ret) {
                 $deleteQuery->delete($con);
                 $this->postDelete($con);
+                // concrete_inheritance behavior
+                $this->getParentOrCreate($con)->delete($con);
+
                 $con->commit();
                 $this->setDeleted(true);
             } else {
@@ -706,6 +974,11 @@ abstract class BaseEssay extends BaseObject implements Persistent
         $isInsert = $this->isNew();
         try {
             $ret = $this->preSave($con);
+            // concrete_inheritance behavior
+            $parent = $this->getSyncParent($con);
+            $parent->save($con);
+            // seemed to be a bug in the concrete inheritance behavior. $this->setPrimaryKey($parent->getPrimaryKey());
+
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
             } else {
@@ -753,6 +1026,41 @@ abstract class BaseEssay extends BaseObject implements Persistent
             // were passed to this object by their coresponding set
             // method.  This object relates to these object(s) by a
             // foreign key reference.
+
+            if ($this->aWork !== null) {
+                if ($this->aWork->isModified() || $this->aWork->isNew()) {
+                    $affectedRows += $this->aWork->save($con);
+                }
+                $this->setWork($this->aWork);
+            }
+
+            if ($this->aPublisher !== null) {
+                if ($this->aPublisher->isModified() || $this->aPublisher->isNew()) {
+                    $affectedRows += $this->aPublisher->save($con);
+                }
+                $this->setPublisher($this->aPublisher);
+            }
+
+            if ($this->aPrinter !== null) {
+                if ($this->aPrinter->isModified() || $this->aPrinter->isNew()) {
+                    $affectedRows += $this->aPrinter->save($con);
+                }
+                $this->setPrinter($this->aPrinter);
+            }
+
+            if ($this->aTranslator !== null) {
+                if ($this->aTranslator->isModified() || $this->aTranslator->isNew()) {
+                    $affectedRows += $this->aTranslator->save($con);
+                }
+                $this->setTranslator($this->aTranslator);
+            }
+
+            if ($this->aRelatedset !== null) {
+                if ($this->aRelatedset->isModified() || $this->aRelatedset->isNew()) {
+                    $affectedRows += $this->aRelatedset->save($con);
+                }
+                $this->setRelatedset($this->aRelatedset);
+            }
 
             if ($this->aTitle !== null) {
                 if ($this->aTitle->isModified() || $this->aTitle->isNew()) {
@@ -822,18 +1130,6 @@ abstract class BaseEssay extends BaseObject implements Persistent
         if ($this->isColumnModified(EssayPeer::ID)) {
             $modifiedColumns[':p' . $index++]  = '`id`';
         }
-        if ($this->isColumnModified(EssayPeer::TITLE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`title_id`';
-        }
-        if ($this->isColumnModified(EssayPeer::PUBLISHINGCOMPANY_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`publishingCompany_id`';
-        }
-        if ($this->isColumnModified(EssayPeer::PLACE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`place_id`';
-        }
-        if ($this->isColumnModified(EssayPeer::DATESPECIFICATION_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`dateSpecification_id`';
-        }
         if ($this->isColumnModified(EssayPeer::PRINTRUN)) {
             $modifiedColumns[':p' . $index++]  = '`printRun`';
         }
@@ -852,6 +1148,33 @@ abstract class BaseEssay extends BaseObject implements Persistent
         if ($this->isColumnModified(EssayPeer::BIBLIOGRAPHICCITATION)) {
             $modifiedColumns[':p' . $index++]  = '`bibliographicCitation`';
         }
+        if ($this->isColumnModified(EssayPeer::TITLE_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`title_id`';
+        }
+        if ($this->isColumnModified(EssayPeer::PUBLISHINGCOMPANY_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`publishingCompany_id`';
+        }
+        if ($this->isColumnModified(EssayPeer::PLACE_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`place_id`';
+        }
+        if ($this->isColumnModified(EssayPeer::DATESPECIFICATION_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`dateSpecification_id`';
+        }
+        if ($this->isColumnModified(EssayPeer::RELATEDSET_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`relatedSet_id`';
+        }
+        if ($this->isColumnModified(EssayPeer::WORK_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`work_id`';
+        }
+        if ($this->isColumnModified(EssayPeer::PUBLISHER_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`publisher_id`';
+        }
+        if ($this->isColumnModified(EssayPeer::PRINTER_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`printer_id`';
+        }
+        if ($this->isColumnModified(EssayPeer::TRANSLATOR_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`translator_id`';
+        }
 
         $sql = sprintf(
             'INSERT INTO `essay` (%s) VALUES (%s)',
@@ -865,18 +1188,6 @@ abstract class BaseEssay extends BaseObject implements Persistent
                 switch ($columnName) {
                     case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
-                        break;
-                    case '`title_id`':
-                        $stmt->bindValue($identifier, $this->title_id, PDO::PARAM_INT);
-                        break;
-                    case '`publishingCompany_id`':
-                        $stmt->bindValue($identifier, $this->publishingcompany_id, PDO::PARAM_INT);
-                        break;
-                    case '`place_id`':
-                        $stmt->bindValue($identifier, $this->place_id, PDO::PARAM_INT);
-                        break;
-                    case '`dateSpecification_id`':
-                        $stmt->bindValue($identifier, $this->datespecification_id, PDO::PARAM_INT);
                         break;
                     case '`printRun`':
                         $stmt->bindValue($identifier, $this->printrun, PDO::PARAM_STR);
@@ -895,6 +1206,33 @@ abstract class BaseEssay extends BaseObject implements Persistent
                         break;
                     case '`bibliographicCitation`':
                         $stmt->bindValue($identifier, $this->bibliographiccitation, PDO::PARAM_STR);
+                        break;
+                    case '`title_id`':
+                        $stmt->bindValue($identifier, $this->title_id, PDO::PARAM_INT);
+                        break;
+                    case '`publishingCompany_id`':
+                        $stmt->bindValue($identifier, $this->publishingcompany_id, PDO::PARAM_INT);
+                        break;
+                    case '`place_id`':
+                        $stmt->bindValue($identifier, $this->place_id, PDO::PARAM_INT);
+                        break;
+                    case '`dateSpecification_id`':
+                        $stmt->bindValue($identifier, $this->datespecification_id, PDO::PARAM_INT);
+                        break;
+                    case '`relatedSet_id`':
+                        $stmt->bindValue($identifier, $this->relatedset_id, PDO::PARAM_INT);
+                        break;
+                    case '`work_id`':
+                        $stmt->bindValue($identifier, $this->work_id, PDO::PARAM_INT);
+                        break;
+                    case '`publisher_id`':
+                        $stmt->bindValue($identifier, $this->publisher_id, PDO::PARAM_INT);
+                        break;
+                    case '`printer_id`':
+                        $stmt->bindValue($identifier, $this->printer_id, PDO::PARAM_INT);
+                        break;
+                    case '`translator_id`':
+                        $stmt->bindValue($identifier, $this->translator_id, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -995,6 +1333,36 @@ abstract class BaseEssay extends BaseObject implements Persistent
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
+            if ($this->aWork !== null) {
+                if (!$this->aWork->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aWork->getValidationFailures());
+                }
+            }
+
+            if ($this->aPublisher !== null) {
+                if (!$this->aPublisher->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aPublisher->getValidationFailures());
+                }
+            }
+
+            if ($this->aPrinter !== null) {
+                if (!$this->aPrinter->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aPrinter->getValidationFailures());
+                }
+            }
+
+            if ($this->aTranslator !== null) {
+                if (!$this->aTranslator->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aTranslator->getValidationFailures());
+                }
+            }
+
+            if ($this->aRelatedset !== null) {
+                if (!$this->aRelatedset->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aRelatedset->getValidationFailures());
+                }
+            }
+
             if ($this->aTitle !== null) {
                 if (!$this->aTitle->validate($columns)) {
                     $failureMap = array_merge($failureMap, $this->aTitle->getValidationFailures());
@@ -1064,34 +1432,49 @@ abstract class BaseEssay extends BaseObject implements Persistent
                 return $this->getId();
                 break;
             case 1:
-                return $this->getTitleId();
-                break;
-            case 2:
-                return $this->getPublishingcompanyId();
-                break;
-            case 3:
-                return $this->getPlaceId();
-                break;
-            case 4:
-                return $this->getDatespecificationId();
-                break;
-            case 5:
                 return $this->getPrintrun();
                 break;
-            case 6:
+            case 2:
                 return $this->getPrintruncomment();
                 break;
-            case 7:
+            case 3:
                 return $this->getEdition();
                 break;
-            case 8:
+            case 4:
                 return $this->getNumpages();
                 break;
-            case 9:
+            case 5:
                 return $this->getNumpagesnormed();
                 break;
-            case 10:
+            case 6:
                 return $this->getBibliographiccitation();
+                break;
+            case 7:
+                return $this->getTitleId();
+                break;
+            case 8:
+                return $this->getPublishingcompanyId();
+                break;
+            case 9:
+                return $this->getPlaceId();
+                break;
+            case 10:
+                return $this->getDatespecificationId();
+                break;
+            case 11:
+                return $this->getRelatedsetId();
+                break;
+            case 12:
+                return $this->getWorkId();
+                break;
+            case 13:
+                return $this->getPublisherId();
+                break;
+            case 14:
+                return $this->getPrinterId();
+                break;
+            case 15:
+                return $this->getTranslatorId();
                 break;
             default:
                 return null;
@@ -1123,18 +1506,38 @@ abstract class BaseEssay extends BaseObject implements Persistent
         $keys = EssayPeer::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getTitleId(),
-            $keys[2] => $this->getPublishingcompanyId(),
-            $keys[3] => $this->getPlaceId(),
-            $keys[4] => $this->getDatespecificationId(),
-            $keys[5] => $this->getPrintrun(),
-            $keys[6] => $this->getPrintruncomment(),
-            $keys[7] => $this->getEdition(),
-            $keys[8] => $this->getNumpages(),
-            $keys[9] => $this->getNumpagesnormed(),
-            $keys[10] => $this->getBibliographiccitation(),
+            $keys[1] => $this->getPrintrun(),
+            $keys[2] => $this->getPrintruncomment(),
+            $keys[3] => $this->getEdition(),
+            $keys[4] => $this->getNumpages(),
+            $keys[5] => $this->getNumpagesnormed(),
+            $keys[6] => $this->getBibliographiccitation(),
+            $keys[7] => $this->getTitleId(),
+            $keys[8] => $this->getPublishingcompanyId(),
+            $keys[9] => $this->getPlaceId(),
+            $keys[10] => $this->getDatespecificationId(),
+            $keys[11] => $this->getRelatedsetId(),
+            $keys[12] => $this->getWorkId(),
+            $keys[13] => $this->getPublisherId(),
+            $keys[14] => $this->getPrinterId(),
+            $keys[15] => $this->getTranslatorId(),
         );
         if ($includeForeignObjects) {
+            if (null !== $this->aWork) {
+                $result['Work'] = $this->aWork->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aPublisher) {
+                $result['Publisher'] = $this->aPublisher->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aPrinter) {
+                $result['Printer'] = $this->aPrinter->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aTranslator) {
+                $result['Translator'] = $this->aTranslator->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aRelatedset) {
+                $result['Relatedset'] = $this->aRelatedset->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
             if (null !== $this->aTitle) {
                 $result['Title'] = $this->aTitle->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
@@ -1185,34 +1588,49 @@ abstract class BaseEssay extends BaseObject implements Persistent
                 $this->setId($value);
                 break;
             case 1:
-                $this->setTitleId($value);
-                break;
-            case 2:
-                $this->setPublishingcompanyId($value);
-                break;
-            case 3:
-                $this->setPlaceId($value);
-                break;
-            case 4:
-                $this->setDatespecificationId($value);
-                break;
-            case 5:
                 $this->setPrintrun($value);
                 break;
-            case 6:
+            case 2:
                 $this->setPrintruncomment($value);
                 break;
-            case 7:
+            case 3:
                 $this->setEdition($value);
                 break;
-            case 8:
+            case 4:
                 $this->setNumpages($value);
                 break;
-            case 9:
+            case 5:
                 $this->setNumpagesnormed($value);
                 break;
-            case 10:
+            case 6:
                 $this->setBibliographiccitation($value);
+                break;
+            case 7:
+                $this->setTitleId($value);
+                break;
+            case 8:
+                $this->setPublishingcompanyId($value);
+                break;
+            case 9:
+                $this->setPlaceId($value);
+                break;
+            case 10:
+                $this->setDatespecificationId($value);
+                break;
+            case 11:
+                $this->setRelatedsetId($value);
+                break;
+            case 12:
+                $this->setWorkId($value);
+                break;
+            case 13:
+                $this->setPublisherId($value);
+                break;
+            case 14:
+                $this->setPrinterId($value);
+                break;
+            case 15:
+                $this->setTranslatorId($value);
                 break;
         } // switch()
     }
@@ -1239,16 +1657,21 @@ abstract class BaseEssay extends BaseObject implements Persistent
         $keys = EssayPeer::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setTitleId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setPublishingcompanyId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setPlaceId($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setDatespecificationId($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setPrintrun($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setPrintruncomment($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setEdition($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setNumpages($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setNumpagesnormed($arr[$keys[9]]);
-        if (array_key_exists($keys[10], $arr)) $this->setBibliographiccitation($arr[$keys[10]]);
+        if (array_key_exists($keys[1], $arr)) $this->setPrintrun($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setPrintruncomment($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setEdition($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setNumpages($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setNumpagesnormed($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setBibliographiccitation($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setTitleId($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setPublishingcompanyId($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setPlaceId($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setDatespecificationId($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setRelatedsetId($arr[$keys[11]]);
+        if (array_key_exists($keys[12], $arr)) $this->setWorkId($arr[$keys[12]]);
+        if (array_key_exists($keys[13], $arr)) $this->setPublisherId($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setPrinterId($arr[$keys[14]]);
+        if (array_key_exists($keys[15], $arr)) $this->setTranslatorId($arr[$keys[15]]);
     }
 
     /**
@@ -1261,16 +1684,21 @@ abstract class BaseEssay extends BaseObject implements Persistent
         $criteria = new Criteria(EssayPeer::DATABASE_NAME);
 
         if ($this->isColumnModified(EssayPeer::ID)) $criteria->add(EssayPeer::ID, $this->id);
-        if ($this->isColumnModified(EssayPeer::TITLE_ID)) $criteria->add(EssayPeer::TITLE_ID, $this->title_id);
-        if ($this->isColumnModified(EssayPeer::PUBLISHINGCOMPANY_ID)) $criteria->add(EssayPeer::PUBLISHINGCOMPANY_ID, $this->publishingcompany_id);
-        if ($this->isColumnModified(EssayPeer::PLACE_ID)) $criteria->add(EssayPeer::PLACE_ID, $this->place_id);
-        if ($this->isColumnModified(EssayPeer::DATESPECIFICATION_ID)) $criteria->add(EssayPeer::DATESPECIFICATION_ID, $this->datespecification_id);
         if ($this->isColumnModified(EssayPeer::PRINTRUN)) $criteria->add(EssayPeer::PRINTRUN, $this->printrun);
         if ($this->isColumnModified(EssayPeer::PRINTRUNCOMMENT)) $criteria->add(EssayPeer::PRINTRUNCOMMENT, $this->printruncomment);
         if ($this->isColumnModified(EssayPeer::EDITION)) $criteria->add(EssayPeer::EDITION, $this->edition);
         if ($this->isColumnModified(EssayPeer::NUMPAGES)) $criteria->add(EssayPeer::NUMPAGES, $this->numpages);
         if ($this->isColumnModified(EssayPeer::NUMPAGESNORMED)) $criteria->add(EssayPeer::NUMPAGESNORMED, $this->numpagesnormed);
         if ($this->isColumnModified(EssayPeer::BIBLIOGRAPHICCITATION)) $criteria->add(EssayPeer::BIBLIOGRAPHICCITATION, $this->bibliographiccitation);
+        if ($this->isColumnModified(EssayPeer::TITLE_ID)) $criteria->add(EssayPeer::TITLE_ID, $this->title_id);
+        if ($this->isColumnModified(EssayPeer::PUBLISHINGCOMPANY_ID)) $criteria->add(EssayPeer::PUBLISHINGCOMPANY_ID, $this->publishingcompany_id);
+        if ($this->isColumnModified(EssayPeer::PLACE_ID)) $criteria->add(EssayPeer::PLACE_ID, $this->place_id);
+        if ($this->isColumnModified(EssayPeer::DATESPECIFICATION_ID)) $criteria->add(EssayPeer::DATESPECIFICATION_ID, $this->datespecification_id);
+        if ($this->isColumnModified(EssayPeer::RELATEDSET_ID)) $criteria->add(EssayPeer::RELATEDSET_ID, $this->relatedset_id);
+        if ($this->isColumnModified(EssayPeer::WORK_ID)) $criteria->add(EssayPeer::WORK_ID, $this->work_id);
+        if ($this->isColumnModified(EssayPeer::PUBLISHER_ID)) $criteria->add(EssayPeer::PUBLISHER_ID, $this->publisher_id);
+        if ($this->isColumnModified(EssayPeer::PRINTER_ID)) $criteria->add(EssayPeer::PRINTER_ID, $this->printer_id);
+        if ($this->isColumnModified(EssayPeer::TRANSLATOR_ID)) $criteria->add(EssayPeer::TRANSLATOR_ID, $this->translator_id);
 
         return $criteria;
     }
@@ -1334,16 +1762,21 @@ abstract class BaseEssay extends BaseObject implements Persistent
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setTitleId($this->getTitleId());
-        $copyObj->setPublishingcompanyId($this->getPublishingcompanyId());
-        $copyObj->setPlaceId($this->getPlaceId());
-        $copyObj->setDatespecificationId($this->getDatespecificationId());
         $copyObj->setPrintrun($this->getPrintrun());
         $copyObj->setPrintruncomment($this->getPrintruncomment());
         $copyObj->setEdition($this->getEdition());
         $copyObj->setNumpages($this->getNumpages());
         $copyObj->setNumpagesnormed($this->getNumpagesnormed());
         $copyObj->setBibliographiccitation($this->getBibliographiccitation());
+        $copyObj->setTitleId($this->getTitleId());
+        $copyObj->setPublishingcompanyId($this->getPublishingcompanyId());
+        $copyObj->setPlaceId($this->getPlaceId());
+        $copyObj->setDatespecificationId($this->getDatespecificationId());
+        $copyObj->setRelatedsetId($this->getRelatedsetId());
+        $copyObj->setWorkId($this->getWorkId());
+        $copyObj->setPublisherId($this->getPublisherId());
+        $copyObj->setPrinterId($this->getPrinterId());
+        $copyObj->setTranslatorId($this->getTranslatorId());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1400,6 +1833,272 @@ abstract class BaseEssay extends BaseObject implements Persistent
         }
 
         return self::$peer;
+    }
+
+    /**
+     * Declares an association between this object and a Work object.
+     *
+     * @param             Work $v
+     * @return Essay The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setWork(Work $v = null)
+    {
+        if ($v === null) {
+            $this->setWorkId(NULL);
+        } else {
+            $this->setWorkId($v->getId());
+        }
+
+        $this->aWork = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Work object, it will not be re-added.
+        if ($v !== null) {
+            $v->addEssay($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Work object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return Work The associated Work object.
+     * @throws PropelException
+     */
+    public function getWork(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aWork === null && ($this->work_id !== null) && $doQuery) {
+            $this->aWork = WorkQuery::create()->findPk($this->work_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aWork->addEssays($this);
+             */
+        }
+
+        return $this->aWork;
+    }
+
+    /**
+     * Declares an association between this object and a Publisher object.
+     *
+     * @param             Publisher $v
+     * @return Essay The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setPublisher(Publisher $v = null)
+    {
+        if ($v === null) {
+            $this->setPublisherId(NULL);
+        } else {
+            $this->setPublisherId($v->getId());
+        }
+
+        $this->aPublisher = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Publisher object, it will not be re-added.
+        if ($v !== null) {
+            $v->addEssay($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Publisher object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return Publisher The associated Publisher object.
+     * @throws PropelException
+     */
+    public function getPublisher(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aPublisher === null && ($this->publisher_id !== null) && $doQuery) {
+            $this->aPublisher = PublisherQuery::create()
+                ->filterByEssay($this) // here
+                ->findOne($con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aPublisher->addEssays($this);
+             */
+        }
+
+        return $this->aPublisher;
+    }
+
+    /**
+     * Declares an association between this object and a Printer object.
+     *
+     * @param             Printer $v
+     * @return Essay The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setPrinter(Printer $v = null)
+    {
+        if ($v === null) {
+            $this->setPrinterId(NULL);
+        } else {
+            $this->setPrinterId($v->getId());
+        }
+
+        $this->aPrinter = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Printer object, it will not be re-added.
+        if ($v !== null) {
+            $v->addEssay($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Printer object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return Printer The associated Printer object.
+     * @throws PropelException
+     */
+    public function getPrinter(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aPrinter === null && ($this->printer_id !== null) && $doQuery) {
+            $this->aPrinter = PrinterQuery::create()
+                ->filterByEssay($this) // here
+                ->findOne($con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aPrinter->addEssays($this);
+             */
+        }
+
+        return $this->aPrinter;
+    }
+
+    /**
+     * Declares an association between this object and a Translator object.
+     *
+     * @param             Translator $v
+     * @return Essay The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setTranslator(Translator $v = null)
+    {
+        if ($v === null) {
+            $this->setTranslatorId(NULL);
+        } else {
+            $this->setTranslatorId($v->getId());
+        }
+
+        $this->aTranslator = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Translator object, it will not be re-added.
+        if ($v !== null) {
+            $v->addEssay($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Translator object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return Translator The associated Translator object.
+     * @throws PropelException
+     */
+    public function getTranslator(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aTranslator === null && ($this->translator_id !== null) && $doQuery) {
+            $this->aTranslator = TranslatorQuery::create()
+                ->filterByEssay($this) // here
+                ->findOne($con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aTranslator->addEssays($this);
+             */
+        }
+
+        return $this->aTranslator;
+    }
+
+    /**
+     * Declares an association between this object and a Relatedset object.
+     *
+     * @param             Relatedset $v
+     * @return Essay The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setRelatedset(Relatedset $v = null)
+    {
+        if ($v === null) {
+            $this->setRelatedsetId(NULL);
+        } else {
+            $this->setRelatedsetId($v->getId());
+        }
+
+        $this->aRelatedset = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Relatedset object, it will not be re-added.
+        if ($v !== null) {
+            $v->addEssay($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Relatedset object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return Relatedset The associated Relatedset object.
+     * @throws PropelException
+     */
+    public function getRelatedset(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aRelatedset === null && ($this->relatedset_id !== null) && $doQuery) {
+            $this->aRelatedset = RelatedsetQuery::create()->findPk($this->relatedset_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aRelatedset->addEssays($this);
+             */
+        }
+
+        return $this->aRelatedset;
     }
 
     /**
@@ -1616,16 +2315,21 @@ abstract class BaseEssay extends BaseObject implements Persistent
     public function clear()
     {
         $this->id = null;
-        $this->title_id = null;
-        $this->publishingcompany_id = null;
-        $this->place_id = null;
-        $this->datespecification_id = null;
         $this->printrun = null;
         $this->printruncomment = null;
         $this->edition = null;
         $this->numpages = null;
         $this->numpagesnormed = null;
         $this->bibliographiccitation = null;
+        $this->title_id = null;
+        $this->publishingcompany_id = null;
+        $this->place_id = null;
+        $this->datespecification_id = null;
+        $this->relatedset_id = null;
+        $this->work_id = null;
+        $this->publisher_id = null;
+        $this->printer_id = null;
+        $this->translator_id = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
@@ -1648,6 +2352,21 @@ abstract class BaseEssay extends BaseObject implements Persistent
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->aWork instanceof Persistent) {
+              $this->aWork->clearAllReferences($deep);
+            }
+            if ($this->aPublisher instanceof Persistent) {
+              $this->aPublisher->clearAllReferences($deep);
+            }
+            if ($this->aPrinter instanceof Persistent) {
+              $this->aPrinter->clearAllReferences($deep);
+            }
+            if ($this->aTranslator instanceof Persistent) {
+              $this->aTranslator->clearAllReferences($deep);
+            }
+            if ($this->aRelatedset instanceof Persistent) {
+              $this->aRelatedset->clearAllReferences($deep);
+            }
             if ($this->aTitle instanceof Persistent) {
               $this->aTitle->clearAllReferences($deep);
             }
@@ -1664,6 +2383,11 @@ abstract class BaseEssay extends BaseObject implements Persistent
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
+        $this->aWork = null;
+        $this->aPublisher = null;
+        $this->aPrinter = null;
+        $this->aTranslator = null;
+        $this->aRelatedset = null;
         $this->aTitle = null;
         $this->aPublishingcompany = null;
         $this->aPlace = null;
@@ -1688,6 +2412,94 @@ abstract class BaseEssay extends BaseObject implements Persistent
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
+    }
+
+    // concrete_inheritance behavior
+
+    /**
+     * Get or Create the parent Publication object of the current object
+     *
+     * @return    Publication The parent object
+     */
+    public function getParentOrCreate($con = null)
+    {
+        if ($this->isNew()) {
+            if ($this->isPrimaryKeyNull()) {
+                //this prevent issue with deep copy & save parent object
+                //seemed to be a bug in the behavior. if (null === ($parent = $this->getPublication($con))) {
+                    $parent = new Publication();
+                //}
+                $parent->setDescendantClass('DTA\MetadataBundle\Model\Essay');
+
+                return $parent;
+            } else {
+                $parent = PublicationQuery::create()->findPk($this->getPrimaryKey(), $con);
+                if (null === $parent || null !== $parent->getDescendantClass()) {
+                    $parent = new Publication();
+                    $parent->setPrimaryKey($this->getPrimaryKey());
+                    $parent->setDescendantClass('Essay');
+                }
+
+                return $parent;
+            }
+        }
+
+        return PublicationQuery::create()->findPk($this->getPrimaryKey(), $con);
+    }
+
+    /**
+     * Create or Update the parent Publication object
+     * And return its primary key
+     *
+     * @return    int The primary key of the parent object
+     */
+    public function getSyncParent($con = null)
+    {
+        $parent = $this->getParentOrCreate($con);
+        $parent->setPrintrun($this->getPrintrun());
+        $parent->setPrintruncomment($this->getPrintruncomment());
+        $parent->setEdition($this->getEdition());
+        $parent->setNumpages($this->getNumpages());
+        $parent->setNumpagesnormed($this->getNumpagesnormed());
+        $parent->setBibliographiccitation($this->getBibliographiccitation());
+        $parent->setTitleId($this->getTitleId());
+        $parent->setPublishingcompanyId($this->getPublishingcompanyId());
+        $parent->setPlaceId($this->getPlaceId());
+        $parent->setDatespecificationId($this->getDatespecificationId());
+        $parent->setRelatedsetId($this->getRelatedsetId());
+        $parent->setWorkId($this->getWorkId());
+        $parent->setPublisherId($this->getPublisherId());
+        $parent->setPrinterId($this->getPrinterId());
+        $parent->setTranslatorId($this->getTranslatorId());
+        if ($this->getWork() && $this->getWork()->isNew()) {
+            $parent->setWork($this->getWork());
+        }
+        if ($this->getPublisher() && $this->getPublisher()->isNew()) {
+            $parent->setPublisher($this->getPublisher());
+        }
+        if ($this->getPrinter() && $this->getPrinter()->isNew()) {
+            $parent->setPrinter($this->getPrinter());
+        }
+        if ($this->getTranslator() && $this->getTranslator()->isNew()) {
+            $parent->setTranslator($this->getTranslator());
+        }
+        if ($this->getRelatedset() && $this->getRelatedset()->isNew()) {
+            $parent->setRelatedset($this->getRelatedset());
+        }
+        if ($this->getTitle() && $this->getTitle()->isNew()) {
+            $parent->setTitle($this->getTitle());
+        }
+        if ($this->getPublishingcompany() && $this->getPublishingcompany()->isNew()) {
+            $parent->setPublishingcompany($this->getPublishingcompany());
+        }
+        if ($this->getPlace() && $this->getPlace()->isNew()) {
+            $parent->setPlace($this->getPlace());
+        }
+        if ($this->getDatespecification() && $this->getDatespecification()->isNew()) {
+            $parent->setDatespecification($this->getDatespecification());
+        }
+
+        return $parent;
     }
 
 }

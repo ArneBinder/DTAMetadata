@@ -13,13 +13,21 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use DTA\MetadataBundle\Model\Essay;
+use DTA\MetadataBundle\Model\EssayQuery;
+use DTA\MetadataBundle\Model\Magazine;
+use DTA\MetadataBundle\Model\MagazineQuery;
+use DTA\MetadataBundle\Model\Monograph;
+use DTA\MetadataBundle\Model\MonographQuery;
 use DTA\MetadataBundle\Model\Person;
 use DTA\MetadataBundle\Model\PersonQuery;
 use DTA\MetadataBundle\Model\Printer;
 use DTA\MetadataBundle\Model\PrinterPeer;
 use DTA\MetadataBundle\Model\PrinterQuery;
-use DTA\MetadataBundle\Model\Writ;
-use DTA\MetadataBundle\Model\WritQuery;
+use DTA\MetadataBundle\Model\Publication;
+use DTA\MetadataBundle\Model\PublicationQuery;
+use DTA\MetadataBundle\Model\Series;
+use DTA\MetadataBundle\Model\SeriesQuery;
 
 abstract class BasePrinter extends BaseObject implements Persistent
 {
@@ -60,10 +68,34 @@ abstract class BasePrinter extends BaseObject implements Persistent
     protected $aPerson;
 
     /**
-     * @var        PropelObjectCollection|Writ[] Collection to store aggregation of Writ objects.
+     * @var        PropelObjectCollection|Publication[] Collection to store aggregation of Publication objects.
      */
-    protected $collWrits;
-    protected $collWritsPartial;
+    protected $collPublications;
+    protected $collPublicationsPartial;
+
+    /**
+     * @var        PropelObjectCollection|Monograph[] Collection to store aggregation of Monograph objects.
+     */
+    protected $collMonographs;
+    protected $collMonographsPartial;
+
+    /**
+     * @var        PropelObjectCollection|Essay[] Collection to store aggregation of Essay objects.
+     */
+    protected $collEssays;
+    protected $collEssaysPartial;
+
+    /**
+     * @var        PropelObjectCollection|Magazine[] Collection to store aggregation of Magazine objects.
+     */
+    protected $collMagazines;
+    protected $collMagazinesPartial;
+
+    /**
+     * @var        PropelObjectCollection|Series[] Collection to store aggregation of Series objects.
+     */
+    protected $collSeries;
+    protected $collSeriesPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -89,7 +121,31 @@ abstract class BasePrinter extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $writsScheduledForDeletion = null;
+    protected $publicationsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $monographsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $essaysScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $magazinesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $seriesScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -265,7 +321,15 @@ abstract class BasePrinter extends BaseObject implements Persistent
         if ($deep) {  // also de-associate any related objects?
 
             $this->aPerson = null;
-            $this->collWrits = null;
+            $this->collPublications = null;
+
+            $this->collMonographs = null;
+
+            $this->collEssays = null;
+
+            $this->collMagazines = null;
+
+            $this->collSeries = null;
 
         } // if (deep)
     }
@@ -403,18 +467,90 @@ abstract class BasePrinter extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
-            if ($this->writsScheduledForDeletion !== null) {
-                if (!$this->writsScheduledForDeletion->isEmpty()) {
-                    foreach ($this->writsScheduledForDeletion as $writ) {
+            if ($this->publicationsScheduledForDeletion !== null) {
+                if (!$this->publicationsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->publicationsScheduledForDeletion as $publication) {
                         // need to save related object because we set the relation to null
-                        $writ->save($con);
+                        $publication->save($con);
                     }
-                    $this->writsScheduledForDeletion = null;
+                    $this->publicationsScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collWrits !== null) {
-                foreach ($this->collWrits as $referrerFK) {
+            if ($this->collPublications !== null) {
+                foreach ($this->collPublications as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->monographsScheduledForDeletion !== null) {
+                if (!$this->monographsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->monographsScheduledForDeletion as $monograph) {
+                        // need to save related object because we set the relation to null
+                        $monograph->save($con);
+                    }
+                    $this->monographsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collMonographs !== null) {
+                foreach ($this->collMonographs as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->essaysScheduledForDeletion !== null) {
+                if (!$this->essaysScheduledForDeletion->isEmpty()) {
+                    foreach ($this->essaysScheduledForDeletion as $essay) {
+                        // need to save related object because we set the relation to null
+                        $essay->save($con);
+                    }
+                    $this->essaysScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collEssays !== null) {
+                foreach ($this->collEssays as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->magazinesScheduledForDeletion !== null) {
+                if (!$this->magazinesScheduledForDeletion->isEmpty()) {
+                    foreach ($this->magazinesScheduledForDeletion as $magazine) {
+                        // need to save related object because we set the relation to null
+                        $magazine->save($con);
+                    }
+                    $this->magazinesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collMagazines !== null) {
+                foreach ($this->collMagazines as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->seriesScheduledForDeletion !== null) {
+                if (!$this->seriesScheduledForDeletion->isEmpty()) {
+                    foreach ($this->seriesScheduledForDeletion as $series) {
+                        // need to save related object because we set the relation to null
+                        $series->save($con);
+                    }
+                    $this->seriesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collSeries !== null) {
+                foreach ($this->collSeries as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -581,8 +717,40 @@ abstract class BasePrinter extends BaseObject implements Persistent
             }
 
 
-                if ($this->collWrits !== null) {
-                    foreach ($this->collWrits as $referrerFK) {
+                if ($this->collPublications !== null) {
+                    foreach ($this->collPublications as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collMonographs !== null) {
+                    foreach ($this->collMonographs as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collEssays !== null) {
+                    foreach ($this->collEssays as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collMagazines !== null) {
+                    foreach ($this->collMagazines as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collSeries !== null) {
+                    foreach ($this->collSeries as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -666,8 +834,20 @@ abstract class BasePrinter extends BaseObject implements Persistent
             if (null !== $this->aPerson) {
                 $result['Person'] = $this->aPerson->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->collWrits) {
-                $result['Writs'] = $this->collWrits->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collPublications) {
+                $result['Publications'] = $this->collPublications->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collMonographs) {
+                $result['Monographs'] = $this->collMonographs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collEssays) {
+                $result['Essays'] = $this->collEssays->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collMagazines) {
+                $result['Magazines'] = $this->collMagazines->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collSeries) {
+                $result['Series'] = $this->collSeries->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -827,9 +1007,33 @@ abstract class BasePrinter extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getWrits() as $relObj) {
+            foreach ($this->getPublications() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addWrit($relObj->copy($deepCopy));
+                    $copyObj->addPublication($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getMonographs() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addMonograph($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getEssays() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addEssay($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getMagazines() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addMagazine($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getSeries() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addSeries($relObj->copy($deepCopy));
                 }
             }
 
@@ -946,42 +1150,54 @@ abstract class BasePrinter extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
-        if ('Writ' == $relationName) {
-            $this->initWrits();
+        if ('Publication' == $relationName) {
+            $this->initPublications();
+        }
+        if ('Monograph' == $relationName) {
+            $this->initMonographs();
+        }
+        if ('Essay' == $relationName) {
+            $this->initEssays();
+        }
+        if ('Magazine' == $relationName) {
+            $this->initMagazines();
+        }
+        if ('Series' == $relationName) {
+            $this->initSeries();
         }
     }
 
     /**
-     * Clears out the collWrits collection
+     * Clears out the collPublications collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return Printer The current object (for fluent API support)
-     * @see        addWrits()
+     * @see        addPublications()
      */
-    public function clearWrits()
+    public function clearPublications()
     {
-        $this->collWrits = null; // important to set this to null since that means it is uninitialized
-        $this->collWritsPartial = null;
+        $this->collPublications = null; // important to set this to null since that means it is uninitialized
+        $this->collPublicationsPartial = null;
 
         return $this;
     }
 
     /**
-     * reset is the collWrits collection loaded partially
+     * reset is the collPublications collection loaded partially
      *
      * @return void
      */
-    public function resetPartialWrits($v = true)
+    public function resetPartialPublications($v = true)
     {
-        $this->collWritsPartial = $v;
+        $this->collPublicationsPartial = $v;
     }
 
     /**
-     * Initializes the collWrits collection.
+     * Initializes the collPublications collection.
      *
-     * By default this just sets the collWrits collection to an empty array (like clearcollWrits());
+     * By default this just sets the collPublications collection to an empty array (like clearcollPublications());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -990,17 +1206,17 @@ abstract class BasePrinter extends BaseObject implements Persistent
      *
      * @return void
      */
-    public function initWrits($overrideExisting = true)
+    public function initPublications($overrideExisting = true)
     {
-        if (null !== $this->collWrits && !$overrideExisting) {
+        if (null !== $this->collPublications && !$overrideExisting) {
             return;
         }
-        $this->collWrits = new PropelObjectCollection();
-        $this->collWrits->setModel('Writ');
+        $this->collPublications = new PropelObjectCollection();
+        $this->collPublications->setModel('Publication');
     }
 
     /**
-     * Gets an array of Writ objects which contain a foreign key that references this object.
+     * Gets an array of Publication objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1010,105 +1226,105 @@ abstract class BasePrinter extends BaseObject implements Persistent
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|Writ[] List of Writ objects
+     * @return PropelObjectCollection|Publication[] List of Publication objects
      * @throws PropelException
      */
-    public function getWrits($criteria = null, PropelPDO $con = null)
+    public function getPublications($criteria = null, PropelPDO $con = null)
     {
-        $partial = $this->collWritsPartial && !$this->isNew();
-        if (null === $this->collWrits || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collWrits) {
+        $partial = $this->collPublicationsPartial && !$this->isNew();
+        if (null === $this->collPublications || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collPublications) {
                 // return empty collection
-                $this->initWrits();
+                $this->initPublications();
             } else {
-                $collWrits = WritQuery::create(null, $criteria)
+                $collPublications = PublicationQuery::create(null, $criteria)
                     ->filterByPrinter($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    if (false !== $this->collWritsPartial && count($collWrits)) {
-                      $this->initWrits(false);
+                    if (false !== $this->collPublicationsPartial && count($collPublications)) {
+                      $this->initPublications(false);
 
-                      foreach($collWrits as $obj) {
-                        if (false == $this->collWrits->contains($obj)) {
-                          $this->collWrits->append($obj);
+                      foreach($collPublications as $obj) {
+                        if (false == $this->collPublications->contains($obj)) {
+                          $this->collPublications->append($obj);
                         }
                       }
 
-                      $this->collWritsPartial = true;
+                      $this->collPublicationsPartial = true;
                     }
 
-                    $collWrits->getInternalIterator()->rewind();
-                    return $collWrits;
+                    $collPublications->getInternalIterator()->rewind();
+                    return $collPublications;
                 }
 
-                if($partial && $this->collWrits) {
-                    foreach($this->collWrits as $obj) {
+                if($partial && $this->collPublications) {
+                    foreach($this->collPublications as $obj) {
                         if($obj->isNew()) {
-                            $collWrits[] = $obj;
+                            $collPublications[] = $obj;
                         }
                     }
                 }
 
-                $this->collWrits = $collWrits;
-                $this->collWritsPartial = false;
+                $this->collPublications = $collPublications;
+                $this->collPublicationsPartial = false;
             }
         }
 
-        return $this->collWrits;
+        return $this->collPublications;
     }
 
     /**
-     * Sets a collection of Writ objects related by a one-to-many relationship
+     * Sets a collection of Publication objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $writs A Propel collection.
+     * @param PropelCollection $publications A Propel collection.
      * @param PropelPDO $con Optional connection object
      * @return Printer The current object (for fluent API support)
      */
-    public function setWrits(PropelCollection $writs, PropelPDO $con = null)
+    public function setPublications(PropelCollection $publications, PropelPDO $con = null)
     {
-        $writsToDelete = $this->getWrits(new Criteria(), $con)->diff($writs);
+        $publicationsToDelete = $this->getPublications(new Criteria(), $con)->diff($publications);
 
-        $this->writsScheduledForDeletion = unserialize(serialize($writsToDelete));
+        $this->publicationsScheduledForDeletion = unserialize(serialize($publicationsToDelete));
 
-        foreach ($writsToDelete as $writRemoved) {
-            $writRemoved->setPrinter(null);
+        foreach ($publicationsToDelete as $publicationRemoved) {
+            $publicationRemoved->setPrinter(null);
         }
 
-        $this->collWrits = null;
-        foreach ($writs as $writ) {
-            $this->addWrit($writ);
+        $this->collPublications = null;
+        foreach ($publications as $publication) {
+            $this->addPublication($publication);
         }
 
-        $this->collWrits = $writs;
-        $this->collWritsPartial = false;
+        $this->collPublications = $publications;
+        $this->collPublicationsPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related Writ objects.
+     * Returns the number of related Publication objects.
      *
      * @param Criteria $criteria
      * @param boolean $distinct
      * @param PropelPDO $con
-     * @return int             Count of related Writ objects.
+     * @return int             Count of related Publication objects.
      * @throws PropelException
      */
-    public function countWrits(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countPublications(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $partial = $this->collWritsPartial && !$this->isNew();
-        if (null === $this->collWrits || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collWrits) {
+        $partial = $this->collPublicationsPartial && !$this->isNew();
+        if (null === $this->collPublications || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collPublications) {
                 return 0;
             }
 
             if($partial && !$criteria) {
-                return count($this->getWrits());
+                return count($this->getPublications());
             }
-            $query = WritQuery::create(null, $criteria);
+            $query = PublicationQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
@@ -1118,52 +1334,52 @@ abstract class BasePrinter extends BaseObject implements Persistent
                 ->count($con);
         }
 
-        return count($this->collWrits);
+        return count($this->collPublications);
     }
 
     /**
-     * Method called to associate a Writ object to this object
-     * through the Writ foreign key attribute.
+     * Method called to associate a Publication object to this object
+     * through the Publication foreign key attribute.
      *
-     * @param    Writ $l Writ
+     * @param    Publication $l Publication
      * @return Printer The current object (for fluent API support)
      */
-    public function addWrit(Writ $l)
+    public function addPublication(Publication $l)
     {
-        if ($this->collWrits === null) {
-            $this->initWrits();
-            $this->collWritsPartial = true;
+        if ($this->collPublications === null) {
+            $this->initPublications();
+            $this->collPublicationsPartial = true;
         }
-        if (!in_array($l, $this->collWrits->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddWrit($l);
+        if (!in_array($l, $this->collPublications->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddPublication($l);
         }
 
         return $this;
     }
 
     /**
-     * @param	Writ $writ The writ object to add.
+     * @param	Publication $publication The publication object to add.
      */
-    protected function doAddWrit($writ)
+    protected function doAddPublication($publication)
     {
-        $this->collWrits[]= $writ;
-        $writ->setPrinter($this);
+        $this->collPublications[]= $publication;
+        $publication->setPrinter($this);
     }
 
     /**
-     * @param	Writ $writ The writ object to remove.
+     * @param	Publication $publication The publication object to remove.
      * @return Printer The current object (for fluent API support)
      */
-    public function removeWrit($writ)
+    public function removePublication($publication)
     {
-        if ($this->getWrits()->contains($writ)) {
-            $this->collWrits->remove($this->collWrits->search($writ));
-            if (null === $this->writsScheduledForDeletion) {
-                $this->writsScheduledForDeletion = clone $this->collWrits;
-                $this->writsScheduledForDeletion->clear();
+        if ($this->getPublications()->contains($publication)) {
+            $this->collPublications->remove($this->collPublications->search($publication));
+            if (null === $this->publicationsScheduledForDeletion) {
+                $this->publicationsScheduledForDeletion = clone $this->collPublications;
+                $this->publicationsScheduledForDeletion->clear();
             }
-            $this->writsScheduledForDeletion[]= $writ;
-            $writ->setPrinter(null);
+            $this->publicationsScheduledForDeletion[]= $publication;
+            $publication->setPrinter(null);
         }
 
         return $this;
@@ -1175,7 +1391,7 @@ abstract class BasePrinter extends BaseObject implements Persistent
      * an identical criteria, it returns the collection.
      * Otherwise if this Printer is new, it will return
      * an empty collection; or if this Printer has previously
-     * been saved, it will retrieve related Writs from storage.
+     * been saved, it will retrieve related Publications from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1184,14 +1400,14 @@ abstract class BasePrinter extends BaseObject implements Persistent
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Writ[] List of Writ objects
+     * @return PropelObjectCollection|Publication[] List of Publication objects
      */
-    public function getWritsJoinWork($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getPublicationsJoinWork($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
-        $query = WritQuery::create(null, $criteria);
+        $query = PublicationQuery::create(null, $criteria);
         $query->joinWith('Work', $join_behavior);
 
-        return $this->getWrits($query, $con);
+        return $this->getPublications($query, $con);
     }
 
 
@@ -1200,7 +1416,7 @@ abstract class BasePrinter extends BaseObject implements Persistent
      * an identical criteria, it returns the collection.
      * Otherwise if this Printer is new, it will return
      * an empty collection; or if this Printer has previously
-     * been saved, it will retrieve related Writs from storage.
+     * been saved, it will retrieve related Publications from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1209,14 +1425,14 @@ abstract class BasePrinter extends BaseObject implements Persistent
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Writ[] List of Writ objects
+     * @return PropelObjectCollection|Publication[] List of Publication objects
      */
-    public function getWritsJoinPublisher($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getPublicationsJoinPublisher($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
-        $query = WritQuery::create(null, $criteria);
+        $query = PublicationQuery::create(null, $criteria);
         $query->joinWith('Publisher', $join_behavior);
 
-        return $this->getWrits($query, $con);
+        return $this->getPublications($query, $con);
     }
 
 
@@ -1225,7 +1441,7 @@ abstract class BasePrinter extends BaseObject implements Persistent
      * an identical criteria, it returns the collection.
      * Otherwise if this Printer is new, it will return
      * an empty collection; or if this Printer has previously
-     * been saved, it will retrieve related Writs from storage.
+     * been saved, it will retrieve related Publications from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1234,14 +1450,14 @@ abstract class BasePrinter extends BaseObject implements Persistent
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Writ[] List of Writ objects
+     * @return PropelObjectCollection|Publication[] List of Publication objects
      */
-    public function getWritsJoinTranslator($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getPublicationsJoinTranslator($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
-        $query = WritQuery::create(null, $criteria);
+        $query = PublicationQuery::create(null, $criteria);
         $query->joinWith('Translator', $join_behavior);
 
-        return $this->getWrits($query, $con);
+        return $this->getPublications($query, $con);
     }
 
 
@@ -1250,7 +1466,7 @@ abstract class BasePrinter extends BaseObject implements Persistent
      * an identical criteria, it returns the collection.
      * Otherwise if this Printer is new, it will return
      * an empty collection; or if this Printer has previously
-     * been saved, it will retrieve related Writs from storage.
+     * been saved, it will retrieve related Publications from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1259,39 +1475,1786 @@ abstract class BasePrinter extends BaseObject implements Persistent
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Writ[] List of Writ objects
+     * @return PropelObjectCollection|Publication[] List of Publication objects
      */
-    public function getWritsJoinPublication($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getPublicationsJoinRelatedset($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
-        $query = WritQuery::create(null, $criteria);
-        $query->joinWith('Publication', $join_behavior);
-
-        return $this->getWrits($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Printer is new, it will return
-     * an empty collection; or if this Printer has previously
-     * been saved, it will retrieve related Writs from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Printer.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Writ[] List of Writ objects
-     */
-    public function getWritsJoinRelatedset($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = WritQuery::create(null, $criteria);
+        $query = PublicationQuery::create(null, $criteria);
         $query->joinWith('Relatedset', $join_behavior);
 
-        return $this->getWrits($query, $con);
+        return $this->getPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinTitle($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Title', $join_behavior);
+
+        return $this->getPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinPublishingcompany($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Publishingcompany', $join_behavior);
+
+        return $this->getPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinPlace($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Place', $join_behavior);
+
+        return $this->getPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinDatespecification($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Datespecification', $join_behavior);
+
+        return $this->getPublications($query, $con);
+    }
+
+    /**
+     * Clears out the collMonographs collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Printer The current object (for fluent API support)
+     * @see        addMonographs()
+     */
+    public function clearMonographs()
+    {
+        $this->collMonographs = null; // important to set this to null since that means it is uninitialized
+        $this->collMonographsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collMonographs collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialMonographs($v = true)
+    {
+        $this->collMonographsPartial = $v;
+    }
+
+    /**
+     * Initializes the collMonographs collection.
+     *
+     * By default this just sets the collMonographs collection to an empty array (like clearcollMonographs());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initMonographs($overrideExisting = true)
+    {
+        if (null !== $this->collMonographs && !$overrideExisting) {
+            return;
+        }
+        $this->collMonographs = new PropelObjectCollection();
+        $this->collMonographs->setModel('Monograph');
+    }
+
+    /**
+     * Gets an array of Monograph objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Printer is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Monograph[] List of Monograph objects
+     * @throws PropelException
+     */
+    public function getMonographs($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collMonographsPartial && !$this->isNew();
+        if (null === $this->collMonographs || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collMonographs) {
+                // return empty collection
+                $this->initMonographs();
+            } else {
+                $collMonographs = MonographQuery::create(null, $criteria)
+                    ->filterByPrinter($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collMonographsPartial && count($collMonographs)) {
+                      $this->initMonographs(false);
+
+                      foreach($collMonographs as $obj) {
+                        if (false == $this->collMonographs->contains($obj)) {
+                          $this->collMonographs->append($obj);
+                        }
+                      }
+
+                      $this->collMonographsPartial = true;
+                    }
+
+                    $collMonographs->getInternalIterator()->rewind();
+                    return $collMonographs;
+                }
+
+                if($partial && $this->collMonographs) {
+                    foreach($this->collMonographs as $obj) {
+                        if($obj->isNew()) {
+                            $collMonographs[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collMonographs = $collMonographs;
+                $this->collMonographsPartial = false;
+            }
+        }
+
+        return $this->collMonographs;
+    }
+
+    /**
+     * Sets a collection of Monograph objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $monographs A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Printer The current object (for fluent API support)
+     */
+    public function setMonographs(PropelCollection $monographs, PropelPDO $con = null)
+    {
+        $monographsToDelete = $this->getMonographs(new Criteria(), $con)->diff($monographs);
+
+        $this->monographsScheduledForDeletion = unserialize(serialize($monographsToDelete));
+
+        foreach ($monographsToDelete as $monographRemoved) {
+            $monographRemoved->setPrinter(null);
+        }
+
+        $this->collMonographs = null;
+        foreach ($monographs as $monograph) {
+            $this->addMonograph($monograph);
+        }
+
+        $this->collMonographs = $monographs;
+        $this->collMonographsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Monograph objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Monograph objects.
+     * @throws PropelException
+     */
+    public function countMonographs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collMonographsPartial && !$this->isNew();
+        if (null === $this->collMonographs || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collMonographs) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getMonographs());
+            }
+            $query = MonographQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPrinter($this)
+                ->count($con);
+        }
+
+        return count($this->collMonographs);
+    }
+
+    /**
+     * Method called to associate a Monograph object to this object
+     * through the Monograph foreign key attribute.
+     *
+     * @param    Monograph $l Monograph
+     * @return Printer The current object (for fluent API support)
+     */
+    public function addMonograph(Monograph $l)
+    {
+        if ($this->collMonographs === null) {
+            $this->initMonographs();
+            $this->collMonographsPartial = true;
+        }
+        if (!in_array($l, $this->collMonographs->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddMonograph($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Monograph $monograph The monograph object to add.
+     */
+    protected function doAddMonograph($monograph)
+    {
+        $this->collMonographs[]= $monograph;
+        $monograph->setPrinter($this);
+    }
+
+    /**
+     * @param	Monograph $monograph The monograph object to remove.
+     * @return Printer The current object (for fluent API support)
+     */
+    public function removeMonograph($monograph)
+    {
+        if ($this->getMonographs()->contains($monograph)) {
+            $this->collMonographs->remove($this->collMonographs->search($monograph));
+            if (null === $this->monographsScheduledForDeletion) {
+                $this->monographsScheduledForDeletion = clone $this->collMonographs;
+                $this->monographsScheduledForDeletion->clear();
+            }
+            $this->monographsScheduledForDeletion[]= $monograph;
+            $monograph->setPrinter(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Monographs from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Monograph[] List of Monograph objects
+     */
+    public function getMonographsJoinWork($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MonographQuery::create(null, $criteria);
+        $query->joinWith('Work', $join_behavior);
+
+        return $this->getMonographs($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Monographs from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Monograph[] List of Monograph objects
+     */
+    public function getMonographsJoinPublisher($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MonographQuery::create(null, $criteria);
+        $query->joinWith('Publisher', $join_behavior);
+
+        return $this->getMonographs($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Monographs from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Monograph[] List of Monograph objects
+     */
+    public function getMonographsJoinTranslator($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MonographQuery::create(null, $criteria);
+        $query->joinWith('Translator', $join_behavior);
+
+        return $this->getMonographs($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Monographs from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Monograph[] List of Monograph objects
+     */
+    public function getMonographsJoinRelatedset($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MonographQuery::create(null, $criteria);
+        $query->joinWith('Relatedset', $join_behavior);
+
+        return $this->getMonographs($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Monographs from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Monograph[] List of Monograph objects
+     */
+    public function getMonographsJoinTitle($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MonographQuery::create(null, $criteria);
+        $query->joinWith('Title', $join_behavior);
+
+        return $this->getMonographs($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Monographs from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Monograph[] List of Monograph objects
+     */
+    public function getMonographsJoinPublishingcompany($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MonographQuery::create(null, $criteria);
+        $query->joinWith('Publishingcompany', $join_behavior);
+
+        return $this->getMonographs($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Monographs from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Monograph[] List of Monograph objects
+     */
+    public function getMonographsJoinPlace($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MonographQuery::create(null, $criteria);
+        $query->joinWith('Place', $join_behavior);
+
+        return $this->getMonographs($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Monographs from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Monograph[] List of Monograph objects
+     */
+    public function getMonographsJoinDatespecification($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MonographQuery::create(null, $criteria);
+        $query->joinWith('Datespecification', $join_behavior);
+
+        return $this->getMonographs($query, $con);
+    }
+
+    /**
+     * Clears out the collEssays collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Printer The current object (for fluent API support)
+     * @see        addEssays()
+     */
+    public function clearEssays()
+    {
+        $this->collEssays = null; // important to set this to null since that means it is uninitialized
+        $this->collEssaysPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collEssays collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialEssays($v = true)
+    {
+        $this->collEssaysPartial = $v;
+    }
+
+    /**
+     * Initializes the collEssays collection.
+     *
+     * By default this just sets the collEssays collection to an empty array (like clearcollEssays());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initEssays($overrideExisting = true)
+    {
+        if (null !== $this->collEssays && !$overrideExisting) {
+            return;
+        }
+        $this->collEssays = new PropelObjectCollection();
+        $this->collEssays->setModel('Essay');
+    }
+
+    /**
+     * Gets an array of Essay objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Printer is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Essay[] List of Essay objects
+     * @throws PropelException
+     */
+    public function getEssays($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collEssaysPartial && !$this->isNew();
+        if (null === $this->collEssays || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collEssays) {
+                // return empty collection
+                $this->initEssays();
+            } else {
+                $collEssays = EssayQuery::create(null, $criteria)
+                    ->filterByPrinter($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collEssaysPartial && count($collEssays)) {
+                      $this->initEssays(false);
+
+                      foreach($collEssays as $obj) {
+                        if (false == $this->collEssays->contains($obj)) {
+                          $this->collEssays->append($obj);
+                        }
+                      }
+
+                      $this->collEssaysPartial = true;
+                    }
+
+                    $collEssays->getInternalIterator()->rewind();
+                    return $collEssays;
+                }
+
+                if($partial && $this->collEssays) {
+                    foreach($this->collEssays as $obj) {
+                        if($obj->isNew()) {
+                            $collEssays[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collEssays = $collEssays;
+                $this->collEssaysPartial = false;
+            }
+        }
+
+        return $this->collEssays;
+    }
+
+    /**
+     * Sets a collection of Essay objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $essays A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Printer The current object (for fluent API support)
+     */
+    public function setEssays(PropelCollection $essays, PropelPDO $con = null)
+    {
+        $essaysToDelete = $this->getEssays(new Criteria(), $con)->diff($essays);
+
+        $this->essaysScheduledForDeletion = unserialize(serialize($essaysToDelete));
+
+        foreach ($essaysToDelete as $essayRemoved) {
+            $essayRemoved->setPrinter(null);
+        }
+
+        $this->collEssays = null;
+        foreach ($essays as $essay) {
+            $this->addEssay($essay);
+        }
+
+        $this->collEssays = $essays;
+        $this->collEssaysPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Essay objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Essay objects.
+     * @throws PropelException
+     */
+    public function countEssays(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collEssaysPartial && !$this->isNew();
+        if (null === $this->collEssays || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collEssays) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getEssays());
+            }
+            $query = EssayQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPrinter($this)
+                ->count($con);
+        }
+
+        return count($this->collEssays);
+    }
+
+    /**
+     * Method called to associate a Essay object to this object
+     * through the Essay foreign key attribute.
+     *
+     * @param    Essay $l Essay
+     * @return Printer The current object (for fluent API support)
+     */
+    public function addEssay(Essay $l)
+    {
+        if ($this->collEssays === null) {
+            $this->initEssays();
+            $this->collEssaysPartial = true;
+        }
+        if (!in_array($l, $this->collEssays->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddEssay($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Essay $essay The essay object to add.
+     */
+    protected function doAddEssay($essay)
+    {
+        $this->collEssays[]= $essay;
+        $essay->setPrinter($this);
+    }
+
+    /**
+     * @param	Essay $essay The essay object to remove.
+     * @return Printer The current object (for fluent API support)
+     */
+    public function removeEssay($essay)
+    {
+        if ($this->getEssays()->contains($essay)) {
+            $this->collEssays->remove($this->collEssays->search($essay));
+            if (null === $this->essaysScheduledForDeletion) {
+                $this->essaysScheduledForDeletion = clone $this->collEssays;
+                $this->essaysScheduledForDeletion->clear();
+            }
+            $this->essaysScheduledForDeletion[]= $essay;
+            $essay->setPrinter(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Essays from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Essay[] List of Essay objects
+     */
+    public function getEssaysJoinWork($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = EssayQuery::create(null, $criteria);
+        $query->joinWith('Work', $join_behavior);
+
+        return $this->getEssays($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Essays from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Essay[] List of Essay objects
+     */
+    public function getEssaysJoinPublisher($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = EssayQuery::create(null, $criteria);
+        $query->joinWith('Publisher', $join_behavior);
+
+        return $this->getEssays($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Essays from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Essay[] List of Essay objects
+     */
+    public function getEssaysJoinTranslator($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = EssayQuery::create(null, $criteria);
+        $query->joinWith('Translator', $join_behavior);
+
+        return $this->getEssays($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Essays from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Essay[] List of Essay objects
+     */
+    public function getEssaysJoinRelatedset($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = EssayQuery::create(null, $criteria);
+        $query->joinWith('Relatedset', $join_behavior);
+
+        return $this->getEssays($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Essays from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Essay[] List of Essay objects
+     */
+    public function getEssaysJoinTitle($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = EssayQuery::create(null, $criteria);
+        $query->joinWith('Title', $join_behavior);
+
+        return $this->getEssays($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Essays from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Essay[] List of Essay objects
+     */
+    public function getEssaysJoinPublishingcompany($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = EssayQuery::create(null, $criteria);
+        $query->joinWith('Publishingcompany', $join_behavior);
+
+        return $this->getEssays($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Essays from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Essay[] List of Essay objects
+     */
+    public function getEssaysJoinPlace($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = EssayQuery::create(null, $criteria);
+        $query->joinWith('Place', $join_behavior);
+
+        return $this->getEssays($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Essays from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Essay[] List of Essay objects
+     */
+    public function getEssaysJoinDatespecification($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = EssayQuery::create(null, $criteria);
+        $query->joinWith('Datespecification', $join_behavior);
+
+        return $this->getEssays($query, $con);
+    }
+
+    /**
+     * Clears out the collMagazines collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Printer The current object (for fluent API support)
+     * @see        addMagazines()
+     */
+    public function clearMagazines()
+    {
+        $this->collMagazines = null; // important to set this to null since that means it is uninitialized
+        $this->collMagazinesPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collMagazines collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialMagazines($v = true)
+    {
+        $this->collMagazinesPartial = $v;
+    }
+
+    /**
+     * Initializes the collMagazines collection.
+     *
+     * By default this just sets the collMagazines collection to an empty array (like clearcollMagazines());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initMagazines($overrideExisting = true)
+    {
+        if (null !== $this->collMagazines && !$overrideExisting) {
+            return;
+        }
+        $this->collMagazines = new PropelObjectCollection();
+        $this->collMagazines->setModel('Magazine');
+    }
+
+    /**
+     * Gets an array of Magazine objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Printer is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Magazine[] List of Magazine objects
+     * @throws PropelException
+     */
+    public function getMagazines($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collMagazinesPartial && !$this->isNew();
+        if (null === $this->collMagazines || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collMagazines) {
+                // return empty collection
+                $this->initMagazines();
+            } else {
+                $collMagazines = MagazineQuery::create(null, $criteria)
+                    ->filterByPrinter($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collMagazinesPartial && count($collMagazines)) {
+                      $this->initMagazines(false);
+
+                      foreach($collMagazines as $obj) {
+                        if (false == $this->collMagazines->contains($obj)) {
+                          $this->collMagazines->append($obj);
+                        }
+                      }
+
+                      $this->collMagazinesPartial = true;
+                    }
+
+                    $collMagazines->getInternalIterator()->rewind();
+                    return $collMagazines;
+                }
+
+                if($partial && $this->collMagazines) {
+                    foreach($this->collMagazines as $obj) {
+                        if($obj->isNew()) {
+                            $collMagazines[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collMagazines = $collMagazines;
+                $this->collMagazinesPartial = false;
+            }
+        }
+
+        return $this->collMagazines;
+    }
+
+    /**
+     * Sets a collection of Magazine objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $magazines A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Printer The current object (for fluent API support)
+     */
+    public function setMagazines(PropelCollection $magazines, PropelPDO $con = null)
+    {
+        $magazinesToDelete = $this->getMagazines(new Criteria(), $con)->diff($magazines);
+
+        $this->magazinesScheduledForDeletion = unserialize(serialize($magazinesToDelete));
+
+        foreach ($magazinesToDelete as $magazineRemoved) {
+            $magazineRemoved->setPrinter(null);
+        }
+
+        $this->collMagazines = null;
+        foreach ($magazines as $magazine) {
+            $this->addMagazine($magazine);
+        }
+
+        $this->collMagazines = $magazines;
+        $this->collMagazinesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Magazine objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Magazine objects.
+     * @throws PropelException
+     */
+    public function countMagazines(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collMagazinesPartial && !$this->isNew();
+        if (null === $this->collMagazines || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collMagazines) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getMagazines());
+            }
+            $query = MagazineQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPrinter($this)
+                ->count($con);
+        }
+
+        return count($this->collMagazines);
+    }
+
+    /**
+     * Method called to associate a Magazine object to this object
+     * through the Magazine foreign key attribute.
+     *
+     * @param    Magazine $l Magazine
+     * @return Printer The current object (for fluent API support)
+     */
+    public function addMagazine(Magazine $l)
+    {
+        if ($this->collMagazines === null) {
+            $this->initMagazines();
+            $this->collMagazinesPartial = true;
+        }
+        if (!in_array($l, $this->collMagazines->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddMagazine($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Magazine $magazine The magazine object to add.
+     */
+    protected function doAddMagazine($magazine)
+    {
+        $this->collMagazines[]= $magazine;
+        $magazine->setPrinter($this);
+    }
+
+    /**
+     * @param	Magazine $magazine The magazine object to remove.
+     * @return Printer The current object (for fluent API support)
+     */
+    public function removeMagazine($magazine)
+    {
+        if ($this->getMagazines()->contains($magazine)) {
+            $this->collMagazines->remove($this->collMagazines->search($magazine));
+            if (null === $this->magazinesScheduledForDeletion) {
+                $this->magazinesScheduledForDeletion = clone $this->collMagazines;
+                $this->magazinesScheduledForDeletion->clear();
+            }
+            $this->magazinesScheduledForDeletion[]= $magazine;
+            $magazine->setPrinter(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Magazines from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Magazine[] List of Magazine objects
+     */
+    public function getMagazinesJoinWork($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MagazineQuery::create(null, $criteria);
+        $query->joinWith('Work', $join_behavior);
+
+        return $this->getMagazines($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Magazines from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Magazine[] List of Magazine objects
+     */
+    public function getMagazinesJoinPublisher($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MagazineQuery::create(null, $criteria);
+        $query->joinWith('Publisher', $join_behavior);
+
+        return $this->getMagazines($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Magazines from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Magazine[] List of Magazine objects
+     */
+    public function getMagazinesJoinTranslator($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MagazineQuery::create(null, $criteria);
+        $query->joinWith('Translator', $join_behavior);
+
+        return $this->getMagazines($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Magazines from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Magazine[] List of Magazine objects
+     */
+    public function getMagazinesJoinRelatedset($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MagazineQuery::create(null, $criteria);
+        $query->joinWith('Relatedset', $join_behavior);
+
+        return $this->getMagazines($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Magazines from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Magazine[] List of Magazine objects
+     */
+    public function getMagazinesJoinTitle($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MagazineQuery::create(null, $criteria);
+        $query->joinWith('Title', $join_behavior);
+
+        return $this->getMagazines($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Magazines from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Magazine[] List of Magazine objects
+     */
+    public function getMagazinesJoinPublishingcompany($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MagazineQuery::create(null, $criteria);
+        $query->joinWith('Publishingcompany', $join_behavior);
+
+        return $this->getMagazines($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Magazines from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Magazine[] List of Magazine objects
+     */
+    public function getMagazinesJoinPlace($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MagazineQuery::create(null, $criteria);
+        $query->joinWith('Place', $join_behavior);
+
+        return $this->getMagazines($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Magazines from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Magazine[] List of Magazine objects
+     */
+    public function getMagazinesJoinDatespecification($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MagazineQuery::create(null, $criteria);
+        $query->joinWith('Datespecification', $join_behavior);
+
+        return $this->getMagazines($query, $con);
+    }
+
+    /**
+     * Clears out the collSeries collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Printer The current object (for fluent API support)
+     * @see        addSeries()
+     */
+    public function clearSeries()
+    {
+        $this->collSeries = null; // important to set this to null since that means it is uninitialized
+        $this->collSeriesPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collSeries collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialSeries($v = true)
+    {
+        $this->collSeriesPartial = $v;
+    }
+
+    /**
+     * Initializes the collSeries collection.
+     *
+     * By default this just sets the collSeries collection to an empty array (like clearcollSeries());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initSeries($overrideExisting = true)
+    {
+        if (null !== $this->collSeries && !$overrideExisting) {
+            return;
+        }
+        $this->collSeries = new PropelObjectCollection();
+        $this->collSeries->setModel('Series');
+    }
+
+    /**
+     * Gets an array of Series objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Printer is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Series[] List of Series objects
+     * @throws PropelException
+     */
+    public function getSeries($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collSeriesPartial && !$this->isNew();
+        if (null === $this->collSeries || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collSeries) {
+                // return empty collection
+                $this->initSeries();
+            } else {
+                $collSeries = SeriesQuery::create(null, $criteria)
+                    ->filterByPrinter($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collSeriesPartial && count($collSeries)) {
+                      $this->initSeries(false);
+
+                      foreach($collSeries as $obj) {
+                        if (false == $this->collSeries->contains($obj)) {
+                          $this->collSeries->append($obj);
+                        }
+                      }
+
+                      $this->collSeriesPartial = true;
+                    }
+
+                    $collSeries->getInternalIterator()->rewind();
+                    return $collSeries;
+                }
+
+                if($partial && $this->collSeries) {
+                    foreach($this->collSeries as $obj) {
+                        if($obj->isNew()) {
+                            $collSeries[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collSeries = $collSeries;
+                $this->collSeriesPartial = false;
+            }
+        }
+
+        return $this->collSeries;
+    }
+
+    /**
+     * Sets a collection of Series objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $series A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Printer The current object (for fluent API support)
+     */
+    public function setSeries(PropelCollection $series, PropelPDO $con = null)
+    {
+        $seriesToDelete = $this->getSeries(new Criteria(), $con)->diff($series);
+
+        $this->seriesScheduledForDeletion = unserialize(serialize($seriesToDelete));
+
+        foreach ($seriesToDelete as $seriesRemoved) {
+            $seriesRemoved->setPrinter(null);
+        }
+
+        $this->collSeries = null;
+        foreach ($series as $series) {
+            $this->addSeries($series);
+        }
+
+        $this->collSeries = $series;
+        $this->collSeriesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Series objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Series objects.
+     * @throws PropelException
+     */
+    public function countSeries(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collSeriesPartial && !$this->isNew();
+        if (null === $this->collSeries || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collSeries) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getSeries());
+            }
+            $query = SeriesQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPrinter($this)
+                ->count($con);
+        }
+
+        return count($this->collSeries);
+    }
+
+    /**
+     * Method called to associate a Series object to this object
+     * through the Series foreign key attribute.
+     *
+     * @param    Series $l Series
+     * @return Printer The current object (for fluent API support)
+     */
+    public function addSeries(Series $l)
+    {
+        if ($this->collSeries === null) {
+            $this->initSeries();
+            $this->collSeriesPartial = true;
+        }
+        if (!in_array($l, $this->collSeries->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddSeries($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Series $series The series object to add.
+     */
+    protected function doAddSeries($series)
+    {
+        $this->collSeries[]= $series;
+        $series->setPrinter($this);
+    }
+
+    /**
+     * @param	Series $series The series object to remove.
+     * @return Printer The current object (for fluent API support)
+     */
+    public function removeSeries($series)
+    {
+        if ($this->getSeries()->contains($series)) {
+            $this->collSeries->remove($this->collSeries->search($series));
+            if (null === $this->seriesScheduledForDeletion) {
+                $this->seriesScheduledForDeletion = clone $this->collSeries;
+                $this->seriesScheduledForDeletion->clear();
+            }
+            $this->seriesScheduledForDeletion[]= $series;
+            $series->setPrinter(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Series from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Series[] List of Series objects
+     */
+    public function getSeriesJoinWork($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = SeriesQuery::create(null, $criteria);
+        $query->joinWith('Work', $join_behavior);
+
+        return $this->getSeries($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Series from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Series[] List of Series objects
+     */
+    public function getSeriesJoinPublisher($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = SeriesQuery::create(null, $criteria);
+        $query->joinWith('Publisher', $join_behavior);
+
+        return $this->getSeries($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Series from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Series[] List of Series objects
+     */
+    public function getSeriesJoinTranslator($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = SeriesQuery::create(null, $criteria);
+        $query->joinWith('Translator', $join_behavior);
+
+        return $this->getSeries($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Series from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Series[] List of Series objects
+     */
+    public function getSeriesJoinRelatedset($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = SeriesQuery::create(null, $criteria);
+        $query->joinWith('Relatedset', $join_behavior);
+
+        return $this->getSeries($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Series from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Series[] List of Series objects
+     */
+    public function getSeriesJoinTitle($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = SeriesQuery::create(null, $criteria);
+        $query->joinWith('Title', $join_behavior);
+
+        return $this->getSeries($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Series from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Series[] List of Series objects
+     */
+    public function getSeriesJoinPublishingcompany($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = SeriesQuery::create(null, $criteria);
+        $query->joinWith('Publishingcompany', $join_behavior);
+
+        return $this->getSeries($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Series from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Series[] List of Series objects
+     */
+    public function getSeriesJoinPlace($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = SeriesQuery::create(null, $criteria);
+        $query->joinWith('Place', $join_behavior);
+
+        return $this->getSeries($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Printer is new, it will return
+     * an empty collection; or if this Printer has previously
+     * been saved, it will retrieve related Series from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Printer.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Series[] List of Series objects
+     */
+    public function getSeriesJoinDatespecification($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = SeriesQuery::create(null, $criteria);
+        $query->joinWith('Datespecification', $join_behavior);
+
+        return $this->getSeries($query, $con);
     }
 
     /**
@@ -1323,8 +3286,28 @@ abstract class BasePrinter extends BaseObject implements Persistent
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
-            if ($this->collWrits) {
-                foreach ($this->collWrits as $o) {
+            if ($this->collPublications) {
+                foreach ($this->collPublications as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collMonographs) {
+                foreach ($this->collMonographs as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collEssays) {
+                foreach ($this->collEssays as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collMagazines) {
+                foreach ($this->collMagazines as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collSeries) {
+                foreach ($this->collSeries as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -1335,10 +3318,26 @@ abstract class BasePrinter extends BaseObject implements Persistent
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
-        if ($this->collWrits instanceof PropelCollection) {
-            $this->collWrits->clearIterator();
+        if ($this->collPublications instanceof PropelCollection) {
+            $this->collPublications->clearIterator();
         }
-        $this->collWrits = null;
+        $this->collPublications = null;
+        if ($this->collMonographs instanceof PropelCollection) {
+            $this->collMonographs->clearIterator();
+        }
+        $this->collMonographs = null;
+        if ($this->collEssays instanceof PropelCollection) {
+            $this->collEssays->clearIterator();
+        }
+        $this->collEssays = null;
+        if ($this->collMagazines instanceof PropelCollection) {
+            $this->collMagazines->clearIterator();
+        }
+        $this->collMagazines = null;
+        if ($this->collSeries instanceof PropelCollection) {
+            $this->collSeries->clearIterator();
+        }
+        $this->collSeries = null;
         $this->aPerson = null;
     }
 

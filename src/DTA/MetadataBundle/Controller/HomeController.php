@@ -27,6 +27,10 @@ class HomeController extends DTABaseController {
      * @Route("/home", name="home")
      */
     public function indexAction(Request $request) {
+        $k = new Model\Monograph();
+        $k->setNumpages(32);
+        
+        $k->save();
         return $this->renderDomainSpecific('DTAMetadataBundle:Home:Home.html.twig', array(
             'testData' => $k->getNumpages(),            
         ));
