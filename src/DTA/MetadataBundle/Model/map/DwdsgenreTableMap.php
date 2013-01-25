@@ -54,9 +54,9 @@ class DwdsgenreTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('DwdsgenreRelatedByChildof', 'DTA\\MetadataBundle\\Model\\Dwdsgenre', RelationMap::MANY_TO_ONE, array('childOf' => 'id', ), null, null);
-        $this->addRelation('DwdsgenreRelatedById', 'DTA\\MetadataBundle\\Model\\Dwdsgenre', RelationMap::ONE_TO_MANY, array('id' => 'childOf', ), null, null, 'DwdsgenresRelatedById');
         $this->addRelation('WorkRelatedByDwdsgenreId', 'DTA\\MetadataBundle\\Model\\Work', RelationMap::ONE_TO_MANY, array('id' => 'dwdsGenre_id', ), null, null, 'WorksRelatedByDwdsgenreId');
         $this->addRelation('WorkRelatedByDwdssubgenreId', 'DTA\\MetadataBundle\\Model\\Work', RelationMap::ONE_TO_MANY, array('id' => 'dwdsSubgenre_id', ), null, null, 'WorksRelatedByDwdssubgenreId');
+        $this->addRelation('DwdsgenreRelatedById', 'DTA\\MetadataBundle\\Model\\Dwdsgenre', RelationMap::ONE_TO_MANY, array('id' => 'childOf', ), null, null, 'DwdsgenresRelatedById');
     } // buildRelations()
 
 } // DwdsgenreTableMap

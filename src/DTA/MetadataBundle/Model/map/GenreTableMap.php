@@ -54,9 +54,9 @@ class GenreTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('GenreRelatedByChildof', 'DTA\\MetadataBundle\\Model\\Genre', RelationMap::MANY_TO_ONE, array('childOf' => 'id', ), null, null);
-        $this->addRelation('GenreRelatedById', 'DTA\\MetadataBundle\\Model\\Genre', RelationMap::ONE_TO_MANY, array('id' => 'childOf', ), null, null, 'GenresRelatedById');
         $this->addRelation('WorkRelatedByGenreId', 'DTA\\MetadataBundle\\Model\\Work', RelationMap::ONE_TO_MANY, array('id' => 'genre_id', ), null, null, 'WorksRelatedByGenreId');
         $this->addRelation('WorkRelatedBySubgenreId', 'DTA\\MetadataBundle\\Model\\Work', RelationMap::ONE_TO_MANY, array('id' => 'subgenre_id', ), null, null, 'WorksRelatedBySubgenreId');
+        $this->addRelation('GenreRelatedById', 'DTA\\MetadataBundle\\Model\\Genre', RelationMap::ONE_TO_MANY, array('id' => 'childOf', ), null, null, 'GenresRelatedById');
     } // buildRelations()
 
 } // GenreTableMap

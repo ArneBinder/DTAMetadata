@@ -43,6 +43,16 @@ class EssayTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addForeignKey('title_id', 'TitleId', 'INTEGER', 'title', 'id', true, null, null);
+        $this->addForeignKey('publishingCompany_id', 'PublishingcompanyId', 'INTEGER', 'publishingCompany', 'id', false, null, null);
+        $this->addForeignKey('place_id', 'PlaceId', 'INTEGER', 'place', 'id', false, null, null);
+        $this->addForeignKey('dateSpecification_id', 'DatespecificationId', 'INTEGER', 'dateSpecification', 'id', false, null, null);
+        $this->addColumn('printRun', 'Printrun', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('printRunComment', 'Printruncomment', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('edition', 'Edition', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('numPages', 'Numpages', 'INTEGER', false, null, null);
+        $this->addColumn('numPagesNormed', 'Numpagesnormed', 'INTEGER', false, null, null);
+        $this->addColumn('bibliographicCitation', 'Bibliographiccitation', 'LONGVARCHAR', false, null, null);
         // validators
     } // initialize()
 
@@ -51,22 +61,10 @@ class EssayTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Publication', RelationMap::ONE_TO_ONE, array('id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('Title', 'DTA\\MetadataBundle\\Model\\Title', RelationMap::MANY_TO_ONE, array('title_id' => 'id', ), null, null);
+        $this->addRelation('Publishingcompany', 'DTA\\MetadataBundle\\Model\\Publishingcompany', RelationMap::MANY_TO_ONE, array('publishingCompany_id' => 'id', ), null, null);
+        $this->addRelation('Place', 'DTA\\MetadataBundle\\Model\\Place', RelationMap::MANY_TO_ONE, array('place_id' => 'id', ), null, null);
+        $this->addRelation('Datespecification', 'DTA\\MetadataBundle\\Model\\Datespecification', RelationMap::MANY_TO_ONE, array('dateSpecification_id' => 'id', ), null, null);
     } // buildRelations()
-
-    /**
-     *
-     * Gets the list of behaviors registered for this table
-     *
-     * @return array Associative array (name => parameters) of behaviors
-     */
-    public function getBehaviors()
-    {
-        return array(
-            'delegate' =>  array (
-  'to' => 'publication',
-),
-        );
-    } // getBehaviors()
 
 } // EssayTableMap

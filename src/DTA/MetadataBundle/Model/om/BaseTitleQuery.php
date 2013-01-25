@@ -12,7 +12,11 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use DTA\MetadataBundle\Model\Essay;
+use DTA\MetadataBundle\Model\Magazine;
+use DTA\MetadataBundle\Model\Monograph;
 use DTA\MetadataBundle\Model\Publication;
+use DTA\MetadataBundle\Model\Series;
 use DTA\MetadataBundle\Model\Title;
 use DTA\MetadataBundle\Model\TitlePeer;
 use DTA\MetadataBundle\Model\TitleQuery;
@@ -27,13 +31,29 @@ use DTA\MetadataBundle\Model\Titlefragment;
  * @method TitleQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method TitleQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method TitleQuery leftJoinTitlefragment($relationAlias = null) Adds a LEFT JOIN clause to the query using the Titlefragment relation
- * @method TitleQuery rightJoinTitlefragment($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Titlefragment relation
- * @method TitleQuery innerJoinTitlefragment($relationAlias = null) Adds a INNER JOIN clause to the query using the Titlefragment relation
- *
  * @method TitleQuery leftJoinPublication($relationAlias = null) Adds a LEFT JOIN clause to the query using the Publication relation
  * @method TitleQuery rightJoinPublication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Publication relation
  * @method TitleQuery innerJoinPublication($relationAlias = null) Adds a INNER JOIN clause to the query using the Publication relation
+ *
+ * @method TitleQuery leftJoinMonograph($relationAlias = null) Adds a LEFT JOIN clause to the query using the Monograph relation
+ * @method TitleQuery rightJoinMonograph($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Monograph relation
+ * @method TitleQuery innerJoinMonograph($relationAlias = null) Adds a INNER JOIN clause to the query using the Monograph relation
+ *
+ * @method TitleQuery leftJoinEssay($relationAlias = null) Adds a LEFT JOIN clause to the query using the Essay relation
+ * @method TitleQuery rightJoinEssay($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Essay relation
+ * @method TitleQuery innerJoinEssay($relationAlias = null) Adds a INNER JOIN clause to the query using the Essay relation
+ *
+ * @method TitleQuery leftJoinMagazine($relationAlias = null) Adds a LEFT JOIN clause to the query using the Magazine relation
+ * @method TitleQuery rightJoinMagazine($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Magazine relation
+ * @method TitleQuery innerJoinMagazine($relationAlias = null) Adds a INNER JOIN clause to the query using the Magazine relation
+ *
+ * @method TitleQuery leftJoinSeries($relationAlias = null) Adds a LEFT JOIN clause to the query using the Series relation
+ * @method TitleQuery rightJoinSeries($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Series relation
+ * @method TitleQuery innerJoinSeries($relationAlias = null) Adds a INNER JOIN clause to the query using the Series relation
+ *
+ * @method TitleQuery leftJoinTitlefragment($relationAlias = null) Adds a LEFT JOIN clause to the query using the Titlefragment relation
+ * @method TitleQuery rightJoinTitlefragment($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Titlefragment relation
+ * @method TitleQuery innerJoinTitlefragment($relationAlias = null) Adds a INNER JOIN clause to the query using the Titlefragment relation
  *
  * @method Title findOne(PropelPDO $con = null) Return the first Title matching the query
  * @method Title findOneOrCreate(PropelPDO $con = null) Return the first Title matching the query, or a new Title object populated from the query conditions when no match is found
@@ -273,80 +293,6 @@ abstract class BaseTitleQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Titlefragment object
-     *
-     * @param   Titlefragment|PropelObjectCollection $titlefragment  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 TitleQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByTitlefragment($titlefragment, $comparison = null)
-    {
-        if ($titlefragment instanceof Titlefragment) {
-            return $this
-                ->addUsingAlias(TitlePeer::ID, $titlefragment->getTitleId(), $comparison);
-        } elseif ($titlefragment instanceof PropelObjectCollection) {
-            return $this
-                ->useTitlefragmentQuery()
-                ->filterByPrimaryKeys($titlefragment->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByTitlefragment() only accepts arguments of type Titlefragment or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Titlefragment relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return TitleQuery The current query, for fluid interface
-     */
-    public function joinTitlefragment($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Titlefragment');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Titlefragment');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Titlefragment relation Titlefragment object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\TitlefragmentQuery A secondary query class using the current class as primary query
-     */
-    public function useTitlefragmentQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinTitlefragment($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Titlefragment', '\DTA\MetadataBundle\Model\TitlefragmentQuery');
-    }
-
-    /**
      * Filter the query by a related Publication object
      *
      * @param   Publication|PropelObjectCollection $publication  the related object to use as filter
@@ -418,6 +364,376 @@ abstract class BaseTitleQuery extends ModelCriteria
         return $this
             ->joinPublication($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Publication', '\DTA\MetadataBundle\Model\PublicationQuery');
+    }
+
+    /**
+     * Filter the query by a related Monograph object
+     *
+     * @param   Monograph|PropelObjectCollection $monograph  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 TitleQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByMonograph($monograph, $comparison = null)
+    {
+        if ($monograph instanceof Monograph) {
+            return $this
+                ->addUsingAlias(TitlePeer::ID, $monograph->getTitleId(), $comparison);
+        } elseif ($monograph instanceof PropelObjectCollection) {
+            return $this
+                ->useMonographQuery()
+                ->filterByPrimaryKeys($monograph->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByMonograph() only accepts arguments of type Monograph or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Monograph relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return TitleQuery The current query, for fluid interface
+     */
+    public function joinMonograph($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Monograph');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Monograph');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Monograph relation Monograph object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\MonographQuery A secondary query class using the current class as primary query
+     */
+    public function useMonographQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinMonograph($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Monograph', '\DTA\MetadataBundle\Model\MonographQuery');
+    }
+
+    /**
+     * Filter the query by a related Essay object
+     *
+     * @param   Essay|PropelObjectCollection $essay  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 TitleQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByEssay($essay, $comparison = null)
+    {
+        if ($essay instanceof Essay) {
+            return $this
+                ->addUsingAlias(TitlePeer::ID, $essay->getTitleId(), $comparison);
+        } elseif ($essay instanceof PropelObjectCollection) {
+            return $this
+                ->useEssayQuery()
+                ->filterByPrimaryKeys($essay->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByEssay() only accepts arguments of type Essay or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Essay relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return TitleQuery The current query, for fluid interface
+     */
+    public function joinEssay($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Essay');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Essay');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Essay relation Essay object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\EssayQuery A secondary query class using the current class as primary query
+     */
+    public function useEssayQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinEssay($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Essay', '\DTA\MetadataBundle\Model\EssayQuery');
+    }
+
+    /**
+     * Filter the query by a related Magazine object
+     *
+     * @param   Magazine|PropelObjectCollection $magazine  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 TitleQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByMagazine($magazine, $comparison = null)
+    {
+        if ($magazine instanceof Magazine) {
+            return $this
+                ->addUsingAlias(TitlePeer::ID, $magazine->getTitleId(), $comparison);
+        } elseif ($magazine instanceof PropelObjectCollection) {
+            return $this
+                ->useMagazineQuery()
+                ->filterByPrimaryKeys($magazine->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByMagazine() only accepts arguments of type Magazine or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Magazine relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return TitleQuery The current query, for fluid interface
+     */
+    public function joinMagazine($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Magazine');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Magazine');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Magazine relation Magazine object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\MagazineQuery A secondary query class using the current class as primary query
+     */
+    public function useMagazineQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinMagazine($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Magazine', '\DTA\MetadataBundle\Model\MagazineQuery');
+    }
+
+    /**
+     * Filter the query by a related Series object
+     *
+     * @param   Series|PropelObjectCollection $series  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 TitleQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterBySeries($series, $comparison = null)
+    {
+        if ($series instanceof Series) {
+            return $this
+                ->addUsingAlias(TitlePeer::ID, $series->getTitleId(), $comparison);
+        } elseif ($series instanceof PropelObjectCollection) {
+            return $this
+                ->useSeriesQuery()
+                ->filterByPrimaryKeys($series->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterBySeries() only accepts arguments of type Series or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Series relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return TitleQuery The current query, for fluid interface
+     */
+    public function joinSeries($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Series');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Series');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Series relation Series object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\SeriesQuery A secondary query class using the current class as primary query
+     */
+    public function useSeriesQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinSeries($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Series', '\DTA\MetadataBundle\Model\SeriesQuery');
+    }
+
+    /**
+     * Filter the query by a related Titlefragment object
+     *
+     * @param   Titlefragment|PropelObjectCollection $titlefragment  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 TitleQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByTitlefragment($titlefragment, $comparison = null)
+    {
+        if ($titlefragment instanceof Titlefragment) {
+            return $this
+                ->addUsingAlias(TitlePeer::ID, $titlefragment->getTitleId(), $comparison);
+        } elseif ($titlefragment instanceof PropelObjectCollection) {
+            return $this
+                ->useTitlefragmentQuery()
+                ->filterByPrimaryKeys($titlefragment->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByTitlefragment() only accepts arguments of type Titlefragment or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Titlefragment relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return TitleQuery The current query, for fluid interface
+     */
+    public function joinTitlefragment($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Titlefragment');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Titlefragment');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Titlefragment relation Titlefragment object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\TitlefragmentQuery A secondary query class using the current class as primary query
+     */
+    public function useTitlefragmentQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinTitlefragment($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Titlefragment', '\DTA\MetadataBundle\Model\TitlefragmentQuery');
     }
 
     /**

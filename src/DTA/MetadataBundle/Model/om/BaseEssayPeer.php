@@ -9,9 +9,12 @@ use \PDOStatement;
 use \Propel;
 use \PropelException;
 use \PropelPDO;
+use DTA\MetadataBundle\Model\DatespecificationPeer;
 use DTA\MetadataBundle\Model\Essay;
 use DTA\MetadataBundle\Model\EssayPeer;
-use DTA\MetadataBundle\Model\PublicationPeer;
+use DTA\MetadataBundle\Model\PlacePeer;
+use DTA\MetadataBundle\Model\PublishingcompanyPeer;
+use DTA\MetadataBundle\Model\TitlePeer;
 use DTA\MetadataBundle\Model\map\EssayTableMap;
 
 abstract class BaseEssayPeer
@@ -30,16 +33,46 @@ abstract class BaseEssayPeer
     const TM_CLASS = 'EssayTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 1;
+    const NUM_COLUMNS = 11;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 1;
+    const NUM_HYDRATE_COLUMNS = 11;
 
     /** the column name for the id field */
     const ID = 'essay.id';
+
+    /** the column name for the title_id field */
+    const TITLE_ID = 'essay.title_id';
+
+    /** the column name for the publishingCompany_id field */
+    const PUBLISHINGCOMPANY_ID = 'essay.publishingCompany_id';
+
+    /** the column name for the place_id field */
+    const PLACE_ID = 'essay.place_id';
+
+    /** the column name for the dateSpecification_id field */
+    const DATESPECIFICATION_ID = 'essay.dateSpecification_id';
+
+    /** the column name for the printRun field */
+    const PRINTRUN = 'essay.printRun';
+
+    /** the column name for the printRunComment field */
+    const PRINTRUNCOMMENT = 'essay.printRunComment';
+
+    /** the column name for the edition field */
+    const EDITION = 'essay.edition';
+
+    /** the column name for the numPages field */
+    const NUMPAGES = 'essay.numPages';
+
+    /** the column name for the numPagesNormed field */
+    const NUMPAGESNORMED = 'essay.numPagesNormed';
+
+    /** the column name for the bibliographicCitation field */
+    const BIBLIOGRAPHICCITATION = 'essay.bibliographicCitation';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -60,12 +93,12 @@ abstract class BaseEssayPeer
      * e.g. EssayPeer::$fieldNames[EssayPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', ),
-        BasePeer::TYPE_COLNAME => array (EssayPeer::ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', ),
-        BasePeer::TYPE_NUM => array (0, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'TitleId', 'PublishingcompanyId', 'PlaceId', 'DatespecificationId', 'Printrun', 'Printruncomment', 'Edition', 'Numpages', 'Numpagesnormed', 'Bibliographiccitation', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'titleId', 'publishingcompanyId', 'placeId', 'datespecificationId', 'printrun', 'printruncomment', 'edition', 'numpages', 'numpagesnormed', 'bibliographiccitation', ),
+        BasePeer::TYPE_COLNAME => array (EssayPeer::ID, EssayPeer::TITLE_ID, EssayPeer::PUBLISHINGCOMPANY_ID, EssayPeer::PLACE_ID, EssayPeer::DATESPECIFICATION_ID, EssayPeer::PRINTRUN, EssayPeer::PRINTRUNCOMMENT, EssayPeer::EDITION, EssayPeer::NUMPAGES, EssayPeer::NUMPAGESNORMED, EssayPeer::BIBLIOGRAPHICCITATION, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TITLE_ID', 'PUBLISHINGCOMPANY_ID', 'PLACE_ID', 'DATESPECIFICATION_ID', 'PRINTRUN', 'PRINTRUNCOMMENT', 'EDITION', 'NUMPAGES', 'NUMPAGESNORMED', 'BIBLIOGRAPHICCITATION', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'title_id', 'publishingCompany_id', 'place_id', 'dateSpecification_id', 'printRun', 'printRunComment', 'edition', 'numPages', 'numPagesNormed', 'bibliographicCitation', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
     );
 
     /**
@@ -75,12 +108,12 @@ abstract class BaseEssayPeer
      * e.g. EssayPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, ),
-        BasePeer::TYPE_COLNAME => array (EssayPeer::ID => 0, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, ),
-        BasePeer::TYPE_NUM => array (0, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'TitleId' => 1, 'PublishingcompanyId' => 2, 'PlaceId' => 3, 'DatespecificationId' => 4, 'Printrun' => 5, 'Printruncomment' => 6, 'Edition' => 7, 'Numpages' => 8, 'Numpagesnormed' => 9, 'Bibliographiccitation' => 10, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'titleId' => 1, 'publishingcompanyId' => 2, 'placeId' => 3, 'datespecificationId' => 4, 'printrun' => 5, 'printruncomment' => 6, 'edition' => 7, 'numpages' => 8, 'numpagesnormed' => 9, 'bibliographiccitation' => 10, ),
+        BasePeer::TYPE_COLNAME => array (EssayPeer::ID => 0, EssayPeer::TITLE_ID => 1, EssayPeer::PUBLISHINGCOMPANY_ID => 2, EssayPeer::PLACE_ID => 3, EssayPeer::DATESPECIFICATION_ID => 4, EssayPeer::PRINTRUN => 5, EssayPeer::PRINTRUNCOMMENT => 6, EssayPeer::EDITION => 7, EssayPeer::NUMPAGES => 8, EssayPeer::NUMPAGESNORMED => 9, EssayPeer::BIBLIOGRAPHICCITATION => 10, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TITLE_ID' => 1, 'PUBLISHINGCOMPANY_ID' => 2, 'PLACE_ID' => 3, 'DATESPECIFICATION_ID' => 4, 'PRINTRUN' => 5, 'PRINTRUNCOMMENT' => 6, 'EDITION' => 7, 'NUMPAGES' => 8, 'NUMPAGESNORMED' => 9, 'BIBLIOGRAPHICCITATION' => 10, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'title_id' => 1, 'publishingCompany_id' => 2, 'place_id' => 3, 'dateSpecification_id' => 4, 'printRun' => 5, 'printRunComment' => 6, 'edition' => 7, 'numPages' => 8, 'numPagesNormed' => 9, 'bibliographicCitation' => 10, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
     );
 
     /**
@@ -155,8 +188,28 @@ abstract class BaseEssayPeer
     {
         if (null === $alias) {
             $criteria->addSelectColumn(EssayPeer::ID);
+            $criteria->addSelectColumn(EssayPeer::TITLE_ID);
+            $criteria->addSelectColumn(EssayPeer::PUBLISHINGCOMPANY_ID);
+            $criteria->addSelectColumn(EssayPeer::PLACE_ID);
+            $criteria->addSelectColumn(EssayPeer::DATESPECIFICATION_ID);
+            $criteria->addSelectColumn(EssayPeer::PRINTRUN);
+            $criteria->addSelectColumn(EssayPeer::PRINTRUNCOMMENT);
+            $criteria->addSelectColumn(EssayPeer::EDITION);
+            $criteria->addSelectColumn(EssayPeer::NUMPAGES);
+            $criteria->addSelectColumn(EssayPeer::NUMPAGESNORMED);
+            $criteria->addSelectColumn(EssayPeer::BIBLIOGRAPHICCITATION);
         } else {
             $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.title_id');
+            $criteria->addSelectColumn($alias . '.publishingCompany_id');
+            $criteria->addSelectColumn($alias . '.place_id');
+            $criteria->addSelectColumn($alias . '.dateSpecification_id');
+            $criteria->addSelectColumn($alias . '.printRun');
+            $criteria->addSelectColumn($alias . '.printRunComment');
+            $criteria->addSelectColumn($alias . '.edition');
+            $criteria->addSelectColumn($alias . '.numPages');
+            $criteria->addSelectColumn($alias . '.numPagesNormed');
+            $criteria->addSelectColumn($alias . '.bibliographicCitation');
         }
     }
 
@@ -363,9 +416,6 @@ abstract class BaseEssayPeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in PublicationPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        PublicationPeer::clearInstancePool();
     }
 
     /**
@@ -460,6 +510,1381 @@ abstract class BaseEssayPeer
         }
 
         return array($obj, $col);
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Title table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinTitle(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(EssayPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            EssayPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(EssayPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(EssayPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(EssayPeer::TITLE_ID, TitlePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Publishingcompany table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinPublishingcompany(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(EssayPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            EssayPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(EssayPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(EssayPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(EssayPeer::PUBLISHINGCOMPANY_ID, PublishingcompanyPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Place table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinPlace(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(EssayPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            EssayPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(EssayPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(EssayPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(EssayPeer::PLACE_ID, PlacePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Datespecification table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinDatespecification(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(EssayPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            EssayPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(EssayPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(EssayPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(EssayPeer::DATESPECIFICATION_ID, DatespecificationPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Selects a collection of Essay objects pre-filled with their Title objects.
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Essay objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinTitle(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(EssayPeer::DATABASE_NAME);
+        }
+
+        EssayPeer::addSelectColumns($criteria);
+        $startcol = EssayPeer::NUM_HYDRATE_COLUMNS;
+        TitlePeer::addSelectColumns($criteria);
+
+        $criteria->addJoin(EssayPeer::TITLE_ID, TitlePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = EssayPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = EssayPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+
+                $cls = EssayPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                EssayPeer::addInstanceToPool($obj1, $key1);
+            } // if $obj1 already loaded
+
+            $key2 = TitlePeer::getPrimaryKeyHashFromRow($row, $startcol);
+            if ($key2 !== null) {
+                $obj2 = TitlePeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = TitlePeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol);
+                    TitlePeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 already loaded
+
+                // Add the $obj1 (Essay) to $obj2 (Title)
+                $obj2->addEssay($obj1);
+
+            } // if joined row was not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Selects a collection of Essay objects pre-filled with their Publishingcompany objects.
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Essay objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinPublishingcompany(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(EssayPeer::DATABASE_NAME);
+        }
+
+        EssayPeer::addSelectColumns($criteria);
+        $startcol = EssayPeer::NUM_HYDRATE_COLUMNS;
+        PublishingcompanyPeer::addSelectColumns($criteria);
+
+        $criteria->addJoin(EssayPeer::PUBLISHINGCOMPANY_ID, PublishingcompanyPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = EssayPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = EssayPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+
+                $cls = EssayPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                EssayPeer::addInstanceToPool($obj1, $key1);
+            } // if $obj1 already loaded
+
+            $key2 = PublishingcompanyPeer::getPrimaryKeyHashFromRow($row, $startcol);
+            if ($key2 !== null) {
+                $obj2 = PublishingcompanyPeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = PublishingcompanyPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol);
+                    PublishingcompanyPeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 already loaded
+
+                // Add the $obj1 (Essay) to $obj2 (Publishingcompany)
+                $obj2->addEssay($obj1);
+
+            } // if joined row was not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Selects a collection of Essay objects pre-filled with their Place objects.
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Essay objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinPlace(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(EssayPeer::DATABASE_NAME);
+        }
+
+        EssayPeer::addSelectColumns($criteria);
+        $startcol = EssayPeer::NUM_HYDRATE_COLUMNS;
+        PlacePeer::addSelectColumns($criteria);
+
+        $criteria->addJoin(EssayPeer::PLACE_ID, PlacePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = EssayPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = EssayPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+
+                $cls = EssayPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                EssayPeer::addInstanceToPool($obj1, $key1);
+            } // if $obj1 already loaded
+
+            $key2 = PlacePeer::getPrimaryKeyHashFromRow($row, $startcol);
+            if ($key2 !== null) {
+                $obj2 = PlacePeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = PlacePeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol);
+                    PlacePeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 already loaded
+
+                // Add the $obj1 (Essay) to $obj2 (Place)
+                $obj2->addEssay($obj1);
+
+            } // if joined row was not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Selects a collection of Essay objects pre-filled with their Datespecification objects.
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Essay objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinDatespecification(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(EssayPeer::DATABASE_NAME);
+        }
+
+        EssayPeer::addSelectColumns($criteria);
+        $startcol = EssayPeer::NUM_HYDRATE_COLUMNS;
+        DatespecificationPeer::addSelectColumns($criteria);
+
+        $criteria->addJoin(EssayPeer::DATESPECIFICATION_ID, DatespecificationPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = EssayPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = EssayPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+
+                $cls = EssayPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                EssayPeer::addInstanceToPool($obj1, $key1);
+            } // if $obj1 already loaded
+
+            $key2 = DatespecificationPeer::getPrimaryKeyHashFromRow($row, $startcol);
+            if ($key2 !== null) {
+                $obj2 = DatespecificationPeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = DatespecificationPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol);
+                    DatespecificationPeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 already loaded
+
+                // Add the $obj1 (Essay) to $obj2 (Datespecification)
+                $obj2->addEssay($obj1);
+
+            } // if joined row was not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining all related tables
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAll(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(EssayPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            EssayPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(EssayPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(EssayPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(EssayPeer::TITLE_ID, TitlePeer::ID, $join_behavior);
+
+        $criteria->addJoin(EssayPeer::PUBLISHINGCOMPANY_ID, PublishingcompanyPeer::ID, $join_behavior);
+
+        $criteria->addJoin(EssayPeer::PLACE_ID, PlacePeer::ID, $join_behavior);
+
+        $criteria->addJoin(EssayPeer::DATESPECIFICATION_ID, DatespecificationPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+    /**
+     * Selects a collection of Essay objects pre-filled with all related objects.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Essay objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAll(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(EssayPeer::DATABASE_NAME);
+        }
+
+        EssayPeer::addSelectColumns($criteria);
+        $startcol2 = EssayPeer::NUM_HYDRATE_COLUMNS;
+
+        TitlePeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + TitlePeer::NUM_HYDRATE_COLUMNS;
+
+        PublishingcompanyPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + PublishingcompanyPeer::NUM_HYDRATE_COLUMNS;
+
+        PlacePeer::addSelectColumns($criteria);
+        $startcol5 = $startcol4 + PlacePeer::NUM_HYDRATE_COLUMNS;
+
+        DatespecificationPeer::addSelectColumns($criteria);
+        $startcol6 = $startcol5 + DatespecificationPeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(EssayPeer::TITLE_ID, TitlePeer::ID, $join_behavior);
+
+        $criteria->addJoin(EssayPeer::PUBLISHINGCOMPANY_ID, PublishingcompanyPeer::ID, $join_behavior);
+
+        $criteria->addJoin(EssayPeer::PLACE_ID, PlacePeer::ID, $join_behavior);
+
+        $criteria->addJoin(EssayPeer::DATESPECIFICATION_ID, DatespecificationPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = EssayPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = EssayPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = EssayPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                EssayPeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+            // Add objects for joined Title rows
+
+            $key2 = TitlePeer::getPrimaryKeyHashFromRow($row, $startcol2);
+            if ($key2 !== null) {
+                $obj2 = TitlePeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = TitlePeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    TitlePeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 loaded
+
+                // Add the $obj1 (Essay) to the collection in $obj2 (Title)
+                $obj2->addEssay($obj1);
+            } // if joined row not null
+
+            // Add objects for joined Publishingcompany rows
+
+            $key3 = PublishingcompanyPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+            if ($key3 !== null) {
+                $obj3 = PublishingcompanyPeer::getInstanceFromPool($key3);
+                if (!$obj3) {
+
+                    $cls = PublishingcompanyPeer::getOMClass();
+
+                    $obj3 = new $cls();
+                    $obj3->hydrate($row, $startcol3);
+                    PublishingcompanyPeer::addInstanceToPool($obj3, $key3);
+                } // if obj3 loaded
+
+                // Add the $obj1 (Essay) to the collection in $obj3 (Publishingcompany)
+                $obj3->addEssay($obj1);
+            } // if joined row not null
+
+            // Add objects for joined Place rows
+
+            $key4 = PlacePeer::getPrimaryKeyHashFromRow($row, $startcol4);
+            if ($key4 !== null) {
+                $obj4 = PlacePeer::getInstanceFromPool($key4);
+                if (!$obj4) {
+
+                    $cls = PlacePeer::getOMClass();
+
+                    $obj4 = new $cls();
+                    $obj4->hydrate($row, $startcol4);
+                    PlacePeer::addInstanceToPool($obj4, $key4);
+                } // if obj4 loaded
+
+                // Add the $obj1 (Essay) to the collection in $obj4 (Place)
+                $obj4->addEssay($obj1);
+            } // if joined row not null
+
+            // Add objects for joined Datespecification rows
+
+            $key5 = DatespecificationPeer::getPrimaryKeyHashFromRow($row, $startcol5);
+            if ($key5 !== null) {
+                $obj5 = DatespecificationPeer::getInstanceFromPool($key5);
+                if (!$obj5) {
+
+                    $cls = DatespecificationPeer::getOMClass();
+
+                    $obj5 = new $cls();
+                    $obj5->hydrate($row, $startcol5);
+                    DatespecificationPeer::addInstanceToPool($obj5, $key5);
+                } // if obj5 loaded
+
+                // Add the $obj1 (Essay) to the collection in $obj5 (Datespecification)
+                $obj5->addEssay($obj1);
+            } // if joined row not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Title table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAllExceptTitle(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(EssayPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            EssayPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
+
+        // Set the correct dbName
+        $criteria->setDbName(EssayPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(EssayPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(EssayPeer::PUBLISHINGCOMPANY_ID, PublishingcompanyPeer::ID, $join_behavior);
+
+        $criteria->addJoin(EssayPeer::PLACE_ID, PlacePeer::ID, $join_behavior);
+
+        $criteria->addJoin(EssayPeer::DATESPECIFICATION_ID, DatespecificationPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Publishingcompany table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAllExceptPublishingcompany(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(EssayPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            EssayPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
+
+        // Set the correct dbName
+        $criteria->setDbName(EssayPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(EssayPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(EssayPeer::TITLE_ID, TitlePeer::ID, $join_behavior);
+
+        $criteria->addJoin(EssayPeer::PLACE_ID, PlacePeer::ID, $join_behavior);
+
+        $criteria->addJoin(EssayPeer::DATESPECIFICATION_ID, DatespecificationPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Place table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAllExceptPlace(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(EssayPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            EssayPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
+
+        // Set the correct dbName
+        $criteria->setDbName(EssayPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(EssayPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(EssayPeer::TITLE_ID, TitlePeer::ID, $join_behavior);
+
+        $criteria->addJoin(EssayPeer::PUBLISHINGCOMPANY_ID, PublishingcompanyPeer::ID, $join_behavior);
+
+        $criteria->addJoin(EssayPeer::DATESPECIFICATION_ID, DatespecificationPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Datespecification table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAllExceptDatespecification(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(EssayPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            EssayPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
+
+        // Set the correct dbName
+        $criteria->setDbName(EssayPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(EssayPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(EssayPeer::TITLE_ID, TitlePeer::ID, $join_behavior);
+
+        $criteria->addJoin(EssayPeer::PUBLISHINGCOMPANY_ID, PublishingcompanyPeer::ID, $join_behavior);
+
+        $criteria->addJoin(EssayPeer::PLACE_ID, PlacePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Selects a collection of Essay objects pre-filled with all related objects except Title.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Essay objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAllExceptTitle(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        // $criteria->getDbName() will return the same object if not set to another value
+        // so == check is okay and faster
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(EssayPeer::DATABASE_NAME);
+        }
+
+        EssayPeer::addSelectColumns($criteria);
+        $startcol2 = EssayPeer::NUM_HYDRATE_COLUMNS;
+
+        PublishingcompanyPeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + PublishingcompanyPeer::NUM_HYDRATE_COLUMNS;
+
+        PlacePeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + PlacePeer::NUM_HYDRATE_COLUMNS;
+
+        DatespecificationPeer::addSelectColumns($criteria);
+        $startcol5 = $startcol4 + DatespecificationPeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(EssayPeer::PUBLISHINGCOMPANY_ID, PublishingcompanyPeer::ID, $join_behavior);
+
+        $criteria->addJoin(EssayPeer::PLACE_ID, PlacePeer::ID, $join_behavior);
+
+        $criteria->addJoin(EssayPeer::DATESPECIFICATION_ID, DatespecificationPeer::ID, $join_behavior);
+
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = EssayPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = EssayPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = EssayPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                EssayPeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+                // Add objects for joined Publishingcompany rows
+
+                $key2 = PublishingcompanyPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                if ($key2 !== null) {
+                    $obj2 = PublishingcompanyPeer::getInstanceFromPool($key2);
+                    if (!$obj2) {
+
+                        $cls = PublishingcompanyPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    PublishingcompanyPeer::addInstanceToPool($obj2, $key2);
+                } // if $obj2 already loaded
+
+                // Add the $obj1 (Essay) to the collection in $obj2 (Publishingcompany)
+                $obj2->addEssay($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Place rows
+
+                $key3 = PlacePeer::getPrimaryKeyHashFromRow($row, $startcol3);
+                if ($key3 !== null) {
+                    $obj3 = PlacePeer::getInstanceFromPool($key3);
+                    if (!$obj3) {
+
+                        $cls = PlacePeer::getOMClass();
+
+                    $obj3 = new $cls();
+                    $obj3->hydrate($row, $startcol3);
+                    PlacePeer::addInstanceToPool($obj3, $key3);
+                } // if $obj3 already loaded
+
+                // Add the $obj1 (Essay) to the collection in $obj3 (Place)
+                $obj3->addEssay($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Datespecification rows
+
+                $key4 = DatespecificationPeer::getPrimaryKeyHashFromRow($row, $startcol4);
+                if ($key4 !== null) {
+                    $obj4 = DatespecificationPeer::getInstanceFromPool($key4);
+                    if (!$obj4) {
+
+                        $cls = DatespecificationPeer::getOMClass();
+
+                    $obj4 = new $cls();
+                    $obj4->hydrate($row, $startcol4);
+                    DatespecificationPeer::addInstanceToPool($obj4, $key4);
+                } // if $obj4 already loaded
+
+                // Add the $obj1 (Essay) to the collection in $obj4 (Datespecification)
+                $obj4->addEssay($obj1);
+
+            } // if joined row is not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Selects a collection of Essay objects pre-filled with all related objects except Publishingcompany.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Essay objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAllExceptPublishingcompany(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        // $criteria->getDbName() will return the same object if not set to another value
+        // so == check is okay and faster
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(EssayPeer::DATABASE_NAME);
+        }
+
+        EssayPeer::addSelectColumns($criteria);
+        $startcol2 = EssayPeer::NUM_HYDRATE_COLUMNS;
+
+        TitlePeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + TitlePeer::NUM_HYDRATE_COLUMNS;
+
+        PlacePeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + PlacePeer::NUM_HYDRATE_COLUMNS;
+
+        DatespecificationPeer::addSelectColumns($criteria);
+        $startcol5 = $startcol4 + DatespecificationPeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(EssayPeer::TITLE_ID, TitlePeer::ID, $join_behavior);
+
+        $criteria->addJoin(EssayPeer::PLACE_ID, PlacePeer::ID, $join_behavior);
+
+        $criteria->addJoin(EssayPeer::DATESPECIFICATION_ID, DatespecificationPeer::ID, $join_behavior);
+
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = EssayPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = EssayPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = EssayPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                EssayPeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+                // Add objects for joined Title rows
+
+                $key2 = TitlePeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                if ($key2 !== null) {
+                    $obj2 = TitlePeer::getInstanceFromPool($key2);
+                    if (!$obj2) {
+
+                        $cls = TitlePeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    TitlePeer::addInstanceToPool($obj2, $key2);
+                } // if $obj2 already loaded
+
+                // Add the $obj1 (Essay) to the collection in $obj2 (Title)
+                $obj2->addEssay($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Place rows
+
+                $key3 = PlacePeer::getPrimaryKeyHashFromRow($row, $startcol3);
+                if ($key3 !== null) {
+                    $obj3 = PlacePeer::getInstanceFromPool($key3);
+                    if (!$obj3) {
+
+                        $cls = PlacePeer::getOMClass();
+
+                    $obj3 = new $cls();
+                    $obj3->hydrate($row, $startcol3);
+                    PlacePeer::addInstanceToPool($obj3, $key3);
+                } // if $obj3 already loaded
+
+                // Add the $obj1 (Essay) to the collection in $obj3 (Place)
+                $obj3->addEssay($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Datespecification rows
+
+                $key4 = DatespecificationPeer::getPrimaryKeyHashFromRow($row, $startcol4);
+                if ($key4 !== null) {
+                    $obj4 = DatespecificationPeer::getInstanceFromPool($key4);
+                    if (!$obj4) {
+
+                        $cls = DatespecificationPeer::getOMClass();
+
+                    $obj4 = new $cls();
+                    $obj4->hydrate($row, $startcol4);
+                    DatespecificationPeer::addInstanceToPool($obj4, $key4);
+                } // if $obj4 already loaded
+
+                // Add the $obj1 (Essay) to the collection in $obj4 (Datespecification)
+                $obj4->addEssay($obj1);
+
+            } // if joined row is not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Selects a collection of Essay objects pre-filled with all related objects except Place.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Essay objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAllExceptPlace(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        // $criteria->getDbName() will return the same object if not set to another value
+        // so == check is okay and faster
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(EssayPeer::DATABASE_NAME);
+        }
+
+        EssayPeer::addSelectColumns($criteria);
+        $startcol2 = EssayPeer::NUM_HYDRATE_COLUMNS;
+
+        TitlePeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + TitlePeer::NUM_HYDRATE_COLUMNS;
+
+        PublishingcompanyPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + PublishingcompanyPeer::NUM_HYDRATE_COLUMNS;
+
+        DatespecificationPeer::addSelectColumns($criteria);
+        $startcol5 = $startcol4 + DatespecificationPeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(EssayPeer::TITLE_ID, TitlePeer::ID, $join_behavior);
+
+        $criteria->addJoin(EssayPeer::PUBLISHINGCOMPANY_ID, PublishingcompanyPeer::ID, $join_behavior);
+
+        $criteria->addJoin(EssayPeer::DATESPECIFICATION_ID, DatespecificationPeer::ID, $join_behavior);
+
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = EssayPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = EssayPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = EssayPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                EssayPeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+                // Add objects for joined Title rows
+
+                $key2 = TitlePeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                if ($key2 !== null) {
+                    $obj2 = TitlePeer::getInstanceFromPool($key2);
+                    if (!$obj2) {
+
+                        $cls = TitlePeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    TitlePeer::addInstanceToPool($obj2, $key2);
+                } // if $obj2 already loaded
+
+                // Add the $obj1 (Essay) to the collection in $obj2 (Title)
+                $obj2->addEssay($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Publishingcompany rows
+
+                $key3 = PublishingcompanyPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+                if ($key3 !== null) {
+                    $obj3 = PublishingcompanyPeer::getInstanceFromPool($key3);
+                    if (!$obj3) {
+
+                        $cls = PublishingcompanyPeer::getOMClass();
+
+                    $obj3 = new $cls();
+                    $obj3->hydrate($row, $startcol3);
+                    PublishingcompanyPeer::addInstanceToPool($obj3, $key3);
+                } // if $obj3 already loaded
+
+                // Add the $obj1 (Essay) to the collection in $obj3 (Publishingcompany)
+                $obj3->addEssay($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Datespecification rows
+
+                $key4 = DatespecificationPeer::getPrimaryKeyHashFromRow($row, $startcol4);
+                if ($key4 !== null) {
+                    $obj4 = DatespecificationPeer::getInstanceFromPool($key4);
+                    if (!$obj4) {
+
+                        $cls = DatespecificationPeer::getOMClass();
+
+                    $obj4 = new $cls();
+                    $obj4->hydrate($row, $startcol4);
+                    DatespecificationPeer::addInstanceToPool($obj4, $key4);
+                } // if $obj4 already loaded
+
+                // Add the $obj1 (Essay) to the collection in $obj4 (Datespecification)
+                $obj4->addEssay($obj1);
+
+            } // if joined row is not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Selects a collection of Essay objects pre-filled with all related objects except Datespecification.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Essay objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAllExceptDatespecification(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        // $criteria->getDbName() will return the same object if not set to another value
+        // so == check is okay and faster
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(EssayPeer::DATABASE_NAME);
+        }
+
+        EssayPeer::addSelectColumns($criteria);
+        $startcol2 = EssayPeer::NUM_HYDRATE_COLUMNS;
+
+        TitlePeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + TitlePeer::NUM_HYDRATE_COLUMNS;
+
+        PublishingcompanyPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + PublishingcompanyPeer::NUM_HYDRATE_COLUMNS;
+
+        PlacePeer::addSelectColumns($criteria);
+        $startcol5 = $startcol4 + PlacePeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(EssayPeer::TITLE_ID, TitlePeer::ID, $join_behavior);
+
+        $criteria->addJoin(EssayPeer::PUBLISHINGCOMPANY_ID, PublishingcompanyPeer::ID, $join_behavior);
+
+        $criteria->addJoin(EssayPeer::PLACE_ID, PlacePeer::ID, $join_behavior);
+
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = EssayPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = EssayPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = EssayPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                EssayPeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+                // Add objects for joined Title rows
+
+                $key2 = TitlePeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                if ($key2 !== null) {
+                    $obj2 = TitlePeer::getInstanceFromPool($key2);
+                    if (!$obj2) {
+
+                        $cls = TitlePeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    TitlePeer::addInstanceToPool($obj2, $key2);
+                } // if $obj2 already loaded
+
+                // Add the $obj1 (Essay) to the collection in $obj2 (Title)
+                $obj2->addEssay($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Publishingcompany rows
+
+                $key3 = PublishingcompanyPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+                if ($key3 !== null) {
+                    $obj3 = PublishingcompanyPeer::getInstanceFromPool($key3);
+                    if (!$obj3) {
+
+                        $cls = PublishingcompanyPeer::getOMClass();
+
+                    $obj3 = new $cls();
+                    $obj3->hydrate($row, $startcol3);
+                    PublishingcompanyPeer::addInstanceToPool($obj3, $key3);
+                } // if $obj3 already loaded
+
+                // Add the $obj1 (Essay) to the collection in $obj3 (Publishingcompany)
+                $obj3->addEssay($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Place rows
+
+                $key4 = PlacePeer::getPrimaryKeyHashFromRow($row, $startcol4);
+                if ($key4 !== null) {
+                    $obj4 = PlacePeer::getInstanceFromPool($key4);
+                    if (!$obj4) {
+
+                        $cls = PlacePeer::getOMClass();
+
+                    $obj4 = new $cls();
+                    $obj4->hydrate($row, $startcol4);
+                    PlacePeer::addInstanceToPool($obj4, $key4);
+                } // if $obj4 already loaded
+
+                // Add the $obj1 (Essay) to the collection in $obj4 (Place)
+                $obj4->addEssay($obj1);
+
+            } // if joined row is not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
     }
 
     /**
@@ -595,7 +2020,6 @@ abstract class BaseEssayPeer
             // use transaction because $criteria could contain info
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
-            $affectedRows += EssayPeer::doOnDeleteCascade(new Criteria(EssayPeer::DATABASE_NAME), $con);
             $affectedRows += BasePeer::doDeleteAll(EssayPeer::TABLE_NAME, $con, EssayPeer::DATABASE_NAME);
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
@@ -629,14 +2053,24 @@ abstract class BaseEssayPeer
         }
 
         if ($values instanceof Criteria) {
+            // invalidate the cache for all objects of this type, since we have no
+            // way of knowing (without running a query) what objects should be invalidated
+            // from the cache based on this Criteria.
+            EssayPeer::clearInstancePool();
             // rename for clarity
             $criteria = clone $values;
         } elseif ($values instanceof Essay) { // it's a model object
+            // invalidate the cache for this single object
+            EssayPeer::removeInstanceFromPool($values);
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(EssayPeer::DATABASE_NAME);
             $criteria->add(EssayPeer::ID, (array) $values, Criteria::IN);
+            // invalidate the cache for this object(s)
+            foreach ((array) $values as $singleval) {
+                EssayPeer::removeInstanceFromPool($singleval);
+            }
         }
 
         // Set the correct dbName
@@ -649,23 +2083,6 @@ abstract class BaseEssayPeer
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
 
-            // cloning the Criteria in case it's modified by doSelect() or doSelectStmt()
-            $c = clone $criteria;
-            $affectedRows += EssayPeer::doOnDeleteCascade($c, $con);
-
-            // Because this db requires some delete cascade/set null emulation, we have to
-            // clear the cached instance *after* the emulation has happened (since
-            // instances get re-added by the select statement contained therein).
-            if ($values instanceof Criteria) {
-                EssayPeer::clearInstancePool();
-            } elseif ($values instanceof Essay) { // it's a model object
-                EssayPeer::removeInstanceFromPool($values);
-            } else { // it's a primary key, or an array of pks
-                foreach ((array) $values as $singleval) {
-                    EssayPeer::removeInstanceFromPool($singleval);
-                }
-            }
-
             $affectedRows += BasePeer::doDelete($criteria, $con);
             EssayPeer::clearRelatedInstancePool();
             $con->commit();
@@ -675,39 +2092,6 @@ abstract class BaseEssayPeer
             $con->rollBack();
             throw $e;
         }
-    }
-
-    /**
-     * This is a method for emulating ON DELETE CASCADE for DBs that don't support this
-     * feature (like MySQL or SQLite).
-     *
-     * This method is not very speedy because it must perform a query first to get
-     * the implicated records and then perform the deletes by calling those Peer classes.
-     *
-     * This method should be used within a transaction if possible.
-     *
-     * @param      Criteria $criteria
-     * @param      PropelPDO $con
-     * @return int The number of affected rows (if supported by underlying database driver).
-     */
-    protected static function doOnDeleteCascade(Criteria $criteria, PropelPDO $con)
-    {
-        // initialize var to track total num of affected rows
-        $affectedRows = 0;
-
-        // first find the objects that are implicated by the $criteria
-        $objects = EssayPeer::doSelect($criteria, $con);
-        foreach ($objects as $obj) {
-
-
-            // delete related Publication objects
-            $criteria = new Criteria(PublicationPeer::DATABASE_NAME);
-
-            $criteria->add(PublicationPeer::ID, $obj->getId());
-            $affectedRows += PublicationPeer::doDelete($criteria, $con);
-        }
-
-        return $affectedRows;
     }
 
     /**

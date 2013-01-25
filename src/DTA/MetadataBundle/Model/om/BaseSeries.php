@@ -9,15 +9,19 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
-use DTA\MetadataBundle\Model\Publication;
-use DTA\MetadataBundle\Model\PublicationQuery;
+use DTA\MetadataBundle\Model\Datespecification;
+use DTA\MetadataBundle\Model\DatespecificationQuery;
+use DTA\MetadataBundle\Model\Place;
+use DTA\MetadataBundle\Model\PlaceQuery;
+use DTA\MetadataBundle\Model\Publishingcompany;
+use DTA\MetadataBundle\Model\PublishingcompanyQuery;
 use DTA\MetadataBundle\Model\Series;
 use DTA\MetadataBundle\Model\SeriesPeer;
 use DTA\MetadataBundle\Model\SeriesQuery;
+use DTA\MetadataBundle\Model\Title;
+use DTA\MetadataBundle\Model\TitleQuery;
 
 abstract class BaseSeries extends BaseObject implements Persistent
 {
@@ -53,9 +57,84 @@ abstract class BaseSeries extends BaseObject implements Persistent
     protected $volume;
 
     /**
-     * @var        Publication one-to-one related Publication object
+     * The value for the title_id field.
+     * @var        int
      */
-    protected $singlePublication;
+    protected $title_id;
+
+    /**
+     * The value for the publishingcompany_id field.
+     * @var        int
+     */
+    protected $publishingcompany_id;
+
+    /**
+     * The value for the place_id field.
+     * @var        int
+     */
+    protected $place_id;
+
+    /**
+     * The value for the datespecification_id field.
+     * @var        int
+     */
+    protected $datespecification_id;
+
+    /**
+     * The value for the printrun field.
+     * @var        string
+     */
+    protected $printrun;
+
+    /**
+     * The value for the printruncomment field.
+     * @var        string
+     */
+    protected $printruncomment;
+
+    /**
+     * The value for the edition field.
+     * @var        string
+     */
+    protected $edition;
+
+    /**
+     * The value for the numpages field.
+     * @var        int
+     */
+    protected $numpages;
+
+    /**
+     * The value for the numpagesnormed field.
+     * @var        int
+     */
+    protected $numpagesnormed;
+
+    /**
+     * The value for the bibliographiccitation field.
+     * @var        string
+     */
+    protected $bibliographiccitation;
+
+    /**
+     * @var        Title
+     */
+    protected $aTitle;
+
+    /**
+     * @var        Publishingcompany
+     */
+    protected $aPublishingcompany;
+
+    /**
+     * @var        Place
+     */
+    protected $aPlace;
+
+    /**
+     * @var        Datespecification
+     */
+    protected $aDatespecification;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -78,12 +157,6 @@ abstract class BaseSeries extends BaseObject implements Persistent
     protected $alreadyInClearAllReferencesDeep = false;
 
     /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $publicationsScheduledForDeletion = null;
-
-    /**
      * Get the [id] column value.
      *
      * @return int
@@ -101,6 +174,106 @@ abstract class BaseSeries extends BaseObject implements Persistent
     public function getVolume()
     {
         return $this->volume;
+    }
+
+    /**
+     * Get the [title_id] column value.
+     *
+     * @return int
+     */
+    public function getTitleId()
+    {
+        return $this->title_id;
+    }
+
+    /**
+     * Get the [publishingcompany_id] column value.
+     *
+     * @return int
+     */
+    public function getPublishingcompanyId()
+    {
+        return $this->publishingcompany_id;
+    }
+
+    /**
+     * Get the [place_id] column value.
+     *
+     * @return int
+     */
+    public function getPlaceId()
+    {
+        return $this->place_id;
+    }
+
+    /**
+     * Get the [datespecification_id] column value.
+     *
+     * @return int
+     */
+    public function getDatespecificationId()
+    {
+        return $this->datespecification_id;
+    }
+
+    /**
+     * Get the [printrun] column value.
+     * Auflage
+     * @return string
+     */
+    public function getPrintrun()
+    {
+        return $this->printrun;
+    }
+
+    /**
+     * Get the [printruncomment] column value.
+     *
+     * @return string
+     */
+    public function getPrintruncomment()
+    {
+        return $this->printruncomment;
+    }
+
+    /**
+     * Get the [edition] column value.
+     *
+     * @return string
+     */
+    public function getEdition()
+    {
+        return $this->edition;
+    }
+
+    /**
+     * Get the [numpages] column value.
+     *
+     * @return int
+     */
+    public function getNumpages()
+    {
+        return $this->numpages;
+    }
+
+    /**
+     * Get the [numpagesnormed] column value.
+     *
+     * @return int
+     */
+    public function getNumpagesnormed()
+    {
+        return $this->numpagesnormed;
+    }
+
+    /**
+     * Get the [bibliographiccitation] column value.
+     *
+     * @return string
+     */
+    public function getBibliographiccitation()
+    {
+        return $this->bibliographiccitation;
     }
 
     /**
@@ -146,6 +319,232 @@ abstract class BaseSeries extends BaseObject implements Persistent
     } // setVolume()
 
     /**
+     * Set the value of [title_id] column.
+     *
+     * @param int $v new value
+     * @return Series The current object (for fluent API support)
+     */
+    public function setTitleId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->title_id !== $v) {
+            $this->title_id = $v;
+            $this->modifiedColumns[] = SeriesPeer::TITLE_ID;
+        }
+
+        if ($this->aTitle !== null && $this->aTitle->getId() !== $v) {
+            $this->aTitle = null;
+        }
+
+
+        return $this;
+    } // setTitleId()
+
+    /**
+     * Set the value of [publishingcompany_id] column.
+     *
+     * @param int $v new value
+     * @return Series The current object (for fluent API support)
+     */
+    public function setPublishingcompanyId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->publishingcompany_id !== $v) {
+            $this->publishingcompany_id = $v;
+            $this->modifiedColumns[] = SeriesPeer::PUBLISHINGCOMPANY_ID;
+        }
+
+        if ($this->aPublishingcompany !== null && $this->aPublishingcompany->getId() !== $v) {
+            $this->aPublishingcompany = null;
+        }
+
+
+        return $this;
+    } // setPublishingcompanyId()
+
+    /**
+     * Set the value of [place_id] column.
+     *
+     * @param int $v new value
+     * @return Series The current object (for fluent API support)
+     */
+    public function setPlaceId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->place_id !== $v) {
+            $this->place_id = $v;
+            $this->modifiedColumns[] = SeriesPeer::PLACE_ID;
+        }
+
+        if ($this->aPlace !== null && $this->aPlace->getId() !== $v) {
+            $this->aPlace = null;
+        }
+
+
+        return $this;
+    } // setPlaceId()
+
+    /**
+     * Set the value of [datespecification_id] column.
+     *
+     * @param int $v new value
+     * @return Series The current object (for fluent API support)
+     */
+    public function setDatespecificationId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->datespecification_id !== $v) {
+            $this->datespecification_id = $v;
+            $this->modifiedColumns[] = SeriesPeer::DATESPECIFICATION_ID;
+        }
+
+        if ($this->aDatespecification !== null && $this->aDatespecification->getId() !== $v) {
+            $this->aDatespecification = null;
+        }
+
+
+        return $this;
+    } // setDatespecificationId()
+
+    /**
+     * Set the value of [printrun] column.
+     * Auflage
+     * @param string $v new value
+     * @return Series The current object (for fluent API support)
+     */
+    public function setPrintrun($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->printrun !== $v) {
+            $this->printrun = $v;
+            $this->modifiedColumns[] = SeriesPeer::PRINTRUN;
+        }
+
+
+        return $this;
+    } // setPrintrun()
+
+    /**
+     * Set the value of [printruncomment] column.
+     *
+     * @param string $v new value
+     * @return Series The current object (for fluent API support)
+     */
+    public function setPrintruncomment($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->printruncomment !== $v) {
+            $this->printruncomment = $v;
+            $this->modifiedColumns[] = SeriesPeer::PRINTRUNCOMMENT;
+        }
+
+
+        return $this;
+    } // setPrintruncomment()
+
+    /**
+     * Set the value of [edition] column.
+     *
+     * @param string $v new value
+     * @return Series The current object (for fluent API support)
+     */
+    public function setEdition($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->edition !== $v) {
+            $this->edition = $v;
+            $this->modifiedColumns[] = SeriesPeer::EDITION;
+        }
+
+
+        return $this;
+    } // setEdition()
+
+    /**
+     * Set the value of [numpages] column.
+     *
+     * @param int $v new value
+     * @return Series The current object (for fluent API support)
+     */
+    public function setNumpages($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->numpages !== $v) {
+            $this->numpages = $v;
+            $this->modifiedColumns[] = SeriesPeer::NUMPAGES;
+        }
+
+
+        return $this;
+    } // setNumpages()
+
+    /**
+     * Set the value of [numpagesnormed] column.
+     *
+     * @param int $v new value
+     * @return Series The current object (for fluent API support)
+     */
+    public function setNumpagesnormed($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->numpagesnormed !== $v) {
+            $this->numpagesnormed = $v;
+            $this->modifiedColumns[] = SeriesPeer::NUMPAGESNORMED;
+        }
+
+
+        return $this;
+    } // setNumpagesnormed()
+
+    /**
+     * Set the value of [bibliographiccitation] column.
+     *
+     * @param string $v new value
+     * @return Series The current object (for fluent API support)
+     */
+    public function setBibliographiccitation($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->bibliographiccitation !== $v) {
+            $this->bibliographiccitation = $v;
+            $this->modifiedColumns[] = SeriesPeer::BIBLIOGRAPHICCITATION;
+        }
+
+
+        return $this;
+    } // setBibliographiccitation()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -179,6 +578,16 @@ abstract class BaseSeries extends BaseObject implements Persistent
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->volume = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
+            $this->title_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+            $this->publishingcompany_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+            $this->place_id = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
+            $this->datespecification_id = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+            $this->printrun = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+            $this->printruncomment = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+            $this->edition = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+            $this->numpages = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+            $this->numpagesnormed = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
+            $this->bibliographiccitation = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -187,7 +596,7 @@ abstract class BaseSeries extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 2; // 2 = SeriesPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 12; // 12 = SeriesPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Series object", $e);
@@ -210,6 +619,18 @@ abstract class BaseSeries extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aTitle !== null && $this->title_id !== $this->aTitle->getId()) {
+            $this->aTitle = null;
+        }
+        if ($this->aPublishingcompany !== null && $this->publishingcompany_id !== $this->aPublishingcompany->getId()) {
+            $this->aPublishingcompany = null;
+        }
+        if ($this->aPlace !== null && $this->place_id !== $this->aPlace->getId()) {
+            $this->aPlace = null;
+        }
+        if ($this->aDatespecification !== null && $this->datespecification_id !== $this->aDatespecification->getId()) {
+            $this->aDatespecification = null;
+        }
     } // ensureConsistency
 
     /**
@@ -249,8 +670,10 @@ abstract class BaseSeries extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singlePublication = null;
-
+            $this->aTitle = null;
+            $this->aPublishingcompany = null;
+            $this->aPlace = null;
+            $this->aDatespecification = null;
         } // if (deep)
     }
 
@@ -364,6 +787,39 @@ abstract class BaseSeries extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aTitle !== null) {
+                if ($this->aTitle->isModified() || $this->aTitle->isNew()) {
+                    $affectedRows += $this->aTitle->save($con);
+                }
+                $this->setTitle($this->aTitle);
+            }
+
+            if ($this->aPublishingcompany !== null) {
+                if ($this->aPublishingcompany->isModified() || $this->aPublishingcompany->isNew()) {
+                    $affectedRows += $this->aPublishingcompany->save($con);
+                }
+                $this->setPublishingcompany($this->aPublishingcompany);
+            }
+
+            if ($this->aPlace !== null) {
+                if ($this->aPlace->isModified() || $this->aPlace->isNew()) {
+                    $affectedRows += $this->aPlace->save($con);
+                }
+                $this->setPlace($this->aPlace);
+            }
+
+            if ($this->aDatespecification !== null) {
+                if ($this->aDatespecification->isModified() || $this->aDatespecification->isNew()) {
+                    $affectedRows += $this->aDatespecification->save($con);
+                }
+                $this->setDatespecification($this->aDatespecification);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -373,21 +829,6 @@ abstract class BaseSeries extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->publicationsScheduledForDeletion !== null) {
-                if (!$this->publicationsScheduledForDeletion->isEmpty()) {
-                    PublicationQuery::create()
-                        ->filterByPrimaryKeys($this->publicationsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->publicationsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singlePublication !== null) {
-                if (!$this->singlePublication->isDeleted() && ($this->singlePublication->isNew() || $this->singlePublication->isModified())) {
-                        $affectedRows += $this->singlePublication->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -422,6 +863,36 @@ abstract class BaseSeries extends BaseObject implements Persistent
         if ($this->isColumnModified(SeriesPeer::VOLUME)) {
             $modifiedColumns[':p' . $index++]  = '`volume`';
         }
+        if ($this->isColumnModified(SeriesPeer::TITLE_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`title_id`';
+        }
+        if ($this->isColumnModified(SeriesPeer::PUBLISHINGCOMPANY_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`publishingCompany_id`';
+        }
+        if ($this->isColumnModified(SeriesPeer::PLACE_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`place_id`';
+        }
+        if ($this->isColumnModified(SeriesPeer::DATESPECIFICATION_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`dateSpecification_id`';
+        }
+        if ($this->isColumnModified(SeriesPeer::PRINTRUN)) {
+            $modifiedColumns[':p' . $index++]  = '`printRun`';
+        }
+        if ($this->isColumnModified(SeriesPeer::PRINTRUNCOMMENT)) {
+            $modifiedColumns[':p' . $index++]  = '`printRunComment`';
+        }
+        if ($this->isColumnModified(SeriesPeer::EDITION)) {
+            $modifiedColumns[':p' . $index++]  = '`edition`';
+        }
+        if ($this->isColumnModified(SeriesPeer::NUMPAGES)) {
+            $modifiedColumns[':p' . $index++]  = '`numPages`';
+        }
+        if ($this->isColumnModified(SeriesPeer::NUMPAGESNORMED)) {
+            $modifiedColumns[':p' . $index++]  = '`numPagesNormed`';
+        }
+        if ($this->isColumnModified(SeriesPeer::BIBLIOGRAPHICCITATION)) {
+            $modifiedColumns[':p' . $index++]  = '`bibliographicCitation`';
+        }
 
         $sql = sprintf(
             'INSERT INTO `series` (%s) VALUES (%s)',
@@ -438,6 +909,36 @@ abstract class BaseSeries extends BaseObject implements Persistent
                         break;
                     case '`volume`':
                         $stmt->bindValue($identifier, $this->volume, PDO::PARAM_STR);
+                        break;
+                    case '`title_id`':
+                        $stmt->bindValue($identifier, $this->title_id, PDO::PARAM_INT);
+                        break;
+                    case '`publishingCompany_id`':
+                        $stmt->bindValue($identifier, $this->publishingcompany_id, PDO::PARAM_INT);
+                        break;
+                    case '`place_id`':
+                        $stmt->bindValue($identifier, $this->place_id, PDO::PARAM_INT);
+                        break;
+                    case '`dateSpecification_id`':
+                        $stmt->bindValue($identifier, $this->datespecification_id, PDO::PARAM_INT);
+                        break;
+                    case '`printRun`':
+                        $stmt->bindValue($identifier, $this->printrun, PDO::PARAM_STR);
+                        break;
+                    case '`printRunComment`':
+                        $stmt->bindValue($identifier, $this->printruncomment, PDO::PARAM_STR);
+                        break;
+                    case '`edition`':
+                        $stmt->bindValue($identifier, $this->edition, PDO::PARAM_STR);
+                        break;
+                    case '`numPages`':
+                        $stmt->bindValue($identifier, $this->numpages, PDO::PARAM_INT);
+                        break;
+                    case '`numPagesNormed`':
+                        $stmt->bindValue($identifier, $this->numpagesnormed, PDO::PARAM_INT);
+                        break;
+                    case '`bibliographicCitation`':
+                        $stmt->bindValue($identifier, $this->bibliographiccitation, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -533,16 +1034,40 @@ abstract class BaseSeries extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aTitle !== null) {
+                if (!$this->aTitle->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aTitle->getValidationFailures());
+                }
+            }
+
+            if ($this->aPublishingcompany !== null) {
+                if (!$this->aPublishingcompany->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aPublishingcompany->getValidationFailures());
+                }
+            }
+
+            if ($this->aPlace !== null) {
+                if (!$this->aPlace->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aPlace->getValidationFailures());
+                }
+            }
+
+            if ($this->aDatespecification !== null) {
+                if (!$this->aDatespecification->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aDatespecification->getValidationFailures());
+                }
+            }
+
+
             if (($retval = SeriesPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singlePublication !== null) {
-                    if (!$this->singlePublication->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singlePublication->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -585,6 +1110,36 @@ abstract class BaseSeries extends BaseObject implements Persistent
             case 1:
                 return $this->getVolume();
                 break;
+            case 2:
+                return $this->getTitleId();
+                break;
+            case 3:
+                return $this->getPublishingcompanyId();
+                break;
+            case 4:
+                return $this->getPlaceId();
+                break;
+            case 5:
+                return $this->getDatespecificationId();
+                break;
+            case 6:
+                return $this->getPrintrun();
+                break;
+            case 7:
+                return $this->getPrintruncomment();
+                break;
+            case 8:
+                return $this->getEdition();
+                break;
+            case 9:
+                return $this->getNumpages();
+                break;
+            case 10:
+                return $this->getNumpagesnormed();
+                break;
+            case 11:
+                return $this->getBibliographiccitation();
+                break;
             default:
                 return null;
                 break;
@@ -616,10 +1171,29 @@ abstract class BaseSeries extends BaseObject implements Persistent
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getVolume(),
+            $keys[2] => $this->getTitleId(),
+            $keys[3] => $this->getPublishingcompanyId(),
+            $keys[4] => $this->getPlaceId(),
+            $keys[5] => $this->getDatespecificationId(),
+            $keys[6] => $this->getPrintrun(),
+            $keys[7] => $this->getPrintruncomment(),
+            $keys[8] => $this->getEdition(),
+            $keys[9] => $this->getNumpages(),
+            $keys[10] => $this->getNumpagesnormed(),
+            $keys[11] => $this->getBibliographiccitation(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singlePublication) {
-                $result['Publication'] = $this->singlePublication->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aTitle) {
+                $result['Title'] = $this->aTitle->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aPublishingcompany) {
+                $result['Publishingcompany'] = $this->aPublishingcompany->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aPlace) {
+                $result['Place'] = $this->aPlace->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aDatespecification) {
+                $result['Datespecification'] = $this->aDatespecification->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -661,6 +1235,36 @@ abstract class BaseSeries extends BaseObject implements Persistent
             case 1:
                 $this->setVolume($value);
                 break;
+            case 2:
+                $this->setTitleId($value);
+                break;
+            case 3:
+                $this->setPublishingcompanyId($value);
+                break;
+            case 4:
+                $this->setPlaceId($value);
+                break;
+            case 5:
+                $this->setDatespecificationId($value);
+                break;
+            case 6:
+                $this->setPrintrun($value);
+                break;
+            case 7:
+                $this->setPrintruncomment($value);
+                break;
+            case 8:
+                $this->setEdition($value);
+                break;
+            case 9:
+                $this->setNumpages($value);
+                break;
+            case 10:
+                $this->setNumpagesnormed($value);
+                break;
+            case 11:
+                $this->setBibliographiccitation($value);
+                break;
         } // switch()
     }
 
@@ -687,6 +1291,16 @@ abstract class BaseSeries extends BaseObject implements Persistent
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setVolume($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setTitleId($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setPublishingcompanyId($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setPlaceId($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setDatespecificationId($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setPrintrun($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setPrintruncomment($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setEdition($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setNumpages($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setNumpagesnormed($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setBibliographiccitation($arr[$keys[11]]);
     }
 
     /**
@@ -700,6 +1314,16 @@ abstract class BaseSeries extends BaseObject implements Persistent
 
         if ($this->isColumnModified(SeriesPeer::ID)) $criteria->add(SeriesPeer::ID, $this->id);
         if ($this->isColumnModified(SeriesPeer::VOLUME)) $criteria->add(SeriesPeer::VOLUME, $this->volume);
+        if ($this->isColumnModified(SeriesPeer::TITLE_ID)) $criteria->add(SeriesPeer::TITLE_ID, $this->title_id);
+        if ($this->isColumnModified(SeriesPeer::PUBLISHINGCOMPANY_ID)) $criteria->add(SeriesPeer::PUBLISHINGCOMPANY_ID, $this->publishingcompany_id);
+        if ($this->isColumnModified(SeriesPeer::PLACE_ID)) $criteria->add(SeriesPeer::PLACE_ID, $this->place_id);
+        if ($this->isColumnModified(SeriesPeer::DATESPECIFICATION_ID)) $criteria->add(SeriesPeer::DATESPECIFICATION_ID, $this->datespecification_id);
+        if ($this->isColumnModified(SeriesPeer::PRINTRUN)) $criteria->add(SeriesPeer::PRINTRUN, $this->printrun);
+        if ($this->isColumnModified(SeriesPeer::PRINTRUNCOMMENT)) $criteria->add(SeriesPeer::PRINTRUNCOMMENT, $this->printruncomment);
+        if ($this->isColumnModified(SeriesPeer::EDITION)) $criteria->add(SeriesPeer::EDITION, $this->edition);
+        if ($this->isColumnModified(SeriesPeer::NUMPAGES)) $criteria->add(SeriesPeer::NUMPAGES, $this->numpages);
+        if ($this->isColumnModified(SeriesPeer::NUMPAGESNORMED)) $criteria->add(SeriesPeer::NUMPAGESNORMED, $this->numpagesnormed);
+        if ($this->isColumnModified(SeriesPeer::BIBLIOGRAPHICCITATION)) $criteria->add(SeriesPeer::BIBLIOGRAPHICCITATION, $this->bibliographiccitation);
 
         return $criteria;
     }
@@ -764,6 +1388,16 @@ abstract class BaseSeries extends BaseObject implements Persistent
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setVolume($this->getVolume());
+        $copyObj->setTitleId($this->getTitleId());
+        $copyObj->setPublishingcompanyId($this->getPublishingcompanyId());
+        $copyObj->setPlaceId($this->getPlaceId());
+        $copyObj->setDatespecificationId($this->getDatespecificationId());
+        $copyObj->setPrintrun($this->getPrintrun());
+        $copyObj->setPrintruncomment($this->getPrintruncomment());
+        $copyObj->setEdition($this->getEdition());
+        $copyObj->setNumpages($this->getNumpages());
+        $copyObj->setNumpagesnormed($this->getNumpagesnormed());
+        $copyObj->setBibliographiccitation($this->getBibliographiccitation());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -771,11 +1405,6 @@ abstract class BaseSeries extends BaseObject implements Persistent
             $copyObj->setNew(false);
             // store object hash to prevent cycle
             $this->startCopy = true;
-
-            $relObj = $this->getPublication();
-            if ($relObj) {
-                $copyObj->setPublication($relObj->copy($deepCopy));
-            }
 
             //unflag object copy
             $this->startCopy = false;
@@ -827,53 +1456,212 @@ abstract class BaseSeries extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Title object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Publication object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Publication
-     * @throws PropelException
-     */
-    public function getPublication(PropelPDO $con = null)
-    {
-
-        if ($this->singlePublication === null && !$this->isNew()) {
-            $this->singlePublication = PublicationQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singlePublication;
-    }
-
-    /**
-     * Sets a single Publication object as related to this object by a one-to-one relationship.
-     *
-     * @param             Publication $v Publication
+     * @param             Title $v
      * @return Series The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setPublication(Publication $v = null)
+    public function setTitle(Title $v = null)
     {
-        $this->singlePublication = $v;
-
-        // Make sure that that the passed-in Publication isn't already associated with this object
-        if ($v !== null && $v->getSeries(null, false) === null) {
-            $v->setSeries($this);
+        if ($v === null) {
+            $this->setTitleId(NULL);
+        } else {
+            $this->setTitleId($v->getId());
         }
 
+        $this->aTitle = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Title object, it will not be re-added.
+        if ($v !== null) {
+            $v->addSeries($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated Title object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return Title The associated Title object.
+     * @throws PropelException
+     */
+    public function getTitle(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aTitle === null && ($this->title_id !== null) && $doQuery) {
+            $this->aTitle = TitleQuery::create()->findPk($this->title_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aTitle->addSeries($this);
+             */
+        }
+
+        return $this->aTitle;
+    }
+
+    /**
+     * Declares an association between this object and a Publishingcompany object.
+     *
+     * @param             Publishingcompany $v
+     * @return Series The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setPublishingcompany(Publishingcompany $v = null)
+    {
+        if ($v === null) {
+            $this->setPublishingcompanyId(NULL);
+        } else {
+            $this->setPublishingcompanyId($v->getId());
+        }
+
+        $this->aPublishingcompany = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Publishingcompany object, it will not be re-added.
+        if ($v !== null) {
+            $v->addSeries($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Publishingcompany object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return Publishingcompany The associated Publishingcompany object.
+     * @throws PropelException
+     */
+    public function getPublishingcompany(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aPublishingcompany === null && ($this->publishingcompany_id !== null) && $doQuery) {
+            $this->aPublishingcompany = PublishingcompanyQuery::create()->findPk($this->publishingcompany_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aPublishingcompany->addSeries($this);
+             */
+        }
+
+        return $this->aPublishingcompany;
+    }
+
+    /**
+     * Declares an association between this object and a Place object.
+     *
+     * @param             Place $v
+     * @return Series The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setPlace(Place $v = null)
+    {
+        if ($v === null) {
+            $this->setPlaceId(NULL);
+        } else {
+            $this->setPlaceId($v->getId());
+        }
+
+        $this->aPlace = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Place object, it will not be re-added.
+        if ($v !== null) {
+            $v->addSeries($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Place object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return Place The associated Place object.
+     * @throws PropelException
+     */
+    public function getPlace(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aPlace === null && ($this->place_id !== null) && $doQuery) {
+            $this->aPlace = PlaceQuery::create()->findPk($this->place_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aPlace->addSeries($this);
+             */
+        }
+
+        return $this->aPlace;
+    }
+
+    /**
+     * Declares an association between this object and a Datespecification object.
+     *
+     * @param             Datespecification $v
+     * @return Series The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setDatespecification(Datespecification $v = null)
+    {
+        if ($v === null) {
+            $this->setDatespecificationId(NULL);
+        } else {
+            $this->setDatespecificationId($v->getId());
+        }
+
+        $this->aDatespecification = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Datespecification object, it will not be re-added.
+        if ($v !== null) {
+            $v->addSeries($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Datespecification object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return Datespecification The associated Datespecification object.
+     * @throws PropelException
+     */
+    public function getDatespecification(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aDatespecification === null && ($this->datespecification_id !== null) && $doQuery) {
+            $this->aDatespecification = DatespecificationQuery::create()->findPk($this->datespecification_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aDatespecification->addSeries($this);
+             */
+        }
+
+        return $this->aDatespecification;
     }
 
     /**
@@ -883,6 +1671,16 @@ abstract class BaseSeries extends BaseObject implements Persistent
     {
         $this->id = null;
         $this->volume = null;
+        $this->title_id = null;
+        $this->publishingcompany_id = null;
+        $this->place_id = null;
+        $this->datespecification_id = null;
+        $this->printrun = null;
+        $this->printruncomment = null;
+        $this->edition = null;
+        $this->numpages = null;
+        $this->numpagesnormed = null;
+        $this->bibliographiccitation = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
@@ -905,17 +1703,26 @@ abstract class BaseSeries extends BaseObject implements Persistent
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
-            if ($this->singlePublication) {
-                $this->singlePublication->clearAllReferences($deep);
+            if ($this->aTitle instanceof Persistent) {
+              $this->aTitle->clearAllReferences($deep);
+            }
+            if ($this->aPublishingcompany instanceof Persistent) {
+              $this->aPublishingcompany->clearAllReferences($deep);
+            }
+            if ($this->aPlace instanceof Persistent) {
+              $this->aPlace->clearAllReferences($deep);
+            }
+            if ($this->aDatespecification instanceof Persistent) {
+              $this->aDatespecification->clearAllReferences($deep);
             }
 
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
-        if ($this->singlePublication instanceof PropelCollection) {
-            $this->singlePublication->clearIterator();
-        }
-        $this->singlePublication = null;
+        $this->aTitle = null;
+        $this->aPublishingcompany = null;
+        $this->aPlace = null;
+        $this->aDatespecification = null;
     }
 
     /**
@@ -936,26 +1743,6 @@ abstract class BaseSeries extends BaseObject implements Persistent
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
-    }
-
-    /**
-     * Catches calls to virtual methods
-     */
-    public function __call($name, $params)
-    {
-
-        // delegate behavior
-
-        if (is_callable(array('DTA\MetadataBundle\Model\Publication', $name))) {
-            if (!$delegate = $this->getPublication()) {
-                $delegate = new Publication();
-                $this->setPublication($delegate);
-            }
-
-            return call_user_func_array(array($delegate, $name), $params);
-        }
-
-        return parent::__call($name, $params);
     }
 
 }

@@ -30,13 +30,13 @@ use DTA\MetadataBundle\Model\WritgroupQuery;
  * @method WritgroupQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method WritgroupQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method WritgroupQuery leftJoinTask($relationAlias = null) Adds a LEFT JOIN clause to the query using the Task relation
- * @method WritgroupQuery rightJoinTask($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Task relation
- * @method WritgroupQuery innerJoinTask($relationAlias = null) Adds a INNER JOIN clause to the query using the Task relation
- *
  * @method WritgroupQuery leftJoinWritWritgroup($relationAlias = null) Adds a LEFT JOIN clause to the query using the WritWritgroup relation
  * @method WritgroupQuery rightJoinWritWritgroup($relationAlias = null) Adds a RIGHT JOIN clause to the query using the WritWritgroup relation
  * @method WritgroupQuery innerJoinWritWritgroup($relationAlias = null) Adds a INNER JOIN clause to the query using the WritWritgroup relation
+ *
+ * @method WritgroupQuery leftJoinTask($relationAlias = null) Adds a LEFT JOIN clause to the query using the Task relation
+ * @method WritgroupQuery rightJoinTask($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Task relation
+ * @method WritgroupQuery innerJoinTask($relationAlias = null) Adds a INNER JOIN clause to the query using the Task relation
  *
  * @method Writgroup findOne(PropelPDO $con = null) Return the first Writgroup matching the query
  * @method Writgroup findOneOrCreate(PropelPDO $con = null) Return the first Writgroup matching the query, or a new Writgroup object populated from the query conditions when no match is found
@@ -307,80 +307,6 @@ abstract class BaseWritgroupQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Task object
-     *
-     * @param   Task|PropelObjectCollection $task  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 WritgroupQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByTask($task, $comparison = null)
-    {
-        if ($task instanceof Task) {
-            return $this
-                ->addUsingAlias(WritgroupPeer::ID, $task->getWritgroupId(), $comparison);
-        } elseif ($task instanceof PropelObjectCollection) {
-            return $this
-                ->useTaskQuery()
-                ->filterByPrimaryKeys($task->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByTask() only accepts arguments of type Task or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Task relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return WritgroupQuery The current query, for fluid interface
-     */
-    public function joinTask($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Task');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Task');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Task relation Task object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\TaskQuery A secondary query class using the current class as primary query
-     */
-    public function useTaskQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinTask($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Task', '\DTA\MetadataBundle\Model\TaskQuery');
-    }
-
-    /**
      * Filter the query by a related WritWritgroup object
      *
      * @param   WritWritgroup|PropelObjectCollection $writWritgroup  the related object to use as filter
@@ -452,6 +378,80 @@ abstract class BaseWritgroupQuery extends ModelCriteria
         return $this
             ->joinWritWritgroup($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'WritWritgroup', '\DTA\MetadataBundle\Model\WritWritgroupQuery');
+    }
+
+    /**
+     * Filter the query by a related Task object
+     *
+     * @param   Task|PropelObjectCollection $task  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 WritgroupQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByTask($task, $comparison = null)
+    {
+        if ($task instanceof Task) {
+            return $this
+                ->addUsingAlias(WritgroupPeer::ID, $task->getWritgroupId(), $comparison);
+        } elseif ($task instanceof PropelObjectCollection) {
+            return $this
+                ->useTaskQuery()
+                ->filterByPrimaryKeys($task->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByTask() only accepts arguments of type Task or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Task relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return WritgroupQuery The current query, for fluid interface
+     */
+    public function joinTask($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Task');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Task');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Task relation Task object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\TaskQuery A secondary query class using the current class as primary query
+     */
+    public function useTaskQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinTask($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Task', '\DTA\MetadataBundle\Model\TaskQuery');
     }
 
     /**

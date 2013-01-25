@@ -12,29 +12,84 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use DTA\MetadataBundle\Model\Datespecification;
 use DTA\MetadataBundle\Model\Essay;
 use DTA\MetadataBundle\Model\EssayPeer;
 use DTA\MetadataBundle\Model\EssayQuery;
-use DTA\MetadataBundle\Model\Publication;
+use DTA\MetadataBundle\Model\Place;
+use DTA\MetadataBundle\Model\Publishingcompany;
+use DTA\MetadataBundle\Model\Title;
 
 /**
  * @method EssayQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method EssayQuery orderByTitleId($order = Criteria::ASC) Order by the title_id column
+ * @method EssayQuery orderByPublishingcompanyId($order = Criteria::ASC) Order by the publishingCompany_id column
+ * @method EssayQuery orderByPlaceId($order = Criteria::ASC) Order by the place_id column
+ * @method EssayQuery orderByDatespecificationId($order = Criteria::ASC) Order by the dateSpecification_id column
+ * @method EssayQuery orderByPrintrun($order = Criteria::ASC) Order by the printRun column
+ * @method EssayQuery orderByPrintruncomment($order = Criteria::ASC) Order by the printRunComment column
+ * @method EssayQuery orderByEdition($order = Criteria::ASC) Order by the edition column
+ * @method EssayQuery orderByNumpages($order = Criteria::ASC) Order by the numPages column
+ * @method EssayQuery orderByNumpagesnormed($order = Criteria::ASC) Order by the numPagesNormed column
+ * @method EssayQuery orderByBibliographiccitation($order = Criteria::ASC) Order by the bibliographicCitation column
  *
  * @method EssayQuery groupById() Group by the id column
+ * @method EssayQuery groupByTitleId() Group by the title_id column
+ * @method EssayQuery groupByPublishingcompanyId() Group by the publishingCompany_id column
+ * @method EssayQuery groupByPlaceId() Group by the place_id column
+ * @method EssayQuery groupByDatespecificationId() Group by the dateSpecification_id column
+ * @method EssayQuery groupByPrintrun() Group by the printRun column
+ * @method EssayQuery groupByPrintruncomment() Group by the printRunComment column
+ * @method EssayQuery groupByEdition() Group by the edition column
+ * @method EssayQuery groupByNumpages() Group by the numPages column
+ * @method EssayQuery groupByNumpagesnormed() Group by the numPagesNormed column
+ * @method EssayQuery groupByBibliographiccitation() Group by the bibliographicCitation column
  *
  * @method EssayQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method EssayQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method EssayQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method EssayQuery leftJoinPublication($relationAlias = null) Adds a LEFT JOIN clause to the query using the Publication relation
- * @method EssayQuery rightJoinPublication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Publication relation
- * @method EssayQuery innerJoinPublication($relationAlias = null) Adds a INNER JOIN clause to the query using the Publication relation
+ * @method EssayQuery leftJoinTitle($relationAlias = null) Adds a LEFT JOIN clause to the query using the Title relation
+ * @method EssayQuery rightJoinTitle($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Title relation
+ * @method EssayQuery innerJoinTitle($relationAlias = null) Adds a INNER JOIN clause to the query using the Title relation
+ *
+ * @method EssayQuery leftJoinPublishingcompany($relationAlias = null) Adds a LEFT JOIN clause to the query using the Publishingcompany relation
+ * @method EssayQuery rightJoinPublishingcompany($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Publishingcompany relation
+ * @method EssayQuery innerJoinPublishingcompany($relationAlias = null) Adds a INNER JOIN clause to the query using the Publishingcompany relation
+ *
+ * @method EssayQuery leftJoinPlace($relationAlias = null) Adds a LEFT JOIN clause to the query using the Place relation
+ * @method EssayQuery rightJoinPlace($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Place relation
+ * @method EssayQuery innerJoinPlace($relationAlias = null) Adds a INNER JOIN clause to the query using the Place relation
+ *
+ * @method EssayQuery leftJoinDatespecification($relationAlias = null) Adds a LEFT JOIN clause to the query using the Datespecification relation
+ * @method EssayQuery rightJoinDatespecification($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Datespecification relation
+ * @method EssayQuery innerJoinDatespecification($relationAlias = null) Adds a INNER JOIN clause to the query using the Datespecification relation
  *
  * @method Essay findOne(PropelPDO $con = null) Return the first Essay matching the query
  * @method Essay findOneOrCreate(PropelPDO $con = null) Return the first Essay matching the query, or a new Essay object populated from the query conditions when no match is found
  *
+ * @method Essay findOneByTitleId(int $title_id) Return the first Essay filtered by the title_id column
+ * @method Essay findOneByPublishingcompanyId(int $publishingCompany_id) Return the first Essay filtered by the publishingCompany_id column
+ * @method Essay findOneByPlaceId(int $place_id) Return the first Essay filtered by the place_id column
+ * @method Essay findOneByDatespecificationId(int $dateSpecification_id) Return the first Essay filtered by the dateSpecification_id column
+ * @method Essay findOneByPrintrun(string $printRun) Return the first Essay filtered by the printRun column
+ * @method Essay findOneByPrintruncomment(string $printRunComment) Return the first Essay filtered by the printRunComment column
+ * @method Essay findOneByEdition(string $edition) Return the first Essay filtered by the edition column
+ * @method Essay findOneByNumpages(int $numPages) Return the first Essay filtered by the numPages column
+ * @method Essay findOneByNumpagesnormed(int $numPagesNormed) Return the first Essay filtered by the numPagesNormed column
+ * @method Essay findOneByBibliographiccitation(string $bibliographicCitation) Return the first Essay filtered by the bibliographicCitation column
  *
  * @method array findById(int $id) Return Essay objects filtered by the id column
+ * @method array findByTitleId(int $title_id) Return Essay objects filtered by the title_id column
+ * @method array findByPublishingcompanyId(int $publishingCompany_id) Return Essay objects filtered by the publishingCompany_id column
+ * @method array findByPlaceId(int $place_id) Return Essay objects filtered by the place_id column
+ * @method array findByDatespecificationId(int $dateSpecification_id) Return Essay objects filtered by the dateSpecification_id column
+ * @method array findByPrintrun(string $printRun) Return Essay objects filtered by the printRun column
+ * @method array findByPrintruncomment(string $printRunComment) Return Essay objects filtered by the printRunComment column
+ * @method array findByEdition(string $edition) Return Essay objects filtered by the edition column
+ * @method array findByNumpages(int $numPages) Return Essay objects filtered by the numPages column
+ * @method array findByNumpagesnormed(int $numPagesNormed) Return Essay objects filtered by the numPagesNormed column
+ * @method array findByBibliographiccitation(string $bibliographicCitation) Return Essay objects filtered by the bibliographicCitation column
  */
 abstract class BaseEssayQuery extends ModelCriteria
 {
@@ -136,7 +191,7 @@ abstract class BaseEssayQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id` FROM `essay` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `title_id`, `publishingCompany_id`, `place_id`, `dateSpecification_id`, `printRun`, `printRunComment`, `edition`, `numPages`, `numPagesNormed`, `bibliographicCitation` FROM `essay` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -268,41 +323,419 @@ abstract class BaseEssayQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Publication object
+     * Filter the query on the title_id column
      *
-     * @param   Publication|PropelObjectCollection $publication  the related object to use as filter
+     * Example usage:
+     * <code>
+     * $query->filterByTitleId(1234); // WHERE title_id = 1234
+     * $query->filterByTitleId(array(12, 34)); // WHERE title_id IN (12, 34)
+     * $query->filterByTitleId(array('min' => 12)); // WHERE title_id >= 12
+     * $query->filterByTitleId(array('max' => 12)); // WHERE title_id <= 12
+     * </code>
+     *
+     * @see       filterByTitle()
+     *
+     * @param     mixed $titleId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return EssayQuery The current query, for fluid interface
+     */
+    public function filterByTitleId($titleId = null, $comparison = null)
+    {
+        if (is_array($titleId)) {
+            $useMinMax = false;
+            if (isset($titleId['min'])) {
+                $this->addUsingAlias(EssayPeer::TITLE_ID, $titleId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($titleId['max'])) {
+                $this->addUsingAlias(EssayPeer::TITLE_ID, $titleId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(EssayPeer::TITLE_ID, $titleId, $comparison);
+    }
+
+    /**
+     * Filter the query on the publishingCompany_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPublishingcompanyId(1234); // WHERE publishingCompany_id = 1234
+     * $query->filterByPublishingcompanyId(array(12, 34)); // WHERE publishingCompany_id IN (12, 34)
+     * $query->filterByPublishingcompanyId(array('min' => 12)); // WHERE publishingCompany_id >= 12
+     * $query->filterByPublishingcompanyId(array('max' => 12)); // WHERE publishingCompany_id <= 12
+     * </code>
+     *
+     * @see       filterByPublishingcompany()
+     *
+     * @param     mixed $publishingcompanyId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return EssayQuery The current query, for fluid interface
+     */
+    public function filterByPublishingcompanyId($publishingcompanyId = null, $comparison = null)
+    {
+        if (is_array($publishingcompanyId)) {
+            $useMinMax = false;
+            if (isset($publishingcompanyId['min'])) {
+                $this->addUsingAlias(EssayPeer::PUBLISHINGCOMPANY_ID, $publishingcompanyId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($publishingcompanyId['max'])) {
+                $this->addUsingAlias(EssayPeer::PUBLISHINGCOMPANY_ID, $publishingcompanyId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(EssayPeer::PUBLISHINGCOMPANY_ID, $publishingcompanyId, $comparison);
+    }
+
+    /**
+     * Filter the query on the place_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPlaceId(1234); // WHERE place_id = 1234
+     * $query->filterByPlaceId(array(12, 34)); // WHERE place_id IN (12, 34)
+     * $query->filterByPlaceId(array('min' => 12)); // WHERE place_id >= 12
+     * $query->filterByPlaceId(array('max' => 12)); // WHERE place_id <= 12
+     * </code>
+     *
+     * @see       filterByPlace()
+     *
+     * @param     mixed $placeId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return EssayQuery The current query, for fluid interface
+     */
+    public function filterByPlaceId($placeId = null, $comparison = null)
+    {
+        if (is_array($placeId)) {
+            $useMinMax = false;
+            if (isset($placeId['min'])) {
+                $this->addUsingAlias(EssayPeer::PLACE_ID, $placeId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($placeId['max'])) {
+                $this->addUsingAlias(EssayPeer::PLACE_ID, $placeId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(EssayPeer::PLACE_ID, $placeId, $comparison);
+    }
+
+    /**
+     * Filter the query on the dateSpecification_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByDatespecificationId(1234); // WHERE dateSpecification_id = 1234
+     * $query->filterByDatespecificationId(array(12, 34)); // WHERE dateSpecification_id IN (12, 34)
+     * $query->filterByDatespecificationId(array('min' => 12)); // WHERE dateSpecification_id >= 12
+     * $query->filterByDatespecificationId(array('max' => 12)); // WHERE dateSpecification_id <= 12
+     * </code>
+     *
+     * @see       filterByDatespecification()
+     *
+     * @param     mixed $datespecificationId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return EssayQuery The current query, for fluid interface
+     */
+    public function filterByDatespecificationId($datespecificationId = null, $comparison = null)
+    {
+        if (is_array($datespecificationId)) {
+            $useMinMax = false;
+            if (isset($datespecificationId['min'])) {
+                $this->addUsingAlias(EssayPeer::DATESPECIFICATION_ID, $datespecificationId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($datespecificationId['max'])) {
+                $this->addUsingAlias(EssayPeer::DATESPECIFICATION_ID, $datespecificationId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(EssayPeer::DATESPECIFICATION_ID, $datespecificationId, $comparison);
+    }
+
+    /**
+     * Filter the query on the printRun column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPrintrun('fooValue');   // WHERE printRun = 'fooValue'
+     * $query->filterByPrintrun('%fooValue%'); // WHERE printRun LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $printrun The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return EssayQuery The current query, for fluid interface
+     */
+    public function filterByPrintrun($printrun = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($printrun)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $printrun)) {
+                $printrun = str_replace('*', '%', $printrun);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(EssayPeer::PRINTRUN, $printrun, $comparison);
+    }
+
+    /**
+     * Filter the query on the printRunComment column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPrintruncomment('fooValue');   // WHERE printRunComment = 'fooValue'
+     * $query->filterByPrintruncomment('%fooValue%'); // WHERE printRunComment LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $printruncomment The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return EssayQuery The current query, for fluid interface
+     */
+    public function filterByPrintruncomment($printruncomment = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($printruncomment)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $printruncomment)) {
+                $printruncomment = str_replace('*', '%', $printruncomment);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(EssayPeer::PRINTRUNCOMMENT, $printruncomment, $comparison);
+    }
+
+    /**
+     * Filter the query on the edition column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByEdition('fooValue');   // WHERE edition = 'fooValue'
+     * $query->filterByEdition('%fooValue%'); // WHERE edition LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $edition The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return EssayQuery The current query, for fluid interface
+     */
+    public function filterByEdition($edition = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($edition)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $edition)) {
+                $edition = str_replace('*', '%', $edition);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(EssayPeer::EDITION, $edition, $comparison);
+    }
+
+    /**
+     * Filter the query on the numPages column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByNumpages(1234); // WHERE numPages = 1234
+     * $query->filterByNumpages(array(12, 34)); // WHERE numPages IN (12, 34)
+     * $query->filterByNumpages(array('min' => 12)); // WHERE numPages >= 12
+     * $query->filterByNumpages(array('max' => 12)); // WHERE numPages <= 12
+     * </code>
+     *
+     * @param     mixed $numpages The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return EssayQuery The current query, for fluid interface
+     */
+    public function filterByNumpages($numpages = null, $comparison = null)
+    {
+        if (is_array($numpages)) {
+            $useMinMax = false;
+            if (isset($numpages['min'])) {
+                $this->addUsingAlias(EssayPeer::NUMPAGES, $numpages['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($numpages['max'])) {
+                $this->addUsingAlias(EssayPeer::NUMPAGES, $numpages['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(EssayPeer::NUMPAGES, $numpages, $comparison);
+    }
+
+    /**
+     * Filter the query on the numPagesNormed column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByNumpagesnormed(1234); // WHERE numPagesNormed = 1234
+     * $query->filterByNumpagesnormed(array(12, 34)); // WHERE numPagesNormed IN (12, 34)
+     * $query->filterByNumpagesnormed(array('min' => 12)); // WHERE numPagesNormed >= 12
+     * $query->filterByNumpagesnormed(array('max' => 12)); // WHERE numPagesNormed <= 12
+     * </code>
+     *
+     * @param     mixed $numpagesnormed The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return EssayQuery The current query, for fluid interface
+     */
+    public function filterByNumpagesnormed($numpagesnormed = null, $comparison = null)
+    {
+        if (is_array($numpagesnormed)) {
+            $useMinMax = false;
+            if (isset($numpagesnormed['min'])) {
+                $this->addUsingAlias(EssayPeer::NUMPAGESNORMED, $numpagesnormed['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($numpagesnormed['max'])) {
+                $this->addUsingAlias(EssayPeer::NUMPAGESNORMED, $numpagesnormed['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(EssayPeer::NUMPAGESNORMED, $numpagesnormed, $comparison);
+    }
+
+    /**
+     * Filter the query on the bibliographicCitation column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByBibliographiccitation('fooValue');   // WHERE bibliographicCitation = 'fooValue'
+     * $query->filterByBibliographiccitation('%fooValue%'); // WHERE bibliographicCitation LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $bibliographiccitation The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return EssayQuery The current query, for fluid interface
+     */
+    public function filterByBibliographiccitation($bibliographiccitation = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($bibliographiccitation)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $bibliographiccitation)) {
+                $bibliographiccitation = str_replace('*', '%', $bibliographiccitation);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(EssayPeer::BIBLIOGRAPHICCITATION, $bibliographiccitation, $comparison);
+    }
+
+    /**
+     * Filter the query by a related Title object
+     *
+     * @param   Title|PropelObjectCollection $title The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return                 EssayQuery The current query, for fluid interface
      * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterByPublication($publication, $comparison = null)
+    public function filterByTitle($title, $comparison = null)
     {
-        if ($publication instanceof Publication) {
+        if ($title instanceof Title) {
             return $this
-                ->addUsingAlias(EssayPeer::ID, $publication->getId(), $comparison);
-        } elseif ($publication instanceof PropelObjectCollection) {
+                ->addUsingAlias(EssayPeer::TITLE_ID, $title->getId(), $comparison);
+        } elseif ($title instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->usePublicationQuery()
-                ->filterByPrimaryKeys($publication->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(EssayPeer::TITLE_ID, $title->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByPublication() only accepts arguments of type Publication or PropelCollection');
+            throw new PropelException('filterByTitle() only accepts arguments of type Title or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Publication relation
+     * Adds a JOIN clause to the query using the Title relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return EssayQuery The current query, for fluid interface
      */
-    public function joinPublication($relationAlias = null, $joinType = 'LEFT JOIN')
+    public function joinTitle($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Publication');
+        $relationMap = $tableMap->getRelation('Title');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -317,14 +750,14 @@ abstract class BaseEssayQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Publication');
+            $this->addJoinObject($join, 'Title');
         }
 
         return $this;
     }
 
     /**
-     * Use the Publication relation Publication object
+     * Use the Title relation Title object
      *
      * @see       useQuery()
      *
@@ -332,13 +765,241 @@ abstract class BaseEssayQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \DTA\MetadataBundle\Model\PublicationQuery A secondary query class using the current class as primary query
+     * @return   \DTA\MetadataBundle\Model\TitleQuery A secondary query class using the current class as primary query
      */
-    public function usePublicationQuery($relationAlias = null, $joinType = 'LEFT JOIN')
+    public function useTitleQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinPublication($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Publication', '\DTA\MetadataBundle\Model\PublicationQuery');
+            ->joinTitle($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Title', '\DTA\MetadataBundle\Model\TitleQuery');
+    }
+
+    /**
+     * Filter the query by a related Publishingcompany object
+     *
+     * @param   Publishingcompany|PropelObjectCollection $publishingcompany The related object(s) to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 EssayQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByPublishingcompany($publishingcompany, $comparison = null)
+    {
+        if ($publishingcompany instanceof Publishingcompany) {
+            return $this
+                ->addUsingAlias(EssayPeer::PUBLISHINGCOMPANY_ID, $publishingcompany->getId(), $comparison);
+        } elseif ($publishingcompany instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(EssayPeer::PUBLISHINGCOMPANY_ID, $publishingcompany->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByPublishingcompany() only accepts arguments of type Publishingcompany or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Publishingcompany relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return EssayQuery The current query, for fluid interface
+     */
+    public function joinPublishingcompany($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Publishingcompany');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Publishingcompany');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Publishingcompany relation Publishingcompany object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\PublishingcompanyQuery A secondary query class using the current class as primary query
+     */
+    public function usePublishingcompanyQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinPublishingcompany($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Publishingcompany', '\DTA\MetadataBundle\Model\PublishingcompanyQuery');
+    }
+
+    /**
+     * Filter the query by a related Place object
+     *
+     * @param   Place|PropelObjectCollection $place The related object(s) to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 EssayQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByPlace($place, $comparison = null)
+    {
+        if ($place instanceof Place) {
+            return $this
+                ->addUsingAlias(EssayPeer::PLACE_ID, $place->getId(), $comparison);
+        } elseif ($place instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(EssayPeer::PLACE_ID, $place->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByPlace() only accepts arguments of type Place or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Place relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return EssayQuery The current query, for fluid interface
+     */
+    public function joinPlace($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Place');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Place');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Place relation Place object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\PlaceQuery A secondary query class using the current class as primary query
+     */
+    public function usePlaceQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinPlace($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Place', '\DTA\MetadataBundle\Model\PlaceQuery');
+    }
+
+    /**
+     * Filter the query by a related Datespecification object
+     *
+     * @param   Datespecification|PropelObjectCollection $datespecification The related object(s) to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 EssayQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByDatespecification($datespecification, $comparison = null)
+    {
+        if ($datespecification instanceof Datespecification) {
+            return $this
+                ->addUsingAlias(EssayPeer::DATESPECIFICATION_ID, $datespecification->getId(), $comparison);
+        } elseif ($datespecification instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(EssayPeer::DATESPECIFICATION_ID, $datespecification->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByDatespecification() only accepts arguments of type Datespecification or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Datespecification relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return EssayQuery The current query, for fluid interface
+     */
+    public function joinDatespecification($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Datespecification');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Datespecification');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Datespecification relation Datespecification object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\DatespecificationQuery A secondary query class using the current class as primary query
+     */
+    public function useDatespecificationQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinDatespecification($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Datespecification', '\DTA\MetadataBundle\Model\DatespecificationQuery');
     }
 
     /**

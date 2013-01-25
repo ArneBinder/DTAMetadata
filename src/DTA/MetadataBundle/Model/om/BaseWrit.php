@@ -139,6 +139,12 @@ abstract class BaseWrit extends BaseObject implements Persistent
     protected $aRelatedset;
 
     /**
+     * @var        PropelObjectCollection|WritWritgroup[] Collection to store aggregation of WritWritgroup objects.
+     */
+    protected $collWritWritgroups;
+    protected $collWritWritgroupsPartial;
+
+    /**
      * @var        PropelObjectCollection|Corpus[] Collection to store aggregation of Corpus objects.
      */
     protected $collCorpuses;
@@ -155,12 +161,6 @@ abstract class BaseWrit extends BaseObject implements Persistent
      */
     protected $collTasks;
     protected $collTasksPartial;
-
-    /**
-     * @var        PropelObjectCollection|WritWritgroup[] Collection to store aggregation of WritWritgroup objects.
-     */
-    protected $collWritWritgroups;
-    protected $collWritWritgroupsPartial;
 
     /**
      * @var        PropelObjectCollection|Writgroup[] Collection to store aggregation of Writgroup objects.
@@ -197,6 +197,12 @@ abstract class BaseWrit extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
+    protected $writWritgroupsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
     protected $corpusesScheduledForDeletion = null;
 
     /**
@@ -210,12 +216,6 @@ abstract class BaseWrit extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $tasksScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $writWritgroupsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -623,13 +623,13 @@ abstract class BaseWrit extends BaseObject implements Persistent
             $this->aTranslator = null;
             $this->aPublication = null;
             $this->aRelatedset = null;
+            $this->collWritWritgroups = null;
+
             $this->collCorpuses = null;
 
             $this->collSources = null;
 
             $this->collTasks = null;
-
-            $this->collWritWritgroups = null;
 
             $this->collWritgroups = null;
         } // if (deep)
@@ -829,6 +829,23 @@ abstract class BaseWrit extends BaseObject implements Persistent
                 }
             }
 
+            if ($this->writWritgroupsScheduledForDeletion !== null) {
+                if (!$this->writWritgroupsScheduledForDeletion->isEmpty()) {
+                    WritWritgroupQuery::create()
+                        ->filterByPrimaryKeys($this->writWritgroupsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->writWritgroupsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collWritWritgroups !== null) {
+                foreach ($this->collWritWritgroups as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             if ($this->corpusesScheduledForDeletion !== null) {
                 if (!$this->corpusesScheduledForDeletion->isEmpty()) {
                     foreach ($this->corpusesScheduledForDeletion as $corpus) {
@@ -876,23 +893,6 @@ abstract class BaseWrit extends BaseObject implements Persistent
 
             if ($this->collTasks !== null) {
                 foreach ($this->collTasks as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
-            if ($this->writWritgroupsScheduledForDeletion !== null) {
-                if (!$this->writWritgroupsScheduledForDeletion->isEmpty()) {
-                    WritWritgroupQuery::create()
-                        ->filterByPrimaryKeys($this->writWritgroupsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->writWritgroupsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collWritWritgroups !== null) {
-                foreach ($this->collWritWritgroups as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1125,6 +1125,14 @@ abstract class BaseWrit extends BaseObject implements Persistent
             }
 
 
+                if ($this->collWritWritgroups !== null) {
+                    foreach ($this->collWritWritgroups as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
                 if ($this->collCorpuses !== null) {
                     foreach ($this->collCorpuses as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -1143,14 +1151,6 @@ abstract class BaseWrit extends BaseObject implements Persistent
 
                 if ($this->collTasks !== null) {
                     foreach ($this->collTasks as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
-                if ($this->collWritWritgroups !== null) {
-                    foreach ($this->collWritWritgroups as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -1273,6 +1273,9 @@ abstract class BaseWrit extends BaseObject implements Persistent
             if (null !== $this->aRelatedset) {
                 $result['Relatedset'] = $this->aRelatedset->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
+            if (null !== $this->collWritWritgroups) {
+                $result['WritWritgroups'] = $this->collWritWritgroups->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collCorpuses) {
                 $result['Corpuses'] = $this->collCorpuses->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1281,9 +1284,6 @@ abstract class BaseWrit extends BaseObject implements Persistent
             }
             if (null !== $this->collTasks) {
                 $result['Tasks'] = $this->collTasks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
-            if (null !== $this->collWritWritgroups) {
-                $result['WritWritgroups'] = $this->collWritWritgroups->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1472,6 +1472,12 @@ abstract class BaseWrit extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
+            foreach ($this->getWritWritgroups() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addWritWritgroup($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getCorpuses() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addCorpus($relObj->copy($deepCopy));
@@ -1487,12 +1493,6 @@ abstract class BaseWrit extends BaseObject implements Persistent
             foreach ($this->getTasks() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addTask($relObj->copy($deepCopy));
-                }
-            }
-
-            foreach ($this->getWritWritgroups() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addWritWritgroup($relObj->copy($deepCopy));
                 }
             }
 
@@ -1875,6 +1875,9 @@ abstract class BaseWrit extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
+        if ('WritWritgroup' == $relationName) {
+            $this->initWritWritgroups();
+        }
         if ('Corpus' == $relationName) {
             $this->initCorpuses();
         }
@@ -1884,9 +1887,249 @@ abstract class BaseWrit extends BaseObject implements Persistent
         if ('Task' == $relationName) {
             $this->initTasks();
         }
-        if ('WritWritgroup' == $relationName) {
-            $this->initWritWritgroups();
+    }
+
+    /**
+     * Clears out the collWritWritgroups collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Writ The current object (for fluent API support)
+     * @see        addWritWritgroups()
+     */
+    public function clearWritWritgroups()
+    {
+        $this->collWritWritgroups = null; // important to set this to null since that means it is uninitialized
+        $this->collWritWritgroupsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collWritWritgroups collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialWritWritgroups($v = true)
+    {
+        $this->collWritWritgroupsPartial = $v;
+    }
+
+    /**
+     * Initializes the collWritWritgroups collection.
+     *
+     * By default this just sets the collWritWritgroups collection to an empty array (like clearcollWritWritgroups());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initWritWritgroups($overrideExisting = true)
+    {
+        if (null !== $this->collWritWritgroups && !$overrideExisting) {
+            return;
         }
+        $this->collWritWritgroups = new PropelObjectCollection();
+        $this->collWritWritgroups->setModel('WritWritgroup');
+    }
+
+    /**
+     * Gets an array of WritWritgroup objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Writ is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|WritWritgroup[] List of WritWritgroup objects
+     * @throws PropelException
+     */
+    public function getWritWritgroups($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collWritWritgroupsPartial && !$this->isNew();
+        if (null === $this->collWritWritgroups || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collWritWritgroups) {
+                // return empty collection
+                $this->initWritWritgroups();
+            } else {
+                $collWritWritgroups = WritWritgroupQuery::create(null, $criteria)
+                    ->filterByWrit($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collWritWritgroupsPartial && count($collWritWritgroups)) {
+                      $this->initWritWritgroups(false);
+
+                      foreach($collWritWritgroups as $obj) {
+                        if (false == $this->collWritWritgroups->contains($obj)) {
+                          $this->collWritWritgroups->append($obj);
+                        }
+                      }
+
+                      $this->collWritWritgroupsPartial = true;
+                    }
+
+                    $collWritWritgroups->getInternalIterator()->rewind();
+                    return $collWritWritgroups;
+                }
+
+                if($partial && $this->collWritWritgroups) {
+                    foreach($this->collWritWritgroups as $obj) {
+                        if($obj->isNew()) {
+                            $collWritWritgroups[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collWritWritgroups = $collWritWritgroups;
+                $this->collWritWritgroupsPartial = false;
+            }
+        }
+
+        return $this->collWritWritgroups;
+    }
+
+    /**
+     * Sets a collection of WritWritgroup objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $writWritgroups A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Writ The current object (for fluent API support)
+     */
+    public function setWritWritgroups(PropelCollection $writWritgroups, PropelPDO $con = null)
+    {
+        $writWritgroupsToDelete = $this->getWritWritgroups(new Criteria(), $con)->diff($writWritgroups);
+
+        $this->writWritgroupsScheduledForDeletion = unserialize(serialize($writWritgroupsToDelete));
+
+        foreach ($writWritgroupsToDelete as $writWritgroupRemoved) {
+            $writWritgroupRemoved->setWrit(null);
+        }
+
+        $this->collWritWritgroups = null;
+        foreach ($writWritgroups as $writWritgroup) {
+            $this->addWritWritgroup($writWritgroup);
+        }
+
+        $this->collWritWritgroups = $writWritgroups;
+        $this->collWritWritgroupsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related WritWritgroup objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related WritWritgroup objects.
+     * @throws PropelException
+     */
+    public function countWritWritgroups(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collWritWritgroupsPartial && !$this->isNew();
+        if (null === $this->collWritWritgroups || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collWritWritgroups) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getWritWritgroups());
+            }
+            $query = WritWritgroupQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByWrit($this)
+                ->count($con);
+        }
+
+        return count($this->collWritWritgroups);
+    }
+
+    /**
+     * Method called to associate a WritWritgroup object to this object
+     * through the WritWritgroup foreign key attribute.
+     *
+     * @param    WritWritgroup $l WritWritgroup
+     * @return Writ The current object (for fluent API support)
+     */
+    public function addWritWritgroup(WritWritgroup $l)
+    {
+        if ($this->collWritWritgroups === null) {
+            $this->initWritWritgroups();
+            $this->collWritWritgroupsPartial = true;
+        }
+        if (!in_array($l, $this->collWritWritgroups->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddWritWritgroup($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	WritWritgroup $writWritgroup The writWritgroup object to add.
+     */
+    protected function doAddWritWritgroup($writWritgroup)
+    {
+        $this->collWritWritgroups[]= $writWritgroup;
+        $writWritgroup->setWrit($this);
+    }
+
+    /**
+     * @param	WritWritgroup $writWritgroup The writWritgroup object to remove.
+     * @return Writ The current object (for fluent API support)
+     */
+    public function removeWritWritgroup($writWritgroup)
+    {
+        if ($this->getWritWritgroups()->contains($writWritgroup)) {
+            $this->collWritWritgroups->remove($this->collWritWritgroups->search($writWritgroup));
+            if (null === $this->writWritgroupsScheduledForDeletion) {
+                $this->writWritgroupsScheduledForDeletion = clone $this->collWritWritgroups;
+                $this->writWritgroupsScheduledForDeletion->clear();
+            }
+            $this->writWritgroupsScheduledForDeletion[]= clone $writWritgroup;
+            $writWritgroup->setWrit(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Writ is new, it will return
+     * an empty collection; or if this Writ has previously
+     * been saved, it will retrieve related WritWritgroups from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Writ.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|WritWritgroup[] List of WritWritgroup objects
+     */
+    public function getWritWritgroupsJoinWritgroup($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = WritWritgroupQuery::create(null, $criteria);
+        $query->joinWith('Writgroup', $join_behavior);
+
+        return $this->getWritWritgroups($query, $con);
     }
 
     /**
@@ -2619,249 +2862,6 @@ abstract class BaseWrit extends BaseObject implements Persistent
     }
 
     /**
-     * Clears out the collWritWritgroups collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return Writ The current object (for fluent API support)
-     * @see        addWritWritgroups()
-     */
-    public function clearWritWritgroups()
-    {
-        $this->collWritWritgroups = null; // important to set this to null since that means it is uninitialized
-        $this->collWritWritgroupsPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * reset is the collWritWritgroups collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialWritWritgroups($v = true)
-    {
-        $this->collWritWritgroupsPartial = $v;
-    }
-
-    /**
-     * Initializes the collWritWritgroups collection.
-     *
-     * By default this just sets the collWritWritgroups collection to an empty array (like clearcollWritWritgroups());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initWritWritgroups($overrideExisting = true)
-    {
-        if (null !== $this->collWritWritgroups && !$overrideExisting) {
-            return;
-        }
-        $this->collWritWritgroups = new PropelObjectCollection();
-        $this->collWritWritgroups->setModel('WritWritgroup');
-    }
-
-    /**
-     * Gets an array of WritWritgroup objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Writ is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|WritWritgroup[] List of WritWritgroup objects
-     * @throws PropelException
-     */
-    public function getWritWritgroups($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collWritWritgroupsPartial && !$this->isNew();
-        if (null === $this->collWritWritgroups || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collWritWritgroups) {
-                // return empty collection
-                $this->initWritWritgroups();
-            } else {
-                $collWritWritgroups = WritWritgroupQuery::create(null, $criteria)
-                    ->filterByWrit($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collWritWritgroupsPartial && count($collWritWritgroups)) {
-                      $this->initWritWritgroups(false);
-
-                      foreach($collWritWritgroups as $obj) {
-                        if (false == $this->collWritWritgroups->contains($obj)) {
-                          $this->collWritWritgroups->append($obj);
-                        }
-                      }
-
-                      $this->collWritWritgroupsPartial = true;
-                    }
-
-                    $collWritWritgroups->getInternalIterator()->rewind();
-                    return $collWritWritgroups;
-                }
-
-                if($partial && $this->collWritWritgroups) {
-                    foreach($this->collWritWritgroups as $obj) {
-                        if($obj->isNew()) {
-                            $collWritWritgroups[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collWritWritgroups = $collWritWritgroups;
-                $this->collWritWritgroupsPartial = false;
-            }
-        }
-
-        return $this->collWritWritgroups;
-    }
-
-    /**
-     * Sets a collection of WritWritgroup objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $writWritgroups A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     * @return Writ The current object (for fluent API support)
-     */
-    public function setWritWritgroups(PropelCollection $writWritgroups, PropelPDO $con = null)
-    {
-        $writWritgroupsToDelete = $this->getWritWritgroups(new Criteria(), $con)->diff($writWritgroups);
-
-        $this->writWritgroupsScheduledForDeletion = unserialize(serialize($writWritgroupsToDelete));
-
-        foreach ($writWritgroupsToDelete as $writWritgroupRemoved) {
-            $writWritgroupRemoved->setWrit(null);
-        }
-
-        $this->collWritWritgroups = null;
-        foreach ($writWritgroups as $writWritgroup) {
-            $this->addWritWritgroup($writWritgroup);
-        }
-
-        $this->collWritWritgroups = $writWritgroups;
-        $this->collWritWritgroupsPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related WritWritgroup objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related WritWritgroup objects.
-     * @throws PropelException
-     */
-    public function countWritWritgroups(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collWritWritgroupsPartial && !$this->isNew();
-        if (null === $this->collWritWritgroups || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collWritWritgroups) {
-                return 0;
-            }
-
-            if($partial && !$criteria) {
-                return count($this->getWritWritgroups());
-            }
-            $query = WritWritgroupQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByWrit($this)
-                ->count($con);
-        }
-
-        return count($this->collWritWritgroups);
-    }
-
-    /**
-     * Method called to associate a WritWritgroup object to this object
-     * through the WritWritgroup foreign key attribute.
-     *
-     * @param    WritWritgroup $l WritWritgroup
-     * @return Writ The current object (for fluent API support)
-     */
-    public function addWritWritgroup(WritWritgroup $l)
-    {
-        if ($this->collWritWritgroups === null) {
-            $this->initWritWritgroups();
-            $this->collWritWritgroupsPartial = true;
-        }
-        if (!in_array($l, $this->collWritWritgroups->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddWritWritgroup($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	WritWritgroup $writWritgroup The writWritgroup object to add.
-     */
-    protected function doAddWritWritgroup($writWritgroup)
-    {
-        $this->collWritWritgroups[]= $writWritgroup;
-        $writWritgroup->setWrit($this);
-    }
-
-    /**
-     * @param	WritWritgroup $writWritgroup The writWritgroup object to remove.
-     * @return Writ The current object (for fluent API support)
-     */
-    public function removeWritWritgroup($writWritgroup)
-    {
-        if ($this->getWritWritgroups()->contains($writWritgroup)) {
-            $this->collWritWritgroups->remove($this->collWritWritgroups->search($writWritgroup));
-            if (null === $this->writWritgroupsScheduledForDeletion) {
-                $this->writWritgroupsScheduledForDeletion = clone $this->collWritWritgroups;
-                $this->writWritgroupsScheduledForDeletion->clear();
-            }
-            $this->writWritgroupsScheduledForDeletion[]= clone $writWritgroup;
-            $writWritgroup->setWrit(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Writ is new, it will return
-     * an empty collection; or if this Writ has previously
-     * been saved, it will retrieve related WritWritgroups from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Writ.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|WritWritgroup[] List of WritWritgroup objects
-     */
-    public function getWritWritgroupsJoinWritgroup($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = WritWritgroupQuery::create(null, $criteria);
-        $query->joinWith('Writgroup', $join_behavior);
-
-        return $this->getWritWritgroups($query, $con);
-    }
-
-    /**
      * Clears out the collWritgroups collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -3073,6 +3073,11 @@ abstract class BaseWrit extends BaseObject implements Persistent
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->collWritWritgroups) {
+                foreach ($this->collWritWritgroups as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collCorpuses) {
                 foreach ($this->collCorpuses as $o) {
                     $o->clearAllReferences($deep);
@@ -3085,11 +3090,6 @@ abstract class BaseWrit extends BaseObject implements Persistent
             }
             if ($this->collTasks) {
                 foreach ($this->collTasks as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
-            if ($this->collWritWritgroups) {
-                foreach ($this->collWritWritgroups as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -3120,6 +3120,10 @@ abstract class BaseWrit extends BaseObject implements Persistent
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
+        if ($this->collWritWritgroups instanceof PropelCollection) {
+            $this->collWritWritgroups->clearIterator();
+        }
+        $this->collWritWritgroups = null;
         if ($this->collCorpuses instanceof PropelCollection) {
             $this->collCorpuses->clearIterator();
         }
@@ -3132,10 +3136,6 @@ abstract class BaseWrit extends BaseObject implements Persistent
             $this->collTasks->clearIterator();
         }
         $this->collTasks = null;
-        if ($this->collWritWritgroups instanceof PropelCollection) {
-            $this->collWritWritgroups->clearIterator();
-        }
-        $this->collWritWritgroups = null;
         if ($this->collWritgroups instanceof PropelCollection) {
             $this->collWritgroups->clearIterator();
         }

@@ -17,11 +17,15 @@ class MonographType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('titleFragments', new Form\DerivedType\SortableCollectionType(), array( 
-            'label' => ' ',
-            'type' => new TitlefragmentType(),
-            'allow_add' => true,
-            'by_reference' => false,
+        $builder->add('Numpages', 'integer', array(
+            'label' => 'Seitenzahl',
         ));
+        
+//        $builder->add('', new \DTA\MetadataBundle\Form\DerivedType\SortableCollectionType(), array( 
+//            'label' => ' ',
+//            'type' => new TitlefragmentType(),
+//            'allow_add' => true,
+//            'by_reference' => false,
+//        ));
     }
 }

@@ -27,7 +27,9 @@ class HomeController extends DTABaseController {
      * @Route("/home", name="home")
      */
     public function indexAction(Request $request) {
-        return $this->renderDomainSpecific('DTAMetadataBundle:Home:Home.html.twig');
+        return $this->renderDomainSpecific('DTAMetadataBundle:Home:Home.html.twig', array(
+            'testData' => $k->getNumpages(),            
+        ));
     }
 
     /**

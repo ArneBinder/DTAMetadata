@@ -34,10 +34,6 @@ use DTA\MetadataBundle\Model\Work;
  * @method DwdsgenreQuery rightJoinDwdsgenreRelatedByChildof($relationAlias = null) Adds a RIGHT JOIN clause to the query using the DwdsgenreRelatedByChildof relation
  * @method DwdsgenreQuery innerJoinDwdsgenreRelatedByChildof($relationAlias = null) Adds a INNER JOIN clause to the query using the DwdsgenreRelatedByChildof relation
  *
- * @method DwdsgenreQuery leftJoinDwdsgenreRelatedById($relationAlias = null) Adds a LEFT JOIN clause to the query using the DwdsgenreRelatedById relation
- * @method DwdsgenreQuery rightJoinDwdsgenreRelatedById($relationAlias = null) Adds a RIGHT JOIN clause to the query using the DwdsgenreRelatedById relation
- * @method DwdsgenreQuery innerJoinDwdsgenreRelatedById($relationAlias = null) Adds a INNER JOIN clause to the query using the DwdsgenreRelatedById relation
- *
  * @method DwdsgenreQuery leftJoinWorkRelatedByDwdsgenreId($relationAlias = null) Adds a LEFT JOIN clause to the query using the WorkRelatedByDwdsgenreId relation
  * @method DwdsgenreQuery rightJoinWorkRelatedByDwdsgenreId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the WorkRelatedByDwdsgenreId relation
  * @method DwdsgenreQuery innerJoinWorkRelatedByDwdsgenreId($relationAlias = null) Adds a INNER JOIN clause to the query using the WorkRelatedByDwdsgenreId relation
@@ -45,6 +41,10 @@ use DTA\MetadataBundle\Model\Work;
  * @method DwdsgenreQuery leftJoinWorkRelatedByDwdssubgenreId($relationAlias = null) Adds a LEFT JOIN clause to the query using the WorkRelatedByDwdssubgenreId relation
  * @method DwdsgenreQuery rightJoinWorkRelatedByDwdssubgenreId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the WorkRelatedByDwdssubgenreId relation
  * @method DwdsgenreQuery innerJoinWorkRelatedByDwdssubgenreId($relationAlias = null) Adds a INNER JOIN clause to the query using the WorkRelatedByDwdssubgenreId relation
+ *
+ * @method DwdsgenreQuery leftJoinDwdsgenreRelatedById($relationAlias = null) Adds a LEFT JOIN clause to the query using the DwdsgenreRelatedById relation
+ * @method DwdsgenreQuery rightJoinDwdsgenreRelatedById($relationAlias = null) Adds a RIGHT JOIN clause to the query using the DwdsgenreRelatedById relation
+ * @method DwdsgenreQuery innerJoinDwdsgenreRelatedById($relationAlias = null) Adds a INNER JOIN clause to the query using the DwdsgenreRelatedById relation
  *
  * @method Dwdsgenre findOne(PropelPDO $con = null) Return the first Dwdsgenre matching the query
  * @method Dwdsgenre findOneOrCreate(PropelPDO $con = null) Return the first Dwdsgenre matching the query, or a new Dwdsgenre object populated from the query conditions when no match is found
@@ -437,80 +437,6 @@ abstract class BaseDwdsgenreQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Dwdsgenre object
-     *
-     * @param   Dwdsgenre|PropelObjectCollection $dwdsgenre  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 DwdsgenreQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByDwdsgenreRelatedById($dwdsgenre, $comparison = null)
-    {
-        if ($dwdsgenre instanceof Dwdsgenre) {
-            return $this
-                ->addUsingAlias(DwdsgenrePeer::ID, $dwdsgenre->getChildof(), $comparison);
-        } elseif ($dwdsgenre instanceof PropelObjectCollection) {
-            return $this
-                ->useDwdsgenreRelatedByIdQuery()
-                ->filterByPrimaryKeys($dwdsgenre->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByDwdsgenreRelatedById() only accepts arguments of type Dwdsgenre or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the DwdsgenreRelatedById relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return DwdsgenreQuery The current query, for fluid interface
-     */
-    public function joinDwdsgenreRelatedById($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('DwdsgenreRelatedById');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'DwdsgenreRelatedById');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the DwdsgenreRelatedById relation Dwdsgenre object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\DwdsgenreQuery A secondary query class using the current class as primary query
-     */
-    public function useDwdsgenreRelatedByIdQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinDwdsgenreRelatedById($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'DwdsgenreRelatedById', '\DTA\MetadataBundle\Model\DwdsgenreQuery');
-    }
-
-    /**
      * Filter the query by a related Work object
      *
      * @param   Work|PropelObjectCollection $work  the related object to use as filter
@@ -656,6 +582,80 @@ abstract class BaseDwdsgenreQuery extends ModelCriteria
         return $this
             ->joinWorkRelatedByDwdssubgenreId($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'WorkRelatedByDwdssubgenreId', '\DTA\MetadataBundle\Model\WorkQuery');
+    }
+
+    /**
+     * Filter the query by a related Dwdsgenre object
+     *
+     * @param   Dwdsgenre|PropelObjectCollection $dwdsgenre  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 DwdsgenreQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByDwdsgenreRelatedById($dwdsgenre, $comparison = null)
+    {
+        if ($dwdsgenre instanceof Dwdsgenre) {
+            return $this
+                ->addUsingAlias(DwdsgenrePeer::ID, $dwdsgenre->getChildof(), $comparison);
+        } elseif ($dwdsgenre instanceof PropelObjectCollection) {
+            return $this
+                ->useDwdsgenreRelatedByIdQuery()
+                ->filterByPrimaryKeys($dwdsgenre->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByDwdsgenreRelatedById() only accepts arguments of type Dwdsgenre or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the DwdsgenreRelatedById relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return DwdsgenreQuery The current query, for fluid interface
+     */
+    public function joinDwdsgenreRelatedById($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('DwdsgenreRelatedById');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'DwdsgenreRelatedById');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the DwdsgenreRelatedById relation Dwdsgenre object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\DwdsgenreQuery A secondary query class using the current class as primary query
+     */
+    public function useDwdsgenreRelatedByIdQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinDwdsgenreRelatedById($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'DwdsgenreRelatedById', '\DTA\MetadataBundle\Model\DwdsgenreQuery');
     }
 
     /**

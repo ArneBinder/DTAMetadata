@@ -15,12 +15,6 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use DTA\MetadataBundle\Model\Datespecification;
 use DTA\MetadataBundle\Model\DatespecificationQuery;
-use DTA\MetadataBundle\Model\Essay;
-use DTA\MetadataBundle\Model\EssayQuery;
-use DTA\MetadataBundle\Model\Magazine;
-use DTA\MetadataBundle\Model\MagazineQuery;
-use DTA\MetadataBundle\Model\Monograph;
-use DTA\MetadataBundle\Model\MonographQuery;
 use DTA\MetadataBundle\Model\Place;
 use DTA\MetadataBundle\Model\PlaceQuery;
 use DTA\MetadataBundle\Model\Publication;
@@ -28,8 +22,6 @@ use DTA\MetadataBundle\Model\PublicationPeer;
 use DTA\MetadataBundle\Model\PublicationQuery;
 use DTA\MetadataBundle\Model\Publishingcompany;
 use DTA\MetadataBundle\Model\PublishingcompanyQuery;
-use DTA\MetadataBundle\Model\Series;
-use DTA\MetadataBundle\Model\SeriesQuery;
 use DTA\MetadataBundle\Model\Title;
 use DTA\MetadataBundle\Model\TitleQuery;
 use DTA\MetadataBundle\Model\Writ;
@@ -141,26 +133,6 @@ abstract class BasePublication extends BaseObject implements Persistent
      * @var        Datespecification
      */
     protected $aDatespecification;
-
-    /**
-     * @var        Essay
-     */
-    protected $aEssay;
-
-    /**
-     * @var        Magazine
-     */
-    protected $aMagazine;
-
-    /**
-     * @var        Monograph
-     */
-    protected $aMonograph;
-
-    /**
-     * @var        Series
-     */
-    protected $aSeries;
 
     /**
      * @var        PropelObjectCollection|Writ[] Collection to store aggregation of Writ objects.
@@ -319,22 +291,6 @@ abstract class BasePublication extends BaseObject implements Persistent
         if ($this->id !== $v) {
             $this->id = $v;
             $this->modifiedColumns[] = PublicationPeer::ID;
-        }
-
-        if ($this->aEssay !== null && $this->aEssay->getId() !== $v) {
-            $this->aEssay = null;
-        }
-
-        if ($this->aMagazine !== null && $this->aMagazine->getId() !== $v) {
-            $this->aMagazine = null;
-        }
-
-        if ($this->aMonograph !== null && $this->aMonograph->getId() !== $v) {
-            $this->aMonograph = null;
-        }
-
-        if ($this->aSeries !== null && $this->aSeries->getId() !== $v) {
-            $this->aSeries = null;
         }
 
 
@@ -641,18 +597,6 @@ abstract class BasePublication extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
-        if ($this->aEssay !== null && $this->id !== $this->aEssay->getId()) {
-            $this->aEssay = null;
-        }
-        if ($this->aMagazine !== null && $this->id !== $this->aMagazine->getId()) {
-            $this->aMagazine = null;
-        }
-        if ($this->aMonograph !== null && $this->id !== $this->aMonograph->getId()) {
-            $this->aMonograph = null;
-        }
-        if ($this->aSeries !== null && $this->id !== $this->aSeries->getId()) {
-            $this->aSeries = null;
-        }
         if ($this->aTitle !== null && $this->title_id !== $this->aTitle->getId()) {
             $this->aTitle = null;
         }
@@ -708,10 +652,6 @@ abstract class BasePublication extends BaseObject implements Persistent
             $this->aPublishingcompany = null;
             $this->aPlace = null;
             $this->aDatespecification = null;
-            $this->aEssay = null;
-            $this->aMagazine = null;
-            $this->aMonograph = null;
-            $this->aSeries = null;
             $this->collWrits = null;
 
         } // if (deep)
@@ -858,34 +798,6 @@ abstract class BasePublication extends BaseObject implements Persistent
                     $affectedRows += $this->aDatespecification->save($con);
                 }
                 $this->setDatespecification($this->aDatespecification);
-            }
-
-            if ($this->aEssay !== null) {
-                if ($this->aEssay->isModified() || $this->aEssay->isNew()) {
-                    $affectedRows += $this->aEssay->save($con);
-                }
-                $this->setEssay($this->aEssay);
-            }
-
-            if ($this->aMagazine !== null) {
-                if ($this->aMagazine->isModified() || $this->aMagazine->isNew()) {
-                    $affectedRows += $this->aMagazine->save($con);
-                }
-                $this->setMagazine($this->aMagazine);
-            }
-
-            if ($this->aMonograph !== null) {
-                if ($this->aMonograph->isModified() || $this->aMonograph->isNew()) {
-                    $affectedRows += $this->aMonograph->save($con);
-                }
-                $this->setMonograph($this->aMonograph);
-            }
-
-            if ($this->aSeries !== null) {
-                if ($this->aSeries->isModified() || $this->aSeries->isNew()) {
-                    $affectedRows += $this->aSeries->save($con);
-                }
-                $this->setSeries($this->aSeries);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -1142,30 +1054,6 @@ abstract class BasePublication extends BaseObject implements Persistent
                 }
             }
 
-            if ($this->aEssay !== null) {
-                if (!$this->aEssay->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aEssay->getValidationFailures());
-                }
-            }
-
-            if ($this->aMagazine !== null) {
-                if (!$this->aMagazine->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aMagazine->getValidationFailures());
-                }
-            }
-
-            if ($this->aMonograph !== null) {
-                if (!$this->aMonograph->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aMonograph->getValidationFailures());
-                }
-            }
-
-            if ($this->aSeries !== null) {
-                if (!$this->aSeries->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aSeries->getValidationFailures());
-                }
-            }
-
 
             if (($retval = PublicationPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
@@ -1301,18 +1189,6 @@ abstract class BasePublication extends BaseObject implements Persistent
             }
             if (null !== $this->aDatespecification) {
                 $result['Datespecification'] = $this->aDatespecification->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->aEssay) {
-                $result['Essay'] = $this->aEssay->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->aMagazine) {
-                $result['Magazine'] = $this->aMagazine->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->aMonograph) {
-                $result['Monograph'] = $this->aMonograph->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->aSeries) {
-                $result['Series'] = $this->aSeries->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->collWrits) {
                 $result['Writs'] = $this->collWrits->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1526,26 +1402,6 @@ abstract class BasePublication extends BaseObject implements Persistent
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addWrit($relObj->copy($deepCopy));
                 }
-            }
-
-            $relObj = $this->getEssay();
-            if ($relObj) {
-                $copyObj->setEssay($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getMagazine();
-            if ($relObj) {
-                $copyObj->setMagazine($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getMonograph();
-            if ($relObj) {
-                $copyObj->setMonograph($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getSeries();
-            if ($relObj) {
-                $copyObj->setSeries($relObj->copy($deepCopy));
             }
 
             //unflag object copy
@@ -1804,190 +1660,6 @@ abstract class BasePublication extends BaseObject implements Persistent
         }
 
         return $this->aDatespecification;
-    }
-
-    /**
-     * Declares an association between this object and a Essay object.
-     *
-     * @param             Essay $v
-     * @return Publication The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setEssay(Essay $v = null)
-    {
-        if ($v === null) {
-            $this->setId(NULL);
-        } else {
-            $this->setId($v->getId());
-        }
-
-        $this->aEssay = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setPublication($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated Essay object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @param $doQuery Executes a query to get the object if required
-     * @return Essay The associated Essay object.
-     * @throws PropelException
-     */
-    public function getEssay(PropelPDO $con = null, $doQuery = true)
-    {
-        if ($this->aEssay === null && ($this->id !== null) && $doQuery) {
-            $this->aEssay = EssayQuery::create()->findPk($this->id, $con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aEssay->setPublication($this);
-        }
-
-        return $this->aEssay;
-    }
-
-    /**
-     * Declares an association between this object and a Magazine object.
-     *
-     * @param             Magazine $v
-     * @return Publication The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setMagazine(Magazine $v = null)
-    {
-        if ($v === null) {
-            $this->setId(NULL);
-        } else {
-            $this->setId($v->getId());
-        }
-
-        $this->aMagazine = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setPublication($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated Magazine object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @param $doQuery Executes a query to get the object if required
-     * @return Magazine The associated Magazine object.
-     * @throws PropelException
-     */
-    public function getMagazine(PropelPDO $con = null, $doQuery = true)
-    {
-        if ($this->aMagazine === null && ($this->id !== null) && $doQuery) {
-            $this->aMagazine = MagazineQuery::create()->findPk($this->id, $con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aMagazine->setPublication($this);
-        }
-
-        return $this->aMagazine;
-    }
-
-    /**
-     * Declares an association between this object and a Monograph object.
-     *
-     * @param             Monograph $v
-     * @return Publication The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setMonograph(Monograph $v = null)
-    {
-        if ($v === null) {
-            $this->setId(NULL);
-        } else {
-            $this->setId($v->getId());
-        }
-
-        $this->aMonograph = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setPublication($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated Monograph object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @param $doQuery Executes a query to get the object if required
-     * @return Monograph The associated Monograph object.
-     * @throws PropelException
-     */
-    public function getMonograph(PropelPDO $con = null, $doQuery = true)
-    {
-        if ($this->aMonograph === null && ($this->id !== null) && $doQuery) {
-            $this->aMonograph = MonographQuery::create()->findPk($this->id, $con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aMonograph->setPublication($this);
-        }
-
-        return $this->aMonograph;
-    }
-
-    /**
-     * Declares an association between this object and a Series object.
-     *
-     * @param             Series $v
-     * @return Publication The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setSeries(Series $v = null)
-    {
-        if ($v === null) {
-            $this->setId(NULL);
-        } else {
-            $this->setId($v->getId());
-        }
-
-        $this->aSeries = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setPublication($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated Series object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @param $doQuery Executes a query to get the object if required
-     * @return Series The associated Series object.
-     * @throws PropelException
-     */
-    public function getSeries(PropelPDO $con = null, $doQuery = true)
-    {
-        if ($this->aSeries === null && ($this->id !== null) && $doQuery) {
-            $this->aSeries = SeriesQuery::create()->findPk($this->id, $con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aSeries->setPublication($this);
-        }
-
-        return $this->aSeries;
     }
 
 
@@ -2404,18 +2076,6 @@ abstract class BasePublication extends BaseObject implements Persistent
             if ($this->aDatespecification instanceof Persistent) {
               $this->aDatespecification->clearAllReferences($deep);
             }
-            if ($this->aEssay instanceof Persistent) {
-              $this->aEssay->clearAllReferences($deep);
-            }
-            if ($this->aMagazine instanceof Persistent) {
-              $this->aMagazine->clearAllReferences($deep);
-            }
-            if ($this->aMonograph instanceof Persistent) {
-              $this->aMonograph->clearAllReferences($deep);
-            }
-            if ($this->aSeries instanceof Persistent) {
-              $this->aSeries->clearAllReferences($deep);
-            }
 
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
@@ -2428,10 +2088,6 @@ abstract class BasePublication extends BaseObject implements Persistent
         $this->aPublishingcompany = null;
         $this->aPlace = null;
         $this->aDatespecification = null;
-        $this->aEssay = null;
-        $this->aMagazine = null;
-        $this->aMonograph = null;
-        $this->aSeries = null;
     }
 
     /**

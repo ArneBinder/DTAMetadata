@@ -64,12 +64,6 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
     protected $aDwdsgenreRelatedByChildof;
 
     /**
-     * @var        PropelObjectCollection|Dwdsgenre[] Collection to store aggregation of Dwdsgenre objects.
-     */
-    protected $collDwdsgenresRelatedById;
-    protected $collDwdsgenresRelatedByIdPartial;
-
-    /**
      * @var        PropelObjectCollection|Work[] Collection to store aggregation of Work objects.
      */
     protected $collWorksRelatedByDwdsgenreId;
@@ -80,6 +74,12 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
      */
     protected $collWorksRelatedByDwdssubgenreId;
     protected $collWorksRelatedByDwdssubgenreIdPartial;
+
+    /**
+     * @var        PropelObjectCollection|Dwdsgenre[] Collection to store aggregation of Dwdsgenre objects.
+     */
+    protected $collDwdsgenresRelatedById;
+    protected $collDwdsgenresRelatedByIdPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -105,12 +105,6 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $dwdsgenresRelatedByIdScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
     protected $worksRelatedByDwdsgenreIdScheduledForDeletion = null;
 
     /**
@@ -118,6 +112,12 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $worksRelatedByDwdssubgenreIdScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $dwdsgenresRelatedByIdScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -325,11 +325,11 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
         if ($deep) {  // also de-associate any related objects?
 
             $this->aDwdsgenreRelatedByChildof = null;
-            $this->collDwdsgenresRelatedById = null;
-
             $this->collWorksRelatedByDwdsgenreId = null;
 
             $this->collWorksRelatedByDwdssubgenreId = null;
+
+            $this->collDwdsgenresRelatedById = null;
 
         } // if (deep)
     }
@@ -467,24 +467,6 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
-            if ($this->dwdsgenresRelatedByIdScheduledForDeletion !== null) {
-                if (!$this->dwdsgenresRelatedByIdScheduledForDeletion->isEmpty()) {
-                    foreach ($this->dwdsgenresRelatedByIdScheduledForDeletion as $dwdsgenreRelatedById) {
-                        // need to save related object because we set the relation to null
-                        $dwdsgenreRelatedById->save($con);
-                    }
-                    $this->dwdsgenresRelatedByIdScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collDwdsgenresRelatedById !== null) {
-                foreach ($this->collDwdsgenresRelatedById as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             if ($this->worksRelatedByDwdsgenreIdScheduledForDeletion !== null) {
                 if (!$this->worksRelatedByDwdsgenreIdScheduledForDeletion->isEmpty()) {
                     foreach ($this->worksRelatedByDwdsgenreIdScheduledForDeletion as $workRelatedByDwdsgenreId) {
@@ -515,6 +497,24 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
 
             if ($this->collWorksRelatedByDwdssubgenreId !== null) {
                 foreach ($this->collWorksRelatedByDwdssubgenreId as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->dwdsgenresRelatedByIdScheduledForDeletion !== null) {
+                if (!$this->dwdsgenresRelatedByIdScheduledForDeletion->isEmpty()) {
+                    foreach ($this->dwdsgenresRelatedByIdScheduledForDeletion as $dwdsgenreRelatedById) {
+                        // need to save related object because we set the relation to null
+                        $dwdsgenreRelatedById->save($con);
+                    }
+                    $this->dwdsgenresRelatedByIdScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collDwdsgenresRelatedById !== null) {
+                foreach ($this->collDwdsgenresRelatedById as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -687,14 +687,6 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
             }
 
 
-                if ($this->collDwdsgenresRelatedById !== null) {
-                    foreach ($this->collDwdsgenresRelatedById as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
                 if ($this->collWorksRelatedByDwdsgenreId !== null) {
                     foreach ($this->collWorksRelatedByDwdsgenreId as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -705,6 +697,14 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
 
                 if ($this->collWorksRelatedByDwdssubgenreId !== null) {
                     foreach ($this->collWorksRelatedByDwdssubgenreId as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collDwdsgenresRelatedById !== null) {
+                    foreach ($this->collDwdsgenresRelatedById as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -792,14 +792,14 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
             if (null !== $this->aDwdsgenreRelatedByChildof) {
                 $result['DwdsgenreRelatedByChildof'] = $this->aDwdsgenreRelatedByChildof->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->collDwdsgenresRelatedById) {
-                $result['DwdsgenresRelatedById'] = $this->collDwdsgenresRelatedById->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
             if (null !== $this->collWorksRelatedByDwdsgenreId) {
                 $result['WorksRelatedByDwdsgenreId'] = $this->collWorksRelatedByDwdsgenreId->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collWorksRelatedByDwdssubgenreId) {
                 $result['WorksRelatedByDwdssubgenreId'] = $this->collWorksRelatedByDwdssubgenreId->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collDwdsgenresRelatedById) {
+                $result['DwdsgenresRelatedById'] = $this->collDwdsgenresRelatedById->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -958,12 +958,6 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getDwdsgenresRelatedById() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addDwdsgenreRelatedById($relObj->copy($deepCopy));
-                }
-            }
-
             foreach ($this->getWorksRelatedByDwdsgenreId() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addWorkRelatedByDwdsgenreId($relObj->copy($deepCopy));
@@ -973,6 +967,12 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
             foreach ($this->getWorksRelatedByDwdssubgenreId() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addWorkRelatedByDwdssubgenreId($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getDwdsgenresRelatedById() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addDwdsgenreRelatedById($relObj->copy($deepCopy));
                 }
             }
 
@@ -1089,233 +1089,15 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
-        if ('DwdsgenreRelatedById' == $relationName) {
-            $this->initDwdsgenresRelatedById();
-        }
         if ('WorkRelatedByDwdsgenreId' == $relationName) {
             $this->initWorksRelatedByDwdsgenreId();
         }
         if ('WorkRelatedByDwdssubgenreId' == $relationName) {
             $this->initWorksRelatedByDwdssubgenreId();
         }
-    }
-
-    /**
-     * Clears out the collDwdsgenresRelatedById collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return Dwdsgenre The current object (for fluent API support)
-     * @see        addDwdsgenresRelatedById()
-     */
-    public function clearDwdsgenresRelatedById()
-    {
-        $this->collDwdsgenresRelatedById = null; // important to set this to null since that means it is uninitialized
-        $this->collDwdsgenresRelatedByIdPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * reset is the collDwdsgenresRelatedById collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialDwdsgenresRelatedById($v = true)
-    {
-        $this->collDwdsgenresRelatedByIdPartial = $v;
-    }
-
-    /**
-     * Initializes the collDwdsgenresRelatedById collection.
-     *
-     * By default this just sets the collDwdsgenresRelatedById collection to an empty array (like clearcollDwdsgenresRelatedById());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initDwdsgenresRelatedById($overrideExisting = true)
-    {
-        if (null !== $this->collDwdsgenresRelatedById && !$overrideExisting) {
-            return;
-        }
-        $this->collDwdsgenresRelatedById = new PropelObjectCollection();
-        $this->collDwdsgenresRelatedById->setModel('Dwdsgenre');
-    }
-
-    /**
-     * Gets an array of Dwdsgenre objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Dwdsgenre is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|Dwdsgenre[] List of Dwdsgenre objects
-     * @throws PropelException
-     */
-    public function getDwdsgenresRelatedById($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collDwdsgenresRelatedByIdPartial && !$this->isNew();
-        if (null === $this->collDwdsgenresRelatedById || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collDwdsgenresRelatedById) {
-                // return empty collection
-                $this->initDwdsgenresRelatedById();
-            } else {
-                $collDwdsgenresRelatedById = DwdsgenreQuery::create(null, $criteria)
-                    ->filterByDwdsgenreRelatedByChildof($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collDwdsgenresRelatedByIdPartial && count($collDwdsgenresRelatedById)) {
-                      $this->initDwdsgenresRelatedById(false);
-
-                      foreach($collDwdsgenresRelatedById as $obj) {
-                        if (false == $this->collDwdsgenresRelatedById->contains($obj)) {
-                          $this->collDwdsgenresRelatedById->append($obj);
-                        }
-                      }
-
-                      $this->collDwdsgenresRelatedByIdPartial = true;
-                    }
-
-                    $collDwdsgenresRelatedById->getInternalIterator()->rewind();
-                    return $collDwdsgenresRelatedById;
-                }
-
-                if($partial && $this->collDwdsgenresRelatedById) {
-                    foreach($this->collDwdsgenresRelatedById as $obj) {
-                        if($obj->isNew()) {
-                            $collDwdsgenresRelatedById[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collDwdsgenresRelatedById = $collDwdsgenresRelatedById;
-                $this->collDwdsgenresRelatedByIdPartial = false;
-            }
-        }
-
-        return $this->collDwdsgenresRelatedById;
-    }
-
-    /**
-     * Sets a collection of DwdsgenreRelatedById objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $dwdsgenresRelatedById A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     * @return Dwdsgenre The current object (for fluent API support)
-     */
-    public function setDwdsgenresRelatedById(PropelCollection $dwdsgenresRelatedById, PropelPDO $con = null)
-    {
-        $dwdsgenresRelatedByIdToDelete = $this->getDwdsgenresRelatedById(new Criteria(), $con)->diff($dwdsgenresRelatedById);
-
-        $this->dwdsgenresRelatedByIdScheduledForDeletion = unserialize(serialize($dwdsgenresRelatedByIdToDelete));
-
-        foreach ($dwdsgenresRelatedByIdToDelete as $dwdsgenreRelatedByIdRemoved) {
-            $dwdsgenreRelatedByIdRemoved->setDwdsgenreRelatedByChildof(null);
-        }
-
-        $this->collDwdsgenresRelatedById = null;
-        foreach ($dwdsgenresRelatedById as $dwdsgenreRelatedById) {
-            $this->addDwdsgenreRelatedById($dwdsgenreRelatedById);
-        }
-
-        $this->collDwdsgenresRelatedById = $dwdsgenresRelatedById;
-        $this->collDwdsgenresRelatedByIdPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related Dwdsgenre objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related Dwdsgenre objects.
-     * @throws PropelException
-     */
-    public function countDwdsgenresRelatedById(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collDwdsgenresRelatedByIdPartial && !$this->isNew();
-        if (null === $this->collDwdsgenresRelatedById || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collDwdsgenresRelatedById) {
-                return 0;
-            }
-
-            if($partial && !$criteria) {
-                return count($this->getDwdsgenresRelatedById());
-            }
-            $query = DwdsgenreQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByDwdsgenreRelatedByChildof($this)
-                ->count($con);
-        }
-
-        return count($this->collDwdsgenresRelatedById);
-    }
-
-    /**
-     * Method called to associate a Dwdsgenre object to this object
-     * through the Dwdsgenre foreign key attribute.
-     *
-     * @param    Dwdsgenre $l Dwdsgenre
-     * @return Dwdsgenre The current object (for fluent API support)
-     */
-    public function addDwdsgenreRelatedById(Dwdsgenre $l)
-    {
-        if ($this->collDwdsgenresRelatedById === null) {
+        if ('DwdsgenreRelatedById' == $relationName) {
             $this->initDwdsgenresRelatedById();
-            $this->collDwdsgenresRelatedByIdPartial = true;
         }
-        if (!in_array($l, $this->collDwdsgenresRelatedById->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddDwdsgenreRelatedById($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	DwdsgenreRelatedById $dwdsgenreRelatedById The dwdsgenreRelatedById object to add.
-     */
-    protected function doAddDwdsgenreRelatedById($dwdsgenreRelatedById)
-    {
-        $this->collDwdsgenresRelatedById[]= $dwdsgenreRelatedById;
-        $dwdsgenreRelatedById->setDwdsgenreRelatedByChildof($this);
-    }
-
-    /**
-     * @param	DwdsgenreRelatedById $dwdsgenreRelatedById The dwdsgenreRelatedById object to remove.
-     * @return Dwdsgenre The current object (for fluent API support)
-     */
-    public function removeDwdsgenreRelatedById($dwdsgenreRelatedById)
-    {
-        if ($this->getDwdsgenresRelatedById()->contains($dwdsgenreRelatedById)) {
-            $this->collDwdsgenresRelatedById->remove($this->collDwdsgenresRelatedById->search($dwdsgenreRelatedById));
-            if (null === $this->dwdsgenresRelatedByIdScheduledForDeletion) {
-                $this->dwdsgenresRelatedByIdScheduledForDeletion = clone $this->collDwdsgenresRelatedById;
-                $this->dwdsgenresRelatedByIdScheduledForDeletion->clear();
-            }
-            $this->dwdsgenresRelatedByIdScheduledForDeletion[]= $dwdsgenreRelatedById;
-            $dwdsgenreRelatedById->setDwdsgenreRelatedByChildof(null);
-        }
-
-        return $this;
     }
 
     /**
@@ -1955,6 +1737,224 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collDwdsgenresRelatedById collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Dwdsgenre The current object (for fluent API support)
+     * @see        addDwdsgenresRelatedById()
+     */
+    public function clearDwdsgenresRelatedById()
+    {
+        $this->collDwdsgenresRelatedById = null; // important to set this to null since that means it is uninitialized
+        $this->collDwdsgenresRelatedByIdPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collDwdsgenresRelatedById collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialDwdsgenresRelatedById($v = true)
+    {
+        $this->collDwdsgenresRelatedByIdPartial = $v;
+    }
+
+    /**
+     * Initializes the collDwdsgenresRelatedById collection.
+     *
+     * By default this just sets the collDwdsgenresRelatedById collection to an empty array (like clearcollDwdsgenresRelatedById());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initDwdsgenresRelatedById($overrideExisting = true)
+    {
+        if (null !== $this->collDwdsgenresRelatedById && !$overrideExisting) {
+            return;
+        }
+        $this->collDwdsgenresRelatedById = new PropelObjectCollection();
+        $this->collDwdsgenresRelatedById->setModel('Dwdsgenre');
+    }
+
+    /**
+     * Gets an array of Dwdsgenre objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Dwdsgenre is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Dwdsgenre[] List of Dwdsgenre objects
+     * @throws PropelException
+     */
+    public function getDwdsgenresRelatedById($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collDwdsgenresRelatedByIdPartial && !$this->isNew();
+        if (null === $this->collDwdsgenresRelatedById || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collDwdsgenresRelatedById) {
+                // return empty collection
+                $this->initDwdsgenresRelatedById();
+            } else {
+                $collDwdsgenresRelatedById = DwdsgenreQuery::create(null, $criteria)
+                    ->filterByDwdsgenreRelatedByChildof($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collDwdsgenresRelatedByIdPartial && count($collDwdsgenresRelatedById)) {
+                      $this->initDwdsgenresRelatedById(false);
+
+                      foreach($collDwdsgenresRelatedById as $obj) {
+                        if (false == $this->collDwdsgenresRelatedById->contains($obj)) {
+                          $this->collDwdsgenresRelatedById->append($obj);
+                        }
+                      }
+
+                      $this->collDwdsgenresRelatedByIdPartial = true;
+                    }
+
+                    $collDwdsgenresRelatedById->getInternalIterator()->rewind();
+                    return $collDwdsgenresRelatedById;
+                }
+
+                if($partial && $this->collDwdsgenresRelatedById) {
+                    foreach($this->collDwdsgenresRelatedById as $obj) {
+                        if($obj->isNew()) {
+                            $collDwdsgenresRelatedById[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collDwdsgenresRelatedById = $collDwdsgenresRelatedById;
+                $this->collDwdsgenresRelatedByIdPartial = false;
+            }
+        }
+
+        return $this->collDwdsgenresRelatedById;
+    }
+
+    /**
+     * Sets a collection of DwdsgenreRelatedById objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $dwdsgenresRelatedById A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Dwdsgenre The current object (for fluent API support)
+     */
+    public function setDwdsgenresRelatedById(PropelCollection $dwdsgenresRelatedById, PropelPDO $con = null)
+    {
+        $dwdsgenresRelatedByIdToDelete = $this->getDwdsgenresRelatedById(new Criteria(), $con)->diff($dwdsgenresRelatedById);
+
+        $this->dwdsgenresRelatedByIdScheduledForDeletion = unserialize(serialize($dwdsgenresRelatedByIdToDelete));
+
+        foreach ($dwdsgenresRelatedByIdToDelete as $dwdsgenreRelatedByIdRemoved) {
+            $dwdsgenreRelatedByIdRemoved->setDwdsgenreRelatedByChildof(null);
+        }
+
+        $this->collDwdsgenresRelatedById = null;
+        foreach ($dwdsgenresRelatedById as $dwdsgenreRelatedById) {
+            $this->addDwdsgenreRelatedById($dwdsgenreRelatedById);
+        }
+
+        $this->collDwdsgenresRelatedById = $dwdsgenresRelatedById;
+        $this->collDwdsgenresRelatedByIdPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Dwdsgenre objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Dwdsgenre objects.
+     * @throws PropelException
+     */
+    public function countDwdsgenresRelatedById(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collDwdsgenresRelatedByIdPartial && !$this->isNew();
+        if (null === $this->collDwdsgenresRelatedById || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collDwdsgenresRelatedById) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getDwdsgenresRelatedById());
+            }
+            $query = DwdsgenreQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByDwdsgenreRelatedByChildof($this)
+                ->count($con);
+        }
+
+        return count($this->collDwdsgenresRelatedById);
+    }
+
+    /**
+     * Method called to associate a Dwdsgenre object to this object
+     * through the Dwdsgenre foreign key attribute.
+     *
+     * @param    Dwdsgenre $l Dwdsgenre
+     * @return Dwdsgenre The current object (for fluent API support)
+     */
+    public function addDwdsgenreRelatedById(Dwdsgenre $l)
+    {
+        if ($this->collDwdsgenresRelatedById === null) {
+            $this->initDwdsgenresRelatedById();
+            $this->collDwdsgenresRelatedByIdPartial = true;
+        }
+        if (!in_array($l, $this->collDwdsgenresRelatedById->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddDwdsgenreRelatedById($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	DwdsgenreRelatedById $dwdsgenreRelatedById The dwdsgenreRelatedById object to add.
+     */
+    protected function doAddDwdsgenreRelatedById($dwdsgenreRelatedById)
+    {
+        $this->collDwdsgenresRelatedById[]= $dwdsgenreRelatedById;
+        $dwdsgenreRelatedById->setDwdsgenreRelatedByChildof($this);
+    }
+
+    /**
+     * @param	DwdsgenreRelatedById $dwdsgenreRelatedById The dwdsgenreRelatedById object to remove.
+     * @return Dwdsgenre The current object (for fluent API support)
+     */
+    public function removeDwdsgenreRelatedById($dwdsgenreRelatedById)
+    {
+        if ($this->getDwdsgenresRelatedById()->contains($dwdsgenreRelatedById)) {
+            $this->collDwdsgenresRelatedById->remove($this->collDwdsgenresRelatedById->search($dwdsgenreRelatedById));
+            if (null === $this->dwdsgenresRelatedByIdScheduledForDeletion) {
+                $this->dwdsgenresRelatedByIdScheduledForDeletion = clone $this->collDwdsgenresRelatedById;
+                $this->dwdsgenresRelatedByIdScheduledForDeletion->clear();
+            }
+            $this->dwdsgenresRelatedByIdScheduledForDeletion[]= $dwdsgenreRelatedById;
+            $dwdsgenreRelatedById->setDwdsgenreRelatedByChildof(null);
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -1984,11 +1984,6 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
-            if ($this->collDwdsgenresRelatedById) {
-                foreach ($this->collDwdsgenresRelatedById as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collWorksRelatedByDwdsgenreId) {
                 foreach ($this->collWorksRelatedByDwdsgenreId as $o) {
                     $o->clearAllReferences($deep);
@@ -1999,6 +1994,11 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collDwdsgenresRelatedById) {
+                foreach ($this->collDwdsgenresRelatedById as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->aDwdsgenreRelatedByChildof instanceof Persistent) {
               $this->aDwdsgenreRelatedByChildof->clearAllReferences($deep);
             }
@@ -2006,10 +2006,6 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
-        if ($this->collDwdsgenresRelatedById instanceof PropelCollection) {
-            $this->collDwdsgenresRelatedById->clearIterator();
-        }
-        $this->collDwdsgenresRelatedById = null;
         if ($this->collWorksRelatedByDwdsgenreId instanceof PropelCollection) {
             $this->collWorksRelatedByDwdsgenreId->clearIterator();
         }
@@ -2018,6 +2014,10 @@ abstract class BaseDwdsgenre extends BaseObject implements Persistent
             $this->collWorksRelatedByDwdssubgenreId->clearIterator();
         }
         $this->collWorksRelatedByDwdssubgenreId = null;
+        if ($this->collDwdsgenresRelatedById instanceof PropelCollection) {
+            $this->collDwdsgenresRelatedById->clearIterator();
+        }
+        $this->collDwdsgenresRelatedById = null;
         $this->aDwdsgenreRelatedByChildof = null;
     }
 

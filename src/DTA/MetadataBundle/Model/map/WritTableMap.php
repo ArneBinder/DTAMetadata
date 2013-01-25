@@ -64,10 +64,10 @@ class WritTableMap extends TableMap
         $this->addRelation('Translator', 'DTA\\MetadataBundle\\Model\\Translator', RelationMap::MANY_TO_ONE, array('translator_id' => 'id', ), null, null);
         $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Publication', RelationMap::MANY_TO_ONE, array('publication_id' => 'id', ), null, null);
         $this->addRelation('Relatedset', 'DTA\\MetadataBundle\\Model\\Relatedset', RelationMap::MANY_TO_ONE, array('relatedSet_id' => 'id', ), null, null);
+        $this->addRelation('WritWritgroup', 'DTA\\MetadataBundle\\Model\\WritWritgroup', RelationMap::ONE_TO_MANY, array('id' => 'writ_id', ), null, null, 'WritWritgroups');
         $this->addRelation('Corpus', 'DTA\\MetadataBundle\\Model\\Corpus', RelationMap::ONE_TO_MANY, array('id' => 'writ_id', ), null, null, 'Corpuses');
         $this->addRelation('Source', 'DTA\\MetadataBundle\\Model\\Source', RelationMap::ONE_TO_MANY, array('id' => 'writ_id', ), null, null, 'Sources');
         $this->addRelation('Task', 'DTA\\MetadataBundle\\Model\\Task', RelationMap::ONE_TO_MANY, array('id' => 'writ_id', ), null, null, 'Tasks');
-        $this->addRelation('WritWritgroup', 'DTA\\MetadataBundle\\Model\\WritWritgroup', RelationMap::ONE_TO_MANY, array('id' => 'writ_id', ), null, null, 'WritWritgroups');
         $this->addRelation('Writgroup', 'DTA\\MetadataBundle\\Model\\Writgroup', RelationMap::MANY_TO_MANY, array(), null, null, 'Writgroups');
     } // buildRelations()
 
