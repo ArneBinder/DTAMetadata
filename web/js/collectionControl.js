@@ -23,7 +23,7 @@ jQuery(document).ready(function(){
 });
 
 function createAddLink(element){
-    var linkText = 'Bestandteil Hinzufügen {prototyp. swapping doesn\'t yet copy all values.}';
+    var linkText = 'Bestandteil Hinzufügen {swapping doesn\'t yet copy all values.}';
     var link = $('<a href="#" class="add-entity">'+linkText+'</a>');
     link.on('click', addFormElement);    
     $(element).append(link);

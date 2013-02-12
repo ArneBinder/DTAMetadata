@@ -59,25 +59,25 @@
         <index name="editionVon">
             <index-column name="work_id"/>
         </index>
-        <index name="fk_edition_herausgeber1">
+        <index name="idx_edition_herausgeber1">
             <index-column name="publisher_id"/>
         </index>
-        <index name="fk_edition_drucker1">
+        <index name="idx_edition_drucker1">
             <index-column name="printer_id"/>
         </index>
-        <index name="fk_schriftstueck_uebersetzer1">
+        <index name="idx_schriftstueck_uebersetzer1">
             <index-column name="translator_id"/>
         </index>
-        <index name="fk_pub_relatedSet1">
+        <index name="idx_pub_relatedSet1">
             <index-column name="relatedSet_id"/>
         </index>
-       <index name="fk_publikation_verlag1">
+       <index name="idx_publikation_verlag1">
            <index-column name="publishingCompany_id"/>
        </index>
-       <index name="fk_publikation_ort1">
+       <index name="idx_publikation_ort1">
            <index-column name="place_id"/>
        </index>
-       <index name="fk_publication_dateSpecification1">
+       <index name="idx_publication_dateSpecification1">
            <index-column name="dateSpecification_id"/>
        </index>
     </table>
@@ -88,7 +88,7 @@
        <foreign-key foreignTable="publication" name="fk_publicationValid">
            <reference local="publication_id" foreign="id"/>
        </foreign-key>
-       <index name="fk_publicationId">
+       <index name="idx_publicationId">
            <index-column name="publication_id"/>
        </index>
     </table>
@@ -132,7 +132,7 @@
         <foreign-key foreignTable="monograph" name="fk_volume_monograph1">
             <reference local="monograph_id" foreign="id"/>
         </foreign-key>
-        <index name="fk_volume_monograph1">
+        <index name="idx_volume_monograph1">
             <index-column name="monograph_id"/>
         </index>
     </table>
@@ -168,22 +168,22 @@
         <foreign-key foreignTable="dateSpecification" name="fk_work_dateSpecification1">
             <reference local="dateSpecification_id" foreign="id"/>
         </foreign-key>
-        <index name="fk_werk_status1">
+        <index name="idx_werk_status1">
             <index-column name="status_id"/>
         </index>
-        <index name="fk_werk_genre1">
+        <index name="idx_werk_genre1">
             <index-column name="genre_id"/>
         </index>
-        <index name="fk_werk_genre2">
+        <index name="idx_werk_genre2">
             <index-column name="subgenre_id"/>
         </index>
-        <index name="fk_werk_dwdsGenre2">
+        <index name="idx_werk_dwdsGenre2">
             <index-column name="dwdsGenre_id"/>
         </index>
-        <index name="fk_werk_dwdsGenre3">
+        <index name="idx_werk_dwdsGenre3">
             <index-column name="dwdsSubgenre_id"/>
         </index>
-        <index name="fk_work_dateSpecification1">
+        <index name="idx_work_dateSpecification1">
             <index-column name="dateSpecification_id"/>
         </index>
     </table>
@@ -194,13 +194,13 @@
         <foreign-key foreignTable="publicationGroup" name="fk_publicationGroupValid">
             <reference local="publicationGroup_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="publication" name="fk_publicationValid">
+        <foreign-key foreignTable="publication">
             <reference local="publication_id" foreign="id"/>
         </foreign-key>
-        <index name="fk_publicationGroupValid">
+        <index name="idx_publicationValid">
             <index-column name="publication_id"/>
         </index>
-        <index name="fk_publicationValid">
+        <index name="idx_publicationGroupValid">
             <index-column name="publicationGroup_id"/>
         </index>
     </table>
@@ -220,7 +220,7 @@
     <foreign-key foreignTable="dwdsGenre" name="fk_subgenre0">
       <reference local="childOf" foreign="id"/>
     </foreign-key>
-    <index name="fk_nachfolgender_arbeitsschritt">
+    <index name="idx_nachfolgender_arbeitsschritt">
       <index-column name="childOf"/>
     </index>
   </table>
@@ -232,7 +232,7 @@
     <foreign-key foreignTable="genre" name="fk_subgenre">
       <reference local="childOf" foreign="id"/>
     </foreign-key>
-    <index name="fk_nachfolgender_arbeitsschritt">
+    <index name="idx_nachfolgender_arbeitsschritt">
       <index-column name="childOf"/>
     </index>
   </table>
@@ -289,7 +289,7 @@
     <index name="id_Fundstellen_2">
       <index-column name="id"/>
     </index>
-    <index name="fk_quelle_edition1">
+    <index name="idx_quelle_edition1">
       <index-column name="publication_id"/>
     </index>
   </table>
@@ -336,16 +336,16 @@
     <index name="closed_2">
       <index-column name="done"/>
     </index>
-    <index name="fk_aufgabe_arbeitsschritt1">
+    <index name="idx_aufgabe_arbeitsschritt1">
       <index-column name="taskType_id"/>
     </index>
-    <index name="fk_aufgabe_buchGruppe1">
+    <index name="idx_aufgabe_buchGruppe1">
       <index-column name="publicationGroup_id"/>
     </index>
-    <index name="fk_aufgabe_schriftstueck1">
+    <index name="idx_aufgabe_schriftstueck1">
       <index-column name="publication_id"/>
     </index>
-    <index name="fk_task_name1">
+    <index name="idx_task_name1">
       <index-column name="responsibleUser_id"/>
     </index>
   </table>
@@ -403,7 +403,7 @@
         <foreign-key foreignTable="person" name="fk_personalName_person1">
             <reference local="person_id" foreign="id"/>
         </foreign-key>
-        <index name="fk_personalName_person1">
+        <index name="idx_personalName_person1">
             <index-column name="person_id"/>
         </index>
     </table>
@@ -423,10 +423,10 @@
         <foreign-key foreignTable="personalName" name="fk_nameFragment_personalName1">
             <reference local="personalName_id" foreign="id"/>
         </foreign-key>
-        <index name="fk_name_namensart1">
+        <index name="idx_name_namensart1">
             <index-column name="nameFragmentTypeId"/>
         </index>
-        <index name="fk_nameFragment_personalName1">
+        <index name="idx_nameFragment_personalName1">
             <index-column name="personalName_id"/>
         </index>
     </table>
@@ -458,10 +458,10 @@
         <foreign-key foreignTable="titleFragmentType" name="fk_name_titelFragmentArt1">
             <reference local="titleFragmentType_id" foreign="id"/>
         </foreign-key>
-        <index name="fk_title_titleid2">
+        <index name="idx_title_titleid2">
             <index-column name="title_id"/>
         </index>
-        <index name="fk_titleFragmentType_type2">
+        <index name="idx_titleFragmentType_type2">
             <index-column name="titleFragmentType_id"/>
         </index>
         
@@ -492,7 +492,7 @@
         <foreign-key foreignTable="person" name="fk_autor_person1">
             <reference local="person_id" foreign="id"/>
         </foreign-key>
-        <index name="fk_autor_person1">
+        <index name="idx_autor_person1">
             <index-column name="person_id"/>
         </index>
     </table>
@@ -509,11 +509,11 @@
             <reference local="author_id" foreign="id"/>
             <reference local="author_person_id" foreign="person_id"/>
         </foreign-key>
-        <index name="fk_werk_has_autor_autor1">
+        <index name="idx_werk_has_autor_autor1">
             <index-column name="author_id"/>
             <index-column name="author_person_id"/>
         </index>
-        <index name="fk_werk_has_autor_werk1">
+        <index name="idx_werk_has_autor_werk1">
             <index-column name="work_id"/>
         </index>
     </table>
@@ -532,7 +532,7 @@
         <foreign-key foreignTable="person" name="fk_drucker_person1">
             <reference local="person_id" foreign="id"/>
         </foreign-key>
-        <index name="fk_drucker_person1">
+        <index name="idx_drucker_person1">
             <index-column name="person_id"/>
         </index>
     </table>
@@ -543,7 +543,7 @@
         <foreign-key foreignTable="person" name="fk_herausgeber_ist_person">
             <reference local="person_id" foreign="id"/>
         </foreign-key>
-        <index name="fk_herausgeber_ist_person">
+        <index name="idx_herausgeber_ist_person">
             <index-column name="person_id"/>
         </index>
     </table>
@@ -554,7 +554,7 @@
         <foreign-key foreignTable="person" name="fk_translator_person1">
             <reference local="person_id" foreign="id"/>
         </foreign-key>
-        <index name="fk_translator_person1">
+        <index name="idx_translator_person1">
             <index-column name="person_id"/>
         </index>
     </table>

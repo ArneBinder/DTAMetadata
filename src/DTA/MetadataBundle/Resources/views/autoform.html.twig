@@ -1,26 +1,16 @@
 {# 
-    Template for rendering forms of any type.
-
-The dynamic extend is for extending the template of the currently active domain, 
-    (the overridden domainKey value is passed by the renderWithDomainMenu method
-    within the DTABaseController.
-    The according template files are located in 
-        src/DTA/MetadataBundle/Resources/views/domainKey/base.html.twig
-    Template inheritance is basically for inheriting the correct domain menu.
+    Template for rendering forms for any model type (i.e. database entity).
 #}
-{% extends 'DTAMetadataBundle:'~ domainKey ~':' ~ domainKey ~ '.html.twig' %}
-
-
-
-{% form_theme form 'DTAMetadataBundle:Form:sortableCollection.html.twig' %}
 
 {% block core %}
 
-    <h3>{{className}}</h3>
+    {# The german name of the model class is provided in the options array of 
+        the according form type class (e.g. WorkType.php for Work or TitlefragmenttypeType.php for TitleFragmentType) #}
+    <h3>{{form.vars.modelNameGerman|default(className)}}</h3>
 
     {#{domainKey}#}
     
-    <form action="{{ path('genericNew', {'className':className, 'domainKey': domainKey}) }}" method="post" {{ form_enctype(form) }}>
+    <form action="{{ path('genericNew', {'className':className, 'domainKey': domainKey|default("none")}) }}" method="post" {{ form_enctype(form) }}>
         {{ form_rest(form) }}
          <input type="submit"/>
     </form>
@@ -32,7 +22,7 @@ The dynamic extend is for extending the template of the currently active domain,
     
 {% endblock %}
 
-{# Some fragments
+{# Deprecated fragments
 
  <form action="{{ path('genericNew', {'className':className}) }}" method="post" {{ form_enctype(form) }}>
      <ol class="zebra collection-editor collection-sortable" data-prototype="{{ form_widget(form.titleFragments.vars.prototype)|e }}">

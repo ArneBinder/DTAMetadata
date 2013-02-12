@@ -7,3 +7,4 @@ vendor/*
 !vendor/propel
 composer.phar
 /nbproject/private/
+!/vendor/autoload.php
