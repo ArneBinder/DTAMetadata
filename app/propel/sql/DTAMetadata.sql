@@ -30,15 +30,42 @@ CREATE TABLE `publication`
     `descendant_class` VARCHAR(100),
     PRIMARY KEY (`id`),
     INDEX `editionVon` (`work_id`),
-    INDEX `fk_edition_herausgeber1` (`publisher_id`),
-    INDEX `fk_edition_drucker1` (`printer_id`),
-    INDEX `fk_schriftstueck_uebersetzer1` (`translator_id`),
-    INDEX `fk_pub_relatedSet1` (`relatedSet_id`),
-    INDEX `fk_publikation_verlag1` (`publishingCompany_id`),
-    INDEX `fk_publikation_ort1` (`place_id`),
-    INDEX `fk_publication_dateSpecification1` (`dateSpecification_id`),
-    INDEX `FI_publikation_titel12` (`title_id`)
-) ENGINE=MyISAM;
+    INDEX `idx_edition_herausgeber1` (`publisher_id`),
+    INDEX `idx_edition_drucker1` (`printer_id`),
+    INDEX `idx_schriftstueck_uebersetzer1` (`translator_id`),
+    INDEX `idx_pub_relatedSet1` (`relatedSet_id`),
+    INDEX `idx_publikation_verlag1` (`publishingCompany_id`),
+    INDEX `idx_publikation_ort1` (`place_id`),
+    INDEX `idx_publication_dateSpecification1` (`dateSpecification_id`),
+    INDEX `FI_publikation_titel12` (`title_id`),
+    CONSTRAINT `editionVon`
+        FOREIGN KEY (`work_id`)
+        REFERENCES `work` (`id`),
+    CONSTRAINT `fk_edition_herausgeber1`
+        FOREIGN KEY (`publisher_id`)
+        REFERENCES `publisher` (`id`),
+    CONSTRAINT `fk_edition_drucker1`
+        FOREIGN KEY (`printer_id`)
+        REFERENCES `printer` (`id`),
+    CONSTRAINT `fk_schriftstueck_uebersetzer1`
+        FOREIGN KEY (`translator_id`)
+        REFERENCES `translator` (`id`),
+    CONSTRAINT `fk_publication_relatedSet1`
+        FOREIGN KEY (`relatedSet_id`)
+        REFERENCES `relatedSet` (`id`),
+    CONSTRAINT `fk_publikation_titel12`
+        FOREIGN KEY (`title_id`)
+        REFERENCES `title` (`id`),
+    CONSTRAINT `fk_publikation_verlag1`
+        FOREIGN KEY (`publishingCompany_id`)
+        REFERENCES `publishingCompany` (`id`),
+    CONSTRAINT `fk_publikation_ort1`
+        FOREIGN KEY (`place_id`)
+        REFERENCES `place` (`id`),
+    CONSTRAINT `fk_publication_dateSpecification1`
+        FOREIGN KEY (`dateSpecification_id`)
+        REFERENCES `dateSpecification` (`id`)
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- monograph
@@ -51,8 +78,11 @@ CREATE TABLE `monograph`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `publication_id` INTEGER NOT NULL,
     PRIMARY KEY (`id`,`publication_id`),
-    INDEX `fk_publicationId` (`publication_id`)
-) ENGINE=MyISAM;
+    INDEX `idx_publicationId` (`publication_id`),
+    CONSTRAINT `fk_publicationValid`
+        FOREIGN KEY (`publication_id`)
+        REFERENCES `publication` (`id`)
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- essay
@@ -87,8 +117,35 @@ CREATE TABLE `essay`
     INDEX `essay_I_6` (`publishingCompany_id`),
     INDEX `essay_I_7` (`place_id`),
     INDEX `essay_I_8` (`dateSpecification_id`),
-    INDEX `essay_I_9` (`title_id`)
-) ENGINE=MyISAM;
+    INDEX `essay_I_9` (`title_id`),
+    CONSTRAINT `essay_FK_1`
+        FOREIGN KEY (`work_id`)
+        REFERENCES `work` (`id`),
+    CONSTRAINT `essay_FK_2`
+        FOREIGN KEY (`publisher_id`)
+        REFERENCES `publisher` (`id`),
+    CONSTRAINT `essay_FK_3`
+        FOREIGN KEY (`printer_id`)
+        REFERENCES `printer` (`id`),
+    CONSTRAINT `essay_FK_4`
+        FOREIGN KEY (`translator_id`)
+        REFERENCES `translator` (`id`),
+    CONSTRAINT `essay_FK_5`
+        FOREIGN KEY (`relatedSet_id`)
+        REFERENCES `relatedSet` (`id`),
+    CONSTRAINT `essay_FK_6`
+        FOREIGN KEY (`title_id`)
+        REFERENCES `title` (`id`),
+    CONSTRAINT `essay_FK_7`
+        FOREIGN KEY (`publishingCompany_id`)
+        REFERENCES `publishingCompany` (`id`),
+    CONSTRAINT `essay_FK_8`
+        FOREIGN KEY (`place_id`)
+        REFERENCES `place` (`id`),
+    CONSTRAINT `essay_FK_9`
+        FOREIGN KEY (`dateSpecification_id`)
+        REFERENCES `dateSpecification` (`id`)
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- magazine
@@ -123,8 +180,35 @@ CREATE TABLE `magazine`
     INDEX `magazine_I_6` (`publishingCompany_id`),
     INDEX `magazine_I_7` (`place_id`),
     INDEX `magazine_I_8` (`dateSpecification_id`),
-    INDEX `magazine_I_9` (`title_id`)
-) ENGINE=MyISAM;
+    INDEX `magazine_I_9` (`title_id`),
+    CONSTRAINT `magazine_FK_1`
+        FOREIGN KEY (`work_id`)
+        REFERENCES `work` (`id`),
+    CONSTRAINT `magazine_FK_2`
+        FOREIGN KEY (`publisher_id`)
+        REFERENCES `publisher` (`id`),
+    CONSTRAINT `magazine_FK_3`
+        FOREIGN KEY (`printer_id`)
+        REFERENCES `printer` (`id`),
+    CONSTRAINT `magazine_FK_4`
+        FOREIGN KEY (`translator_id`)
+        REFERENCES `translator` (`id`),
+    CONSTRAINT `magazine_FK_5`
+        FOREIGN KEY (`relatedSet_id`)
+        REFERENCES `relatedSet` (`id`),
+    CONSTRAINT `magazine_FK_6`
+        FOREIGN KEY (`title_id`)
+        REFERENCES `title` (`id`),
+    CONSTRAINT `magazine_FK_7`
+        FOREIGN KEY (`publishingCompany_id`)
+        REFERENCES `publishingCompany` (`id`),
+    CONSTRAINT `magazine_FK_8`
+        FOREIGN KEY (`place_id`)
+        REFERENCES `place` (`id`),
+    CONSTRAINT `magazine_FK_9`
+        FOREIGN KEY (`dateSpecification_id`)
+        REFERENCES `dateSpecification` (`id`)
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- series
@@ -160,8 +244,35 @@ CREATE TABLE `series`
     INDEX `series_I_6` (`publishingCompany_id`),
     INDEX `series_I_7` (`place_id`),
     INDEX `series_I_8` (`dateSpecification_id`),
-    INDEX `series_I_9` (`title_id`)
-) ENGINE=MyISAM;
+    INDEX `series_I_9` (`title_id`),
+    CONSTRAINT `series_FK_1`
+        FOREIGN KEY (`work_id`)
+        REFERENCES `work` (`id`),
+    CONSTRAINT `series_FK_2`
+        FOREIGN KEY (`publisher_id`)
+        REFERENCES `publisher` (`id`),
+    CONSTRAINT `series_FK_3`
+        FOREIGN KEY (`printer_id`)
+        REFERENCES `printer` (`id`),
+    CONSTRAINT `series_FK_4`
+        FOREIGN KEY (`translator_id`)
+        REFERENCES `translator` (`id`),
+    CONSTRAINT `series_FK_5`
+        FOREIGN KEY (`relatedSet_id`)
+        REFERENCES `relatedSet` (`id`),
+    CONSTRAINT `series_FK_6`
+        FOREIGN KEY (`title_id`)
+        REFERENCES `title` (`id`),
+    CONSTRAINT `series_FK_7`
+        FOREIGN KEY (`publishingCompany_id`)
+        REFERENCES `publishingCompany` (`id`),
+    CONSTRAINT `series_FK_8`
+        FOREIGN KEY (`place_id`)
+        REFERENCES `place` (`id`),
+    CONSTRAINT `series_FK_9`
+        FOREIGN KEY (`dateSpecification_id`)
+        REFERENCES `dateSpecification` (`id`)
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- publishingCompany
@@ -175,7 +286,7 @@ CREATE TABLE `publishingCompany`
     `name` TEXT NOT NULL,
     `gnd` TEXT,
     PRIMARY KEY (`id`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- volume
@@ -192,8 +303,11 @@ CREATE TABLE `volume`
     `monograph_id` INTEGER NOT NULL,
     `monograph_publication_id` INTEGER NOT NULL,
     PRIMARY KEY (`id`),
-    INDEX `fk_volume_monograph1` (`monograph_id`)
-) ENGINE=MyISAM;
+    INDEX `idx_volume_monograph1` (`monograph_id`),
+    CONSTRAINT `fk_volume_monograph1`
+        FOREIGN KEY (`monograph_id`)
+        REFERENCES `monograph` (`id`)
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- work
@@ -215,13 +329,31 @@ CREATE TABLE `work`
     `format` TEXT,
     `directoryName` TEXT,
     PRIMARY KEY (`id`),
-    INDEX `fk_werk_status1` (`status_id`),
-    INDEX `fk_werk_genre1` (`genre_id`),
-    INDEX `fk_werk_genre2` (`subgenre_id`),
-    INDEX `fk_werk_dwdsGenre2` (`dwdsGenre_id`),
-    INDEX `fk_werk_dwdsGenre3` (`dwdsSubgenre_id`),
-    INDEX `fk_work_dateSpecification1` (`dateSpecification_id`)
-) ENGINE=MyISAM;
+    INDEX `idx_werk_status1` (`status_id`),
+    INDEX `idx_werk_genre1` (`genre_id`),
+    INDEX `idx_werk_genre2` (`subgenre_id`),
+    INDEX `idx_werk_dwdsGenre2` (`dwdsGenre_id`),
+    INDEX `idx_werk_dwdsGenre3` (`dwdsSubgenre_id`),
+    INDEX `idx_work_dateSpecification1` (`dateSpecification_id`),
+    CONSTRAINT `fk_werk_status1`
+        FOREIGN KEY (`status_id`)
+        REFERENCES `status` (`id`),
+    CONSTRAINT `fk_werk_genre1`
+        FOREIGN KEY (`genre_id`)
+        REFERENCES `genre` (`id`),
+    CONSTRAINT `fk_werk_genre2`
+        FOREIGN KEY (`subgenre_id`)
+        REFERENCES `genre` (`id`),
+    CONSTRAINT `fk_werk_dwdsGenre2`
+        FOREIGN KEY (`dwdsGenre_id`)
+        REFERENCES `dwdsGenre` (`id`),
+    CONSTRAINT `fk_werk_dwdsGenre3`
+        FOREIGN KEY (`dwdsSubgenre_id`)
+        REFERENCES `dwdsGenre` (`id`),
+    CONSTRAINT `fk_work_dateSpecification1`
+        FOREIGN KEY (`dateSpecification_id`)
+        REFERENCES `dateSpecification` (`id`)
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- publication_publicationGroup
@@ -234,9 +366,15 @@ CREATE TABLE `publication_publicationGroup`
     `publicationGroup_id` INTEGER NOT NULL,
     `publication_id` INTEGER NOT NULL,
     PRIMARY KEY (`publicationGroup_id`,`publication_id`),
-    INDEX `fk_publicationGroupValid` (`publication_id`),
-    INDEX `fk_publicationValid` (`publicationGroup_id`)
-) ENGINE=MyISAM;
+    INDEX `idx_publicationValid` (`publication_id`),
+    INDEX `idx_publicationGroupValid` (`publicationGroup_id`),
+    CONSTRAINT `fk_publicationGroupValid`
+        FOREIGN KEY (`publicationGroup_id`)
+        REFERENCES `publicationGroup` (`id`),
+    CONSTRAINT `publication_publicationGroup_FK_2`
+        FOREIGN KEY (`publication_id`)
+        REFERENCES `publication` (`id`)
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- corpus
@@ -249,7 +387,7 @@ CREATE TABLE `corpus`
     `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
     `name` TEXT NOT NULL,
     PRIMARY KEY (`id`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- dwdsGenre
@@ -263,8 +401,11 @@ CREATE TABLE `dwdsGenre`
     `name` TEXT NOT NULL,
     `childOf` INTEGER,
     PRIMARY KEY (`id`),
-    INDEX `fk_nachfolgender_arbeitsschritt` (`childOf`)
-) ENGINE=MyISAM;
+    INDEX `idx_nachfolgender_arbeitsschritt` (`childOf`),
+    CONSTRAINT `fk_subgenre0`
+        FOREIGN KEY (`childOf`)
+        REFERENCES `dwdsGenre` (`id`)
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- genre
@@ -278,8 +419,11 @@ CREATE TABLE `genre`
     `name` TEXT NOT NULL,
     `childOf` INTEGER,
     PRIMARY KEY (`id`),
-    INDEX `fk_nachfolgender_arbeitsschritt` (`childOf`)
-) ENGINE=MyISAM;
+    INDEX `idx_nachfolgender_arbeitsschritt` (`childOf`),
+    CONSTRAINT `fk_subgenre`
+        FOREIGN KEY (`childOf`)
+        REFERENCES `genre` (`id`)
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- partner
@@ -306,7 +450,7 @@ CREATE TABLE `partner`
     INDEX `AI_id_book_locations` (`id`),
     INDEX `id_book_locations_2` (`id`),
     INDEX `name` (`name`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- relatedSet
@@ -319,7 +463,7 @@ CREATE TABLE `relatedSet`
     `id` INTEGER NOT NULL,
     `name` TEXT NOT NULL,
     PRIMARY KEY (`id`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- source
@@ -341,8 +485,11 @@ CREATE TABLE `source`
     PRIMARY KEY (`id`),
     INDEX `AI_id_Fundstellen` (`id`),
     INDEX `id_Fundstellen_2` (`id`),
-    INDEX `fk_quelle_edition1` (`publication_id`)
-) ENGINE=MyISAM;
+    INDEX `idx_quelle_edition1` (`publication_id`),
+    CONSTRAINT `fk_quelle_edition1`
+        FOREIGN KEY (`publication_id`)
+        REFERENCES `publication` (`id`)
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- status
@@ -355,7 +502,7 @@ CREATE TABLE `status`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` TEXT NOT NULL,
     PRIMARY KEY (`id`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- task
@@ -380,11 +527,23 @@ CREATE TABLE `task`
     INDEX `starttime` (`start`),
     INDEX `active` (`done`),
     INDEX `closed_2` (`done`),
-    INDEX `fk_aufgabe_arbeitsschritt1` (`taskType_id`),
-    INDEX `fk_aufgabe_buchGruppe1` (`publicationGroup_id`),
-    INDEX `fk_aufgabe_schriftstueck1` (`publication_id`),
-    INDEX `fk_task_name1` (`responsibleUser_id`)
-) ENGINE=MyISAM;
+    INDEX `idx_aufgabe_arbeitsschritt1` (`taskType_id`),
+    INDEX `idx_aufgabe_buchGruppe1` (`publicationGroup_id`),
+    INDEX `idx_aufgabe_schriftstueck1` (`publication_id`),
+    INDEX `idx_task_name1` (`responsibleUser_id`),
+    CONSTRAINT `fk_aufgabe_arbeitsschritt1`
+        FOREIGN KEY (`taskType_id`)
+        REFERENCES `taskType` (`id`),
+    CONSTRAINT `fk_aufgabe_buchGruppe1`
+        FOREIGN KEY (`publicationGroup_id`)
+        REFERENCES `publicationGroup` (`id`),
+    CONSTRAINT `fk_aufgabe_schriftstueck1`
+        FOREIGN KEY (`publication_id`)
+        REFERENCES `publication` (`id`),
+    CONSTRAINT `fk_task_name1`
+        FOREIGN KEY (`responsibleUser_id`)
+        REFERENCES `user` (`id`)
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- taskType
@@ -400,7 +559,7 @@ CREATE TABLE `taskType`
     `tree_right` INTEGER,
     `tree_level` INTEGER,
     PRIMARY KEY (`id`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- user
@@ -420,7 +579,7 @@ CREATE TABLE `user`
     INDEX `AI_id_user` (`id`),
     INDEX `id_user_2` (`id`),
     INDEX `name` (`userName`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- publicationGroup
@@ -434,7 +593,7 @@ CREATE TABLE `publicationGroup`
     `name` TEXT NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `AI_id_group` (`id`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- dateSpecification
@@ -449,7 +608,7 @@ CREATE TABLE `dateSpecification`
     `comments` TEXT,
     `year_is_reconstructed` TINYINT(1) DEFAULT 0,
     PRIMARY KEY (`id`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- personalName
@@ -462,8 +621,11 @@ CREATE TABLE `personalName`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `person_id` INTEGER NOT NULL,
     PRIMARY KEY (`id`),
-    INDEX `fk_personalName_person1` (`person_id`)
-) ENGINE=MyISAM;
+    INDEX `idx_personalName_person1` (`person_id`),
+    CONSTRAINT `fk_personalName_person1`
+        FOREIGN KEY (`person_id`)
+        REFERENCES `person` (`id`)
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- nameFragment
@@ -479,9 +641,15 @@ CREATE TABLE `nameFragment`
     `nameFragmentTypeId` INTEGER NOT NULL,
     `sortable_rank` INTEGER,
     PRIMARY KEY (`id`),
-    INDEX `fk_name_namensart1` (`nameFragmentTypeId`),
-    INDEX `fk_nameFragment_personalName1` (`personalName_id`)
-) ENGINE=MyISAM;
+    INDEX `idx_name_namensart1` (`nameFragmentTypeId`),
+    INDEX `idx_nameFragment_personalName1` (`personalName_id`),
+    CONSTRAINT `fk_name_namensart1`
+        FOREIGN KEY (`nameFragmentTypeId`)
+        REFERENCES `nameFragmentType` (`id`),
+    CONSTRAINT `fk_nameFragment_personalName1`
+        FOREIGN KEY (`personalName_id`)
+        REFERENCES `personalName` (`id`)
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- nameFragmentType
@@ -494,7 +662,7 @@ CREATE TABLE `nameFragmentType`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` TEXT NOT NULL,
     PRIMARY KEY (`id`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- place
@@ -508,7 +676,7 @@ CREATE TABLE `place`
     `name` TEXT NOT NULL,
     `gnd` VARCHAR(100),
     PRIMARY KEY (`id`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- title
@@ -520,7 +688,7 @@ CREATE TABLE `title`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     PRIMARY KEY (`id`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- titleFragment
@@ -537,9 +705,15 @@ CREATE TABLE `titleFragment`
     `sortable_rank` INTEGER,
     `name_is_reconstructed` TINYINT(1) DEFAULT 0,
     PRIMARY KEY (`id`),
-    INDEX `fk_title_titleid2` (`title_id`),
-    INDEX `fk_titleFragmentType_type2` (`titleFragmentType_id`)
-) ENGINE=MyISAM;
+    INDEX `idx_title_titleid2` (`title_id`),
+    INDEX `idx_titleFragmentType_type2` (`titleFragmentType_id`),
+    CONSTRAINT `fk_titleFragment_title`
+        FOREIGN KEY (`title_id`)
+        REFERENCES `title` (`id`),
+    CONSTRAINT `fk_name_titelFragmentArt1`
+        FOREIGN KEY (`titleFragmentType_id`)
+        REFERENCES `titleFragmentType` (`id`)
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- titleFragmentType
@@ -552,7 +726,7 @@ CREATE TABLE `titleFragmentType`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` TEXT NOT NULL,
     PRIMARY KEY (`id`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- author
@@ -565,8 +739,11 @@ CREATE TABLE `author`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `person_id` INTEGER NOT NULL,
     PRIMARY KEY (`id`,`person_id`),
-    INDEX `fk_autor_person1` (`person_id`)
-) ENGINE=MyISAM;
+    INDEX `idx_autor_person1` (`person_id`),
+    CONSTRAINT `fk_autor_person1`
+        FOREIGN KEY (`person_id`)
+        REFERENCES `person` (`id`)
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- author_work
@@ -581,9 +758,15 @@ CREATE TABLE `author_work`
     `author_person_id` INTEGER NOT NULL,
     `name_id` INTEGER NOT NULL,
     PRIMARY KEY (`work_id`,`author_id`,`author_person_id`),
-    INDEX `fk_werk_has_autor_autor1` (`author_id`, `author_person_id`),
-    INDEX `fk_werk_has_autor_werk1` (`work_id`)
-) ENGINE=MyISAM;
+    INDEX `idx_werk_has_autor_autor1` (`author_id`, `author_person_id`),
+    INDEX `idx_werk_has_autor_werk1` (`work_id`),
+    CONSTRAINT `fk_werk_has_autor_werk1`
+        FOREIGN KEY (`work_id`)
+        REFERENCES `work` (`id`),
+    CONSTRAINT `fk_werk_has_autor_autor1`
+        FOREIGN KEY (`author_id`,`author_person_id`)
+        REFERENCES `author` (`id`,`person_id`)
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- person
@@ -597,7 +780,7 @@ CREATE TABLE `person`
     `gnd` VARCHAR(100),
     PRIMARY KEY (`id`),
     UNIQUE INDEX `dnb_UNIQUE` (`gnd`)
-) ENGINE=MyISAM;
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- printer
@@ -610,8 +793,11 @@ CREATE TABLE `printer`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `person_id` INTEGER NOT NULL,
     PRIMARY KEY (`id`,`person_id`),
-    INDEX `fk_drucker_person1` (`person_id`)
-) ENGINE=MyISAM;
+    INDEX `idx_drucker_person1` (`person_id`),
+    CONSTRAINT `fk_drucker_person1`
+        FOREIGN KEY (`person_id`)
+        REFERENCES `person` (`id`)
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- publisher
@@ -624,8 +810,11 @@ CREATE TABLE `publisher`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `person_id` INTEGER NOT NULL,
     PRIMARY KEY (`id`,`person_id`),
-    INDEX `fk_herausgeber_ist_person` (`person_id`)
-) ENGINE=MyISAM;
+    INDEX `idx_herausgeber_ist_person` (`person_id`),
+    CONSTRAINT `fk_herausgeber_ist_person`
+        FOREIGN KEY (`person_id`)
+        REFERENCES `person` (`id`)
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- translator
@@ -638,8 +827,11 @@ CREATE TABLE `translator`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `person_id` INTEGER NOT NULL,
     PRIMARY KEY (`id`,`person_id`),
-    INDEX `fk_translator_person1` (`person_id`)
-) ENGINE=MyISAM;
+    INDEX `idx_translator_person1` (`person_id`),
+    CONSTRAINT `fk_translator_person1`
+        FOREIGN KEY (`person_id`)
+        REFERENCES `person` (`id`)
+) ENGINE=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

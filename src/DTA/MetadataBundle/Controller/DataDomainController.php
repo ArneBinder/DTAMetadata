@@ -4,7 +4,6 @@ namespace DTA\MetadataBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-
 use \DTA\MetadataBundle\Model;
 
 /**
@@ -18,15 +17,13 @@ class DataDomainController extends DTABaseController {
 
     /** @inheritdoc */
     public $domainMenu = array(
-        array("caption" => "Publikationen", "path" => 'home',
-            "children" => array(
+        array("caption" => "Publikationen", "path" => 'home', "children" => array(
                 array('caption' => "Alle Publikationsarten", 'path' => 'home'),
                 array('caption' => "Bücher", 'modelClass' => 'Monograph'),
                 array('caption' => "Zeitschriften", 'modelClass' => 'Magazine'),
                 array('caption' => "Reihen", 'modelClass' => 'Series'),
                 array('caption' => "Essays", 'modelClass' => 'Essay'))),
-        array("caption" => "Personen", "path" => 'home',
-            "children" => array(
+        array("caption" => "Personen", "path" => 'home', "children" => array(
                 array('caption' => "Alle Personen", 'path' => 'home'),
                 array('caption' => "Autoren", 'modelClass' => 'Author'),
                 array('caption' => "Verleger", 'modelClass' => 'Publisher'),
@@ -61,7 +58,8 @@ class DataDomainController extends DTABaseController {
      */
     public function generateTestDataAction() {
 
-        // Testnamensarten
+        // name fragment types
+        
         $vorname = new Model\Namefragmenttype();
         $vorname->setName("Vorname");
         $vorname->save();
@@ -70,7 +68,8 @@ class DataDomainController extends DTABaseController {
         $nachname->setName("Nachname");
         $nachname->save();
 
-        // Testnamen
+        // users
+        
         $user = new Model\User();
         $user->setUsername("Frank");
         $user->save();
@@ -90,7 +89,8 @@ class DataDomainController extends DTABaseController {
         $user->setUsername("Alex");
         $user->save();
 
-        // Titelarten
+        // title types (main-, sub- and short title)
+        
         $haupttitel = new Model\Titlefragmenttype();
         $haupttitel->setName("Haupttitel");
         $haupttitel->save();
@@ -101,7 +101,8 @@ class DataDomainController extends DTABaseController {
         $kurztitel->setName("Kurztitel");
         $kurztitel->save();
 
-        // Workflow, einige Aufgabenarten
+        // Workflow, example task types
+        
         $s1 = new Model\Tasktype();
         $s1->setName('Aufgabentypen');
         $s1->makeRoot(); // make this node the root of the tree
@@ -133,17 +134,20 @@ class DataDomainController extends DTABaseController {
         $s7->setName('GrobiZoning');
         $s7->insertAsFirstChildOf($groupB); // insert the node in the tree
         $s7->save();
-
-        // Test Task not adapted to the new structure?
-        //        $t = new Task();
-//        $vk = \DTA\MetadataBundle\Model\Workflow\TasktypeQuery::create()->filterByName("Vorkorrektur")->findOne();
-//        $t->setTasktype($vk);
-//        $t->setStart("22.12.2012");
-//        $t->setEnd("24.12.2012");
-//        $carl = \DTA\MetadataBundle\Model\Workflow\UserQuery::create()->filterByUsername("Carl")->findOne();
-//        $t->setResponsibleuserId($carl->getId());
-//        $t->save();
+        
+        // workflow: publication statuses
+        
+        $unpublished = new Model\Status();
+        $unpublished->setName("Unveröffentlicht");
+        $unpublished->save();
+        
+        $published = new Model\Status();
+        $published->setName("Veröffentlicht");
+        $published->save();
+        
 //        $rootTask = \DTA\MetadataBundle\Model\TasktypeQuery::create()->findRoot();
+
+        return $this->forward("DTAMetadataBundle:Home:index");
     }
 
 }

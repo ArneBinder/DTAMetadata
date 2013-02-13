@@ -4,9 +4,6 @@
     Fills the domain menu template slot with the special option structure 
     for the data domain (view and search, create options for each model class).
     The other data domain templates extend this one (this saves includes for the domain menu all the time).
-
-    
-
 #}
 
 {% block title %}Daten{% endblock %}
@@ -34,7 +31,10 @@
                                 <i class="icon-list"></i> 
                                 Anzeigen und suchen
                         </a></li>
-                        <li><a href="{{ path(domainKey~'NewRecord', {'className':child.modelClass}) }}"> {#, 'recordId':0, 'domainKey': domainKey#}
+                        {# Using the domainKey to generate the path also works:
+                            path(domainKey~'NewRecord', {'className':child.modelClass})
+                         #}
+                        <li><a href="{{ path('DataDomainNewRecord', {'className':child.modelClass}) }}"> {#, 'recordId':0, 'domainKey': domainKey#}
                                 <i class="icon-plus"></i> 
                                 Neu anlegen
                         </a></li>
@@ -58,7 +58,7 @@
                     <li><a href="{{ path('home') }}">
                             <i class="icon-list"></i> 
                             Anzeigen und suchen</a></li>
-                    <li><a href="{{ path(domainKey~'NewRecord', {'className':item.modelClass}) }}"> {#, 'recordId':0, 'domainKey': domainKey#}
+                    <li><a href="{{ path('DataDomainNewRecord', {'className':item.modelClass}) }}"> {#, 'recordId':0, 'domainKey': domainKey#}
                             <i class="icon-plus"></i> 
                             Neu anlegen
                     </a></li>

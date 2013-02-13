@@ -23,7 +23,7 @@ twig:
     strict_variables: %kernel.debug%
     form:
         resources:
-            - 'DTAMetadataBundle:Form:sortableCollection.html.twig'
+            - 'DTAMetadataBundle::dtaFormExtensions.html.twig'
 
 # Assetic Configuration
 assetic:
@@ -38,26 +38,14 @@ assetic:
         #yui_css:
         #    jar: %kernel.root_dir%/Resources/java/yuicompressor-2.4.7.jar
 
-# Doctrine Configuration
-#doctrine:
-#    dbal:
-#        driver:   %database_driver%
-#        host:     %database_host%
-#        port:     %database_port%
-#        dbname:   %database_name%
-#        user:     %database_user%
-#        password: %database_password%
-#        charset:  UTF8
-#
-#    orm:
-#        auto_generate_proxy_classes: %kernel.debug%
-#        auto_mapping: true
-
 propel:
     build_properties:
       propel.packageObjectModel: true
       propel.namespace.autoPackage: true
       propel.behavior.reconstructed_flaggable.class: src.DTA.MetadataBundle.Model.reconstructed_flaggable.ReconstructedFlaggableBehavior
+      # FOR TESTING, non-enforcement of the foreign key constraints is more practical (set to MyISAM)
+      propel.mysql.tableType: InnoDB
+      
       # propel.behavior.reconstructed_flaggable.class: vendor.propel-reconstructed_flaggable-behavior.ReconstructedFlaggableBehavior
 #      propel.database: "%database_driver%"
 #      propel.database.url: "%database_driver%:host=%database_host%;dbname=%database_name%;charset=%database_charset%"
@@ -93,3 +81,20 @@ swiftmailer:
     username:  %mailer_user%
     password:  %mailer_password%
     spool:     { type: memory }
+
+
+
+# Doctrine Configuration
+#doctrine:
+#    dbal:
+#        driver:   %database_driver%
+#        host:     %database_host%
+#        port:     %database_port%
+#        dbname:   %database_name%
+#        user:     %database_user%
+#        password: %database_password%
+#        charset:  UTF8
+#
+#    orm:
+#        auto_generate_proxy_classes: %kernel.debug%
+#        auto_mapping: true
