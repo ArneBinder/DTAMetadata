@@ -761,10 +761,6 @@ abstract class BaseMonographPeer
             throw new PropelException('Cannot insert a value for auto-increment primary key ('.MonographPeer::ID.')');
         }
 
-        if ($criteria->containsKey(MonographPeer::PUBLICATION_ID) && $criteria->keyContainsValue(MonographPeer::PUBLICATION_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.MonographPeer::PUBLICATION_ID.')');
-        }
-
 
         // Set the correct dbName
         $criteria->setDbName(MonographPeer::DATABASE_NAME);

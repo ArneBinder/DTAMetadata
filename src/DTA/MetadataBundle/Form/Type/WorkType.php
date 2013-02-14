@@ -4,33 +4,29 @@ namespace DTA\MetadataBundle\Form\Type;
 
 use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use \DTA\MetadataBundle\Form\DerivedType;
 
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
+
+use DTA\MetadataBundle\Form\DerivedType\SelectOrAddType;
 
 class WorkType extends BaseAbstractType
 {
     protected $options = array(
         'data_class' => 'DTA\MetadataBundle\Model\Work',
         'name'       => 'work',
-        'modelNameGerman'   => 'Werk'
     );
-    
-    // pass the translated name to the view
-    public function finishView(FormView $view, FormInterface $form, array $options){
-        $view->vars['modelNameGerman'] = $options['modelNameGerman'];
-    }
 
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('status', new DerivedType\SelectOrAddType(), array(
+        $builder->add('status', new SelectOrAddType(), array(
             'class' => "DTA\MetadataBundle\Model\Status",
             'property'   => 'Name',
             'label' => 'Status',
+//            'query' => \DTA\MetadataBundle\Model\StatusQuery::create()->orderByName()
         ));
 //        $builder->add('datespecificationId');
 //        $builder->add('genreId');

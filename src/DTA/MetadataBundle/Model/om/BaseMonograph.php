@@ -444,10 +444,6 @@ abstract class BaseMonograph extends BaseObject implements Persistent
         if (null !== $this->id) {
             throw new PropelException('Cannot insert a value for auto-increment primary key (' . MonographPeer::ID . ')');
         }
-        $this->modifiedColumns[] = MonographPeer::PUBLICATION_ID;
-        if (null !== $this->publication_id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . MonographPeer::PUBLICATION_ID . ')');
-        }
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(MonographPeer::ID)) {
@@ -821,6 +817,7 @@ abstract class BaseMonograph extends BaseObject implements Persistent
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
+        $copyObj->setPublicationId($this->getPublicationId());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -842,7 +839,6 @@ abstract class BaseMonograph extends BaseObject implements Persistent
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
-            $copyObj->setPublicationId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 

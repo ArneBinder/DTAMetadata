@@ -27,6 +27,42 @@ class DTABaseController extends Controller {
     public $domainMenu = array();
 
     /**
+     * Returns the fully qualified class names to autoload and generate objects and work with them using their class names.
+     * @param String $className The basic name of the class, all lower-case except the first letter (Work, Personalname, Namefragmenttype)
+     */
+    public function relatedClassNames($className){
+        return array(
+            "model"     => "DTA\\MetadataBundle\\Model\\" . $className,                 // the actual propel data
+            "query"     => "DTA\\MetadataBundle\\Model\\" . $className . "Query",       // utility class for generating queries
+            "peer"      => "DTA\\MetadataBundle\\Model\\" . $className . "Peer",        // utility class for reflection
+            "formType"  => "DTA\\MetadataBundle\\Form\\Type\\" . $className . "Type",   // class for generating form inputs
+        );
+    }
+    
+    /**
+     * 
+     * @param type $className
+     * @Route("/genericView/{className}")
+     */
+    public function genericViewAction($className){
+        
+        $classNames = $this->relatedClassNames($className);
+        
+        // for retrieving the entities
+        $query = new $classNames['query'];
+        // for retrieving the column names
+        $peer = new $classNames['peer'];
+        
+        return $this->renderDomainSpecificAction("DTAMetadataBundle::genericView.html.twig", array(
+            'data' => $query->find(),
+            'columns' => $peer->getFieldNames(\BasePeer::TYPE_PHPNAME),
+//            'peer' => $peer,
+            'className' => $className,
+        ));
+        
+    }
+    
+    /**
      * Creates a form to EDIT OR CREATE any database entity.
      * It is inherited and called by the domain controllers (corresponding to 
      * the four main pages: Daten, Ordnungssysteme, Arbeitsfluss, Administration) 
@@ -37,40 +73,40 @@ class DTABaseController extends Controller {
      * Since 1 is the first ID used by propel, 0 indicates that a new object shall be created.
      * @return The symfony form. If it is an edit form, with fetched data.
      */
-    public function genericEditForm($className, $recordId = 0) {
+    public function genericEditFormAction($className, $recordId = 0) {
 
-        // The fully qualified class name (for autoloading)
-        $objClassName = "DTA\\MetadataBundle\\Model\\" . $className;
-
-        // The form type is responsible for building the form
-        $objFormTypeName = "DTA\\MetadataBundle\\Form\\Type\\" . $className . "Type";
-
-        // The query type is used to obtain the object to edit from the database
-        $objQueryClassName = "DTA\\MetadataBundle\\Model\\" . $className . "Query";
-        $queryObject = $objQueryClassName::create();
+        $classNames = $this->relatedClassNames($className);
+        
+        $queryObject = $classNames['query']::create();
 
         // ------------------------------------------------------------------------
         // Try to fetch the object from the database to fill the form
         $record = $queryObject->findOneById($recordId);
-        $obj = is_null($record) ? new $objClassName : $record;
+        $obj = is_null($record) ? new $classNames['model'] : $record;
 
-        $form = $this->createForm(new $objFormTypeName, $obj);
+        $form = $this->createForm(new $classNames['formType'], $obj);
         return $form;
     }
     
     /**
      * Renders a generic form and returns the result for use in AJAX updating or creating database entities.
-     * @param type $className   The name of the model class (e.g. Status, Title, Titlefragment)
-     * @param type $recordId    The id of the record to edit. Zero indicates that a new record shall be created.
-     * @Route("/plainForm/{className}/{recordId}", name="ajaxGenericForm")
+     * 
+     * @param string $className   The name of the model class (e.g. Status, Title, Titlefragment)
+     * @param int    $recordId    The id of the record to edit. Zero indicates that a new record shall be created.
+     * @param string $captionProperty The property to use as caption for a select option (only for ajax use)
+     * 
+     * @Route("/plainForm/{className}/{recordId}/{captionProperty}", 
+     *      name="plainForm", 
+     *      defaults={"recordId"=0, "captionProperty"="Id"})
      */
-    public function genericEditFormView(Request $request, $className, $recordId = 0){
+    public function plainFormAction(Request $request, $className, $recordId = 0, $captionProperty = "Id"){
         
-        $form = $this->genericEditForm($className, $recordId);
+        $form = $this->genericEditFormAction($className, $recordId);
         
-        return $this->render("DTAMetadataBundle::autoform.html.twig", array(
+        return $this->render("DTAMetadataBundle::modalForm.html.twig", array(
             'form' => $form->createView(),
             'className' => $className,
+            'captionProperty' => $captionProperty,
         ));
     }
 
@@ -81,9 +117,9 @@ class DTABaseController extends Controller {
      * @param type $recordId
      * @Route("/genericUpdate/{className}/{recordId}", name="genericUpdate")
      */
-    public function genericUpdateDatabase(Request $request, $className, $recordId) {
+    public function genericUpdateDatabaseAction(Request $request, $className, $recordId) {
 
-        $form = $this->genericEditForm($className, $recordId);
+        $form = $this->genericEditFormAction($className, $recordId);
         $obj = $form->getData();
 
         if ($request->isMethod("POST")) {
@@ -98,17 +134,19 @@ class DTABaseController extends Controller {
      * @param string $className See genericEditForm for a parameter documentation.
      * @param string domainKey The domain where to redirect to, to view the created record. 
      *                          If it is set to "none", the database update is performed without redirecting (ajax case)
-     * @Route("/genericNew/{domainKey}/{className}", name="genericNew")
+     * @return HTML Option Element|nothing If the new action is called by a nested ajax form (selectOrAdd form type) the result is the option element to add to the nearby select.
+     * 
+     * @Route("/genericNew/{domainKey}/{className}/{captionProperty}", name="genericNew", defaults={"captionProperty"="Id"})
      */
-    public function genericNewAction(Request $request, $className, $domainKey = "none") {
+    public function genericNewAction(Request $request, $className, $domainKey, $captionProperty = "Id") {
 
-//        var_dump($request);
-        $objClassName = "DTA\\MetadataBundle\\Model\\" . $className;
-        $objFormTypeName = "DTA\\MetadataBundle\\Form\\Type\\" . $className . "Type";
-        $obj = new $objClassName;
+        $classNames = $this->relatedClassNames($className);
+        
+        // create object and its form
+        $obj = new $classNames['model'];
+        $form = $this->createForm(new $classNames['formType'], $obj);
 
-        $form = $this->createForm(new $objFormTypeName, $obj);
-
+        // save data on POST
         if ($request->isMethod("POST")) {
             $form->bind($request);
             if ($form->isValid()) {
@@ -116,22 +154,19 @@ class DTABaseController extends Controller {
             }
         }
         
-        // the logical template name DTAMetadataBundle:A:b resolves to src/DTA/MetadataBundle/Resources/views/A/b
-//        return $this->renderDomainSpecific('DTAMetadataBundle::autoform.html.twig', array(
-//                    'className' => $className,
-//                    'persistedObject' => $bindTest,
-//                    'form' => $form->createView(),
-//                    'domainKey' => $domainKey,
-//                ));
-        
         // AJAX case (nested form submit, no redirect)
         if("none" === $domainKey){
-            return new Response("Ajax update successful.");
+            
+            // fetch data for the newly selectable option
+            $id = $obj->getId();
+            $caption = $obj->getByName($captionProperty);
+            
+            return new Response("<option value='$id'>$caption</option>");
         }
         // top level form submit case (redirect to view page)
         else{
             $route = implode(':', array('DTAMetadataBundle', $domainKey, 'index'));
-            return $this->forward($route);
+            return $this->redirect($this->generateUrl($route));
         }
     }
 
@@ -140,7 +175,7 @@ class DTABaseController extends Controller {
      * @param $template Template to use for rendering, e.g. site specific as DTAMetadataBundle:DataDomain:index.html.twig
      * @param $options The data for the template to render 
      */
-    public function renderDomainSpecific($template, array $options = array()) {
+    public function renderDomainSpecificAction($template, array $options = array()) {
         
         // these are overriden by the calling subclass
         $defaultDomainMenu = array(

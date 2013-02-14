@@ -1,5 +1,6 @@
 /* 
- * Contains the UI logic for dynamic forms (with flexible numbers of inputs).
+ * Contains the UI logic for the sortableCollection form type (src/DTA/MetadataBundle/Form/DerivedType/SortableCollectionType.php).
+ * This is basically an input to specify a dynamic number of relations between a database entity and another.
  * Whereever multiple relations between model entities are possible, 
  * DOM manipulation is necessary to dynamically generate the necessary form inputs.
  * 
@@ -8,7 +9,7 @@
  */
 
 jQuery(document).ready(function(){
-    // collections are by (my) convention maintained within unordered lists that have the class collection-editor
+    // collections are by (my) convention maintained within unordered lists that have the css-class collection-editor
     var collectionTags = jQuery('.collection-editor');
     jQuery.each(collectionTags, function(idx,element){
         createAddLink(element);

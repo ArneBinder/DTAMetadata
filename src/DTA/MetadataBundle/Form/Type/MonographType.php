@@ -5,20 +5,23 @@ namespace DTA\MetadataBundle\Form\Type;
 use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\FormInterface;
+
 class MonographType extends BaseAbstractType {
 
     protected $options = array(
         'data_class' => 'DTA\MetadataBundle\Model\Monograph',
         'name' => 'monograph',
     );
-
+    
     /**
      *  {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options) {
         
         $builder->add('publication', new PublicationType(), array(
-            
+            'label' => ' '
         ));
         
 //        $builder->add('title', new TitleType(), array(

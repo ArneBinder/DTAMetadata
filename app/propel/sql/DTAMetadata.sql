@@ -335,7 +335,7 @@ CREATE TABLE `work`
     INDEX `idx_werk_dwdsGenre2` (`dwdsGenre_id`),
     INDEX `idx_werk_dwdsGenre3` (`dwdsSubgenre_id`),
     INDEX `idx_work_dateSpecification1` (`dateSpecification_id`),
-    CONSTRAINT `fk_werk_status1`
+    CONSTRAINT `work_FK_1`
         FOREIGN KEY (`status_id`)
         REFERENCES `status` (`id`),
     CONSTRAINT `fk_werk_genre1`

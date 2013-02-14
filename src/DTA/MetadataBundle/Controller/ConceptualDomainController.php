@@ -26,11 +26,7 @@ class ConceptualDomainController extends DTABaseController {
      */
     public function indexAction() {
 
-        $writ = new \DTA\MetadataBundle\Model\Writ();
-        $writ->setNumpages(3);
-        $writ->save();
-        return $this->renderDomainSpecific('DTAMetadataBundle:ConceptualDomain:index.html.twig', array(
-                    'persistedObject' => $writ,
+        return $this->renderDomainSpecificAction('DTAMetadataBundle:ConceptualDomain:ConceptualDomain.html.twig', array(
                     ));
     }
 

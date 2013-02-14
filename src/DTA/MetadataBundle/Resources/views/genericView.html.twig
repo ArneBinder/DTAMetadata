@@ -1,0 +1,27 @@
+{# Renders all database entities of a certain type #}
+
+{% extends 'DTAMetadataBundle:'~ domainKey ~':' ~ domainKey ~ '.html.twig' %}
+
+{% block core %}
+
+<h3>{{ className|trans }}</h3>
+
+<table class="table">
+    <thead>
+    {% for col in columns %} 
+            {# doesn't work {{ col|trans({},'tableHeaders')}}#}
+        <th> {{ col|trans }} {#% trans with {'col':col} from 'messages.de' %} col {% endtrans %#} </th>
+    {% endfor %}
+    </thead>
+    <tbody>
+    {% for datum in data %}
+        <tr>
+        {% for col in columns %}
+            <td>{{ attribute(datum,col) }}</td>
+        {% endfor %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{#{dump(peer.getTableMap().getRelations())}#}
+{% endblock core %}

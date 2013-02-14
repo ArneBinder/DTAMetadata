@@ -1,0 +1,16 @@
+/* 
+    Document   : dynamicGUI
+    Created on : 13.02.2013, 11:06:07
+    Author     : carlwitt
+    Description:
+        Styles all elements that have been dynamically created via javascript.
+        This includes custom widgets as defined in dtaFormExtensions.html.twig (selectOrAdd, sortableCollection form type)
+*/
+
+.selectOrAdd.add.btn{
+    position: relative; 
+    top: -6px; 
+    margin-left: 10px;
+}
+
+/* */

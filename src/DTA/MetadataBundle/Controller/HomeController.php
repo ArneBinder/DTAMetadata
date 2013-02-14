@@ -30,7 +30,7 @@ class HomeController extends DTABaseController {
 //        $p = new Model\Publication();
 //        $p->setNumpages(101);
 //        $p->save();
-        return $this->renderDomainSpecific('DTAMetadataBundle:Home:Home.html.twig', array(
+        return $this->renderDomainSpecificAction('DTAMetadataBundle:Home:Home.html.twig', array(
 //            'testData' => $k->getNumpages(),            
         ));
     }
@@ -56,7 +56,7 @@ class HomeController extends DTABaseController {
                 $result = "saved.";
             }
         }
-        return $this->renderDomainSpecific('DTAMetadataBundle::autoform.html.twig', array(
+        return $this->renderDomainSpecificAction('DTAMetadataBundle::autoform.html.twig', array(
                     'className' => 'Personalname',
                     'persistedObject' => $result,
                     'form' => $form->createView(),
@@ -79,7 +79,7 @@ class HomeController extends DTABaseController {
                 $obj->save();
         }
 
-        return $this->renderDomainSpecific('DTAMetadataBundle::autoform.html.twig', array(
+        return $this->renderDomainSpecificAction('DTAMetadataBundle::autoform.html.twig', array(
                     'className' => 'Title',
                     'persistedObject' => 'persisted.',
                     'form' => $form->createView(),
@@ -103,7 +103,7 @@ class HomeController extends DTABaseController {
                 $obj->save();
         }
 
-        return $this->renderDomainSpecific('DTAMetadataBundle::autoform.html.twig', array(
+        return $this->renderDomainSpecificAction('DTAMetadataBundle::autoform.html.twig', array(
                     'className' => $className,
                     'persistedObject' => 'persisted.',
                     'form' => $form->createView(),
@@ -128,7 +128,7 @@ class HomeController extends DTABaseController {
 //            }
 //        }
 //
-//        return $this->renderDomainSpecific('DTAMetadataBundle::autoform.html.twig', array(
+//        return $this->renderDomainSpecificAction('DTAMetadataBundle::autoform.html.twig', array(
 //                    'className' => "Namefragment",
 //                    'persistedObject' => $obj,
 //                    'form' => $form->createView(),

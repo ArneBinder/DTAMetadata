@@ -150,6 +150,7 @@
         <column name="comments" type="LONGVARCHAR" required="false"/>
         <column name="format" type="LONGVARCHAR" required="false"/>
         <column name="directoryName" type="LONGVARCHAR" required="false"/>
+        
         <foreign-key foreignTable="status" name="fk_werk_status1">
             <reference local="status_id" foreign="id"/>
         </foreign-key>
@@ -168,6 +169,7 @@
         <foreign-key foreignTable="dateSpecification" name="fk_work_dateSpecification1">
             <reference local="dateSpecification_id" foreign="id"/>
         </foreign-key>
+        
         <index name="idx_werk_status1">
             <index-column name="status_id"/>
         </index>
@@ -397,6 +399,7 @@
         
     </table>
     
+    <!-- Personenname, besteht aus mehreren Namensfragmenten (nameFragment). -->
     <table name="personalName">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="person_id" type="INTEGER" required="true"/>
@@ -408,6 +411,7 @@
         </index>
     </table>
     
+    <!-- Namensfragmente sind Bestandteile eines Namens, z.B. Vor- oder Nachname. -->
     <table name="nameFragment">
         <behavior name="sortable">
             <parameter name="use_scope" value="true"/>
@@ -431,6 +435,7 @@
         </index>
     </table>
     
+    <!-- Verfuegbare Arten von Namensfragmenten. Vorname, Zuname, Kuenstlername, etc. -->
     <table name="nameFragmentType">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
@@ -486,6 +491,22 @@
      <!-- data / persons
     ________________________________________________________-->
     
+    <table name="person" phpName="Person">
+        <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="gnd" phpName="Gnd" type="VARCHAR" size="100" required="false"/>
+        <!-- The name is added in the personalName table because it's a one-to-many relationship.
+        <column name="personalName_id" type="INTEGER"/>
+        <foreign-key foreignTable="personalName" name="fk_person_personalName1">
+            <reference local="personalName_id" foreign="id"/>
+        </foreign-key>
+        <index name="idx_person_personalName1">
+            <index-column name="personalName_id"/>
+        </index>-->
+        <unique name="dnb_UNIQUE">
+            <unique-column name="gnd"/>
+        </unique>
+    </table>
+    
     <table name="author" phpName="Author">
         <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="person_id" phpName="PersonId" type="INTEGER" primaryKey="true" required="true"/>
@@ -516,14 +537,6 @@
         <index name="idx_werk_has_autor_werk1">
             <index-column name="work_id"/>
         </index>
-    </table>
-
-    <table name="person" phpName="Person">
-        <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="gnd" phpName="Gnd" type="VARCHAR" size="100" required="false"/>
-        <unique name="dnb_UNIQUE">
-            <unique-column name="gnd"/>
-        </unique>
     </table>
 
     <table name="printer" phpName="Printer">

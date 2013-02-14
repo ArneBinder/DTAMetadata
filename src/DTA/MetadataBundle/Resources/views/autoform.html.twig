@@ -1,63 +1,22 @@
 {# 
     Template for rendering forms for any model type (i.e. database entity).
+    Used by 
 #}
 
 {% block core %}
 
-    {# The german name of the model class is provided in the options array of 
-        the according form type class (e.g. WorkType.php for Work or TitlefragmenttypeType.php for TitleFragmentType) #}
-    <h3>{{form.vars.modelNameGerman|default(className)}}</h3>
+    <h3>{{className|trans}}</h3>
 
     {#{domainKey}#}
     
-    <form action="{{ path('genericNew', {'className':className, 'domainKey': domainKey|default("none")}) }}" method="post" {{ form_enctype(form) }}>
+    <form action="{{ path('genericNew', {'className':className, 'domainKey': domainKey|default("none")}) }}" 
+          method="post" {{ form_enctype(form) }}>
         {{ form_rest(form) }}
          <input type="submit"/>
     </form>
     
-    <hr/>
+    {# <hr/>
     
-    <pre>{%if persistedObject is defined %}{{dump(persistedObject)}}{%endif%}</pre>
+    <pre>{%if persistedObject is defined %}{{dump(persistedObject)}}{%endif%}</pre> #}
    
-    
 {% endblock %}
-
-{# Deprecated fragments
-
- <form action="{{ path('genericNew', {'className':className}) }}" method="post" {{ form_enctype(form) }}>
-     <ol class="zebra collection-editor collection-sortable" data-prototype="{{ form_widget(form.titleFragments.vars.prototype)|e }}">
-        {% for titlefragment in form.titleFragments %}
-            <li>
-            {{ form_errors(titlefragment.titlefragmenttype) }}
-            {{ form_widget(titlefragment.titlefragmenttype) }}
-            {{ form_row(titlefragment.name) }}       
-            {{ form_row(titlefragment.sortableRank) }}          
-            </li>
-        {% endfor %}
-      </ol>
-        {{ form_rest(form) }}
-        <input type="submit"/>
-    </form>
-
-<form action="{{ path('genericNew', {'className':className, 'recordId': recordId}) }}" method="post" {{ form_enctype(form) }}>
-        {{ form_rest(form) }}
-         <input type="submit"/>
-    </form>
-
-
-    <form action="{{ path('genericNew', {'className':className, 'recordId':0}) }}" method="post" {{ form_enctype(form) }}>
-     <ol class="collection-editor collection-sortable" data-prototype="{{ form_widget(form.titleFragments.vars.prototype)|e }}">
-        {% for titlefragment in form.titleFragments %}
-            <li>
-            {{ form_errors(titlefragment.titlefragmenttype) }}
-            {{ form_widget(titlefragment.titlefragmenttype) }}
-            {{ form_row(titlefragment.name) }}       
-            {{ form_row(titlefragment.sortableRank) }}          
-            </li>
-        {% endfor %}
-      </ol>
-        {{ form_rest(form) }}
-        <input type="submit"/>
-    </form>
-
-#}

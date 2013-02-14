@@ -977,7 +977,7 @@ abstract class BaseEssay extends Publication implements Persistent
             // concrete_inheritance behavior
             $parent = $this->getSyncParent($con);
             $parent->save($con);
-            // seemed to be a bug in the concrete inheritance behavior. $this->setPrimaryKey($parent->getPrimaryKey());
+            $this->setPrimaryKey($parent->getPrimaryKey());
 
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
@@ -2426,9 +2426,9 @@ abstract class BaseEssay extends Publication implements Persistent
         if ($this->isNew()) {
             if ($this->isPrimaryKeyNull()) {
                 //this prevent issue with deep copy & save parent object
-                //seemed to be a bug in the behavior. if (null === ($parent = $this->getPublication($con))) {
+                if (null === ($parent = $this->getPublication($con))) {
                     $parent = new Publication();
-                //}
+                }
                 $parent->setDescendantClass('DTA\MetadataBundle\Model\Essay');
 
                 return $parent;

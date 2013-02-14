@@ -26,11 +26,7 @@ class WorkflowDomainController extends DTABaseController {
      */
     public function indexAction() {
 
-        $writ = new \DTA\MetadataBundle\Model\Writ();
-        $writ->setNumpages(3);
-        $writ->save();
-        return $this->renderDomainSpecific('DTAMetadataBundle:WorkflowDomain:index.html.twig', array(
-                    'persistedObject' => $writ,
+        return $this->renderDomainSpecificAction('DTAMetadataBundle:WorkflowDomain:WorkflowDomain.html.twig', array(
                     ));
     }
 

@@ -20,11 +20,7 @@ class AdministrationDomainController extends DTABaseController {
      */
     public function indexAction() {
 
-        $writ = new \DTA\MetadataBundle\Model\Writ();
-        $writ->setNumpages(3);
-        $writ->save();
-        return $this->renderDomainSpecific('DTAMetadataBundle:AdministrationDomain:index.html.twig', array(
-                    'persistedObject' => $writ,
+        return $this->renderDomainSpecificAction('DTAMetadataBundle:AdministrationDomain:AdministrationDomain.html.twig', array(
                     ));
     }
 

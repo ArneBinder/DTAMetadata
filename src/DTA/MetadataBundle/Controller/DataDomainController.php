@@ -36,7 +36,7 @@ class DataDomainController extends DTABaseController {
      * @Route("/", name="dataDomain")
      */
     public function indexAction() {
-        return $this->renderDomainSpecific('DTAMetadataBundle:DataDomain:index.html.twig');
+        return $this->renderDomainSpecificAction('DTAMetadataBundle:DataDomain:index.html.twig');
     }
 
     /**
@@ -45,12 +45,12 @@ class DataDomainController extends DTABaseController {
      * @Route("/neu/{className}", name="DataDomainNewRecord")
      */
     public function newAction($className) {
-        $form = $this->genericEditForm($className, 0);
-        return $this->renderDomainSpecific('DTAMetadataBundle::autoform.html.twig', array(
-                    'className' => $className,
-                    'recordId' => 0, // create new record
-                    'form' => $form->createView(),
-                ));
+        $form = $this->genericEditFormAction($className, 0);
+        return $this->renderDomainSpecificAction('DTAMetadataBundle::formWrapper.html.twig', array(
+            'className' => $className,
+            'recordId' => 0, // create new record
+            'form' => $form->createView(),
+        ));
     }
 
     /**

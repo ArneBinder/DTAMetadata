@@ -1,0 +1,32 @@
+{# Renders a form for creating any database entity, but for use as ajax requested form (marked up as a twitter/bootstrap modal) #}
+
+{% block core %}
+
+    {# twitter/bootstrap modal elements #}
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3>{{form.vars.modelNameGerman|default(className)}}</h3>
+    </div>
+    <div class="modal-body">
+        
+        {#
+            TODO maintainability. Code duplication of autoform.html.twig.
+            Including via
+                include 'DTAMetadataBundle::autoform.html.twig' 
+            is not directly possible, because the included header must be wrapped in the modal-header div.
+            Try template embedding maybe. (http://twig.sensiolabs.org/doc/tags/embed.html)
+        #}
+        <form action="{{ path('genericNew', {'className':className, 'captionProperty': captionProperty, 'domainKey': domainKey|default("none")}) }}" 
+              method="post" {{ form_enctype(form) }}>
+            {{ form_rest(form) }}
+             <input type="submit"/>
+        </form>
+
+        {#<button class="btn" data-toggle="modal" href="#stack2">Launch modal</button>#}
+    </div>
+    <div class="modal-footer">
+        <button type="button" data-dismiss="modal" class="btn">Close</button>
+        <button type="button" class="btn btn-primary">Ok</button>
+    </div>
+
+{% endblock %}
