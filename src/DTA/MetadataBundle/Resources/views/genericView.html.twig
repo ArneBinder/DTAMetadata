@@ -9,8 +9,8 @@
 <table class="table">
     <thead>
     {% for col in columns %} 
-            {# doesn't work {{ col|trans({},'tableHeaders')}}#}
-        <th> {{ col|trans }} {#% trans with {'col':col} from 'messages.de' %} col {% endtrans %#} </th>
+        {# doesn't work {{ col|trans({},'tableHeaders')}} since the tableHeaders file is never added to the translation catalogue #}
+        <th> {{ col|trans }} </th>
     {% endfor %}
     </thead>
     <tbody>

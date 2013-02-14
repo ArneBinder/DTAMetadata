@@ -5,6 +5,8 @@ namespace DTA\MetadataBundle\Form\Type;
 use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+use DTA\MetadataBundle\Form\DerivedType\SelectOrAddType;
+
 class PublicationType extends BaseAbstractType
 {
     protected $options = array(
@@ -17,15 +19,21 @@ class PublicationType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('title', new TitleType(), array(
-            'label' => 'Titel'
+        $builder->add('title', new TitleType());
+        $builder->add('place', new SelectOrAddType(), array(
+            'class' => 'DTA\MetadataBundle\Model\Place',
+            'property' => 'Name',
+            'label' => 'Druckort'
+            
+        ));
+        $builder->add('publicationDate', new DatespecificationType());
+        $builder->add('originDate', new DatespecificationType(), array(
+            'label' => 'Erscheinungsjahr, falls abweichend'
         ));
 //        $builder->add('publishingcompanyId', new \DTA\MetadataBundle\Form\DerivedType\SelectOrAddType(), array(
 //            'class' => '\DTA\MetadataBundle\Model\Publishingcompany',
 //            'label' => 'Verlag'
 //        ));
-//        $builder->add('placeId');
-//        $builder->add('datespecificationId');
 //        $builder->add('printrun');
 //        $builder->add('printruncomment');
 //        $builder->add('edition');

@@ -21,7 +21,8 @@ CREATE TABLE `publication`
     `title_id` INTEGER NOT NULL,
     `publishingCompany_id` INTEGER,
     `place_id` INTEGER,
-    `dateSpecification_id` INTEGER,
+    `publicationDate_id` INTEGER,
+    `originDate_id` INTEGER,
     `relatedSet_id` INTEGER,
     `work_id` INTEGER NOT NULL,
     `publisher_id` INTEGER,
@@ -38,6 +39,8 @@ CREATE TABLE `publication`
     INDEX `idx_publikation_ort1` (`place_id`),
     INDEX `idx_publication_dateSpecification1` (`dateSpecification_id`),
     INDEX `FI_publikation_titel12` (`title_id`),
+    INDEX `FI_publication_dateSpecification1` (`publicationDate_id`),
+    INDEX `FI_publication_dateSpecification2` (`originDate_id`),
     CONSTRAINT `editionVon`
         FOREIGN KEY (`work_id`)
         REFERENCES `work` (`id`),
@@ -63,7 +66,10 @@ CREATE TABLE `publication`
         FOREIGN KEY (`place_id`)
         REFERENCES `place` (`id`),
     CONSTRAINT `fk_publication_dateSpecification1`
-        FOREIGN KEY (`dateSpecification_id`)
+        FOREIGN KEY (`publicationDate_id`)
+        REFERENCES `dateSpecification` (`id`),
+    CONSTRAINT `fk_publication_dateSpecification2`
+        FOREIGN KEY (`originDate_id`)
         REFERENCES `dateSpecification` (`id`)
 ) ENGINE=InnoDB;
 
@@ -102,7 +108,8 @@ CREATE TABLE `essay`
     `title_id` INTEGER NOT NULL,
     `publishingCompany_id` INTEGER,
     `place_id` INTEGER,
-    `dateSpecification_id` INTEGER,
+    `publicationDate_id` INTEGER,
+    `originDate_id` INTEGER,
     `relatedSet_id` INTEGER,
     `work_id` INTEGER NOT NULL,
     `publisher_id` INTEGER,
@@ -118,6 +125,8 @@ CREATE TABLE `essay`
     INDEX `essay_I_7` (`place_id`),
     INDEX `essay_I_8` (`dateSpecification_id`),
     INDEX `essay_I_9` (`title_id`),
+    INDEX `essay_I_10` (`publicationDate_id`),
+    INDEX `essay_I_11` (`originDate_id`),
     CONSTRAINT `essay_FK_1`
         FOREIGN KEY (`work_id`)
         REFERENCES `work` (`id`),
@@ -143,7 +152,10 @@ CREATE TABLE `essay`
         FOREIGN KEY (`place_id`)
         REFERENCES `place` (`id`),
     CONSTRAINT `essay_FK_9`
-        FOREIGN KEY (`dateSpecification_id`)
+        FOREIGN KEY (`publicationDate_id`)
+        REFERENCES `dateSpecification` (`id`),
+    CONSTRAINT `essay_FK_10`
+        FOREIGN KEY (`originDate_id`)
         REFERENCES `dateSpecification` (`id`)
 ) ENGINE=InnoDB;
 
@@ -165,7 +177,8 @@ CREATE TABLE `magazine`
     `title_id` INTEGER NOT NULL,
     `publishingCompany_id` INTEGER,
     `place_id` INTEGER,
-    `dateSpecification_id` INTEGER,
+    `publicationDate_id` INTEGER,
+    `originDate_id` INTEGER,
     `relatedSet_id` INTEGER,
     `work_id` INTEGER NOT NULL,
     `publisher_id` INTEGER,
@@ -181,6 +194,8 @@ CREATE TABLE `magazine`
     INDEX `magazine_I_7` (`place_id`),
     INDEX `magazine_I_8` (`dateSpecification_id`),
     INDEX `magazine_I_9` (`title_id`),
+    INDEX `magazine_I_10` (`publicationDate_id`),
+    INDEX `magazine_I_11` (`originDate_id`),
     CONSTRAINT `magazine_FK_1`
         FOREIGN KEY (`work_id`)
         REFERENCES `work` (`id`),
@@ -206,7 +221,10 @@ CREATE TABLE `magazine`
         FOREIGN KEY (`place_id`)
         REFERENCES `place` (`id`),
     CONSTRAINT `magazine_FK_9`
-        FOREIGN KEY (`dateSpecification_id`)
+        FOREIGN KEY (`publicationDate_id`)
+        REFERENCES `dateSpecification` (`id`),
+    CONSTRAINT `magazine_FK_10`
+        FOREIGN KEY (`originDate_id`)
         REFERENCES `dateSpecification` (`id`)
 ) ENGINE=InnoDB;
 
@@ -229,7 +247,8 @@ CREATE TABLE `series`
     `title_id` INTEGER NOT NULL,
     `publishingCompany_id` INTEGER,
     `place_id` INTEGER,
-    `dateSpecification_id` INTEGER,
+    `publicationDate_id` INTEGER,
+    `originDate_id` INTEGER,
     `relatedSet_id` INTEGER,
     `work_id` INTEGER NOT NULL,
     `publisher_id` INTEGER,
@@ -245,6 +264,8 @@ CREATE TABLE `series`
     INDEX `series_I_7` (`place_id`),
     INDEX `series_I_8` (`dateSpecification_id`),
     INDEX `series_I_9` (`title_id`),
+    INDEX `series_I_10` (`publicationDate_id`),
+    INDEX `series_I_11` (`originDate_id`),
     CONSTRAINT `series_FK_1`
         FOREIGN KEY (`work_id`)
         REFERENCES `work` (`id`),
@@ -270,7 +291,10 @@ CREATE TABLE `series`
         FOREIGN KEY (`place_id`)
         REFERENCES `place` (`id`),
     CONSTRAINT `series_FK_9`
-        FOREIGN KEY (`dateSpecification_id`)
+        FOREIGN KEY (`publicationDate_id`)
+        REFERENCES `dateSpecification` (`id`),
+    CONSTRAINT `series_FK_10`
+        FOREIGN KEY (`originDate_id`)
         REFERENCES `dateSpecification` (`id`)
 ) ENGINE=InnoDB;
 
@@ -335,7 +359,7 @@ CREATE TABLE `work`
     INDEX `idx_werk_dwdsGenre2` (`dwdsGenre_id`),
     INDEX `idx_werk_dwdsGenre3` (`dwdsSubgenre_id`),
     INDEX `idx_work_dateSpecification1` (`dateSpecification_id`),
-    CONSTRAINT `work_FK_1`
+    CONSTRAINT `fk_werk_status1`
         FOREIGN KEY (`status_id`)
         REFERENCES `status` (`id`),
     CONSTRAINT `fk_werk_genre1`
@@ -729,6 +753,20 @@ CREATE TABLE `titleFragmentType`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
+-- person
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `person`;
+
+CREATE TABLE `person`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `gnd` VARCHAR(100),
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `dnb_UNIQUE` (`gnd`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 -- author
 -- ---------------------------------------------------------------------
 
@@ -766,20 +804,6 @@ CREATE TABLE `author_work`
     CONSTRAINT `fk_werk_has_autor_autor1`
         FOREIGN KEY (`author_id`,`author_person_id`)
         REFERENCES `author` (`id`,`person_id`)
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- person
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `person`;
-
-CREATE TABLE `person`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `gnd` VARCHAR(100),
-    PRIMARY KEY (`id`),
-    UNIQUE INDEX `dnb_UNIQUE` (`gnd`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------

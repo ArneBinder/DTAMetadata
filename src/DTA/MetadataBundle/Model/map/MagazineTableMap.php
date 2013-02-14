@@ -52,7 +52,8 @@ class MagazineTableMap extends TableMap
         $this->addForeignKey('title_id', 'TitleId', 'INTEGER', 'title', 'id', true, null, null);
         $this->addForeignKey('publishingCompany_id', 'PublishingcompanyId', 'INTEGER', 'publishingCompany', 'id', false, null, null);
         $this->addForeignKey('place_id', 'PlaceId', 'INTEGER', 'place', 'id', false, null, null);
-        $this->addForeignKey('dateSpecification_id', 'DatespecificationId', 'INTEGER', 'dateSpecification', 'id', false, null, null);
+        $this->addForeignKey('publicationDate_id', 'PublicationdateId', 'INTEGER', 'dateSpecification', 'id', false, null, null);
+        $this->addForeignKey('originDate_id', 'OrigindateId', 'INTEGER', 'dateSpecification', 'id', false, null, null);
         $this->addForeignKey('relatedSet_id', 'RelatedsetId', 'INTEGER', 'relatedSet', 'id', false, null, null);
         $this->addForeignKey('work_id', 'WorkId', 'INTEGER', 'work', 'id', true, null, null);
         $this->addForeignKey('publisher_id', 'PublisherId', 'INTEGER', 'publisher', 'id', false, null, null);
@@ -74,7 +75,8 @@ class MagazineTableMap extends TableMap
         $this->addRelation('Title', 'DTA\\MetadataBundle\\Model\\Title', RelationMap::MANY_TO_ONE, array('title_id' => 'id', ), null, null);
         $this->addRelation('Publishingcompany', 'DTA\\MetadataBundle\\Model\\Publishingcompany', RelationMap::MANY_TO_ONE, array('publishingCompany_id' => 'id', ), null, null);
         $this->addRelation('Place', 'DTA\\MetadataBundle\\Model\\Place', RelationMap::MANY_TO_ONE, array('place_id' => 'id', ), null, null);
-        $this->addRelation('Datespecification', 'DTA\\MetadataBundle\\Model\\Datespecification', RelationMap::MANY_TO_ONE, array('dateSpecification_id' => 'id', ), null, null);
+        $this->addRelation('DatespecificationRelatedByPublicationdateId', 'DTA\\MetadataBundle\\Model\\Datespecification', RelationMap::MANY_TO_ONE, array('publicationDate_id' => 'id', ), null, null);
+        $this->addRelation('DatespecificationRelatedByOrigindateId', 'DTA\\MetadataBundle\\Model\\Datespecification', RelationMap::MANY_TO_ONE, array('originDate_id' => 'id', ), null, null);
     } // buildRelations()
 
     /**

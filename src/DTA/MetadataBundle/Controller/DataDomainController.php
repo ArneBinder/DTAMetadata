@@ -48,7 +48,6 @@ class DataDomainController extends DTABaseController {
         $form = $this->genericEditFormAction($className, 0);
         return $this->renderDomainSpecificAction('DTAMetadataBundle::formWrapper.html.twig', array(
             'className' => $className,
-            'recordId' => 0, // create new record
             'form' => $form->createView(),
         ));
     }

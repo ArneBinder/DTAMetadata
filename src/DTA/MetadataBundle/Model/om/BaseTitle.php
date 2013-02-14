@@ -1417,10 +1417,35 @@ abstract class BaseTitle extends BaseObject implements Persistent
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Publication[] List of Publication objects
      */
-    public function getPublicationsJoinDatespecification($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getPublicationsJoinDatespecificationRelatedByPublicationdateId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = PublicationQuery::create(null, $criteria);
-        $query->joinWith('Datespecification', $join_behavior);
+        $query->joinWith('DatespecificationRelatedByPublicationdateId', $join_behavior);
+
+        return $this->getPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinDatespecificationRelatedByOrigindateId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('DatespecificationRelatedByOrigindateId', $join_behavior);
 
         return $this->getPublications($query, $con);
     }
@@ -2078,10 +2103,35 @@ abstract class BaseTitle extends BaseObject implements Persistent
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Essay[] List of Essay objects
      */
-    public function getEssaysJoinDatespecification($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getEssaysJoinDatespecificationRelatedByPublicationdateId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = EssayQuery::create(null, $criteria);
-        $query->joinWith('Datespecification', $join_behavior);
+        $query->joinWith('DatespecificationRelatedByPublicationdateId', $join_behavior);
+
+        return $this->getEssays($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Essays from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Essay[] List of Essay objects
+     */
+    public function getEssaysJoinDatespecificationRelatedByOrigindateId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = EssayQuery::create(null, $criteria);
+        $query->joinWith('DatespecificationRelatedByOrigindateId', $join_behavior);
 
         return $this->getEssays($query, $con);
     }
@@ -2496,10 +2546,35 @@ abstract class BaseTitle extends BaseObject implements Persistent
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Magazine[] List of Magazine objects
      */
-    public function getMagazinesJoinDatespecification($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getMagazinesJoinDatespecificationRelatedByPublicationdateId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = MagazineQuery::create(null, $criteria);
-        $query->joinWith('Datespecification', $join_behavior);
+        $query->joinWith('DatespecificationRelatedByPublicationdateId', $join_behavior);
+
+        return $this->getMagazines($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Magazines from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Magazine[] List of Magazine objects
+     */
+    public function getMagazinesJoinDatespecificationRelatedByOrigindateId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = MagazineQuery::create(null, $criteria);
+        $query->joinWith('DatespecificationRelatedByOrigindateId', $join_behavior);
 
         return $this->getMagazines($query, $con);
     }
@@ -2914,10 +2989,35 @@ abstract class BaseTitle extends BaseObject implements Persistent
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Series[] List of Series objects
      */
-    public function getSeriesJoinDatespecification($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getSeriesJoinDatespecificationRelatedByPublicationdateId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = SeriesQuery::create(null, $criteria);
-        $query->joinWith('Datespecification', $join_behavior);
+        $query->joinWith('DatespecificationRelatedByPublicationdateId', $join_behavior);
+
+        return $this->getSeries($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Series from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Series[] List of Series objects
+     */
+    public function getSeriesJoinDatespecificationRelatedByOrigindateId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = SeriesQuery::create(null, $criteria);
+        $query->joinWith('DatespecificationRelatedByOrigindateId', $join_behavior);
 
         return $this->getSeries($query, $con);
     }

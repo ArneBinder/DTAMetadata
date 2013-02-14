@@ -36,7 +36,8 @@ use DTA\MetadataBundle\Model\Work;
  * @method MagazineQuery orderByTitleId($order = Criteria::ASC) Order by the title_id column
  * @method MagazineQuery orderByPublishingcompanyId($order = Criteria::ASC) Order by the publishingCompany_id column
  * @method MagazineQuery orderByPlaceId($order = Criteria::ASC) Order by the place_id column
- * @method MagazineQuery orderByDatespecificationId($order = Criteria::ASC) Order by the dateSpecification_id column
+ * @method MagazineQuery orderByPublicationdateId($order = Criteria::ASC) Order by the publicationDate_id column
+ * @method MagazineQuery orderByOrigindateId($order = Criteria::ASC) Order by the originDate_id column
  * @method MagazineQuery orderByRelatedsetId($order = Criteria::ASC) Order by the relatedSet_id column
  * @method MagazineQuery orderByWorkId($order = Criteria::ASC) Order by the work_id column
  * @method MagazineQuery orderByPublisherId($order = Criteria::ASC) Order by the publisher_id column
@@ -53,7 +54,8 @@ use DTA\MetadataBundle\Model\Work;
  * @method MagazineQuery groupByTitleId() Group by the title_id column
  * @method MagazineQuery groupByPublishingcompanyId() Group by the publishingCompany_id column
  * @method MagazineQuery groupByPlaceId() Group by the place_id column
- * @method MagazineQuery groupByDatespecificationId() Group by the dateSpecification_id column
+ * @method MagazineQuery groupByPublicationdateId() Group by the publicationDate_id column
+ * @method MagazineQuery groupByOrigindateId() Group by the originDate_id column
  * @method MagazineQuery groupByRelatedsetId() Group by the relatedSet_id column
  * @method MagazineQuery groupByWorkId() Group by the work_id column
  * @method MagazineQuery groupByPublisherId() Group by the publisher_id column
@@ -96,9 +98,13 @@ use DTA\MetadataBundle\Model\Work;
  * @method MagazineQuery rightJoinPlace($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Place relation
  * @method MagazineQuery innerJoinPlace($relationAlias = null) Adds a INNER JOIN clause to the query using the Place relation
  *
- * @method MagazineQuery leftJoinDatespecification($relationAlias = null) Adds a LEFT JOIN clause to the query using the Datespecification relation
- * @method MagazineQuery rightJoinDatespecification($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Datespecification relation
- * @method MagazineQuery innerJoinDatespecification($relationAlias = null) Adds a INNER JOIN clause to the query using the Datespecification relation
+ * @method MagazineQuery leftJoinDatespecificationRelatedByPublicationdateId($relationAlias = null) Adds a LEFT JOIN clause to the query using the DatespecificationRelatedByPublicationdateId relation
+ * @method MagazineQuery rightJoinDatespecificationRelatedByPublicationdateId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the DatespecificationRelatedByPublicationdateId relation
+ * @method MagazineQuery innerJoinDatespecificationRelatedByPublicationdateId($relationAlias = null) Adds a INNER JOIN clause to the query using the DatespecificationRelatedByPublicationdateId relation
+ *
+ * @method MagazineQuery leftJoinDatespecificationRelatedByOrigindateId($relationAlias = null) Adds a LEFT JOIN clause to the query using the DatespecificationRelatedByOrigindateId relation
+ * @method MagazineQuery rightJoinDatespecificationRelatedByOrigindateId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the DatespecificationRelatedByOrigindateId relation
+ * @method MagazineQuery innerJoinDatespecificationRelatedByOrigindateId($relationAlias = null) Adds a INNER JOIN clause to the query using the DatespecificationRelatedByOrigindateId relation
  *
  * @method Magazine findOne(PropelPDO $con = null) Return the first Magazine matching the query
  * @method Magazine findOneOrCreate(PropelPDO $con = null) Return the first Magazine matching the query, or a new Magazine object populated from the query conditions when no match is found
@@ -112,7 +118,8 @@ use DTA\MetadataBundle\Model\Work;
  * @method Magazine findOneByTitleId(int $title_id) Return the first Magazine filtered by the title_id column
  * @method Magazine findOneByPublishingcompanyId(int $publishingCompany_id) Return the first Magazine filtered by the publishingCompany_id column
  * @method Magazine findOneByPlaceId(int $place_id) Return the first Magazine filtered by the place_id column
- * @method Magazine findOneByDatespecificationId(int $dateSpecification_id) Return the first Magazine filtered by the dateSpecification_id column
+ * @method Magazine findOneByPublicationdateId(int $publicationDate_id) Return the first Magazine filtered by the publicationDate_id column
+ * @method Magazine findOneByOrigindateId(int $originDate_id) Return the first Magazine filtered by the originDate_id column
  * @method Magazine findOneByRelatedsetId(int $relatedSet_id) Return the first Magazine filtered by the relatedSet_id column
  * @method Magazine findOneByWorkId(int $work_id) Return the first Magazine filtered by the work_id column
  * @method Magazine findOneByPublisherId(int $publisher_id) Return the first Magazine filtered by the publisher_id column
@@ -129,7 +136,8 @@ use DTA\MetadataBundle\Model\Work;
  * @method array findByTitleId(int $title_id) Return Magazine objects filtered by the title_id column
  * @method array findByPublishingcompanyId(int $publishingCompany_id) Return Magazine objects filtered by the publishingCompany_id column
  * @method array findByPlaceId(int $place_id) Return Magazine objects filtered by the place_id column
- * @method array findByDatespecificationId(int $dateSpecification_id) Return Magazine objects filtered by the dateSpecification_id column
+ * @method array findByPublicationdateId(int $publicationDate_id) Return Magazine objects filtered by the publicationDate_id column
+ * @method array findByOrigindateId(int $originDate_id) Return Magazine objects filtered by the originDate_id column
  * @method array findByRelatedsetId(int $relatedSet_id) Return Magazine objects filtered by the relatedSet_id column
  * @method array findByWorkId(int $work_id) Return Magazine objects filtered by the work_id column
  * @method array findByPublisherId(int $publisher_id) Return Magazine objects filtered by the publisher_id column
@@ -236,7 +244,7 @@ abstract class BaseMagazineQuery extends PublicationQuery
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `printRun`, `printRunComment`, `edition`, `numPages`, `numPagesNormed`, `bibliographicCitation`, `title_id`, `publishingCompany_id`, `place_id`, `dateSpecification_id`, `relatedSet_id`, `work_id`, `publisher_id`, `printer_id`, `translator_id` FROM `magazine` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `printRun`, `printRunComment`, `edition`, `numPages`, `numPagesNormed`, `bibliographicCitation`, `title_id`, `publishingCompany_id`, `place_id`, `publicationDate_id`, `originDate_id`, `relatedSet_id`, `work_id`, `publisher_id`, `printer_id`, `translator_id` FROM `magazine` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -700,19 +708,19 @@ abstract class BaseMagazineQuery extends PublicationQuery
     }
 
     /**
-     * Filter the query on the dateSpecification_id column
+     * Filter the query on the publicationDate_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByDatespecificationId(1234); // WHERE dateSpecification_id = 1234
-     * $query->filterByDatespecificationId(array(12, 34)); // WHERE dateSpecification_id IN (12, 34)
-     * $query->filterByDatespecificationId(array('min' => 12)); // WHERE dateSpecification_id >= 12
-     * $query->filterByDatespecificationId(array('max' => 12)); // WHERE dateSpecification_id <= 12
+     * $query->filterByPublicationdateId(1234); // WHERE publicationDate_id = 1234
+     * $query->filterByPublicationdateId(array(12, 34)); // WHERE publicationDate_id IN (12, 34)
+     * $query->filterByPublicationdateId(array('min' => 12)); // WHERE publicationDate_id >= 12
+     * $query->filterByPublicationdateId(array('max' => 12)); // WHERE publicationDate_id <= 12
      * </code>
      *
-     * @see       filterByDatespecification()
+     * @see       filterByDatespecificationRelatedByPublicationdateId()
      *
-     * @param     mixed $datespecificationId The value to use as filter.
+     * @param     mixed $publicationdateId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -720,16 +728,16 @@ abstract class BaseMagazineQuery extends PublicationQuery
      *
      * @return MagazineQuery The current query, for fluid interface
      */
-    public function filterByDatespecificationId($datespecificationId = null, $comparison = null)
+    public function filterByPublicationdateId($publicationdateId = null, $comparison = null)
     {
-        if (is_array($datespecificationId)) {
+        if (is_array($publicationdateId)) {
             $useMinMax = false;
-            if (isset($datespecificationId['min'])) {
-                $this->addUsingAlias(MagazinePeer::DATESPECIFICATION_ID, $datespecificationId['min'], Criteria::GREATER_EQUAL);
+            if (isset($publicationdateId['min'])) {
+                $this->addUsingAlias(MagazinePeer::PUBLICATIONDATE_ID, $publicationdateId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($datespecificationId['max'])) {
-                $this->addUsingAlias(MagazinePeer::DATESPECIFICATION_ID, $datespecificationId['max'], Criteria::LESS_EQUAL);
+            if (isset($publicationdateId['max'])) {
+                $this->addUsingAlias(MagazinePeer::PUBLICATIONDATE_ID, $publicationdateId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -740,7 +748,51 @@ abstract class BaseMagazineQuery extends PublicationQuery
             }
         }
 
-        return $this->addUsingAlias(MagazinePeer::DATESPECIFICATION_ID, $datespecificationId, $comparison);
+        return $this->addUsingAlias(MagazinePeer::PUBLICATIONDATE_ID, $publicationdateId, $comparison);
+    }
+
+    /**
+     * Filter the query on the originDate_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByOrigindateId(1234); // WHERE originDate_id = 1234
+     * $query->filterByOrigindateId(array(12, 34)); // WHERE originDate_id IN (12, 34)
+     * $query->filterByOrigindateId(array('min' => 12)); // WHERE originDate_id >= 12
+     * $query->filterByOrigindateId(array('max' => 12)); // WHERE originDate_id <= 12
+     * </code>
+     *
+     * @see       filterByDatespecificationRelatedByOrigindateId()
+     *
+     * @param     mixed $origindateId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return MagazineQuery The current query, for fluid interface
+     */
+    public function filterByOrigindateId($origindateId = null, $comparison = null)
+    {
+        if (is_array($origindateId)) {
+            $useMinMax = false;
+            if (isset($origindateId['min'])) {
+                $this->addUsingAlias(MagazinePeer::ORIGINDATE_ID, $origindateId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($origindateId['max'])) {
+                $this->addUsingAlias(MagazinePeer::ORIGINDATE_ID, $origindateId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(MagazinePeer::ORIGINDATE_ID, $origindateId, $comparison);
     }
 
     /**
@@ -1580,35 +1632,35 @@ abstract class BaseMagazineQuery extends PublicationQuery
      * @return                 MagazineQuery The current query, for fluid interface
      * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterByDatespecification($datespecification, $comparison = null)
+    public function filterByDatespecificationRelatedByPublicationdateId($datespecification, $comparison = null)
     {
         if ($datespecification instanceof Datespecification) {
             return $this
-                ->addUsingAlias(MagazinePeer::DATESPECIFICATION_ID, $datespecification->getId(), $comparison);
+                ->addUsingAlias(MagazinePeer::PUBLICATIONDATE_ID, $datespecification->getId(), $comparison);
         } elseif ($datespecification instanceof PropelObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(MagazinePeer::DATESPECIFICATION_ID, $datespecification->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(MagazinePeer::PUBLICATIONDATE_ID, $datespecification->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByDatespecification() only accepts arguments of type Datespecification or PropelCollection');
+            throw new PropelException('filterByDatespecificationRelatedByPublicationdateId() only accepts arguments of type Datespecification or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Datespecification relation
+     * Adds a JOIN clause to the query using the DatespecificationRelatedByPublicationdateId relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return MagazineQuery The current query, for fluid interface
      */
-    public function joinDatespecification($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinDatespecificationRelatedByPublicationdateId($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Datespecification');
+        $relationMap = $tableMap->getRelation('DatespecificationRelatedByPublicationdateId');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -1623,14 +1675,14 @@ abstract class BaseMagazineQuery extends PublicationQuery
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Datespecification');
+            $this->addJoinObject($join, 'DatespecificationRelatedByPublicationdateId');
         }
 
         return $this;
     }
 
     /**
-     * Use the Datespecification relation Datespecification object
+     * Use the DatespecificationRelatedByPublicationdateId relation Datespecification object
      *
      * @see       useQuery()
      *
@@ -1640,11 +1692,87 @@ abstract class BaseMagazineQuery extends PublicationQuery
      *
      * @return   \DTA\MetadataBundle\Model\DatespecificationQuery A secondary query class using the current class as primary query
      */
-    public function useDatespecificationQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useDatespecificationRelatedByPublicationdateIdQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
-            ->joinDatespecification($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Datespecification', '\DTA\MetadataBundle\Model\DatespecificationQuery');
+            ->joinDatespecificationRelatedByPublicationdateId($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'DatespecificationRelatedByPublicationdateId', '\DTA\MetadataBundle\Model\DatespecificationQuery');
+    }
+
+    /**
+     * Filter the query by a related Datespecification object
+     *
+     * @param   Datespecification|PropelObjectCollection $datespecification The related object(s) to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 MagazineQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByDatespecificationRelatedByOrigindateId($datespecification, $comparison = null)
+    {
+        if ($datespecification instanceof Datespecification) {
+            return $this
+                ->addUsingAlias(MagazinePeer::ORIGINDATE_ID, $datespecification->getId(), $comparison);
+        } elseif ($datespecification instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(MagazinePeer::ORIGINDATE_ID, $datespecification->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByDatespecificationRelatedByOrigindateId() only accepts arguments of type Datespecification or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the DatespecificationRelatedByOrigindateId relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return MagazineQuery The current query, for fluid interface
+     */
+    public function joinDatespecificationRelatedByOrigindateId($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('DatespecificationRelatedByOrigindateId');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'DatespecificationRelatedByOrigindateId');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the DatespecificationRelatedByOrigindateId relation Datespecification object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\DatespecificationQuery A secondary query class using the current class as primary query
+     */
+    public function useDatespecificationRelatedByOrigindateIdQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinDatespecificationRelatedByOrigindateId($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'DatespecificationRelatedByOrigindateId', '\DTA\MetadataBundle\Model\DatespecificationQuery');
     }
 
     /**
