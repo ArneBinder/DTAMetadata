@@ -75,10 +75,10 @@ abstract class BaseSource extends BaseObject implements Persistent
     protected $available;
 
     /**
-     * The value for the signatur field.
+     * The value for the signature field.
      * @var        string
      */
-    protected $signatur;
+    protected $signature;
 
     /**
      * The value for the library field.
@@ -178,18 +178,18 @@ abstract class BaseSource extends BaseObject implements Persistent
     }
 
     /**
-     * Get the [signatur] column value.
+     * Get the [signature] column value.
      *
      * @return string
      */
-    public function getSignatur()
+    public function getSignature()
     {
-        return $this->signatur;
+        return $this->signature;
     }
 
     /**
      * Get the [library] column value.
-     *
+     * Besitzende Bibliothek
      * @return string
      */
     public function getLibrary()
@@ -346,29 +346,29 @@ abstract class BaseSource extends BaseObject implements Persistent
     } // setAvailable()
 
     /**
-     * Set the value of [signatur] column.
+     * Set the value of [signature] column.
      *
      * @param string $v new value
      * @return Source The current object (for fluent API support)
      */
-    public function setSignatur($v)
+    public function setSignature($v)
     {
         if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
-        if ($this->signatur !== $v) {
-            $this->signatur = $v;
-            $this->modifiedColumns[] = SourcePeer::SIGNATUR;
+        if ($this->signature !== $v) {
+            $this->signature = $v;
+            $this->modifiedColumns[] = SourcePeer::SIGNATURE;
         }
 
 
         return $this;
-    } // setSignatur()
+    } // setSignature()
 
     /**
      * Set the value of [library] column.
-     *
+     * Besitzende Bibliothek
      * @param string $v new value
      * @return Source The current object (for fluent API support)
      */
@@ -446,7 +446,7 @@ abstract class BaseSource extends BaseObject implements Persistent
             $this->name = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
             $this->comments = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
             $this->available = ($row[$startcol + 5] !== null) ? (boolean) $row[$startcol + 5] : null;
-            $this->signatur = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+            $this->signature = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
             $this->library = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
             $this->librarygnd = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
             $this->resetModified();
@@ -703,8 +703,8 @@ abstract class BaseSource extends BaseObject implements Persistent
         if ($this->isColumnModified(SourcePeer::AVAILABLE)) {
             $modifiedColumns[':p' . $index++]  = '`available`';
         }
-        if ($this->isColumnModified(SourcePeer::SIGNATUR)) {
-            $modifiedColumns[':p' . $index++]  = '`signatur`';
+        if ($this->isColumnModified(SourcePeer::SIGNATURE)) {
+            $modifiedColumns[':p' . $index++]  = '`signature`';
         }
         if ($this->isColumnModified(SourcePeer::LIBRARY)) {
             $modifiedColumns[':p' . $index++]  = '`library`';
@@ -741,8 +741,8 @@ abstract class BaseSource extends BaseObject implements Persistent
                     case '`available`':
                         $stmt->bindValue($identifier, (int) $this->available, PDO::PARAM_INT);
                         break;
-                    case '`signatur`':
-                        $stmt->bindValue($identifier, $this->signatur, PDO::PARAM_STR);
+                    case '`signature`':
+                        $stmt->bindValue($identifier, $this->signature, PDO::PARAM_STR);
                         break;
                     case '`library`':
                         $stmt->bindValue($identifier, $this->library, PDO::PARAM_STR);
@@ -915,7 +915,7 @@ abstract class BaseSource extends BaseObject implements Persistent
                 return $this->getAvailable();
                 break;
             case 6:
-                return $this->getSignatur();
+                return $this->getSignature();
                 break;
             case 7:
                 return $this->getLibrary();
@@ -958,7 +958,7 @@ abstract class BaseSource extends BaseObject implements Persistent
             $keys[3] => $this->getName(),
             $keys[4] => $this->getComments(),
             $keys[5] => $this->getAvailable(),
-            $keys[6] => $this->getSignatur(),
+            $keys[6] => $this->getSignature(),
             $keys[7] => $this->getLibrary(),
             $keys[8] => $this->getLibrarygnd(),
         );
@@ -1019,7 +1019,7 @@ abstract class BaseSource extends BaseObject implements Persistent
                 $this->setAvailable($value);
                 break;
             case 6:
-                $this->setSignatur($value);
+                $this->setSignature($value);
                 break;
             case 7:
                 $this->setLibrary($value);
@@ -1057,7 +1057,7 @@ abstract class BaseSource extends BaseObject implements Persistent
         if (array_key_exists($keys[3], $arr)) $this->setName($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setComments($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setAvailable($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setSignatur($arr[$keys[6]]);
+        if (array_key_exists($keys[6], $arr)) $this->setSignature($arr[$keys[6]]);
         if (array_key_exists($keys[7], $arr)) $this->setLibrary($arr[$keys[7]]);
         if (array_key_exists($keys[8], $arr)) $this->setLibrarygnd($arr[$keys[8]]);
     }
@@ -1077,7 +1077,7 @@ abstract class BaseSource extends BaseObject implements Persistent
         if ($this->isColumnModified(SourcePeer::NAME)) $criteria->add(SourcePeer::NAME, $this->name);
         if ($this->isColumnModified(SourcePeer::COMMENTS)) $criteria->add(SourcePeer::COMMENTS, $this->comments);
         if ($this->isColumnModified(SourcePeer::AVAILABLE)) $criteria->add(SourcePeer::AVAILABLE, $this->available);
-        if ($this->isColumnModified(SourcePeer::SIGNATUR)) $criteria->add(SourcePeer::SIGNATUR, $this->signatur);
+        if ($this->isColumnModified(SourcePeer::SIGNATURE)) $criteria->add(SourcePeer::SIGNATURE, $this->signature);
         if ($this->isColumnModified(SourcePeer::LIBRARY)) $criteria->add(SourcePeer::LIBRARY, $this->library);
         if ($this->isColumnModified(SourcePeer::LIBRARYGND)) $criteria->add(SourcePeer::LIBRARYGND, $this->librarygnd);
 
@@ -1148,7 +1148,7 @@ abstract class BaseSource extends BaseObject implements Persistent
         $copyObj->setName($this->getName());
         $copyObj->setComments($this->getComments());
         $copyObj->setAvailable($this->getAvailable());
-        $copyObj->setSignatur($this->getSignatur());
+        $copyObj->setSignature($this->getSignature());
         $copyObj->setLibrary($this->getLibrary());
         $copyObj->setLibrarygnd($this->getLibrarygnd());
 
@@ -1272,7 +1272,7 @@ abstract class BaseSource extends BaseObject implements Persistent
         $this->name = null;
         $this->comments = null;
         $this->available = null;
-        $this->signatur = null;
+        $this->signature = null;
         $this->library = null;
         $this->librarygnd = null;
         $this->alreadyInSave = false;

@@ -56,8 +56,8 @@ abstract class BaseSourcePeer
     /** the column name for the available field */
     const AVAILABLE = 'source.available';
 
-    /** the column name for the signatur field */
-    const SIGNATUR = 'source.signatur';
+    /** the column name for the signature field */
+    const SIGNATURE = 'source.signature';
 
     /** the column name for the library field */
     const LIBRARY = 'source.library';
@@ -84,11 +84,11 @@ abstract class BaseSourcePeer
      * e.g. SourcePeer::$fieldNames[SourcePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'Quality', 'Name', 'Comments', 'Available', 'Signatur', 'Library', 'Librarygnd', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'quality', 'name', 'comments', 'available', 'signatur', 'library', 'librarygnd', ),
-        BasePeer::TYPE_COLNAME => array (SourcePeer::ID, SourcePeer::PUBLICATION_ID, SourcePeer::QUALITY, SourcePeer::NAME, SourcePeer::COMMENTS, SourcePeer::AVAILABLE, SourcePeer::SIGNATUR, SourcePeer::LIBRARY, SourcePeer::LIBRARYGND, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'QUALITY', 'NAME', 'COMMENTS', 'AVAILABLE', 'SIGNATUR', 'LIBRARY', 'LIBRARYGND', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'quality', 'name', 'comments', 'available', 'signatur', 'library', 'libraryGnd', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'Quality', 'Name', 'Comments', 'Available', 'Signature', 'Library', 'Librarygnd', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'quality', 'name', 'comments', 'available', 'signature', 'library', 'librarygnd', ),
+        BasePeer::TYPE_COLNAME => array (SourcePeer::ID, SourcePeer::PUBLICATION_ID, SourcePeer::QUALITY, SourcePeer::NAME, SourcePeer::COMMENTS, SourcePeer::AVAILABLE, SourcePeer::SIGNATURE, SourcePeer::LIBRARY, SourcePeer::LIBRARYGND, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'QUALITY', 'NAME', 'COMMENTS', 'AVAILABLE', 'SIGNATURE', 'LIBRARY', 'LIBRARYGND', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'quality', 'name', 'comments', 'available', 'signature', 'library', 'libraryGnd', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
     );
 
@@ -99,11 +99,11 @@ abstract class BaseSourcePeer
      * e.g. SourcePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'Quality' => 2, 'Name' => 3, 'Comments' => 4, 'Available' => 5, 'Signatur' => 6, 'Library' => 7, 'Librarygnd' => 8, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'quality' => 2, 'name' => 3, 'comments' => 4, 'available' => 5, 'signatur' => 6, 'library' => 7, 'librarygnd' => 8, ),
-        BasePeer::TYPE_COLNAME => array (SourcePeer::ID => 0, SourcePeer::PUBLICATION_ID => 1, SourcePeer::QUALITY => 2, SourcePeer::NAME => 3, SourcePeer::COMMENTS => 4, SourcePeer::AVAILABLE => 5, SourcePeer::SIGNATUR => 6, SourcePeer::LIBRARY => 7, SourcePeer::LIBRARYGND => 8, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'QUALITY' => 2, 'NAME' => 3, 'COMMENTS' => 4, 'AVAILABLE' => 5, 'SIGNATUR' => 6, 'LIBRARY' => 7, 'LIBRARYGND' => 8, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'quality' => 2, 'name' => 3, 'comments' => 4, 'available' => 5, 'signatur' => 6, 'library' => 7, 'libraryGnd' => 8, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'Quality' => 2, 'Name' => 3, 'Comments' => 4, 'Available' => 5, 'Signature' => 6, 'Library' => 7, 'Librarygnd' => 8, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'quality' => 2, 'name' => 3, 'comments' => 4, 'available' => 5, 'signature' => 6, 'library' => 7, 'librarygnd' => 8, ),
+        BasePeer::TYPE_COLNAME => array (SourcePeer::ID => 0, SourcePeer::PUBLICATION_ID => 1, SourcePeer::QUALITY => 2, SourcePeer::NAME => 3, SourcePeer::COMMENTS => 4, SourcePeer::AVAILABLE => 5, SourcePeer::SIGNATURE => 6, SourcePeer::LIBRARY => 7, SourcePeer::LIBRARYGND => 8, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'QUALITY' => 2, 'NAME' => 3, 'COMMENTS' => 4, 'AVAILABLE' => 5, 'SIGNATURE' => 6, 'LIBRARY' => 7, 'LIBRARYGND' => 8, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'quality' => 2, 'name' => 3, 'comments' => 4, 'available' => 5, 'signature' => 6, 'library' => 7, 'libraryGnd' => 8, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
     );
 
@@ -184,7 +184,7 @@ abstract class BaseSourcePeer
             $criteria->addSelectColumn(SourcePeer::NAME);
             $criteria->addSelectColumn(SourcePeer::COMMENTS);
             $criteria->addSelectColumn(SourcePeer::AVAILABLE);
-            $criteria->addSelectColumn(SourcePeer::SIGNATUR);
+            $criteria->addSelectColumn(SourcePeer::SIGNATURE);
             $criteria->addSelectColumn(SourcePeer::LIBRARY);
             $criteria->addSelectColumn(SourcePeer::LIBRARYGND);
         } else {
@@ -194,7 +194,7 @@ abstract class BaseSourcePeer
             $criteria->addSelectColumn($alias . '.name');
             $criteria->addSelectColumn($alias . '.comments');
             $criteria->addSelectColumn($alias . '.available');
-            $criteria->addSelectColumn($alias . '.signatur');
+            $criteria->addSelectColumn($alias . '.signature');
             $criteria->addSelectColumn($alias . '.library');
             $criteria->addSelectColumn($alias . '.libraryGnd');
         }

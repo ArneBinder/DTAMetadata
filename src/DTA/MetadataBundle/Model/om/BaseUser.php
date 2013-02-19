@@ -19,7 +19,7 @@ use DTA\MetadataBundle\Model\User;
 use DTA\MetadataBundle\Model\UserPeer;
 use DTA\MetadataBundle\Model\UserQuery;
 
-abstract class BaseUser extends BaseObject implements Persistent
+// TableRowViewInterface automatically implemented by the TableRowViewBehavior.phpabstract class BaseUser extends BaseObject  implements Persistent, \DTA\MetadataBundle\Model\table_row_view\TableRowViewInterface
 {
     /**
      * Peer class name
@@ -1426,5 +1426,24 @@ abstract class BaseUser extends BaseObject implements Persistent
     {
         return $this->alreadyInSave;
     }
+
+    // table_row_view behavior
+    /**
+     * To specify which columns are to be visible in the user display
+     * (In the view that lists all database records of a class as a table)
+     */
+    public function getTableViewColumnNames(){
+
+    }
+
+    /**
+     * To access the data using the specified column names.
+     * @param string columnName
+     */
+    public function getAttributeByTableViewColumName($columnName){
+
+    }
+
+
 
 }

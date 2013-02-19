@@ -53,11 +53,11 @@ abstract class BaseEssayPeer extends PublicationPeer
     /** the column name for the printRun field */
     const PRINTRUN = 'essay.printRun';
 
-    /** the column name for the printRunComment field */
-    const PRINTRUNCOMMENT = 'essay.printRunComment';
-
     /** the column name for the edition field */
     const EDITION = 'essay.edition';
+
+    /** the column name for the editionNumerical field */
+    const EDITIONNUMERICAL = 'essay.editionNumerical';
 
     /** the column name for the numPages field */
     const NUMPAGES = 'essay.numPages';
@@ -117,11 +117,11 @@ abstract class BaseEssayPeer extends PublicationPeer
      * e.g. EssayPeer::$fieldNames[EssayPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Printrun', 'Printruncomment', 'Edition', 'Numpages', 'Numpagesnormed', 'Bibliographiccitation', 'TitleId', 'PublishingcompanyId', 'PlaceId', 'PublicationdateId', 'OrigindateId', 'RelatedsetId', 'WorkId', 'PublisherId', 'PrinterId', 'TranslatorId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'printrun', 'printruncomment', 'edition', 'numpages', 'numpagesnormed', 'bibliographiccitation', 'titleId', 'publishingcompanyId', 'placeId', 'publicationdateId', 'origindateId', 'relatedsetId', 'workId', 'publisherId', 'printerId', 'translatorId', ),
-        BasePeer::TYPE_COLNAME => array (EssayPeer::ID, EssayPeer::PRINTRUN, EssayPeer::PRINTRUNCOMMENT, EssayPeer::EDITION, EssayPeer::NUMPAGES, EssayPeer::NUMPAGESNORMED, EssayPeer::BIBLIOGRAPHICCITATION, EssayPeer::TITLE_ID, EssayPeer::PUBLISHINGCOMPANY_ID, EssayPeer::PLACE_ID, EssayPeer::PUBLICATIONDATE_ID, EssayPeer::ORIGINDATE_ID, EssayPeer::RELATEDSET_ID, EssayPeer::WORK_ID, EssayPeer::PUBLISHER_ID, EssayPeer::PRINTER_ID, EssayPeer::TRANSLATOR_ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PRINTRUN', 'PRINTRUNCOMMENT', 'EDITION', 'NUMPAGES', 'NUMPAGESNORMED', 'BIBLIOGRAPHICCITATION', 'TITLE_ID', 'PUBLISHINGCOMPANY_ID', 'PLACE_ID', 'PUBLICATIONDATE_ID', 'ORIGINDATE_ID', 'RELATEDSET_ID', 'WORK_ID', 'PUBLISHER_ID', 'PRINTER_ID', 'TRANSLATOR_ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'printRun', 'printRunComment', 'edition', 'numPages', 'numPagesNormed', 'bibliographicCitation', 'title_id', 'publishingCompany_id', 'place_id', 'publicationDate_id', 'originDate_id', 'relatedSet_id', 'work_id', 'publisher_id', 'printer_id', 'translator_id', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Printrun', 'Edition', 'Editionnumerical', 'Numpages', 'Numpagesnormed', 'Bibliographiccitation', 'TitleId', 'PublishingcompanyId', 'PlaceId', 'PublicationdateId', 'OrigindateId', 'RelatedsetId', 'WorkId', 'PublisherId', 'PrinterId', 'TranslatorId', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'printrun', 'edition', 'editionnumerical', 'numpages', 'numpagesnormed', 'bibliographiccitation', 'titleId', 'publishingcompanyId', 'placeId', 'publicationdateId', 'origindateId', 'relatedsetId', 'workId', 'publisherId', 'printerId', 'translatorId', ),
+        BasePeer::TYPE_COLNAME => array (EssayPeer::ID, EssayPeer::PRINTRUN, EssayPeer::EDITION, EssayPeer::EDITIONNUMERICAL, EssayPeer::NUMPAGES, EssayPeer::NUMPAGESNORMED, EssayPeer::BIBLIOGRAPHICCITATION, EssayPeer::TITLE_ID, EssayPeer::PUBLISHINGCOMPANY_ID, EssayPeer::PLACE_ID, EssayPeer::PUBLICATIONDATE_ID, EssayPeer::ORIGINDATE_ID, EssayPeer::RELATEDSET_ID, EssayPeer::WORK_ID, EssayPeer::PUBLISHER_ID, EssayPeer::PRINTER_ID, EssayPeer::TRANSLATOR_ID, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PRINTRUN', 'EDITION', 'EDITIONNUMERICAL', 'NUMPAGES', 'NUMPAGESNORMED', 'BIBLIOGRAPHICCITATION', 'TITLE_ID', 'PUBLISHINGCOMPANY_ID', 'PLACE_ID', 'PUBLICATIONDATE_ID', 'ORIGINDATE_ID', 'RELATEDSET_ID', 'WORK_ID', 'PUBLISHER_ID', 'PRINTER_ID', 'TRANSLATOR_ID', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'printRun', 'edition', 'editionNumerical', 'numPages', 'numPagesNormed', 'bibliographicCitation', 'title_id', 'publishingCompany_id', 'place_id', 'publicationDate_id', 'originDate_id', 'relatedSet_id', 'work_id', 'publisher_id', 'printer_id', 'translator_id', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, )
     );
 
@@ -132,11 +132,11 @@ abstract class BaseEssayPeer extends PublicationPeer
      * e.g. EssayPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Printrun' => 1, 'Printruncomment' => 2, 'Edition' => 3, 'Numpages' => 4, 'Numpagesnormed' => 5, 'Bibliographiccitation' => 6, 'TitleId' => 7, 'PublishingcompanyId' => 8, 'PlaceId' => 9, 'PublicationdateId' => 10, 'OrigindateId' => 11, 'RelatedsetId' => 12, 'WorkId' => 13, 'PublisherId' => 14, 'PrinterId' => 15, 'TranslatorId' => 16, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'printrun' => 1, 'printruncomment' => 2, 'edition' => 3, 'numpages' => 4, 'numpagesnormed' => 5, 'bibliographiccitation' => 6, 'titleId' => 7, 'publishingcompanyId' => 8, 'placeId' => 9, 'publicationdateId' => 10, 'origindateId' => 11, 'relatedsetId' => 12, 'workId' => 13, 'publisherId' => 14, 'printerId' => 15, 'translatorId' => 16, ),
-        BasePeer::TYPE_COLNAME => array (EssayPeer::ID => 0, EssayPeer::PRINTRUN => 1, EssayPeer::PRINTRUNCOMMENT => 2, EssayPeer::EDITION => 3, EssayPeer::NUMPAGES => 4, EssayPeer::NUMPAGESNORMED => 5, EssayPeer::BIBLIOGRAPHICCITATION => 6, EssayPeer::TITLE_ID => 7, EssayPeer::PUBLISHINGCOMPANY_ID => 8, EssayPeer::PLACE_ID => 9, EssayPeer::PUBLICATIONDATE_ID => 10, EssayPeer::ORIGINDATE_ID => 11, EssayPeer::RELATEDSET_ID => 12, EssayPeer::WORK_ID => 13, EssayPeer::PUBLISHER_ID => 14, EssayPeer::PRINTER_ID => 15, EssayPeer::TRANSLATOR_ID => 16, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PRINTRUN' => 1, 'PRINTRUNCOMMENT' => 2, 'EDITION' => 3, 'NUMPAGES' => 4, 'NUMPAGESNORMED' => 5, 'BIBLIOGRAPHICCITATION' => 6, 'TITLE_ID' => 7, 'PUBLISHINGCOMPANY_ID' => 8, 'PLACE_ID' => 9, 'PUBLICATIONDATE_ID' => 10, 'ORIGINDATE_ID' => 11, 'RELATEDSET_ID' => 12, 'WORK_ID' => 13, 'PUBLISHER_ID' => 14, 'PRINTER_ID' => 15, 'TRANSLATOR_ID' => 16, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'printRun' => 1, 'printRunComment' => 2, 'edition' => 3, 'numPages' => 4, 'numPagesNormed' => 5, 'bibliographicCitation' => 6, 'title_id' => 7, 'publishingCompany_id' => 8, 'place_id' => 9, 'publicationDate_id' => 10, 'originDate_id' => 11, 'relatedSet_id' => 12, 'work_id' => 13, 'publisher_id' => 14, 'printer_id' => 15, 'translator_id' => 16, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Printrun' => 1, 'Edition' => 2, 'Editionnumerical' => 3, 'Numpages' => 4, 'Numpagesnormed' => 5, 'Bibliographiccitation' => 6, 'TitleId' => 7, 'PublishingcompanyId' => 8, 'PlaceId' => 9, 'PublicationdateId' => 10, 'OrigindateId' => 11, 'RelatedsetId' => 12, 'WorkId' => 13, 'PublisherId' => 14, 'PrinterId' => 15, 'TranslatorId' => 16, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'printrun' => 1, 'edition' => 2, 'editionnumerical' => 3, 'numpages' => 4, 'numpagesnormed' => 5, 'bibliographiccitation' => 6, 'titleId' => 7, 'publishingcompanyId' => 8, 'placeId' => 9, 'publicationdateId' => 10, 'origindateId' => 11, 'relatedsetId' => 12, 'workId' => 13, 'publisherId' => 14, 'printerId' => 15, 'translatorId' => 16, ),
+        BasePeer::TYPE_COLNAME => array (EssayPeer::ID => 0, EssayPeer::PRINTRUN => 1, EssayPeer::EDITION => 2, EssayPeer::EDITIONNUMERICAL => 3, EssayPeer::NUMPAGES => 4, EssayPeer::NUMPAGESNORMED => 5, EssayPeer::BIBLIOGRAPHICCITATION => 6, EssayPeer::TITLE_ID => 7, EssayPeer::PUBLISHINGCOMPANY_ID => 8, EssayPeer::PLACE_ID => 9, EssayPeer::PUBLICATIONDATE_ID => 10, EssayPeer::ORIGINDATE_ID => 11, EssayPeer::RELATEDSET_ID => 12, EssayPeer::WORK_ID => 13, EssayPeer::PUBLISHER_ID => 14, EssayPeer::PRINTER_ID => 15, EssayPeer::TRANSLATOR_ID => 16, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PRINTRUN' => 1, 'EDITION' => 2, 'EDITIONNUMERICAL' => 3, 'NUMPAGES' => 4, 'NUMPAGESNORMED' => 5, 'BIBLIOGRAPHICCITATION' => 6, 'TITLE_ID' => 7, 'PUBLISHINGCOMPANY_ID' => 8, 'PLACE_ID' => 9, 'PUBLICATIONDATE_ID' => 10, 'ORIGINDATE_ID' => 11, 'RELATEDSET_ID' => 12, 'WORK_ID' => 13, 'PUBLISHER_ID' => 14, 'PRINTER_ID' => 15, 'TRANSLATOR_ID' => 16, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'printRun' => 1, 'edition' => 2, 'editionNumerical' => 3, 'numPages' => 4, 'numPagesNormed' => 5, 'bibliographicCitation' => 6, 'title_id' => 7, 'publishingCompany_id' => 8, 'place_id' => 9, 'publicationDate_id' => 10, 'originDate_id' => 11, 'relatedSet_id' => 12, 'work_id' => 13, 'publisher_id' => 14, 'printer_id' => 15, 'translator_id' => 16, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, )
     );
 
@@ -213,8 +213,8 @@ abstract class BaseEssayPeer extends PublicationPeer
         if (null === $alias) {
             $criteria->addSelectColumn(EssayPeer::ID);
             $criteria->addSelectColumn(EssayPeer::PRINTRUN);
-            $criteria->addSelectColumn(EssayPeer::PRINTRUNCOMMENT);
             $criteria->addSelectColumn(EssayPeer::EDITION);
+            $criteria->addSelectColumn(EssayPeer::EDITIONNUMERICAL);
             $criteria->addSelectColumn(EssayPeer::NUMPAGES);
             $criteria->addSelectColumn(EssayPeer::NUMPAGESNORMED);
             $criteria->addSelectColumn(EssayPeer::BIBLIOGRAPHICCITATION);
@@ -231,8 +231,8 @@ abstract class BaseEssayPeer extends PublicationPeer
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.printRun');
-            $criteria->addSelectColumn($alias . '.printRunComment');
             $criteria->addSelectColumn($alias . '.edition');
+            $criteria->addSelectColumn($alias . '.editionNumerical');
             $criteria->addSelectColumn($alias . '.numPages');
             $criteria->addSelectColumn($alias . '.numPagesNormed');
             $criteria->addSelectColumn($alias . '.bibliographicCitation');

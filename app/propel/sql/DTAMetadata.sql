@@ -12,9 +12,9 @@ DROP TABLE IF EXISTS `publication`;
 CREATE TABLE `publication`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `printRun` TEXT COMMENT 'Auflage',
-    `printRunComment` TEXT,
+    `printRun` TEXT COMMENT 'Bezeichnung der Auflage',
     `edition` TEXT,
+    `numericalEdition` TEXT,
     `numPages` INTEGER,
     `numPagesNormed` INTEGER,
     `bibliographicCitation` TEXT,
@@ -99,9 +99,9 @@ DROP TABLE IF EXISTS `essay`;
 CREATE TABLE `essay`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `printRun` TEXT COMMENT 'Auflage',
-    `printRunComment` TEXT,
+    `printRun` TEXT COMMENT 'Bezeichnung der Auflage',
     `edition` TEXT,
+    `numericalEdition` TEXT,
     `numPages` INTEGER,
     `numPagesNormed` INTEGER,
     `bibliographicCitation` TEXT,
@@ -168,9 +168,9 @@ DROP TABLE IF EXISTS `magazine`;
 CREATE TABLE `magazine`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `printRun` TEXT COMMENT 'Auflage',
-    `printRunComment` TEXT,
+    `printRun` TEXT COMMENT 'Bezeichnung der Auflage',
     `edition` TEXT,
+    `numericalEdition` TEXT,
     `numPages` INTEGER,
     `numPagesNormed` INTEGER,
     `bibliographicCitation` TEXT,
@@ -238,9 +238,9 @@ CREATE TABLE `series`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `volume` TEXT,
-    `printRun` TEXT COMMENT 'Auflage',
-    `printRunComment` TEXT,
+    `printRun` TEXT COMMENT 'Bezeichnung der Auflage',
     `edition` TEXT,
+    `numericalEdition` TEXT,
     `numPages` INTEGER,
     `numPagesNormed` INTEGER,
     `bibliographicCitation` TEXT,
@@ -503,8 +503,8 @@ CREATE TABLE `source`
     `name` TEXT,
     `comments` TEXT,
     `available` TINYINT(1),
-    `signatur` VARCHAR(512),
-    `library` TEXT,
+    `signature` VARCHAR(1024),
+    `library` TEXT COMMENT 'Besitzende Bibliothek',
     `libraryGnd` VARCHAR(1024),
     PRIMARY KEY (`id`),
     INDEX `AI_id_Fundstellen` (`id`),

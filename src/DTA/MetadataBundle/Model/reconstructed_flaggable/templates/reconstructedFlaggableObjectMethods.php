@@ -14,7 +14,7 @@ public function isReconstructedByName($column){
 }
 
 /**
-* Returns all columns that actually are flagged as reconstructed.
+* Returns all columns that are flagged as reconstructed.
 */
 public function getReconstructedFlaggedColumns(){
     $flaggableColumns = $this->getReconstructedFlaggableColumns();

@@ -13,4 +13,7 @@
     margin-left: 10px;
 }
 
-/* */
+/* TODO. view. The bootstrap modal appears not centered the first time called.
+This is due to a miscalculted margin-top which is 0 in the beginning and is then set to half the height of the modal, when closed.
+
+*/

@@ -14,7 +14,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * ========================================================== */
+ * ==========================================================
+ * 
+ *  TODO: add bootstrap extra modals via composer https://github.com/jschr/bootstrap-modal/blob/master/composer.json
+ *    */
 
 
 !function ($) {

@@ -42,8 +42,11 @@ assetic:
 propel:
     build_properties:
       propel.packageObjectModel: true
-      propel.namespace.autoPackage: true
+      #propel.namespace.autoPackage: true
+      #vendor.propel-reconstructed_flaggable-behavior.ReconstructedFlaggableBehavior
       propel.behavior.reconstructed_flaggable.class: src.DTA.MetadataBundle.Model.reconstructed_flaggable.ReconstructedFlaggableBehavior
+      #vendor.propel-table_row_view-behavior.TableRowViewBehavior
+      propel.behavior.table_row_view.class: src.DTA.MetadataBundle.Model.table_row_view.TableRowViewBehavior
       # FOR TESTING, non-enforcement of the foreign key constraints is more practical (set to MyISAM)
       propel.mysql.tableType: InnoDB
       

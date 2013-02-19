@@ -29,8 +29,8 @@ use DTA\MetadataBundle\Model\Work;
  * @method SeriesQuery orderById($order = Criteria::ASC) Order by the id column
  * @method SeriesQuery orderByVolume($order = Criteria::ASC) Order by the volume column
  * @method SeriesQuery orderByPrintrun($order = Criteria::ASC) Order by the printRun column
- * @method SeriesQuery orderByPrintruncomment($order = Criteria::ASC) Order by the printRunComment column
  * @method SeriesQuery orderByEdition($order = Criteria::ASC) Order by the edition column
+ * @method SeriesQuery orderByEditionnumerical($order = Criteria::ASC) Order by the editionNumerical column
  * @method SeriesQuery orderByNumpages($order = Criteria::ASC) Order by the numPages column
  * @method SeriesQuery orderByNumpagesnormed($order = Criteria::ASC) Order by the numPagesNormed column
  * @method SeriesQuery orderByBibliographiccitation($order = Criteria::ASC) Order by the bibliographicCitation column
@@ -48,8 +48,8 @@ use DTA\MetadataBundle\Model\Work;
  * @method SeriesQuery groupById() Group by the id column
  * @method SeriesQuery groupByVolume() Group by the volume column
  * @method SeriesQuery groupByPrintrun() Group by the printRun column
- * @method SeriesQuery groupByPrintruncomment() Group by the printRunComment column
  * @method SeriesQuery groupByEdition() Group by the edition column
+ * @method SeriesQuery groupByEditionnumerical() Group by the editionNumerical column
  * @method SeriesQuery groupByNumpages() Group by the numPages column
  * @method SeriesQuery groupByNumpagesnormed() Group by the numPagesNormed column
  * @method SeriesQuery groupByBibliographiccitation() Group by the bibliographicCitation column
@@ -113,8 +113,8 @@ use DTA\MetadataBundle\Model\Work;
  *
  * @method Series findOneByVolume(string $volume) Return the first Series filtered by the volume column
  * @method Series findOneByPrintrun(string $printRun) Return the first Series filtered by the printRun column
- * @method Series findOneByPrintruncomment(string $printRunComment) Return the first Series filtered by the printRunComment column
  * @method Series findOneByEdition(string $edition) Return the first Series filtered by the edition column
+ * @method Series findOneByEditionnumerical(string $editionNumerical) Return the first Series filtered by the editionNumerical column
  * @method Series findOneByNumpages(int $numPages) Return the first Series filtered by the numPages column
  * @method Series findOneByNumpagesnormed(int $numPagesNormed) Return the first Series filtered by the numPagesNormed column
  * @method Series findOneByBibliographiccitation(string $bibliographicCitation) Return the first Series filtered by the bibliographicCitation column
@@ -132,8 +132,8 @@ use DTA\MetadataBundle\Model\Work;
  * @method array findById(int $id) Return Series objects filtered by the id column
  * @method array findByVolume(string $volume) Return Series objects filtered by the volume column
  * @method array findByPrintrun(string $printRun) Return Series objects filtered by the printRun column
- * @method array findByPrintruncomment(string $printRunComment) Return Series objects filtered by the printRunComment column
  * @method array findByEdition(string $edition) Return Series objects filtered by the edition column
+ * @method array findByEditionnumerical(string $editionNumerical) Return Series objects filtered by the editionNumerical column
  * @method array findByNumpages(int $numPages) Return Series objects filtered by the numPages column
  * @method array findByNumpagesnormed(int $numPagesNormed) Return Series objects filtered by the numPagesNormed column
  * @method array findByBibliographiccitation(string $bibliographicCitation) Return Series objects filtered by the bibliographicCitation column
@@ -248,7 +248,7 @@ abstract class BaseSeriesQuery extends PublicationQuery
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `volume`, `printRun`, `printRunComment`, `edition`, `numPages`, `numPagesNormed`, `bibliographicCitation`, `title_id`, `publishingCompany_id`, `place_id`, `publicationDate_id`, `originDate_id`, `relatedSet_id`, `work_id`, `publisher_id`, `printer_id`, `translator_id` FROM `series` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `volume`, `printRun`, `edition`, `editionNumerical`, `numPages`, `numPagesNormed`, `bibliographicCitation`, `title_id`, `publishingCompany_id`, `place_id`, `publicationDate_id`, `originDate_id`, `relatedSet_id`, `work_id`, `publisher_id`, `printer_id`, `translator_id` FROM `series` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -438,35 +438,6 @@ abstract class BaseSeriesQuery extends PublicationQuery
     }
 
     /**
-     * Filter the query on the printRunComment column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByPrintruncomment('fooValue');   // WHERE printRunComment = 'fooValue'
-     * $query->filterByPrintruncomment('%fooValue%'); // WHERE printRunComment LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $printruncomment The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return SeriesQuery The current query, for fluid interface
-     */
-    public function filterByPrintruncomment($printruncomment = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($printruncomment)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $printruncomment)) {
-                $printruncomment = str_replace('*', '%', $printruncomment);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(SeriesPeer::PRINTRUNCOMMENT, $printruncomment, $comparison);
-    }
-
-    /**
      * Filter the query on the edition column
      *
      * Example usage:
@@ -493,6 +464,35 @@ abstract class BaseSeriesQuery extends PublicationQuery
         }
 
         return $this->addUsingAlias(SeriesPeer::EDITION, $edition, $comparison);
+    }
+
+    /**
+     * Filter the query on the editionNumerical column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByEditionnumerical('fooValue');   // WHERE editionNumerical = 'fooValue'
+     * $query->filterByEditionnumerical('%fooValue%'); // WHERE editionNumerical LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $editionnumerical The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return SeriesQuery The current query, for fluid interface
+     */
+    public function filterByEditionnumerical($editionnumerical = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($editionnumerical)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $editionnumerical)) {
+                $editionnumerical = str_replace('*', '%', $editionnumerical);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(SeriesPeer::EDITIONNUMERICAL, $editionnumerical, $comparison);
     }
 
     /**

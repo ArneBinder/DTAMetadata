@@ -12,7 +12,7 @@
 {% block selectOrAdd_widget %}
     {# The default select box#}
     {{form_widget(form)}} 
-    <button class="selectOrAdd add btn" type="button" data-toggle="modal" href="#testModal">{{ form.vars.label }} neu erstellen...</button>
+    <button class="selectOrAdd add btn" type="button" data-toggle="modal" href="#testModal">{{ form.vars.label }} {{ 'selectOrAdd.addBtn.suffix'|trans }}</button>
     <input type="hidden" class="selectOrAdd" name="modelClass" value="{{ form.vars.modelClass }}"/>
     <input type="hidden" class="selectOrAdd" name="formRetrieveUrl" value="{{ path('plainForm', {'className': form.vars.modelClass, 'captionProperty': form.vars.captionProperty, 'domainKey': "ajax"}) }}"/>
     

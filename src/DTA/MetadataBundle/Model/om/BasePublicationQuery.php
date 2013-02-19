@@ -33,8 +33,8 @@ use DTA\MetadataBundle\Model\Work;
 /**
  * @method PublicationQuery orderById($order = Criteria::ASC) Order by the id column
  * @method PublicationQuery orderByPrintrun($order = Criteria::ASC) Order by the printRun column
- * @method PublicationQuery orderByPrintruncomment($order = Criteria::ASC) Order by the printRunComment column
  * @method PublicationQuery orderByEdition($order = Criteria::ASC) Order by the edition column
+ * @method PublicationQuery orderByEditionnumerical($order = Criteria::ASC) Order by the editionNumerical column
  * @method PublicationQuery orderByNumpages($order = Criteria::ASC) Order by the numPages column
  * @method PublicationQuery orderByNumpagesnormed($order = Criteria::ASC) Order by the numPagesNormed column
  * @method PublicationQuery orderByBibliographiccitation($order = Criteria::ASC) Order by the bibliographicCitation column
@@ -52,8 +52,8 @@ use DTA\MetadataBundle\Model\Work;
  *
  * @method PublicationQuery groupById() Group by the id column
  * @method PublicationQuery groupByPrintrun() Group by the printRun column
- * @method PublicationQuery groupByPrintruncomment() Group by the printRunComment column
  * @method PublicationQuery groupByEdition() Group by the edition column
+ * @method PublicationQuery groupByEditionnumerical() Group by the editionNumerical column
  * @method PublicationQuery groupByNumpages() Group by the numPages column
  * @method PublicationQuery groupByNumpagesnormed() Group by the numPagesNormed column
  * @method PublicationQuery groupByBibliographiccitation() Group by the bibliographicCitation column
@@ -133,8 +133,8 @@ use DTA\MetadataBundle\Model\Work;
  * @method Publication findOneOrCreate(PropelPDO $con = null) Return the first Publication matching the query, or a new Publication object populated from the query conditions when no match is found
  *
  * @method Publication findOneByPrintrun(string $printRun) Return the first Publication filtered by the printRun column
- * @method Publication findOneByPrintruncomment(string $printRunComment) Return the first Publication filtered by the printRunComment column
  * @method Publication findOneByEdition(string $edition) Return the first Publication filtered by the edition column
+ * @method Publication findOneByEditionnumerical(string $editionNumerical) Return the first Publication filtered by the editionNumerical column
  * @method Publication findOneByNumpages(int $numPages) Return the first Publication filtered by the numPages column
  * @method Publication findOneByNumpagesnormed(int $numPagesNormed) Return the first Publication filtered by the numPagesNormed column
  * @method Publication findOneByBibliographiccitation(string $bibliographicCitation) Return the first Publication filtered by the bibliographicCitation column
@@ -152,8 +152,8 @@ use DTA\MetadataBundle\Model\Work;
  *
  * @method array findById(int $id) Return Publication objects filtered by the id column
  * @method array findByPrintrun(string $printRun) Return Publication objects filtered by the printRun column
- * @method array findByPrintruncomment(string $printRunComment) Return Publication objects filtered by the printRunComment column
  * @method array findByEdition(string $edition) Return Publication objects filtered by the edition column
+ * @method array findByEditionnumerical(string $editionNumerical) Return Publication objects filtered by the editionNumerical column
  * @method array findByNumpages(int $numPages) Return Publication objects filtered by the numPages column
  * @method array findByNumpagesnormed(int $numPagesNormed) Return Publication objects filtered by the numPagesNormed column
  * @method array findByBibliographiccitation(string $bibliographicCitation) Return Publication objects filtered by the bibliographicCitation column
@@ -269,7 +269,7 @@ abstract class BasePublicationQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `printRun`, `printRunComment`, `edition`, `numPages`, `numPagesNormed`, `bibliographicCitation`, `title_id`, `publishingCompany_id`, `place_id`, `publicationDate_id`, `originDate_id`, `relatedSet_id`, `work_id`, `publisher_id`, `printer_id`, `translator_id`, `descendant_class` FROM `publication` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `printRun`, `edition`, `editionNumerical`, `numPages`, `numPagesNormed`, `bibliographicCitation`, `title_id`, `publishingCompany_id`, `place_id`, `publicationDate_id`, `originDate_id`, `relatedSet_id`, `work_id`, `publisher_id`, `printer_id`, `translator_id`, `descendant_class` FROM `publication` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -430,35 +430,6 @@ abstract class BasePublicationQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the printRunComment column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByPrintruncomment('fooValue');   // WHERE printRunComment = 'fooValue'
-     * $query->filterByPrintruncomment('%fooValue%'); // WHERE printRunComment LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $printruncomment The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return PublicationQuery The current query, for fluid interface
-     */
-    public function filterByPrintruncomment($printruncomment = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($printruncomment)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $printruncomment)) {
-                $printruncomment = str_replace('*', '%', $printruncomment);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(PublicationPeer::PRINTRUNCOMMENT, $printruncomment, $comparison);
-    }
-
-    /**
      * Filter the query on the edition column
      *
      * Example usage:
@@ -485,6 +456,35 @@ abstract class BasePublicationQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(PublicationPeer::EDITION, $edition, $comparison);
+    }
+
+    /**
+     * Filter the query on the editionNumerical column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByEditionnumerical('fooValue');   // WHERE editionNumerical = 'fooValue'
+     * $query->filterByEditionnumerical('%fooValue%'); // WHERE editionNumerical LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $editionnumerical The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return PublicationQuery The current query, for fluid interface
+     */
+    public function filterByEditionnumerical($editionnumerical = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($editionnumerical)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $editionnumerical)) {
+                $editionnumerical = str_replace('*', '%', $editionnumerical);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(PublicationPeer::EDITIONNUMERICAL, $editionnumerical, $comparison);
     }
 
     /**

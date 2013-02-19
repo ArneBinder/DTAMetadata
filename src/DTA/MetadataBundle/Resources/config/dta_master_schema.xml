@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 
+    Propel schema definition notes.
+    
+    Column types are propel specific and database agnostic, although their names resemble MySQL column types.
+    http://propelorm.org/reference/schema.html#column_types 
+    
+-->
 <database name="DTAMetadata" namespace="DTA\MetadataBundle\Model" defaultIdMethod="native">
   
     <!-- data / publications 
@@ -11,7 +18,7 @@
        <!-- atomic attributes -->
        <column description="Bezeichnung der Auflage" name="printRun"  type="LONGVARCHAR" required="false"/>
        <column name="edition" type="LONGVARCHAR" required="false"/>
-       <!-- Numerische Bezeichnung der Ausgabe --> <column name="editionNumerical" description="numerisch" type="LONGVARCHAR" required="false"/>
+       <column name="editionNumerical" type="LONGVARCHAR" required="false"/>    <!-- Numerische Bezeichnung der Ausgabe --> 
        <column name="numPages" type="INTEGER" required="false"/>
        <column name="numPagesNormed" type="INTEGER" required="false"/>
        <column name="bibliographicCitation" type="LONGVARCHAR" required="false"/>
@@ -283,8 +290,8 @@
     <column name="name" type="LONGVARCHAR" required="false"/>
     <column name="comments" type="LONGVARCHAR" required="false"/>
     <column name="available" type="BOOLEAN" size="1" required="false"/>
-    <column name="signature" type="VARCHAR" size="512" required="false"/>
-    <column name="library" type="LONGVARCHAR" required="false"/>
+    <column name="signature" type="VARCHAR" size="1024" required="false"/>
+    <column name="library" description="Besitzende Bibliothek" type="LONGVARCHAR" required="false"/>
     <column name="libraryGnd" type="VARCHAR" size="1024" required="false"/>
     <foreign-key foreignTable="publication" name="fk_quelle_edition1">
       <reference local="publication_id" foreign="id"/>
@@ -369,6 +376,13 @@
     <column name="name_id" type="INTEGER" required="true"/>
     <column name="mail" type="LONGVARCHAR" required="false"/>
     <column name="phone" type="LONGVARCHAR" required="false"/>
+    
+    <behavior name="table_row_view">
+        <parameter name="column1" value="userName"/>
+        <parameter name="column2" value="mail"/>
+        <parameter name="column2" value="phone"/>
+    </behavior>
+    
     <index name="AI_id_user">
       <index-column name="id"/>
     </index>

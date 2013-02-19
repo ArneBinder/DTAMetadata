@@ -15,7 +15,7 @@ class ConceptualDomainController extends DTABaseController {
             "children" => array(
                 array('caption' => "DTA", 'path' => 'home'),
                 array('caption' => "DWDS", 'path' => 'home'))),
-        array("caption" => "Korpora", "path" => 'home'),
+        array("caption" => "Korpora", "modelClass" => 'Corpus'),
         array("caption" => "Verwandte Werke", "path" => 'home'),
     );
 
@@ -27,7 +27,7 @@ class ConceptualDomainController extends DTABaseController {
     public function indexAction() {
 
         return $this->renderDomainSpecificAction('DTAMetadataBundle:ConceptualDomain:ConceptualDomain.html.twig', array(
-                    ));
+        ));
     }
 
 }

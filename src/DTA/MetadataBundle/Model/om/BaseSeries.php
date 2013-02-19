@@ -73,16 +73,16 @@ abstract class BaseSeries extends Publication implements Persistent
     protected $printrun;
 
     /**
-     * The value for the printruncomment field.
-     * @var        string
-     */
-    protected $printruncomment;
-
-    /**
      * The value for the edition field.
      * @var        string
      */
     protected $edition;
+
+    /**
+     * The value for the editionnumerical field.
+     * @var        string
+     */
+    protected $editionnumerical;
 
     /**
      * The value for the numpages field.
@@ -254,22 +254,12 @@ abstract class BaseSeries extends Publication implements Persistent
 
     /**
      * Get the [printrun] column value.
-     * Auflage
+     * Bezeichnung der Auflage
      * @return string
      */
     public function getPrintrun()
     {
         return $this->printrun;
-    }
-
-    /**
-     * Get the [printruncomment] column value.
-     *
-     * @return string
-     */
-    public function getPrintruncomment()
-    {
-        return $this->printruncomment;
     }
 
     /**
@@ -280,6 +270,16 @@ abstract class BaseSeries extends Publication implements Persistent
     public function getEdition()
     {
         return $this->edition;
+    }
+
+    /**
+     * Get the [editionnumerical] column value.
+     *
+     * @return string
+     */
+    public function getEditionnumerical()
+    {
+        return $this->editionnumerical;
     }
 
     /**
@@ -456,7 +456,7 @@ abstract class BaseSeries extends Publication implements Persistent
 
     /**
      * Set the value of [printrun] column.
-     * Auflage
+     * Bezeichnung der Auflage
      * @param string $v new value
      * @return Series The current object (for fluent API support)
      */
@@ -474,27 +474,6 @@ abstract class BaseSeries extends Publication implements Persistent
 
         return $this;
     } // setPrintrun()
-
-    /**
-     * Set the value of [printruncomment] column.
-     *
-     * @param string $v new value
-     * @return Series The current object (for fluent API support)
-     */
-    public function setPrintruncomment($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
-        }
-
-        if ($this->printruncomment !== $v) {
-            $this->printruncomment = $v;
-            $this->modifiedColumns[] = SeriesPeer::PRINTRUNCOMMENT;
-        }
-
-
-        return $this;
-    } // setPrintruncomment()
 
     /**
      * Set the value of [edition] column.
@@ -516,6 +495,27 @@ abstract class BaseSeries extends Publication implements Persistent
 
         return $this;
     } // setEdition()
+
+    /**
+     * Set the value of [editionnumerical] column.
+     *
+     * @param string $v new value
+     * @return Series The current object (for fluent API support)
+     */
+    public function setEditionnumerical($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->editionnumerical !== $v) {
+            $this->editionnumerical = $v;
+            $this->modifiedColumns[] = SeriesPeer::EDITIONNUMERICAL;
+        }
+
+
+        return $this;
+    } // setEditionnumerical()
 
     /**
      * Set the value of [numpages] column.
@@ -865,8 +865,8 @@ abstract class BaseSeries extends Publication implements Persistent
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->volume = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
             $this->printrun = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-            $this->printruncomment = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-            $this->edition = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+            $this->edition = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+            $this->editionnumerical = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
             $this->numpages = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
             $this->numpagesnormed = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
             $this->bibliographiccitation = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
@@ -1232,11 +1232,11 @@ abstract class BaseSeries extends Publication implements Persistent
         if ($this->isColumnModified(SeriesPeer::PRINTRUN)) {
             $modifiedColumns[':p' . $index++]  = '`printRun`';
         }
-        if ($this->isColumnModified(SeriesPeer::PRINTRUNCOMMENT)) {
-            $modifiedColumns[':p' . $index++]  = '`printRunComment`';
-        }
         if ($this->isColumnModified(SeriesPeer::EDITION)) {
             $modifiedColumns[':p' . $index++]  = '`edition`';
+        }
+        if ($this->isColumnModified(SeriesPeer::EDITIONNUMERICAL)) {
+            $modifiedColumns[':p' . $index++]  = '`editionNumerical`';
         }
         if ($this->isColumnModified(SeriesPeer::NUMPAGES)) {
             $modifiedColumns[':p' . $index++]  = '`numPages`';
@@ -1297,11 +1297,11 @@ abstract class BaseSeries extends Publication implements Persistent
                     case '`printRun`':
                         $stmt->bindValue($identifier, $this->printrun, PDO::PARAM_STR);
                         break;
-                    case '`printRunComment`':
-                        $stmt->bindValue($identifier, $this->printruncomment, PDO::PARAM_STR);
-                        break;
                     case '`edition`':
                         $stmt->bindValue($identifier, $this->edition, PDO::PARAM_STR);
+                        break;
+                    case '`editionNumerical`':
+                        $stmt->bindValue($identifier, $this->editionnumerical, PDO::PARAM_STR);
                         break;
                     case '`numPages`':
                         $stmt->bindValue($identifier, $this->numpages, PDO::PARAM_INT);
@@ -1552,10 +1552,10 @@ abstract class BaseSeries extends Publication implements Persistent
                 return $this->getPrintrun();
                 break;
             case 3:
-                return $this->getPrintruncomment();
+                return $this->getEdition();
                 break;
             case 4:
-                return $this->getEdition();
+                return $this->getEditionnumerical();
                 break;
             case 5:
                 return $this->getNumpages();
@@ -1628,8 +1628,8 @@ abstract class BaseSeries extends Publication implements Persistent
             $keys[0] => $this->getId(),
             $keys[1] => $this->getVolume(),
             $keys[2] => $this->getPrintrun(),
-            $keys[3] => $this->getPrintruncomment(),
-            $keys[4] => $this->getEdition(),
+            $keys[3] => $this->getEdition(),
+            $keys[4] => $this->getEditionnumerical(),
             $keys[5] => $this->getNumpages(),
             $keys[6] => $this->getNumpagesnormed(),
             $keys[7] => $this->getBibliographiccitation(),
@@ -1719,10 +1719,10 @@ abstract class BaseSeries extends Publication implements Persistent
                 $this->setPrintrun($value);
                 break;
             case 3:
-                $this->setPrintruncomment($value);
+                $this->setEdition($value);
                 break;
             case 4:
-                $this->setEdition($value);
+                $this->setEditionnumerical($value);
                 break;
             case 5:
                 $this->setNumpages($value);
@@ -1790,8 +1790,8 @@ abstract class BaseSeries extends Publication implements Persistent
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setVolume($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setPrintrun($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setPrintruncomment($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setEdition($arr[$keys[4]]);
+        if (array_key_exists($keys[3], $arr)) $this->setEdition($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setEditionnumerical($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setNumpages($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setNumpagesnormed($arr[$keys[6]]);
         if (array_key_exists($keys[7], $arr)) $this->setBibliographiccitation($arr[$keys[7]]);
@@ -1819,8 +1819,8 @@ abstract class BaseSeries extends Publication implements Persistent
         if ($this->isColumnModified(SeriesPeer::ID)) $criteria->add(SeriesPeer::ID, $this->id);
         if ($this->isColumnModified(SeriesPeer::VOLUME)) $criteria->add(SeriesPeer::VOLUME, $this->volume);
         if ($this->isColumnModified(SeriesPeer::PRINTRUN)) $criteria->add(SeriesPeer::PRINTRUN, $this->printrun);
-        if ($this->isColumnModified(SeriesPeer::PRINTRUNCOMMENT)) $criteria->add(SeriesPeer::PRINTRUNCOMMENT, $this->printruncomment);
         if ($this->isColumnModified(SeriesPeer::EDITION)) $criteria->add(SeriesPeer::EDITION, $this->edition);
+        if ($this->isColumnModified(SeriesPeer::EDITIONNUMERICAL)) $criteria->add(SeriesPeer::EDITIONNUMERICAL, $this->editionnumerical);
         if ($this->isColumnModified(SeriesPeer::NUMPAGES)) $criteria->add(SeriesPeer::NUMPAGES, $this->numpages);
         if ($this->isColumnModified(SeriesPeer::NUMPAGESNORMED)) $criteria->add(SeriesPeer::NUMPAGESNORMED, $this->numpagesnormed);
         if ($this->isColumnModified(SeriesPeer::BIBLIOGRAPHICCITATION)) $criteria->add(SeriesPeer::BIBLIOGRAPHICCITATION, $this->bibliographiccitation);
@@ -1899,8 +1899,8 @@ abstract class BaseSeries extends Publication implements Persistent
     {
         $copyObj->setVolume($this->getVolume());
         $copyObj->setPrintrun($this->getPrintrun());
-        $copyObj->setPrintruncomment($this->getPrintruncomment());
         $copyObj->setEdition($this->getEdition());
+        $copyObj->setEditionnumerical($this->getEditionnumerical());
         $copyObj->setNumpages($this->getNumpages());
         $copyObj->setNumpagesnormed($this->getNumpagesnormed());
         $copyObj->setBibliographiccitation($this->getBibliographiccitation());
@@ -2506,8 +2506,8 @@ abstract class BaseSeries extends Publication implements Persistent
         $this->id = null;
         $this->volume = null;
         $this->printrun = null;
-        $this->printruncomment = null;
         $this->edition = null;
+        $this->editionnumerical = null;
         $this->numpages = null;
         $this->numpagesnormed = null;
         $this->bibliographiccitation = null;
@@ -2652,8 +2652,8 @@ abstract class BaseSeries extends Publication implements Persistent
     {
         $parent = $this->getParentOrCreate($con);
         $parent->setPrintrun($this->getPrintrun());
-        $parent->setPrintruncomment($this->getPrintruncomment());
         $parent->setEdition($this->getEdition());
+        $parent->setEditionnumerical($this->getEditionnumerical());
         $parent->setNumpages($this->getNumpages());
         $parent->setNumpagesnormed($this->getNumpagesnormed());
         $parent->setBibliographiccitation($this->getBibliographiccitation());

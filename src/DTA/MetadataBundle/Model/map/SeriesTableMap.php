@@ -45,8 +45,8 @@ class SeriesTableMap extends TableMap
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('volume', 'Volume', 'LONGVARCHAR', false, null, null);
         $this->addColumn('printRun', 'Printrun', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('printRunComment', 'Printruncomment', 'LONGVARCHAR', false, null, null);
         $this->addColumn('edition', 'Edition', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('editionNumerical', 'Editionnumerical', 'LONGVARCHAR', false, null, null);
         $this->addColumn('numPages', 'Numpages', 'INTEGER', false, null, null);
         $this->addColumn('numPagesNormed', 'Numpagesnormed', 'INTEGER', false, null, null);
         $this->addColumn('bibliographicCitation', 'Bibliographiccitation', 'LONGVARCHAR', false, null, null);

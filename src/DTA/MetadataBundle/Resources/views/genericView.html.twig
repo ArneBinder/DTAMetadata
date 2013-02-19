@@ -4,24 +4,45 @@
 
 {% block core %}
 
-<h3>{{ className|trans }}</h3>
+<div class="span8 dta-data-listing">
 
-<table class="table">
-    <thead>
-    {% for col in columns %} 
-        {# doesn't work {{ col|trans({},'tableHeaders')}} since the tableHeaders file is never added to the translation catalogue #}
-        <th> {{ col|trans }} </th>
-    {% endfor %}
-    </thead>
-    <tbody>
-    {% for datum in data %}
-        <tr>
-        {% for col in columns %}
-            <td>{{ attribute(datum,col) }}</td>
+    <h3>{{ className|trans }}</h3>
+
+    <table class="table">
+        <thead>
+        {% for col in columns %}    
+            {# doesn't work {{ col|trans({},'tableHeaders')}} since the tableHeaders file is never added to the translation catalogue #}
+            <th> {{ col|trans }} </th>
         {% endfor %}
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
-{#{dump(peer.getTableMap().getRelations())}#}
+        </thead>
+        <tbody>
+        {% for datum in data %}
+            <tr>
+            {% for col in columns %}
+                <td>{{ attribute(datum,col) }}</td>
+            {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {#{dump(peer.getTableMap().getRelations())}#}
+    
+</div><!--/span-->
+                
+<div class="span4 dta-data-filter-box">
+
+    <h3>Suchoptionen</h3>
+    
+    <div class="sidebar-nav well">
+        <ul class="nav nav-list">
+            {#<li class="nav-header">Werk</li>#}
+            {% for col in columns %}
+                {% if col != '#' and col|capitalize != 'Id'|capitalize %}
+                <li><i class="icon-chevron-right" onmouseover="$(this).toggleClass('icon-chevron-right').toggleClass('icon-chevron-down')"></i>{{ col|trans }}</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div><!--/.well -->
+</div><!--/span-->
+
 {% endblock core %}

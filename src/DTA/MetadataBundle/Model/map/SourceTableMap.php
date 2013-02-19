@@ -48,7 +48,7 @@ class SourceTableMap extends TableMap
         $this->addColumn('name', 'Name', 'LONGVARCHAR', false, null, null);
         $this->addColumn('comments', 'Comments', 'LONGVARCHAR', false, null, null);
         $this->addColumn('available', 'Available', 'BOOLEAN', false, 1, null);
-        $this->addColumn('signatur', 'Signatur', 'VARCHAR', false, 512, null);
+        $this->addColumn('signature', 'Signature', 'VARCHAR', false, 1024, null);
         $this->addColumn('library', 'Library', 'LONGVARCHAR', false, null, null);
         $this->addColumn('libraryGnd', 'Librarygnd', 'VARCHAR', false, 1024, null);
         // validators

@@ -27,17 +27,19 @@
                     {{ child.caption }} 
                 </a>
                     <ul class="dropdown-menu">
-                        <li><a href="{{ path('home') }}"> 
-                                <i class="icon-list"></i> 
-                                Anzeigen und suchen
-                        </a></li>
-                        {# Using the domainKey to generate the path also works:
+                        <li>
+                            <a href="{{ path('genericView', {'className':child.modelClass}) }}"> 
+                                <i class="icon-list"></i> Anzeigen und suchen
+                            </a>
+                        </li>
+                        {# Using the domainKey to dynamically generate the path also works:
                             path(domainKey~'NewRecord', {'className':child.modelClass})
                          #}
-                        <li><a href="{{ path('DataDomainNewRecord', {'className':child.modelClass}) }}"> {#, 'recordId':0, 'domainKey': domainKey#}
-                                <i class="icon-plus"></i> 
-                                Neu anlegen
-                        </a></li>
+                        <li>
+                            <a href="{{ path('DataDomainNewRecord', {'className':child.modelClass}) }}"> {#, 'recordId':0, 'domainKey': domainKey#}
+                                <i class="icon-plus"></i> Neu anlegen
+                            </a>
+                        </li>
                     </ul>
                 </li>
             {% else %}
@@ -55,13 +57,16 @@
                     <b class="caret"></b> 
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a href="{{ path('home') }}">
-                            <i class="icon-list"></i> 
-                            Anzeigen und suchen</a></li>
-                    <li><a href="{{ path('DataDomainNewRecord', {'className':item.modelClass}) }}"> {#, 'recordId':0, 'domainKey': domainKey#}
-                            <i class="icon-plus"></i> 
-                            Neu anlegen
-                    </a></li>
+                    <li>
+                        <a href="{{ path('genericView', {'className':item.modelClass}) }}"> 
+                            <i class="icon-list"></i> Anzeigen und suchen
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ path('DataDomainNewRecord', {'className':item.modelClass}) }}"> {#, 'recordId':0, 'domainKey': domainKey#}
+                            <i class="icon-plus"></i> Neu anlegen
+                        </a>
+                    </li>
                  </ul>
             </li>
         {# The menu element is a simple link #}

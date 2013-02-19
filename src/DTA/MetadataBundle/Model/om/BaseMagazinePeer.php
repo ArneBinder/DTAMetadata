@@ -53,11 +53,11 @@ abstract class BaseMagazinePeer extends PublicationPeer
     /** the column name for the printRun field */
     const PRINTRUN = 'magazine.printRun';
 
-    /** the column name for the printRunComment field */
-    const PRINTRUNCOMMENT = 'magazine.printRunComment';
-
     /** the column name for the edition field */
     const EDITION = 'magazine.edition';
+
+    /** the column name for the editionNumerical field */
+    const EDITIONNUMERICAL = 'magazine.editionNumerical';
 
     /** the column name for the numPages field */
     const NUMPAGES = 'magazine.numPages';
@@ -117,11 +117,11 @@ abstract class BaseMagazinePeer extends PublicationPeer
      * e.g. MagazinePeer::$fieldNames[MagazinePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Printrun', 'Printruncomment', 'Edition', 'Numpages', 'Numpagesnormed', 'Bibliographiccitation', 'TitleId', 'PublishingcompanyId', 'PlaceId', 'PublicationdateId', 'OrigindateId', 'RelatedsetId', 'WorkId', 'PublisherId', 'PrinterId', 'TranslatorId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'printrun', 'printruncomment', 'edition', 'numpages', 'numpagesnormed', 'bibliographiccitation', 'titleId', 'publishingcompanyId', 'placeId', 'publicationdateId', 'origindateId', 'relatedsetId', 'workId', 'publisherId', 'printerId', 'translatorId', ),
-        BasePeer::TYPE_COLNAME => array (MagazinePeer::ID, MagazinePeer::PRINTRUN, MagazinePeer::PRINTRUNCOMMENT, MagazinePeer::EDITION, MagazinePeer::NUMPAGES, MagazinePeer::NUMPAGESNORMED, MagazinePeer::BIBLIOGRAPHICCITATION, MagazinePeer::TITLE_ID, MagazinePeer::PUBLISHINGCOMPANY_ID, MagazinePeer::PLACE_ID, MagazinePeer::PUBLICATIONDATE_ID, MagazinePeer::ORIGINDATE_ID, MagazinePeer::RELATEDSET_ID, MagazinePeer::WORK_ID, MagazinePeer::PUBLISHER_ID, MagazinePeer::PRINTER_ID, MagazinePeer::TRANSLATOR_ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PRINTRUN', 'PRINTRUNCOMMENT', 'EDITION', 'NUMPAGES', 'NUMPAGESNORMED', 'BIBLIOGRAPHICCITATION', 'TITLE_ID', 'PUBLISHINGCOMPANY_ID', 'PLACE_ID', 'PUBLICATIONDATE_ID', 'ORIGINDATE_ID', 'RELATEDSET_ID', 'WORK_ID', 'PUBLISHER_ID', 'PRINTER_ID', 'TRANSLATOR_ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'printRun', 'printRunComment', 'edition', 'numPages', 'numPagesNormed', 'bibliographicCitation', 'title_id', 'publishingCompany_id', 'place_id', 'publicationDate_id', 'originDate_id', 'relatedSet_id', 'work_id', 'publisher_id', 'printer_id', 'translator_id', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Printrun', 'Edition', 'Editionnumerical', 'Numpages', 'Numpagesnormed', 'Bibliographiccitation', 'TitleId', 'PublishingcompanyId', 'PlaceId', 'PublicationdateId', 'OrigindateId', 'RelatedsetId', 'WorkId', 'PublisherId', 'PrinterId', 'TranslatorId', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'printrun', 'edition', 'editionnumerical', 'numpages', 'numpagesnormed', 'bibliographiccitation', 'titleId', 'publishingcompanyId', 'placeId', 'publicationdateId', 'origindateId', 'relatedsetId', 'workId', 'publisherId', 'printerId', 'translatorId', ),
+        BasePeer::TYPE_COLNAME => array (MagazinePeer::ID, MagazinePeer::PRINTRUN, MagazinePeer::EDITION, MagazinePeer::EDITIONNUMERICAL, MagazinePeer::NUMPAGES, MagazinePeer::NUMPAGESNORMED, MagazinePeer::BIBLIOGRAPHICCITATION, MagazinePeer::TITLE_ID, MagazinePeer::PUBLISHINGCOMPANY_ID, MagazinePeer::PLACE_ID, MagazinePeer::PUBLICATIONDATE_ID, MagazinePeer::ORIGINDATE_ID, MagazinePeer::RELATEDSET_ID, MagazinePeer::WORK_ID, MagazinePeer::PUBLISHER_ID, MagazinePeer::PRINTER_ID, MagazinePeer::TRANSLATOR_ID, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PRINTRUN', 'EDITION', 'EDITIONNUMERICAL', 'NUMPAGES', 'NUMPAGESNORMED', 'BIBLIOGRAPHICCITATION', 'TITLE_ID', 'PUBLISHINGCOMPANY_ID', 'PLACE_ID', 'PUBLICATIONDATE_ID', 'ORIGINDATE_ID', 'RELATEDSET_ID', 'WORK_ID', 'PUBLISHER_ID', 'PRINTER_ID', 'TRANSLATOR_ID', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'printRun', 'edition', 'editionNumerical', 'numPages', 'numPagesNormed', 'bibliographicCitation', 'title_id', 'publishingCompany_id', 'place_id', 'publicationDate_id', 'originDate_id', 'relatedSet_id', 'work_id', 'publisher_id', 'printer_id', 'translator_id', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, )
     );
 
@@ -132,11 +132,11 @@ abstract class BaseMagazinePeer extends PublicationPeer
      * e.g. MagazinePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Printrun' => 1, 'Printruncomment' => 2, 'Edition' => 3, 'Numpages' => 4, 'Numpagesnormed' => 5, 'Bibliographiccitation' => 6, 'TitleId' => 7, 'PublishingcompanyId' => 8, 'PlaceId' => 9, 'PublicationdateId' => 10, 'OrigindateId' => 11, 'RelatedsetId' => 12, 'WorkId' => 13, 'PublisherId' => 14, 'PrinterId' => 15, 'TranslatorId' => 16, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'printrun' => 1, 'printruncomment' => 2, 'edition' => 3, 'numpages' => 4, 'numpagesnormed' => 5, 'bibliographiccitation' => 6, 'titleId' => 7, 'publishingcompanyId' => 8, 'placeId' => 9, 'publicationdateId' => 10, 'origindateId' => 11, 'relatedsetId' => 12, 'workId' => 13, 'publisherId' => 14, 'printerId' => 15, 'translatorId' => 16, ),
-        BasePeer::TYPE_COLNAME => array (MagazinePeer::ID => 0, MagazinePeer::PRINTRUN => 1, MagazinePeer::PRINTRUNCOMMENT => 2, MagazinePeer::EDITION => 3, MagazinePeer::NUMPAGES => 4, MagazinePeer::NUMPAGESNORMED => 5, MagazinePeer::BIBLIOGRAPHICCITATION => 6, MagazinePeer::TITLE_ID => 7, MagazinePeer::PUBLISHINGCOMPANY_ID => 8, MagazinePeer::PLACE_ID => 9, MagazinePeer::PUBLICATIONDATE_ID => 10, MagazinePeer::ORIGINDATE_ID => 11, MagazinePeer::RELATEDSET_ID => 12, MagazinePeer::WORK_ID => 13, MagazinePeer::PUBLISHER_ID => 14, MagazinePeer::PRINTER_ID => 15, MagazinePeer::TRANSLATOR_ID => 16, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PRINTRUN' => 1, 'PRINTRUNCOMMENT' => 2, 'EDITION' => 3, 'NUMPAGES' => 4, 'NUMPAGESNORMED' => 5, 'BIBLIOGRAPHICCITATION' => 6, 'TITLE_ID' => 7, 'PUBLISHINGCOMPANY_ID' => 8, 'PLACE_ID' => 9, 'PUBLICATIONDATE_ID' => 10, 'ORIGINDATE_ID' => 11, 'RELATEDSET_ID' => 12, 'WORK_ID' => 13, 'PUBLISHER_ID' => 14, 'PRINTER_ID' => 15, 'TRANSLATOR_ID' => 16, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'printRun' => 1, 'printRunComment' => 2, 'edition' => 3, 'numPages' => 4, 'numPagesNormed' => 5, 'bibliographicCitation' => 6, 'title_id' => 7, 'publishingCompany_id' => 8, 'place_id' => 9, 'publicationDate_id' => 10, 'originDate_id' => 11, 'relatedSet_id' => 12, 'work_id' => 13, 'publisher_id' => 14, 'printer_id' => 15, 'translator_id' => 16, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Printrun' => 1, 'Edition' => 2, 'Editionnumerical' => 3, 'Numpages' => 4, 'Numpagesnormed' => 5, 'Bibliographiccitation' => 6, 'TitleId' => 7, 'PublishingcompanyId' => 8, 'PlaceId' => 9, 'PublicationdateId' => 10, 'OrigindateId' => 11, 'RelatedsetId' => 12, 'WorkId' => 13, 'PublisherId' => 14, 'PrinterId' => 15, 'TranslatorId' => 16, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'printrun' => 1, 'edition' => 2, 'editionnumerical' => 3, 'numpages' => 4, 'numpagesnormed' => 5, 'bibliographiccitation' => 6, 'titleId' => 7, 'publishingcompanyId' => 8, 'placeId' => 9, 'publicationdateId' => 10, 'origindateId' => 11, 'relatedsetId' => 12, 'workId' => 13, 'publisherId' => 14, 'printerId' => 15, 'translatorId' => 16, ),
+        BasePeer::TYPE_COLNAME => array (MagazinePeer::ID => 0, MagazinePeer::PRINTRUN => 1, MagazinePeer::EDITION => 2, MagazinePeer::EDITIONNUMERICAL => 3, MagazinePeer::NUMPAGES => 4, MagazinePeer::NUMPAGESNORMED => 5, MagazinePeer::BIBLIOGRAPHICCITATION => 6, MagazinePeer::TITLE_ID => 7, MagazinePeer::PUBLISHINGCOMPANY_ID => 8, MagazinePeer::PLACE_ID => 9, MagazinePeer::PUBLICATIONDATE_ID => 10, MagazinePeer::ORIGINDATE_ID => 11, MagazinePeer::RELATEDSET_ID => 12, MagazinePeer::WORK_ID => 13, MagazinePeer::PUBLISHER_ID => 14, MagazinePeer::PRINTER_ID => 15, MagazinePeer::TRANSLATOR_ID => 16, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PRINTRUN' => 1, 'EDITION' => 2, 'EDITIONNUMERICAL' => 3, 'NUMPAGES' => 4, 'NUMPAGESNORMED' => 5, 'BIBLIOGRAPHICCITATION' => 6, 'TITLE_ID' => 7, 'PUBLISHINGCOMPANY_ID' => 8, 'PLACE_ID' => 9, 'PUBLICATIONDATE_ID' => 10, 'ORIGINDATE_ID' => 11, 'RELATEDSET_ID' => 12, 'WORK_ID' => 13, 'PUBLISHER_ID' => 14, 'PRINTER_ID' => 15, 'TRANSLATOR_ID' => 16, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'printRun' => 1, 'edition' => 2, 'editionNumerical' => 3, 'numPages' => 4, 'numPagesNormed' => 5, 'bibliographicCitation' => 6, 'title_id' => 7, 'publishingCompany_id' => 8, 'place_id' => 9, 'publicationDate_id' => 10, 'originDate_id' => 11, 'relatedSet_id' => 12, 'work_id' => 13, 'publisher_id' => 14, 'printer_id' => 15, 'translator_id' => 16, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, )
     );
 
@@ -213,8 +213,8 @@ abstract class BaseMagazinePeer extends PublicationPeer
         if (null === $alias) {
             $criteria->addSelectColumn(MagazinePeer::ID);
             $criteria->addSelectColumn(MagazinePeer::PRINTRUN);
-            $criteria->addSelectColumn(MagazinePeer::PRINTRUNCOMMENT);
             $criteria->addSelectColumn(MagazinePeer::EDITION);
+            $criteria->addSelectColumn(MagazinePeer::EDITIONNUMERICAL);
             $criteria->addSelectColumn(MagazinePeer::NUMPAGES);
             $criteria->addSelectColumn(MagazinePeer::NUMPAGESNORMED);
             $criteria->addSelectColumn(MagazinePeer::BIBLIOGRAPHICCITATION);
@@ -231,8 +231,8 @@ abstract class BaseMagazinePeer extends PublicationPeer
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.printRun');
-            $criteria->addSelectColumn($alias . '.printRunComment');
             $criteria->addSelectColumn($alias . '.edition');
+            $criteria->addSelectColumn($alias . '.editionNumerical');
             $criteria->addSelectColumn($alias . '.numPages');
             $criteria->addSelectColumn($alias . '.numPagesNormed');
             $criteria->addSelectColumn($alias . '.bibliographicCitation');

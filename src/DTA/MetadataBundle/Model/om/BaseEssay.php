@@ -67,16 +67,16 @@ abstract class BaseEssay extends Publication implements Persistent
     protected $printrun;
 
     /**
-     * The value for the printruncomment field.
-     * @var        string
-     */
-    protected $printruncomment;
-
-    /**
      * The value for the edition field.
      * @var        string
      */
     protected $edition;
+
+    /**
+     * The value for the editionnumerical field.
+     * @var        string
+     */
+    protected $editionnumerical;
 
     /**
      * The value for the numpages field.
@@ -238,22 +238,12 @@ abstract class BaseEssay extends Publication implements Persistent
 
     /**
      * Get the [printrun] column value.
-     * Auflage
+     * Bezeichnung der Auflage
      * @return string
      */
     public function getPrintrun()
     {
         return $this->printrun;
-    }
-
-    /**
-     * Get the [printruncomment] column value.
-     *
-     * @return string
-     */
-    public function getPrintruncomment()
-    {
-        return $this->printruncomment;
     }
 
     /**
@@ -264,6 +254,16 @@ abstract class BaseEssay extends Publication implements Persistent
     public function getEdition()
     {
         return $this->edition;
+    }
+
+    /**
+     * Get the [editionnumerical] column value.
+     *
+     * @return string
+     */
+    public function getEditionnumerical()
+    {
+        return $this->editionnumerical;
     }
 
     /**
@@ -419,7 +419,7 @@ abstract class BaseEssay extends Publication implements Persistent
 
     /**
      * Set the value of [printrun] column.
-     * Auflage
+     * Bezeichnung der Auflage
      * @param string $v new value
      * @return Essay The current object (for fluent API support)
      */
@@ -437,27 +437,6 @@ abstract class BaseEssay extends Publication implements Persistent
 
         return $this;
     } // setPrintrun()
-
-    /**
-     * Set the value of [printruncomment] column.
-     *
-     * @param string $v new value
-     * @return Essay The current object (for fluent API support)
-     */
-    public function setPrintruncomment($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
-        }
-
-        if ($this->printruncomment !== $v) {
-            $this->printruncomment = $v;
-            $this->modifiedColumns[] = EssayPeer::PRINTRUNCOMMENT;
-        }
-
-
-        return $this;
-    } // setPrintruncomment()
 
     /**
      * Set the value of [edition] column.
@@ -479,6 +458,27 @@ abstract class BaseEssay extends Publication implements Persistent
 
         return $this;
     } // setEdition()
+
+    /**
+     * Set the value of [editionnumerical] column.
+     *
+     * @param string $v new value
+     * @return Essay The current object (for fluent API support)
+     */
+    public function setEditionnumerical($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->editionnumerical !== $v) {
+            $this->editionnumerical = $v;
+            $this->modifiedColumns[] = EssayPeer::EDITIONNUMERICAL;
+        }
+
+
+        return $this;
+    } // setEditionnumerical()
 
     /**
      * Set the value of [numpages] column.
@@ -827,8 +827,8 @@ abstract class BaseEssay extends Publication implements Persistent
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->printrun = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
-            $this->printruncomment = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-            $this->edition = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+            $this->edition = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+            $this->editionnumerical = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
             $this->numpages = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
             $this->numpagesnormed = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
             $this->bibliographiccitation = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
@@ -1191,11 +1191,11 @@ abstract class BaseEssay extends Publication implements Persistent
         if ($this->isColumnModified(EssayPeer::PRINTRUN)) {
             $modifiedColumns[':p' . $index++]  = '`printRun`';
         }
-        if ($this->isColumnModified(EssayPeer::PRINTRUNCOMMENT)) {
-            $modifiedColumns[':p' . $index++]  = '`printRunComment`';
-        }
         if ($this->isColumnModified(EssayPeer::EDITION)) {
             $modifiedColumns[':p' . $index++]  = '`edition`';
+        }
+        if ($this->isColumnModified(EssayPeer::EDITIONNUMERICAL)) {
+            $modifiedColumns[':p' . $index++]  = '`editionNumerical`';
         }
         if ($this->isColumnModified(EssayPeer::NUMPAGES)) {
             $modifiedColumns[':p' . $index++]  = '`numPages`';
@@ -1253,11 +1253,11 @@ abstract class BaseEssay extends Publication implements Persistent
                     case '`printRun`':
                         $stmt->bindValue($identifier, $this->printrun, PDO::PARAM_STR);
                         break;
-                    case '`printRunComment`':
-                        $stmt->bindValue($identifier, $this->printruncomment, PDO::PARAM_STR);
-                        break;
                     case '`edition`':
                         $stmt->bindValue($identifier, $this->edition, PDO::PARAM_STR);
+                        break;
+                    case '`editionNumerical`':
+                        $stmt->bindValue($identifier, $this->editionnumerical, PDO::PARAM_STR);
                         break;
                     case '`numPages`':
                         $stmt->bindValue($identifier, $this->numpages, PDO::PARAM_INT);
@@ -1505,10 +1505,10 @@ abstract class BaseEssay extends Publication implements Persistent
                 return $this->getPrintrun();
                 break;
             case 2:
-                return $this->getPrintruncomment();
+                return $this->getEdition();
                 break;
             case 3:
-                return $this->getEdition();
+                return $this->getEditionnumerical();
                 break;
             case 4:
                 return $this->getNumpages();
@@ -1580,8 +1580,8 @@ abstract class BaseEssay extends Publication implements Persistent
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getPrintrun(),
-            $keys[2] => $this->getPrintruncomment(),
-            $keys[3] => $this->getEdition(),
+            $keys[2] => $this->getEdition(),
+            $keys[3] => $this->getEditionnumerical(),
             $keys[4] => $this->getNumpages(),
             $keys[5] => $this->getNumpagesnormed(),
             $keys[6] => $this->getBibliographiccitation(),
@@ -1668,10 +1668,10 @@ abstract class BaseEssay extends Publication implements Persistent
                 $this->setPrintrun($value);
                 break;
             case 2:
-                $this->setPrintruncomment($value);
+                $this->setEdition($value);
                 break;
             case 3:
-                $this->setEdition($value);
+                $this->setEditionnumerical($value);
                 break;
             case 4:
                 $this->setNumpages($value);
@@ -1738,8 +1738,8 @@ abstract class BaseEssay extends Publication implements Persistent
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setPrintrun($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setPrintruncomment($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setEdition($arr[$keys[3]]);
+        if (array_key_exists($keys[2], $arr)) $this->setEdition($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setEditionnumerical($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setNumpages($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setNumpagesnormed($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setBibliographiccitation($arr[$keys[6]]);
@@ -1766,8 +1766,8 @@ abstract class BaseEssay extends Publication implements Persistent
 
         if ($this->isColumnModified(EssayPeer::ID)) $criteria->add(EssayPeer::ID, $this->id);
         if ($this->isColumnModified(EssayPeer::PRINTRUN)) $criteria->add(EssayPeer::PRINTRUN, $this->printrun);
-        if ($this->isColumnModified(EssayPeer::PRINTRUNCOMMENT)) $criteria->add(EssayPeer::PRINTRUNCOMMENT, $this->printruncomment);
         if ($this->isColumnModified(EssayPeer::EDITION)) $criteria->add(EssayPeer::EDITION, $this->edition);
+        if ($this->isColumnModified(EssayPeer::EDITIONNUMERICAL)) $criteria->add(EssayPeer::EDITIONNUMERICAL, $this->editionnumerical);
         if ($this->isColumnModified(EssayPeer::NUMPAGES)) $criteria->add(EssayPeer::NUMPAGES, $this->numpages);
         if ($this->isColumnModified(EssayPeer::NUMPAGESNORMED)) $criteria->add(EssayPeer::NUMPAGESNORMED, $this->numpagesnormed);
         if ($this->isColumnModified(EssayPeer::BIBLIOGRAPHICCITATION)) $criteria->add(EssayPeer::BIBLIOGRAPHICCITATION, $this->bibliographiccitation);
@@ -1845,8 +1845,8 @@ abstract class BaseEssay extends Publication implements Persistent
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setPrintrun($this->getPrintrun());
-        $copyObj->setPrintruncomment($this->getPrintruncomment());
         $copyObj->setEdition($this->getEdition());
+        $copyObj->setEditionnumerical($this->getEditionnumerical());
         $copyObj->setNumpages($this->getNumpages());
         $copyObj->setNumpagesnormed($this->getNumpagesnormed());
         $copyObj->setBibliographiccitation($this->getBibliographiccitation());
@@ -2451,8 +2451,8 @@ abstract class BaseEssay extends Publication implements Persistent
     {
         $this->id = null;
         $this->printrun = null;
-        $this->printruncomment = null;
         $this->edition = null;
+        $this->editionnumerical = null;
         $this->numpages = null;
         $this->numpagesnormed = null;
         $this->bibliographiccitation = null;
@@ -2597,8 +2597,8 @@ abstract class BaseEssay extends Publication implements Persistent
     {
         $parent = $this->getParentOrCreate($con);
         $parent->setPrintrun($this->getPrintrun());
-        $parent->setPrintruncomment($this->getPrintruncomment());
         $parent->setEdition($this->getEdition());
+        $parent->setEditionnumerical($this->getEditionnumerical());
         $parent->setNumpages($this->getNumpages());
         $parent->setNumpagesnormed($this->getNumpagesnormed());
         $parent->setBibliographiccitation($this->getBibliographiccitation());

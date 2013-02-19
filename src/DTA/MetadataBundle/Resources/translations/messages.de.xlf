@@ -18,9 +18,13 @@
                 <source>Username</source>
                 <target>Benutzername</target>
             </trans-unit>
-            <trans-unit id="5">
+            <trans-unit id="5"> 
                 <source>Monograph</source>
                 <target>Einteilige Monographie</target>
+            </trans-unit> 
+             <trans-unit id="6">
+                <source>selectOrAdd.addBtn.suffix</source>
+                <target>hinzufügen...</target>
             </trans-unit>
         </body>
     </file>

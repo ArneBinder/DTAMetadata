@@ -42,7 +42,7 @@ class DTABaseController extends Controller {
     /**
      * 
      * @param type $className
-     * @Route("/genericView/{className}")
+     * @Route("/genericView/{className}", name="genericView")
      */
     public function genericViewAction($className){
         

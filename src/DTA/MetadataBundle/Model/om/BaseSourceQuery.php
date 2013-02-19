@@ -24,7 +24,7 @@ use DTA\MetadataBundle\Model\SourceQuery;
  * @method SourceQuery orderByName($order = Criteria::ASC) Order by the name column
  * @method SourceQuery orderByComments($order = Criteria::ASC) Order by the comments column
  * @method SourceQuery orderByAvailable($order = Criteria::ASC) Order by the available column
- * @method SourceQuery orderBySignatur($order = Criteria::ASC) Order by the signatur column
+ * @method SourceQuery orderBySignature($order = Criteria::ASC) Order by the signature column
  * @method SourceQuery orderByLibrary($order = Criteria::ASC) Order by the library column
  * @method SourceQuery orderByLibrarygnd($order = Criteria::ASC) Order by the libraryGnd column
  *
@@ -34,7 +34,7 @@ use DTA\MetadataBundle\Model\SourceQuery;
  * @method SourceQuery groupByName() Group by the name column
  * @method SourceQuery groupByComments() Group by the comments column
  * @method SourceQuery groupByAvailable() Group by the available column
- * @method SourceQuery groupBySignatur() Group by the signatur column
+ * @method SourceQuery groupBySignature() Group by the signature column
  * @method SourceQuery groupByLibrary() Group by the library column
  * @method SourceQuery groupByLibrarygnd() Group by the libraryGnd column
  *
@@ -54,7 +54,7 @@ use DTA\MetadataBundle\Model\SourceQuery;
  * @method Source findOneByName(string $name) Return the first Source filtered by the name column
  * @method Source findOneByComments(string $comments) Return the first Source filtered by the comments column
  * @method Source findOneByAvailable(boolean $available) Return the first Source filtered by the available column
- * @method Source findOneBySignatur(string $signatur) Return the first Source filtered by the signatur column
+ * @method Source findOneBySignature(string $signature) Return the first Source filtered by the signature column
  * @method Source findOneByLibrary(string $library) Return the first Source filtered by the library column
  * @method Source findOneByLibrarygnd(string $libraryGnd) Return the first Source filtered by the libraryGnd column
  *
@@ -64,7 +64,7 @@ use DTA\MetadataBundle\Model\SourceQuery;
  * @method array findByName(string $name) Return Source objects filtered by the name column
  * @method array findByComments(string $comments) Return Source objects filtered by the comments column
  * @method array findByAvailable(boolean $available) Return Source objects filtered by the available column
- * @method array findBySignatur(string $signatur) Return Source objects filtered by the signatur column
+ * @method array findBySignature(string $signature) Return Source objects filtered by the signature column
  * @method array findByLibrary(string $library) Return Source objects filtered by the library column
  * @method array findByLibrarygnd(string $libraryGnd) Return Source objects filtered by the libraryGnd column
  */
@@ -168,7 +168,7 @@ abstract class BaseSourceQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `publication_id`, `quality`, `name`, `comments`, `available`, `signatur`, `library`, `libraryGnd` FROM `source` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `publication_id`, `quality`, `name`, `comments`, `available`, `signature`, `library`, `libraryGnd` FROM `source` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -458,32 +458,32 @@ abstract class BaseSourceQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the signatur column
+     * Filter the query on the signature column
      *
      * Example usage:
      * <code>
-     * $query->filterBySignatur('fooValue');   // WHERE signatur = 'fooValue'
-     * $query->filterBySignatur('%fooValue%'); // WHERE signatur LIKE '%fooValue%'
+     * $query->filterBySignature('fooValue');   // WHERE signature = 'fooValue'
+     * $query->filterBySignature('%fooValue%'); // WHERE signature LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $signatur The value to use as filter.
+     * @param     string $signature The value to use as filter.
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return SourceQuery The current query, for fluid interface
      */
-    public function filterBySignatur($signatur = null, $comparison = null)
+    public function filterBySignature($signature = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (is_array($signatur)) {
+            if (is_array($signature)) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $signatur)) {
-                $signatur = str_replace('*', '%', $signatur);
+            } elseif (preg_match('/[\%\*]/', $signature)) {
+                $signature = str_replace('*', '%', $signature);
                 $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(SourcePeer::SIGNATUR, $signatur, $comparison);
+        return $this->addUsingAlias(SourcePeer::SIGNATURE, $signature, $comparison);
     }
 
     /**

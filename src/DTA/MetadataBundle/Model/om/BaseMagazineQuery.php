@@ -28,8 +28,8 @@ use DTA\MetadataBundle\Model\Work;
 /**
  * @method MagazineQuery orderById($order = Criteria::ASC) Order by the id column
  * @method MagazineQuery orderByPrintrun($order = Criteria::ASC) Order by the printRun column
- * @method MagazineQuery orderByPrintruncomment($order = Criteria::ASC) Order by the printRunComment column
  * @method MagazineQuery orderByEdition($order = Criteria::ASC) Order by the edition column
+ * @method MagazineQuery orderByEditionnumerical($order = Criteria::ASC) Order by the editionNumerical column
  * @method MagazineQuery orderByNumpages($order = Criteria::ASC) Order by the numPages column
  * @method MagazineQuery orderByNumpagesnormed($order = Criteria::ASC) Order by the numPagesNormed column
  * @method MagazineQuery orderByBibliographiccitation($order = Criteria::ASC) Order by the bibliographicCitation column
@@ -46,8 +46,8 @@ use DTA\MetadataBundle\Model\Work;
  *
  * @method MagazineQuery groupById() Group by the id column
  * @method MagazineQuery groupByPrintrun() Group by the printRun column
- * @method MagazineQuery groupByPrintruncomment() Group by the printRunComment column
  * @method MagazineQuery groupByEdition() Group by the edition column
+ * @method MagazineQuery groupByEditionnumerical() Group by the editionNumerical column
  * @method MagazineQuery groupByNumpages() Group by the numPages column
  * @method MagazineQuery groupByNumpagesnormed() Group by the numPagesNormed column
  * @method MagazineQuery groupByBibliographiccitation() Group by the bibliographicCitation column
@@ -110,8 +110,8 @@ use DTA\MetadataBundle\Model\Work;
  * @method Magazine findOneOrCreate(PropelPDO $con = null) Return the first Magazine matching the query, or a new Magazine object populated from the query conditions when no match is found
  *
  * @method Magazine findOneByPrintrun(string $printRun) Return the first Magazine filtered by the printRun column
- * @method Magazine findOneByPrintruncomment(string $printRunComment) Return the first Magazine filtered by the printRunComment column
  * @method Magazine findOneByEdition(string $edition) Return the first Magazine filtered by the edition column
+ * @method Magazine findOneByEditionnumerical(string $editionNumerical) Return the first Magazine filtered by the editionNumerical column
  * @method Magazine findOneByNumpages(int $numPages) Return the first Magazine filtered by the numPages column
  * @method Magazine findOneByNumpagesnormed(int $numPagesNormed) Return the first Magazine filtered by the numPagesNormed column
  * @method Magazine findOneByBibliographiccitation(string $bibliographicCitation) Return the first Magazine filtered by the bibliographicCitation column
@@ -128,8 +128,8 @@ use DTA\MetadataBundle\Model\Work;
  *
  * @method array findById(int $id) Return Magazine objects filtered by the id column
  * @method array findByPrintrun(string $printRun) Return Magazine objects filtered by the printRun column
- * @method array findByPrintruncomment(string $printRunComment) Return Magazine objects filtered by the printRunComment column
  * @method array findByEdition(string $edition) Return Magazine objects filtered by the edition column
+ * @method array findByEditionnumerical(string $editionNumerical) Return Magazine objects filtered by the editionNumerical column
  * @method array findByNumpages(int $numPages) Return Magazine objects filtered by the numPages column
  * @method array findByNumpagesnormed(int $numPagesNormed) Return Magazine objects filtered by the numPagesNormed column
  * @method array findByBibliographiccitation(string $bibliographicCitation) Return Magazine objects filtered by the bibliographicCitation column
@@ -244,7 +244,7 @@ abstract class BaseMagazineQuery extends PublicationQuery
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `printRun`, `printRunComment`, `edition`, `numPages`, `numPagesNormed`, `bibliographicCitation`, `title_id`, `publishingCompany_id`, `place_id`, `publicationDate_id`, `originDate_id`, `relatedSet_id`, `work_id`, `publisher_id`, `printer_id`, `translator_id` FROM `magazine` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `printRun`, `edition`, `editionNumerical`, `numPages`, `numPagesNormed`, `bibliographicCitation`, `title_id`, `publishingCompany_id`, `place_id`, `publicationDate_id`, `originDate_id`, `relatedSet_id`, `work_id`, `publisher_id`, `printer_id`, `translator_id` FROM `magazine` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -405,35 +405,6 @@ abstract class BaseMagazineQuery extends PublicationQuery
     }
 
     /**
-     * Filter the query on the printRunComment column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByPrintruncomment('fooValue');   // WHERE printRunComment = 'fooValue'
-     * $query->filterByPrintruncomment('%fooValue%'); // WHERE printRunComment LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $printruncomment The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return MagazineQuery The current query, for fluid interface
-     */
-    public function filterByPrintruncomment($printruncomment = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($printruncomment)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $printruncomment)) {
-                $printruncomment = str_replace('*', '%', $printruncomment);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(MagazinePeer::PRINTRUNCOMMENT, $printruncomment, $comparison);
-    }
-
-    /**
      * Filter the query on the edition column
      *
      * Example usage:
@@ -460,6 +431,35 @@ abstract class BaseMagazineQuery extends PublicationQuery
         }
 
         return $this->addUsingAlias(MagazinePeer::EDITION, $edition, $comparison);
+    }
+
+    /**
+     * Filter the query on the editionNumerical column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByEditionnumerical('fooValue');   // WHERE editionNumerical = 'fooValue'
+     * $query->filterByEditionnumerical('%fooValue%'); // WHERE editionNumerical LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $editionnumerical The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return MagazineQuery The current query, for fluid interface
+     */
+    public function filterByEditionnumerical($editionnumerical = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($editionnumerical)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $editionnumerical)) {
+                $editionnumerical = str_replace('*', '%', $editionnumerical);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(MagazinePeer::EDITIONNUMERICAL, $editionnumerical, $comparison);
     }
 
     /**
