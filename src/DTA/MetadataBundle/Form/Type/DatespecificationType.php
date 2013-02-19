@@ -19,6 +19,8 @@ class DatespecificationType extends BaseAbstractType
     {
         $builder->add('year');
         $builder->add('comments');
-        $builder->add('yearIsReconstructed', 'checkbox');
+        $builder->add('yearIsReconstructed', 'checkbox', array(
+            'required' => false
+        ));
     }
 }

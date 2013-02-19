@@ -8,15 +8,15 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 class ConceptualDomainController extends DTABaseController {
 
     /** @inheritdoc */
-    public $domainKey = "ConceptualDomain";
+    public static $domainKey = "ConceptualDomain";
     /** @inheritdoc */
-    public $domainMenu = array(
-        array("caption" => "Genres", "path" => 'home',
+    public static $domainMenu = array(
+        array("caption" => "Genres", 'route' => 'home',
             "children" => array(
-                array('caption' => "DTA", 'path' => 'home'),
-                array('caption' => "DWDS", 'path' => 'home'))),
+                array('caption' => "DTA", 'route' => 'home'),
+                array('caption' => "DWDS", 'route' => 'home'))),
         array("caption" => "Korpora", "modelClass" => 'Corpus'),
-        array("caption" => "Verwandte Werke", "path" => 'home'),
+        array("caption" => "Verwandte Werke", 'route' => 'home'),
     );
 
     /**
@@ -26,7 +26,7 @@ class ConceptualDomainController extends DTABaseController {
      */
     public function indexAction() {
 
-        return $this->renderDomainSpecificAction('DTAMetadataBundle:ConceptualDomain:ConceptualDomain.html.twig', array(
+        return $this->renderControllerSpecificAction('DTAMetadataBundle:ConceptualDomain:ConceptualDomain.html.twig', array(
         ));
     }
 

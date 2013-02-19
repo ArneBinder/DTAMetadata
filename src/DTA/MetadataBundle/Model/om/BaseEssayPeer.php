@@ -117,8 +117,8 @@ abstract class BaseEssayPeer extends PublicationPeer
      * e.g. EssayPeer::$fieldNames[EssayPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Printrun', 'Edition', 'Editionnumerical', 'Numpages', 'Numpagesnormed', 'Bibliographiccitation', 'TitleId', 'PublishingcompanyId', 'PlaceId', 'PublicationdateId', 'OrigindateId', 'RelatedsetId', 'WorkId', 'PublisherId', 'PrinterId', 'TranslatorId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'printrun', 'edition', 'editionnumerical', 'numpages', 'numpagesnormed', 'bibliographiccitation', 'titleId', 'publishingcompanyId', 'placeId', 'publicationdateId', 'origindateId', 'relatedsetId', 'workId', 'publisherId', 'printerId', 'translatorId', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Printrun', 'Edition', 'Editionnumerical', 'Numpages', 'Numpagesnormed', 'Bibliographiccitation', 'TitleId', 'PublishingcompanyId', 'PlaceId', 'PublicationDate', 'OriginDate', 'RelatedsetId', 'WorkId', 'PublisherId', 'PrinterId', 'TranslatorId', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'printrun', 'edition', 'editionnumerical', 'numpages', 'numpagesnormed', 'bibliographiccitation', 'titleId', 'publishingcompanyId', 'placeId', 'publicationDate', 'originDate', 'relatedsetId', 'workId', 'publisherId', 'printerId', 'translatorId', ),
         BasePeer::TYPE_COLNAME => array (EssayPeer::ID, EssayPeer::PRINTRUN, EssayPeer::EDITION, EssayPeer::EDITIONNUMERICAL, EssayPeer::NUMPAGES, EssayPeer::NUMPAGESNORMED, EssayPeer::BIBLIOGRAPHICCITATION, EssayPeer::TITLE_ID, EssayPeer::PUBLISHINGCOMPANY_ID, EssayPeer::PLACE_ID, EssayPeer::PUBLICATIONDATE_ID, EssayPeer::ORIGINDATE_ID, EssayPeer::RELATEDSET_ID, EssayPeer::WORK_ID, EssayPeer::PUBLISHER_ID, EssayPeer::PRINTER_ID, EssayPeer::TRANSLATOR_ID, ),
         BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PRINTRUN', 'EDITION', 'EDITIONNUMERICAL', 'NUMPAGES', 'NUMPAGESNORMED', 'BIBLIOGRAPHICCITATION', 'TITLE_ID', 'PUBLISHINGCOMPANY_ID', 'PLACE_ID', 'PUBLICATIONDATE_ID', 'ORIGINDATE_ID', 'RELATEDSET_ID', 'WORK_ID', 'PUBLISHER_ID', 'PRINTER_ID', 'TRANSLATOR_ID', ),
         BasePeer::TYPE_FIELDNAME => array ('id', 'printRun', 'edition', 'editionNumerical', 'numPages', 'numPagesNormed', 'bibliographicCitation', 'title_id', 'publishingCompany_id', 'place_id', 'publicationDate_id', 'originDate_id', 'relatedSet_id', 'work_id', 'publisher_id', 'printer_id', 'translator_id', ),
@@ -132,8 +132,8 @@ abstract class BaseEssayPeer extends PublicationPeer
      * e.g. EssayPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Printrun' => 1, 'Edition' => 2, 'Editionnumerical' => 3, 'Numpages' => 4, 'Numpagesnormed' => 5, 'Bibliographiccitation' => 6, 'TitleId' => 7, 'PublishingcompanyId' => 8, 'PlaceId' => 9, 'PublicationdateId' => 10, 'OrigindateId' => 11, 'RelatedsetId' => 12, 'WorkId' => 13, 'PublisherId' => 14, 'PrinterId' => 15, 'TranslatorId' => 16, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'printrun' => 1, 'edition' => 2, 'editionnumerical' => 3, 'numpages' => 4, 'numpagesnormed' => 5, 'bibliographiccitation' => 6, 'titleId' => 7, 'publishingcompanyId' => 8, 'placeId' => 9, 'publicationdateId' => 10, 'origindateId' => 11, 'relatedsetId' => 12, 'workId' => 13, 'publisherId' => 14, 'printerId' => 15, 'translatorId' => 16, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Printrun' => 1, 'Edition' => 2, 'Editionnumerical' => 3, 'Numpages' => 4, 'Numpagesnormed' => 5, 'Bibliographiccitation' => 6, 'TitleId' => 7, 'PublishingcompanyId' => 8, 'PlaceId' => 9, 'PublicationDate' => 10, 'OriginDate' => 11, 'RelatedsetId' => 12, 'WorkId' => 13, 'PublisherId' => 14, 'PrinterId' => 15, 'TranslatorId' => 16, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'printrun' => 1, 'edition' => 2, 'editionnumerical' => 3, 'numpages' => 4, 'numpagesnormed' => 5, 'bibliographiccitation' => 6, 'titleId' => 7, 'publishingcompanyId' => 8, 'placeId' => 9, 'publicationDate' => 10, 'originDate' => 11, 'relatedsetId' => 12, 'workId' => 13, 'publisherId' => 14, 'printerId' => 15, 'translatorId' => 16, ),
         BasePeer::TYPE_COLNAME => array (EssayPeer::ID => 0, EssayPeer::PRINTRUN => 1, EssayPeer::EDITION => 2, EssayPeer::EDITIONNUMERICAL => 3, EssayPeer::NUMPAGES => 4, EssayPeer::NUMPAGESNORMED => 5, EssayPeer::BIBLIOGRAPHICCITATION => 6, EssayPeer::TITLE_ID => 7, EssayPeer::PUBLISHINGCOMPANY_ID => 8, EssayPeer::PLACE_ID => 9, EssayPeer::PUBLICATIONDATE_ID => 10, EssayPeer::ORIGINDATE_ID => 11, EssayPeer::RELATEDSET_ID => 12, EssayPeer::WORK_ID => 13, EssayPeer::PUBLISHER_ID => 14, EssayPeer::PRINTER_ID => 15, EssayPeer::TRANSLATOR_ID => 16, ),
         BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PRINTRUN' => 1, 'EDITION' => 2, 'EDITIONNUMERICAL' => 3, 'NUMPAGES' => 4, 'NUMPAGESNORMED' => 5, 'BIBLIOGRAPHICCITATION' => 6, 'TITLE_ID' => 7, 'PUBLISHINGCOMPANY_ID' => 8, 'PLACE_ID' => 9, 'PUBLICATIONDATE_ID' => 10, 'ORIGINDATE_ID' => 11, 'RELATEDSET_ID' => 12, 'WORK_ID' => 13, 'PUBLISHER_ID' => 14, 'PRINTER_ID' => 15, 'TRANSLATOR_ID' => 16, ),
         BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'printRun' => 1, 'edition' => 2, 'editionNumerical' => 3, 'numPages' => 4, 'numPagesNormed' => 5, 'bibliographicCitation' => 6, 'title_id' => 7, 'publishingCompany_id' => 8, 'place_id' => 9, 'publicationDate_id' => 10, 'originDate_id' => 11, 'relatedSet_id' => 12, 'work_id' => 13, 'publisher_id' => 14, 'printer_id' => 15, 'translator_id' => 16, ),
@@ -958,7 +958,7 @@ abstract class BaseEssayPeer extends PublicationPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related DatespecificationRelatedByPublicationdateId table
+     * Returns the number of rows matching criteria, joining the related DatespecificationRelatedByPublicationDate table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -966,7 +966,7 @@ abstract class BaseEssayPeer extends PublicationPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinDatespecificationRelatedByPublicationdateId(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinDatespecificationRelatedByPublicationDate(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -1009,7 +1009,7 @@ abstract class BaseEssayPeer extends PublicationPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related DatespecificationRelatedByOrigindateId table
+     * Returns the number of rows matching criteria, joining the related DatespecificationRelatedByOriginDate table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -1017,7 +1017,7 @@ abstract class BaseEssayPeer extends PublicationPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinDatespecificationRelatedByOrigindateId(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinDatespecificationRelatedByOriginDate(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -1604,7 +1604,7 @@ abstract class BaseEssayPeer extends PublicationPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinDatespecificationRelatedByPublicationdateId(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinDatespecificationRelatedByPublicationDate(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -1650,7 +1650,7 @@ abstract class BaseEssayPeer extends PublicationPeer
                 } // if obj2 already loaded
 
                 // Add the $obj1 (Essay) to $obj2 (Datespecification)
-                $obj2->addEssayRelatedByPublicationdateId($obj1);
+                $obj2->addEssayRelatedByPublicationDate($obj1);
 
             } // if joined row was not null
 
@@ -1671,7 +1671,7 @@ abstract class BaseEssayPeer extends PublicationPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinDatespecificationRelatedByOrigindateId(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinDatespecificationRelatedByOriginDate(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -1717,7 +1717,7 @@ abstract class BaseEssayPeer extends PublicationPeer
                 } // if obj2 already loaded
 
                 // Add the $obj1 (Essay) to $obj2 (Datespecification)
-                $obj2->addEssayRelatedByOrigindateId($obj1);
+                $obj2->addEssayRelatedByOriginDate($obj1);
 
             } // if joined row was not null
 
@@ -2045,7 +2045,7 @@ abstract class BaseEssayPeer extends PublicationPeer
                 } // if obj10 loaded
 
                 // Add the $obj1 (Essay) to the collection in $obj10 (Datespecification)
-                $obj10->addEssayRelatedByPublicationdateId($obj1);
+                $obj10->addEssayRelatedByPublicationDate($obj1);
             } // if joined row not null
 
             // Add objects for joined Datespecification rows
@@ -2063,7 +2063,7 @@ abstract class BaseEssayPeer extends PublicationPeer
                 } // if obj11 loaded
 
                 // Add the $obj1 (Essay) to the collection in $obj11 (Datespecification)
-                $obj11->addEssayRelatedByOrigindateId($obj1);
+                $obj11->addEssayRelatedByOriginDate($obj1);
             } // if joined row not null
 
             $results[] = $obj1;
@@ -2611,7 +2611,7 @@ abstract class BaseEssayPeer extends PublicationPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related DatespecificationRelatedByPublicationdateId table
+     * Returns the number of rows matching criteria, joining the related DatespecificationRelatedByPublicationDate table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -2619,7 +2619,7 @@ abstract class BaseEssayPeer extends PublicationPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinAllExceptDatespecificationRelatedByPublicationdateId(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinAllExceptDatespecificationRelatedByPublicationDate(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -2676,7 +2676,7 @@ abstract class BaseEssayPeer extends PublicationPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related DatespecificationRelatedByOrigindateId table
+     * Returns the number of rows matching criteria, joining the related DatespecificationRelatedByOriginDate table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -2684,7 +2684,7 @@ abstract class BaseEssayPeer extends PublicationPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinAllExceptDatespecificationRelatedByOrigindateId(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinAllExceptDatespecificationRelatedByOriginDate(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -2975,7 +2975,7 @@ abstract class BaseEssayPeer extends PublicationPeer
                 } // if $obj9 already loaded
 
                 // Add the $obj1 (Essay) to the collection in $obj9 (Datespecification)
-                $obj9->addEssayRelatedByPublicationdateId($obj1);
+                $obj9->addEssayRelatedByPublicationDate($obj1);
 
             } // if joined row is not null
 
@@ -2994,7 +2994,7 @@ abstract class BaseEssayPeer extends PublicationPeer
                 } // if $obj10 already loaded
 
                 // Add the $obj1 (Essay) to the collection in $obj10 (Datespecification)
-                $obj10->addEssayRelatedByOrigindateId($obj1);
+                $obj10->addEssayRelatedByOriginDate($obj1);
 
             } // if joined row is not null
 
@@ -3241,7 +3241,7 @@ abstract class BaseEssayPeer extends PublicationPeer
                 } // if $obj9 already loaded
 
                 // Add the $obj1 (Essay) to the collection in $obj9 (Datespecification)
-                $obj9->addEssayRelatedByPublicationdateId($obj1);
+                $obj9->addEssayRelatedByPublicationDate($obj1);
 
             } // if joined row is not null
 
@@ -3260,7 +3260,7 @@ abstract class BaseEssayPeer extends PublicationPeer
                 } // if $obj10 already loaded
 
                 // Add the $obj1 (Essay) to the collection in $obj10 (Datespecification)
-                $obj10->addEssayRelatedByOrigindateId($obj1);
+                $obj10->addEssayRelatedByOriginDate($obj1);
 
             } // if joined row is not null
 
@@ -3507,7 +3507,7 @@ abstract class BaseEssayPeer extends PublicationPeer
                 } // if $obj9 already loaded
 
                 // Add the $obj1 (Essay) to the collection in $obj9 (Datespecification)
-                $obj9->addEssayRelatedByPublicationdateId($obj1);
+                $obj9->addEssayRelatedByPublicationDate($obj1);
 
             } // if joined row is not null
 
@@ -3526,7 +3526,7 @@ abstract class BaseEssayPeer extends PublicationPeer
                 } // if $obj10 already loaded
 
                 // Add the $obj1 (Essay) to the collection in $obj10 (Datespecification)
-                $obj10->addEssayRelatedByOrigindateId($obj1);
+                $obj10->addEssayRelatedByOriginDate($obj1);
 
             } // if joined row is not null
 
@@ -3773,7 +3773,7 @@ abstract class BaseEssayPeer extends PublicationPeer
                 } // if $obj9 already loaded
 
                 // Add the $obj1 (Essay) to the collection in $obj9 (Datespecification)
-                $obj9->addEssayRelatedByPublicationdateId($obj1);
+                $obj9->addEssayRelatedByPublicationDate($obj1);
 
             } // if joined row is not null
 
@@ -3792,7 +3792,7 @@ abstract class BaseEssayPeer extends PublicationPeer
                 } // if $obj10 already loaded
 
                 // Add the $obj1 (Essay) to the collection in $obj10 (Datespecification)
-                $obj10->addEssayRelatedByOrigindateId($obj1);
+                $obj10->addEssayRelatedByOriginDate($obj1);
 
             } // if joined row is not null
 
@@ -4039,7 +4039,7 @@ abstract class BaseEssayPeer extends PublicationPeer
                 } // if $obj9 already loaded
 
                 // Add the $obj1 (Essay) to the collection in $obj9 (Datespecification)
-                $obj9->addEssayRelatedByPublicationdateId($obj1);
+                $obj9->addEssayRelatedByPublicationDate($obj1);
 
             } // if joined row is not null
 
@@ -4058,7 +4058,7 @@ abstract class BaseEssayPeer extends PublicationPeer
                 } // if $obj10 already loaded
 
                 // Add the $obj1 (Essay) to the collection in $obj10 (Datespecification)
-                $obj10->addEssayRelatedByOrigindateId($obj1);
+                $obj10->addEssayRelatedByOriginDate($obj1);
 
             } // if joined row is not null
 
@@ -4305,7 +4305,7 @@ abstract class BaseEssayPeer extends PublicationPeer
                 } // if $obj9 already loaded
 
                 // Add the $obj1 (Essay) to the collection in $obj9 (Datespecification)
-                $obj9->addEssayRelatedByPublicationdateId($obj1);
+                $obj9->addEssayRelatedByPublicationDate($obj1);
 
             } // if joined row is not null
 
@@ -4324,7 +4324,7 @@ abstract class BaseEssayPeer extends PublicationPeer
                 } // if $obj10 already loaded
 
                 // Add the $obj1 (Essay) to the collection in $obj10 (Datespecification)
-                $obj10->addEssayRelatedByOrigindateId($obj1);
+                $obj10->addEssayRelatedByOriginDate($obj1);
 
             } // if joined row is not null
 
@@ -4571,7 +4571,7 @@ abstract class BaseEssayPeer extends PublicationPeer
                 } // if $obj9 already loaded
 
                 // Add the $obj1 (Essay) to the collection in $obj9 (Datespecification)
-                $obj9->addEssayRelatedByPublicationdateId($obj1);
+                $obj9->addEssayRelatedByPublicationDate($obj1);
 
             } // if joined row is not null
 
@@ -4590,7 +4590,7 @@ abstract class BaseEssayPeer extends PublicationPeer
                 } // if $obj10 already loaded
 
                 // Add the $obj1 (Essay) to the collection in $obj10 (Datespecification)
-                $obj10->addEssayRelatedByOrigindateId($obj1);
+                $obj10->addEssayRelatedByOriginDate($obj1);
 
             } // if joined row is not null
 
@@ -4837,7 +4837,7 @@ abstract class BaseEssayPeer extends PublicationPeer
                 } // if $obj9 already loaded
 
                 // Add the $obj1 (Essay) to the collection in $obj9 (Datespecification)
-                $obj9->addEssayRelatedByPublicationdateId($obj1);
+                $obj9->addEssayRelatedByPublicationDate($obj1);
 
             } // if joined row is not null
 
@@ -4856,7 +4856,7 @@ abstract class BaseEssayPeer extends PublicationPeer
                 } // if $obj10 already loaded
 
                 // Add the $obj1 (Essay) to the collection in $obj10 (Datespecification)
-                $obj10->addEssayRelatedByOrigindateId($obj1);
+                $obj10->addEssayRelatedByOriginDate($obj1);
 
             } // if joined row is not null
 
@@ -4869,7 +4869,7 @@ abstract class BaseEssayPeer extends PublicationPeer
 
 
     /**
-     * Selects a collection of Essay objects pre-filled with all related objects except DatespecificationRelatedByPublicationdateId.
+     * Selects a collection of Essay objects pre-filled with all related objects except DatespecificationRelatedByPublicationDate.
      *
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
@@ -4878,7 +4878,7 @@ abstract class BaseEssayPeer extends PublicationPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinAllExceptDatespecificationRelatedByPublicationdateId(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinAllExceptDatespecificationRelatedByPublicationDate(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -5111,7 +5111,7 @@ abstract class BaseEssayPeer extends PublicationPeer
 
 
     /**
-     * Selects a collection of Essay objects pre-filled with all related objects except DatespecificationRelatedByOrigindateId.
+     * Selects a collection of Essay objects pre-filled with all related objects except DatespecificationRelatedByOriginDate.
      *
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
@@ -5120,7 +5120,7 @@ abstract class BaseEssayPeer extends PublicationPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinAllExceptDatespecificationRelatedByOrigindateId(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinAllExceptDatespecificationRelatedByOriginDate(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 

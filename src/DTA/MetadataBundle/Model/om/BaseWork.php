@@ -2502,10 +2502,10 @@ abstract class BaseWork extends BaseObject implements Persistent
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Publication[] List of Publication objects
      */
-    public function getPublicationsJoinDatespecificationRelatedByPublicationdateId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getPublicationsJoinDatespecificationRelatedByPublicationDate($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = PublicationQuery::create(null, $criteria);
-        $query->joinWith('DatespecificationRelatedByPublicationdateId', $join_behavior);
+        $query->joinWith('DatespecificationRelatedByPublicationDate', $join_behavior);
 
         return $this->getPublications($query, $con);
     }
@@ -2527,10 +2527,10 @@ abstract class BaseWork extends BaseObject implements Persistent
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Publication[] List of Publication objects
      */
-    public function getPublicationsJoinDatespecificationRelatedByOrigindateId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getPublicationsJoinDatespecificationRelatedByOriginDate($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = PublicationQuery::create(null, $criteria);
-        $query->joinWith('DatespecificationRelatedByOrigindateId', $join_behavior);
+        $query->joinWith('DatespecificationRelatedByOriginDate', $join_behavior);
 
         return $this->getPublications($query, $con);
     }
@@ -3188,10 +3188,10 @@ abstract class BaseWork extends BaseObject implements Persistent
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Essay[] List of Essay objects
      */
-    public function getEssaysJoinDatespecificationRelatedByPublicationdateId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getEssaysJoinDatespecificationRelatedByPublicationDate($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = EssayQuery::create(null, $criteria);
-        $query->joinWith('DatespecificationRelatedByPublicationdateId', $join_behavior);
+        $query->joinWith('DatespecificationRelatedByPublicationDate', $join_behavior);
 
         return $this->getEssays($query, $con);
     }
@@ -3213,10 +3213,10 @@ abstract class BaseWork extends BaseObject implements Persistent
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Essay[] List of Essay objects
      */
-    public function getEssaysJoinDatespecificationRelatedByOrigindateId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getEssaysJoinDatespecificationRelatedByOriginDate($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = EssayQuery::create(null, $criteria);
-        $query->joinWith('DatespecificationRelatedByOrigindateId', $join_behavior);
+        $query->joinWith('DatespecificationRelatedByOriginDate', $join_behavior);
 
         return $this->getEssays($query, $con);
     }
@@ -3631,10 +3631,10 @@ abstract class BaseWork extends BaseObject implements Persistent
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Magazine[] List of Magazine objects
      */
-    public function getMagazinesJoinDatespecificationRelatedByPublicationdateId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getMagazinesJoinDatespecificationRelatedByPublicationDate($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = MagazineQuery::create(null, $criteria);
-        $query->joinWith('DatespecificationRelatedByPublicationdateId', $join_behavior);
+        $query->joinWith('DatespecificationRelatedByPublicationDate', $join_behavior);
 
         return $this->getMagazines($query, $con);
     }
@@ -3656,10 +3656,10 @@ abstract class BaseWork extends BaseObject implements Persistent
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Magazine[] List of Magazine objects
      */
-    public function getMagazinesJoinDatespecificationRelatedByOrigindateId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getMagazinesJoinDatespecificationRelatedByOriginDate($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = MagazineQuery::create(null, $criteria);
-        $query->joinWith('DatespecificationRelatedByOrigindateId', $join_behavior);
+        $query->joinWith('DatespecificationRelatedByOriginDate', $join_behavior);
 
         return $this->getMagazines($query, $con);
     }
@@ -4074,10 +4074,10 @@ abstract class BaseWork extends BaseObject implements Persistent
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Series[] List of Series objects
      */
-    public function getSeriesJoinDatespecificationRelatedByPublicationdateId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getSeriesJoinDatespecificationRelatedByPublicationDate($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = SeriesQuery::create(null, $criteria);
-        $query->joinWith('DatespecificationRelatedByPublicationdateId', $join_behavior);
+        $query->joinWith('DatespecificationRelatedByPublicationDate', $join_behavior);
 
         return $this->getSeries($query, $con);
     }
@@ -4099,10 +4099,10 @@ abstract class BaseWork extends BaseObject implements Persistent
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Series[] List of Series objects
      */
-    public function getSeriesJoinDatespecificationRelatedByOrigindateId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getSeriesJoinDatespecificationRelatedByOriginDate($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = SeriesQuery::create(null, $criteria);
-        $query->joinWith('DatespecificationRelatedByOrigindateId', $join_behavior);
+        $query->joinWith('DatespecificationRelatedByOriginDate', $join_behavior);
 
         return $this->getSeries($query, $con);
     }

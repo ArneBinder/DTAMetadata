@@ -17,7 +17,7 @@ class PersonType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('name', new \DTA\MetadataBundle\Form\Type\PersonalnameType());
+        $builder->add('personalName', new \DTA\MetadataBundle\Form\Type\PersonalnameType());
         $builder->add('gnd');
     }
 }

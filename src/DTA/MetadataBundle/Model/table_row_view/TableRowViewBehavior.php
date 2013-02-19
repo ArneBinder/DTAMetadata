@@ -24,11 +24,11 @@ class TableRowViewBehavior extends Behavior {
     }
     
     public function objectMethods($builder) {
-        return $this->renderTemplate('tableRowViewObjectMethods', array(
-            'flaggableColumns' => $this->flaggableColumns,
-            'flagColumnSuffix' => ReconstructedFlaggableBehavior::$flagColumnSuffix,
-            'phpFlagColumnSuffix' => ReconstructedFlaggableBehavior::$phpFlagColumnSuffix,
-        ));
+//        return $this->renderTemplate('tableRowViewObjectMethods', array(
+//            'flaggableColumns' => $this->flaggableColumns,
+//            'flagColumnSuffix' => ReconstructedFlaggableBehavior::$flagColumnSuffix,
+//            'phpFlagColumnSuffix' => ReconstructedFlaggableBehavior::$phpFlagColumnSuffix,
+//        ));
     }
 
 }

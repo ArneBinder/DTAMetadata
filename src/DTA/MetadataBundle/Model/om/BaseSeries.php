@@ -205,12 +205,12 @@ abstract class BaseSeries extends Publication implements Persistent
     /**
      * @var        Datespecification
      */
-    protected $aDatespecificationRelatedByPublicationdateId;
+    protected $aDatespecificationRelatedByPublicationDate;
 
     /**
      * @var        Datespecification
      */
-    protected $aDatespecificationRelatedByOrigindateId;
+    protected $aDatespecificationRelatedByOriginDate;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -347,7 +347,7 @@ abstract class BaseSeries extends Publication implements Persistent
      *
      * @return int
      */
-    public function getPublicationdateId()
+    public function getPublicationDate()
     {
         return $this->publicationdate_id;
     }
@@ -357,7 +357,7 @@ abstract class BaseSeries extends Publication implements Persistent
      *
      * @return int
      */
-    public function getOrigindateId()
+    public function getOriginDate()
     {
         return $this->origindate_id;
     }
@@ -661,7 +661,7 @@ abstract class BaseSeries extends Publication implements Persistent
      * @param int $v new value
      * @return Series The current object (for fluent API support)
      */
-    public function setPublicationdateId($v)
+    public function setPublicationDate($v)
     {
         if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
@@ -672,13 +672,13 @@ abstract class BaseSeries extends Publication implements Persistent
             $this->modifiedColumns[] = SeriesPeer::PUBLICATIONDATE_ID;
         }
 
-        if ($this->aDatespecificationRelatedByPublicationdateId !== null && $this->aDatespecificationRelatedByPublicationdateId->getId() !== $v) {
-            $this->aDatespecificationRelatedByPublicationdateId = null;
+        if ($this->aDatespecificationRelatedByPublicationDate !== null && $this->aDatespecificationRelatedByPublicationDate->getId() !== $v) {
+            $this->aDatespecificationRelatedByPublicationDate = null;
         }
 
 
         return $this;
-    } // setPublicationdateId()
+    } // setPublicationDate()
 
     /**
      * Set the value of [origindate_id] column.
@@ -686,7 +686,7 @@ abstract class BaseSeries extends Publication implements Persistent
      * @param int $v new value
      * @return Series The current object (for fluent API support)
      */
-    public function setOrigindateId($v)
+    public function setOriginDate($v)
     {
         if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
@@ -697,13 +697,13 @@ abstract class BaseSeries extends Publication implements Persistent
             $this->modifiedColumns[] = SeriesPeer::ORIGINDATE_ID;
         }
 
-        if ($this->aDatespecificationRelatedByOrigindateId !== null && $this->aDatespecificationRelatedByOrigindateId->getId() !== $v) {
-            $this->aDatespecificationRelatedByOrigindateId = null;
+        if ($this->aDatespecificationRelatedByOriginDate !== null && $this->aDatespecificationRelatedByOriginDate->getId() !== $v) {
+            $this->aDatespecificationRelatedByOriginDate = null;
         }
 
 
         return $this;
-    } // setOrigindateId()
+    } // setOriginDate()
 
     /**
      * Set the value of [relatedset_id] column.
@@ -920,11 +920,11 @@ abstract class BaseSeries extends Publication implements Persistent
         if ($this->aPlace !== null && $this->place_id !== $this->aPlace->getId()) {
             $this->aPlace = null;
         }
-        if ($this->aDatespecificationRelatedByPublicationdateId !== null && $this->publicationdate_id !== $this->aDatespecificationRelatedByPublicationdateId->getId()) {
-            $this->aDatespecificationRelatedByPublicationdateId = null;
+        if ($this->aDatespecificationRelatedByPublicationDate !== null && $this->publicationdate_id !== $this->aDatespecificationRelatedByPublicationDate->getId()) {
+            $this->aDatespecificationRelatedByPublicationDate = null;
         }
-        if ($this->aDatespecificationRelatedByOrigindateId !== null && $this->origindate_id !== $this->aDatespecificationRelatedByOrigindateId->getId()) {
-            $this->aDatespecificationRelatedByOrigindateId = null;
+        if ($this->aDatespecificationRelatedByOriginDate !== null && $this->origindate_id !== $this->aDatespecificationRelatedByOriginDate->getId()) {
+            $this->aDatespecificationRelatedByOriginDate = null;
         }
         if ($this->aRelatedset !== null && $this->relatedset_id !== $this->aRelatedset->getId()) {
             $this->aRelatedset = null;
@@ -988,8 +988,8 @@ abstract class BaseSeries extends Publication implements Persistent
             $this->aTitle = null;
             $this->aPublishingcompany = null;
             $this->aPlace = null;
-            $this->aDatespecificationRelatedByPublicationdateId = null;
-            $this->aDatespecificationRelatedByOrigindateId = null;
+            $this->aDatespecificationRelatedByPublicationDate = null;
+            $this->aDatespecificationRelatedByOriginDate = null;
         } // if (deep)
     }
 
@@ -1172,18 +1172,18 @@ abstract class BaseSeries extends Publication implements Persistent
                 $this->setPlace($this->aPlace);
             }
 
-            if ($this->aDatespecificationRelatedByPublicationdateId !== null) {
-                if ($this->aDatespecificationRelatedByPublicationdateId->isModified() || $this->aDatespecificationRelatedByPublicationdateId->isNew()) {
-                    $affectedRows += $this->aDatespecificationRelatedByPublicationdateId->save($con);
+            if ($this->aDatespecificationRelatedByPublicationDate !== null) {
+                if ($this->aDatespecificationRelatedByPublicationDate->isModified() || $this->aDatespecificationRelatedByPublicationDate->isNew()) {
+                    $affectedRows += $this->aDatespecificationRelatedByPublicationDate->save($con);
                 }
-                $this->setDatespecificationRelatedByPublicationdateId($this->aDatespecificationRelatedByPublicationdateId);
+                $this->setDatespecificationRelatedByPublicationDate($this->aDatespecificationRelatedByPublicationDate);
             }
 
-            if ($this->aDatespecificationRelatedByOrigindateId !== null) {
-                if ($this->aDatespecificationRelatedByOrigindateId->isModified() || $this->aDatespecificationRelatedByOrigindateId->isNew()) {
-                    $affectedRows += $this->aDatespecificationRelatedByOrigindateId->save($con);
+            if ($this->aDatespecificationRelatedByOriginDate !== null) {
+                if ($this->aDatespecificationRelatedByOriginDate->isModified() || $this->aDatespecificationRelatedByOriginDate->isNew()) {
+                    $affectedRows += $this->aDatespecificationRelatedByOriginDate->save($con);
                 }
-                $this->setDatespecificationRelatedByOrigindateId($this->aDatespecificationRelatedByOrigindateId);
+                $this->setDatespecificationRelatedByOriginDate($this->aDatespecificationRelatedByOriginDate);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -1489,15 +1489,15 @@ abstract class BaseSeries extends Publication implements Persistent
                 }
             }
 
-            if ($this->aDatespecificationRelatedByPublicationdateId !== null) {
-                if (!$this->aDatespecificationRelatedByPublicationdateId->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aDatespecificationRelatedByPublicationdateId->getValidationFailures());
+            if ($this->aDatespecificationRelatedByPublicationDate !== null) {
+                if (!$this->aDatespecificationRelatedByPublicationDate->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aDatespecificationRelatedByPublicationDate->getValidationFailures());
                 }
             }
 
-            if ($this->aDatespecificationRelatedByOrigindateId !== null) {
-                if (!$this->aDatespecificationRelatedByOrigindateId->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aDatespecificationRelatedByOrigindateId->getValidationFailures());
+            if ($this->aDatespecificationRelatedByOriginDate !== null) {
+                if (!$this->aDatespecificationRelatedByOriginDate->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aDatespecificationRelatedByOriginDate->getValidationFailures());
                 }
             }
 
@@ -1576,10 +1576,10 @@ abstract class BaseSeries extends Publication implements Persistent
                 return $this->getPlaceId();
                 break;
             case 11:
-                return $this->getPublicationdateId();
+                return $this->getPublicationDate();
                 break;
             case 12:
-                return $this->getOrigindateId();
+                return $this->getOriginDate();
                 break;
             case 13:
                 return $this->getRelatedsetId();
@@ -1636,8 +1636,8 @@ abstract class BaseSeries extends Publication implements Persistent
             $keys[8] => $this->getTitleId(),
             $keys[9] => $this->getPublishingcompanyId(),
             $keys[10] => $this->getPlaceId(),
-            $keys[11] => $this->getPublicationdateId(),
-            $keys[12] => $this->getOrigindateId(),
+            $keys[11] => $this->getPublicationDate(),
+            $keys[12] => $this->getOriginDate(),
             $keys[13] => $this->getRelatedsetId(),
             $keys[14] => $this->getWorkId(),
             $keys[15] => $this->getPublisherId(),
@@ -1669,11 +1669,11 @@ abstract class BaseSeries extends Publication implements Persistent
             if (null !== $this->aPlace) {
                 $result['Place'] = $this->aPlace->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aDatespecificationRelatedByPublicationdateId) {
-                $result['DatespecificationRelatedByPublicationdateId'] = $this->aDatespecificationRelatedByPublicationdateId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aDatespecificationRelatedByPublicationDate) {
+                $result['DatespecificationRelatedByPublicationDate'] = $this->aDatespecificationRelatedByPublicationDate->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aDatespecificationRelatedByOrigindateId) {
-                $result['DatespecificationRelatedByOrigindateId'] = $this->aDatespecificationRelatedByOrigindateId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aDatespecificationRelatedByOriginDate) {
+                $result['DatespecificationRelatedByOriginDate'] = $this->aDatespecificationRelatedByOriginDate->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1743,10 +1743,10 @@ abstract class BaseSeries extends Publication implements Persistent
                 $this->setPlaceId($value);
                 break;
             case 11:
-                $this->setPublicationdateId($value);
+                $this->setPublicationDate($value);
                 break;
             case 12:
-                $this->setOrigindateId($value);
+                $this->setOriginDate($value);
                 break;
             case 13:
                 $this->setRelatedsetId($value);
@@ -1798,8 +1798,8 @@ abstract class BaseSeries extends Publication implements Persistent
         if (array_key_exists($keys[8], $arr)) $this->setTitleId($arr[$keys[8]]);
         if (array_key_exists($keys[9], $arr)) $this->setPublishingcompanyId($arr[$keys[9]]);
         if (array_key_exists($keys[10], $arr)) $this->setPlaceId($arr[$keys[10]]);
-        if (array_key_exists($keys[11], $arr)) $this->setPublicationdateId($arr[$keys[11]]);
-        if (array_key_exists($keys[12], $arr)) $this->setOrigindateId($arr[$keys[12]]);
+        if (array_key_exists($keys[11], $arr)) $this->setPublicationDate($arr[$keys[11]]);
+        if (array_key_exists($keys[12], $arr)) $this->setOriginDate($arr[$keys[12]]);
         if (array_key_exists($keys[13], $arr)) $this->setRelatedsetId($arr[$keys[13]]);
         if (array_key_exists($keys[14], $arr)) $this->setWorkId($arr[$keys[14]]);
         if (array_key_exists($keys[15], $arr)) $this->setPublisherId($arr[$keys[15]]);
@@ -1907,8 +1907,8 @@ abstract class BaseSeries extends Publication implements Persistent
         $copyObj->setTitleId($this->getTitleId());
         $copyObj->setPublishingcompanyId($this->getPublishingcompanyId());
         $copyObj->setPlaceId($this->getPlaceId());
-        $copyObj->setPublicationdateId($this->getPublicationdateId());
-        $copyObj->setOrigindateId($this->getOrigindateId());
+        $copyObj->setPublicationDate($this->getPublicationDate());
+        $copyObj->setOriginDate($this->getOriginDate());
         $copyObj->setRelatedsetId($this->getRelatedsetId());
         $copyObj->setWorkId($this->getWorkId());
         $copyObj->setPublisherId($this->getPublisherId());
@@ -2401,20 +2401,20 @@ abstract class BaseSeries extends Publication implements Persistent
      * @return Series The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setDatespecificationRelatedByPublicationdateId(Datespecification $v = null)
+    public function setDatespecificationRelatedByPublicationDate(Datespecification $v = null)
     {
         if ($v === null) {
-            $this->setPublicationdateId(NULL);
+            $this->setPublicationDate(NULL);
         } else {
-            $this->setPublicationdateId($v->getId());
+            $this->setPublicationDate($v->getId());
         }
 
-        $this->aDatespecificationRelatedByPublicationdateId = $v;
+        $this->aDatespecificationRelatedByPublicationDate = $v;
 
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the Datespecification object, it will not be re-added.
         if ($v !== null) {
-            $v->addSeriesRelatedByPublicationdateId($this);
+            $v->addSeriesRelatedByPublicationDate($this);
         }
 
 
@@ -2430,20 +2430,20 @@ abstract class BaseSeries extends Publication implements Persistent
      * @return Datespecification The associated Datespecification object.
      * @throws PropelException
      */
-    public function getDatespecificationRelatedByPublicationdateId(PropelPDO $con = null, $doQuery = true)
+    public function getDatespecificationRelatedByPublicationDate(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aDatespecificationRelatedByPublicationdateId === null && ($this->publicationdate_id !== null) && $doQuery) {
-            $this->aDatespecificationRelatedByPublicationdateId = DatespecificationQuery::create()->findPk($this->publicationdate_id, $con);
+        if ($this->aDatespecificationRelatedByPublicationDate === null && ($this->publicationdate_id !== null) && $doQuery) {
+            $this->aDatespecificationRelatedByPublicationDate = DatespecificationQuery::create()->findPk($this->publicationdate_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aDatespecificationRelatedByPublicationdateId->addSeriesRelatedByPublicationdateId($this);
+                $this->aDatespecificationRelatedByPublicationDate->addSeriesRelatedByPublicationDate($this);
              */
         }
 
-        return $this->aDatespecificationRelatedByPublicationdateId;
+        return $this->aDatespecificationRelatedByPublicationDate;
     }
 
     /**
@@ -2453,20 +2453,20 @@ abstract class BaseSeries extends Publication implements Persistent
      * @return Series The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setDatespecificationRelatedByOrigindateId(Datespecification $v = null)
+    public function setDatespecificationRelatedByOriginDate(Datespecification $v = null)
     {
         if ($v === null) {
-            $this->setOrigindateId(NULL);
+            $this->setOriginDate(NULL);
         } else {
-            $this->setOrigindateId($v->getId());
+            $this->setOriginDate($v->getId());
         }
 
-        $this->aDatespecificationRelatedByOrigindateId = $v;
+        $this->aDatespecificationRelatedByOriginDate = $v;
 
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the Datespecification object, it will not be re-added.
         if ($v !== null) {
-            $v->addSeriesRelatedByOrigindateId($this);
+            $v->addSeriesRelatedByOriginDate($this);
         }
 
 
@@ -2482,20 +2482,20 @@ abstract class BaseSeries extends Publication implements Persistent
      * @return Datespecification The associated Datespecification object.
      * @throws PropelException
      */
-    public function getDatespecificationRelatedByOrigindateId(PropelPDO $con = null, $doQuery = true)
+    public function getDatespecificationRelatedByOriginDate(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aDatespecificationRelatedByOrigindateId === null && ($this->origindate_id !== null) && $doQuery) {
-            $this->aDatespecificationRelatedByOrigindateId = DatespecificationQuery::create()->findPk($this->origindate_id, $con);
+        if ($this->aDatespecificationRelatedByOriginDate === null && ($this->origindate_id !== null) && $doQuery) {
+            $this->aDatespecificationRelatedByOriginDate = DatespecificationQuery::create()->findPk($this->origindate_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aDatespecificationRelatedByOrigindateId->addSeriesRelatedByOrigindateId($this);
+                $this->aDatespecificationRelatedByOriginDate->addSeriesRelatedByOriginDate($this);
              */
         }
 
-        return $this->aDatespecificationRelatedByOrigindateId;
+        return $this->aDatespecificationRelatedByOriginDate;
     }
 
     /**
@@ -2567,11 +2567,11 @@ abstract class BaseSeries extends Publication implements Persistent
             if ($this->aPlace instanceof Persistent) {
               $this->aPlace->clearAllReferences($deep);
             }
-            if ($this->aDatespecificationRelatedByPublicationdateId instanceof Persistent) {
-              $this->aDatespecificationRelatedByPublicationdateId->clearAllReferences($deep);
+            if ($this->aDatespecificationRelatedByPublicationDate instanceof Persistent) {
+              $this->aDatespecificationRelatedByPublicationDate->clearAllReferences($deep);
             }
-            if ($this->aDatespecificationRelatedByOrigindateId instanceof Persistent) {
-              $this->aDatespecificationRelatedByOrigindateId->clearAllReferences($deep);
+            if ($this->aDatespecificationRelatedByOriginDate instanceof Persistent) {
+              $this->aDatespecificationRelatedByOriginDate->clearAllReferences($deep);
             }
 
             $this->alreadyInClearAllReferencesDeep = false;
@@ -2585,8 +2585,8 @@ abstract class BaseSeries extends Publication implements Persistent
         $this->aTitle = null;
         $this->aPublishingcompany = null;
         $this->aPlace = null;
-        $this->aDatespecificationRelatedByPublicationdateId = null;
-        $this->aDatespecificationRelatedByOrigindateId = null;
+        $this->aDatespecificationRelatedByPublicationDate = null;
+        $this->aDatespecificationRelatedByOriginDate = null;
     }
 
     /**
@@ -2660,8 +2660,8 @@ abstract class BaseSeries extends Publication implements Persistent
         $parent->setTitleId($this->getTitleId());
         $parent->setPublishingcompanyId($this->getPublishingcompanyId());
         $parent->setPlaceId($this->getPlaceId());
-        $parent->setPublicationdateId($this->getPublicationdateId());
-        $parent->setOrigindateId($this->getOrigindateId());
+        $parent->setPublicationDate($this->getPublicationDate());
+        $parent->setOriginDate($this->getOriginDate());
         $parent->setRelatedsetId($this->getRelatedsetId());
         $parent->setWorkId($this->getWorkId());
         $parent->setPublisherId($this->getPublisherId());
@@ -2691,11 +2691,11 @@ abstract class BaseSeries extends Publication implements Persistent
         if ($this->getPlace() && $this->getPlace()->isNew()) {
             $parent->setPlace($this->getPlace());
         }
-        if ($this->getDatespecificationRelatedByPublicationdateId() && $this->getDatespecificationRelatedByPublicationdateId()->isNew()) {
-            $parent->setDatespecificationRelatedByPublicationdateId($this->getDatespecificationRelatedByPublicationdateId());
+        if ($this->getDatespecificationRelatedByPublicationDate() && $this->getDatespecificationRelatedByPublicationDate()->isNew()) {
+            $parent->setDatespecificationRelatedByPublicationDate($this->getDatespecificationRelatedByPublicationDate());
         }
-        if ($this->getDatespecificationRelatedByOrigindateId() && $this->getDatespecificationRelatedByOrigindateId()->isNew()) {
-            $parent->setDatespecificationRelatedByOrigindateId($this->getDatespecificationRelatedByOrigindateId());
+        if ($this->getDatespecificationRelatedByOriginDate() && $this->getDatespecificationRelatedByOriginDate()->isNew()) {
+            $parent->setDatespecificationRelatedByOriginDate($this->getDatespecificationRelatedByOriginDate());
         }
 
         return $parent;

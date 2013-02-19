@@ -117,8 +117,8 @@ abstract class BaseMagazinePeer extends PublicationPeer
      * e.g. MagazinePeer::$fieldNames[MagazinePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Printrun', 'Edition', 'Editionnumerical', 'Numpages', 'Numpagesnormed', 'Bibliographiccitation', 'TitleId', 'PublishingcompanyId', 'PlaceId', 'PublicationdateId', 'OrigindateId', 'RelatedsetId', 'WorkId', 'PublisherId', 'PrinterId', 'TranslatorId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'printrun', 'edition', 'editionnumerical', 'numpages', 'numpagesnormed', 'bibliographiccitation', 'titleId', 'publishingcompanyId', 'placeId', 'publicationdateId', 'origindateId', 'relatedsetId', 'workId', 'publisherId', 'printerId', 'translatorId', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Printrun', 'Edition', 'Editionnumerical', 'Numpages', 'Numpagesnormed', 'Bibliographiccitation', 'TitleId', 'PublishingcompanyId', 'PlaceId', 'PublicationDate', 'OriginDate', 'RelatedsetId', 'WorkId', 'PublisherId', 'PrinterId', 'TranslatorId', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'printrun', 'edition', 'editionnumerical', 'numpages', 'numpagesnormed', 'bibliographiccitation', 'titleId', 'publishingcompanyId', 'placeId', 'publicationDate', 'originDate', 'relatedsetId', 'workId', 'publisherId', 'printerId', 'translatorId', ),
         BasePeer::TYPE_COLNAME => array (MagazinePeer::ID, MagazinePeer::PRINTRUN, MagazinePeer::EDITION, MagazinePeer::EDITIONNUMERICAL, MagazinePeer::NUMPAGES, MagazinePeer::NUMPAGESNORMED, MagazinePeer::BIBLIOGRAPHICCITATION, MagazinePeer::TITLE_ID, MagazinePeer::PUBLISHINGCOMPANY_ID, MagazinePeer::PLACE_ID, MagazinePeer::PUBLICATIONDATE_ID, MagazinePeer::ORIGINDATE_ID, MagazinePeer::RELATEDSET_ID, MagazinePeer::WORK_ID, MagazinePeer::PUBLISHER_ID, MagazinePeer::PRINTER_ID, MagazinePeer::TRANSLATOR_ID, ),
         BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PRINTRUN', 'EDITION', 'EDITIONNUMERICAL', 'NUMPAGES', 'NUMPAGESNORMED', 'BIBLIOGRAPHICCITATION', 'TITLE_ID', 'PUBLISHINGCOMPANY_ID', 'PLACE_ID', 'PUBLICATIONDATE_ID', 'ORIGINDATE_ID', 'RELATEDSET_ID', 'WORK_ID', 'PUBLISHER_ID', 'PRINTER_ID', 'TRANSLATOR_ID', ),
         BasePeer::TYPE_FIELDNAME => array ('id', 'printRun', 'edition', 'editionNumerical', 'numPages', 'numPagesNormed', 'bibliographicCitation', 'title_id', 'publishingCompany_id', 'place_id', 'publicationDate_id', 'originDate_id', 'relatedSet_id', 'work_id', 'publisher_id', 'printer_id', 'translator_id', ),
@@ -132,8 +132,8 @@ abstract class BaseMagazinePeer extends PublicationPeer
      * e.g. MagazinePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Printrun' => 1, 'Edition' => 2, 'Editionnumerical' => 3, 'Numpages' => 4, 'Numpagesnormed' => 5, 'Bibliographiccitation' => 6, 'TitleId' => 7, 'PublishingcompanyId' => 8, 'PlaceId' => 9, 'PublicationdateId' => 10, 'OrigindateId' => 11, 'RelatedsetId' => 12, 'WorkId' => 13, 'PublisherId' => 14, 'PrinterId' => 15, 'TranslatorId' => 16, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'printrun' => 1, 'edition' => 2, 'editionnumerical' => 3, 'numpages' => 4, 'numpagesnormed' => 5, 'bibliographiccitation' => 6, 'titleId' => 7, 'publishingcompanyId' => 8, 'placeId' => 9, 'publicationdateId' => 10, 'origindateId' => 11, 'relatedsetId' => 12, 'workId' => 13, 'publisherId' => 14, 'printerId' => 15, 'translatorId' => 16, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Printrun' => 1, 'Edition' => 2, 'Editionnumerical' => 3, 'Numpages' => 4, 'Numpagesnormed' => 5, 'Bibliographiccitation' => 6, 'TitleId' => 7, 'PublishingcompanyId' => 8, 'PlaceId' => 9, 'PublicationDate' => 10, 'OriginDate' => 11, 'RelatedsetId' => 12, 'WorkId' => 13, 'PublisherId' => 14, 'PrinterId' => 15, 'TranslatorId' => 16, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'printrun' => 1, 'edition' => 2, 'editionnumerical' => 3, 'numpages' => 4, 'numpagesnormed' => 5, 'bibliographiccitation' => 6, 'titleId' => 7, 'publishingcompanyId' => 8, 'placeId' => 9, 'publicationDate' => 10, 'originDate' => 11, 'relatedsetId' => 12, 'workId' => 13, 'publisherId' => 14, 'printerId' => 15, 'translatorId' => 16, ),
         BasePeer::TYPE_COLNAME => array (MagazinePeer::ID => 0, MagazinePeer::PRINTRUN => 1, MagazinePeer::EDITION => 2, MagazinePeer::EDITIONNUMERICAL => 3, MagazinePeer::NUMPAGES => 4, MagazinePeer::NUMPAGESNORMED => 5, MagazinePeer::BIBLIOGRAPHICCITATION => 6, MagazinePeer::TITLE_ID => 7, MagazinePeer::PUBLISHINGCOMPANY_ID => 8, MagazinePeer::PLACE_ID => 9, MagazinePeer::PUBLICATIONDATE_ID => 10, MagazinePeer::ORIGINDATE_ID => 11, MagazinePeer::RELATEDSET_ID => 12, MagazinePeer::WORK_ID => 13, MagazinePeer::PUBLISHER_ID => 14, MagazinePeer::PRINTER_ID => 15, MagazinePeer::TRANSLATOR_ID => 16, ),
         BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PRINTRUN' => 1, 'EDITION' => 2, 'EDITIONNUMERICAL' => 3, 'NUMPAGES' => 4, 'NUMPAGESNORMED' => 5, 'BIBLIOGRAPHICCITATION' => 6, 'TITLE_ID' => 7, 'PUBLISHINGCOMPANY_ID' => 8, 'PLACE_ID' => 9, 'PUBLICATIONDATE_ID' => 10, 'ORIGINDATE_ID' => 11, 'RELATEDSET_ID' => 12, 'WORK_ID' => 13, 'PUBLISHER_ID' => 14, 'PRINTER_ID' => 15, 'TRANSLATOR_ID' => 16, ),
         BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'printRun' => 1, 'edition' => 2, 'editionNumerical' => 3, 'numPages' => 4, 'numPagesNormed' => 5, 'bibliographicCitation' => 6, 'title_id' => 7, 'publishingCompany_id' => 8, 'place_id' => 9, 'publicationDate_id' => 10, 'originDate_id' => 11, 'relatedSet_id' => 12, 'work_id' => 13, 'publisher_id' => 14, 'printer_id' => 15, 'translator_id' => 16, ),
@@ -958,7 +958,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related DatespecificationRelatedByPublicationdateId table
+     * Returns the number of rows matching criteria, joining the related DatespecificationRelatedByPublicationDate table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -966,7 +966,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinDatespecificationRelatedByPublicationdateId(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinDatespecificationRelatedByPublicationDate(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -1009,7 +1009,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related DatespecificationRelatedByOrigindateId table
+     * Returns the number of rows matching criteria, joining the related DatespecificationRelatedByOriginDate table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -1017,7 +1017,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinDatespecificationRelatedByOrigindateId(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinDatespecificationRelatedByOriginDate(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -1604,7 +1604,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinDatespecificationRelatedByPublicationdateId(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinDatespecificationRelatedByPublicationDate(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -1650,7 +1650,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
                 } // if obj2 already loaded
 
                 // Add the $obj1 (Magazine) to $obj2 (Datespecification)
-                $obj2->addMagazineRelatedByPublicationdateId($obj1);
+                $obj2->addMagazineRelatedByPublicationDate($obj1);
 
             } // if joined row was not null
 
@@ -1671,7 +1671,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinDatespecificationRelatedByOrigindateId(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinDatespecificationRelatedByOriginDate(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -1717,7 +1717,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
                 } // if obj2 already loaded
 
                 // Add the $obj1 (Magazine) to $obj2 (Datespecification)
-                $obj2->addMagazineRelatedByOrigindateId($obj1);
+                $obj2->addMagazineRelatedByOriginDate($obj1);
 
             } // if joined row was not null
 
@@ -2045,7 +2045,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
                 } // if obj10 loaded
 
                 // Add the $obj1 (Magazine) to the collection in $obj10 (Datespecification)
-                $obj10->addMagazineRelatedByPublicationdateId($obj1);
+                $obj10->addMagazineRelatedByPublicationDate($obj1);
             } // if joined row not null
 
             // Add objects for joined Datespecification rows
@@ -2063,7 +2063,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
                 } // if obj11 loaded
 
                 // Add the $obj1 (Magazine) to the collection in $obj11 (Datespecification)
-                $obj11->addMagazineRelatedByOrigindateId($obj1);
+                $obj11->addMagazineRelatedByOriginDate($obj1);
             } // if joined row not null
 
             $results[] = $obj1;
@@ -2611,7 +2611,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related DatespecificationRelatedByPublicationdateId table
+     * Returns the number of rows matching criteria, joining the related DatespecificationRelatedByPublicationDate table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -2619,7 +2619,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinAllExceptDatespecificationRelatedByPublicationdateId(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinAllExceptDatespecificationRelatedByPublicationDate(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -2676,7 +2676,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related DatespecificationRelatedByOrigindateId table
+     * Returns the number of rows matching criteria, joining the related DatespecificationRelatedByOriginDate table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -2684,7 +2684,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinAllExceptDatespecificationRelatedByOrigindateId(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinAllExceptDatespecificationRelatedByOriginDate(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -2975,7 +2975,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
                 } // if $obj9 already loaded
 
                 // Add the $obj1 (Magazine) to the collection in $obj9 (Datespecification)
-                $obj9->addMagazineRelatedByPublicationdateId($obj1);
+                $obj9->addMagazineRelatedByPublicationDate($obj1);
 
             } // if joined row is not null
 
@@ -2994,7 +2994,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
                 } // if $obj10 already loaded
 
                 // Add the $obj1 (Magazine) to the collection in $obj10 (Datespecification)
-                $obj10->addMagazineRelatedByOrigindateId($obj1);
+                $obj10->addMagazineRelatedByOriginDate($obj1);
 
             } // if joined row is not null
 
@@ -3241,7 +3241,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
                 } // if $obj9 already loaded
 
                 // Add the $obj1 (Magazine) to the collection in $obj9 (Datespecification)
-                $obj9->addMagazineRelatedByPublicationdateId($obj1);
+                $obj9->addMagazineRelatedByPublicationDate($obj1);
 
             } // if joined row is not null
 
@@ -3260,7 +3260,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
                 } // if $obj10 already loaded
 
                 // Add the $obj1 (Magazine) to the collection in $obj10 (Datespecification)
-                $obj10->addMagazineRelatedByOrigindateId($obj1);
+                $obj10->addMagazineRelatedByOriginDate($obj1);
 
             } // if joined row is not null
 
@@ -3507,7 +3507,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
                 } // if $obj9 already loaded
 
                 // Add the $obj1 (Magazine) to the collection in $obj9 (Datespecification)
-                $obj9->addMagazineRelatedByPublicationdateId($obj1);
+                $obj9->addMagazineRelatedByPublicationDate($obj1);
 
             } // if joined row is not null
 
@@ -3526,7 +3526,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
                 } // if $obj10 already loaded
 
                 // Add the $obj1 (Magazine) to the collection in $obj10 (Datespecification)
-                $obj10->addMagazineRelatedByOrigindateId($obj1);
+                $obj10->addMagazineRelatedByOriginDate($obj1);
 
             } // if joined row is not null
 
@@ -3773,7 +3773,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
                 } // if $obj9 already loaded
 
                 // Add the $obj1 (Magazine) to the collection in $obj9 (Datespecification)
-                $obj9->addMagazineRelatedByPublicationdateId($obj1);
+                $obj9->addMagazineRelatedByPublicationDate($obj1);
 
             } // if joined row is not null
 
@@ -3792,7 +3792,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
                 } // if $obj10 already loaded
 
                 // Add the $obj1 (Magazine) to the collection in $obj10 (Datespecification)
-                $obj10->addMagazineRelatedByOrigindateId($obj1);
+                $obj10->addMagazineRelatedByOriginDate($obj1);
 
             } // if joined row is not null
 
@@ -4039,7 +4039,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
                 } // if $obj9 already loaded
 
                 // Add the $obj1 (Magazine) to the collection in $obj9 (Datespecification)
-                $obj9->addMagazineRelatedByPublicationdateId($obj1);
+                $obj9->addMagazineRelatedByPublicationDate($obj1);
 
             } // if joined row is not null
 
@@ -4058,7 +4058,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
                 } // if $obj10 already loaded
 
                 // Add the $obj1 (Magazine) to the collection in $obj10 (Datespecification)
-                $obj10->addMagazineRelatedByOrigindateId($obj1);
+                $obj10->addMagazineRelatedByOriginDate($obj1);
 
             } // if joined row is not null
 
@@ -4305,7 +4305,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
                 } // if $obj9 already loaded
 
                 // Add the $obj1 (Magazine) to the collection in $obj9 (Datespecification)
-                $obj9->addMagazineRelatedByPublicationdateId($obj1);
+                $obj9->addMagazineRelatedByPublicationDate($obj1);
 
             } // if joined row is not null
 
@@ -4324,7 +4324,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
                 } // if $obj10 already loaded
 
                 // Add the $obj1 (Magazine) to the collection in $obj10 (Datespecification)
-                $obj10->addMagazineRelatedByOrigindateId($obj1);
+                $obj10->addMagazineRelatedByOriginDate($obj1);
 
             } // if joined row is not null
 
@@ -4571,7 +4571,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
                 } // if $obj9 already loaded
 
                 // Add the $obj1 (Magazine) to the collection in $obj9 (Datespecification)
-                $obj9->addMagazineRelatedByPublicationdateId($obj1);
+                $obj9->addMagazineRelatedByPublicationDate($obj1);
 
             } // if joined row is not null
 
@@ -4590,7 +4590,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
                 } // if $obj10 already loaded
 
                 // Add the $obj1 (Magazine) to the collection in $obj10 (Datespecification)
-                $obj10->addMagazineRelatedByOrigindateId($obj1);
+                $obj10->addMagazineRelatedByOriginDate($obj1);
 
             } // if joined row is not null
 
@@ -4837,7 +4837,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
                 } // if $obj9 already loaded
 
                 // Add the $obj1 (Magazine) to the collection in $obj9 (Datespecification)
-                $obj9->addMagazineRelatedByPublicationdateId($obj1);
+                $obj9->addMagazineRelatedByPublicationDate($obj1);
 
             } // if joined row is not null
 
@@ -4856,7 +4856,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
                 } // if $obj10 already loaded
 
                 // Add the $obj1 (Magazine) to the collection in $obj10 (Datespecification)
-                $obj10->addMagazineRelatedByOrigindateId($obj1);
+                $obj10->addMagazineRelatedByOriginDate($obj1);
 
             } // if joined row is not null
 
@@ -4869,7 +4869,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
 
 
     /**
-     * Selects a collection of Magazine objects pre-filled with all related objects except DatespecificationRelatedByPublicationdateId.
+     * Selects a collection of Magazine objects pre-filled with all related objects except DatespecificationRelatedByPublicationDate.
      *
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
@@ -4878,7 +4878,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinAllExceptDatespecificationRelatedByPublicationdateId(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinAllExceptDatespecificationRelatedByPublicationDate(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -5111,7 +5111,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
 
 
     /**
-     * Selects a collection of Magazine objects pre-filled with all related objects except DatespecificationRelatedByOrigindateId.
+     * Selects a collection of Magazine objects pre-filled with all related objects except DatespecificationRelatedByOriginDate.
      *
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
@@ -5120,7 +5120,7 @@ abstract class BaseMagazinePeer extends PublicationPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinAllExceptDatespecificationRelatedByOrigindateId(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinAllExceptDatespecificationRelatedByOriginDate(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 

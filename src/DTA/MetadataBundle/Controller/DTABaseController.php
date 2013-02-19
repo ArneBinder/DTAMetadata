@@ -16,7 +16,7 @@ class DTABaseController extends Controller {
     /**
      * IMPLEMENT ME IF CREATING A NEW DOMAIN 
      * The flag that it is set to true to indicate to the base template which domain to highlight in the main menu. */
-    public $domainKey = "";
+    public static $domainKey = "";
 
     /**
      * IMPLEMENT ME IF CREATING A NEW DOMAIN 
@@ -24,7 +24,7 @@ class DTABaseController extends Controller {
      * TODO: Generate this automatically. To avoid multiple edit locations on adding a new publication type
      * The inheritance should be detectable by the delegate behavior in the schema.xml
      */
-    public $domainMenu = array();
+    public static $domainMenu = array();
 
     /**
      * Returns the fully qualified class names to autoload and generate objects and work with them using their class names.
@@ -42,9 +42,9 @@ class DTABaseController extends Controller {
     /**
      * 
      * @param type $className
-     * @Route("/genericView/{className}", name="genericView")
+     * @Route("/genericView/{domainKey}/{className}", name="genericView")
      */
-    public function genericViewAction($className){
+    public function genericViewAction($domainKey, $className){
         
         $classNames = $this->relatedClassNames($className);
         
@@ -53,7 +53,7 @@ class DTABaseController extends Controller {
         // for retrieving the column names
         $peer = new $classNames['peer'];
         
-        return $this->renderDomainSpecificAction("DTAMetadataBundle::genericView.html.twig", array(
+        return $this->renderDomainKeySpecificAction($domainKey, "DTAMetadataBundle::genericView.html.twig", array(
             'data' => $query->find(),
             'columns' => $peer->getFieldNames(\BasePeer::TYPE_PHPNAME),
 //            'peer' => $peer,
@@ -103,6 +103,7 @@ class DTABaseController extends Controller {
         
         $form = $this->genericEditFormAction($className, $recordId);
         
+        // plain ajax response, without any menus or other html
         return $this->render("DTAMetadataBundle::modalForm.html.twig", array(
             'form' => $form->createView(),
             'className' => $className,
@@ -165,25 +166,54 @@ class DTABaseController extends Controller {
         }
         // top level form submit case (redirect to view page)
         else{
-            $route = implode(':', array('DTAMetadataBundle', $domainKey, 'index'));
-            return $this->redirect($this->generateUrl($route));
+//            $route = implode(':', array('DTAMetadataBundle', $domainKey, 'index'));
+            // for accessing static attributes of the controllers
+            $cr = $this->getControllerReflectionClass($domainKey);
+            
+            return $this->renderDomainKeySpecificAction($domainKey, 'DTAMetadataBundle::formWrapper.html.twig', array(
+                'form' => $form->createView(),
+                'className' => $className,
+            ));
         }
     }
 
-    /**
-     * Called by the _derived_ classes. Passes the domain key and menu of the derived class to the template given.
-     * @param $template Template to use for rendering, e.g. site specific as DTAMetadataBundle:DataDomain:index.html.twig
-     * @param $options The data for the template to render 
-     */
-    public function renderDomainSpecificAction($template, array $options = array()) {
+    private function getControllerReflectionClass($domainKey){
+        return new \ReflectionClass("DTA\\MetadataBundle\\Controller\\" . $domainKey . "Controller");
+    }
+    
+    public function renderDomainKeySpecificAction($domainKey, $template, array $options = array()){
+        
+        $cr = $this->getControllerReflectionClass($domainKey);
         
         // these are overriden by the calling subclass
         $defaultDomainMenu = array(
-            'domainMenu' => $this->domainMenu,
-            "domainKey" => $this->domainKey);
+            'domainMenu' => $cr->getStaticPropertyValue('domainMenu'),
+            "domainKey" => $cr->getStaticPropertyValue('domainKey'));
         
         // replaces the domain menu of $defaultDomainMenu with the domain menu of options, if both are set.
         $options = array_merge($defaultDomainMenu, $options);
+        return $this->render($template, $options);
+    }
+    
+    /**
+     * Called by the _derived_ domain controllers. Automatically passes the domain key and menu of the derived class to the template.
+     * @param $template Template to use for rendering, e.g. site specific as DTAMetadataBundle:DataDomain:index.html.twig
+     * @param $options The data for the template to render 
+     */
+    public function renderControllerSpecificAction($template, array $options = array()) {
+
+        // static properties cannot be accessed via $this
+        $controllerReflection = new \ReflectionClass($this);
+        
+        // these are overriden by the calling subclass
+        $defaultDomainMenu = array(
+            'domainMenu' => $controllerReflection->getStaticPropertyValue('domainMenu'),
+            "domainKey" => $controllerReflection->getStaticPropertyValue('domainKey'));
+        
+        // replaces the domain menu of $defaultDomainMenu with the domain menu of options, if both are set.
+        // adds the data for the view from $options
+        $options = array_merge($defaultDomainMenu, $options);
+        
         return $this->render($template, $options);
     }
 

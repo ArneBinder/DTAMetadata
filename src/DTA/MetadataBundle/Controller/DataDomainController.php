@@ -13,18 +13,18 @@ use \DTA\MetadataBundle\Model;
 class DataDomainController extends DTABaseController {
 
     /** @inheritdoc */
-    public $domainKey = "DataDomain";
+    public static $domainKey = "DataDomain";
 
     /** @inheritdoc */
-    public $domainMenu = array(
-        array("caption" => "Publikationen", "path" => 'home', "children" => array(
-                array('caption' => "Alle Publikationsarten", 'path' => 'home'),
+    public static $domainMenu = array(
+        array("caption" => "Publikationen", "children" => array(
+                array('caption' => "Alle Publikationsarten", 'route' => 'home'),
                 array('caption' => "Bücher", 'modelClass' => 'Monograph'),
                 array('caption' => "Zeitschriften", 'modelClass' => 'Magazine'),
                 array('caption' => "Reihen", 'modelClass' => 'Series'),
                 array('caption' => "Essays", 'modelClass' => 'Essay'))),
-        array("caption" => "Personen", "path" => 'home', "children" => array(
-                array('caption' => "Alle Personen", 'path' => 'home'),
+        array("caption" => "Personen", "children" => array(
+                array('caption' => "Alle Personen", 'route' => 'home'),
                 array('caption' => "Autoren", 'modelClass' => 'Author'),
                 array('caption' => "Verleger", 'modelClass' => 'Publisher'),
                 array('caption' => "Übersetzer", 'modelClass' => 'Translator'),
@@ -36,7 +36,8 @@ class DataDomainController extends DTABaseController {
      * @Route("/", name="dataDomain")
      */
     public function indexAction() {
-        return $this->renderDomainSpecificAction('DTAMetadataBundle:DataDomain:index.html.twig');
+        // TODO: remove. DataDomain.html.twig is useless now, as the domain menu has been generalized to the top level.
+        return $this->renderControllerSpecificAction('DTAMetadataBundle:DataDomain:index.html.twig');
     }
 
     /**
@@ -46,7 +47,7 @@ class DataDomainController extends DTABaseController {
      */
     public function newAction($className) {
         $form = $this->genericEditFormAction($className, 0);
-        return $this->renderDomainSpecificAction('DTAMetadataBundle::formWrapper.html.twig', array(
+        return $this->renderControllerSpecificAction('DTAMetadataBundle::formWrapper.html.twig', array(
             'className' => $className,
             'form' => $form->createView(),
         ));

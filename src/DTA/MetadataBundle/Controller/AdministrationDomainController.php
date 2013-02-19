@@ -7,10 +7,10 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 class AdministrationDomainController extends DTABaseController {
     /** @inheritdoc */
-    public $domainKey = "AdministrationDomain";
+    public static $domainKey = "AdministrationDomain";
     /** @inheritdoc */
-    public $domainMenu = array(
-        array("caption" => "Benutzer", "path" => 'home'),
+    public static $domainMenu = array(
+        array("caption" => "Benutzer", 'modelClass' => 'User'),
     );
 
     /**
@@ -20,7 +20,7 @@ class AdministrationDomainController extends DTABaseController {
      */
     public function indexAction() {
 
-        return $this->renderDomainSpecificAction('DTAMetadataBundle:AdministrationDomain:AdministrationDomain.html.twig', array(
+        return $this->renderControllerSpecificAction('DTAMetadataBundle:AdministrationDomain:AdministrationDomain.html.twig', array(
                     ));
     }
 

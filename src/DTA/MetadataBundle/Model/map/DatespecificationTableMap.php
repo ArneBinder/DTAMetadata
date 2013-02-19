@@ -54,15 +54,15 @@ class DatespecificationTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('PublicationRelatedByPublicationdateId', 'DTA\\MetadataBundle\\Model\\Publication', RelationMap::ONE_TO_MANY, array('id' => 'publicationDate_id', ), null, null, 'PublicationsRelatedByPublicationdateId');
-        $this->addRelation('PublicationRelatedByOrigindateId', 'DTA\\MetadataBundle\\Model\\Publication', RelationMap::ONE_TO_MANY, array('id' => 'originDate_id', ), null, null, 'PublicationsRelatedByOrigindateId');
+        $this->addRelation('PublicationRelatedByPublicationDate', 'DTA\\MetadataBundle\\Model\\Publication', RelationMap::ONE_TO_MANY, array('id' => 'publicationDate_id', ), null, null, 'PublicationsRelatedByPublicationDate');
+        $this->addRelation('PublicationRelatedByOriginDate', 'DTA\\MetadataBundle\\Model\\Publication', RelationMap::ONE_TO_MANY, array('id' => 'originDate_id', ), null, null, 'PublicationsRelatedByOriginDate');
         $this->addRelation('Work', 'DTA\\MetadataBundle\\Model\\Work', RelationMap::ONE_TO_MANY, array('id' => 'dateSpecification_id', ), null, null, 'Works');
-        $this->addRelation('EssayRelatedByPublicationdateId', 'DTA\\MetadataBundle\\Model\\Essay', RelationMap::ONE_TO_MANY, array('id' => 'publicationDate_id', ), null, null, 'EssaysRelatedByPublicationdateId');
-        $this->addRelation('EssayRelatedByOrigindateId', 'DTA\\MetadataBundle\\Model\\Essay', RelationMap::ONE_TO_MANY, array('id' => 'originDate_id', ), null, null, 'EssaysRelatedByOrigindateId');
-        $this->addRelation('MagazineRelatedByPublicationdateId', 'DTA\\MetadataBundle\\Model\\Magazine', RelationMap::ONE_TO_MANY, array('id' => 'publicationDate_id', ), null, null, 'MagazinesRelatedByPublicationdateId');
-        $this->addRelation('MagazineRelatedByOrigindateId', 'DTA\\MetadataBundle\\Model\\Magazine', RelationMap::ONE_TO_MANY, array('id' => 'originDate_id', ), null, null, 'MagazinesRelatedByOrigindateId');
-        $this->addRelation('SeriesRelatedByPublicationdateId', 'DTA\\MetadataBundle\\Model\\Series', RelationMap::ONE_TO_MANY, array('id' => 'publicationDate_id', ), null, null, 'SeriesRelatedByPublicationdateId');
-        $this->addRelation('SeriesRelatedByOrigindateId', 'DTA\\MetadataBundle\\Model\\Series', RelationMap::ONE_TO_MANY, array('id' => 'originDate_id', ), null, null, 'SeriesRelatedByOrigindateId');
+        $this->addRelation('EssayRelatedByPublicationDate', 'DTA\\MetadataBundle\\Model\\Essay', RelationMap::ONE_TO_MANY, array('id' => 'publicationDate_id', ), null, null, 'EssaysRelatedByPublicationDate');
+        $this->addRelation('EssayRelatedByOriginDate', 'DTA\\MetadataBundle\\Model\\Essay', RelationMap::ONE_TO_MANY, array('id' => 'originDate_id', ), null, null, 'EssaysRelatedByOriginDate');
+        $this->addRelation('MagazineRelatedByPublicationDate', 'DTA\\MetadataBundle\\Model\\Magazine', RelationMap::ONE_TO_MANY, array('id' => 'publicationDate_id', ), null, null, 'MagazinesRelatedByPublicationDate');
+        $this->addRelation('MagazineRelatedByOriginDate', 'DTA\\MetadataBundle\\Model\\Magazine', RelationMap::ONE_TO_MANY, array('id' => 'originDate_id', ), null, null, 'MagazinesRelatedByOriginDate');
+        $this->addRelation('SeriesRelatedByPublicationDate', 'DTA\\MetadataBundle\\Model\\Series', RelationMap::ONE_TO_MANY, array('id' => 'publicationDate_id', ), null, null, 'SeriesRelatedByPublicationDate');
+        $this->addRelation('SeriesRelatedByOriginDate', 'DTA\\MetadataBundle\\Model\\Series', RelationMap::ONE_TO_MANY, array('id' => 'originDate_id', ), null, null, 'SeriesRelatedByOriginDate');
     } // buildRelations()
 
     /**

@@ -13,13 +13,13 @@ use DTA\MetadataBundle\Form;
 class HomeController extends DTABaseController {
 
     /** @inheritdoc */
-    public $domainKey = "Home";
+    public static $domainKey = "Home";
 
     /** @inheritdoc */
-    public $domainMenu = array(
-        array("caption" => "Zuletzt Angelegt", "path" => 'home'),
-        array("caption" => "Zuletzt Bearbeitet", "path" => 'home'),
-        array("caption" => "Zuletzt Angesehen", "path" => 'home'),
+    public static $domainMenu = array(
+        array("caption" => "Zuletzt Angelegt", 'route' => 'home'),
+        array("caption" => "Zuletzt Bearbeitet", 'route' => 'home'),
+        array("caption" => "Zuletzt Angesehen", 'route' => 'home'),
     );
 
     /**
@@ -30,7 +30,7 @@ class HomeController extends DTABaseController {
 //        $p = new Model\Publication();
 //        $p->setNumpages(101);
 //        $p->save();
-        return $this->renderDomainSpecificAction('DTAMetadataBundle:Home:Home.html.twig', array(
+        return $this->renderControllerSpecificAction('DTAMetadataBundle:Home:Home.html.twig', array(
 //            'testData' => $k->getNumpages(),            
         ));
     }
@@ -56,7 +56,7 @@ class HomeController extends DTABaseController {
                 $result = "saved.";
             }
         }
-        return $this->renderDomainSpecificAction('DTAMetadataBundle::autoform.html.twig', array(
+        return $this->renderControllerSpecificAction('DTAMetadataBundle::autoform.html.twig', array(
                     'className' => 'Personalname',
                     'persistedObject' => $result,
                     'form' => $form->createView(),
@@ -79,7 +79,7 @@ class HomeController extends DTABaseController {
                 $obj->save();
         }
 
-        return $this->renderDomainSpecificAction('DTAMetadataBundle::autoform.html.twig', array(
+        return $this->renderControllerSpecificAction('DTAMetadataBundle::autoform.html.twig', array(
                     'className' => 'Title',
                     'persistedObject' => 'persisted.',
                     'form' => $form->createView(),
@@ -103,7 +103,7 @@ class HomeController extends DTABaseController {
                 $obj->save();
         }
 
-        return $this->renderDomainSpecificAction('DTAMetadataBundle::autoform.html.twig', array(
+        return $this->renderControllerSpecificAction('DTAMetadataBundle::autoform.html.twig', array(
                     'className' => $className,
                     'persistedObject' => 'persisted.',
                     'form' => $form->createView(),

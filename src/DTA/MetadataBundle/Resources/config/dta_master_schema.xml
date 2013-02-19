@@ -27,8 +27,9 @@
        <column name="title_id" type="INTEGER" required="true"/>
        <column name="publishingCompany_id" type="INTEGER" required="false"/>
        <column name="place_id" type="INTEGER" required="false"/>
-       <column name="publicationDate_id" type="INTEGER" required="false"/>
-       <!--Entstehungsjahr--> <column name="originDate_id" type="INTEGER" required="false"/>                               
+       <column name="publicationDate_id" phpName="PublicationDate" type="INTEGER" required="false"/>
+       <!--Entstehungsjahr--> 
+       <column name="originDate_id" phpName="OriginDate" type="INTEGER" required="false"/>                               
        <column name="relatedSet_id" type="INTEGER" required="false"/>
        
        <!-- Relations to other persons -->       
@@ -88,8 +89,11 @@
        <index name="idx_publikation_ort1">
            <index-column name="place_id"/>
        </index>
-       <index name="idx_publication_dateSpecification1">
-           <index-column name="dateSpecification_id"/>
+       <index name="idx_publication_publicationDateId1">
+           <index-column name="publicationDate_id"/>
+       </index>
+       <index name="idx_publication_originDateId1">
+           <index-column name="originDate_id"/>
        </index>
     </table>
 
@@ -267,10 +271,7 @@
     <column name="fax" type="VARCHAR" size="50" required="false"/>
     <column name="log_last_change" type="TIMESTAMP" required="true"/>
     <column name="log_last_user" type="INTEGER" required="false"/>
-    <index name="AI_id_book_locations">
-      <index-column name="id"/>
-    </index>
-    <index name="id_book_locations_2">
+    <index name="idx_book_locations_2">
       <index-column name="id"/>
     </index>
     <index name="name">
@@ -284,7 +285,7 @@
   </table>
 
   <table name="source" phpName="Source">
-    <column name="id" type="INTEGER" size="10" primaryKey="true" autoIncrement="true" required="true"/>
+    <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
     <column name="publication_id" type="INTEGER" required="true"/>
     <column name="quality" type="LONGVARCHAR" required="false"/>
     <column name="name" type="LONGVARCHAR" required="false"/>
@@ -296,10 +297,7 @@
     <foreign-key foreignTable="publication" name="fk_quelle_edition1">
       <reference local="publication_id" foreign="id"/>
     </foreign-key>
-    <index name="AI_id_Fundstellen">
-      <index-column name="id"/>
-    </index>
-    <index name="id_Fundstellen_2">
+    <index name="idx_Fundstellen_3">
       <index-column name="id"/>
     </index>
     <index name="idx_quelle_edition1">
@@ -346,9 +344,6 @@
     <index name="active">
       <index-column name="done"/>
     </index>
-    <index name="closed_2">
-      <index-column name="done"/>
-    </index>
     <index name="idx_aufgabe_arbeitsschritt1">
       <index-column name="taskType_id"/>
     </index>
@@ -384,9 +379,6 @@
     </behavior>
     
     <index name="AI_id_user">
-      <index-column name="id"/>
-    </index>
-    <index name="id_user_2">
       <index-column name="id"/>
     </index>
     <index name="name">

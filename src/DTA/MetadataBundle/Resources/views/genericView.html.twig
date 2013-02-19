@@ -4,7 +4,7 @@
 
 {% block core %}
 
-<div class="span8 dta-data-listing">
+<div class="span12 dta-data-listing">
 
     <h3>{{ className|trans }}</h3>
 
@@ -28,14 +28,14 @@
     {#{dump(peer.getTableMap().getRelations())}#}
     
 </div><!--/span-->
-                
+
+{#
 <div class="span4 dta-data-filter-box">
 
     <h3>Suchoptionen</h3>
     
     <div class="sidebar-nav well">
         <ul class="nav nav-list">
-            {#<li class="nav-header">Werk</li>#}
             {% for col in columns %}
                 {% if col != '#' and col|capitalize != 'Id'|capitalize %}
                 <li><i class="icon-chevron-right" onmouseover="$(this).toggleClass('icon-chevron-right').toggleClass('icon-chevron-down')"></i>{{ col|trans }}</li>
@@ -44,5 +44,5 @@
         </ul>
     </div><!--/.well -->
 </div><!--/span-->
-
+#}
 {% endblock core %}
