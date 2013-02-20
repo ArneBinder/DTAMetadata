@@ -54,15 +54,8 @@ class DatespecificationTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('PublicationRelatedByPublicationDate', 'DTA\\MetadataBundle\\Model\\Publication', RelationMap::ONE_TO_MANY, array('id' => 'publicationDate_id', ), null, null, 'PublicationsRelatedByPublicationDate');
-        $this->addRelation('PublicationRelatedByOriginDate', 'DTA\\MetadataBundle\\Model\\Publication', RelationMap::ONE_TO_MANY, array('id' => 'originDate_id', ), null, null, 'PublicationsRelatedByOriginDate');
+        $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Publication', RelationMap::ONE_TO_MANY, array('id' => 'publicationDate_id', ), null, null, 'Publications');
         $this->addRelation('Work', 'DTA\\MetadataBundle\\Model\\Work', RelationMap::ONE_TO_MANY, array('id' => 'dateSpecification_id', ), null, null, 'Works');
-        $this->addRelation('EssayRelatedByPublicationDate', 'DTA\\MetadataBundle\\Model\\Essay', RelationMap::ONE_TO_MANY, array('id' => 'publicationDate_id', ), null, null, 'EssaysRelatedByPublicationDate');
-        $this->addRelation('EssayRelatedByOriginDate', 'DTA\\MetadataBundle\\Model\\Essay', RelationMap::ONE_TO_MANY, array('id' => 'originDate_id', ), null, null, 'EssaysRelatedByOriginDate');
-        $this->addRelation('MagazineRelatedByPublicationDate', 'DTA\\MetadataBundle\\Model\\Magazine', RelationMap::ONE_TO_MANY, array('id' => 'publicationDate_id', ), null, null, 'MagazinesRelatedByPublicationDate');
-        $this->addRelation('MagazineRelatedByOriginDate', 'DTA\\MetadataBundle\\Model\\Magazine', RelationMap::ONE_TO_MANY, array('id' => 'originDate_id', ), null, null, 'MagazinesRelatedByOriginDate');
-        $this->addRelation('SeriesRelatedByPublicationDate', 'DTA\\MetadataBundle\\Model\\Series', RelationMap::ONE_TO_MANY, array('id' => 'publicationDate_id', ), null, null, 'SeriesRelatedByPublicationDate');
-        $this->addRelation('SeriesRelatedByOriginDate', 'DTA\\MetadataBundle\\Model\\Series', RelationMap::ONE_TO_MANY, array('id' => 'originDate_id', ), null, null, 'SeriesRelatedByOriginDate');
     } // buildRelations()
 
     /**

@@ -15,10 +15,7 @@ use \PropelPDO;
 use DTA\MetadataBundle\Model\Datespecification;
 use DTA\MetadataBundle\Model\DatespecificationPeer;
 use DTA\MetadataBundle\Model\DatespecificationQuery;
-use DTA\MetadataBundle\Model\Essay;
-use DTA\MetadataBundle\Model\Magazine;
 use DTA\MetadataBundle\Model\Publication;
-use DTA\MetadataBundle\Model\Series;
 use DTA\MetadataBundle\Model\Work;
 
 /**
@@ -36,41 +33,13 @@ use DTA\MetadataBundle\Model\Work;
  * @method DatespecificationQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method DatespecificationQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method DatespecificationQuery leftJoinPublicationRelatedByPublicationDate($relationAlias = null) Adds a LEFT JOIN clause to the query using the PublicationRelatedByPublicationDate relation
- * @method DatespecificationQuery rightJoinPublicationRelatedByPublicationDate($relationAlias = null) Adds a RIGHT JOIN clause to the query using the PublicationRelatedByPublicationDate relation
- * @method DatespecificationQuery innerJoinPublicationRelatedByPublicationDate($relationAlias = null) Adds a INNER JOIN clause to the query using the PublicationRelatedByPublicationDate relation
- *
- * @method DatespecificationQuery leftJoinPublicationRelatedByOriginDate($relationAlias = null) Adds a LEFT JOIN clause to the query using the PublicationRelatedByOriginDate relation
- * @method DatespecificationQuery rightJoinPublicationRelatedByOriginDate($relationAlias = null) Adds a RIGHT JOIN clause to the query using the PublicationRelatedByOriginDate relation
- * @method DatespecificationQuery innerJoinPublicationRelatedByOriginDate($relationAlias = null) Adds a INNER JOIN clause to the query using the PublicationRelatedByOriginDate relation
+ * @method DatespecificationQuery leftJoinPublication($relationAlias = null) Adds a LEFT JOIN clause to the query using the Publication relation
+ * @method DatespecificationQuery rightJoinPublication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Publication relation
+ * @method DatespecificationQuery innerJoinPublication($relationAlias = null) Adds a INNER JOIN clause to the query using the Publication relation
  *
  * @method DatespecificationQuery leftJoinWork($relationAlias = null) Adds a LEFT JOIN clause to the query using the Work relation
  * @method DatespecificationQuery rightJoinWork($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Work relation
  * @method DatespecificationQuery innerJoinWork($relationAlias = null) Adds a INNER JOIN clause to the query using the Work relation
- *
- * @method DatespecificationQuery leftJoinEssayRelatedByPublicationDate($relationAlias = null) Adds a LEFT JOIN clause to the query using the EssayRelatedByPublicationDate relation
- * @method DatespecificationQuery rightJoinEssayRelatedByPublicationDate($relationAlias = null) Adds a RIGHT JOIN clause to the query using the EssayRelatedByPublicationDate relation
- * @method DatespecificationQuery innerJoinEssayRelatedByPublicationDate($relationAlias = null) Adds a INNER JOIN clause to the query using the EssayRelatedByPublicationDate relation
- *
- * @method DatespecificationQuery leftJoinEssayRelatedByOriginDate($relationAlias = null) Adds a LEFT JOIN clause to the query using the EssayRelatedByOriginDate relation
- * @method DatespecificationQuery rightJoinEssayRelatedByOriginDate($relationAlias = null) Adds a RIGHT JOIN clause to the query using the EssayRelatedByOriginDate relation
- * @method DatespecificationQuery innerJoinEssayRelatedByOriginDate($relationAlias = null) Adds a INNER JOIN clause to the query using the EssayRelatedByOriginDate relation
- *
- * @method DatespecificationQuery leftJoinMagazineRelatedByPublicationDate($relationAlias = null) Adds a LEFT JOIN clause to the query using the MagazineRelatedByPublicationDate relation
- * @method DatespecificationQuery rightJoinMagazineRelatedByPublicationDate($relationAlias = null) Adds a RIGHT JOIN clause to the query using the MagazineRelatedByPublicationDate relation
- * @method DatespecificationQuery innerJoinMagazineRelatedByPublicationDate($relationAlias = null) Adds a INNER JOIN clause to the query using the MagazineRelatedByPublicationDate relation
- *
- * @method DatespecificationQuery leftJoinMagazineRelatedByOriginDate($relationAlias = null) Adds a LEFT JOIN clause to the query using the MagazineRelatedByOriginDate relation
- * @method DatespecificationQuery rightJoinMagazineRelatedByOriginDate($relationAlias = null) Adds a RIGHT JOIN clause to the query using the MagazineRelatedByOriginDate relation
- * @method DatespecificationQuery innerJoinMagazineRelatedByOriginDate($relationAlias = null) Adds a INNER JOIN clause to the query using the MagazineRelatedByOriginDate relation
- *
- * @method DatespecificationQuery leftJoinSeriesRelatedByPublicationDate($relationAlias = null) Adds a LEFT JOIN clause to the query using the SeriesRelatedByPublicationDate relation
- * @method DatespecificationQuery rightJoinSeriesRelatedByPublicationDate($relationAlias = null) Adds a RIGHT JOIN clause to the query using the SeriesRelatedByPublicationDate relation
- * @method DatespecificationQuery innerJoinSeriesRelatedByPublicationDate($relationAlias = null) Adds a INNER JOIN clause to the query using the SeriesRelatedByPublicationDate relation
- *
- * @method DatespecificationQuery leftJoinSeriesRelatedByOriginDate($relationAlias = null) Adds a LEFT JOIN clause to the query using the SeriesRelatedByOriginDate relation
- * @method DatespecificationQuery rightJoinSeriesRelatedByOriginDate($relationAlias = null) Adds a RIGHT JOIN clause to the query using the SeriesRelatedByOriginDate relation
- * @method DatespecificationQuery innerJoinSeriesRelatedByOriginDate($relationAlias = null) Adds a INNER JOIN clause to the query using the SeriesRelatedByOriginDate relation
  *
  * @method Datespecification findOne(PropelPDO $con = null) Return the first Datespecification matching the query
  * @method Datespecification findOneOrCreate(PropelPDO $con = null) Return the first Datespecification matching the query, or a new Datespecification object populated from the query conditions when no match is found
@@ -422,33 +391,33 @@ abstract class BaseDatespecificationQuery extends ModelCriteria
      * @return                 DatespecificationQuery The current query, for fluid interface
      * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterByPublicationRelatedByPublicationDate($publication, $comparison = null)
+    public function filterByPublication($publication, $comparison = null)
     {
         if ($publication instanceof Publication) {
             return $this
-                ->addUsingAlias(DatespecificationPeer::ID, $publication->getPublicationDate(), $comparison);
+                ->addUsingAlias(DatespecificationPeer::ID, $publication->getPublicationdateId(), $comparison);
         } elseif ($publication instanceof PropelObjectCollection) {
             return $this
-                ->usePublicationRelatedByPublicationDateQuery()
+                ->usePublicationQuery()
                 ->filterByPrimaryKeys($publication->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByPublicationRelatedByPublicationDate() only accepts arguments of type Publication or PropelCollection');
+            throw new PropelException('filterByPublication() only accepts arguments of type Publication or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the PublicationRelatedByPublicationDate relation
+     * Adds a JOIN clause to the query using the Publication relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return DatespecificationQuery The current query, for fluid interface
      */
-    public function joinPublicationRelatedByPublicationDate($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinPublication($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('PublicationRelatedByPublicationDate');
+        $relationMap = $tableMap->getRelation('Publication');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -463,14 +432,14 @@ abstract class BaseDatespecificationQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'PublicationRelatedByPublicationDate');
+            $this->addJoinObject($join, 'Publication');
         }
 
         return $this;
     }
 
     /**
-     * Use the PublicationRelatedByPublicationDate relation Publication object
+     * Use the Publication relation Publication object
      *
      * @see       useQuery()
      *
@@ -480,85 +449,11 @@ abstract class BaseDatespecificationQuery extends ModelCriteria
      *
      * @return   \DTA\MetadataBundle\Model\PublicationQuery A secondary query class using the current class as primary query
      */
-    public function usePublicationRelatedByPublicationDateQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function usePublicationQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
-            ->joinPublicationRelatedByPublicationDate($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'PublicationRelatedByPublicationDate', '\DTA\MetadataBundle\Model\PublicationQuery');
-    }
-
-    /**
-     * Filter the query by a related Publication object
-     *
-     * @param   Publication|PropelObjectCollection $publication  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 DatespecificationQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByPublicationRelatedByOriginDate($publication, $comparison = null)
-    {
-        if ($publication instanceof Publication) {
-            return $this
-                ->addUsingAlias(DatespecificationPeer::ID, $publication->getOriginDate(), $comparison);
-        } elseif ($publication instanceof PropelObjectCollection) {
-            return $this
-                ->usePublicationRelatedByOriginDateQuery()
-                ->filterByPrimaryKeys($publication->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByPublicationRelatedByOriginDate() only accepts arguments of type Publication or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the PublicationRelatedByOriginDate relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return DatespecificationQuery The current query, for fluid interface
-     */
-    public function joinPublicationRelatedByOriginDate($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('PublicationRelatedByOriginDate');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'PublicationRelatedByOriginDate');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the PublicationRelatedByOriginDate relation Publication object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\PublicationQuery A secondary query class using the current class as primary query
-     */
-    public function usePublicationRelatedByOriginDateQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinPublicationRelatedByOriginDate($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'PublicationRelatedByOriginDate', '\DTA\MetadataBundle\Model\PublicationQuery');
+            ->joinPublication($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Publication', '\DTA\MetadataBundle\Model\PublicationQuery');
     }
 
     /**
@@ -633,450 +528,6 @@ abstract class BaseDatespecificationQuery extends ModelCriteria
         return $this
             ->joinWork($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Work', '\DTA\MetadataBundle\Model\WorkQuery');
-    }
-
-    /**
-     * Filter the query by a related Essay object
-     *
-     * @param   Essay|PropelObjectCollection $essay  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 DatespecificationQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByEssayRelatedByPublicationDate($essay, $comparison = null)
-    {
-        if ($essay instanceof Essay) {
-            return $this
-                ->addUsingAlias(DatespecificationPeer::ID, $essay->getPublicationDate(), $comparison);
-        } elseif ($essay instanceof PropelObjectCollection) {
-            return $this
-                ->useEssayRelatedByPublicationDateQuery()
-                ->filterByPrimaryKeys($essay->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByEssayRelatedByPublicationDate() only accepts arguments of type Essay or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the EssayRelatedByPublicationDate relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return DatespecificationQuery The current query, for fluid interface
-     */
-    public function joinEssayRelatedByPublicationDate($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('EssayRelatedByPublicationDate');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'EssayRelatedByPublicationDate');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the EssayRelatedByPublicationDate relation Essay object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\EssayQuery A secondary query class using the current class as primary query
-     */
-    public function useEssayRelatedByPublicationDateQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinEssayRelatedByPublicationDate($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'EssayRelatedByPublicationDate', '\DTA\MetadataBundle\Model\EssayQuery');
-    }
-
-    /**
-     * Filter the query by a related Essay object
-     *
-     * @param   Essay|PropelObjectCollection $essay  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 DatespecificationQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByEssayRelatedByOriginDate($essay, $comparison = null)
-    {
-        if ($essay instanceof Essay) {
-            return $this
-                ->addUsingAlias(DatespecificationPeer::ID, $essay->getOriginDate(), $comparison);
-        } elseif ($essay instanceof PropelObjectCollection) {
-            return $this
-                ->useEssayRelatedByOriginDateQuery()
-                ->filterByPrimaryKeys($essay->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByEssayRelatedByOriginDate() only accepts arguments of type Essay or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the EssayRelatedByOriginDate relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return DatespecificationQuery The current query, for fluid interface
-     */
-    public function joinEssayRelatedByOriginDate($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('EssayRelatedByOriginDate');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'EssayRelatedByOriginDate');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the EssayRelatedByOriginDate relation Essay object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\EssayQuery A secondary query class using the current class as primary query
-     */
-    public function useEssayRelatedByOriginDateQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinEssayRelatedByOriginDate($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'EssayRelatedByOriginDate', '\DTA\MetadataBundle\Model\EssayQuery');
-    }
-
-    /**
-     * Filter the query by a related Magazine object
-     *
-     * @param   Magazine|PropelObjectCollection $magazine  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 DatespecificationQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByMagazineRelatedByPublicationDate($magazine, $comparison = null)
-    {
-        if ($magazine instanceof Magazine) {
-            return $this
-                ->addUsingAlias(DatespecificationPeer::ID, $magazine->getPublicationDate(), $comparison);
-        } elseif ($magazine instanceof PropelObjectCollection) {
-            return $this
-                ->useMagazineRelatedByPublicationDateQuery()
-                ->filterByPrimaryKeys($magazine->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByMagazineRelatedByPublicationDate() only accepts arguments of type Magazine or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the MagazineRelatedByPublicationDate relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return DatespecificationQuery The current query, for fluid interface
-     */
-    public function joinMagazineRelatedByPublicationDate($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('MagazineRelatedByPublicationDate');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'MagazineRelatedByPublicationDate');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the MagazineRelatedByPublicationDate relation Magazine object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\MagazineQuery A secondary query class using the current class as primary query
-     */
-    public function useMagazineRelatedByPublicationDateQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinMagazineRelatedByPublicationDate($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'MagazineRelatedByPublicationDate', '\DTA\MetadataBundle\Model\MagazineQuery');
-    }
-
-    /**
-     * Filter the query by a related Magazine object
-     *
-     * @param   Magazine|PropelObjectCollection $magazine  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 DatespecificationQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByMagazineRelatedByOriginDate($magazine, $comparison = null)
-    {
-        if ($magazine instanceof Magazine) {
-            return $this
-                ->addUsingAlias(DatespecificationPeer::ID, $magazine->getOriginDate(), $comparison);
-        } elseif ($magazine instanceof PropelObjectCollection) {
-            return $this
-                ->useMagazineRelatedByOriginDateQuery()
-                ->filterByPrimaryKeys($magazine->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByMagazineRelatedByOriginDate() only accepts arguments of type Magazine or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the MagazineRelatedByOriginDate relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return DatespecificationQuery The current query, for fluid interface
-     */
-    public function joinMagazineRelatedByOriginDate($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('MagazineRelatedByOriginDate');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'MagazineRelatedByOriginDate');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the MagazineRelatedByOriginDate relation Magazine object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\MagazineQuery A secondary query class using the current class as primary query
-     */
-    public function useMagazineRelatedByOriginDateQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinMagazineRelatedByOriginDate($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'MagazineRelatedByOriginDate', '\DTA\MetadataBundle\Model\MagazineQuery');
-    }
-
-    /**
-     * Filter the query by a related Series object
-     *
-     * @param   Series|PropelObjectCollection $series  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 DatespecificationQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterBySeriesRelatedByPublicationDate($series, $comparison = null)
-    {
-        if ($series instanceof Series) {
-            return $this
-                ->addUsingAlias(DatespecificationPeer::ID, $series->getPublicationDate(), $comparison);
-        } elseif ($series instanceof PropelObjectCollection) {
-            return $this
-                ->useSeriesRelatedByPublicationDateQuery()
-                ->filterByPrimaryKeys($series->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterBySeriesRelatedByPublicationDate() only accepts arguments of type Series or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the SeriesRelatedByPublicationDate relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return DatespecificationQuery The current query, for fluid interface
-     */
-    public function joinSeriesRelatedByPublicationDate($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('SeriesRelatedByPublicationDate');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'SeriesRelatedByPublicationDate');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the SeriesRelatedByPublicationDate relation Series object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\SeriesQuery A secondary query class using the current class as primary query
-     */
-    public function useSeriesRelatedByPublicationDateQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinSeriesRelatedByPublicationDate($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'SeriesRelatedByPublicationDate', '\DTA\MetadataBundle\Model\SeriesQuery');
-    }
-
-    /**
-     * Filter the query by a related Series object
-     *
-     * @param   Series|PropelObjectCollection $series  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 DatespecificationQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterBySeriesRelatedByOriginDate($series, $comparison = null)
-    {
-        if ($series instanceof Series) {
-            return $this
-                ->addUsingAlias(DatespecificationPeer::ID, $series->getOriginDate(), $comparison);
-        } elseif ($series instanceof PropelObjectCollection) {
-            return $this
-                ->useSeriesRelatedByOriginDateQuery()
-                ->filterByPrimaryKeys($series->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterBySeriesRelatedByOriginDate() only accepts arguments of type Series or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the SeriesRelatedByOriginDate relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return DatespecificationQuery The current query, for fluid interface
-     */
-    public function joinSeriesRelatedByOriginDate($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('SeriesRelatedByOriginDate');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'SeriesRelatedByOriginDate');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the SeriesRelatedByOriginDate relation Series object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\SeriesQuery A secondary query class using the current class as primary query
-     */
-    public function useSeriesRelatedByOriginDateQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinSeriesRelatedByOriginDate($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'SeriesRelatedByOriginDate', '\DTA\MetadataBundle\Model\SeriesQuery');
     }
 
     /**

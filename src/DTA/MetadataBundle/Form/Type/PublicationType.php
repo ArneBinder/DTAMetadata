@@ -20,16 +20,18 @@ class PublicationType extends BaseAbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('title', new TitleType());
+        $builder->add('work', new WorkType());
         $builder->add('place', new SelectOrAddType(), array(
             'class' => 'DTA\MetadataBundle\Model\Place',
             'property' => 'Name',
             'label' => 'Druckort'
             
         ));
-        $builder->add('publicationDate', new DatespecificationType());
-        $builder->add('originDate', new DatespecificationType(), array(
+        //$builder->add('publicationDate', new DatespecificationType());
+        $builder->add('Datespecification', new DatespecificationType(), array(
             'label' => 'Erscheinungsjahr, falls abweichend'
         ));
+        
 //        $builder->add('publishingcompanyId', new \DTA\MetadataBundle\Form\DerivedType\SelectOrAddType(), array(
 //            'class' => '\DTA\MetadataBundle\Model\Publishingcompany',
 //            'label' => 'Verlag'

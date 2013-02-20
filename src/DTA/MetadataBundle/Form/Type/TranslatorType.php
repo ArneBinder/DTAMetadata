@@ -17,5 +17,7 @@ class TranslatorType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->add('id');
+        $builder->add('Person', new PersonType());
     }
 }

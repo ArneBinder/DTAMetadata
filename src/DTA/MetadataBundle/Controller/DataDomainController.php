@@ -19,15 +19,15 @@ class DataDomainController extends DTABaseController {
     public static $domainMenu = array(
         array("caption" => "Publikationen", "children" => array(
                 array('caption' => "Alle Publikationsarten", 'route' => 'home'),
-                array('caption' => "Bücher", 'modelClass' => 'Monograph'),
-                array('caption' => "Zeitschriften", 'modelClass' => 'Magazine'),
+                array('modelClass' => 'Monograph'),
+                array('modelClass' => 'Magazine'),
                 array('caption' => "Reihen", 'modelClass' => 'Series'),
                 array('caption' => "Essays", 'modelClass' => 'Essay'))),
         array("caption" => "Personen", "children" => array(
                 array('caption' => "Alle Personen", 'route' => 'home'),
-                array('caption' => "Autoren", 'modelClass' => 'Author'),
+                array('modelClass' => 'Author'),
                 array('caption' => "Verleger", 'modelClass' => 'Publisher'),
-                array('caption' => "Übersetzer", 'modelClass' => 'Translator'),
+                array('modelClass' => 'Translator'),
                 array('caption' => "Drucker", 'modelClass' => 'Printer'))),
         array("caption" => "Verlage", 'modelClass' => 'PublishingCompany'),
     );
@@ -37,7 +37,11 @@ class DataDomainController extends DTABaseController {
      */
     public function indexAction() {
         // TODO: remove. DataDomain.html.twig is useless now, as the domain menu has been generalized to the top level.
-        return $this->renderControllerSpecificAction('DTAMetadataBundle:DataDomain:index.html.twig');
+//        $pnq = new Model\PersonalQuery();
+        
+        return $this->renderControllerSpecificAction('DTAMetadataBundle:DataDomain:index.html.twig', array(
+            "person" => ""//$pnq->findOneById(4)->getPersonalnames(),
+        ));
     }
 
     /**
@@ -46,7 +50,7 @@ class DataDomainController extends DTABaseController {
      * @Route("/neu/{className}", name="DataDomainNewRecord")
      */
     public function newAction($className) {
-        $form = $this->genericEditFormAction($className, 0);
+        $form = $this->dynamicForm($className, 0);
         return $this->renderControllerSpecificAction('DTAMetadataBundle::formWrapper.html.twig', array(
             'className' => $className,
             'form' => $form->createView(),
@@ -67,6 +71,20 @@ class DataDomainController extends DTABaseController {
         $nachname = new Model\Namefragmenttype();
         $nachname->setName("Nachname");
         $nachname->save();
+        
+        $adelstitel = new Model\Namefragmenttype();
+        $adelstitel->setName("Adelstitel");
+        $adelstitel->save();
+        
+        $generation = new Model\Namefragmenttype();
+        $generation->setName("Generation");
+        $generation->save();
+        
+        $pseudonym = new Model\Namefragmenttype();
+        $pseudonym->setName("Pseudonym");
+        $pseudonym->save();
+        
+        
 
         // users
         

@@ -3,25 +3,31 @@
     removing the labels and adding indicator classes to it to trigger javascript gui generation.
 
     The basics were taken from form_div_layout.hmtl.twig as provided by the symfony vendor files.
+
+    the convention for naming blocks is
+        <name> = result of form type's getName() function
+        <name>_widget
  #}
 
-{# 
-    The extended select box with an option to add a new database entity 
-#}
+{#  -----------------------------------------------------------------------------
+    The selectOrAdd widget extends a select box with 
+    an option to add a new database entity 
+    ----------------------------------------------------------------------------- #}
 
-{% block selectOrAdd_widget %}
+{% block selectOrAdd_widget %} 
     {# The default select box#}
     {{form_widget(form)}} 
-    <button class="selectOrAdd add btn" type="button" data-toggle="modal" href="#testModal">{{ form.vars.label }} {{ 'selectOrAdd.addBtn.suffix'|trans }}</button>
+    {# The href attribute of the button, which defines the target modal, is added via javascript. #}
+    <button class="selectOrAdd add btn" type="button" data-toggle="modal">{{ form.vars.label }} {{ 'selectOrAdd.addBtn.suffix'|trans }}</button>
     <input type="hidden" class="selectOrAdd" name="modelClass" value="{{ form.vars.modelClass }}"/>
     <input type="hidden" class="selectOrAdd" name="formRetrieveUrl" value="{{ path('plainForm', {'className': form.vars.modelClass, 'captionProperty': form.vars.captionProperty, 'domainKey': "ajax"}) }}"/>
     
     {#{dump(form.vars)}#}
 {% endblock selectOrAdd_widget %}
 
-{# 
-    Input controls for all entities with multiple parts, with an order and a type (titles, names)
-#}
+{#  -----------------------------------------------------------------------------
+    sortable collection widget
+    ----------------------------------------------------------------------------- #}
 
 {% block sortableCollection_widget %}
 {% spaceless %}
@@ -38,6 +44,16 @@
         {{ block('sortableCollection_rows') }}
         {{ form_rest(form) }}
     </ol>
+        {#onclick="function(){console.log('success')}"#}
+
+    <a href="#" class="sortableCollectionWidget add-entity">
+        {{ form.vars.modelClass|trans }} hinzufügen {prototype: swapping doesn't yet copy all values.}
+    </a>
+    
+    {# For the javascript to have access to the translated modelClass name.
+       The up and down sortable controls need this to be more expressive.   #}
+    <input type="hidden" name="translatedModelClassName" value="{{ form.vars.modelClass|trans }}"/>
+    
 {% endspaceless %}
 {% endblock %}
 
@@ -47,23 +63,9 @@
     <li>
         {{ form_errors(child) }}
         {{ form_widget(child) }}
-        {# omit the default label (just a zero-based index) #}
+        {# omit the default label (just a zero-based index) for each fragment #}
         {#{ form_rest(child) }#}
     </li>
     {% endfor %}
 {% endspaceless %}
 {% endblock sortableCollection_rows %}
-
-{% block titleFragment_widget %}
-{% spaceless %}
-    <div {{ block('widget_container_attributes') }}>
-       {% if form.parent is empty %}
-           {{ form_errors(form) }}
-       {% endif %}
-       {{ block('form_rows') }}
-       {{ form_rest(form) }}
-   </div>
-{% endspaceless %}
-{% endblock titleFragment_widget %}
-
-

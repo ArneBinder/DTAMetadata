@@ -42,7 +42,7 @@ class SourceTableMap extends TableMap
         $this->setPackage('src.DTA.MetadataBundle.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, 10, null);
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('publication_id', 'PublicationId', 'INTEGER', 'publication', 'id', true, null, null);
         $this->addColumn('quality', 'Quality', 'LONGVARCHAR', false, null, null);
         $this->addColumn('name', 'Name', 'LONGVARCHAR', false, null, null);

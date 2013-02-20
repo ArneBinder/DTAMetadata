@@ -54,9 +54,21 @@ class TranslatorTableMap extends TableMap
     {
         $this->addRelation('Person', 'DTA\\MetadataBundle\\Model\\Person', RelationMap::MANY_TO_ONE, array('person_id' => 'id', ), null, null);
         $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Publication', RelationMap::ONE_TO_MANY, array('id' => 'translator_id', ), null, null, 'Publications');
-        $this->addRelation('Essay', 'DTA\\MetadataBundle\\Model\\Essay', RelationMap::ONE_TO_MANY, array('id' => 'translator_id', ), null, null, 'Essays');
-        $this->addRelation('Magazine', 'DTA\\MetadataBundle\\Model\\Magazine', RelationMap::ONE_TO_MANY, array('id' => 'translator_id', ), null, null, 'Magazines');
-        $this->addRelation('Series', 'DTA\\MetadataBundle\\Model\\Series', RelationMap::ONE_TO_MANY, array('id' => 'translator_id', ), null, null, 'Series');
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'table_row_view' =>  array (
+  'embedColumns_1' => 'person',
+),
+        );
+    } // getBehaviors()
 
 } // TranslatorTableMap

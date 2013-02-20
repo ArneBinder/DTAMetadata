@@ -43,22 +43,7 @@ class EssayTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('printRun', 'Printrun', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('edition', 'Edition', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('editionNumerical', 'Editionnumerical', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('numPages', 'Numpages', 'INTEGER', false, null, null);
-        $this->addColumn('numPagesNormed', 'Numpagesnormed', 'INTEGER', false, null, null);
-        $this->addColumn('bibliographicCitation', 'Bibliographiccitation', 'LONGVARCHAR', false, null, null);
-        $this->addForeignKey('title_id', 'TitleId', 'INTEGER', 'title', 'id', true, null, null);
-        $this->addForeignKey('publishingCompany_id', 'PublishingcompanyId', 'INTEGER', 'publishingCompany', 'id', false, null, null);
-        $this->addForeignKey('place_id', 'PlaceId', 'INTEGER', 'place', 'id', false, null, null);
-        $this->addForeignKey('publicationDate_id', 'PublicationDate', 'INTEGER', 'dateSpecification', 'id', false, null, null);
-        $this->addForeignKey('originDate_id', 'OriginDate', 'INTEGER', 'dateSpecification', 'id', false, null, null);
-        $this->addForeignKey('relatedSet_id', 'RelatedsetId', 'INTEGER', 'relatedSet', 'id', false, null, null);
-        $this->addForeignKey('work_id', 'WorkId', 'INTEGER', 'work', 'id', true, null, null);
-        $this->addForeignKey('publisher_id', 'PublisherId', 'INTEGER', 'publisher', 'id', false, null, null);
-        $this->addForeignKey('printer_id', 'PrinterId', 'INTEGER', 'printer', 'id', false, null, null);
-        $this->addForeignKey('translator_id', 'TranslatorId', 'INTEGER', 'translator', 'id', false, null, null);
+        $this->addForeignPrimaryKey('publication_id', 'PublicationId', 'INTEGER' , 'publication', 'id', true, null, null);
         // validators
     } // initialize()
 
@@ -67,34 +52,7 @@ class EssayTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Work', 'DTA\\MetadataBundle\\Model\\Work', RelationMap::MANY_TO_ONE, array('work_id' => 'id', ), null, null);
-        $this->addRelation('Publisher', 'DTA\\MetadataBundle\\Model\\Publisher', RelationMap::MANY_TO_ONE, array('publisher_id' => 'id', ), null, null);
-        $this->addRelation('Printer', 'DTA\\MetadataBundle\\Model\\Printer', RelationMap::MANY_TO_ONE, array('printer_id' => 'id', ), null, null);
-        $this->addRelation('Translator', 'DTA\\MetadataBundle\\Model\\Translator', RelationMap::MANY_TO_ONE, array('translator_id' => 'id', ), null, null);
-        $this->addRelation('Relatedset', 'DTA\\MetadataBundle\\Model\\Relatedset', RelationMap::MANY_TO_ONE, array('relatedSet_id' => 'id', ), null, null);
-        $this->addRelation('Title', 'DTA\\MetadataBundle\\Model\\Title', RelationMap::MANY_TO_ONE, array('title_id' => 'id', ), null, null);
-        $this->addRelation('Publishingcompany', 'DTA\\MetadataBundle\\Model\\Publishingcompany', RelationMap::MANY_TO_ONE, array('publishingCompany_id' => 'id', ), null, null);
-        $this->addRelation('Place', 'DTA\\MetadataBundle\\Model\\Place', RelationMap::MANY_TO_ONE, array('place_id' => 'id', ), null, null);
-        $this->addRelation('DatespecificationRelatedByPublicationDate', 'DTA\\MetadataBundle\\Model\\Datespecification', RelationMap::MANY_TO_ONE, array('publicationDate_id' => 'id', ), null, null);
-        $this->addRelation('DatespecificationRelatedByOriginDate', 'DTA\\MetadataBundle\\Model\\Datespecification', RelationMap::MANY_TO_ONE, array('originDate_id' => 'id', ), null, null);
+        $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Publication', RelationMap::MANY_TO_ONE, array('publication_id' => 'id', ), null, null);
     } // buildRelations()
-
-    /**
-     *
-     * Gets the list of behaviors registered for this table
-     *
-     * @return array Associative array (name => parameters) of behaviors
-     */
-    public function getBehaviors()
-    {
-        return array(
-            'concrete_inheritance' =>  array (
-  'extends' => 'publication',
-  'descendant_column' => 'descendant_class',
-  'copy_data_to_parent' => 'true',
-  'schema' => '',
-),
-        );
-    } // getBehaviors()
 
 } // EssayTableMap

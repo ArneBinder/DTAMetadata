@@ -20,6 +20,7 @@ function launchAddDialog(){
         modal = createModal($addButton.parent());
         modal.data("selectWidget", selectWidget);
         
+        $addButton.attr("href", "#"+modal.prop("id"));
         $addButton.data("modal", modal);
         $addButton.addClass("modalCreated");
     } else {
@@ -71,7 +72,10 @@ function updateSelectWidget(data){
 // formElement is the dom element with which the modal interacts
 function createModal(formElement){
     
-    var modal = $('<div id="testModal" class="modal hide fade" tabindex="-1"/>');
+    var formDataUnit = $(formElement).parent();
+    var modalId = "modal_for_"+formDataUnit.prop("id");
+    var modal = $('<div id="'+modalId+'" class="modal hide fade" tabindex="-1"/>');
+    
     $(formElement).append(modal);
     
     return modal;

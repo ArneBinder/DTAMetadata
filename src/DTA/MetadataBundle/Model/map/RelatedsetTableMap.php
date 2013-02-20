@@ -53,9 +53,6 @@ class RelatedsetTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Publication', RelationMap::ONE_TO_MANY, array('id' => 'relatedSet_id', ), null, null, 'Publications');
-        $this->addRelation('Essay', 'DTA\\MetadataBundle\\Model\\Essay', RelationMap::ONE_TO_MANY, array('id' => 'relatedSet_id', ), null, null, 'Essays');
-        $this->addRelation('Magazine', 'DTA\\MetadataBundle\\Model\\Magazine', RelationMap::ONE_TO_MANY, array('id' => 'relatedSet_id', ), null, null, 'Magazines');
-        $this->addRelation('Series', 'DTA\\MetadataBundle\\Model\\Series', RelationMap::ONE_TO_MANY, array('id' => 'relatedSet_id', ), null, null, 'Series');
     } // buildRelations()
 
 } // RelatedsetTableMap

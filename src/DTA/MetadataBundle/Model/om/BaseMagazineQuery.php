@@ -4,6 +4,7 @@ namespace DTA\MetadataBundle\Model\om;
 
 use \Criteria;
 use \Exception;
+use \ModelCriteria;
 use \ModelJoin;
 use \PDO;
 use \Propel;
@@ -11,140 +12,36 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
-use DTA\MetadataBundle\Model\Datespecification;
 use DTA\MetadataBundle\Model\Magazine;
 use DTA\MetadataBundle\Model\MagazinePeer;
 use DTA\MetadataBundle\Model\MagazineQuery;
-use DTA\MetadataBundle\Model\Place;
-use DTA\MetadataBundle\Model\Printer;
-use DTA\MetadataBundle\Model\PublicationQuery;
-use DTA\MetadataBundle\Model\Publisher;
-use DTA\MetadataBundle\Model\Publishingcompany;
-use DTA\MetadataBundle\Model\Relatedset;
-use DTA\MetadataBundle\Model\Title;
-use DTA\MetadataBundle\Model\Translator;
-use DTA\MetadataBundle\Model\Work;
+use DTA\MetadataBundle\Model\Publication;
 
 /**
  * @method MagazineQuery orderById($order = Criteria::ASC) Order by the id column
- * @method MagazineQuery orderByPrintrun($order = Criteria::ASC) Order by the printRun column
- * @method MagazineQuery orderByEdition($order = Criteria::ASC) Order by the edition column
- * @method MagazineQuery orderByEditionnumerical($order = Criteria::ASC) Order by the editionNumerical column
- * @method MagazineQuery orderByNumpages($order = Criteria::ASC) Order by the numPages column
- * @method MagazineQuery orderByNumpagesnormed($order = Criteria::ASC) Order by the numPagesNormed column
- * @method MagazineQuery orderByBibliographiccitation($order = Criteria::ASC) Order by the bibliographicCitation column
- * @method MagazineQuery orderByTitleId($order = Criteria::ASC) Order by the title_id column
- * @method MagazineQuery orderByPublishingcompanyId($order = Criteria::ASC) Order by the publishingCompany_id column
- * @method MagazineQuery orderByPlaceId($order = Criteria::ASC) Order by the place_id column
- * @method MagazineQuery orderByPublicationDate($order = Criteria::ASC) Order by the publicationDate_id column
- * @method MagazineQuery orderByOriginDate($order = Criteria::ASC) Order by the originDate_id column
- * @method MagazineQuery orderByRelatedsetId($order = Criteria::ASC) Order by the relatedSet_id column
- * @method MagazineQuery orderByWorkId($order = Criteria::ASC) Order by the work_id column
- * @method MagazineQuery orderByPublisherId($order = Criteria::ASC) Order by the publisher_id column
- * @method MagazineQuery orderByPrinterId($order = Criteria::ASC) Order by the printer_id column
- * @method MagazineQuery orderByTranslatorId($order = Criteria::ASC) Order by the translator_id column
+ * @method MagazineQuery orderByPublicationId($order = Criteria::ASC) Order by the publication_id column
  *
  * @method MagazineQuery groupById() Group by the id column
- * @method MagazineQuery groupByPrintrun() Group by the printRun column
- * @method MagazineQuery groupByEdition() Group by the edition column
- * @method MagazineQuery groupByEditionnumerical() Group by the editionNumerical column
- * @method MagazineQuery groupByNumpages() Group by the numPages column
- * @method MagazineQuery groupByNumpagesnormed() Group by the numPagesNormed column
- * @method MagazineQuery groupByBibliographiccitation() Group by the bibliographicCitation column
- * @method MagazineQuery groupByTitleId() Group by the title_id column
- * @method MagazineQuery groupByPublishingcompanyId() Group by the publishingCompany_id column
- * @method MagazineQuery groupByPlaceId() Group by the place_id column
- * @method MagazineQuery groupByPublicationDate() Group by the publicationDate_id column
- * @method MagazineQuery groupByOriginDate() Group by the originDate_id column
- * @method MagazineQuery groupByRelatedsetId() Group by the relatedSet_id column
- * @method MagazineQuery groupByWorkId() Group by the work_id column
- * @method MagazineQuery groupByPublisherId() Group by the publisher_id column
- * @method MagazineQuery groupByPrinterId() Group by the printer_id column
- * @method MagazineQuery groupByTranslatorId() Group by the translator_id column
+ * @method MagazineQuery groupByPublicationId() Group by the publication_id column
  *
  * @method MagazineQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method MagazineQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method MagazineQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method MagazineQuery leftJoinWork($relationAlias = null) Adds a LEFT JOIN clause to the query using the Work relation
- * @method MagazineQuery rightJoinWork($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Work relation
- * @method MagazineQuery innerJoinWork($relationAlias = null) Adds a INNER JOIN clause to the query using the Work relation
- *
- * @method MagazineQuery leftJoinPublisher($relationAlias = null) Adds a LEFT JOIN clause to the query using the Publisher relation
- * @method MagazineQuery rightJoinPublisher($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Publisher relation
- * @method MagazineQuery innerJoinPublisher($relationAlias = null) Adds a INNER JOIN clause to the query using the Publisher relation
- *
- * @method MagazineQuery leftJoinPrinter($relationAlias = null) Adds a LEFT JOIN clause to the query using the Printer relation
- * @method MagazineQuery rightJoinPrinter($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Printer relation
- * @method MagazineQuery innerJoinPrinter($relationAlias = null) Adds a INNER JOIN clause to the query using the Printer relation
- *
- * @method MagazineQuery leftJoinTranslator($relationAlias = null) Adds a LEFT JOIN clause to the query using the Translator relation
- * @method MagazineQuery rightJoinTranslator($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Translator relation
- * @method MagazineQuery innerJoinTranslator($relationAlias = null) Adds a INNER JOIN clause to the query using the Translator relation
- *
- * @method MagazineQuery leftJoinRelatedset($relationAlias = null) Adds a LEFT JOIN clause to the query using the Relatedset relation
- * @method MagazineQuery rightJoinRelatedset($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Relatedset relation
- * @method MagazineQuery innerJoinRelatedset($relationAlias = null) Adds a INNER JOIN clause to the query using the Relatedset relation
- *
- * @method MagazineQuery leftJoinTitle($relationAlias = null) Adds a LEFT JOIN clause to the query using the Title relation
- * @method MagazineQuery rightJoinTitle($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Title relation
- * @method MagazineQuery innerJoinTitle($relationAlias = null) Adds a INNER JOIN clause to the query using the Title relation
- *
- * @method MagazineQuery leftJoinPublishingcompany($relationAlias = null) Adds a LEFT JOIN clause to the query using the Publishingcompany relation
- * @method MagazineQuery rightJoinPublishingcompany($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Publishingcompany relation
- * @method MagazineQuery innerJoinPublishingcompany($relationAlias = null) Adds a INNER JOIN clause to the query using the Publishingcompany relation
- *
- * @method MagazineQuery leftJoinPlace($relationAlias = null) Adds a LEFT JOIN clause to the query using the Place relation
- * @method MagazineQuery rightJoinPlace($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Place relation
- * @method MagazineQuery innerJoinPlace($relationAlias = null) Adds a INNER JOIN clause to the query using the Place relation
- *
- * @method MagazineQuery leftJoinDatespecificationRelatedByPublicationDate($relationAlias = null) Adds a LEFT JOIN clause to the query using the DatespecificationRelatedByPublicationDate relation
- * @method MagazineQuery rightJoinDatespecificationRelatedByPublicationDate($relationAlias = null) Adds a RIGHT JOIN clause to the query using the DatespecificationRelatedByPublicationDate relation
- * @method MagazineQuery innerJoinDatespecificationRelatedByPublicationDate($relationAlias = null) Adds a INNER JOIN clause to the query using the DatespecificationRelatedByPublicationDate relation
- *
- * @method MagazineQuery leftJoinDatespecificationRelatedByOriginDate($relationAlias = null) Adds a LEFT JOIN clause to the query using the DatespecificationRelatedByOriginDate relation
- * @method MagazineQuery rightJoinDatespecificationRelatedByOriginDate($relationAlias = null) Adds a RIGHT JOIN clause to the query using the DatespecificationRelatedByOriginDate relation
- * @method MagazineQuery innerJoinDatespecificationRelatedByOriginDate($relationAlias = null) Adds a INNER JOIN clause to the query using the DatespecificationRelatedByOriginDate relation
+ * @method MagazineQuery leftJoinPublication($relationAlias = null) Adds a LEFT JOIN clause to the query using the Publication relation
+ * @method MagazineQuery rightJoinPublication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Publication relation
+ * @method MagazineQuery innerJoinPublication($relationAlias = null) Adds a INNER JOIN clause to the query using the Publication relation
  *
  * @method Magazine findOne(PropelPDO $con = null) Return the first Magazine matching the query
  * @method Magazine findOneOrCreate(PropelPDO $con = null) Return the first Magazine matching the query, or a new Magazine object populated from the query conditions when no match is found
  *
- * @method Magazine findOneByPrintrun(string $printRun) Return the first Magazine filtered by the printRun column
- * @method Magazine findOneByEdition(string $edition) Return the first Magazine filtered by the edition column
- * @method Magazine findOneByEditionnumerical(string $editionNumerical) Return the first Magazine filtered by the editionNumerical column
- * @method Magazine findOneByNumpages(int $numPages) Return the first Magazine filtered by the numPages column
- * @method Magazine findOneByNumpagesnormed(int $numPagesNormed) Return the first Magazine filtered by the numPagesNormed column
- * @method Magazine findOneByBibliographiccitation(string $bibliographicCitation) Return the first Magazine filtered by the bibliographicCitation column
- * @method Magazine findOneByTitleId(int $title_id) Return the first Magazine filtered by the title_id column
- * @method Magazine findOneByPublishingcompanyId(int $publishingCompany_id) Return the first Magazine filtered by the publishingCompany_id column
- * @method Magazine findOneByPlaceId(int $place_id) Return the first Magazine filtered by the place_id column
- * @method Magazine findOneByPublicationDate(int $publicationDate_id) Return the first Magazine filtered by the publicationDate_id column
- * @method Magazine findOneByOriginDate(int $originDate_id) Return the first Magazine filtered by the originDate_id column
- * @method Magazine findOneByRelatedsetId(int $relatedSet_id) Return the first Magazine filtered by the relatedSet_id column
- * @method Magazine findOneByWorkId(int $work_id) Return the first Magazine filtered by the work_id column
- * @method Magazine findOneByPublisherId(int $publisher_id) Return the first Magazine filtered by the publisher_id column
- * @method Magazine findOneByPrinterId(int $printer_id) Return the first Magazine filtered by the printer_id column
- * @method Magazine findOneByTranslatorId(int $translator_id) Return the first Magazine filtered by the translator_id column
+ * @method Magazine findOneById(int $id) Return the first Magazine filtered by the id column
+ * @method Magazine findOneByPublicationId(int $publication_id) Return the first Magazine filtered by the publication_id column
  *
  * @method array findById(int $id) Return Magazine objects filtered by the id column
- * @method array findByPrintrun(string $printRun) Return Magazine objects filtered by the printRun column
- * @method array findByEdition(string $edition) Return Magazine objects filtered by the edition column
- * @method array findByEditionnumerical(string $editionNumerical) Return Magazine objects filtered by the editionNumerical column
- * @method array findByNumpages(int $numPages) Return Magazine objects filtered by the numPages column
- * @method array findByNumpagesnormed(int $numPagesNormed) Return Magazine objects filtered by the numPagesNormed column
- * @method array findByBibliographiccitation(string $bibliographicCitation) Return Magazine objects filtered by the bibliographicCitation column
- * @method array findByTitleId(int $title_id) Return Magazine objects filtered by the title_id column
- * @method array findByPublishingcompanyId(int $publishingCompany_id) Return Magazine objects filtered by the publishingCompany_id column
- * @method array findByPlaceId(int $place_id) Return Magazine objects filtered by the place_id column
- * @method array findByPublicationDate(int $publicationDate_id) Return Magazine objects filtered by the publicationDate_id column
- * @method array findByOriginDate(int $originDate_id) Return Magazine objects filtered by the originDate_id column
- * @method array findByRelatedsetId(int $relatedSet_id) Return Magazine objects filtered by the relatedSet_id column
- * @method array findByWorkId(int $work_id) Return Magazine objects filtered by the work_id column
- * @method array findByPublisherId(int $publisher_id) Return Magazine objects filtered by the publisher_id column
- * @method array findByPrinterId(int $printer_id) Return Magazine objects filtered by the printer_id column
- * @method array findByTranslatorId(int $translator_id) Return Magazine objects filtered by the translator_id column
+ * @method array findByPublicationId(int $publication_id) Return Magazine objects filtered by the publication_id column
  */
-abstract class BaseMagazineQuery extends PublicationQuery
+abstract class BaseMagazineQuery extends ModelCriteria
 {
     /**
      * Initializes internal state of BaseMagazineQuery object.
@@ -188,10 +85,11 @@ abstract class BaseMagazineQuery extends PublicationQuery
      * Go fast if the query is untouched.
      *
      * <code>
-     * $obj  = $c->findPk(12, $con);
+     * $obj = $c->findPk(array(12, 34), $con);
      * </code>
      *
-     * @param mixed $key Primary key to use for the query
+     * @param array $key Primary key to use for the query
+                         A Primary key composition: [$id, $publication_id]
      * @param     PropelPDO $con an optional connection object
      *
      * @return   Magazine|Magazine[]|mixed the result, formatted by the current formatter
@@ -201,7 +99,7 @@ abstract class BaseMagazineQuery extends PublicationQuery
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = MagazinePeer::getInstanceFromPool((string) $key))) && !$this->formatter) {
+        if ((null !== ($obj = MagazinePeer::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1]))))) && !$this->formatter) {
             // the object is alredy in the instance pool
             return $obj;
         }
@@ -219,20 +117,6 @@ abstract class BaseMagazineQuery extends PublicationQuery
     }
 
     /**
-     * Alias of findPk to use instance pooling
-     *
-     * @param     mixed $key Primary key to use for the query
-     * @param     PropelPDO $con A connection object
-     *
-     * @return                 Magazine A model object, or null if the key is not found
-     * @throws PropelException
-     */
-     public function findOneById($key, $con = null)
-     {
-        return $this->findPk($key, $con);
-     }
-
-    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
@@ -244,10 +128,11 @@ abstract class BaseMagazineQuery extends PublicationQuery
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `printRun`, `edition`, `editionNumerical`, `numPages`, `numPagesNormed`, `bibliographicCitation`, `title_id`, `publishingCompany_id`, `place_id`, `publicationDate_id`, `originDate_id`, `relatedSet_id`, `work_id`, `publisher_id`, `printer_id`, `translator_id` FROM `magazine` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `publication_id` FROM `magazine` WHERE `id` = :p0 AND `publication_id` = :p1';
         try {
             $stmt = $con->prepare($sql);
-            $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
+            $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
+            $stmt->bindValue(':p1', $key[1], PDO::PARAM_INT);
             $stmt->execute();
         } catch (Exception $e) {
             Propel::log($e->getMessage(), Propel::LOG_ERR);
@@ -257,7 +142,7 @@ abstract class BaseMagazineQuery extends PublicationQuery
         if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
             $obj = new Magazine();
             $obj->hydrate($row);
-            MagazinePeer::addInstanceToPool($obj, (string) $key);
+            MagazinePeer::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1])));
         }
         $stmt->closeCursor();
 
@@ -286,7 +171,7 @@ abstract class BaseMagazineQuery extends PublicationQuery
     /**
      * Find objects by primary key
      * <code>
-     * $objs = $c->findPks(array(12, 56, 832), $con);
+     * $objs = $c->findPks(array(array(12, 56), array(832, 123), array(123, 456)), $con);
      * </code>
      * @param     array $keys Primary keys to use for the query
      * @param     PropelPDO $con an optional connection object
@@ -316,8 +201,10 @@ abstract class BaseMagazineQuery extends PublicationQuery
      */
     public function filterByPrimaryKey($key)
     {
+        $this->addUsingAlias(MagazinePeer::ID, $key[0], Criteria::EQUAL);
+        $this->addUsingAlias(MagazinePeer::PUBLICATION_ID, $key[1], Criteria::EQUAL);
 
-        return $this->addUsingAlias(MagazinePeer::ID, $key, Criteria::EQUAL);
+        return $this;
     }
 
     /**
@@ -329,8 +216,17 @@ abstract class BaseMagazineQuery extends PublicationQuery
      */
     public function filterByPrimaryKeys($keys)
     {
+        if (empty($keys)) {
+            return $this->add(null, '1<>1', Criteria::CUSTOM);
+        }
+        foreach ($keys as $key) {
+            $cton0 = $this->getNewCriterion(MagazinePeer::ID, $key[0], Criteria::EQUAL);
+            $cton1 = $this->getNewCriterion(MagazinePeer::PUBLICATION_ID, $key[1], Criteria::EQUAL);
+            $cton0->addAnd($cton1);
+            $this->addOr($cton0);
+        }
 
-        return $this->addUsingAlias(MagazinePeer::ID, $keys, Criteria::IN);
+        return $this;
     }
 
     /**
@@ -376,104 +272,19 @@ abstract class BaseMagazineQuery extends PublicationQuery
     }
 
     /**
-     * Filter the query on the printRun column
+     * Filter the query on the publication_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByPrintrun('fooValue');   // WHERE printRun = 'fooValue'
-     * $query->filterByPrintrun('%fooValue%'); // WHERE printRun LIKE '%fooValue%'
+     * $query->filterByPublicationId(1234); // WHERE publication_id = 1234
+     * $query->filterByPublicationId(array(12, 34)); // WHERE publication_id IN (12, 34)
+     * $query->filterByPublicationId(array('min' => 12)); // WHERE publication_id >= 12
+     * $query->filterByPublicationId(array('max' => 12)); // WHERE publication_id <= 12
      * </code>
      *
-     * @param     string $printrun The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @see       filterByPublication()
      *
-     * @return MagazineQuery The current query, for fluid interface
-     */
-    public function filterByPrintrun($printrun = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($printrun)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $printrun)) {
-                $printrun = str_replace('*', '%', $printrun);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(MagazinePeer::PRINTRUN, $printrun, $comparison);
-    }
-
-    /**
-     * Filter the query on the edition column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByEdition('fooValue');   // WHERE edition = 'fooValue'
-     * $query->filterByEdition('%fooValue%'); // WHERE edition LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $edition The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return MagazineQuery The current query, for fluid interface
-     */
-    public function filterByEdition($edition = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($edition)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $edition)) {
-                $edition = str_replace('*', '%', $edition);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(MagazinePeer::EDITION, $edition, $comparison);
-    }
-
-    /**
-     * Filter the query on the editionNumerical column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByEditionnumerical('fooValue');   // WHERE editionNumerical = 'fooValue'
-     * $query->filterByEditionnumerical('%fooValue%'); // WHERE editionNumerical LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $editionnumerical The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return MagazineQuery The current query, for fluid interface
-     */
-    public function filterByEditionnumerical($editionnumerical = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($editionnumerical)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $editionnumerical)) {
-                $editionnumerical = str_replace('*', '%', $editionnumerical);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(MagazinePeer::EDITIONNUMERICAL, $editionnumerical, $comparison);
-    }
-
-    /**
-     * Filter the query on the numPages column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByNumpages(1234); // WHERE numPages = 1234
-     * $query->filterByNumpages(array(12, 34)); // WHERE numPages IN (12, 34)
-     * $query->filterByNumpages(array('min' => 12)); // WHERE numPages >= 12
-     * $query->filterByNumpages(array('max' => 12)); // WHERE numPages <= 12
-     * </code>
-     *
-     * @param     mixed $numpages The value to use as filter.
+     * @param     mixed $publicationId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -481,16 +292,16 @@ abstract class BaseMagazineQuery extends PublicationQuery
      *
      * @return MagazineQuery The current query, for fluid interface
      */
-    public function filterByNumpages($numpages = null, $comparison = null)
+    public function filterByPublicationId($publicationId = null, $comparison = null)
     {
-        if (is_array($numpages)) {
+        if (is_array($publicationId)) {
             $useMinMax = false;
-            if (isset($numpages['min'])) {
-                $this->addUsingAlias(MagazinePeer::NUMPAGES, $numpages['min'], Criteria::GREATER_EQUAL);
+            if (isset($publicationId['min'])) {
+                $this->addUsingAlias(MagazinePeer::PUBLICATION_ID, $publicationId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($numpages['max'])) {
-                $this->addUsingAlias(MagazinePeer::NUMPAGES, $numpages['max'], Criteria::LESS_EQUAL);
+            if (isset($publicationId['max'])) {
+                $this->addUsingAlias(MagazinePeer::PUBLICATION_ID, $publicationId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -501,558 +312,47 @@ abstract class BaseMagazineQuery extends PublicationQuery
             }
         }
 
-        return $this->addUsingAlias(MagazinePeer::NUMPAGES, $numpages, $comparison);
+        return $this->addUsingAlias(MagazinePeer::PUBLICATION_ID, $publicationId, $comparison);
     }
 
     /**
-     * Filter the query on the numPagesNormed column
+     * Filter the query by a related Publication object
      *
-     * Example usage:
-     * <code>
-     * $query->filterByNumpagesnormed(1234); // WHERE numPagesNormed = 1234
-     * $query->filterByNumpagesnormed(array(12, 34)); // WHERE numPagesNormed IN (12, 34)
-     * $query->filterByNumpagesnormed(array('min' => 12)); // WHERE numPagesNormed >= 12
-     * $query->filterByNumpagesnormed(array('max' => 12)); // WHERE numPagesNormed <= 12
-     * </code>
-     *
-     * @param     mixed $numpagesnormed The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return MagazineQuery The current query, for fluid interface
-     */
-    public function filterByNumpagesnormed($numpagesnormed = null, $comparison = null)
-    {
-        if (is_array($numpagesnormed)) {
-            $useMinMax = false;
-            if (isset($numpagesnormed['min'])) {
-                $this->addUsingAlias(MagazinePeer::NUMPAGESNORMED, $numpagesnormed['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($numpagesnormed['max'])) {
-                $this->addUsingAlias(MagazinePeer::NUMPAGESNORMED, $numpagesnormed['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(MagazinePeer::NUMPAGESNORMED, $numpagesnormed, $comparison);
-    }
-
-    /**
-     * Filter the query on the bibliographicCitation column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByBibliographiccitation('fooValue');   // WHERE bibliographicCitation = 'fooValue'
-     * $query->filterByBibliographiccitation('%fooValue%'); // WHERE bibliographicCitation LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $bibliographiccitation The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return MagazineQuery The current query, for fluid interface
-     */
-    public function filterByBibliographiccitation($bibliographiccitation = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($bibliographiccitation)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $bibliographiccitation)) {
-                $bibliographiccitation = str_replace('*', '%', $bibliographiccitation);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(MagazinePeer::BIBLIOGRAPHICCITATION, $bibliographiccitation, $comparison);
-    }
-
-    /**
-     * Filter the query on the title_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByTitleId(1234); // WHERE title_id = 1234
-     * $query->filterByTitleId(array(12, 34)); // WHERE title_id IN (12, 34)
-     * $query->filterByTitleId(array('min' => 12)); // WHERE title_id >= 12
-     * $query->filterByTitleId(array('max' => 12)); // WHERE title_id <= 12
-     * </code>
-     *
-     * @see       filterByTitle()
-     *
-     * @param     mixed $titleId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return MagazineQuery The current query, for fluid interface
-     */
-    public function filterByTitleId($titleId = null, $comparison = null)
-    {
-        if (is_array($titleId)) {
-            $useMinMax = false;
-            if (isset($titleId['min'])) {
-                $this->addUsingAlias(MagazinePeer::TITLE_ID, $titleId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($titleId['max'])) {
-                $this->addUsingAlias(MagazinePeer::TITLE_ID, $titleId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(MagazinePeer::TITLE_ID, $titleId, $comparison);
-    }
-
-    /**
-     * Filter the query on the publishingCompany_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByPublishingcompanyId(1234); // WHERE publishingCompany_id = 1234
-     * $query->filterByPublishingcompanyId(array(12, 34)); // WHERE publishingCompany_id IN (12, 34)
-     * $query->filterByPublishingcompanyId(array('min' => 12)); // WHERE publishingCompany_id >= 12
-     * $query->filterByPublishingcompanyId(array('max' => 12)); // WHERE publishingCompany_id <= 12
-     * </code>
-     *
-     * @see       filterByPublishingcompany()
-     *
-     * @param     mixed $publishingcompanyId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return MagazineQuery The current query, for fluid interface
-     */
-    public function filterByPublishingcompanyId($publishingcompanyId = null, $comparison = null)
-    {
-        if (is_array($publishingcompanyId)) {
-            $useMinMax = false;
-            if (isset($publishingcompanyId['min'])) {
-                $this->addUsingAlias(MagazinePeer::PUBLISHINGCOMPANY_ID, $publishingcompanyId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($publishingcompanyId['max'])) {
-                $this->addUsingAlias(MagazinePeer::PUBLISHINGCOMPANY_ID, $publishingcompanyId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(MagazinePeer::PUBLISHINGCOMPANY_ID, $publishingcompanyId, $comparison);
-    }
-
-    /**
-     * Filter the query on the place_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByPlaceId(1234); // WHERE place_id = 1234
-     * $query->filterByPlaceId(array(12, 34)); // WHERE place_id IN (12, 34)
-     * $query->filterByPlaceId(array('min' => 12)); // WHERE place_id >= 12
-     * $query->filterByPlaceId(array('max' => 12)); // WHERE place_id <= 12
-     * </code>
-     *
-     * @see       filterByPlace()
-     *
-     * @param     mixed $placeId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return MagazineQuery The current query, for fluid interface
-     */
-    public function filterByPlaceId($placeId = null, $comparison = null)
-    {
-        if (is_array($placeId)) {
-            $useMinMax = false;
-            if (isset($placeId['min'])) {
-                $this->addUsingAlias(MagazinePeer::PLACE_ID, $placeId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($placeId['max'])) {
-                $this->addUsingAlias(MagazinePeer::PLACE_ID, $placeId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(MagazinePeer::PLACE_ID, $placeId, $comparison);
-    }
-
-    /**
-     * Filter the query on the publicationDate_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByPublicationDate(1234); // WHERE publicationDate_id = 1234
-     * $query->filterByPublicationDate(array(12, 34)); // WHERE publicationDate_id IN (12, 34)
-     * $query->filterByPublicationDate(array('min' => 12)); // WHERE publicationDate_id >= 12
-     * $query->filterByPublicationDate(array('max' => 12)); // WHERE publicationDate_id <= 12
-     * </code>
-     *
-     * @see       filterByDatespecificationRelatedByPublicationDate()
-     *
-     * @param     mixed $publicationDate The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return MagazineQuery The current query, for fluid interface
-     */
-    public function filterByPublicationDate($publicationDate = null, $comparison = null)
-    {
-        if (is_array($publicationDate)) {
-            $useMinMax = false;
-            if (isset($publicationDate['min'])) {
-                $this->addUsingAlias(MagazinePeer::PUBLICATIONDATE_ID, $publicationDate['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($publicationDate['max'])) {
-                $this->addUsingAlias(MagazinePeer::PUBLICATIONDATE_ID, $publicationDate['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(MagazinePeer::PUBLICATIONDATE_ID, $publicationDate, $comparison);
-    }
-
-    /**
-     * Filter the query on the originDate_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByOriginDate(1234); // WHERE originDate_id = 1234
-     * $query->filterByOriginDate(array(12, 34)); // WHERE originDate_id IN (12, 34)
-     * $query->filterByOriginDate(array('min' => 12)); // WHERE originDate_id >= 12
-     * $query->filterByOriginDate(array('max' => 12)); // WHERE originDate_id <= 12
-     * </code>
-     *
-     * @see       filterByDatespecificationRelatedByOriginDate()
-     *
-     * @param     mixed $originDate The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return MagazineQuery The current query, for fluid interface
-     */
-    public function filterByOriginDate($originDate = null, $comparison = null)
-    {
-        if (is_array($originDate)) {
-            $useMinMax = false;
-            if (isset($originDate['min'])) {
-                $this->addUsingAlias(MagazinePeer::ORIGINDATE_ID, $originDate['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($originDate['max'])) {
-                $this->addUsingAlias(MagazinePeer::ORIGINDATE_ID, $originDate['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(MagazinePeer::ORIGINDATE_ID, $originDate, $comparison);
-    }
-
-    /**
-     * Filter the query on the relatedSet_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByRelatedsetId(1234); // WHERE relatedSet_id = 1234
-     * $query->filterByRelatedsetId(array(12, 34)); // WHERE relatedSet_id IN (12, 34)
-     * $query->filterByRelatedsetId(array('min' => 12)); // WHERE relatedSet_id >= 12
-     * $query->filterByRelatedsetId(array('max' => 12)); // WHERE relatedSet_id <= 12
-     * </code>
-     *
-     * @see       filterByRelatedset()
-     *
-     * @param     mixed $relatedsetId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return MagazineQuery The current query, for fluid interface
-     */
-    public function filterByRelatedsetId($relatedsetId = null, $comparison = null)
-    {
-        if (is_array($relatedsetId)) {
-            $useMinMax = false;
-            if (isset($relatedsetId['min'])) {
-                $this->addUsingAlias(MagazinePeer::RELATEDSET_ID, $relatedsetId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($relatedsetId['max'])) {
-                $this->addUsingAlias(MagazinePeer::RELATEDSET_ID, $relatedsetId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(MagazinePeer::RELATEDSET_ID, $relatedsetId, $comparison);
-    }
-
-    /**
-     * Filter the query on the work_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByWorkId(1234); // WHERE work_id = 1234
-     * $query->filterByWorkId(array(12, 34)); // WHERE work_id IN (12, 34)
-     * $query->filterByWorkId(array('min' => 12)); // WHERE work_id >= 12
-     * $query->filterByWorkId(array('max' => 12)); // WHERE work_id <= 12
-     * </code>
-     *
-     * @see       filterByWork()
-     *
-     * @param     mixed $workId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return MagazineQuery The current query, for fluid interface
-     */
-    public function filterByWorkId($workId = null, $comparison = null)
-    {
-        if (is_array($workId)) {
-            $useMinMax = false;
-            if (isset($workId['min'])) {
-                $this->addUsingAlias(MagazinePeer::WORK_ID, $workId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($workId['max'])) {
-                $this->addUsingAlias(MagazinePeer::WORK_ID, $workId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(MagazinePeer::WORK_ID, $workId, $comparison);
-    }
-
-    /**
-     * Filter the query on the publisher_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByPublisherId(1234); // WHERE publisher_id = 1234
-     * $query->filterByPublisherId(array(12, 34)); // WHERE publisher_id IN (12, 34)
-     * $query->filterByPublisherId(array('min' => 12)); // WHERE publisher_id >= 12
-     * $query->filterByPublisherId(array('max' => 12)); // WHERE publisher_id <= 12
-     * </code>
-     *
-     * @see       filterByPublisher()
-     *
-     * @param     mixed $publisherId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return MagazineQuery The current query, for fluid interface
-     */
-    public function filterByPublisherId($publisherId = null, $comparison = null)
-    {
-        if (is_array($publisherId)) {
-            $useMinMax = false;
-            if (isset($publisherId['min'])) {
-                $this->addUsingAlias(MagazinePeer::PUBLISHER_ID, $publisherId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($publisherId['max'])) {
-                $this->addUsingAlias(MagazinePeer::PUBLISHER_ID, $publisherId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(MagazinePeer::PUBLISHER_ID, $publisherId, $comparison);
-    }
-
-    /**
-     * Filter the query on the printer_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByPrinterId(1234); // WHERE printer_id = 1234
-     * $query->filterByPrinterId(array(12, 34)); // WHERE printer_id IN (12, 34)
-     * $query->filterByPrinterId(array('min' => 12)); // WHERE printer_id >= 12
-     * $query->filterByPrinterId(array('max' => 12)); // WHERE printer_id <= 12
-     * </code>
-     *
-     * @see       filterByPrinter()
-     *
-     * @param     mixed $printerId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return MagazineQuery The current query, for fluid interface
-     */
-    public function filterByPrinterId($printerId = null, $comparison = null)
-    {
-        if (is_array($printerId)) {
-            $useMinMax = false;
-            if (isset($printerId['min'])) {
-                $this->addUsingAlias(MagazinePeer::PRINTER_ID, $printerId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($printerId['max'])) {
-                $this->addUsingAlias(MagazinePeer::PRINTER_ID, $printerId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(MagazinePeer::PRINTER_ID, $printerId, $comparison);
-    }
-
-    /**
-     * Filter the query on the translator_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByTranslatorId(1234); // WHERE translator_id = 1234
-     * $query->filterByTranslatorId(array(12, 34)); // WHERE translator_id IN (12, 34)
-     * $query->filterByTranslatorId(array('min' => 12)); // WHERE translator_id >= 12
-     * $query->filterByTranslatorId(array('max' => 12)); // WHERE translator_id <= 12
-     * </code>
-     *
-     * @see       filterByTranslator()
-     *
-     * @param     mixed $translatorId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return MagazineQuery The current query, for fluid interface
-     */
-    public function filterByTranslatorId($translatorId = null, $comparison = null)
-    {
-        if (is_array($translatorId)) {
-            $useMinMax = false;
-            if (isset($translatorId['min'])) {
-                $this->addUsingAlias(MagazinePeer::TRANSLATOR_ID, $translatorId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($translatorId['max'])) {
-                $this->addUsingAlias(MagazinePeer::TRANSLATOR_ID, $translatorId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(MagazinePeer::TRANSLATOR_ID, $translatorId, $comparison);
-    }
-
-    /**
-     * Filter the query by a related Work object
-     *
-     * @param   Work|PropelObjectCollection $work The related object(s) to use as filter
+     * @param   Publication|PropelObjectCollection $publication The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return                 MagazineQuery The current query, for fluid interface
      * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterByWork($work, $comparison = null)
+    public function filterByPublication($publication, $comparison = null)
     {
-        if ($work instanceof Work) {
+        if ($publication instanceof Publication) {
             return $this
-                ->addUsingAlias(MagazinePeer::WORK_ID, $work->getId(), $comparison);
-        } elseif ($work instanceof PropelObjectCollection) {
+                ->addUsingAlias(MagazinePeer::PUBLICATION_ID, $publication->getId(), $comparison);
+        } elseif ($publication instanceof PropelObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(MagazinePeer::WORK_ID, $work->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(MagazinePeer::PUBLICATION_ID, $publication->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByWork() only accepts arguments of type Work or PropelCollection');
+            throw new PropelException('filterByPublication() only accepts arguments of type Publication or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Work relation
+     * Adds a JOIN clause to the query using the Publication relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return MagazineQuery The current query, for fluid interface
      */
-    public function joinWork($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinPublication($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Work');
+        $relationMap = $tableMap->getRelation('Publication');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -1067,14 +367,14 @@ abstract class BaseMagazineQuery extends PublicationQuery
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Work');
+            $this->addJoinObject($join, 'Publication');
         }
 
         return $this;
     }
 
     /**
-     * Use the Work relation Work object
+     * Use the Publication relation Publication object
      *
      * @see       useQuery()
      *
@@ -1082,697 +382,13 @@ abstract class BaseMagazineQuery extends PublicationQuery
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \DTA\MetadataBundle\Model\WorkQuery A secondary query class using the current class as primary query
+     * @return   \DTA\MetadataBundle\Model\PublicationQuery A secondary query class using the current class as primary query
      */
-    public function useWorkQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function usePublicationQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinWork($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Work', '\DTA\MetadataBundle\Model\WorkQuery');
-    }
-
-    /**
-     * Filter the query by a related Publisher object
-     *
-     * @param   Publisher|PropelObjectCollection $publisher The related object(s) to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 MagazineQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByPublisher($publisher, $comparison = null)
-    {
-        if ($publisher instanceof Publisher) {
-            return $this
-                ->addUsingAlias(MagazinePeer::PUBLISHER_ID, $publisher->getId(), $comparison);
-        } elseif ($publisher instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(MagazinePeer::PUBLISHER_ID, $publisher->toKeyValue('Id', 'Id'), $comparison);
-        } else {
-            throw new PropelException('filterByPublisher() only accepts arguments of type Publisher or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Publisher relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return MagazineQuery The current query, for fluid interface
-     */
-    public function joinPublisher($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Publisher');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Publisher');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Publisher relation Publisher object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\PublisherQuery A secondary query class using the current class as primary query
-     */
-    public function usePublisherQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinPublisher($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Publisher', '\DTA\MetadataBundle\Model\PublisherQuery');
-    }
-
-    /**
-     * Filter the query by a related Printer object
-     *
-     * @param   Printer|PropelObjectCollection $printer The related object(s) to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 MagazineQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByPrinter($printer, $comparison = null)
-    {
-        if ($printer instanceof Printer) {
-            return $this
-                ->addUsingAlias(MagazinePeer::PRINTER_ID, $printer->getId(), $comparison);
-        } elseif ($printer instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(MagazinePeer::PRINTER_ID, $printer->toKeyValue('Id', 'Id'), $comparison);
-        } else {
-            throw new PropelException('filterByPrinter() only accepts arguments of type Printer or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Printer relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return MagazineQuery The current query, for fluid interface
-     */
-    public function joinPrinter($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Printer');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Printer');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Printer relation Printer object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\PrinterQuery A secondary query class using the current class as primary query
-     */
-    public function usePrinterQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinPrinter($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Printer', '\DTA\MetadataBundle\Model\PrinterQuery');
-    }
-
-    /**
-     * Filter the query by a related Translator object
-     *
-     * @param   Translator|PropelObjectCollection $translator The related object(s) to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 MagazineQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByTranslator($translator, $comparison = null)
-    {
-        if ($translator instanceof Translator) {
-            return $this
-                ->addUsingAlias(MagazinePeer::TRANSLATOR_ID, $translator->getId(), $comparison);
-        } elseif ($translator instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(MagazinePeer::TRANSLATOR_ID, $translator->toKeyValue('Id', 'Id'), $comparison);
-        } else {
-            throw new PropelException('filterByTranslator() only accepts arguments of type Translator or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Translator relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return MagazineQuery The current query, for fluid interface
-     */
-    public function joinTranslator($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Translator');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Translator');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Translator relation Translator object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\TranslatorQuery A secondary query class using the current class as primary query
-     */
-    public function useTranslatorQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinTranslator($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Translator', '\DTA\MetadataBundle\Model\TranslatorQuery');
-    }
-
-    /**
-     * Filter the query by a related Relatedset object
-     *
-     * @param   Relatedset|PropelObjectCollection $relatedset The related object(s) to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 MagazineQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByRelatedset($relatedset, $comparison = null)
-    {
-        if ($relatedset instanceof Relatedset) {
-            return $this
-                ->addUsingAlias(MagazinePeer::RELATEDSET_ID, $relatedset->getId(), $comparison);
-        } elseif ($relatedset instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(MagazinePeer::RELATEDSET_ID, $relatedset->toKeyValue('PrimaryKey', 'Id'), $comparison);
-        } else {
-            throw new PropelException('filterByRelatedset() only accepts arguments of type Relatedset or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Relatedset relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return MagazineQuery The current query, for fluid interface
-     */
-    public function joinRelatedset($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Relatedset');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Relatedset');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Relatedset relation Relatedset object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\RelatedsetQuery A secondary query class using the current class as primary query
-     */
-    public function useRelatedsetQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinRelatedset($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Relatedset', '\DTA\MetadataBundle\Model\RelatedsetQuery');
-    }
-
-    /**
-     * Filter the query by a related Title object
-     *
-     * @param   Title|PropelObjectCollection $title The related object(s) to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 MagazineQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByTitle($title, $comparison = null)
-    {
-        if ($title instanceof Title) {
-            return $this
-                ->addUsingAlias(MagazinePeer::TITLE_ID, $title->getId(), $comparison);
-        } elseif ($title instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(MagazinePeer::TITLE_ID, $title->toKeyValue('PrimaryKey', 'Id'), $comparison);
-        } else {
-            throw new PropelException('filterByTitle() only accepts arguments of type Title or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Title relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return MagazineQuery The current query, for fluid interface
-     */
-    public function joinTitle($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Title');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Title');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Title relation Title object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\TitleQuery A secondary query class using the current class as primary query
-     */
-    public function useTitleQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinTitle($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Title', '\DTA\MetadataBundle\Model\TitleQuery');
-    }
-
-    /**
-     * Filter the query by a related Publishingcompany object
-     *
-     * @param   Publishingcompany|PropelObjectCollection $publishingcompany The related object(s) to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 MagazineQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByPublishingcompany($publishingcompany, $comparison = null)
-    {
-        if ($publishingcompany instanceof Publishingcompany) {
-            return $this
-                ->addUsingAlias(MagazinePeer::PUBLISHINGCOMPANY_ID, $publishingcompany->getId(), $comparison);
-        } elseif ($publishingcompany instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(MagazinePeer::PUBLISHINGCOMPANY_ID, $publishingcompany->toKeyValue('PrimaryKey', 'Id'), $comparison);
-        } else {
-            throw new PropelException('filterByPublishingcompany() only accepts arguments of type Publishingcompany or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Publishingcompany relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return MagazineQuery The current query, for fluid interface
-     */
-    public function joinPublishingcompany($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Publishingcompany');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Publishingcompany');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Publishingcompany relation Publishingcompany object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\PublishingcompanyQuery A secondary query class using the current class as primary query
-     */
-    public function usePublishingcompanyQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinPublishingcompany($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Publishingcompany', '\DTA\MetadataBundle\Model\PublishingcompanyQuery');
-    }
-
-    /**
-     * Filter the query by a related Place object
-     *
-     * @param   Place|PropelObjectCollection $place The related object(s) to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 MagazineQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByPlace($place, $comparison = null)
-    {
-        if ($place instanceof Place) {
-            return $this
-                ->addUsingAlias(MagazinePeer::PLACE_ID, $place->getId(), $comparison);
-        } elseif ($place instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(MagazinePeer::PLACE_ID, $place->toKeyValue('PrimaryKey', 'Id'), $comparison);
-        } else {
-            throw new PropelException('filterByPlace() only accepts arguments of type Place or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Place relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return MagazineQuery The current query, for fluid interface
-     */
-    public function joinPlace($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Place');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Place');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Place relation Place object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\PlaceQuery A secondary query class using the current class as primary query
-     */
-    public function usePlaceQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinPlace($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Place', '\DTA\MetadataBundle\Model\PlaceQuery');
-    }
-
-    /**
-     * Filter the query by a related Datespecification object
-     *
-     * @param   Datespecification|PropelObjectCollection $datespecification The related object(s) to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 MagazineQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByDatespecificationRelatedByPublicationDate($datespecification, $comparison = null)
-    {
-        if ($datespecification instanceof Datespecification) {
-            return $this
-                ->addUsingAlias(MagazinePeer::PUBLICATIONDATE_ID, $datespecification->getId(), $comparison);
-        } elseif ($datespecification instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(MagazinePeer::PUBLICATIONDATE_ID, $datespecification->toKeyValue('PrimaryKey', 'Id'), $comparison);
-        } else {
-            throw new PropelException('filterByDatespecificationRelatedByPublicationDate() only accepts arguments of type Datespecification or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the DatespecificationRelatedByPublicationDate relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return MagazineQuery The current query, for fluid interface
-     */
-    public function joinDatespecificationRelatedByPublicationDate($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('DatespecificationRelatedByPublicationDate');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'DatespecificationRelatedByPublicationDate');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the DatespecificationRelatedByPublicationDate relation Datespecification object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\DatespecificationQuery A secondary query class using the current class as primary query
-     */
-    public function useDatespecificationRelatedByPublicationDateQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinDatespecificationRelatedByPublicationDate($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'DatespecificationRelatedByPublicationDate', '\DTA\MetadataBundle\Model\DatespecificationQuery');
-    }
-
-    /**
-     * Filter the query by a related Datespecification object
-     *
-     * @param   Datespecification|PropelObjectCollection $datespecification The related object(s) to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 MagazineQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByDatespecificationRelatedByOriginDate($datespecification, $comparison = null)
-    {
-        if ($datespecification instanceof Datespecification) {
-            return $this
-                ->addUsingAlias(MagazinePeer::ORIGINDATE_ID, $datespecification->getId(), $comparison);
-        } elseif ($datespecification instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(MagazinePeer::ORIGINDATE_ID, $datespecification->toKeyValue('PrimaryKey', 'Id'), $comparison);
-        } else {
-            throw new PropelException('filterByDatespecificationRelatedByOriginDate() only accepts arguments of type Datespecification or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the DatespecificationRelatedByOriginDate relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return MagazineQuery The current query, for fluid interface
-     */
-    public function joinDatespecificationRelatedByOriginDate($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('DatespecificationRelatedByOriginDate');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'DatespecificationRelatedByOriginDate');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the DatespecificationRelatedByOriginDate relation Datespecification object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\DatespecificationQuery A secondary query class using the current class as primary query
-     */
-    public function useDatespecificationRelatedByOriginDateQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinDatespecificationRelatedByOriginDate($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'DatespecificationRelatedByOriginDate', '\DTA\MetadataBundle\Model\DatespecificationQuery');
+            ->joinPublication($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Publication', '\DTA\MetadataBundle\Model\PublicationQuery');
     }
 
     /**
@@ -1785,7 +401,9 @@ abstract class BaseMagazineQuery extends PublicationQuery
     public function prune($magazine = null)
     {
         if ($magazine) {
-            $this->addUsingAlias(MagazinePeer::ID, $magazine->getId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond0', $this->getAliasedColName(MagazinePeer::ID), $magazine->getId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond1', $this->getAliasedColName(MagazinePeer::PUBLICATION_ID), $magazine->getPublicationId(), Criteria::NOT_EQUAL);
+            $this->combine(array('pruneCond0', 'pruneCond1'), Criteria::LOGICAL_OR);
         }
 
         return $this;

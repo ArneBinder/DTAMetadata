@@ -19,7 +19,13 @@
         {% for datum in data %}
             <tr>
             {% for col in columns %}
-                <td>{{ attribute(datum,col) }}</td>
+                <td>
+                {% if col=='Id' %}
+                        <a href="{{ path('viewRecord', {'domainKey':domainKey, 'className':className, 'recordId':attribute(datum,col)}) }}">{{ attribute(datum,col) }}</a>
+                {% else %}
+                    {{ attribute(datum,col) }}
+                {% endif %}
+                </td>
             {% endfor %}
             </tr>
         {% endfor %}

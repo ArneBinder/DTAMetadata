@@ -3,7 +3,7 @@
  * (In the view that lists all database records of a class as a table) 
  */
 public function getTableViewColumnNames(){
-    
+    return $this->captions;
 }
 
 /** 
@@ -11,7 +11,7 @@ public function getTableViewColumnNames(){
  * @param string columnName 
  */
 public function getAttributeByTableViewColumName($columnName){
-
+    return $this->accessors[$columnName];
 }    
 
 

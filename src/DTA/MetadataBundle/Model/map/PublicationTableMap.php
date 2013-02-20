@@ -52,14 +52,12 @@ class PublicationTableMap extends TableMap
         $this->addForeignKey('title_id', 'TitleId', 'INTEGER', 'title', 'id', true, null, null);
         $this->addForeignKey('publishingCompany_id', 'PublishingcompanyId', 'INTEGER', 'publishingCompany', 'id', false, null, null);
         $this->addForeignKey('place_id', 'PlaceId', 'INTEGER', 'place', 'id', false, null, null);
-        $this->addForeignKey('publicationDate_id', 'PublicationDate', 'INTEGER', 'dateSpecification', 'id', false, null, null);
-        $this->addForeignKey('originDate_id', 'OriginDate', 'INTEGER', 'dateSpecification', 'id', false, null, null);
+        $this->addForeignKey('publicationDate_id', 'PublicationdateId', 'INTEGER', 'dateSpecification', 'id', false, null, null);
         $this->addForeignKey('relatedSet_id', 'RelatedsetId', 'INTEGER', 'relatedSet', 'id', false, null, null);
         $this->addForeignKey('work_id', 'WorkId', 'INTEGER', 'work', 'id', true, null, null);
         $this->addForeignKey('publisher_id', 'PublisherId', 'INTEGER', 'publisher', 'id', false, null, null);
         $this->addForeignKey('printer_id', 'PrinterId', 'INTEGER', 'printer', 'id', false, null, null);
         $this->addForeignKey('translator_id', 'TranslatorId', 'INTEGER', 'translator', 'id', false, null, null);
-        $this->addColumn('descendant_class', 'DescendantClass', 'VARCHAR', false, 100, null);
         // validators
     } // initialize()
 
@@ -76,28 +74,15 @@ class PublicationTableMap extends TableMap
         $this->addRelation('Title', 'DTA\\MetadataBundle\\Model\\Title', RelationMap::MANY_TO_ONE, array('title_id' => 'id', ), null, null);
         $this->addRelation('Publishingcompany', 'DTA\\MetadataBundle\\Model\\Publishingcompany', RelationMap::MANY_TO_ONE, array('publishingCompany_id' => 'id', ), null, null);
         $this->addRelation('Place', 'DTA\\MetadataBundle\\Model\\Place', RelationMap::MANY_TO_ONE, array('place_id' => 'id', ), null, null);
-        $this->addRelation('DatespecificationRelatedByPublicationDate', 'DTA\\MetadataBundle\\Model\\Datespecification', RelationMap::MANY_TO_ONE, array('publicationDate_id' => 'id', ), null, null);
-        $this->addRelation('DatespecificationRelatedByOriginDate', 'DTA\\MetadataBundle\\Model\\Datespecification', RelationMap::MANY_TO_ONE, array('originDate_id' => 'id', ), null, null);
+        $this->addRelation('Datespecification', 'DTA\\MetadataBundle\\Model\\Datespecification', RelationMap::MANY_TO_ONE, array('publicationDate_id' => 'id', ), null, null);
         $this->addRelation('Monograph', 'DTA\\MetadataBundle\\Model\\Monograph', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Monographs');
+        $this->addRelation('Essay', 'DTA\\MetadataBundle\\Model\\Essay', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Essays');
+        $this->addRelation('Magazine', 'DTA\\MetadataBundle\\Model\\Magazine', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Magazines');
+        $this->addRelation('Series', 'DTA\\MetadataBundle\\Model\\Series', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Series');
         $this->addRelation('PublicationPublicationgroup', 'DTA\\MetadataBundle\\Model\\PublicationPublicationgroup', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationPublicationgroups');
         $this->addRelation('Source', 'DTA\\MetadataBundle\\Model\\Source', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Sources');
         $this->addRelation('Task', 'DTA\\MetadataBundle\\Model\\Task', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Tasks');
         $this->addRelation('Publicationgroup', 'DTA\\MetadataBundle\\Model\\Publicationgroup', RelationMap::MANY_TO_MANY, array(), null, null, 'Publicationgroups');
     } // buildRelations()
-
-    /**
-     *
-     * Gets the list of behaviors registered for this table
-     *
-     * @return array Associative array (name => parameters) of behaviors
-     */
-    public function getBehaviors()
-    {
-        return array(
-            'concrete_inheritance_parent' =>  array (
-  'descendant_column' => 'descendant_class',
-),
-        );
-    } // getBehaviors()
 
 } // PublicationTableMap

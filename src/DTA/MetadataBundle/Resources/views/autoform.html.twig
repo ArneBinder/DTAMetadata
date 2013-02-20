@@ -1,22 +1,30 @@
 {# 
     Template for rendering forms for any model type (i.e. database entity).
-    Used by 
+    Used for creating and editing entities.
+    By default, a new entity is created.
+    For editing entities, the action variable contains a route to the 
 #}
 
 {% block core %}
 
-    <h3>{{className|trans}}</h3>
+    {# Determine where to post the form data (create or update the data) #}
+    {% if action|default("new") == "new" %}
+        {% set actionTarget = path('genericNew', {'className':className, 'domainKey': domainKey|default("none")}) %}
+        {% set headerSuffix = "form.create.suffix"|trans %}
+    {% endif %}
+    {% if action|default("new") == "edit" %}
+        {% set actionTarget = path('viewRecord', {'domainKey': domainKey, 'className':className, 'recordId':recordId}) %}
+        {% set headerSuffix = "form.edit.suffix"|trans %}
+    {% endif %}
 
-    {#{domainKey}#}
-    
-    <form action="{{ path('genericNew', {'className':className, 'domainKey': domainKey|default("none")}) }}" 
-          method="post" {{ form_enctype(form) }}>
+    <h3>{{className|trans}} {{ headerSuffix }} </h3>
+
+    <form action="{{ actionTarget }}" method="post" {{ form_enctype(form) }}>
         {{ form_rest(form) }}
          <input type="submit"/>
     </form>
     
-    {# <hr/>
+    <hr/>
     
-    <pre>{%if persistedObject is defined %}{{dump(persistedObject)}}{%endif%}</pre> #}
-   
+    {#{dump(form.children)}#}   
 {% endblock %}

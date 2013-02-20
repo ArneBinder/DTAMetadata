@@ -59,4 +59,19 @@ class PersonTableMap extends TableMap
         $this->addRelation('Translator', 'DTA\\MetadataBundle\\Model\\Translator', RelationMap::ONE_TO_MANY, array('id' => 'person_id', ), null, null, 'Translators');
     } // buildRelations()
 
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'table_row_view' =>  array (
+  'Normdatei' => 'gnd',
+),
+        );
+    } // getBehaviors()
+
 } // PersonTableMap

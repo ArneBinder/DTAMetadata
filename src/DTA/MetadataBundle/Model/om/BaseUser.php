@@ -19,7 +19,7 @@ use DTA\MetadataBundle\Model\User;
 use DTA\MetadataBundle\Model\UserPeer;
 use DTA\MetadataBundle\Model\UserQuery;
 
-// TableRowViewInterface automatically implemented by the TableRowViewBehavior.phpabstract class BaseUser extends BaseObject  implements Persistent, \DTA\MetadataBundle\Model\table_row_view\TableRowViewInterface
+abstract class BaseUser extends BaseObject implements Persistent
 {
     /**
      * Peer class name

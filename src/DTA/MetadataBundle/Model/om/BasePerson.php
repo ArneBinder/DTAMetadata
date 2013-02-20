@@ -27,7 +27,7 @@ use DTA\MetadataBundle\Model\PublisherQuery;
 use DTA\MetadataBundle\Model\Translator;
 use DTA\MetadataBundle\Model\TranslatorQuery;
 
-abstract class BasePerson extends BaseObject implements Persistent
+// TableRowViewInterface automatically implemented by the TableRowViewBehavior.phpabstract class BasePerson extends BaseObject  implements Persistent, \DTA\MetadataBundle\Model\table_row_view\TableRowViewInterface
 {
     /**
      * Peer class name
@@ -110,6 +110,8 @@ abstract class BasePerson extends BaseObject implements Persistent
      */
     protected $alreadyInClearAllReferencesDeep = false;
 
+    // table_row_view behavior
+    public $tableRowViewCaptions = array('Normdatei', );public $tableRowViewAccessors = array('Normdatei'=>'Gnd', );
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -2250,5 +2252,24 @@ abstract class BasePerson extends BaseObject implements Persistent
     {
         return $this->alreadyInSave;
     }
+
+    // table_row_view behavior
+    /**
+     * To specify which columns are to be visible in the user display
+     * (In the view that lists all database records of a class as a table)
+     */
+    public function getTableViewColumnNames(){
+        return $this->captions;
+    }
+
+    /**
+     * To access the data using the specified column names.
+     * @param string columnName
+     */
+    public function getAttributeByTableViewColumName($columnName){
+        return $this->accessors[$columnName];
+    }
+
+
 
 }

@@ -59,20 +59,4 @@ class UserTableMap extends TableMap
         $this->addRelation('Task', 'DTA\\MetadataBundle\\Model\\Task', RelationMap::ONE_TO_MANY, array('id' => 'responsibleUser_id', ), null, null, 'Tasks');
     } // buildRelations()
 
-    /**
-     *
-     * Gets the list of behaviors registered for this table
-     *
-     * @return array Associative array (name => parameters) of behaviors
-     */
-    public function getBehaviors()
-    {
-        return array(
-            'table_row_view' =>  array (
-  'column1' => 'userName',
-  'column2' => 'phone',
-),
-        );
-    } // getBehaviors()
-
 } // UserTableMap

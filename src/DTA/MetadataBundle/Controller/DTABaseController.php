@@ -44,7 +44,7 @@ class DTABaseController extends Controller {
      * @param type $className
      * @Route("/genericView/{domainKey}/{className}", name="genericView")
      */
-    public function genericViewAction($domainKey, $className){
+    public function genericViewAllAction($domainKey, $className){
         
         $classNames = $this->relatedClassNames($className);
         
@@ -59,21 +59,51 @@ class DTABaseController extends Controller {
 //            'peer' => $peer,
             'className' => $className,
         ));
-        
     }
     
     /**
-     * Creates a form to EDIT OR CREATE any database entity.
-     * It is inherited and called by the domain controllers (corresponding to 
-     * the four main pages: Daten, Ordnungssysteme, Arbeitsfluss, Administration) 
-     * to embed the form into their respective page structures.
+     * Used for creating an edit form for a specific database entity.
+     * @param type $domainKey
+     * @param type $className
+     * @param type $recordId
+     * @Route("/zeigeDatensatz/{domainKey}/{className}/{recordId}", name="viewRecord")
+     */
+    public function genericViewOneAction(Request $request, $domainKey, $className, $recordId){
+        
+         $classNames = $this->relatedClassNames($className);
+        
+        // create object and its form
+        $form = $this->dynamicForm($className, $recordId);
+//        $obj = new $classNames['model'];
+        
+        // save data on POST
+        if ($request->isMethod("POST")) {
+            // gives for instance modified data
+            //var_dump($request->get('monograph')['publication']['title']['titleFragments']);
+            $form->bind($request);
+            if ($form->isValid()) {
+                $form->getData()->save();
+//                $obj->save();
+                $this->get('session')->getFlashBag()->add('warning', 'Änderungen vorgenommen.');
+            }
+        }
+        return $this->renderDomainKeySpecificAction($domainKey, "DTAMetadataBundle::formWrapper.html.twig", array(
+            'form' => $form->createView(),
+            'action' => 'edit',
+            'className' => $className,
+            'recordId' => $recordId,
+        ));
+    }
+    
+    /**
+     * Creates a form to EDIT or CREATE any database entity.
      * @param string $className The name of the model class to create the form for (refer to the Model directory,
-     * the DTA\MetadataBundle\Model namespace members or simply the schema.xml) 
-     * @param int recordId If the form shall be used for editing, the id of the entity.
+     * the DTA\MetadataBundle\Model namespace members) 
+     * @param int recordId If the form shall be used for editing, the id of the entity to edit.
      * Since 1 is the first ID used by propel, 0 indicates that a new object shall be created.
      * @return The symfony form. If it is an edit form, with fetched data.
      */
-    public function genericEditFormAction($className, $recordId = 0) {
+    public function dynamicForm($className, $recordId = 0) {
 
         $classNames = $this->relatedClassNames($className);
         
@@ -86,10 +116,11 @@ class DTABaseController extends Controller {
 
         $form = $this->createForm(new $classNames['formType'], $obj);
         return $form;
+//        return array('form'=>$form, 'object'=>$obj);
     }
     
     /**
-     * Renders a generic form and returns the result for use in AJAX updating or creating database entities.
+     * Renders a dynamic form and returns the result for use in AJAX updating or creating database entities.
      * 
      * @param string $className   The name of the model class (e.g. Status, Title, Titlefragment)
      * @param int    $recordId    The id of the record to edit. Zero indicates that a new record shall be created.
@@ -99,12 +130,12 @@ class DTABaseController extends Controller {
      *      name="plainForm", 
      *      defaults={"recordId"=0, "captionProperty"="Id"})
      */
-    public function plainFormAction(Request $request, $className, $recordId = 0, $captionProperty = "Id"){
+    public function plainFormAction($className, $recordId = 0, $captionProperty = "Id"){
         
-        $form = $this->genericEditFormAction($className, $recordId);
+        $form = $this->dynamicForm($className, $recordId);
         
         // plain ajax response, without any menus or other html
-        return $this->render("DTAMetadataBundle::modalForm.html.twig", array(
+        return $this->render("DTAMetadataBundle::plainForm.html.twig", array(
             'form' => $form->createView(),
             'className' => $className,
             'captionProperty' => $captionProperty,
@@ -112,29 +143,11 @@ class DTABaseController extends Controller {
     }
 
     /**
-     * Handles the POST request that is set off when clicking the submit button on a generic edit form.
-     * @param type $Request
-     * @param type $className
-     * @param type $recordId
-     * @Route("/genericUpdate/{className}/{recordId}", name="genericUpdate")
-     */
-    public function genericUpdateDatabaseAction(Request $request, $className, $recordId) {
-
-        $form = $this->genericEditFormAction($className, $recordId);
-        $obj = $form->getData();
-
-        if ($request->isMethod("POST")) {
-            $form->bind($request);
-            if ($form->isValid())
-                $obj->save();
-        }
-    }
-
-    /**
      * Handles POST requests that have been set off due to creating a new record.
      * @param string $className See genericEditForm for a parameter documentation.
      * @param string domainKey The domain where to redirect to, to view the created record. 
      *                          If it is set to "none", the database update is performed without redirecting (ajax case)
+     * @param string captionProperty For ajax use: Which attribute does the select use to describe the entities it lists? Used to generate a new select option via ajax.
      * @return HTML Option Element|nothing If the new action is called by a nested ajax form (selectOrAdd form type) the result is the option element to add to the nearby select.
      * 
      * @Route("/genericNew/{domainKey}/{className}/{captionProperty}", name="genericNew", defaults={"captionProperty"="Id"})

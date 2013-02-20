@@ -28,7 +28,9 @@ class WorkType extends BaseAbstractType
             'label' => 'Status',
 //            'query' => \DTA\MetadataBundle\Model\StatusQuery::create()->orderByName()
         ));
-//        $builder->add('datespecificationId');
+        $builder->add('datespecification', new DatespecificationType(), array(
+            'label' => 'Entstehungsjahr'
+        ));
 //        $builder->add('genreId');
 //        $builder->add('subgenreId');
 //        $builder->add('dwdsgenreId');

@@ -10,7 +10,6 @@
     {% block stylesheets %}
         <link href="{{ asset('css/layout.css') }}" type="text/css" rel="stylesheet" /> 
         <link href="{{ asset('css/genericHtml.css') }}" type="text/css" rel="stylesheet" />
-        <link href="{{ asset('css/formWidgets/collections.css') }}" type="text/css" rel="stylesheet" />
         <link href="{{ asset('css/formWidgets/dynamicGUI.css') }}" rel="stylesheet">
         <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet">
         <link href="{{ asset('css/bootstrap-responsive.css') }}" rel="stylesheet">
@@ -34,7 +33,7 @@
         {#  ---------------------------------------------
             The menu is highlighted using the domainKey variable
             --------------------------------------------- #}
-        
+
         <div class="navbar navbar-fixed-top">
             <div class="navbar-inner">
                 <div class="container-fluid">
@@ -102,14 +101,19 @@
             --------------------------------------------- #}
         
         <div class="container-fluid">
+            {% for flash in app.session.getFlashBag.all %} 
+            <div class="alert">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                {{ flash[0] }}
+            </div>
+            {% endfor %} 
+            
             {# Allow stacking of sidebar and main content if too few space is available #}
             <div class="row-fluid" id="core">
                 {% block core %}
                 {% endblock %}
             </div><!--/row-->
             
-            <hr>
-
             <footer>
             {% block footer %}
                 <p>© DTA-Projektdatenbank (v 2.0)</p>
