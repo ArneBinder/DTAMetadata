@@ -53,6 +53,7 @@
     {# For the javascript to have access to the translated modelClass name.
        The up and down sortable controls need this to be more expressive.   #}
     <input type="hidden" name="translatedModelClassName" value="{{ form.vars.modelClass|trans }}"/>
+    <input type="hidden" name="modelClassName" value="{{ form.vars.modelClass }}"/>
     
 {% endspaceless %}
 {% endblock %}
@@ -61,10 +62,12 @@
 {% spaceless %}
     {% for child in form %}
     <li>
-        {{ form_errors(child) }}
-        {{ form_widget(child) }}
+        {{ form.vars.modelClass|trans }}
+        
+        {#{ form_errors(child) }}
+        {{ form_widget(child) }#}
         {# omit the default label (just a zero-based index) for each fragment #}
-        {#{ form_rest(child) }#}
+        {{ form_rest(child) }}
     </li>
     {% endfor %}
 {% endspaceless %}

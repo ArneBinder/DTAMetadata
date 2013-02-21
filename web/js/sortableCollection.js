@@ -13,6 +13,12 @@ jQuery(document).ready(createGui);
 
 function createGui(){
     jQuery(document).on('click', '.sortableCollectionWidget.add-entity', addFormElement);
+    
+    // add up and down control elements for sortable collections
+    var sortableElements = jQuery('.collection-sortable li');
+    jQuery.each(sortableElements, function(idx,element){
+        createSortableControls(element);
+    });
 }
 
 /**
@@ -26,6 +32,8 @@ function addFormElement(){
     var $collection = $collectionHolder.children('ol.collection-sortable');
     console.log($collectionHolder, $collection);
     
+    // PREPARE PROTOTYPE 
+    
     if($collection.attr("data-prototype") === undefined){
         console.log('No protoype element for the collection editor available!');
         return false;
@@ -34,19 +42,28 @@ function addFormElement(){
     // using the children method (instead of find) is important here, because sortable collections might be nested,
     // in which case the collection element would be to descending sortable collections as well.
     var elementId = $collection.children("li").length; 
-    var displayElementId = elementId+1;
+    var modelClassName = $collectionHolder
+        .children('input[name=modelClassName]')
+        .val();
     var translatedModelClassName = $collectionHolder
         .children('input[name=translatedModelClassName]')
         .val();
+    
     var prototype = $collection.attr("data-prototype")
-        .replace(/<label class="required">__name__label__<\/label>/g, translatedModelClassName+' ('+displayElementId+')')   // TODO finalization. Ugly workaround. Use theming.
-        .replace(/label__/g, '')  // remove per fragment label
-        .replace(/__name__/g, '') // remove per fragment label
-        ;
+        .replace(/<label class="required">__name__label__<\/label>/g, '');  // remove per fragment label
+       
+    prototype = prototype.replace(new RegExp('__'+ modelClassName +'ID__', 'g'), elementId);
+    
+    // CREATE NEW DOM ELEMENT 
     
     var $newForm = $(prototype);
-                    
-    var $newFormLi = $('<li></li>').append($newForm);
+    // TODO: somehow, two additional divs are created by the symfony prototype (check whether sortableCollectionType needs to override a method)
+    // remove these
+    $newForm = $newForm.children('div').children('div');
+    
+    var $newFormLi = $('<li></li>')
+        .text(translatedModelClassName)
+        .append($newForm);
     
     var sortable = $collection.hasClass('collection-sortable');
     if(sortable){
@@ -64,15 +81,23 @@ function addFormElement(){
     return false;
 }
 
-function createSortableControls($element, translatedModelClassName){
+function createSortableControls(element, translatedModelClassName){
+                     
+    var $collectionHolder = $(element).parent().parent(); // element: li, parent: ol, parent: collection holder
+    
+    if(undefined === translatedModelClassName)
+        translatedModelClassName = $collectionHolder
+            .children('input[name=translatedModelClassName]')
+            .val();
+        
     var iconUpStr = '<i class="icon-arrow-up"></i>';
     var iconDownStr = '<i class="icon-arrow-down"></i>';
     var up   = $('<a href="#" class="sortable-up">'+ iconUpStr + translatedModelClassName +' nach oben</a> ');
     var down = $('<a href="#" class="sortable-down">'+ iconDownStr + translatedModelClassName +' nach unten</a>');
     up.on('click', sortableUp);    
     down.on('click', sortableDown);    
-    $element.append(up);
-    $element.append(down);
+    $(element).append(up);
+    $(element).append(down);
 }
 
 /**

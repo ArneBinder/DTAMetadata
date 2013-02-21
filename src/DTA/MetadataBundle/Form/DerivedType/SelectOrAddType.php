@@ -16,7 +16,12 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  * Using this type in a formbuilder allows selection of an existing entity or creation of a new one. 
  * The gui element (button) for creating a new entity is added via form theming (see dtaFormExtensions.html.twig / selectOrAdd_widget).
  * The javascript is located in selectOrAdd.js.
- *
+ * 
+ * Usage: specify the class and property e.g.
+ *      'class' => 'DTA\MetadataBundle\Model\Place',
+ *      'property' => 'Name',
+ * The class determines which basic formtype will be used in the selectbox
+ * The property determines which attribute will be used to summarize each entity in a select option
  * @author carlwitt
  */
 

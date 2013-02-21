@@ -11,7 +11,8 @@ public function getTableViewColumnNames(){
  * @param string columnName 
  */
 public function getAttributeByTableViewColumName($columnName){
-    return $this->accessors[$columnName];
+    $accessor = $this->accessors[$columnName];
+    return $this->$accessor;
 }    
 
 

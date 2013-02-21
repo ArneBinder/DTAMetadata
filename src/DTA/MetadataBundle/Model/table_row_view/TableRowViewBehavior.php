@@ -27,64 +27,6 @@ class TableRowViewBehavior extends Behavior {
         // 'caption'=>'accessor',
     );
     
-    
-    /**
-     * Extract local columns and embedded columns from the parameters.
-     * @return array Two arrays containing the single column and embedded column parameters.
-     *  array(
-     *      'localColumns' => array(),
-     *      'embeddedColumns' => array()
-     *  )
-     */
-//    private function parseParameters() {
-//
-//        $table = $this->getTable();
-//        
-//        foreach ($this->getParameters() as $captionOrIndicator => $columnOrEntity) {
-//
-//            // check whether parameter name is an indicator to embed columns
-//            if (!strncmp($captionOrIndicator, "embedColumns", strlen("embedColumns"))) {
-//
-//                $entity = $columnOrEntity;
-//                
-//                echo "gnu";
-//                echo "$entity";
-//                
-//                // add all captions and accessors of the other entity
-//                $otherTable = $table->getDatabase()->getTable($entity);
-//                
-//                if (!$otherTable)
-//                    throw new InvalidArgumentException(sprintf(
-//                                    'The entity \'%s\' referenced by the parameter \'%s\' in the table_row_view behavior of table \'%s\' doesn\'t exist. Please use the table name as specified by the schema <table> tag.', $entity, $captionOrIndicator, $table->getName()));
-//                
-//                $otherBehavior = $otherTable->getBehavior('table_row_view');
-//                
-//                if (!$otherBehavior)
-//                    throw new InvalidArgumentException(sprintf(
-//                                    'The entity \'%s\' referenced by the parameter \'%s\' in the table_row_view behavior of table \'%s\' doesn\'t implement the table_row_behavior. Please add it before proceeding.', $entity, $captionOrIndicator, $table->getName()));
-//                
-//                var_dump($otherBehavior->parameters);
-//                
-//            } else { // simple column taken from the entity itself
-//               
-//                $column = $columnOrEntity;
-//                // check whether the column exists
-//                if (!$table->containsColumn($column))
-//                    throw new InvalidArgumentException(sprintf(
-//                                    'The column \'%s\' referenced by the parameter \'%s\' in the table_row_view behavior of table \'%s\' doesn\'t exist. ', $column, $captionOrIndicator, $table->getName()));
-//                
-//                $caption = $captionOrIndicator;
-//                $accessor = $table->getColumn($column)->getPhpName();
-//                
-//                $this->captions[] = $caption;
-//                $this->accessors[$caption] = $accessor;
-//                
-//                var_dump($this->captions);
-//                var_dump($this->accessors);
-//            }
-//        }//for each parameter
-//    }
-    
     /**
      * Extract local columns and embedded columns from the parameters.
      * Check their existance and whether target entities also implement the behavior.

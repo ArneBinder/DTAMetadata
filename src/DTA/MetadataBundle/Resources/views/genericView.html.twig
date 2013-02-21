@@ -2,6 +2,8 @@
 
 {% extends 'DTAMetadataBundle:'~ domainKey ~':' ~ domainKey ~ '.html.twig' %}
 
+{% block title %} Zeige: {{ className|trans }} {% endblock %}
+
 {% block core %}
 
 <div class="span12 dta-data-listing">

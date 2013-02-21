@@ -315,6 +315,7 @@
     </table>
 
     <table name="task" phpName="Task">
+        
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="taskType_id" type="INTEGER" required="true"/>
         <column name="done" type="BOOLEAN" size="1" required="false"/>
@@ -324,6 +325,7 @@
         <column name="publicationGroup_id" type="INTEGER" required="false"/>
         <column name="publication_id" type="INTEGER" required="false"/>
         <column name="responsibleUser_id" type="INTEGER" required="false"/>
+        
         <foreign-key foreignTable="taskType" name="fk_aufgabe_arbeitsschritt1">
             <reference local="taskType_id" foreign="id"/>
         </foreign-key>
@@ -333,9 +335,10 @@
         <foreign-key foreignTable="publication" name="fk_aufgabe_schriftstueck1">
             <reference local="publication_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="user" name="fk_task_name1">
+        <foreign-key foreignTable="user" name="fk_task_responsibleUser1">
             <reference local="responsibleUser_id" foreign="id"/>
         </foreign-key>
+        
         <index name="id_task_2">
             <index-column name="id"/>
         </index>
@@ -506,7 +509,7 @@
         
         <behavior name="table_row_view">
             <parameter name="Normdatei" value="gnd"/>
-            <parameter name="Prsnm" value=""/>
+            <!--<parameter name="Prsnm" value=""/>-->
         </behavior>
         
         <unique name="dnb_UNIQUE">

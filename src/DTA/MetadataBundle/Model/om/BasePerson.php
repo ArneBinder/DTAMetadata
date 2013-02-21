@@ -111,7 +111,7 @@ use DTA\MetadataBundle\Model\TranslatorQuery;
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public $tableRowViewCaptions = array('Normdatei', );public $tableRowViewAccessors = array('Normdatei'=>'Gnd', );
+    public $tableRowViewCaptions = array('Normdatei', );	public $tableRowViewAccessors = array('Normdatei'=>'Gnd', );
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -2267,7 +2267,8 @@ use DTA\MetadataBundle\Model\TranslatorQuery;
      * @param string columnName
      */
     public function getAttributeByTableViewColumName($columnName){
-        return $this->accessors[$columnName];
+        $accessor = $this->accessors[$columnName];
+        return $this->$accessor;
     }
 
 

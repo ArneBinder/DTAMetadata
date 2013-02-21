@@ -19,6 +19,7 @@ class PersonalnameType extends BaseAbstractType {
     public function buildForm(FormBuilderInterface $builder, array $options) {
         $builder->add('nameFragments', new Form\DerivedType\SortableCollectionType(), array(
             'allow_add' => true,
+            'allow_delete' => true,
             'by_reference' => false,
             'type' => new NamefragmentType(),
             'label' => ' ',

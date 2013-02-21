@@ -17,13 +17,18 @@ class TaskType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('tasktypeId');
+        $builder->add('tasktype', new \DTA\MetadataBundle\Form\DerivedType\SelectOrAddType(), array(
+            'class' => '\DTA\MetadataBundle\Model\Tasktype',
+            'property' => 'name',
+        ));
         $builder->add('done');
         $builder->add('start');
         $builder->add('end');
         $builder->add('comments');
-        $builder->add('writgroupId');
-        $builder->add('writId');
-        $builder->add('responsibleuserId');
+        $builder->add('User', 'model', array(
+            'property' => 'username',
+            'class' => 'DTA\MetadataBundle\Model\User',
+            'label' => 'verantwortlich'
+        ));
     }
 }
