@@ -58,6 +58,7 @@ class DataDomainController extends DTABaseController {
     }
 
     /**
+     * TODO: finalization. remove test data generator.
      * @Route("/generateTestData", name="generateTestData")
      */
     public function generateTestDataAction() {

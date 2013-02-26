@@ -25,7 +25,7 @@
                 {% if col=='Id' %}
                         <a href="{{ path('viewRecord', {'domainKey':domainKey, 'className':className, 'recordId':attribute(datum,col)}) }}">{{ attribute(datum,col) }}</a>
                 {% else %}
-                    {{ attribute(datum,col) }}
+                    {{ datum.getAttributeByTableViewColumName(col) }}
                 {% endif %}
                 </td>
             {% endfor %}

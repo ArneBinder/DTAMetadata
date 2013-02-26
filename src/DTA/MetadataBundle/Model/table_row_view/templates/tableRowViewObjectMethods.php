@@ -2,8 +2,9 @@
  * To specify which columns are to be visible in the user display 
  * (In the view that lists all database records of a class as a table) 
  */
-public function getTableViewColumnNames(){
-    return $this->captions;
+public static function getTableViewColumnNames(){
+    $rc = new \ReflectionClass(get_called_class());
+    return $rc->getStaticPropertyValue("tableRowViewCaptions");
 }
 
 /** 

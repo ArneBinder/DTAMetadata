@@ -8,6 +8,12 @@
 -->
 <database name="DTAMetadata" namespace="DTA\MetadataBundle\Model" defaultIdMethod="native">
   
+    <!-- This parameter set is added to each entity that doesn't implement the table_row_view behavior. 
+         It is not added to tables/entities that define the bahavior. -->
+    <behavior name="table_row_view">
+        <!--If no parameters are defined, all columns are added. (WITHOUT embedding any related entities) -->
+    </behavior>
+    
     <!-- data / publications 
     ________________________________________________________-->
     
@@ -263,16 +269,16 @@
 
     <table name="partner" phpName="Partner">
         <column name="id" type="INTEGER" size="10" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="name" type="VARCHAR" size="255" required="false"/>
-        <column name="adress" type="VARCHAR" size="255" required="false"/>
-        <column name="person" type="VARCHAR" size="255" required="false"/>
-        <column name="mail" type="VARCHAR" size="100" required="false"/>
-        <column name="web" type="VARCHAR" size="255" required="false"/>
+        <column name="name" type="LONGVARCHAR" required="false"/>
+        <column name="adress" type="LONGVARCHAR" required="false"/>
+        <column name="person" type="LONGVARCHAR" required="false"/>
+        <column name="mail" type="LONGVARCHAR" required="false"/>
+        <column name="web" type="LONGVARCHAR" required="false"/>
         <column name="comments" type="LONGVARCHAR" required="false"/>
-        <column name="phone1" type="VARCHAR" size="50" required="false"/>
-        <column name="phone2" type="VARCHAR" size="50" required="false"/>
-        <column name="phone3" type="VARCHAR" size="50" required="false"/>
-        <column name="fax" type="VARCHAR" size="50" required="false"/>
+        <column name="phone1" type="LONGVARCHAR" required="false"/>
+        <column name="phone2" type="LONGVARCHAR" required="false"/>
+        <column name="phone3" type="LONGVARCHAR" required="false"/>
+        <column name="fax" type="LONGVARCHAR" required="false"/>
         <column name="log_last_change" type="TIMESTAMP" required="true"/>
         <column name="log_last_user" type="INTEGER" required="false"/>
         <index name="idx_book_locations_2">
@@ -295,9 +301,9 @@
         <column name="name" type="LONGVARCHAR" required="false"/>
         <column name="comments" type="LONGVARCHAR" required="false"/>
         <column name="available" type="BOOLEAN" size="1" required="false"/>
-        <column name="signature" type="VARCHAR" size="1024" required="false"/>
+        <column name="signature" type="LONGVARCHAR"  required="false"/>
         <column name="library" description="Besitzende Bibliothek" type="LONGVARCHAR" required="false"/>
-        <column name="libraryGnd" type="VARCHAR" size="1024" required="false"/>
+        <column name="libraryGnd" type="LONGVARCHAR" required="false"/>
         <foreign-key foreignTable="publication" name="fk_quelle_edition1">
             <reference local="publication_id" foreign="id"/>
         </foreign-key>
@@ -373,7 +379,7 @@
 
     <table name="user" phpName="User">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="userName" type="VARCHAR" size="255" required="false"/>
+        <column name="userName" type="LONGVARCHAR" required="false"/>
         <column name="passwordHash" type="LONGVARCHAR" required="false"/>
         <column name="name_id" type="INTEGER" required="true"/>
         <column name="mail" type="LONGVARCHAR" required="false"/>
@@ -455,7 +461,7 @@
     <table name="place">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
-        <column name="gnd" type="VARCHAR" size="100" required="false"/>
+        <column name="gnd" type="LONGVARCHAR" required="false"/>
     </table>
     
     <table name="title">
@@ -504,12 +510,12 @@
     
     <table name="person" phpName="Person">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="gnd" type="VARCHAR" size="100" required="false"/>
+        <column name="gnd" type="LONGVARCHAR" required="false"/>
         <!--The name is added in the personalName table because it's a one-to-many relationship.-->
         
         <behavior name="table_row_view">
             <parameter name="Normdatei" value="gnd"/>
-            <!--<parameter name="Prsnm" value=""/>-->
+            <!--<parameter name="Prsnm" value="Personalnames"/>-->
         </behavior>
         
         <unique name="dnb_UNIQUE">

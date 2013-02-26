@@ -51,12 +51,14 @@ class DTABaseController extends Controller {
         // for retrieving the entities
         $query = new $classNames['query'];
         // for retrieving the column names
-        $peer = new $classNames['peer'];
+        $modelClass = new $classNames["model"];
+        
+//        $rc = new \ReflectionClass();
+//        $rc->getStaticPropertyValue("")
         
         return $this->renderDomainKeySpecificAction($domainKey, "DTAMetadataBundle::genericView.html.twig", array(
             'data' => $query->find(),
-            'columns' => $peer->getFieldNames(\BasePeer::TYPE_PHPNAME),
-//            'peer' => $peer,
+            'columns' => $modelClass::getTableViewColumnNames(),
             'className' => $className,
         ));
     }
@@ -191,7 +193,10 @@ class DTABaseController extends Controller {
     }
 
     private function getControllerReflectionClass($domainKey){
-        return new \ReflectionClass("DTA\\MetadataBundle\\Controller\\" . $domainKey . "Controller");
+         return new \ReflectionClass("DTA\\MetadataBundle\\Controller\\" . $domainKey . "Controller");
+    }
+    private function getModelReflectionClass($className){
+         return new \ReflectionClass("DTA\\MetadataBundle\\Model\\" . $className);
     }
     
     public function renderDomainKeySpecificAction($domainKey, $template, array $options = array()){
