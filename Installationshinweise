@@ -1,0 +1,8 @@
+Installationsanweisung
+
+1.    Datenbankname, user passw. kommen nach app/config/parameters.yml 
+2.    SQL Schema wird generiert per php skript: app/console propel:sql:build
+3.    SQL Schema wird in die Datenbank geschrieben mit app/console propel:sql:insert --force
+4.    PHP Code generieren app/console propel:model:build
+
+Aenderungen am XML Schema (src/DTA/MetadataBundle/Resources/config/dta_master_schema.xml) werden wie in Schritt 4 realisiert.
