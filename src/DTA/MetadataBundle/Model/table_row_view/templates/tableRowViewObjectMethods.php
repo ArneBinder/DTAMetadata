@@ -12,8 +12,8 @@ public static function getTableViewColumnNames(){
  * @param string columnName 
  */
 public function getAttributeByTableViewColumName($columnName){
-    $accessor = $this->accessors[$columnName];
-    return $this->$accessor;
+    $accessor = $this->tableRowViewAccessors[$columnName];
+    return $this->getByName($accessor, \BasePeer::TYPE_PHPNAME);
 }    
 
 
