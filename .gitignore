@@ -8,3 +8,4 @@ vendor/*
 composer.phar
 /nbproject/private/
 !/vendor/autoload.php
+/src/DTA/MetadataBundle/Model/om/
