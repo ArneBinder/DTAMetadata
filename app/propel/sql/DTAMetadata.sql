@@ -22,7 +22,9 @@ CREATE TABLE `publication`
     `publishingCompany_id` INTEGER,
     `place_id` INTEGER,
     `publicationDate_id` INTEGER,
+    `originDate_id` INTEGER,
     `relatedSet_id` INTEGER,
+    `status_id` INTEGER NOT NULL,
     `work_id` INTEGER NOT NULL,
     `publisher_id` INTEGER,
     `printer_id` INTEGER,
@@ -36,7 +38,9 @@ CREATE TABLE `publication`
     INDEX `idx_publikation_verlag1` (`publishingCompany_id`),
     INDEX `idx_publikation_ort1` (`place_id`),
     INDEX `idx_publication_publicationDateId1` (`publicationDate_id`),
-    INDEX `FI_publikation_titel12` (`title_id`)
+    INDEX `idx_werk_status1` (`status_id`),
+    INDEX `FI_publikation_titel12` (`title_id`),
+    INDEX `FI_writtenIn` (`originDate_id`)
 ) ENGINE=MyISAM;
 
 -- ---------------------------------------------------------------------
@@ -137,7 +141,6 @@ DROP TABLE IF EXISTS `work`;
 CREATE TABLE `work`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `status_id` INTEGER NOT NULL,
     `dateSpecification_id` INTEGER,
     `genre_id` INTEGER,
     `subgenre_id` INTEGER,
@@ -148,7 +151,6 @@ CREATE TABLE `work`
     `format` TEXT,
     `directoryName` TEXT,
     PRIMARY KEY (`id`),
-    INDEX `idx_werk_status1` (`status_id`),
     INDEX `idx_werk_genre1` (`genre_id`),
     INDEX `idx_werk_genre2` (`subgenre_id`),
     INDEX `idx_werk_dwdsGenre2` (`dwdsGenre_id`),
@@ -222,21 +224,20 @@ DROP TABLE IF EXISTS `partner`;
 CREATE TABLE `partner`
 (
     `id` INTEGER(10) NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(255),
-    `adress` VARCHAR(255),
-    `person` VARCHAR(255),
-    `mail` VARCHAR(100),
-    `web` VARCHAR(255),
+    `name` TEXT,
+    `adress` TEXT,
+    `person` TEXT,
+    `mail` TEXT,
+    `web` TEXT,
     `comments` TEXT,
-    `phone1` VARCHAR(50),
-    `phone2` VARCHAR(50),
-    `phone3` VARCHAR(50),
-    `fax` VARCHAR(50),
+    `phone1` TEXT,
+    `phone2` TEXT,
+    `phone3` TEXT,
+    `fax` TEXT,
     `log_last_change` DATETIME NOT NULL,
     `log_last_user` INTEGER,
     PRIMARY KEY (`id`),
-    INDEX `idx_book_locations_2` (`id`),
-    INDEX `name` (`name`)
+    INDEX `idx_book_locations_2` (`id`)
 ) ENGINE=MyISAM;
 
 -- ---------------------------------------------------------------------
@@ -266,9 +267,9 @@ CREATE TABLE `source`
     `name` TEXT,
     `comments` TEXT,
     `available` TINYINT(1),
-    `signature` VARCHAR(1024),
+    `signature` TEXT,
     `library` TEXT COMMENT 'Besitzende Bibliothek',
-    `libraryGnd` VARCHAR(1024),
+    `libraryGnd` TEXT,
     PRIMARY KEY (`id`),
     INDEX `idx_Fundstellen_3` (`id`),
     INDEX `idx_quelle_edition1` (`publication_id`)
@@ -340,14 +341,13 @@ DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `userName` VARCHAR(255),
+    `userName` TEXT,
     `passwordHash` TEXT,
     `name_id` INTEGER NOT NULL,
     `mail` TEXT,
     `phone` TEXT,
     PRIMARY KEY (`id`),
-    INDEX `AI_id_user` (`id`),
-    INDEX `name` (`userName`)
+    INDEX `AI_id_user` (`id`)
 ) ENGINE=MyISAM;
 
 -- ---------------------------------------------------------------------
@@ -434,7 +434,7 @@ CREATE TABLE `place`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` TEXT NOT NULL,
-    `gnd` VARCHAR(100),
+    `gnd` TEXT,
     PRIMARY KEY (`id`)
 ) ENGINE=MyISAM;
 
@@ -491,7 +491,7 @@ DROP TABLE IF EXISTS `person`;
 CREATE TABLE `person`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `gnd` VARCHAR(100),
+    `gnd` VARCHAR(255),
     PRIMARY KEY (`id`),
     UNIQUE INDEX `dnb_UNIQUE` (`gnd`)
 ) ENGINE=MyISAM;

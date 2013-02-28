@@ -17,6 +17,7 @@ class DataDomainController extends DTABaseController {
 
     /** @inheritdoc */
     public static $domainMenu = array(
+        array("caption" => "Werke", "modelClass" => "Work"),
         array("caption" => "Publikationen", "children" => array(
                 array('caption' => "Alle Publikationsarten", 'route' => 'home'),
                 array('modelClass' => 'Monograph'),
@@ -37,10 +38,10 @@ class DataDomainController extends DTABaseController {
      */
     public function indexAction() {
         // TODO: remove. DataDomain.html.twig is useless now, as the domain menu has been generalized to the top level.
-//        $pnq = new Model\PersonalQuery();
+        $p = Model\PersonQuery::create()->findOneById(1);
         
         return $this->renderControllerSpecificAction('DTAMetadataBundle:DataDomain:index.html.twig', array(
-            "person" => ""//$pnq->findOneById(4)->getPersonalnames(),
+            "person" => count($p->getPersonalnames()->getArrayCopy())//[0]->__toString(),
         ));
     }
 

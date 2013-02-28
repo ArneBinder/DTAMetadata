@@ -30,14 +30,6 @@
                 <source>Magazine</source>
                 <target>Zeitschrift</target>
             </trans-unit>
-            <trans-unit id="11">
-                <source>Author</source>
-                <target>Autor</target>
-            </trans-unit>
-            <trans-unit id="10">
-                <source>Translator</source>
-                <target>Übersetzer</target>
-            </trans-unit>
             <trans-unit id="8">
                 <source>form.edit.suffix</source>
                 <target> bearbeiten</target>
@@ -46,6 +38,14 @@
                 <source>form.create.suffix</source>
                 <target> anlegen</target>
             </trans-unit>
+            <trans-unit id="10">
+                <source>Translator</source>
+                <target>Übersetzer</target>
+            </trans-unit>
+            <trans-unit id="11">
+                <source>Author</source>
+                <target>Autor</target>
+            </trans-unit>
             <trans-unit id="12">
                 <source>Personalname</source>
                 <target>Name</target>
@@ -53,6 +53,18 @@
             <trans-unit id="13">
                 <source>Namefragment</source>
                 <target>Namensbestandteil</target>
+            </trans-unit>
+            <trans-unit id="14">
+				<source>listView.edit.row.buttonSuffix</source>
+                <target> bearbeiten</target>
+            </trans-unit>
+            <trans-unit id="15">
+				<source>listView.add.row.buttonSuffix</source>
+                <target> hinzufügen</target>
+            </trans-unit>
+			<trans-unit id="16">
+				<source>listView.addColumn.caption</source>
+                <target>Datensatz bearbeiten</target>
             </trans-unit>
         </body>
     </file>

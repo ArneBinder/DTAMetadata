@@ -32,7 +32,7 @@ class DTABaseController extends Controller {
      */
     public function relatedClassNames($className){
         return array(
-            "model"     => "DTA\\MetadataBundle\\Model\\" . $className,                 // the actual propel data
+            "model"     => "DTA\\MetadataBundle\\Model\\" . $className,                 // the actual propel active record
             "query"     => "DTA\\MetadataBundle\\Model\\" . $className . "Query",       // utility class for generating queries
             "peer"      => "DTA\\MetadataBundle\\Model\\" . $className . "Peer",        // utility class for reflection
             "formType"  => "DTA\\MetadataBundle\\Form\\Type\\" . $className . "Type",   // class for generating form inputs
@@ -42,9 +42,11 @@ class DTABaseController extends Controller {
     /**
      * 
      * @param type $className
-     * @Route("/genericView/{domainKey}/{className}", name="genericView")
+     * @Route("/genericView/{domainKey}/{className}/{updatedObjectId}", 
+     *      defaults={"updatedObjectId"=0},
+     *      name="genericView")
      */
-    public function genericViewAllAction($domainKey, $className){
+    public function genericViewAllAction($domainKey, $className, $updatedObjectId = 0){
         
         $classNames = $this->relatedClassNames($className);
         
@@ -60,6 +62,7 @@ class DTABaseController extends Controller {
             'data' => $query->find(),
             'columns' => $modelClass::getTableViewColumnNames(),
             'className' => $className,
+            'updatedObjectId' => $updatedObjectId,
         ));
     }
     
@@ -80,13 +83,21 @@ class DTABaseController extends Controller {
         
         // save data on POST
         if ($request->isMethod("POST")) {
-            // gives for instance modified data
-            //var_dump($request->get('monograph')['publication']['title']['titleFragments']);
-            $form->bind($request);
+            // put form data on a virtual form
+            $form->bindRequest($request);
             if ($form->isValid()) {
-                $form->getData()->save();
-//                $obj->save();
-                $this->get('session')->getFlashBag()->add('warning', 'Änderungen vorgenommen.');
+                // parse propel object from virtual form
+                $obj = $form->getData();
+                $obj->save();
+//ob_start();
+//var_dump($obj->getPublication()->getTitle());
+$result = ob_get_clean();
+                $this->get('session')->getFlashBag()->add('success', 'Änderungen vorgenommen.'.$result);
+                return $this->redirect($this->generateUrl('genericView',array(
+                    'domainKey'=>$domainKey, 
+                    'className'=>$className,
+                    'updatedObjectId'=>$obj->getId(),
+                    )));
             }
         }
         return $this->renderDomainKeySpecificAction($domainKey, "DTAMetadataBundle::formWrapper.html.twig", array(

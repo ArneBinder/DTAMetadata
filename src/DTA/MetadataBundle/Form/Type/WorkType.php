@@ -22,12 +22,6 @@ class WorkType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('status', new SelectOrAddType(), array(
-            'class' => "DTA\MetadataBundle\Model\Status",
-            'property'   => 'Name',
-            'label' => 'Status',
-//            'query' => \DTA\MetadataBundle\Model\StatusQuery::create()->orderByName()
-        ));
         $builder->add('datespecification', new DatespecificationType(), array(
             'label' => 'Entstehungsjahr'
         ));

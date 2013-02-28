@@ -9,9 +9,9 @@
 <div class="span12 dta-data-listing">
 
     <h3>{{ className|trans }}</h3>
-
-    <table class="table">
+    <table class="table table-striped table-hover"> {# further bootstrap table classes: table-hover #}
         <thead>
+            <th>{{ "listView.addColumn.caption"|trans }}</th>
         {% for col in columns %}    
             {# doesn't work {{ col|trans({},'tableHeaders')}} since the tableHeaders file is never added to the translation catalogue #}
             <th> {{ col|trans }} </th>
@@ -19,20 +19,28 @@
         </thead>
         <tbody>
         {% for datum in data %}
-            <tr>
+            {% set recordId = attribute(datum,"getId") %}
+            <tr {% if recordId ==updatedObjectId %}class="success"{% endif %}>
+            {# Display edit buttons instead of Ids #}
+                <td>
+                    <a name="record{{recordId}}" class="btn btn-mini" href="{{ path('viewRecord', {'domainKey':domainKey, 'className':className, 'recordId':attribute(datum,"getId")}) }}">
+                        <i class="icon-pencil"></i>
+                        {{ className|trans~"listView.edit.row.buttonSuffix"|trans }}
+                    </a>
+                </td>
             {% for col in columns %}
                 <td>
-                {% if col=='Id' %}
-                        <a href="{{ path('viewRecord', {'domainKey':domainKey, 'className':className, 'recordId':attribute(datum,col)}) }}">{{ attribute(datum,col) }}</a>
-                {% else %}
                     {{ datum.getAttributeByTableViewColumName(col) }}
-                {% endif %}
                 </td>
             {% endfor %}
             </tr>
         {% endfor %}
         </tbody>
     </table>
+                    <a class="btn btn-mini listView-add-button" href="{{ path('genericNew', {'domainKey':domainKey, 'className':className}) }}">
+                        <i class="icon-pencil"></i>
+                        {{ className|trans~"listView.add.row.buttonSuffix"|trans }}
+                    </a>
     {#{dump(peer.getTableMap().getRelations())}#}
     
 </div><!--/span-->

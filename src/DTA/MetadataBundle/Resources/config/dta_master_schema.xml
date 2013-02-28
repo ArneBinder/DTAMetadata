@@ -33,15 +33,27 @@
         <column name="title_id" type="INTEGER" required="true"/>
         <column name="publishingCompany_id" type="INTEGER" required="false"/>
         <column name="place_id" type="INTEGER" required="false"/>
+        
         <column name="publicationDate_id" type="INTEGER" required="false"/>
+        <column name="originDate_id" type="INTEGER" required="false"/>
+        
         <column name="relatedSet_id" type="INTEGER" required="false"/>
-       
+        <column name="status_id" type="INTEGER" required="true"/>
+        
         <!-- Relations to other persons -->       
         <column name="work_id" type="INTEGER" required="true"/>
         <column name="publisher_id" type="INTEGER" required="false"/>
         <column name="printer_id" type="INTEGER" required="false"/>
         <column name="translator_id" type="INTEGER" required="false"/>
        
+        <behavior name="table_row_view">
+            <!--<parameter name="Id" value="id"/>-->
+            <!--<parameter name="Geschrieben" value="accessor:getDateSpecificationRelatedByOrigindateId"/>-->
+            <parameter name="Veröffentlicht" value="publicationDate_id"/>
+            <parameter name="embedColumnsStatus" value="status"/>
+            <parameter name="embedColumnsTitle" value="title"/>
+        </behavior>
+        
         <foreign-key foreignTable="work" name="editionVon">
             <reference local="work_id" foreign="id"/>
         </foreign-key>
@@ -66,9 +78,17 @@
         <foreign-key foreignTable="place" name="fk_publikation_ort1">
             <reference local="place_id" foreign="id"/>
         </foreign-key>
+        
         <foreign-key foreignTable="dateSpecification" name="fk_published">
             <reference local="publicationDate_id" foreign="id"/>
         </foreign-key>
+        <foreign-key foreignTable="dateSpecification" name="fk_writtenIn">
+            <reference local="originDate_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="status" name="fk_werk_status1">
+            <reference local="status_id" foreign="id"/>
+        </foreign-key>
+        
         <index name="editionVon">
             <index-column name="work_id"/>
         </index>
@@ -93,11 +113,19 @@
         <index name="idx_publication_publicationDateId1">
             <index-column name="publicationDate_id"/>
         </index>
+        <index name="idx_werk_status1">
+            <index-column name="status_id"/>
+        </index>
     </table>
 
     <table name="monograph">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="publication_id" type="INTEGER" primaryKey="true" required="true"/>
+        
+        <behavior name="table_row_view">
+            <parameter name="embedColumnsPublication" value="publication" />
+        </behavior>
+        
         <foreign-key foreignTable="publication" name="fk_monograph_publicationValid">
             <reference local="publication_id" foreign="id"/>
         </foreign-key>
@@ -165,7 +193,6 @@
     <!-- The core class representing an authors work. This is independent of the actual written form of the work which is represented by the Publication class. -->
     <table name="work">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="status_id" type="INTEGER" required="true"/>
         <column name="dateSpecification_id" type="INTEGER" required="false"/>
         <column name="genre_id" type="INTEGER" required="false"/>
         <column name="subgenre_id" type="INTEGER" required="false"/>
@@ -176,9 +203,6 @@
         <column name="format" type="LONGVARCHAR" required="false"/>
         <column name="directoryName" type="LONGVARCHAR" required="false"/>
         
-        <foreign-key foreignTable="status" name="fk_werk_status1">
-            <reference local="status_id" foreign="id"/>
-        </foreign-key>
         <foreign-key foreignTable="genre" name="fk_werk_genre1">
             <reference local="genre_id" foreign="id"/>
         </foreign-key>
@@ -195,9 +219,6 @@
             <reference local="dateSpecification_id" foreign="id"/>
         </foreign-key>
         
-        <index name="idx_werk_status1">
-            <index-column name="status_id"/>
-        </index>
         <index name="idx_werk_genre1">
             <index-column name="genre_id"/>
         </index>
@@ -284,9 +305,6 @@
         <index name="idx_book_locations_2">
             <index-column name="id"/>
         </index>
-        <index name="name">
-            <index-column name="name"/>
-        </index>
     </table>
 
     <table name="relatedSet" phpName="Relatedset">
@@ -318,6 +336,9 @@
     <table name="status" phpName="Status">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
+        <behavior name="table_row_view">
+            <parameter name="Status" value="name"/>
+        </behavior>
     </table>
 
     <table name="task" phpName="Task">
@@ -388,9 +409,6 @@
         <index name="AI_id_user">
             <index-column name="id"/>
         </index>
-        <index name="name">
-            <index-column name="userName"/>
-        </index>
     </table>
 
     <table name="publicationGroup" phpName="Publicationgroup">
@@ -420,6 +438,11 @@
     <table name="personalName">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="person_id" type="INTEGER" required="true"/>
+        <behavior name="table_row_view">
+            <!--<parameter name="Id" value="id"/>-->
+            <parameter name="Name" value="accessor:__toString"/>
+            <!--<parameter name="zugeordnet (Personen-ID)" value="person_id"/>-->
+        </behavior>
         <foreign-key foreignTable="person" name="fk_personalName_person1">
             <reference local="person_id" foreign="id"/>
         </foreign-key>
@@ -438,6 +461,13 @@
         <column name="personalName_id" type="INTEGER" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
         <column name="nameFragmentTypeId" type="INTEGER" required="true"/>
+        
+        <behavior name="table_row_view">
+            <parameter name="Id" value="id"/>
+            <parameter name="Bestandteil" value="name"/>
+            <parameter name="embedColumnsArt" value="nameFragmentType"/>
+        </behavior>
+        
         <foreign-key foreignTable="nameFragmentType" name="fk_name_namensart1">
             <reference local="nameFragmentTypeId" foreign="id"/>
         </foreign-key>
@@ -466,6 +496,10 @@
     
     <table name="title">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <behavior name="table_row_view">
+            <!--<parameter name="Id" value="id"/>-->
+            <parameter name="Titel" value="accessor:__toString"/>
+        </behavior>
     </table>
     
     <table name="titleFragment">
@@ -505,17 +539,18 @@
  
     
     
-    <!-- data / persons
+    <!-- data domain / person kinds
     ________________________________________________________-->
     
     <table name="person" phpName="Person">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="gnd" type="LONGVARCHAR" required="false"/>
+        <!--255 is the maximum length for a limit of 1000 bytes. required to allow unique indexing-->
+        <column name="gnd" type="VARCHAR" size="255" required="false"/> 
         <!--The name is added in the personalName table because it's a one-to-many relationship.-->
         
         <behavior name="table_row_view">
-            <parameter name="Normdatei" value="gnd"/>
-            <!--<parameter name="Prsnm" value="Personalnames"/>-->
+            <parameter name="Name" value="personalName"/>
+            <parameter name="GND" value="gnd"/>
         </behavior>
         
         <unique name="dnb_UNIQUE">
@@ -526,6 +561,11 @@
     <table name="author" phpName="Author">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="person_id" type="INTEGER" primaryKey="true" required="true"/>
+        
+        <behavior name="table_row_view">
+            <parameter name="embedColumnsPerson" value="person"/>
+        </behavior>
+        
         <foreign-key foreignTable="person" name="fk_autor_person1">
             <reference local="person_id" foreign="id"/>
         </foreign-key>

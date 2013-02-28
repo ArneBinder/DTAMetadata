@@ -1,0 +1,11 @@
+/* 
+    Document   : templateStyles
+    Created on : 28.02.2013, 11:29:53
+    Author     : carlwitt
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+.listView-add-button{
+    display: block; /* full width for the add button */
+}

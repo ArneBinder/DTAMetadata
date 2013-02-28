@@ -28,10 +28,15 @@ class PublicationType extends BaseAbstractType
             
         ));
         //$builder->add('publicationDate', new DatespecificationType());
-        $builder->add('Datespecification', new DatespecificationType(), array(
+        $builder->add('DatespecificationRelatedByOrigindateId', new DatespecificationType(), array(
             'label' => 'Erscheinungsjahr, falls abweichend'
         ));
-        
+        $builder->add('status', new SelectOrAddType(), array(
+            'class' => "DTA\MetadataBundle\Model\Status",
+            'property'   => 'Name',
+            'label' => 'Status',
+//            'query' => \DTA\MetadataBundle\Model\StatusQuery::create()->orderByName()
+        ));
 //        $builder->add('publishingcompanyId', new \DTA\MetadataBundle\Form\DerivedType\SelectOrAddType(), array(
 //            'class' => '\DTA\MetadataBundle\Model\Publishingcompany',
 //            'label' => 'Verlag'
