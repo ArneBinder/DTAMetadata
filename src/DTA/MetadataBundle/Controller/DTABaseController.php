@@ -30,15 +30,15 @@ class DTABaseController extends Controller {
      * Returns the fully qualified class names to autoload and generate objects and work with them using their class names.
      * @param String $className The basic name of the class, all lower-case except the first letter (Work, Personalname, Namefragmenttype)
      */
-    public function relatedClassNames($className){
+    public function relatedClassNames($className) {
         return array(
-            "model"     => "DTA\\MetadataBundle\\Model\\" . $className,                 // the actual propel active record
-            "query"     => "DTA\\MetadataBundle\\Model\\" . $className . "Query",       // utility class for generating queries
-            "peer"      => "DTA\\MetadataBundle\\Model\\" . $className . "Peer",        // utility class for reflection
-            "formType"  => "DTA\\MetadataBundle\\Form\\Type\\" . $className . "Type",   // class for generating form inputs
+            "model" => "DTA\\MetadataBundle\\Model\\" . $className, // the actual propel active record
+            "query" => "DTA\\MetadataBundle\\Model\\" . $className . "Query", // utility class for generating queries
+            "peer" => "DTA\\MetadataBundle\\Model\\" . $className . "Peer", // utility class for reflection
+            "formType" => "DTA\\MetadataBundle\\Form\\Type\\" . $className . "Type", // class for generating form inputs
         );
     }
-    
+
     /**
      * 
      * @param type $className
@@ -46,26 +46,80 @@ class DTABaseController extends Controller {
      *      defaults={"updatedObjectId"=0},
      *      name="genericView")
      */
-    public function genericViewAllAction($domainKey, $className, $updatedObjectId = 0){
-        
+    public function genericViewAllAction($domainKey, $className, $updatedObjectId = 0) {
+
         $classNames = $this->relatedClassNames($className);
-        
+
         // for retrieving the entities
         $query = new $classNames['query'];
         // for retrieving the column names
         $modelClass = new $classNames["model"];
-        
+
 //        $rc = new \ReflectionClass();
 //        $rc->getStaticPropertyValue("")
-        
+
         return $this->renderDomainKeySpecificAction($domainKey, "DTAMetadataBundle::genericView.html.twig", array(
-            'data' => $query->find(),
-            'columns' => $modelClass::getTableViewColumnNames(),
-            'className' => $className,
-            'updatedObjectId' => $updatedObjectId,
-        ));
+                    'data' => $query->find(),
+                    'columns' => $modelClass::getTableViewColumnNames(),
+                    'className' => $className,
+                    'updatedObjectId' => $updatedObjectId,
+                ));
     }
-    
+
+    /**
+     * Visits recursively all related entities and saves them.
+     * @param type $object              The object to save
+     * @param type $className           The fully namespace-qualified name of the class
+     * @param type $visitedEntities     List of model classes already visited (Pass array($unqualifiedClassNameOfObject) in the beginning)
+     */
+    private function saveRecursively($object, $className, $visitedEntities) {
+
+        if(is_object($object))
+            $object->save();
+        else
+            return;
+
+        // save related objects
+        $classNames = $this->relatedClassNames($className);
+        $tableMap = $classNames['peer']::getTableMap();
+
+//        echo $className;
+//        var_dump(count($tableMap->getRelations()));
+        foreach ($tableMap->getRelations() as $relation) {
+
+            $relatedClassName = $relation->getName();
+            
+//            echo $className . "->" . $relatedClassName . "\n";
+//            var_dump($visitedEntities);
+//                var_dump($relation);
+//                
+            // skip nodes where you've been before
+            // TODO correctness. Check whether recursion loop prevention fails in scenarios with several relations between two entities.
+            if (false !== array_search($relatedClassName, $visitedEntities))
+                continue;
+            $visitedEntities[] = $relatedClassName;
+
+            //            var_dump($relation);
+
+//            echo "type: " . $relation->getType() . "\n";
+            switch ($relation->getType()) {
+                case \RelationMap::ONE_TO_MANY:
+                case \RelationMap::MANY_TO_MANY:
+                    $getterName = "get" . $relation->getPluralName();
+                    foreach (call_user_func(array($object, $getterName)) as $relatedEntity) {
+                        $this->saveRecursively($relatedEntity, $relatedClassName, $visitedEntities);
+                    }
+                    break;
+                case \RelationMap::ONE_TO_ONE:
+                case \RelationMap::MANY_TO_ONE:
+                    $getterName = "get" . $relatedClassName;
+                    $relatedObject = call_user_func(array($object, $getterName));
+                    $this->saveRecursively($relatedObject, $relatedClassName, $visitedEntities);
+                    break;
+            }
+        }
+    }
+
     /**
      * Used for creating an edit form for a specific database entity.
      * @param type $domainKey
@@ -73,41 +127,40 @@ class DTABaseController extends Controller {
      * @param type $recordId
      * @Route("/zeigeDatensatz/{domainKey}/{className}/{recordId}", name="viewRecord")
      */
-    public function genericViewOneAction(Request $request, $domainKey, $className, $recordId){
-        
-         $classNames = $this->relatedClassNames($className);
-        
+    public function genericViewOneAction(Request $request, $domainKey, $className, $recordId) {
+
         // create object and its form
         $form = $this->dynamicForm($className, $recordId);
-//        $obj = new $classNames['model'];
         
         // save data on POST
         if ($request->isMethod("POST")) {
             // put form data on a virtual form
             $form->bindRequest($request);
             if ($form->isValid()) {
+                
                 // parse propel object from virtual form
                 $obj = $form->getData();
-                $obj->save();
-//ob_start();
-//var_dump($obj->getPublication()->getTitle());
-$result = ob_get_clean();
-                $this->get('session')->getFlashBag()->add('success', 'Änderungen vorgenommen.'.$result);
-                return $this->redirect($this->generateUrl('genericView',array(
-                    'domainKey'=>$domainKey, 
-                    'className'=>$className,
-                    'updatedObjectId'=>$obj->getId(),
-                    )));
+                $this->saveRecursively($obj, $className, array($className));
+
+                $this->get('session')->getFlashBag()->add('success', 'Änderungen vorgenommen.');
+
+                var_dump($form);
+
+                return $this->redirect($this->generateUrl('genericView', array(
+                                    'domainKey' => $domainKey,
+                                    'className' => $className,
+                                    'updatedObjectId' => $obj->getId(),
+                                )));
             }
         }
         return $this->renderDomainKeySpecificAction($domainKey, "DTAMetadataBundle::formWrapper.html.twig", array(
-            'form' => $form->createView(),
-            'action' => 'edit',
-            'className' => $className,
-            'recordId' => $recordId,
-        ));
+                    'form' => $form->createView(),
+                    'action' => 'edit',
+                    'className' => $className,
+                    'recordId' => $recordId,
+                ));
     }
-    
+
     /**
      * Creates a form to EDIT or CREATE any database entity.
      * @param string $className The name of the model class to create the form for (refer to the Model directory,
@@ -119,7 +172,7 @@ $result = ob_get_clean();
     public function dynamicForm($className, $recordId = 0) {
 
         $classNames = $this->relatedClassNames($className);
-        
+
         $queryObject = $classNames['query']::create();
 
         // ------------------------------------------------------------------------
@@ -131,7 +184,7 @@ $result = ob_get_clean();
         return $form;
 //        return array('form'=>$form, 'object'=>$obj);
     }
-    
+
     /**
      * Renders a dynamic form and returns the result for use in AJAX updating or creating database entities.
      * 
@@ -143,16 +196,16 @@ $result = ob_get_clean();
      *      name="plainForm", 
      *      defaults={"recordId"=0, "captionProperty"="Id"})
      */
-    public function plainFormAction($className, $recordId = 0, $captionProperty = "Id"){
-        
+    public function plainFormAction($className, $recordId = 0, $captionProperty = "Id") {
+
         $form = $this->dynamicForm($className, $recordId);
-        
+
         // plain ajax response, without any menus or other html
         return $this->render("DTAMetadataBundle::plainForm.html.twig", array(
-            'form' => $form->createView(),
-            'className' => $className,
-            'captionProperty' => $captionProperty,
-        ));
+                    'form' => $form->createView(),
+                    'className' => $className,
+                    'captionProperty' => $captionProperty,
+                ));
     }
 
     /**
@@ -168,7 +221,7 @@ $result = ob_get_clean();
     public function genericNewAction(Request $request, $className, $domainKey, $captionProperty = "Id") {
 
         $classNames = $this->relatedClassNames($className);
-        
+
         // create object and its form
         $obj = new $classNames['model'];
         $form = $this->createForm(new $classNames['formType'], $obj);
@@ -180,50 +233,51 @@ $result = ob_get_clean();
                 $obj->save();
             }
         }
-        
+
         // AJAX case (nested form submit, no redirect)
-        if("none" === $domainKey){
-            
+        if ("none" === $domainKey) {
+
             // fetch data for the newly selectable option
             $id = $obj->getId();
             $caption = $obj->getByName($captionProperty);
-            
+
             return new Response("<option value='$id'>$caption</option>");
         }
         // top level form submit case (redirect to view page)
-        else{
+        else {
 //            $route = implode(':', array('DTAMetadataBundle', $domainKey, 'index'));
             // for accessing static attributes of the controllers
             $cr = $this->getControllerReflectionClass($domainKey);
-            
+
             return $this->renderDomainKeySpecificAction($domainKey, 'DTAMetadataBundle::formWrapper.html.twig', array(
-                'form' => $form->createView(),
-                'className' => $className,
-            ));
+                        'form' => $form->createView(),
+                        'className' => $className,
+                    ));
         }
     }
 
-    private function getControllerReflectionClass($domainKey){
-         return new \ReflectionClass("DTA\\MetadataBundle\\Controller\\" . $domainKey . "Controller");
+    private function getControllerReflectionClass($domainKey) {
+        return new \ReflectionClass("DTA\\MetadataBundle\\Controller\\" . $domainKey . "Controller");
     }
-    private function getModelReflectionClass($className){
-         return new \ReflectionClass("DTA\\MetadataBundle\\Model\\" . $className);
+
+    private function getModelReflectionClass($className) {
+        return new \ReflectionClass("DTA\\MetadataBundle\\Model\\" . $className);
     }
-    
-    public function renderDomainKeySpecificAction($domainKey, $template, array $options = array()){
-        
+
+    public function renderDomainKeySpecificAction($domainKey, $template, array $options = array()) {
+
         $cr = $this->getControllerReflectionClass($domainKey);
-        
+
         // these are overriden by the calling subclass
         $defaultDomainMenu = array(
             'domainMenu' => $cr->getStaticPropertyValue('domainMenu'),
             "domainKey" => $cr->getStaticPropertyValue('domainKey'));
-        
+
         // replaces the domain menu of $defaultDomainMenu with the domain menu of options, if both are set.
         $options = array_merge($defaultDomainMenu, $options);
         return $this->render($template, $options);
     }
-    
+
     /**
      * Called by the _derived_ domain controllers. Automatically passes the domain key and menu of the derived class to the template.
      * @param $template Template to use for rendering, e.g. site specific as DTAMetadataBundle:DataDomain:index.html.twig
@@ -233,16 +287,16 @@ $result = ob_get_clean();
 
         // static properties cannot be accessed via $this
         $controllerReflection = new \ReflectionClass($this);
-        
+
         // these are overriden by the calling subclass
         $defaultDomainMenu = array(
             'domainMenu' => $controllerReflection->getStaticPropertyValue('domainMenu'),
             "domainKey" => $controllerReflection->getStaticPropertyValue('domainKey'));
-        
+
         // replaces the domain menu of $defaultDomainMenu with the domain menu of options, if both are set.
         // adds the data for the view from $options
         $options = array_merge($defaultDomainMenu, $options);
-        
+
         return $this->render($template, $options);
     }
 
