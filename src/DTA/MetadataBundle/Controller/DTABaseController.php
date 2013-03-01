@@ -67,58 +67,29 @@ class DTABaseController extends Controller {
     }
 
     /**
-     * Visits recursively all related entities and saves them.
-     * @param type $object              The object to save
-     * @param type $className           The fully namespace-qualified name of the class
-     * @param type $visitedEntities     List of model classes already visited (Pass array($unqualifiedClassNameOfObject) in the beginning)
+     * Visits recursively all nested form elements and saves them.
+     * @param Form $form The form object that contains the data defined by the top level form type (PersonType, NamefragmentType, ...)
      */
-    private function saveRecursively($object, $className, $visitedEntities) {
+private function saveRecursively(\Symfony\Component\Form\Form $form, $visited = array()) {
 
-        if(is_object($object))
-            $object->save();
-        else
-            return;
+//    if( false !== array_search($form, $visited))
+//        return $visited;
+//
+//    $visited[] = $form;
 
-        // save related objects
-        $classNames = $this->relatedClassNames($className);
-        $tableMap = $classNames['peer']::getTableMap();
+    $entity = $form->getData();
+//        echo "<-" . $entity;
+//        var_dump($form );
+//        echo "->" . $entity;
+    if(is_object($entity))
+        $entity->save();
 
-//        echo $className;
-//        var_dump(count($tableMap->getRelations()));
-        foreach ($tableMap->getRelations() as $relation) {
-
-            $relatedClassName = $relation->getName();
-            
-//            echo $className . "->" . $relatedClassName . "\n";
-//            var_dump($visitedEntities);
-//                var_dump($relation);
-//                
-            // skip nodes where you've been before
-            // TODO correctness. Check whether recursion loop prevention fails in scenarios with several relations between two entities.
-            if (false !== array_search($relatedClassName, $visitedEntities))
-                continue;
-            $visitedEntities[] = $relatedClassName;
-
-            //            var_dump($relation);
-
-//            echo "type: " . $relation->getType() . "\n";
-            switch ($relation->getType()) {
-                case \RelationMap::ONE_TO_MANY:
-                case \RelationMap::MANY_TO_MANY:
-                    $getterName = "get" . $relation->getPluralName();
-                    foreach (call_user_func(array($object, $getterName)) as $relatedEntity) {
-                        $this->saveRecursively($relatedEntity, $relatedClassName, $visitedEntities);
-                    }
-                    break;
-                case \RelationMap::ONE_TO_ONE:
-                case \RelationMap::MANY_TO_ONE:
-                    $getterName = "get" . $relatedClassName;
-                    $relatedObject = call_user_func(array($object, $getterName));
-                    $this->saveRecursively($relatedObject, $relatedClassName, $visitedEntities);
-                    break;
-            }
-        }
+    foreach ($form->getChildren() as $child){
+//        $visited = 
+        $this->saveRecursively($child);
     }
+//    return $visited;
+}
 
     /**
      * Used for creating an edit form for a specific database entity.
@@ -139,17 +110,14 @@ class DTABaseController extends Controller {
             if ($form->isValid()) {
                 
                 // parse propel object from virtual form
-                $obj = $form->getData();
-                $this->saveRecursively($obj, $className, array($className));
+                $this->saveRecursively($form);
 
                 $this->get('session')->getFlashBag()->add('success', 'Änderungen vorgenommen.');
-
-                var_dump($form);
 
                 return $this->redirect($this->generateUrl('genericView', array(
                                     'domainKey' => $domainKey,
                                     'className' => $className,
-                                    'updatedObjectId' => $obj->getId(),
+                                    'updatedObjectId' => $form->getData()->getId(),
                                 )));
             }
         }
@@ -232,6 +200,14 @@ class DTABaseController extends Controller {
             if ($form->isValid()) {
                 $obj->save();
             }
+            
+            $this->get('session')->getFlashBag()->add('success', 'Änderungen vorgenommen.');
+            
+            return $this->redirect($this->generateUrl('genericView', array(
+                                    'domainKey' => $domainKey,
+                                    'className' => $className,
+                                    'updatedObjectId' => $form->getData()->getId(),
+                                )));
         }
 
         // AJAX case (nested form submit, no redirect)

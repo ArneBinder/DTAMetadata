@@ -43,7 +43,7 @@ class DataDomainController extends DTABaseController {
         
                 
         return $this->renderControllerSpecificAction('DTAMetadataBundle:DataDomain:index.html.twig', array(
-            "person" => $persont->getRelations() //count($p->getPersonalnames()->getArrayCopy())//[0]->__toString(),
+            "person" => "" //$persont->getRelations() //count($p->getPersonalnames()->getArrayCopy())//[0]->__toString(),
         ));
     }
 

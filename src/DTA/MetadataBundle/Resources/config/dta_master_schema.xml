@@ -259,6 +259,9 @@
     <table name="corpus" phpName="Corpus">
         <column name="id" type="INTEGER" size="10" sqlType="int(10) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
+<!--        <unique name="korpusname_einzigartig">
+            <unique-column name="corpusNameHash"/>
+        </unique>-->
     </table>
 
     <table name="dwdsGenre" phpName="Dwdsgenre">

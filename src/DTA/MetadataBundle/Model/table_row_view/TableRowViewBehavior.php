@@ -225,11 +225,12 @@ class TableRowViewBehavior extends Behavior {
         $otherBehavior->build();
 
         // add all columns to the local view
+        $i = 0;
         foreach ($otherBehavior->accessors as $remoteCaption => $remoteAccessor) {
-            
+            $i++;
             // generate a getter function that redirected the remote accessor to the related entity
             $relatedEntityPhpName = $relatedEntity->getPhpName();
-            $embeddedGetterFunctionName = 'get' . $remoteCaption . 'For' . $relatedEntityPhpName;
+            $embeddedGetterFunctionName = 'getEmbeddedColumn' . $i . 'Of' . $relatedEntityPhpName;
             $this->embeddedGetterFunctions[] = $this->renderTemplate('tableRowViewEmbeddedGetter',array(
                 'functionName' => $embeddedGetterFunctionName,
                 'relatedEntity' => $relatedEntityPhpName,
@@ -237,6 +238,7 @@ class TableRowViewBehavior extends Behavior {
             ));
             
             $subAccessor = 'accessor:' . $embeddedGetterFunctionName;
+//            visualizing the structure is useful but results in long table headlines, that are impractical
 //            $this->addViewElement($relatedEntityPhpName."_".$remoteCaption, $subAccessor);
             $this->addViewElement($remoteCaption, $subAccessor);
             
