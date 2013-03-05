@@ -15,3 +15,15 @@
 .collection-editor ol{
     list-style-type: decimal;
 }
+
+.sortable-up{
+    position: relative;
+    top: -43px;
+    left: -20px;
+}
+
+.sortable-down{
+    position: relative;
+    top: -27px;
+    left: -27px;
+}

@@ -72,23 +72,16 @@ class DTABaseController extends Controller {
      */
 private function saveRecursively(\Symfony\Component\Form\Form $form, $visited = array()) {
 
-//    if( false !== array_search($form, $visited))
-//        return $visited;
-//
-//    $visited[] = $form;
-
     $entity = $form->getData();
-//        echo "<-" . $entity;
-//        var_dump($form );
-//        echo "->" . $entity;
-    if(is_object($entity))
-        $entity->save();
+    if(is_object($entity)){
+        $rc = new \ReflectionClass($entity);
+        if($rc->hasMethod('save'))
+            $entity->save();
+    }
 
     foreach ($form->getChildren() as $child){
-//        $visited = 
         $this->saveRecursively($child);
     }
-//    return $visited;
 }
 
     /**

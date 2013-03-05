@@ -9,7 +9,7 @@ class NamefragmentType extends BaseAbstractType {
 
     protected $options = array(
         'data_class' => 'DTA\MetadataBundle\Model\Namefragment',
-        'name' => 'titleFragment', // TODO convenience. rename the titleFragment to something more generic.
+        'name' => 'namefragment',
     );
 
     /**
@@ -21,7 +21,7 @@ class NamefragmentType extends BaseAbstractType {
             'property' => 'name',
             'class' => 'DTA\MetadataBundle\Model\Namefragmenttype',
         ));
-        $builder->add('name', null, array('label' => ' '));
+        $builder->add('name', 'text', array('label' => ' '));
         $builder->add('sortableRank', 'hidden');     
     }
 

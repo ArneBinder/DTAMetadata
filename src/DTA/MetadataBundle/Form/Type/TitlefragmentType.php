@@ -9,9 +9,9 @@ class TitlefragmentType extends BaseAbstractType {
 
     protected $options = array(
         'data_class' => 'DTA\MetadataBundle\Model\Titlefragment',
-        'name' => 'titleFragment',
+        'name' => 'titlefragment',
     );
-
+    
     /**
      *  {@inheritdoc}
      */
@@ -20,11 +20,15 @@ class TitlefragmentType extends BaseAbstractType {
             'label' => ' ',
             'property' => 'name',
             'class' => 'DTA\MetadataBundle\Model\Titlefragmenttype',
+//            'block_name' => 'zebra'
         ));
         
-        $builder->add('name', null, array('label' => ' '));
+        $builder->add('name', 'text', array('label' => ' '));
         $builder->add('sortableRank', 'hidden');             // this is controlled via javascript generated ui elements    
-//        $builder->add('titleId', 'hidden', array('data'=>$options['titleId']));
+        $builder->add('NameIsReconstructed', 'checkbox', array(
+            'required'=>false,
+            'label'=>'ist aus anderen Quellen rekonstruiert'
+            ));
     }
     
 }

@@ -55,7 +55,7 @@ propel:
       # propel.mysql.tableType: InnoDB
       
       # multiple schemas with the same database name
-      # propel.packageObjectModel: true
+      #propel.packageObjectModel: true
       
       # leads to problems with code location and autoloading
       #propel.namespace.autoPackage: true

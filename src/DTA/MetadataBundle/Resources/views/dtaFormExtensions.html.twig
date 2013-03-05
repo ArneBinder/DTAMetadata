@@ -9,6 +9,63 @@
         <name>_widget
  #}
 
+{#% block title_label %} 
+{% endblock title_label %}
+
+{% block title_widget %} 
+{{form_widget(form)}}
+{% endblock title_widget %}
+
+{% block titleFragment_widget %}
+<div class="form-inline">
+{{ form_widget(form.titlefragmenttype,  {'attr':{'class':'franzoesisch'} }) }}
+</div>
+{{ form_rest(form, {'attr':{'class':'english'} }) }}
+{% endblock titleFragment_widget %#}
+
+{#% block model_row%}
+{{ form_widget(form, , {'attr':{'style':'float:left; margin-right: 10px'} }) }}
+{% endblock model_row %#}
+
+{% block titlefragment_row %}
+    <div>
+        {% for child in [form.titlefragmenttype, form.name] %}
+            <div style="float:left; margin-right: 10px">
+                {{ form_row(child )}} 
+            </div>
+        {% endfor %}
+        {{form_row(form.NameIsReconstructed, {'label_attr':{'class':'label-inline-centered'}, 
+                'attr':{'class':'checkbox-inline-centered'} })}}
+    </div>
+    {{form_rest(form)}}
+{% endblock %}
+
+{% block personalname_row %}
+    {{ form_widget(form) }}
+{% endblock %}
+
+{% block namefragment_row %}
+    <div>
+        {% for child in [form.namefragmenttype, form.name] %}
+            <div style="float:left; margin-right: 10px">
+                {{ form_row(child )}} 
+            </div>
+        {% endfor %}
+    </div>
+    {{form_rest(form)}}
+{% endblock %}
+
+{# without the surrounding div of each row #}
+
+{#% block model_row %}
+{% spaceless %}
+        {{ form_label(form) }}
+        {{ form_errors(form) }}
+        {{ form_widget(form, {'attr':{ 'style':'float:left; margin-right:10px;' } }) }}
+{% endspaceless %}
+{% endblock %#}
+
+
 {#  -----------------------------------------------------------------------------
     The selectOrAdd widget extends a select box with 
     an option to add a new database entity 
@@ -37,7 +94,8 @@
         {# Set marker classes for the JS (collectionControl.js) to add the corresponding buttons #}
         {% set attr = attr|merge({'class': "collection-editor collection-sortable" }) %}
     {% endif %}
-    <ol {{ block('widget_container_attributes') }}>
+    {#% set attr = attr|merge({'class': 'sortableCollection'}) %#}
+    <ol class='sortableCollection'{{ block('widget_container_attributes', {'attr':attr|merge({'class':'sortableCollection'})}) }} >
         {% if form.parent is empty %}
             {{ form_errors(form) }}
         {% endif %}
@@ -66,9 +124,10 @@
         
         {#{ form_errors(child) }}
         {{ form_widget(child) }#}
-        {# omit the default label (just a zero-based index) for each fragment #}
-        {{ form_rest(child) }}
+        {# omit the default label (just a zero-based index) for each fragment 
+        {{ form_errors(child) }}    #}
+        {{ form_row(child) }}
     </li>
     {% endfor %}
 {% endspaceless %}
-{% endblock sortableCollection_rows %}
+{% endblock %}

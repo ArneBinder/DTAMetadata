@@ -21,7 +21,10 @@ public function getAttributeByTableViewColumName($columnName){
         $accessor = substr($accessor, strlen("accessor:"));
         return call_user_func(array($this, $accessor));
     } else {
-        return $this->getByName($accessor, \BasePeer::TYPE_PHPNAME);
+        $result = $this->getByName($accessor, \BasePeer::TYPE_PHPNAME);
+        if( is_a($result, 'DateTime') )
+            $result = $result->format('d/m/Y');
+        return $result;
     }
 }    
 

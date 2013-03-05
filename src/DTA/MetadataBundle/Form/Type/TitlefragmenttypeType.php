@@ -11,12 +11,11 @@ class TitlefragmenttypeType extends BaseAbstractType
         'data_class' => 'DTA\MetadataBundle\Model\Titlefragmenttype',
         'name'       => 'titlefragmenttype',
     );
-
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('name');
+        $builder->add('name', 'text');
     }
 }

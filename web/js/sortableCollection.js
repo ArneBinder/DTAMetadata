@@ -12,12 +12,30 @@
 jQuery(document).ready(createGui);
 
 function createGui(){
-    jQuery(document).on('click', '.sortableCollectionWidget.add-entity', addFormElement);
+//    jQuery(document).on('click', '.sortableCollectionWidget.add-entity', addFormElement);
     
     // add up and down control elements for sortable collections
     var sortableElements = jQuery('.collection-sortable li');
     jQuery.each(sortableElements, function(idx,element){
         createSortableControls(element);
+    });
+
+    jQuery('ol.sortableCollection').sortable({
+        cursor: "move",
+        update: updateSortableRanks
+    });
+
+}
+
+/* Propagates the new positions (in the ordered list) to the hidden sortable rank input fields.
+ * Applied each time the user changes the position of a sortable element. */
+function updateSortableRanks( event, ui ){
+       
+    var $sortableCollectionHolder = $('#' + event.target.id);
+    
+    $sortableCollectionHolder.children('li').each(function(index, listElement){
+        $(listElement).find('input[name*=sortableRank]').val(index);
+        //console.log($(listElement).find('input[name*=sortableRank]'), index);
     });
 }
 
@@ -25,7 +43,7 @@ function createGui(){
  * Extends the sortable collection by one collection element.
  */
 function addFormElement(){
-    
+    console.log('add triggered');
     var $addLink = $(this);
     
     var $collectionHolder = $addLink.parent();
@@ -49,17 +67,16 @@ function addFormElement(){
         .children('input[name=translatedModelClassName]')
         .val();
     
+    
+    console.log("raw prototype",$collection.attr("data-prototype"));
     var prototype = $collection.attr("data-prototype")
         .replace(/<label class="required">__name__label__<\/label>/g, '');  // remove per fragment label
-       
+    console.log("replaced prototype",prototype);   
     prototype = prototype.replace(new RegExp('__'+ modelClassName +'ID__', 'g'), elementId);
-    
+    console.log("filled prototype",prototype);   
+
     // CREATE NEW DOM ELEMENT 
-    
     var $newForm = $(prototype);
-    // TODO: somehow, two additional divs are created by the symfony prototype (check whether sortableCollectionType needs to override a method)
-    // remove these
-    $newForm = $newForm.children('div').children('div');
     
     var $newFormLi = $('<li></li>')
         .text(translatedModelClassName)
@@ -92,60 +109,13 @@ function createSortableControls(element, translatedModelClassName){
         
     var iconUpStr = '<i class="icon-arrow-up"></i>';
     var iconDownStr = '<i class="icon-arrow-down"></i>';
-    var up   = $('<a href="#" class="sortable-up">'+ iconUpStr + translatedModelClassName +' nach oben</a> ');
-    var down = $('<a href="#" class="sortable-down">'+ iconDownStr + translatedModelClassName +' nach unten</a>');
+    var upStr = ' nach oben';
+    var downStr = ' nach unten';
+    var up   = $('<a href="#" class="sortable-up">'+ iconUpStr + /*translatedModelClassName + upStr + */'</a> ');
+    var down = $('<a href="#" class="sortable-down">'+ iconDownStr + /*translatedModelClassName + downStr + */'</a>');
     up.on('click', sortableUp);    
     down.on('click', sortableDown);    
     $(element).append(up);
     $(element).append(down);
-}
-
-/**
- * Swaps the values of the sortableRank hidden input fields of the li element,
- * that is the logical title fragment
- */
-function swapRanks(titleFragmentLi, otherTitleFragmentLi){
-    var rankField = $(titleFragmentLi).find('input[name*=sortableRank]');
-    var otherRankField = $(otherTitleFragmentLi).find('input[name*=sortableRank]');
-    
-    var myRank = rankField.attr('value');
-    rankField.attr('value', otherRankField.attr('value'));
-    otherRankField.attr('value', myRank);
-        
-    console.log(jQuery('input[name*=sortableRank]')); //TODO finalization. remove.
-}
-function sortableUp(){
-    var liElement = $(this).parent();
-    var prevElement = liElement.prev("li");
-    
-    if(prevElement.length == 0) return false; // this element is already the first
-    else{
-        swapRanks(liElement, prevElement);
-        // change DOM elements order
-        var textareaContent = liElement.find('textarea').attr('value');
-        var newElement = liElement.clone(true); // clone event handlers as well
-        newElement.find('textarea').attr('value', textareaContent);
-        prevElement.before(newElement);
-        newElement.effect('highlight');
-        liElement.remove();
-    }
-    return false;
-}
-function sortableDown(){
-    var liElement = $(this).parent();
-    var nextElement = liElement.next("li");
-    
-    if(nextElement.length == 0) return false; // this element is already the last
-    else{
-        swapRanks(liElement,nextElement);
-        // change order in the dom tree
-        var textareaContent = liElement.find('textarea').attr('value');
-        var newElement = liElement.clone(true); // clone event handlers as well
-        newElement.find('textarea').attr('value', textareaContent);
-        nextElement.after(newElement);
-        newElement.effect('highlight');
-        liElement.remove();
-    }
-    return false;
 }
 

@@ -1,20 +1,22 @@
 <!DOCTYPE html><html lang="de">
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <meta charset="utf-8">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta charset="utf-8" />
         <title>{% block title %}Projektdatenbank des Deutschen Textarchivs{% endblock %} - DTADB</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="DTA Metadatenbank">
-        <meta name="author" content="Deutsches Textarchiv / Berlin-Brandenburgische Akademie der Wissenschaften">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="DTA Metadatenbank" />
+        <meta name="author" content="Deutsches Textarchiv / Berlin-Brandenburgische Akademie der Wissenschaften" />
 
     {% block stylesheets %}
         <link href="{{ asset('css/layout.css') }}" type="text/css" rel="stylesheet" /> 
         <link href="{{ asset('css/genericHtml.css') }}" type="text/css" rel="stylesheet" />
-        <link href="{{ asset('css/formWidgets/dynamicGUI.css') }}" rel="stylesheet">
-        <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet">
-        <link href="{{ asset('css/bootstrap-responsive.css') }}" rel="stylesheet">
-        <link href="{{ asset('css/templateStyles.css') }}" rel="stylesheet">
-        <link href="{{ asset('js/bootstrap-extra-modals/bootstrap-modal.css') }}" rel="stylesheet">
+        <link href="{{ asset('css/formWidgets/dynamicGUI.css') }}" rel="stylesheet" />
+        <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet" />
+        <link href="{{ asset('css/bootstrap-responsive.css') }}" rel="stylesheet" />
+        <link href="{{ asset('css/templateStyles.css') }}" rel="stylesheet" />
+        <link href="{{ asset('js/bootstrap-extra-modals/bootstrap-modal.css') }}" rel="stylesheet" />
+        <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.1/themes/base/jquery-ui.css">
+  
         <!--[if lt IE 9]> <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script> <![endif]-->
     {% endblock %}
 
@@ -29,7 +31,7 @@
     <link rel="apple-touch-icon-precomposed" href="http://twitter.github.com/bootstrap/assets/ico/apple-touch-icon-57-precomposed.png">
     #}
     </head>
-    <body>
+    <body style="min-width: 900px">
 
         {#  ---------------------------------------------
             The menu is highlighted using the domainKey variable
@@ -42,7 +44,7 @@
                         <a class="brand" href="{{ path('home') }}">
                             DTA Projektdatenbank
                         </a>
-                        <div class="nav-collapse collapse">
+                        <div class="nav">
                             <ul class="nav">
                             {% block domainMenu %}
                                 <li {% if domainKey == "Home" %} class='active' {% endif %} >
@@ -80,8 +82,8 @@
                         The submenu is built using the domainMenu data structure
                         --------------------------------------------- #}
                     
-                    <div class="row-fluid" style='border-top: 1px solid #DDD;'>
-                        <div class="nav-collapse collapse">
+                    <div class="row" style='border-top: 1px solid #DDD;'>
+                        <div class="nav ">
                             <ul class="nav">
                                 
                             {% block currentDomainMenu %}
@@ -144,6 +146,7 @@
         <script src="{{ asset('js/bootstrap.js') }}" type="text/javascript"></script>
         <script src="{{ asset('js/bootstrap-extra-modals/bootstrap-modal.js') }}" type="text/javascript"></script>
         <script src="{{ asset('js/bootstrap-extra-modals/bootstrap-modalmanager.js') }}" type="text/javascript"></script>
-        
+        <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+        <script src="http://code.jquery.com/ui/1.10.1/jquery-ui.js"></script>
     </body>
 </html>

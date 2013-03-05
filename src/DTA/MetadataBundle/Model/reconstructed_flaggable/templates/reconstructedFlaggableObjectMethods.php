@@ -14,6 +14,18 @@ public function isReconstructedByName($column){
 }
 
 /**
+* Returns the marked column value, e.g. in brackets to denote that the value is reconstructed.
+* e.g. getMarkedByName('name') return '[<name>]'.
+* @param $column the PHP name of the column as defined in the schema
+*/
+public function getMarkedByName($column){
+    if($this->isReconstructedByName($column))
+        return '[' . $this->getByName($column) . ']';
+    else
+        return $this->getByName($column);
+}
+
+/**
 * Returns all columns that are flagged as reconstructed.
 */
 public function getReconstructedFlaggedColumns(){

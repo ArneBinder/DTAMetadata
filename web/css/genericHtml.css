@@ -10,6 +10,20 @@ body {
     padding-top: 100px;
     padding-bottom: 40px;
 }
+
+/* forms */
+
 textarea{
     /*width: 500px;*/
 }
+
+/* for inline forms, where a text input is nearby, which is relatively tall */
+.label-inline-centered{
+    float:left; 
+    margin: 9px 7px 0 0;
+}
+
+form div > input.checkbox-inline-centered{
+    margin-top: 14px;
+}
+

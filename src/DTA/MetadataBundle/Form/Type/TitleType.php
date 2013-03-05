@@ -23,6 +23,7 @@ class TitleType extends BaseAbstractType {
             'type' => new TitlefragmentType(),
             'allow_add' => true,
             'by_reference' => false,
+//            'block_name' => 'anotherThemeBlock',
         ));
     }
 

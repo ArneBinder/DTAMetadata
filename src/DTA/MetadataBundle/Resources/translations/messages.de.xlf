@@ -66,6 +66,10 @@
 				<source>listView.addColumn.caption</source>
                 <target>Datensatz bearbeiten</target>
             </trans-unit>
+            <trans-unit id="17">
+				<source>Titlefragment</source>
+                <target>Titelbestandteil</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

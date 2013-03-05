@@ -4,7 +4,7 @@
     By default, a new entity is created.
     For editing entities, the action variable contains a route to the 
 #}
-
+    
 {% block core %}
 
     {# Determine where to post the form data (create or update the data) #}
@@ -20,7 +20,7 @@
     <h3>{{className|trans}} {{ headerSuffix }} </h3>
 
     <form action="{{ actionTarget }}" method="post" {{ form_enctype(form) }}>
-        {{ form_rest(form) }}
+        {{ form_row(form) }}
          <input type="submit"/>
     </form>
     

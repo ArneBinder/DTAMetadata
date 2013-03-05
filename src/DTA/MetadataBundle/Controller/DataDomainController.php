@@ -40,10 +40,10 @@ class DataDomainController extends DTABaseController {
         // TODO: remove. DataDomain.html.twig is useless now, as the domain menu has been generalized to the top level.
         $p = Model\PersonQuery::create()->findOneById(1);
         $persont = Model\PersonPeer::getTableMap();
-        
                 
         return $this->renderControllerSpecificAction('DTAMetadataBundle:DataDomain:index.html.twig', array(
-            "person" => "" //$persont->getRelations() //count($p->getPersonalnames()->getArrayCopy())//[0]->__toString(),
+            "person" => '' //$persont->getRelations() //count($p->getPersonalnames()->getArrayCopy())//[0]->__toString(),
+            // get_declared_classes()
         ));
     }
 

@@ -317,9 +317,10 @@ class TableRowViewBehavior extends Behavior {
 
     // add interface implementation declaration
     public function objectFilter(&$script) {
+        //$pattern = '/abstract class (\w+) extends (\w+) implements (\w+)/i';
         $pattern = '/abstract class (\w+) extends (\w+) implements (\w+)/i';
-        $replace = "// TableRowViewInterface automatically implemented by the TableRowViewBehavior.php\r" .
-                'abstract class ${1} extends ${2}  implements ${3}, \DTA\MetadataBundle\Model\table_row_view\TableRowViewInterface';
+        // the comment causes problems if other behaviors want to add interfaces, too. "// TableRowViewInterface automatically implemented by the TableRowViewBehavior.php\r" .
+        $replace = 'abstract class ${1} extends ${2} implements ${3}, \DTA\MetadataBundle\Model\table_row_view\TableRowViewInterface';
         $script = preg_replace($pattern, $replace, $script);
     }
 

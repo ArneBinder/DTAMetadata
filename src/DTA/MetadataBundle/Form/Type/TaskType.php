@@ -22,7 +22,7 @@ class TaskType extends BaseAbstractType
             'property' => 'name',
         ));
         $builder->add('done');
-        $builder->add('start');
+        $builder->add('start', null, array('years'=>array('2013'),'widget' => 'choice'));
         $builder->add('end');
         $builder->add('comments');
         $builder->add('User', 'model', array(
