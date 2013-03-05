@@ -36,8 +36,10 @@
         {% endfor %}
         {{form_row(form.NameIsReconstructed, {'label_attr':{'class':'label-inline-centered'}, 
                 'attr':{'class':'checkbox-inline-centered'} })}}
-    </div>
+            <div>
     {{form_rest(form)}}
+                </div>
+    </div>
 {% endblock %}
 
 {% block personalname_row %}
@@ -51,8 +53,8 @@
                 {{ form_row(child )}} 
             </div>
         {% endfor %}
+        {{form_rest(form)}}
     </div>
-    {{form_rest(form)}}
 {% endblock %}
 
 {# without the surrounding div of each row #}
@@ -95,7 +97,7 @@
         {% set attr = attr|merge({'class': "collection-editor collection-sortable" }) %}
     {% endif %}
     {#% set attr = attr|merge({'class': 'sortableCollection'}) %#}
-    <ol class='sortableCollection'{{ block('widget_container_attributes', {'attr':attr|merge({'class':'sortableCollection'})}) }} >
+    <ol class='collection-sortable'{{ block('widget_container_attributes', {'attr':attr|merge({'class':'sortableCollection'})}) }} >
         {% if form.parent is empty %}
             {{ form_errors(form) }}
         {% endif %}

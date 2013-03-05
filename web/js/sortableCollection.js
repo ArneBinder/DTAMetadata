@@ -12,7 +12,7 @@
 jQuery(document).ready(createGui);
 
 function createGui(){
-//    jQuery(document).on('click', '.sortableCollectionWidget.add-entity', addFormElement);
+    jQuery(document).on('click', '.sortableCollectionWidget.add-entity', addFormElement);
     
     // add up and down control elements for sortable collections
     var sortableElements = jQuery('.collection-sortable li');
@@ -20,7 +20,7 @@ function createGui(){
         createSortableControls(element);
     });
 
-    jQuery('ol.sortableCollection').sortable({
+    jQuery('ol.collection-sortable').sortable({
         cursor: "move",
         update: updateSortableRanks
     });
@@ -48,7 +48,7 @@ function addFormElement(){
     
     var $collectionHolder = $addLink.parent();
     var $collection = $collectionHolder.children('ol.collection-sortable');
-    console.log($collectionHolder, $collection);
+    console.log('collection holder', $collectionHolder, 'collection ol', $collection);
     
     // PREPARE PROTOTYPE 
     
@@ -69,7 +69,8 @@ function addFormElement(){
     
     
     console.log("raw prototype",$collection.attr("data-prototype"));
-    var prototype = $collection.attr("data-prototype")
+    var prototype = $.trim($collection.attr("data-prototype"))
+        .replace(/\n/g,'')
         .replace(/<label class="required">__name__label__<\/label>/g, '');  // remove per fragment label
     console.log("replaced prototype",prototype);   
     prototype = prototype.replace(new RegExp('__'+ modelClassName +'ID__', 'g'), elementId);
@@ -113,8 +114,6 @@ function createSortableControls(element, translatedModelClassName){
     var downStr = ' nach unten';
     var up   = $('<a href="#" class="sortable-up">'+ iconUpStr + /*translatedModelClassName + upStr + */'</a> ');
     var down = $('<a href="#" class="sortable-down">'+ iconDownStr + /*translatedModelClassName + downStr + */'</a>');
-    up.on('click', sortableUp);    
-    down.on('click', sortableDown);    
     $(element).append(up);
     $(element).append(down);
 }
