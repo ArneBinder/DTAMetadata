@@ -19,11 +19,10 @@ class TitleType extends BaseAbstractType {
      */
     public function buildForm(FormBuilderInterface $builder, array $options) {
         $builder->add('titleFragments', new Form\DerivedType\SortableCollectionType(), array( 
-            'label' => ' ',
             'type' => new TitlefragmentType(),
             'allow_add' => true,
+            'allow_delete' => true,
             'by_reference' => false,
-//            'block_name' => 'anotherThemeBlock',
         ));
     }
 

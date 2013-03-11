@@ -33,9 +33,9 @@ function updateSortableRanks( event, ui ){
        
     var $sortableCollectionHolder = $('#' + event.target.id);
     
+    // traverse in order of dom tree, push this 'real' index to the hidden inputs
     $sortableCollectionHolder.children('li').each(function(index, listElement){
         $(listElement).find('input[name*=sortableRank]').val(index);
-        //console.log($(listElement).find('input[name*=sortableRank]'), index);
     });
 }
 
@@ -43,12 +43,11 @@ function updateSortableRanks( event, ui ){
  * Extends the sortable collection by one collection element.
  */
 function addFormElement(){
-    console.log('add triggered');
     var $addLink = $(this);
     
     var $collectionHolder = $addLink.parent();
     var $collection = $collectionHolder.children('ol.collection-sortable');
-    console.log('collection holder', $collectionHolder, 'collection ol', $collection);
+//    console.log('collection holder', $collectionHolder, 'collection ol', $collection);
     
     // PREPARE PROTOTYPE 
     
@@ -68,13 +67,10 @@ function addFormElement(){
         .val();
     
     
-    console.log("raw prototype",$collection.attr("data-prototype"));
     var prototype = $.trim($collection.attr("data-prototype"))
         .replace(/\n/g,'')
         .replace(/<label class="required">__name__label__<\/label>/g, '');  // remove per fragment label
-    console.log("replaced prototype",prototype);   
     prototype = prototype.replace(new RegExp('__'+ modelClassName +'ID__', 'g'), elementId);
-    console.log("filled prototype",prototype);   
 
     // CREATE NEW DOM ELEMENT 
     var $newForm = $(prototype);

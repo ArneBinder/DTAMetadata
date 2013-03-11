@@ -25,6 +25,8 @@ twig:
     form:
         resources:
             - 'DTAMetadataBundle::dtaFormExtensions.html.twig'
+            - 'DTAMetadataBundle::formTypes.html.twig'
+
 
 # Assetic Configuration
 assetic:

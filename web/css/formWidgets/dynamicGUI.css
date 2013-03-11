@@ -8,22 +8,21 @@
 */
 
 .selectOrAdd.add.btn{
-    position: relative; 
-    top: -6px; 
-    margin-left: 10px;
+/*    position: relative; 
+    margin-left: 10px;*/
 }
 .collection-editor ol{
     list-style-type: decimal;
 }
 
 .sortable-up{
-    position: relative;
-    top: -43px;
-    left: -20px;
+    position: absolute;
+    top: 24px;
+    left: -23px;
 }
 
 .sortable-down{
-    position: relative;
-    top: -27px;
-    left: -27px;
+    position: absolute;
+    top: 39px;
+    left: -14px;
 }

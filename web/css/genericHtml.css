@@ -17,6 +17,9 @@ textarea{
     /*width: 500px;*/
 }
 
+.no-margin-bottom * {
+    margin-bottom: 0;
+}
 /* for inline forms, where a text input is nearby, which is relatively tall */
 .label-inline-centered{
     float:left; 
@@ -27,3 +30,10 @@ form div > input.checkbox-inline-centered{
     margin-top: 14px;
 }
 
+input.single-line-medium-text{
+    width: 375px;
+}
+
+.control-group.form-inline .controls{
+    margin-left: 0;
+} 

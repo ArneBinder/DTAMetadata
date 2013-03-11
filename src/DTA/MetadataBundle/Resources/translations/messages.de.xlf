@@ -70,6 +70,14 @@
 				<source>Titlefragment</source>
                 <target>Titelbestandteil</target>
             </trans-unit>
+            <trans-unit id="18">
+				<source>Title</source>
+                <target>Titel</target>
+            </trans-unit>
+            <trans-unit id="19">
+				<source>Publication</source>
+                <target>Publikation</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

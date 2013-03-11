@@ -16,11 +16,6 @@
     overflow: auto;
 }
 
-/* In the case a class has been forgotten somewhere, the first-child should trigger the correct block also. */
-#core div:first-child{
-    overflow: auto;
-}
-
 /* The well has its own padding, no need to have two paddings if there's nothing but the ul in the well. */
 .well ul{
     padding: 0px;

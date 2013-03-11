@@ -1,4 +1,4 @@
-{# This defines how to render the sortable collection form type widget.
+{# This defines how to render the additional form type widgets.
     Its structure is derived from the collection form type, basically
     removing the labels and adding indicator classes to it to trigger javascript gui generation.
 
@@ -6,67 +6,11 @@
 
     the convention for naming blocks is
         <name> = result of form type's getName() function
-        <name>_widget
+        <name>_widget: the generated HTML
+        <name>_row: the div containing the label, widget and errors
+        <name>_label, <name>_errors: ...
+
  #}
-
-{#% block title_label %} 
-{% endblock title_label %}
-
-{% block title_widget %} 
-{{form_widget(form)}}
-{% endblock title_widget %}
-
-{% block titleFragment_widget %}
-<div class="form-inline">
-{{ form_widget(form.titlefragmenttype,  {'attr':{'class':'franzoesisch'} }) }}
-</div>
-{{ form_rest(form, {'attr':{'class':'english'} }) }}
-{% endblock titleFragment_widget %#}
-
-{#% block model_row%}
-{{ form_widget(form, , {'attr':{'style':'float:left; margin-right: 10px'} }) }}
-{% endblock model_row %#}
-
-{% block titlefragment_row %}
-    <div>
-        {% for child in [form.titlefragmenttype, form.name] %}
-            <div style="float:left; margin-right: 10px">
-                {{ form_row(child )}} 
-            </div>
-        {% endfor %}
-        {{form_row(form.NameIsReconstructed, {'label_attr':{'class':'label-inline-centered'}, 
-                'attr':{'class':'checkbox-inline-centered'} })}}
-            <div>
-    {{form_rest(form)}}
-                </div>
-    </div>
-{% endblock %}
-
-{% block personalname_row %}
-    {{ form_widget(form) }}
-{% endblock %}
-
-{% block namefragment_row %}
-    <div>
-        {% for child in [form.namefragmenttype, form.name] %}
-            <div style="float:left; margin-right: 10px">
-                {{ form_row(child )}} 
-            </div>
-        {% endfor %}
-        {{form_rest(form)}}
-    </div>
-{% endblock %}
-
-{# without the surrounding div of each row #}
-
-{#% block model_row %}
-{% spaceless %}
-        {{ form_label(form) }}
-        {{ form_errors(form) }}
-        {{ form_widget(form, {'attr':{ 'style':'float:left; margin-right:10px;' } }) }}
-{% endspaceless %}
-{% endblock %#}
-
 
 {#  -----------------------------------------------------------------------------
     The selectOrAdd widget extends a select box with 
@@ -107,7 +51,7 @@
         {#onclick="function(){console.log('success')}"#}
 
     <a href="#" class="sortableCollectionWidget add-entity">
-        {{ form.vars.modelClass|trans }} hinzufügen {prototype: swapping doesn't yet copy all values.}
+        {{ form.vars.modelClass|trans }} hinzufügen
     </a>
     
     {# For the javascript to have access to the translated modelClass name.
@@ -121,7 +65,7 @@
 {% block sortableCollection_rows %}
 {% spaceless %}
     {% for child in form %}
-    <li>
+    <li style='position: relative'>
         {{ form.vars.modelClass|trans }}
         
         {#{ form_errors(child) }}

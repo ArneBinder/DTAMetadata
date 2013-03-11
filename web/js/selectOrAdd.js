@@ -34,7 +34,7 @@ function launchAddDialog(){
         // ajax behavior for the nested submit button
         var submitButton = $(modal).find("input[type=submit]");
         submitButton.on("click", function(clickEvent){submitFormData.apply(modal,[clickEvent])}); // set "this" to the modal, not the submit button
-        
+      console.log(modal);  
         modal.modal(); 
     });
 }
@@ -74,10 +74,11 @@ function createModal(formElement){
     
     var formDataUnit = $(formElement).parent();
     var modalId = "modal_for_"+formDataUnit.prop("id");
+    console.log(modalId);
     var modal = $('<div id="'+modalId+'" class="modal hide fade" tabindex="-1"/>');
     
     $(formElement).append(modal);
     
-    return modal;
+    return $('#'+modalId);
 }
 

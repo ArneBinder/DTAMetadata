@@ -17,11 +17,6 @@ class AuthorType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('person',new \DTA\MetadataBundle\Form\Type\PersonType(), array(
-                    'label' => ' ',
-                ));
-//        $builder->add('name', null, array('label'=>' '));
-//        $builder->add('sortableRank','hidden');             // this is controlled via javascript generated ui elements    
-        
+        $builder->add('person',new \DTA\MetadataBundle\Form\Type\PersonType());
     }
 }

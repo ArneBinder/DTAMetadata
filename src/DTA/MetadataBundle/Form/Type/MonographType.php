@@ -20,9 +20,7 @@ class MonographType extends BaseAbstractType {
      */
     public function buildForm(FormBuilderInterface $builder, array $options) {
         
-        $builder->add('publication', new PublicationType(), array(
-            'label' => ' '
-        ));
+        $builder->add('publication', new PublicationType());
         
 //        $builder->add('title', new TitleType(), array(
 //		'label' => 'Titel'));

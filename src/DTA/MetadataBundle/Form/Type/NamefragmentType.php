@@ -17,11 +17,10 @@ class NamefragmentType extends BaseAbstractType {
      */
     public function buildForm(FormBuilderInterface $builder, array $options) {
         $builder->add('namefragmenttype', 'model', array(
-            'label' => ' ',
             'property' => 'name',
             'class' => 'DTA\MetadataBundle\Model\Namefragmenttype',
         ));
-        $builder->add('name', 'text', array('label' => ' '));
+        $builder->add('name', 'text');
         $builder->add('sortableRank', 'hidden');     
     }
 

@@ -22,7 +22,6 @@ class PersonalnameType extends BaseAbstractType {
             'allow_delete' => true,
             'by_reference' => false,
             'type' => new NamefragmentType(),
-            'label' => ' ',
         ));
     }
 

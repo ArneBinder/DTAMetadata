@@ -12,15 +12,16 @@
         {% set actionTarget = path('genericNew', {'className':className, 'domainKey': domainKey|default("none")}) %}
         {% set headerSuffix = "form.create.suffix"|trans %}
     {% endif %}
-    {% if action|default("new") == "edit" %}
+    {% if action|default("") == "edit" %}
         {% set actionTarget = path('viewRecord', {'domainKey': domainKey, 'className':className, 'recordId':recordId}) %}
         {% set headerSuffix = "form.edit.suffix"|trans %}
     {% endif %}
 
     <h3>{{className|trans}} {{ headerSuffix }} </h3>
 
-    <form action="{{ actionTarget }}" method="post" {{ form_enctype(form) }}>
-        {{ form_row(form) }}
+    <form action="{{ actionTarget }}" method="post" {{ form_enctype(form) }} class="form-horizontal">
+        {# inlineLabel removes the additional column for the label. #}
+        {{ form_row(form, {'inlineLabel':true, 'hideLabel':true}) }}
          <input type="submit"/>
     </form>
     

@@ -5,26 +5,19 @@ In diesem Bereich werden Daten verwaltet, die sich auf die historische Realität
 
 {{dump(person)}}
 <form class="form-horizontal">
-  <div class="control-group">
-    <label class="control-label" for="inputEmail">Email</label>
-    <div class="controls">
-      <input type="text" id="inputEmail" placeholder="Email">
+    <div class="control-group">
+        <label class="control-label" for="inputEmail">Email</label>
+        <div class="controls form-inline">
+            <input type="text" id="inputEmail" placeholder="Email">
+            <label class="" for="inputPassword">Pass</label>
+            <input type="password" id="inputPassword" placeholder="Password">
+            <label class="checkbox">
+                <input type="checkbox"> Remember me
+            </label>
+        </div>
     </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label" for="inputPassword">Password</label>
-    <div class="controls">
-      <input type="password" id="inputPassword" placeholder="Password">
-    </div>
-  </div>
-  <div class="control-group">
-    <div class="controls">
-      <label class="checkbox">
-        <input type="checkbox"> Remember me
-      </label>
-      <button type="submit" class="btn">Sign in</button>
-    </div>
-  </div>
+    <button type="submit" class="btn">Sign in</button>
+
 </form>
 {% endblock %}
 

@@ -17,13 +17,11 @@ class TitlefragmentType extends BaseAbstractType {
      */
     public function buildForm(FormBuilderInterface $builder, array $options) {
         $builder->add('titlefragmenttype', 'model', array(
-            'label' => ' ',
             'property' => 'name',
             'class' => 'DTA\MetadataBundle\Model\Titlefragmenttype',
-//            'block_name' => 'zebra'
         ));
         
-        $builder->add('name', 'text', array('label' => ' '));
+        $builder->add('name', 'text');
         $builder->add('sortableRank', 'hidden');             // this is controlled via javascript generated ui elements    
         $builder->add('NameIsReconstructed', 'checkbox', array(
             'required'=>false,
