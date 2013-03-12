@@ -12,7 +12,9 @@
 jQuery(document).ready(createGui);
 
 function createGui(){
+    
     jQuery(document).on('click', '.sortableCollectionWidget.add-entity', addFormElement);
+    jQuery(document).on('DOMNodeRemoved', '.collection-sortable li', updateSortableRanks);
     
     // add up and down control elements for sortable collections
     var sortableElements = jQuery('.collection-sortable li');
@@ -22,7 +24,8 @@ function createGui(){
 
     jQuery('ol.collection-sortable').sortable({
         cursor: "move",
-        update: updateSortableRanks
+        update: updateSortableRanks,
+        placeholder: "ui-state-highlight"
     });
 
 }
@@ -104,13 +107,13 @@ function createSortableControls(element, translatedModelClassName){
             .children('input[name=translatedModelClassName]')
             .val();
         
-    var iconUpStr = '<i class="icon-arrow-up"></i>';
-    var iconDownStr = '<i class="icon-arrow-down"></i>';
-    var upStr = ' nach oben';
-    var downStr = ' nach unten';
-    var up   = $('<a href="#" class="sortable-up">'+ iconUpStr + /*translatedModelClassName + upStr + */'</a> ');
-    var down = $('<a href="#" class="sortable-down">'+ iconDownStr + /*translatedModelClassName + downStr + */'</a>');
-    $(element).append(up);
-    $(element).append(down);
+//    var iconUpStr = '<i class="icon-arrow-up"></i>';
+//    var iconDownStr = '<i class="icon-arrow-down"></i>';
+//    var upStr = ' nach oben';
+//    var downStr = ' nach unten';
+//    var up   = $('<a href="#" class="sortable-up">'+ iconUpStr + /*translatedModelClassName + upStr + */'</a> ');
+//    var down = $('<a href="#" class="sortable-down">'+ iconDownStr + /*translatedModelClassName + downStr + */'</a>');
+//    $(element).append(up);
+//    $(element).append(down);
 }
 

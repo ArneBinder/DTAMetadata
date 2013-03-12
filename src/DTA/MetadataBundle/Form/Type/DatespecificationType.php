@@ -17,9 +17,15 @@ class DatespecificationType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('year');
-        $builder->add('comments');
+        $builder->add('year', null, array(
+            'label' => '@suppress',
+        ));
+        $builder->add('comments', 'text', array(
+            'label' => 'Kommentare',
+            'required' => false,
+        ));
         $builder->add('yearIsReconstructed', 'checkbox', array(
+            'label' => 'ist aus anderen Quellen rekonstruiert',
             'required' => false
         ));
     }

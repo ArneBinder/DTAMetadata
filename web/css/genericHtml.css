@@ -17,23 +17,25 @@ textarea{
     /*width: 500px;*/
 }
 
-.no-margin-bottom * {
-    margin-bottom: 0;
-}
-/* for inline forms, where a text input is nearby, which is relatively tall */
-.label-inline-centered{
-    float:left; 
-    margin: 9px 7px 0 0;
+.form-horizontal .control-group {
+    /*margin-bottom: 10px !important;*/
 }
 
-form div > input.checkbox-inline-centered{
-    margin-top: 14px;
-}
-
-input.single-line-medium-text{
+input.medium-text{
     width: 375px;
 }
-
-.control-group.form-inline .controls{
-    margin-left: 0;
+/*
+.form-horizontal .controls{
+    margin-left: 170px !important;
+    border-left: 1px solid gray;
+    padding-left: 7px;
 } 
+
+.form-horizontal .control-label{
+    padding-right: 10px;
+    border-right: 1px solid gray;
+}*/
+
+.form-inline * {
+    /*margin-right: 7px;*/
+}

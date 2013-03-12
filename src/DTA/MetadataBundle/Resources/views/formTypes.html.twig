@@ -8,19 +8,18 @@
 {# --------------------- Form base customizations --------------------- #}
 
 {% block form_row %}
-
     {% set inlineControls = inlineControls is defined ? inlineControls : false %}
     {#% set levelsWithoutLabel = levelsWithoutLabel is defined ? levelsWithoutLabel : 0 %#}
     
     {% if not inlined|default(false) %}
-    <div class="control-group {{ inlineControls ? 'form-inline' }}">
+    <div class="control-group">
     {% endif %}
         
         {# Wrap label and controls in separate columns, unless inlineControls labels are requested #}
         {% if not inlineLabel|default(false) and not inlined|default(false) %}
             {# form_label automatically generates a label tag, with the correct id specified, the label class, added, etc. #}
             {{ form_label(form, null , {'label_attr':{'class':'control-label'} }) }}
-            <div class="controls">
+            <div class="controls {{ inlineControls ? 'form-inline' }}">
         {% endif %}
 
         {% if inlineControls %}
@@ -29,7 +28,7 @@
             {% endfor %}
         {% else %}
             {% if not hideLabel|default(false) and (inlineLabel|default(false) or inlined|default(false))  %}
-                {{ form_label(form) }}
+                {{ form_label(form) }} 
             {% endif %}
             {{ form_errors(form) }}
             {{ form_widget(form) }}
@@ -45,6 +44,19 @@
     
 {% endblock form_row %}
 
+{% block form_label %}
+    {% if label != '@suppress' %}
+        {{ parent() }}
+    {% endif %}
+{% endblock form_label %}
+
+{% block checkbox_row %}
+    <label class="checkbox">
+        {{ form_widget(form) }}
+        {{ label }}
+    </label>
+{% endblock checkbox_row %}
+
 {# --------------------- Form Type Configurations as made available by the above code --------------------- #}
 
 {% block publication_row %}
@@ -59,29 +71,42 @@
     {{ form_row(form, {'inlineLabel':true, 'hideLabel':true }) }}
 {% endblock %}
 
-
 {% block titlefragment_row %}
     <div class="control-group form-inline">
-        <div class="controls">
+            <i class="icon-move"></i>
             {{ form_widget(form.titlefragmenttype)}}
-            {{ form_widget(form.name) }} 
-            <label class="checkbox">
-                {{ form_widget(form.NameIsReconstructed) }} 
-                {{ form.NameIsReconstructed.vars.label }} 
-            </label>
-            {{form_rest(form)}}
-        </div>
+            {{ form_widget(form.name,{'attr':{'class':'medium-text'} }) }} 
+            <br/>
+            {{ form_row(form.NameIsReconstructed ) }}
+            {{ form_rest(form) }}
+            <a onclick="$(this).parent().parent().remove();">
+                <i class="icon-remove"></i> Entfernen
+            </a>
     </div>
 {% endblock %}
 
+{% block person_row %}
+    {{ form_row(form.personalNames, {'inlineLabel':false, 'label':'Quark mit Soße' }) }}
+    {{ form_row(form.gnd) }}
+{% endblock %}
+
+{% block personalname_row %}
+    {{ form_row(form, {'inlineLabel':true, 'hideLabel':true }) }}
+{% endblock %}
+
+{% block namefragment_row %}
+    <div class="control-group form-inline">
+            {{ form_widget(form.namefragmenttype)}}
+            {{ form_widget(form.name) }} 
+            {{ form_rest(form) }}
+            <a onclick="$(this).parent().parent().remove();"><i class="icon-remove"></i>Entfernen</a>
+    </div>
+{% endblock %}
 
 {% block datespecification_row %}
-    {{ form_row(form, {'inlineLabel':false, 'inlineControls':true}) }}
+    {{ form_row(form, {'inlineControls':true }) }}
 {% endblock %}
 
-{% block sortableCollection_row %}
-    {{ form_row(form, {'inlineLabel':true}) }}
-{% endblock %}
 {# --------------------- Title form types --------------------- #}
     
 {#% block title_row %}

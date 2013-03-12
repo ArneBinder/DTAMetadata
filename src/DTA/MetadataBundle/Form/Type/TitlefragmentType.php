@@ -22,11 +22,11 @@ class TitlefragmentType extends BaseAbstractType {
         ));
         
         $builder->add('name', 'text');
-        $builder->add('sortableRank', 'hidden');             // this is controlled via javascript generated ui elements    
         $builder->add('NameIsReconstructed', 'checkbox', array(
             'required'=>false,
             'label'=>'ist aus anderen Quellen rekonstruiert'
             ));
+        $builder->add('sortableRank', 'hidden');             // this is controlled via javascript generated ui elements    
     }
     
 }

@@ -9,7 +9,7 @@
 <database name="DTAMetadata" namespace="DTA\MetadataBundle\Model" defaultIdMethod="native">
   
     <!-- This parameter set is added to each entity that doesn't implement the table_row_view behavior. 
-         It is not added to tables/entities that define the bahavior. -->
+    It is not added to tables/entities that define the bahavior. -->
     <behavior name="table_row_view">
         <!--If no parameters are defined, all columns are added. (WITHOUT embedding any related entities) -->
     </behavior>
@@ -42,9 +42,6 @@
         
         <!-- Relations to other persons -->       
         <column name="work_id" type="INTEGER" required="true"/>
-        <column name="publisher_id" type="INTEGER" required="false"/>
-        <column name="printer_id" type="INTEGER" required="false"/>
-        <column name="translator_id" type="INTEGER" required="false"/>
        
         <behavior name="table_row_view">
             <!--<parameter name="Id" value="id"/>-->
@@ -56,15 +53,6 @@
         
         <foreign-key foreignTable="work" name="editionVon">
             <reference local="work_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="publisher" name="fk_edition_herausgeber1">
-            <reference local="publisher_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="printer" name="fk_edition_drucker1">
-            <reference local="printer_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="translator" name="fk_schriftstueck_uebersetzer1">
-            <reference local="translator_id" foreign="id"/>
         </foreign-key>
         <foreign-key foreignTable="relatedSet" name="fk_publication_relatedSet1">
             <reference local="relatedSet_id" foreign="id"/>
@@ -91,15 +79,6 @@
         
         <index name="editionVon">
             <index-column name="work_id"/>
-        </index>
-        <index name="idx_edition_herausgeber1">
-            <index-column name="publisher_id"/>
-        </index>
-        <index name="idx_edition_drucker1">
-            <index-column name="printer_id"/>
-        </index>
-        <index name="idx_schriftstueck_uebersetzer1">
-            <index-column name="translator_id"/>
         </index>
         <index name="idx_pub_relatedSet1">
             <index-column name="relatedSet_id"/>
@@ -245,7 +224,7 @@
         <foreign-key foreignTable="publication">
             <reference local="publication_id" foreign="id"/>
         </foreign-key>
-<!--        <index name="idx_publicationValid">
+        <!--        <index name="idx_publicationValid">
             <index-column name="publication_id"/>
         </index>
         <index name="idx_publicationGroupValid">
@@ -259,7 +238,7 @@
     <table name="corpus" phpName="Corpus">
         <column name="id" type="INTEGER" size="10" sqlType="int(10) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
-<!--        <unique name="korpusname_einzigartig">
+        <!--        <unique name="korpusname_einzigartig">
             <unique-column name="corpusNameHash"/>
         </unique>-->
     </table>
@@ -561,80 +540,65 @@
         </unique>
     </table>
     
-    <table name="author" phpName="Author">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="person_id" type="INTEGER" primaryKey="true" required="true"/>
+    <table name="publicationRole" phpName="Publicationrole" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" primaryKey="true" required="true"/>
+        <column name="name" phpName="Name" type="LONGVARCHAR" required="true"/>
+    </table>
+  
+    <table name="person_publication" phpName="PersonPublication" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" primaryKey="true" required="true"/>
+        <column name="publicationRole_id" phpName="PublicationroleId" type="INTEGER" required="true"/>
+        <column name="person_id" phpName="PersonId" type="INTEGER" required="true"/>
+        <column name="publication_id" phpName="PublicationId" type="INTEGER" required="true"/>
         
-        <behavior name="table_row_view">
-            <parameter name="embedColumnsPerson" value="person"/>
-        </behavior>
-        
-        <foreign-key foreignTable="person" name="fk_autor_person1">
+        <foreign-key foreignTable="publicationRole" name="fk_person_publication_publicationRole1">
+            <reference local="publicationRole_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="person" name="fk_person_publication_person1">
             <reference local="person_id" foreign="id"/>
         </foreign-key>
-        <index name="idx_autor_person1">
+        <foreign-key foreignTable="publication" name="fk_person_publication_publication1">
+            <reference local="publication_id" foreign="id"/>
+        </foreign-key>
+        <index name="fk_person_publication_publicationRole1_idx">
+            <index-column name="publicationRole_id"/>
+        </index>
+        <index name="fk_person_publication_person1_idx">
             <index-column name="person_id"/>
         </index>
+        <index name="fk_person_publication_publication1_idx">
+            <index-column name="publication_id"/>
+        </index>
     </table>
-
-    <table name="author_work" isCrossRef="true">
-        <column name="work_id" type="INTEGER" primaryKey="true" required="true"/>
-        <column name="author_id" type="INTEGER" primaryKey="true" required="true"/>
-        <column name="author_person_id" type="INTEGER" primaryKey="true" required="true"/>
-        <column name="name_id" type="INTEGER" required="true"/>
-        <foreign-key foreignTable="work" name="fk_werk_has_autor_werk1">
+    
+    <table name="workRole" phpName="Workrole" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" primaryKey="true" required="true"/>
+        <column name="name" phpName="Name" type="VARCHAR" size="1024" required="false"/>
+    </table>
+    
+    <table name="person_work" phpName="PersonWork" idMethod="native">
+        <column name="id" phpName="Id" type="INTEGER" primaryKey="true" required="true"/>
+        <column name="person_id" phpName="PersonId" type="INTEGER" required="true"/>
+        <column name="workRole_id" phpName="WorkroleId" type="INTEGER" required="true"/>
+        <column name="work_id" phpName="WorkId" type="INTEGER" required="true"/>
+        <foreign-key foreignTable="person" name="fk_person_publication_person10">
+            <reference local="person_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="workRole" name="fk_person_work_workRole1">
+            <reference local="workRole_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="work" name="fk_person_publication_copy1_work1">
             <reference local="work_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="author" name="fk_werk_has_autor_autor1">
-            <reference local="author_id" foreign="id"/>
-            <reference local="author_person_id" foreign="person_id"/>
-        </foreign-key>
-        <index name="idx_werk_has_autor_autor1">
-            <index-column name="author_id"/>
-            <index-column name="author_person_id"/>
+        <index name="fk_person_publication_person1_idx">
+            <index-column name="person_id"/>
         </index>
-        <index name="idx_werk_has_autor_werk1">
+        <index name="fk_person_publication_copy1_workRole1_idx">
+            <index-column name="workRole_id"/>
+        </index>
+        <index name="fk_person_publication_copy1_work1_idx">
             <index-column name="work_id"/>
         </index>
     </table>
-
-    <table name="printer" phpName="Printer">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="person_id" type="INTEGER" primaryKey="true" required="true"/>
-        <foreign-key foreignTable="person" name="fk_drucker_person1">
-            <reference local="person_id" foreign="id"/>
-        </foreign-key>
-        <index name="idx_drucker_person1">
-            <index-column name="person_id"/>
-        </index>
-    </table>
-
-    <table name="publisher" phpName="Publisher">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="person_id" type="INTEGER" primaryKey="true" required="true"/>
-        <foreign-key foreignTable="person" name="fk_herausgeber_ist_person">
-            <reference local="person_id" foreign="id"/>
-        </foreign-key>
-        <index name="idx_herausgeber_ist_person">
-            <index-column name="person_id"/>
-        </index>
-    </table>
-
-    <table name="translator" phpName="Translator">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="person_id" type="INTEGER" primaryKey="true" required="true"/>
-        
-        <behavior name="table_row_view">
-            <parameter name="embedColumns_1" value="person"/>
-        </behavior>
-        
-        <foreign-key foreignTable="person" name="fk_translator_person1">
-            <reference local="person_id" foreign="id"/>
-        </foreign-key>
-        <index name="idx_translator_person1">
-            <index-column name="person_id"/>
-        </index>
-    </table>
-
 
 </database>

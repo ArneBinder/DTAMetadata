@@ -32,8 +32,12 @@
     sortable collection widget
     ----------------------------------------------------------------------------- #}
 
+{% block sortableCollection_row %}
+    {{ form_row(form, {'inlineLabel':true, 'hideLabel':true }) }}
+{% endblock %}
+    
 {% block sortableCollection_widget %}
-{% spaceless %}
+
     {% if prototype is defined %}
         {# Add prototype for dynamically adding forms with JS #}
         {% set attr = attr|merge({'data-prototype': form_row(prototype) }) %}
@@ -59,11 +63,12 @@
     <input type="hidden" name="translatedModelClassName" value="{{ form.vars.modelClass|trans }}"/>
     <input type="hidden" name="modelClassName" value="{{ form.vars.modelClass }}"/>
     
-{% endspaceless %}
 {% endblock %}
 
+{# TODO: having removed all spaceless blocks, the source output is rather convoluted. #}
+    
 {% block sortableCollection_rows %}
-{% spaceless %}
+
     {% for child in form %}
     <li style='position: relative'>
         {{ form.vars.modelClass|trans }}
@@ -75,5 +80,5 @@
         {{ form_row(child) }}
     </li>
     {% endfor %}
-{% endspaceless %}
+
 {% endblock %}

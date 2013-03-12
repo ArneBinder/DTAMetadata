@@ -6,6 +6,15 @@ use DTA\MetadataBundle\Model\om\BasePersonalname;
 
 class Personalname extends BasePersonalname
 {
+    public function getNameFragments($criteria = NULL, PropelPDO $con = NULL){
+        $collection = parent::getNamefragments();
+         // Re-sort them by Sequence, numerically
+        $collection->uasort(function($a, $b) {
+            return $a->getSortableRank() - $b->getSortableRank();
+        });
+        return $collection;
+    }
+    
     public function __toString(){
 // TODO: If there should be any issue with the order, switch to the more complicated query structure.
 //        NamefragmentQuery::create()

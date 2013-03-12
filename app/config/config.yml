@@ -53,7 +53,7 @@ propel:
       #vendor.propel-table_row_view-behavior.TableRowViewBehavior
       propel.behavior.table_row_view.class: src.DTA.MetadataBundle.Model.table_row_view.TableRowViewBehavior
 
-      # TODO FOR TESTING, non-enforcement of the foreign key constraints is more practical (set to MyISAM)
+      # TODO: for testing, non-enforcement of the foreign key constraints is more practical (set to MyISAM)
       # propel.mysql.tableType: InnoDB
       
       # multiple schemas with the same database name
@@ -73,11 +73,11 @@ propel:
               dsn:        "%database_driver%:host=%database_host%;dbname=%database_name%;charset=%database_charset%"
               options:    {}
               attributes: {}
-            #ReverseSource:
-            #  driver:     "%database_driver%"
-            #  user:       "%database_user%"
-            #  password:   "%database_password%"
-            #  dsn:        "%database_driver%:host=%database_host%;dbname=metadatenbank;charset=%database_charset%"
+            ReverseSource:
+              driver:     "%database_driver%"
+              user:       "%database_user%"
+              password:   "%database_password%"
+              dsn:        "%database_driver%:host=%database_host%;dbname=metadatenbank;charset=%database_charset%"
            
 
         
