@@ -16,16 +16,23 @@ class SortableCollectionType extends \Symfony\Component\Form\Extension\Core\Type
      */
     public $modelClass;
     
-    public function getName() {
-        return 'sortableCollection';
-    }
+    protected $themeBlockName;
     
+    public function getName() {
+        return $this->themeBlockName;
+    }
+
     /**
      * Only Build the prototype with modified placeholders
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         parent::buildForm($builder, $options);
+
+        if($options['themeBlockName'] !== null )
+            $this->themeBlockName = $options['themeBlockName'];
+        else
+            $this->themeBlockName = 'sortableCollection';
         
         // extract unqualified class name and pass it to the view
         // this allows more accurate control elements (instead of "add component",
@@ -46,6 +53,17 @@ class SortableCollectionType extends \Symfony\Component\Form\Extension\Core\Type
     
     public function finishView(FormView $view, FormInterface $form, array $options){
         $view->vars['modelClass'] = $this->modelClass;
+    }
+    
+     public function setDefaultOptions(OptionsResolverInterface $resolver){
+         parent::setDefaultOptions($resolver);
+         
+         // the theme block name option allows individual styling of sortable collections,
+         // e.g. based on the entity that's stored in it. Pass any string under the themeBlockName 
+         // option to override the sortable collection form type name.
+         $resolver->setDefaults(array(
+            'themeBlockName' => null,
+        ));
     }
 }
 ?>

@@ -9,6 +9,7 @@
  * The behavior supports the following functionality
  * 
  * 1. Simple projection on / selection of local columns
+ * ----------------------------------------------------------------
  * 
  *  <parameter name="<columnHeadline>" value="<columnName>"/>
  * 
@@ -20,6 +21,7 @@
  * For the column <column name="person_id" type="INTEGER" required="true"/>
  * 
  * 2. Embedding all visible columns of a one-to-one related entity
+ * ----------------------------------------------------------------
  * 
  * <parameter name="embedColumns<*>" value="<tableName>" />
  * 
@@ -29,6 +31,7 @@
  * (this is independent of the obligation to make the relation explicit using a foreign key).
  * 
  * 3. Specifying a custom function
+ * ----------------------------------------------------------------
  * 
  * To specify a function that returns the value for the column, use the 'accessor:' prefix, 
  * followed by the name of the function to call on the object. This can be used to display derived
@@ -49,11 +52,14 @@
  * </code>
  * 
  * 4. Pick a representative related entity
+ * ----------------------------------------------------------------
  * 
  * To indicate that there are several related entities or to summarize a complex related entity into a single column,
- * reference the related table without the embedColumns keyword, just by giving a column headline
+ * reference the related table without the embedColumns keyword, just by giving a column headline with either the suffix '@representative' 
+ * or '@count' to get the first of the related entities or the count, respectively.
  * 
- * <parameter name="<columnHeadline>" value="<tableName>"/>
+ * <parameter name="<columnHeadline>@representative" value="<tableName>"/>
+ * <parameter name="<columnHeadline>@count" value="<tableName>"/>
  * 
  * The behavior will recognize whether this is a one-to-one relationship or a one-to-many relationship.
  * Use any value of the name attribute of another table instead of <tableName>.
@@ -270,14 +276,32 @@ class TableRowViewBehavior extends Behavior {
         
         $relatedPhpName = $relatedEntity->getPhpName();
         
-        $accessor = "accessor:" . "getRepresentative$relatedPhpName";
+        // check suffizes to determine special columns
+        $representativeCandidate = substr($caption, -strlen("@representative"));
+        $countCandidate = substr($caption, -strlen("@count"));
+        
+        if(!strncmp($representativeCandidate, "@representative", strlen("@representative"))){
+            
+            $captionCharacters = strlen($caption) - strlen('@representative');
+            $representativeCaption = substr($caption, 0, $captionCharacters);
+            $representativeAccessor = 'accessor:getRepresentative' . $relatedPhpName;
+            $this->addViewElement($representativeCaption, $representativeAccessor);
+            
+        } elseif (!strncmp($countCandidate, "@count", strlen("@count"))) {
+            
+            $captionCharacters = strlen($caption) - strlen('@count');
+            $countCaption = substr($caption, 0, $captionCharacters);
+            $countAccessor = "accessor:" . "getRepresentative".$relatedPhpName."Count";
+            $this->addViewElement($countCaption, $countAccessor);
+            
+        }
         
         $getterFunc = $this->renderTemplate('tableRowViewRepresentativeGetter', array(
             'className' => $relatedPhpName,
         ));
-        $this->representativeGetterFunctions[] = $getterFunc;
         
-        $this->addViewElement($caption, $accessor);
+        if( false === array_search($getterFunc, $this->representativeGetterFunctions))
+            $this->representativeGetterFunctions[] = $getterFunc;
     }
 
     /**

@@ -528,7 +528,8 @@
         <!--The name is added in the personalName table because it's a one-to-many relationship.-->
         
         <behavior name="table_row_view">
-            <parameter name="Name" value="personalName"/>
+            <parameter name="Erster Name@representative" value="personalName"/>
+            <parameter name="Namen gesamt@count" value="personalName"/>
             <parameter name="GND" value="gnd"/>
         </behavior>
         
@@ -543,7 +544,7 @@
     </table>
   
     <table name="person_publication" phpName="PersonPublication" idMethod="native">
-        <column name="id" phpName="Id" type="INTEGER" primaryKey="true" required="true"/>
+        <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="publicationRole_id" phpName="PublicationroleId" type="INTEGER" required="true"/>
         <column name="person_id" phpName="PersonId" type="INTEGER" required="true"/>
         <column name="publication_id" phpName="PublicationId" type="INTEGER" required="true"/>
@@ -574,7 +575,7 @@
     </table>
     
     <table name="person_work" phpName="PersonWork" idMethod="native">
-        <column name="id" phpName="Id" type="INTEGER" primaryKey="true" required="true"/>
+        <column name="id" phpName="Id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="person_id" phpName="PersonId" type="INTEGER" required="true"/>
         <column name="workRole_id" phpName="WorkroleId" type="INTEGER" required="true"/>
         <column name="work_id" phpName="WorkId" type="INTEGER" required="true"/>

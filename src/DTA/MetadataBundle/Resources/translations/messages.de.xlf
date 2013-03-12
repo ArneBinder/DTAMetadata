@@ -78,6 +78,24 @@
 				<source>Publication</source>
                 <target>Publikation</target>
             </trans-unit>
+            <trans-unit id="20">
+				<source>PublicationRole</source>
+                <target>Person/Publikation-Beziehungstyp</target>
+            </trans-unit>
+            <trans-unit id="21">
+				<source>WorkRole</source>
+                <target>Person/Werk-Beziehungstyp</target>
+            </trans-unit>
+            <trans-unit id="22">
+				<source>PersonWork</source>
+                <target>Werkpersonalie</target>
+            </trans-unit>
+            <trans-unit id="23">
+				<source>PersonPublication</source>
+                <target>Publikationspersonalie</target>
+            </trans-unit>
+            
+
         </body>
     </file>
 </xliff>

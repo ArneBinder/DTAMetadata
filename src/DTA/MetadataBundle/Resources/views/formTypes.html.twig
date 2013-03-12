@@ -57,18 +57,30 @@
     </label>
 {% endblock checkbox_row %}
 
-{# --------------------- Form Type Configurations as made available by the above code --------------------- #}
+{# --------------------- Form Type Configurations, e.g. as made available by the above code --------------------- #}
 
 {% block publication_row %}
     {{ form_row(form, {'inlineLabel':true, 'hideLabel': true}) }}
 {% endblock %}
-    
-{% block title_row %}
-    {{ form_row(form, {'inlineLabel':false}) }}
+{% block work_row %}    
+    {{ form_row(form, {'inlineLabel':true, 'hideLabel':true }) }}
+{% endblock %}
+{% block datespecification_row %}
+    {{ form_row(form, {'inlineControls':true }) }}
 {% endblock %}
 
-{% block work_row %}
-    {{ form_row(form, {'inlineLabel':true, 'hideLabel':true }) }}
+{% block personpublication_row %}
+    <div class="control-group form-inline">
+            {{ form_widget(form.publicationroleId) }}
+            {{ form_widget(form.person) }}
+            <a onclick="$(this).parent().parent().remove();"><i class="icon-remove"></i></a>
+    </div>
+{% endblock %}
+
+{# --------------------- Title --------------------- #}
+
+{% block title_row %}
+    {{ form_row(form, {'inlineLabel':false}) }}
 {% endblock %}
 
 {% block titlefragment_row %}
@@ -85,9 +97,12 @@
     </div>
 {% endblock %}
 
+{# --------------------- Personal Name --------------------- #}
+
 {% block person_row %}
-    {{ form_row(form.personalNames, {'inlineLabel':false, 'label':'Quark mit Soße' }) }}
+    {{ form_row(form.personalNames, {'inlineLabel':false }) }}
     {{ form_row(form.gnd) }}
+    {{ form_rest(form) }}
 {% endblock %}
 
 {% block personalname_row %}
@@ -101,10 +116,6 @@
             {{ form_rest(form) }}
             <a onclick="$(this).parent().parent().remove();"><i class="icon-remove"></i>Entfernen</a>
     </div>
-{% endblock %}
-
-{% block datespecification_row %}
-    {{ form_row(form, {'inlineControls':true }) }}
 {% endblock %}
 
 {# --------------------- Title form types --------------------- #}

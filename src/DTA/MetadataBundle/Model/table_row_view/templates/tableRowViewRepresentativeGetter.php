@@ -3,22 +3,32 @@
  */
  
 <?php 
-    $getterFunctionName = 'getRepresentative' . $className;
+    $representativeFunctionName = 'getRepresentative' . $className;
+    $countFunctionName = 'getRepresentative' . $className . 'Count';
     $pluralizer = new \StandardEnglishPluralizer();
     $pluralizedClassname = $pluralizer->getPluralForm($className);
 ?>
-public function <?php echo $getterFunctionName;?>(){
+public function <?php echo $representativeFunctionName;?>(){
     
     $relatedEntities = $this->get<?php echo $pluralizedClassname?>();
     $relatedEntityArray = $relatedEntities->getArrayCopy();
     $relatedEntityCount = count($relatedEntityArray);
-    if($relatedEntityCount > 0){
-        $more = $relatedEntityCount-1;
-        return $relatedEntityArray[0] . " [$more weitere]";
+
+    if($relatedEntityCount == 1){
+        return $relatedEntityArray[0];
+    } elseif($relatedEntityCount > 1){
+        return $relatedEntityArray[0];
     } else {
-        return "No entity associated.";
+        return "-";
     }
-    
 }    
 
+public function <?php echo $countFunctionName;?>(){
+    
+    $relatedEntities = $this->get<?php echo $pluralizedClassname?>();
+    $relatedEntityArray = $relatedEntities->getArrayCopy();
+    $relatedEntityCount = count($relatedEntityArray);
+
+    return $relatedEntityCount;
+}    
 

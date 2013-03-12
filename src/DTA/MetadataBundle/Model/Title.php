@@ -30,6 +30,6 @@ class Title extends BaseTitle
             else
                 $fragmentStrings[] = $nf->getName();
         }
-        return implode(" – ", $fragmentStrings);
+        return implode(" ~ ", $fragmentStrings);
     }
 }

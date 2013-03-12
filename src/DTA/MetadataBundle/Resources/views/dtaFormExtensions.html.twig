@@ -32,8 +32,20 @@
     sortable collection widget
     ----------------------------------------------------------------------------- #}
 
+{# By default, don't add an extra column for the label of the sortable collection #}
 {% block sortableCollection_row %}
     {{ form_row(form, {'inlineLabel':true, 'hideLabel':true }) }}
+{% endblock %}
+    
+{# Use 'themeBlockName' => 'labelledSortableCollection' to change this behavior.
+    This is for instance necessary on data elements that are direct children of a top level entity (such as Publication->Personalia) #}
+{% block labelledSortableCollection_row %}
+    <div class="control-group">
+        {{ form_label(form, null , {'label_attr':{'class':'control-label'} }) }}
+        <div class="controls">
+            {{ block('sortableCollection_widget') }}
+        </div>
+    </div>
 {% endblock %}
     
 {% block sortableCollection_widget %}

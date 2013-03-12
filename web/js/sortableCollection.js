@@ -25,7 +25,8 @@ function createGui(){
     jQuery('ol.collection-sortable').sortable({
         cursor: "move",
         update: updateSortableRanks,
-        placeholder: "ui-state-highlight"
+        placeholder: "sortableDragPlaceholder",
+        distance: 20
     });
 
 }
@@ -38,7 +39,8 @@ function updateSortableRanks( event, ui ){
     
     // traverse in order of dom tree, push this 'real' index to the hidden inputs
     $sortableCollectionHolder.children('li').each(function(index, listElement){
-        $(listElement).find('input[name*=sortableRank]').val(index);
+        console.log($(listElement).children().children('input[name*=sortableRank]').val());
+        $(listElement).children().children('input[name*=sortableRank]').val(index);
     });
 }
 
