@@ -42,7 +42,7 @@ class DataDomainController extends DTABaseController {
         $persont = Model\PersonPeer::getTableMap();
                 
         return $this->renderControllerSpecificAction('DTAMetadataBundle:DataDomain:index.html.twig', array(
-            "person" => '' //$persont->getRelations() //count($p->getPersonalnames()->getArrayCopy())//[0]->__toString(),
+            "person" => true //$persont->getRelations() //count($p->getPersonalnames()->getArrayCopy())//[0]->__toString(),
             // get_declared_classes()
         ));
     }
@@ -88,7 +88,6 @@ class DataDomainController extends DTABaseController {
         $pseudonym->setName("Pseudonym");
         $pseudonym->save();
         
-        
 
         // users
         
@@ -122,6 +121,24 @@ class DataDomainController extends DTABaseController {
         $kurztitel = new Model\Titlefragmenttype();
         $kurztitel->setName("Kurztitel");
         $kurztitel->save();
+        
+        // person types: work and publication
+        
+        $author = new Model\Workrole();
+        $author->setName('Autor');
+        $author->save();
+        
+        $publisher = new Model\Publicationrole();
+        $publisher->setName('Verleger');
+        $publisher->save();
+        
+        $translator = new Model\Publicationrole();
+        $translator->setName("Übersetzer");
+        $translator->save();
+        
+        $printer = new Model\Publicationrole();
+        $printer->setName('Drucker');
+        $printer->save();
 
         // Workflow, example task types
         

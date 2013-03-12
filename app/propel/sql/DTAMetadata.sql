@@ -26,14 +26,8 @@ CREATE TABLE `publication`
     `relatedSet_id` INTEGER,
     `status_id` INTEGER NOT NULL,
     `work_id` INTEGER NOT NULL,
-    `publisher_id` INTEGER,
-    `printer_id` INTEGER,
-    `translator_id` INTEGER,
     PRIMARY KEY (`id`),
     INDEX `editionVon` (`work_id`),
-    INDEX `idx_edition_herausgeber1` (`publisher_id`),
-    INDEX `idx_edition_drucker1` (`printer_id`),
-    INDEX `idx_schriftstueck_uebersetzer1` (`translator_id`),
     INDEX `idx_pub_relatedSet1` (`relatedSet_id`),
     INDEX `idx_publikation_verlag1` (`publishingCompany_id`),
     INDEX `idx_publikation_ort1` (`place_id`),
@@ -299,8 +293,8 @@ CREATE TABLE `task`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `taskType_id` INTEGER NOT NULL,
     `done` TINYINT(1),
-    `start` DATETIME,
-    `end` DATETIME,
+    `start` DATE,
+    `end` DATE,
     `comments` TEXT,
     `publicationGroup_id` INTEGER,
     `publication_id` INTEGER,
@@ -497,76 +491,65 @@ CREATE TABLE `person`
 ) ENGINE=MyISAM;
 
 -- ---------------------------------------------------------------------
--- author
+-- publicationRole
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `author`;
+DROP TABLE IF EXISTS `publicationRole`;
 
-CREATE TABLE `author`
+CREATE TABLE `publicationRole`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `person_id` INTEGER NOT NULL,
-    PRIMARY KEY (`id`,`person_id`),
-    INDEX `idx_autor_person1` (`person_id`)
+    `name` TEXT NOT NULL,
+    PRIMARY KEY (`id`)
 ) ENGINE=MyISAM;
 
 -- ---------------------------------------------------------------------
--- author_work
+-- person_publication
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `author_work`;
+DROP TABLE IF EXISTS `person_publication`;
 
-CREATE TABLE `author_work`
+CREATE TABLE `person_publication`
 (
+    `id` INTEGER NOT NULL,
+    `publicationRole_id` INTEGER NOT NULL,
+    `person_id` INTEGER NOT NULL,
+    `publication_id` INTEGER NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `fk_person_publication_publicationRole1_idx` (`publicationRole_id`),
+    INDEX `fk_person_publication_person1_idx` (`person_id`),
+    INDEX `fk_person_publication_publication1_idx` (`publication_id`)
+) ENGINE=MyISAM;
+
+-- ---------------------------------------------------------------------
+-- workRole
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `workRole`;
+
+CREATE TABLE `workRole`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(1024),
+    PRIMARY KEY (`id`)
+) ENGINE=MyISAM;
+
+-- ---------------------------------------------------------------------
+-- person_work
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `person_work`;
+
+CREATE TABLE `person_work`
+(
+    `id` INTEGER NOT NULL,
+    `person_id` INTEGER NOT NULL,
+    `workRole_id` INTEGER NOT NULL,
     `work_id` INTEGER NOT NULL,
-    `author_id` INTEGER NOT NULL,
-    `author_person_id` INTEGER NOT NULL,
-    `name_id` INTEGER NOT NULL,
-    PRIMARY KEY (`work_id`,`author_id`,`author_person_id`),
-    INDEX `idx_werk_has_autor_autor1` (`author_id`, `author_person_id`),
-    INDEX `idx_werk_has_autor_werk1` (`work_id`)
-) ENGINE=MyISAM;
-
--- ---------------------------------------------------------------------
--- printer
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `printer`;
-
-CREATE TABLE `printer`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `person_id` INTEGER NOT NULL,
-    PRIMARY KEY (`id`,`person_id`),
-    INDEX `idx_drucker_person1` (`person_id`)
-) ENGINE=MyISAM;
-
--- ---------------------------------------------------------------------
--- publisher
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `publisher`;
-
-CREATE TABLE `publisher`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `person_id` INTEGER NOT NULL,
-    PRIMARY KEY (`id`,`person_id`),
-    INDEX `idx_herausgeber_ist_person` (`person_id`)
-) ENGINE=MyISAM;
-
--- ---------------------------------------------------------------------
--- translator
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `translator`;
-
-CREATE TABLE `translator`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `person_id` INTEGER NOT NULL,
-    PRIMARY KEY (`id`,`person_id`),
-    INDEX `idx_translator_person1` (`person_id`)
+    PRIMARY KEY (`id`),
+    INDEX `fk_person_publication_person1_idx` (`person_id`),
+    INDEX `fk_person_publication_copy1_workRole1_idx` (`workRole_id`),
+    INDEX `fk_person_publication_copy1_work1_idx` (`work_id`)
 ) ENGINE=MyISAM;
 
 # This restores the fkey checks, after having unset them earlier
