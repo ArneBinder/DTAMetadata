@@ -1,7 +1,10 @@
 imports:
     - { resource: parameters.yml }
     - { resource: security.yml }
-
+# Precautionary include in case anyone should wish to register the DTA form types as services.
+# This would make them available in the form builders under aliases e.g. 'dynamicCollection', 'selectOrAdd', ...
+    - { resource: '@DTAMetadataBundle/Resources/config/services.yml' }
+    
 framework:
     #esi:             ~
     # translate to german by default

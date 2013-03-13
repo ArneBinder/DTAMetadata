@@ -12,24 +12,17 @@
 
  #}
 
+{# TODO: having removed all spaceless blocks (form_div_layout), the source output is rather convoluted. #}
+    
+{% extends 'form_div_layout.html.twig' %}
+
 {#  -----------------------------------------------------------------------------
     dynamic collection widget
     ----------------------------------------------------------------------------- #}
 
 {# By default, don't add an extra column for the label of the dynamic collection #}
 {% block dynamicCollection_row %}
-    {{ form_row(form, {'inlineLabel':true, 'hideLabel':true }) }}
-{% endblock %}
-    
-{# Use 'themeBlockName' => 'labelledDynamicCollection' to change this behavior.
-    This is for instance necessary on data elements that are direct children of a top level entity (such as Publication->Personalia) #}
-{% block labelledDynamicCollection_row %}
-    <div class="control-group">
-        {{ form_label(form, null , {'label_attr':{'class':'control-label'} }) }}
-        <div class="controls">
-            {{ block('dynamicCollection_widget') }}
-        </div>
-    </div>
+    {{ form_row(form, {'inlineLabel':inlineLabel, 'hideLabel':true }) }}
 {% endblock %}
     
 {% block dynamicCollection_widget %}
@@ -39,17 +32,28 @@
         {% set attr = attr|merge({'data-prototype': form_row(prototype) }) %}
     {% endif %}
     
-    <ol class='dynamic-collection list {{ additionalListCssClasses }}' {{ block('widget_container_attributes') }} >
+    <ol class='dynamic-collection list {{ listAdditionalCssClasses }}' {{ block('widget_container_attributes') }} >
         {% if form.parent is empty %}
             {{ form_errors(form) }}
         {% endif %}
-        {{ block('dynamicCollection_rows') }}
+        
+        {% for child in form %}
+        <li style='position: relative'>
+            {{ sortable ? form.vars.modelClass|trans }}
+            {#{ form_errors(child) }}
+            {{ form_widget(child) }#}
+            {# omit the default label (just a zero-based index) for each fragment 
+            {{ form_errors(child) }}    #}
+            {{ form_row(child) }}
+        </li>
+        {% endfor %}
+        
         {{ form_rest(form) }}
     </ol>
         {#onclick="function(){console.log('success')}"#}
 
     <a href="#" class="dynamic-collection add-entity">
-        {{ form.vars.modelClass|trans }} hinzufügen
+        <i class='icon-plus'></i>{{ form.vars.modelClass|trans }} hinzufügen
     </a>
     
     {# For the javascript to have access to the translated modelClass name.
@@ -59,22 +63,6 @@
     
 {% endblock %}
 
-{# TODO: having removed all spaceless blocks, the source output is rather convoluted. #}
-    
-{% block dynamicCollection_rows %}
-
-    {% for child in form %}
-    <li style='position: relative'>
-        {#{ form_errors(child) }}
-        {{ form_widget(child) }#}
-        {# omit the default label (just a zero-based index) for each fragment 
-        {{ form_errors(child) }}    #}
-        {{ form_row(child) }}
-    </li>
-    {% endfor %}
-
-{% endblock %}
-    
 {#  -----------------------------------------------------------------------------
     The selectOrAdd widget extends a select box with 
     an option to add a new database entity 

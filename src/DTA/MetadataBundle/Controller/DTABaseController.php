@@ -113,7 +113,8 @@ private function saveRecursively(\Symfony\Component\Form\Form $form) {
                                     'updatedObjectId' => $form->getData()->getId(),
                                 )));
             } else {
-                // TODO check error reporting mechanisms and test whether they work on different inputs.
+                // TODO compare form_row (form_div_layout.html.twig) error reporting mechanisms to the overriden version of form_row (formTypes.html.twig)
+                // and test whether they work on different inputs.
                 var_dump($form->getErrors());
             }
         }

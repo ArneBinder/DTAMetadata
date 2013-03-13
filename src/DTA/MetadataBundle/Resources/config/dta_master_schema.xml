@@ -420,10 +420,14 @@
     <table name="personalName">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="person_id" type="INTEGER" required="true"/>
+        <behavior name="sortable">
+            <parameter name="scope_column" value="id"/>
+        </behavior>
         <behavior name="table_row_view">
-            <!--<parameter name="Id" value="id"/>-->
+            <parameter name="Id" value="id"/>
             <parameter name="Name" value="accessor:__toString"/>
-            <!--<parameter name="zugeordnet (Personen-ID)" value="person_id"/>-->
+            <parameter name="zugeordnet (Personen-ID)" value="person_id"/>
+            <parameter name="Reihenfolge" value="accessor:getSortableRank"/>
         </behavior>
         <foreign-key foreignTable="person" name="fk_personalName_person1">
             <reference local="person_id" foreign="id"/>

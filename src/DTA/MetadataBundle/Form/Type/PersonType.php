@@ -23,7 +23,6 @@ class PersonType extends BaseAbstractType {
             'by_reference' => false,
             'type' => new PersonalnameType(),
             'label' => 'Namen',
-            'sortable' => false,
         ));
         $builder->add('gnd');
     }

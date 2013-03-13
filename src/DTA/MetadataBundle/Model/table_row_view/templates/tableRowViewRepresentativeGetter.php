@@ -4,31 +4,31 @@
  
 <?php 
     $representativeFunctionName = 'getRepresentative' . $className;
-    $countFunctionName = 'getRepresentative' . $className . 'Count';
     $pluralizer = new \StandardEnglishPluralizer();
     $pluralizedClassname = $pluralizer->getPluralForm($className);
+    
+    $countFunction = '$this->count' . $pluralizedClassname;
+    $relatedEntitiesGetter = '$this->get' . $pluralizedClassname;
+    $filterFunctionName = 'filterBy' . $modelClassName . 'Id';
 ?>
 public function <?php echo $representativeFunctionName;?>(){
     
-    $relatedEntities = $this->get<?php echo $pluralizedClassname?>();
-    $relatedEntityArray = $relatedEntities->getArrayCopy();
-    $relatedEntityCount = count($relatedEntityArray);
+    if (<?php echo $countFunction;?>() > 0) {
 
-    if($relatedEntityCount == 1){
-        return $relatedEntityArray[0];
-    } elseif($relatedEntityCount > 1){
-        return $relatedEntityArray[0];
+        $pn = <?php echo $relatedEntitiesGetter;?>();
+
+        // sort by rank if available
+        $rc = new \ReflectionClass(new <?php echo $className;?>());
+        if ( $rc->hasMethod('getSortableRank')) {
+            $pn->uasort(function($a, $b) {
+                        return $a->getSortableRank() - $b->getSortableRank();
+                    });
+        }
+
+        $pn = $pn->toKeyValue();
+        return array_shift($pn);
+
     } else {
         return "-";
     }
 }    
-
-public function <?php echo $countFunctionName;?>(){
-    
-    $relatedEntities = $this->get<?php echo $pluralizedClassname?>();
-    $relatedEntityArray = $relatedEntities->getArrayCopy();
-    $relatedEntityCount = count($relatedEntityArray);
-
-    return $relatedEntityCount;
-}    
-

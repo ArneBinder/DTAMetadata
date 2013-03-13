@@ -25,7 +25,7 @@ input.medium-text{
     width: 375px;
 }
 
-.control-group ol, .control-group ul{
+.controls.labelled > ol, .controls.labelled > ul{
     padding-top: 5px;  
 }
 

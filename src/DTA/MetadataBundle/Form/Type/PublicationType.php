@@ -22,15 +22,15 @@ class PublicationType extends BaseAbstractType
     {
         $builder->add('title', new TitleType());
 
-//        $builder->add('personPublications', new DynamicCollectionType(), array(
-//            'type' => new PersonPublicationType(),
-//            'allow_add' => true,
-//            'allow_delete' => true,
-//            'by_reference' => false,
-//            'label' => 'Personalia',
-////            'themeBlockName' => 'personalia',
-//            'sortable' => false,
-//        ));
+        $builder->add('personPublications', new DynamicCollectionType(), array(
+            'type' => new PersonPublicationType(),
+            'allow_add' => true,
+            'allow_delete' => true,
+            'by_reference' => false,
+            'label' => 'Personalia',
+            'inlineLabel' => false,
+            'sortable' => false,
+        ));
         
         $builder->add('work', new WorkType());
         

@@ -10,12 +10,6 @@
 {% block publication_row %}
     {{ form_row(form, {'inlineLabel':true, 'hideLabel': true}) }}
 {% endblock %}
-{% block work_row %}    
-    {{ form_row(form, {'inlineLabel':true, 'hideLabel':true }) }}
-{% endblock %}
-{% block datespecification_row %}
-    {{ form_row(form, {'inlineControls':true }) }}
-{% endblock %}
 
 {% block personpublication_row %}
     <div class="control-group form-inline">
@@ -26,6 +20,14 @@
             {#{ form_rest(form) }#}
     </div>
 {% endblock %}
+
+{% block work_row %}    
+    {{ form_row(form, {'inlineLabel':true, 'hideLabel':true }) }}
+{% endblock %}
+{% block datespecification_row %}
+    {{ form_row(form, {'inlineControls':true }) }}
+{% endblock %}
+
 
 {# --------------------- Title --------------------- #}
 
@@ -66,17 +68,16 @@
 {# --------------------- Form base customizations --------------------- #}
 
 {% block form_row %}
-    {% set inlineControls = inlineControls is defined ? inlineControls : false %}
-    {#% set levelsWithoutLabel = levelsWithoutLabel is defined ? levelsWithoutLabel : 0 %#}
     
-    {% if not inlined|default(false) %}
-    <div class="control-group">
-    {% endif %}
-        {# Wrap label and controls in separate columns, unless inlineControls labels are requested #}
+    {# set default value false for the inlineControls variable #}
+    {% set inlineControls = inlineControls is defined ? inlineControls : false %}
+    
+        {# Wrap label and controls in separate columns, unless inline labels are requested #}
         {% if not inlineLabel|default(false) and not inlined|default(false) %}
+        <div class="control-group">
             {# form_label automatically generates a label tag, with the correct id specified, the label class, added, etc. #}
             {{ form_label(form, null , {'label_attr':{'class':'control-label'} }) }}
-            <div class="controls {{ inlineControls ? 'form-inline' }}">
+            <div class="controls {{ inlineControls ? 'form-inline' : 'labelled' }}">
         {% endif %}
 
         {% if inlineControls %}
@@ -92,15 +93,12 @@
         {% endif %}            
 
         {% if not inlineLabel|default(false) and not inlined|default(false) %}
-                </div>
+            </div>
+            {{ form_rest(form) }}
+        </div>
         {% endif %}
     
-    {{ form_rest(form) }}
             
-    {% if not inlined|default(false) %}
-    </div>
-    {% endif %}
-    
 {% endblock form_row %}
 
 {% block form_label %}

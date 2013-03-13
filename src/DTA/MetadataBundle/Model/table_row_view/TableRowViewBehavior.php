@@ -291,13 +291,17 @@ class TableRowViewBehavior extends Behavior {
             
             $captionCharacters = strlen($caption) - strlen('@count');
             $countCaption = substr($caption, 0, $captionCharacters);
-            $countAccessor = "accessor:" . "getRepresentative".$relatedPhpName."Count";
+            // the accessor already exists as a propel convenience function
+            $pluralizer = new \StandardEnglishPluralizer();
+            $pluralizedClassname = $pluralizer->getPluralForm($relatedPhpName);
+            $countAccessor = "accessor:" . "count".$pluralizedClassname;
             $this->addViewElement($countCaption, $countAccessor);
             
         }
         
         $getterFunc = $this->renderTemplate('tableRowViewRepresentativeGetter', array(
             'className' => $relatedPhpName,
+            'modelClassName' => $table->getPhpName(),
         ));
         
         if( false === array_search($getterFunc, $this->representativeGetterFunctions))

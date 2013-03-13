@@ -37,9 +37,9 @@ function updateSortableRanks( event, ui ){
        
     var $dynamicCollectionList = $('#' + event.target.id);
     
-    // traverse in order of dom tree, push this 'real' index to the hidden inputs
+    // traverse in order of dom tree, push this 'visible' index to the hidden inputs
     $dynamicCollectionList.children('li').each(function(index, listElement){
-        console.log($(listElement).children().children('input[name*=sortableRank]').val());
+        console.log($(listElement), $(listElement).children().children('input[name*=sortableRank]').val());
         $(listElement).children().children('input[name*=sortableRank]').val(index);
     });
 }
@@ -109,7 +109,7 @@ function addFormElement(){
 }
 
 function createElementControls(element, translatedModelClassName){
-                     
+             
     var $collectionHolder = $(element).parent().parent(); // element: li, parent: ol, parent: collection holder
     
     if(undefined === translatedModelClassName)
@@ -124,7 +124,7 @@ function createElementControls(element, translatedModelClassName){
 //    var downStr = ' nach unten';
 //    var up   = $('<a href="#" class="sortable-up">'+ iconUpStr + /*translatedModelClassName + upStr + */'</a> ');
 //    var down = $('<a href="#" class="sortable-down">'+ iconDownStr + /*translatedModelClassName + downStr + */'</a>');
-    $(element).children('div.control-group').append(removeButtonStr);
+    $(element).children('div').append(removeButtonStr);
 //    $(element).append(down);
 }
 

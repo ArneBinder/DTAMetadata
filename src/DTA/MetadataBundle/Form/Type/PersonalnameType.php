@@ -23,6 +23,7 @@ class PersonalnameType extends BaseAbstractType {
             'by_reference' => false,
             'type' => new NamefragmentType(),
         ));
+        $builder->add('sortableRank', 'hidden');
     }
 
 }

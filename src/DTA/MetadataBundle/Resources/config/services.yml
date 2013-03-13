@@ -2,6 +2,23 @@ parameters:
 #    dta_metadata.example.class: DTA\MetadataBundle\Example
 
 services:
-#    dta_metadata.example:
-#        class: %dta_metadata.example.class%
-#        arguments: [@service_id, "plain_value", %parameter%]
+    dta.twig.currentTimeStamp_extension:
+        class: DTA\MetadataBundle\Twig\CurrentTimestampExtension
+        tags:
+            - { name: twig.extension }
+    dta.twig.setPlainArray_extension:
+        class: DTA\MetadataBundle\Twig\SetPlainArrayExtension
+        tags:
+            - { name: twig.extension }
+
+# registering the form type as a service allows to use 'dynamicCollection' in the 
+# form builders instead of new Form\DerivedType\DynamicCollectionType()
+# But this more verbose version seemed more transparent to me. 
+#    dta_metadata.form.type.dynamicCollection:
+#        class: DTA\MetadataBundle\Form\DerivedType\DynamicCollectionType
+#        arguments:
+#            # could receive options from the app/config/config.yml, see
+#            # http://symfony.com/doc/2.1/cookbook/form/create_custom_field_type.html#creating-your-field-type-as-a-service
+#        tags:
+#            - { name: form.type, alias: dynamicCollection }
+#            

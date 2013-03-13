@@ -1,6 +1,6 @@
 <?php
 
-namespace DTA\MetadataBundle\Form\DerivedType;
+namespace DTA\MetadataBundle\Form\Extension;
 
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormView;
@@ -9,7 +9,7 @@ use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class DynamicCollectionType extends \Symfony\Component\Form\Extension\Core\Type\CollectionType {
+class DynamicCollectionTypeExtension extends \Symfony\Component\Form\AbstractTypeExtension {
 
     /**
      * @var string contains the unqualified model class name to use in the view (for translation, dynamic controls, etc.)
@@ -18,29 +18,23 @@ class DynamicCollectionType extends \Symfony\Component\Form\Extension\Core\Type\
     protected $themeBlockName;
 
     public function getName() {
-//  this is only necessary if registering the type as a service, because the symfony form type registry runs additional checks.
-//        if( 0 == strlen($this->themeBlockName) ) return 'dynamicCollection';
-//        else
         return $this->themeBlockName;
     }
 
     public function getParent(){
-        return 'collection';
+        return 'form';
     }
     
     /**
-     * Builds the prototype with modified placeholders to allow nested collections.
-     * @param $options['themeBlockName']    allows individual styling of a collection, 
-     *                                      e.g. based on the entity that's stored in it. Pass any string under the themeBlockName 
-     *                                      option to override the dynamic collection form type name.
-     * @param $options['sortable']          determines whether the order of collection elements shall be changeable
-     * @param $options['inlineLabel']       render an extra column with label or not
+     * Only Build the prototype with modified placeholders
      */
     public function buildForm(FormBuilderInterface $builder, array $options) {
-        
         parent::buildForm($builder, $options);
 
-        // modify prototype as to allow nested sortable collections
+        if ($options['themeBlockName'] !== null)
+            $this->themeBlockName = $options['themeBlockName'];
+        else
+            $this->themeBlockName = 'dynamicCollection';
 
         // extract unqualified class name and pass it to the view
         // this allows more accurate control elements (instead of "add component",
@@ -57,12 +51,6 @@ class DynamicCollectionType extends \Symfony\Component\Form\Extension\Core\Type\
                             ), $options['options']));
             $builder->setAttribute('prototype', $prototype->getForm());
         }
-        
-        // push themeBlockName for access via getName
-        if ($options['themeBlockName'] !== null)
-            $this->themeBlockName = $options['themeBlockName'];
-        else
-            $this->themeBlockName = 'dynamicCollection';
     }
 
     public function finishView(FormView $view, FormInterface $form, array $options) {
@@ -74,17 +62,22 @@ class DynamicCollectionType extends \Symfony\Component\Form\Extension\Core\Type\
         
         $view->vars['sortable'] = $options['sortable'];
         $view->vars['listAdditionalCssClasses'] = $listAdditionalCssClasses;
-        $view->vars['inlineLabel'] = $options['inlineLabel'];
     }
 
     public function setDefaultOptions(OptionsResolverInterface $resolver) {
         parent::setDefaultOptions($resolver);
-        
+
+        // the theme block name option allows individual styling of dynamic collections,
+        // e.g. based on the entity that's stored in it. Pass any string under the themeBlockName 
+        // option to override the dynamic collection form type name.
         $resolver->setDefaults(array(
-            'themeBlockName' => null,   // see build form for parameter explanation
+            'themeBlockName' => null,
             'sortable' => true,
-            'inlineLabel' => true,
         ));
+    }
+
+    public function getExtendedType() {
+        return 'collection';
     }
 
 }

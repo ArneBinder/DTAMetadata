@@ -16,11 +16,6 @@ class Title extends BaseTitle
     }
     
     public function __toString(){
-// TODO: If there should be any issue with the order, switch to the more complicated query structure.
-//        NamefragmentQuery::create()
-//                ->filterByPersonalnameId($this->getId())
-//                ->orderByRank('asc')
-//                ->find();
         
         $fragmentStrings = [];
         // convert the fragment object to strings, possibly marking reconstructed title fragments

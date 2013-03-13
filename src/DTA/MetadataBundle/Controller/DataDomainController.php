@@ -37,12 +37,23 @@ class DataDomainController extends DTABaseController {
      * @Route("/", name="dataDomain")
      */
     public function indexAction() {
-        // TODO: remove. DataDomain.html.twig is useless now, as the domain menu has been generalized to the top level.
-        $p = Model\PersonQuery::create()->findOneById(1);
-        $persont = Model\PersonPeer::getTableMap();
-                
+        $p = Model\PersonQuery::create()->findOneById(2);
+        $pname = Model\PersonalnameQuery::create()->filterByPersonId(2)->orderBySortableRank()->findOne();
+        $pname = $p->getPersonalnames();
+        $pname->uasort(function($a, $b){
+//            echo $a->getSortableRank();
+//            echo $b->getSortableRank();
+            return $a->getSortableRank() - $b->getSortableRank();
+        });
+        $pname = $pname->toKeyValue();
+        
+//        return  Model\VolumeQuery::create()->filterb
+//                        ->filterBySeriesId(1)
+////                        ->orderBySortableRank()
+//                        ->findOne();
+        
         return $this->renderControllerSpecificAction('DTAMetadataBundle:DataDomain:index.html.twig', array(
-            "person" => true //$persont->getRelations() //count($p->getPersonalnames()->getArrayCopy())//[0]->__toString(),
+            "person" => array_shift($pname) //$persont->getRelations() //count($p->getPersonalnames()->getArrayCopy())//[0]->__toString(),
             // get_declared_classes()
         ));
     }
