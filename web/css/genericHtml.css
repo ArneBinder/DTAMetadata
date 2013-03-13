@@ -29,6 +29,7 @@ input.medium-text{
     padding-top: 5px;  
 }
 
+/* copied from bootstrap input highlighting */
 li.sortableDragPlaceholder{
     border-color: rgba(82, 168, 236, 0.8);
     outline: 0;

@@ -5,7 +5,7 @@ namespace DTA\MetadataBundle\Form\Type;
 use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-use DTA\MetadataBundle\Form\DerivedType\SortableCollectionType;
+use DTA\MetadataBundle\Form\DerivedType\DynamicCollectionType;
 use DTA\MetadataBundle\Form\DerivedType\SelectOrAddType;
 
 class PublicationType extends BaseAbstractType
@@ -22,14 +22,15 @@ class PublicationType extends BaseAbstractType
     {
         $builder->add('title', new TitleType());
 
-        $builder->add('personPublications', new SortableCollectionType(), array(
-            'type' => new PersonPublicationType(),
-            'allow_add' => true,
-            'allow_delete' => true,
-            'by_reference' => false,
-            'label' => 'Personalia',
-            'themeBlockName' => 'labelledSortableCollection',
-        ));
+//        $builder->add('personPublications', new DynamicCollectionType(), array(
+//            'type' => new PersonPublicationType(),
+//            'allow_add' => true,
+//            'allow_delete' => true,
+//            'by_reference' => false,
+//            'label' => 'Personalia',
+////            'themeBlockName' => 'personalia',
+//            'sortable' => false,
+//        ));
         
         $builder->add('work', new WorkType());
         

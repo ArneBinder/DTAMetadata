@@ -19,12 +19,11 @@ class PersonPublicationType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('publicationroleId');
-//        $builder->add('publicationrole','model', array(
-//            'property' => 'name',
-//            'class' => 'DTA\MetadataBundle\Model\Publicationrole',
-////            'label' => 'Rolle',
-//        ));
+        $builder->add('publicationrole','model', array(
+            'property' => 'name',
+            'class' => 'DTA\MetadataBundle\Model\Publicationrole',
+            'label' => 'Rolle',
+        ));
         $builder->add('person', new SelectOrAddType(), array(
             'class' => 'DTA\MetadataBundle\Model\Person',
             'property' => 'selectBoxString',

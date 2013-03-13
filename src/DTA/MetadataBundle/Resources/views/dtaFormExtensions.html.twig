@@ -1,6 +1,6 @@
 {# This defines how to render the additional form type widgets.
     Its structure is derived from the collection form type, basically
-    removing the labels and adding indicator classes to it to trigger javascript gui generation.
+    adding indicator classes to it to trigger javascript gui generation.
 
     The basics were taken from form_div_layout.hmtl.twig as provided by the symfony vendor files.
 
@@ -8,70 +8,52 @@
         <name> = result of form type's getName() function
         <name>_widget: the generated HTML
         <name>_row: the div containing the label, widget and errors
-        <name>_label, <name>_errors: ...
+        <name>_label, <name>_errors: the generated error display html (usually invisible)
 
  #}
 
 {#  -----------------------------------------------------------------------------
-    The selectOrAdd widget extends a select box with 
-    an option to add a new database entity 
+    dynamic collection widget
     ----------------------------------------------------------------------------- #}
 
-{% block selectOrAdd_widget %} 
-    {# The default select box#}
-    {{form_widget(form)}} 
-    {# The href attribute of the button, which defines the target modal, is added via javascript. #}
-    <button class="selectOrAdd add btn" type="button" data-toggle="modal">{{ form.vars.label }} {{ 'selectOrAdd.addBtn.suffix'|trans }}</button>
-    <input type="hidden" class="selectOrAdd" name="modelClass" value="{{ form.vars.modelClass }}"/>
-    <input type="hidden" class="selectOrAdd" name="formRetrieveUrl" value="{{ path('plainForm', {'className': form.vars.modelClass, 'captionProperty': form.vars.captionProperty, 'domainKey': "ajax"}) }}"/>
-    
-    {#{dump(form.vars)}#}
-{% endblock selectOrAdd_widget %}
-
-{#  -----------------------------------------------------------------------------
-    sortable collection widget
-    ----------------------------------------------------------------------------- #}
-
-{# By default, don't add an extra column for the label of the sortable collection #}
-{% block sortableCollection_row %}
+{# By default, don't add an extra column for the label of the dynamic collection #}
+{% block dynamicCollection_row %}
     {{ form_row(form, {'inlineLabel':true, 'hideLabel':true }) }}
 {% endblock %}
     
-{# Use 'themeBlockName' => 'labelledSortableCollection' to change this behavior.
+{# Use 'themeBlockName' => 'labelledDynamicCollection' to change this behavior.
     This is for instance necessary on data elements that are direct children of a top level entity (such as Publication->Personalia) #}
-{% block labelledSortableCollection_row %}
+{% block labelledDynamicCollection_row %}
     <div class="control-group">
         {{ form_label(form, null , {'label_attr':{'class':'control-label'} }) }}
         <div class="controls">
-            {{ block('sortableCollection_widget') }}
+            {{ block('dynamicCollection_widget') }}
         </div>
     </div>
 {% endblock %}
     
-{% block sortableCollection_widget %}
+{% block dynamicCollection_widget %}
 
     {% if prototype is defined %}
         {# Add prototype for dynamically adding forms with JS #}
         {% set attr = attr|merge({'data-prototype': form_row(prototype) }) %}
-        {# Set marker classes for the JS (collectionControl.js) to add the corresponding buttons #}
-        {% set attr = attr|merge({'class': "collection-editor collection-sortable" }) %}
     {% endif %}
-    {#% set attr = attr|merge({'class': 'sortableCollection'}) %#}
-    <ol class='collection-sortable'{{ block('widget_container_attributes', {'attr':attr|merge({'class':'sortableCollection'})}) }} >
+    
+    <ol class='dynamic-collection list {{ additionalListCssClasses }}' {{ block('widget_container_attributes') }} >
         {% if form.parent is empty %}
             {{ form_errors(form) }}
         {% endif %}
-        {{ block('sortableCollection_rows') }}
+        {{ block('dynamicCollection_rows') }}
         {{ form_rest(form) }}
     </ol>
         {#onclick="function(){console.log('success')}"#}
 
-    <a href="#" class="sortableCollectionWidget add-entity">
+    <a href="#" class="dynamic-collection add-entity">
         {{ form.vars.modelClass|trans }} hinzufügen
     </a>
     
     {# For the javascript to have access to the translated modelClass name.
-       The up and down sortable controls need this to be more expressive.   #}
+       The up and down dynamic controls need this to be more expressive.   #}
     <input type="hidden" name="translatedModelClassName" value="{{ form.vars.modelClass|trans }}"/>
     <input type="hidden" name="modelClassName" value="{{ form.vars.modelClass }}"/>
     
@@ -79,12 +61,10 @@
 
 {# TODO: having removed all spaceless blocks, the source output is rather convoluted. #}
     
-{% block sortableCollection_rows %}
+{% block dynamicCollection_rows %}
 
     {% for child in form %}
     <li style='position: relative'>
-        {{ form.vars.modelClass|trans }}
-        
         {#{ form_errors(child) }}
         {{ form_widget(child) }#}
         {# omit the default label (just a zero-based index) for each fragment 
@@ -94,3 +74,20 @@
     {% endfor %}
 
 {% endblock %}
+    
+{#  -----------------------------------------------------------------------------
+    The selectOrAdd widget extends a select box with 
+    an option to add a new database entity 
+    ----------------------------------------------------------------------------- #}
+
+{% block selectOrAdd_widget %} 
+    
+    {# The default select box#}
+    {{ form_widget(form) }} 
+
+    {# The href attribute of the button, which defines the target modal, is added via javascript. #}
+    <button class="selectOrAdd add btn" type="button" data-toggle="modal">{{ form.vars.label }} {{ 'selectOrAdd.addBtn.suffix'|trans }}</button>
+    <input type="hidden" class="selectOrAdd" name="modelClass" value="{{ form.vars.modelClass }}"/>
+    <input type="hidden" class="selectOrAdd" name="formRetrieveUrl" value="{{ path('plainForm', {'className': form.vars.modelClass, 'captionProperty': form.vars.captionProperty, 'domainKey': "ajax"}) }}"/>
+    
+{% endblock selectOrAdd_widget %}

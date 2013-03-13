@@ -14,12 +14,12 @@ use Symfony\Component\HttpFoundation\Response;
 class DTABaseController extends Controller {
 
     /**
-     * IMPLEMENT ME IF CREATING A NEW DOMAIN 
+     * IMPLEMENT THIS IF CREATING A NEW DOMAIN 
      * The flag that it is set to true to indicate to the base template which domain to highlight in the main menu. */
     public static $domainKey = "";
 
     /**
-     * IMPLEMENT ME IF CREATING A NEW DOMAIN 
+     * IMPLEMENT THIS IF CREATING A NEW DOMAIN 
      * The options in the second menu, displayed right under the main (domain switch) menu.
      * TODO: Generate this automatically. To avoid multiple edit locations on adding a new publication type
      * The inheritance should be detectable by the delegate behavior in the schema.xml
@@ -70,7 +70,7 @@ class DTABaseController extends Controller {
      * Visits recursively all nested form elements and saves them.
      * @param Form $form The form object that contains the data defined by the top level form type (PersonType, NamefragmentType, ...)
      */
-private function saveRecursively(\Symfony\Component\Form\Form $form, $visited = array()) {
+private function saveRecursively(\Symfony\Component\Form\Form $form) {
 
     $entity = $form->getData();
     if(is_object($entity)){
@@ -112,6 +112,9 @@ private function saveRecursively(\Symfony\Component\Form\Form $form, $visited = 
                                     'className' => $className,
                                     'updatedObjectId' => $form->getData()->getId(),
                                 )));
+            } else {
+                // TODO check error reporting mechanisms and test whether they work on different inputs.
+                var_dump($form->getErrors());
             }
         }
         return $this->renderDomainKeySpecificAction($domainKey, "DTAMetadataBundle::formWrapper.html.twig", array(

@@ -4,14 +4,14 @@
     Author     : carlwitt
     Description:
         Styles all elements that have been dynamically created via javascript.
-        This includes custom widgets as defined in dtaFormExtensions.html.twig (selectOrAdd, sortableCollection form type)
+        This includes custom widgets as defined in dtaFormExtensions.html.twig (selectOrAdd, dynamicCollection form type)
 */
 
 .selectOrAdd.add.btn{
     /*margin-left: 7px;*/
 }
 .collection-editor ol{
-    list-style-type: decimal;
+    
 }
 
 .sortable-up{
@@ -24,4 +24,13 @@
     position: absolute;
     top: 33px;
     left: -15px;
+}
+
+ol.dynamic-collection.list{
+    list-style-type: none;
+    margin-left:0;
+}
+ol.dynamic-collection.list.sortable{
+    list-style-type: decimal;
+    margin: 0 0 10px 25px;
 }

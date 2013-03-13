@@ -17,11 +17,13 @@ class PersonType extends BaseAbstractType {
      *  {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options) {
-        $builder->add('personalNames', new Form\DerivedType\SortableCollectionType(), array(
+        $builder->add('personalNames', new Form\DerivedType\DynamicCollectionType(), array(
             'allow_add' => true,
+            'allow_delete' => true,
             'by_reference' => false,
             'type' => new PersonalnameType(),
             'label' => 'Namen',
+            'sortable' => false,
         ));
         $builder->add('gnd');
     }

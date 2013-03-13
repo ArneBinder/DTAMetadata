@@ -5,6 +5,64 @@
 
 {% extends 'form_div_layout.html.twig' %}
 
+{# --------------------- Form Type Configurations, e.g. as made available by the above code --------------------- #}
+
+{% block publication_row %}
+    {{ form_row(form, {'inlineLabel':true, 'hideLabel': true}) }}
+{% endblock %}
+{% block work_row %}    
+    {{ form_row(form, {'inlineLabel':true, 'hideLabel':true }) }}
+{% endblock %}
+{% block datespecification_row %}
+    {{ form_row(form, {'inlineControls':true }) }}
+{% endblock %}
+
+{% block personpublication_row %}
+    <div class="control-group form-inline">
+            {{ form_errors(form.publicationrole) }}
+            {{ form_widget(form.publicationrole) }}
+            {{ form_errors(form.person) }}
+            {{ form_widget(form.person) }}
+            {#{ form_rest(form) }#}
+    </div>
+{% endblock %}
+
+{# --------------------- Title --------------------- #}
+
+{% block title_row %}
+    {{ form_row(form, {'inlineLabel':false}) }}
+{% endblock %}
+
+{% block titlefragment_row %}
+    <div class="control-group form-inline">
+            {{ form_widget(form.titlefragmenttype)}}
+            {{ form_widget(form.name,{'attr':{'class':'medium-text'} }) }} 
+            <br/>
+            {{ form_row(form.NameIsReconstructed ) }}
+            {{ form_rest(form) }}
+    </div>
+{% endblock %}
+
+{# --------------------- Personal Name --------------------- #}
+
+{% block person_row %}
+    {{ form_row(form.personalNames, {'inlineLabel':false }) }}
+    {{ form_row(form.gnd) }}
+    {{ form_rest(form) }}
+{% endblock %}
+
+{% block personalname_row %}
+    {{ form_row(form, {'inlineLabel':true, 'hideLabel':true }) }}
+{% endblock %}
+
+{% block namefragment_row %}
+    <div class="control-group form-inline">
+            {{ form_widget(form.namefragmenttype)}}
+            {{ form_widget(form.name) }} 
+            {{ form_rest(form) }}
+    </div>
+{% endblock %}
+
 {# --------------------- Form base customizations --------------------- #}
 
 {% block form_row %}
@@ -14,7 +72,6 @@
     {% if not inlined|default(false) %}
     <div class="control-group">
     {% endif %}
-        
         {# Wrap label and controls in separate columns, unless inlineControls labels are requested #}
         {% if not inlineLabel|default(false) and not inlined|default(false) %}
             {# form_label automatically generates a label tag, with the correct id specified, the label class, added, etc. #}
@@ -38,6 +95,8 @@
                 </div>
         {% endif %}
     
+    {{ form_rest(form) }}
+            
     {% if not inlined|default(false) %}
     </div>
     {% endif %}
@@ -56,67 +115,6 @@
         {{ label }}
     </label>
 {% endblock checkbox_row %}
-
-{# --------------------- Form Type Configurations, e.g. as made available by the above code --------------------- #}
-
-{% block publication_row %}
-    {{ form_row(form, {'inlineLabel':true, 'hideLabel': true}) }}
-{% endblock %}
-{% block work_row %}    
-    {{ form_row(form, {'inlineLabel':true, 'hideLabel':true }) }}
-{% endblock %}
-{% block datespecification_row %}
-    {{ form_row(form, {'inlineControls':true }) }}
-{% endblock %}
-
-{% block personpublication_row %}
-    <div class="control-group form-inline">
-            {{ form_widget(form.publicationroleId) }}
-            {{ form_widget(form.person) }}
-            <a onclick="$(this).parent().parent().remove();"><i class="icon-remove"></i></a>
-    </div>
-{% endblock %}
-
-{# --------------------- Title --------------------- #}
-
-{% block title_row %}
-    {{ form_row(form, {'inlineLabel':false}) }}
-{% endblock %}
-
-{% block titlefragment_row %}
-    <div class="control-group form-inline">
-            <i class="icon-move"></i>
-            {{ form_widget(form.titlefragmenttype)}}
-            {{ form_widget(form.name,{'attr':{'class':'medium-text'} }) }} 
-            <br/>
-            {{ form_row(form.NameIsReconstructed ) }}
-            {{ form_rest(form) }}
-            <a onclick="$(this).parent().parent().remove();">
-                <i class="icon-remove"></i> Entfernen
-            </a>
-    </div>
-{% endblock %}
-
-{# --------------------- Personal Name --------------------- #}
-
-{% block person_row %}
-    {{ form_row(form.personalNames, {'inlineLabel':false }) }}
-    {{ form_row(form.gnd) }}
-    {{ form_rest(form) }}
-{% endblock %}
-
-{% block personalname_row %}
-    {{ form_row(form, {'inlineLabel':true, 'hideLabel':true }) }}
-{% endblock %}
-
-{% block namefragment_row %}
-    <div class="control-group form-inline">
-            {{ form_widget(form.namefragmenttype)}}
-            {{ form_widget(form.name) }} 
-            {{ form_rest(form) }}
-            <a onclick="$(this).parent().parent().remove();"><i class="icon-remove"></i>Entfernen</a>
-    </div>
-{% endblock %}
 
 {# --------------------- Title form types --------------------- #}
     

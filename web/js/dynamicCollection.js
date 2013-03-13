@@ -1,5 +1,5 @@
 /* 
- * Contains the UI logic for the sortableCollection form type (src/DTA/MetadataBundle/Form/DerivedType/SortableCollectionType.php).
+ * Contains the UI logic for the dynamicCollection form type (src/DTA/MetadataBundle/Form/DerivedType/DynamicCollectionType.php).
  * The form type is an input to specify a dynamic number of relations between a database entity and another.
  * This script handles the DOM manipulation to dynamically generate the necessary form inputs.
  * 
@@ -13,16 +13,16 @@ jQuery(document).ready(createGui);
 
 function createGui(){
     
-    jQuery(document).on('click', '.sortableCollectionWidget.add-entity', addFormElement);
-    jQuery(document).on('DOMNodeRemoved', '.collection-sortable li', updateSortableRanks);
+    jQuery(document).on('click', '.dynamic-collection.add-entity', addFormElement);
+    jQuery(document).on('DOMNodeRemoved', '.dynamic-collection.list li', updateSortableRanks);
     
-    // add up and down control elements for sortable collections
-    var sortableElements = jQuery('.collection-sortable li');
-    jQuery.each(sortableElements, function(idx,element){
-        createSortableControls(element);
+    // add up and down control elements for dynamic collections
+    var dynamicElements = jQuery('.dynamic-collection.list li');
+    jQuery.each(dynamicElements, function(idx,element){
+        createElementControls(element);
     });
 
-    jQuery('ol.collection-sortable').sortable({
+    jQuery('.dynamic-collection.list.sortable').sortable({
         cursor: "move",
         update: updateSortableRanks,
         placeholder: "sortableDragPlaceholder",
@@ -35,35 +35,35 @@ function createGui(){
  * Applied each time the user changes the position of a sortable element. */
 function updateSortableRanks( event, ui ){
        
-    var $sortableCollectionHolder = $('#' + event.target.id);
+    var $dynamicCollectionList = $('#' + event.target.id);
     
     // traverse in order of dom tree, push this 'real' index to the hidden inputs
-    $sortableCollectionHolder.children('li').each(function(index, listElement){
+    $dynamicCollectionList.children('li').each(function(index, listElement){
         console.log($(listElement).children().children('input[name*=sortableRank]').val());
         $(listElement).children().children('input[name*=sortableRank]').val(index);
     });
 }
 
 /**
- * Extends the sortable collection by one collection element.
+ * Extends the dynamic collection by one collection element.
  */
 function addFormElement(){
     var $addLink = $(this);
     
     var $collectionHolder = $addLink.parent();
-    var $collection = $collectionHolder.children('ol.collection-sortable');
-//    console.log('collection holder', $collectionHolder, 'collection ol', $collection);
+    var $collectionList = $collectionHolder.children('.dynamic-collection.list');
+//    console.log('collection holder', $collectionHolder, 'collection ol', $collectionList);
     
     // PREPARE PROTOTYPE 
     
-    if($collection.attr("data-prototype") === undefined){
+    if($collectionList.attr("data-prototype") === undefined){
         console.log('No protoype element for the collection editor available!');
         return false;
     }            
     
-    // using the children method (instead of find) is important here, because sortable collections might be nested,
-    // in which case the collection element would be to descending sortable collections as well.
-    var elementId = $collection.children("li").length; 
+    // using the children method (instead of find) is important here, because dynamic collections might be nested,
+    // in which the li selector might illegally descend into other dynamic collections.
+    var elementId = $collectionList.children("li").length; 
     var modelClassName = $collectionHolder
         .children('input[name=modelClassName]')
         .val();
@@ -71,23 +71,31 @@ function addFormElement(){
         .children('input[name=translatedModelClassName]')
         .val();
     
-    
-    var prototype = $.trim($collection.attr("data-prototype"))
-        .replace(/\n/g,'')
-        .replace(/<label class="required">__name__label__<\/label>/g, '');  // remove per fragment label
+    // remove leading and trailing whitespace, because jQuery has problems to recognize the string otherwise
+    var prototype = $.trim($collectionList.attr("data-prototype"));
+//        .replace(/\n/g,'')
+//        .replace(/<label class="required">__name__label__<\/label>/g, '');  // remove per fragment label
+
+    // generate proper name and id attributes for form input by replacing the ID placeholder with the index of the element
     prototype = prototype.replace(new RegExp('__'+ modelClassName +'ID__', 'g'), elementId);
+
+    
 
     // CREATE NEW DOM ELEMENT 
     var $newForm = $(prototype);
     
     var $newFormLi = $('<li></li>')
-        .text(translatedModelClassName)
         .append($newForm);
     
-    var sortable = $collection.hasClass('collection-sortable');
+    // add e.g. remove button
+    createElementControls($newFormLi, translatedModelClassName);
+        
+    var sortable = $collectionList.hasClass('sortable');
     if(sortable){
-        // add up and down buttons
-        createSortableControls($newFormLi, translatedModelClassName);
+        
+        // add a caption to feed the enumeration (with just a plain div, list elements can't be numbered)
+        // without the list-style-type set to decimal, more compact list elements are possible and preferred
+        $newFormLi.prepend($('<span/>').text(translatedModelClassName));
 
         // initialize the rank hidden input field
         var rank = elementId + 1; // the rank is 1-based
@@ -95,12 +103,12 @@ function addFormElement(){
         $rankInput.attr('value', rank);
     }
     
-    $collection.append($newFormLi);
+    $collectionList.append($newFormLi);
     
     return false;
 }
 
-function createSortableControls(element, translatedModelClassName){
+function createElementControls(element, translatedModelClassName){
                      
     var $collectionHolder = $(element).parent().parent(); // element: li, parent: ol, parent: collection holder
     
@@ -108,14 +116,15 @@ function createSortableControls(element, translatedModelClassName){
         translatedModelClassName = $collectionHolder
             .children('input[name=translatedModelClassName]')
             .val();
-        
+    
+    var removeButtonStr = '<a onclick="$(this).parent().parent().remove();"><i class="icon-remove"></i>'+translatedModelClassName+' entfernen</a>';
 //    var iconUpStr = '<i class="icon-arrow-up"></i>';
 //    var iconDownStr = '<i class="icon-arrow-down"></i>';
 //    var upStr = ' nach oben';
 //    var downStr = ' nach unten';
 //    var up   = $('<a href="#" class="sortable-up">'+ iconUpStr + /*translatedModelClassName + upStr + */'</a> ');
 //    var down = $('<a href="#" class="sortable-down">'+ iconDownStr + /*translatedModelClassName + downStr + */'</a>');
-//    $(element).append(up);
+    $(element).children('div.control-group').append(removeButtonStr);
 //    $(element).append(down);
 }
 
