@@ -42,8 +42,12 @@ class PublicationType extends BaseAbstractType
             
         ));
 
-        $builder->add('DatespecificationRelatedByOrigindateId', new DatespecificationType(), array(
-            'label' => 'Erscheinungsjahr, falls abweichend'
+        $builder->add('DatespecificationRelatedByPublicationdateId', new DatespecificationType(), array(
+            'label' => 'Erscheinungsjahr (f.a.)'
+        ));
+        
+        $builder->add('DatespecificationRelatedByFirstpublicationdateId', new DatespecificationType(), array(
+            'label' => 'Erscheinungsjahr der Erstausgabe (f.a.)'
         ));
         
         $builder->add('status', new SelectOrAddType(), array(

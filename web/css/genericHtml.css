@@ -58,7 +58,10 @@ li.sortableDragPlaceholder{
 .form-horizontal .control-label{
     /* Without absolute positioning, control labels with more than one line for some reason 
         increase the height of the neighboring controls div. This leads to an uneven spacing of the li elements. */
-    position: absolute;
+    /*
+        not increasing the height of the neighboring controls leads to overlapping labels for long label texts and narrow control divs.
+    position: absolute;*/
+    
 }
 
 .form-inline * {

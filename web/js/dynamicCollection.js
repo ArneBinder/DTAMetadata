@@ -79,7 +79,7 @@ function addFormElement(){
     // generate proper name and id attributes for form input by replacing the ID placeholder with the index of the element
     prototype = prototype.replace(new RegExp('__'+ modelClassName +'ID__', 'g'), elementId);
 
-    
+    console.log(prototype);
 
     // CREATE NEW DOM ELEMENT 
     var $newForm = $(prototype);

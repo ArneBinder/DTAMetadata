@@ -28,14 +28,16 @@
         <column name="numPages" type="INTEGER" required="false"/>
         <column name="numPagesNormed" type="INTEGER" required="false"/>
         <column name="bibliographicCitation" type="LONGVARCHAR" required="false"/>
-       
+        <column name="editionDescription" type="LONGVARCHAR" required="false"/>
+        <column name="editionDescriptionNumeric" type="INTEGER" required="false"/>
+        
         <!-- non atomic attributes -->       
         <column name="title_id" type="INTEGER" required="true"/>
         <column name="publishingCompany_id" type="INTEGER" required="false"/>
         <column name="place_id" type="INTEGER" required="false"/>
         
         <column name="publicationDate_id" type="INTEGER" required="false"/>
-        <column name="originDate_id" type="INTEGER" required="false"/>
+        <column name="firstPublicationDate_id" type="INTEGER" required="false"/>
         
         <column name="relatedSet_id" type="INTEGER" required="false"/>
         <column name="status_id" type="INTEGER" required="true"/>
@@ -70,8 +72,8 @@
         <foreign-key foreignTable="dateSpecification" name="fk_published">
             <reference local="publicationDate_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="dateSpecification" name="fk_writtenIn">
-            <reference local="originDate_id" foreign="id"/>
+        <foreign-key foreignTable="dateSpecification" name="fk_firstPublishedIn">
+            <reference local="firstPublicationDate_id" foreign="id"/>
         </foreign-key>
         <foreign-key foreignTable="status" name="fk_werk_status1">
             <reference local="status_id" foreign="id"/>

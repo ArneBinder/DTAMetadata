@@ -5,6 +5,8 @@ namespace DTA\MetadataBundle\Form\Type;
 use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+use DTA\MetadataBundle\Form\DerivedType\SelectOrAddType;
+
 class PersonWorkType extends BaseAbstractType
 {
     protected $options = array(
@@ -17,8 +19,20 @@ class PersonWorkType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('personId');
-        $builder->add('workroleId');
-        $builder->add('workId');
+        $builder->add('workrole','model', array(
+            'property' => 'name',
+            'class' => 'DTA\MetadataBundle\Model\Workrole',
+            'label' => 'Rolle',
+        ));
+        $builder->add('person', new SelectOrAddType(), array(
+            'class' => 'DTA\MetadataBundle\Model\Person',
+            'property' => 'SelectBoxString', // use personEntity->getSelectBoxString to fill the select box
+            'label' => 'Person',
+            'searchable' => true,      
+            
+        ));
+//        $builder->add('personId');
+//        $builder->add('workroleId');
+//        $builder->add('workId');
     }
 }

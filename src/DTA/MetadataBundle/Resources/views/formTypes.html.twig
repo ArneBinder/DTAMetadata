@@ -7,9 +7,16 @@
 
 {# --------------------- Form Type Configurations, e.g. as made available by the above code --------------------- #}
 
+{# --------------------- Work and Publication --------------------- #}
+
 {% block publication_row %}
     {{ form_row(form, {'inlineLabel':true, 'hideLabel': true}) }}
 {% endblock %}
+{% block work_row %}    
+    {{ form_row(form, {'inlineLabel':false, 'hideLabel':false }) }}
+{% endblock %}
+
+{# ---------------------Personalia --------------------- #}
 
 {% block personpublication_row %}
     <div class="control-group form-inline">
@@ -20,14 +27,21 @@
             {#{ form_rest(form) }#}
     </div>
 {% endblock %}
-
-{% block work_row %}    
-    {{ form_row(form, {'inlineLabel':true, 'hideLabel':true }) }}
+{% block personwork_row %}
+    <div class="control-group form-inline">
+            {{ form_errors(form.workrole) }}
+            {{ form_widget(form.workrole) }}
+            {{ form_errors(form.person) }}
+            {{ form_widget(form.person) }}
+            {#{ form_rest(form) }#}
+    </div>
 {% endblock %}
+
+{# --------------------- Space and Time --------------------- #}
+
 {% block datespecification_row %}
     {{ form_row(form, {'inlineControls':true }) }}
 {% endblock %}
-
 
 {# --------------------- Title --------------------- #}
 
