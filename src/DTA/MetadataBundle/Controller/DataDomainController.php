@@ -47,20 +47,13 @@ class DataDomainController extends DTABaseController {
         $p = Model\PersonQuery::create()->findOneById(2);
         $pname = Model\PersonalnameQuery::create()->filterByPersonId(2)->orderBySortableRank()->findOne();
         $pname = $p->getPersonalnames();
-        $pname->uasort(function($a, $b){
-//            echo $a->getSortableRank();
-//            echo $b->getSortableRank();
-            return $a->getSortableRank() - $b->getSortableRank();
-        });
-        $pname = $pname->toKeyValue();
-        
-//        return  Model\VolumeQuery::create()->filterb
-//                        ->filterBySeriesId(1)
-////                        ->orderBySortableRank()
-//                        ->findOne();
+        $dsp = new Model\Datespecification();
+        $dsp->setYear(3000);
+        $pub = Model\PublicationQuery::create()->findOneById(1);
+        $pub->setDatespecificationRelatedByFirstpublicationdateId($dsp);
         
         return $this->renderControllerSpecificAction('DTAMetadataBundle:DataDomain:index.html.twig', array(
-            "person" => array_shift($pname) //$persont->getRelations() //count($p->getPersonalnames()->getArrayCopy())//[0]->__toString(),
+            "person" => "array_shift()" //$persont->getRelations() //count($p->getPersonalnames()->getArrayCopy())//[0]->__toString(),
             // get_declared_classes()
         ));
     }

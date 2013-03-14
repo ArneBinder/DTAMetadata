@@ -70,19 +70,19 @@ class DTABaseController extends Controller {
      * Visits recursively all nested form elements and saves them.
      * @param Form $form The form object that contains the data defined by the top level form type (PersonType, NamefragmentType, ...)
      */
-private function saveRecursively(\Symfony\Component\Form\Form $form) {
+    private function saveRecursively(\Symfony\Component\Form\Form $form) {
 
-    $entity = $form->getData();
-    if(is_object($entity)){
-        $rc = new \ReflectionClass($entity);
-        if($rc->hasMethod('save'))
-            $entity->save();
-    }
+        $entity = $form->getData();
+        if(is_object($entity)){
+            $rc = new \ReflectionClass($entity);
+            if($rc->hasMethod('save'))
+                $entity->save();
+        }
 
-    foreach ($form->getChildren() as $child){
-        $this->saveRecursively($child);
+        foreach ($form->getChildren() as $child){
+            $this->saveRecursively($child);
+        }
     }
-}
 
     /**
      * Used for creating an edit form for a specific database entity.
@@ -204,7 +204,8 @@ private function saveRecursively(\Symfony\Component\Form\Form $form) {
             if ("ajax" == $domainKey) {
                 // fetch data for the newly selectable option
                 $id = $obj->getId();
-                $caption = $obj->getByName($captionProperty);
+                $getter = 'get' . $captionProperty;
+                $caption = $obj->$getter();
 
                 // return the new select option html fragment
                 return new Response("<option value='$id'>$caption</option>");

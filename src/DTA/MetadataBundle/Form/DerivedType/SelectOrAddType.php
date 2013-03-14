@@ -57,6 +57,7 @@ class SelectOrAddType extends \Symfony\Bridge\Propel1\Form\Type\ModelType {
         
         $resolver->setDefaults(array(
             'searchable' => false,   // whether to apply the select2 plugin to add typeahead functionality
+//            'captionProperty' => 'Id', // getId is available on all propel objects.
         ));
     }
 }
