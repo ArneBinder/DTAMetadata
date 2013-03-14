@@ -3,6 +3,10 @@
  * Allows either selection of an existing database entity or creation of a new one in a nested form (modal).
  */
 
+$(function(){
+  $('.selectOrAdd.select.searchable').select2();
+});
+
 /**
  * Called when the add button of a select box. Creates a modal containing a 
  * form to create a new entity. The modal is created only once.

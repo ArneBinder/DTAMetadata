@@ -71,7 +71,11 @@
 {% block selectOrAdd_widget %} 
     
     {# The default select box. The explicit width is used to instruct the select2 plugin to use a fixed width. #}
-    {{ form_widget(form, {'attr':{'style':'width:220px;'} }) }} 
+    {% set attr = attr|merge({'style':'width:220px;'}) %}
+    {% set attr = searchable ? attr|merge({'class':'selectOrAdd select searchable'}) : 
+                               attr|merge({'class':'selectOrAdd select'}) %}
+    
+    {{ form_widget(form, {'attr':attr}) }} 
     {{ form_errors(form) }} 
 
     {# The add button #}
