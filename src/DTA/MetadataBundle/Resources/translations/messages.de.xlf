@@ -94,6 +94,10 @@
 				<source>PersonPublication</source>
                 <target>Publikationspersonalie</target>
             </trans-unit>
+            <trans-unit id="24">
+				<source>Place</source>
+                <target>Ort</target>
+            </trans-unit>
             
 
         </body>

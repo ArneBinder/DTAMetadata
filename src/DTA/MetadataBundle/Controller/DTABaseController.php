@@ -157,16 +157,18 @@ private function saveRecursively(\Symfony\Component\Form\Form $form) {
      * @param int    $recordId    The id of the record to edit. Zero indicates that a new record shall be created.
      * @param string $captionProperty The property to use as caption for a select option (only for ajax use)
      * 
-     * @Route("/plainForm/{className}/{recordId}/{captionProperty}", 
-     *      name="plainForm", 
+     * @Route("/ajaxModalForm/{className}/{recordId}/{captionProperty}", 
+     *      name="ajaxModalForm", 
      *      defaults={"recordId"=0, "captionProperty"="Id"})
      */
-    public function plainFormAction($className, $recordId = 0, $captionProperty = "Id") {
+    public function generateAjaxModalFormAction($className, $recordId = 0, $captionProperty = "Id") {
 
+//        sleep(2);
+        
         $form = $this->dynamicForm($className, $recordId);
 
         // plain ajax response, without any menus or other html
-        return $this->render("DTAMetadataBundle::plainForm.html.twig", array(
+        return $this->render("DTAMetadataBundle::ajaxModalForm.html.twig", array(
                     'form' => $form->createView(),
                     'className' => $className,
                     'captionProperty' => $captionProperty,
@@ -198,35 +200,32 @@ private function saveRecursively(\Symfony\Component\Form\Form $form) {
                 $obj->save();
             }
             
-            $this->get('session')->getFlashBag()->add('success', 'Änderungen vorgenommen.');
-            
-            return $this->redirect($this->generateUrl('genericView', array(
-                                    'domainKey' => $domainKey,
-                                    'className' => $className,
-                                    'updatedObjectId' => $form->getData()->getId(),
-                                )));
+            // AJAX case (nested form submit, no redirect)
+            if ("ajax" == $domainKey) {
+                // fetch data for the newly selectable option
+                $id = $obj->getId();
+                $caption = $obj->getByName($captionProperty);
+
+                // return the new select option html fragment
+                return new Response("<option value='$id'>$caption</option>");
+            } else {
+                // redirect to overview page on success
+                $this->get('session')->getFlashBag()->add('success', 'Änderungen vorgenommen.');
+
+                return $this->redirect($this->generateUrl('genericView', array(
+                                        'domainKey' => $domainKey,
+                                        'className' => $className,
+                                        // highlight the changed or added entity in the list of all entities
+                                        'updatedObjectId' => $form->getData()->getId(),
+                                    )));
+            }
         }
 
-        // AJAX case (nested form submit, no redirect)
-        if ("none" === $domainKey) {
-
-            // fetch data for the newly selectable option
-            $id = $obj->getId();
-            $caption = $obj->getByName($captionProperty);
-
-            return new Response("<option value='$id'>$caption</option>");
-        }
-        // top level form submit case (redirect to view page)
-        else {
-//            $route = implode(':', array('DTAMetadataBundle', $domainKey, 'index'));
-            // for accessing static attributes of the controllers
-            $cr = $this->getControllerReflectionClass($domainKey);
-
-            return $this->renderDomainKeySpecificAction($domainKey, 'DTAMetadataBundle::formWrapper.html.twig', array(
-                        'form' => $form->createView(),
-                        'className' => $className,
-                    ));
-        }
+        // render the form
+        return $this->renderDomainKeySpecificAction($domainKey, 'DTAMetadataBundle::formWrapper.html.twig', array(
+                    'form' => $form->createView(),
+                    'className' => $className,
+                ));
     }
 
     private function getControllerReflectionClass($domainKey) {

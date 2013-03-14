@@ -17,7 +17,7 @@ class PlaceType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('name');
-        $builder->add('gnd');
+        $builder->add('name','text');
+        $builder->add('gnd','text');
     }
 }

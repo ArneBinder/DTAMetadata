@@ -32,6 +32,13 @@ class DataDomainController extends DTABaseController {
                 array('caption' => "Drucker", 'modelClass' => 'Printer'))),
         array("caption" => "Verlage", 'modelClass' => 'PublishingCompany'),
     );
+    
+    /**
+     * @Route("/someSelectValues")
+     */
+    public function someSelectValues(){
+        return new \Symfony\Component\HttpFoundation\Response("{ 'val1' : 12, 'val2' : 13 }");
+    }
 
     /**
      * @Route("/", name="dataDomain")

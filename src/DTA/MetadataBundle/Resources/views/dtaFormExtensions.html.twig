@@ -70,12 +70,21 @@
 
 {% block selectOrAdd_widget %} 
     
-    {# The default select box#}
-    {{ form_widget(form) }} 
+    {# The default select box. The explicit width is used to instruct the select2 plugin to use a fixed width. #}
+    {{ form_widget(form, {'attr':{'style':'width:220px;'} }) }} 
+    {{ form_errors(form) }} 
 
-    {# The href attribute of the button, which defines the target modal, is added via javascript. #}
-    <button class="selectOrAdd add btn" type="button" data-toggle="modal">{{ form.vars.label }} {{ 'selectOrAdd.addBtn.suffix'|trans }}</button>
-    <input type="hidden" class="selectOrAdd" name="modelClass" value="{{ form.vars.modelClass }}"/>
-    <input type="hidden" class="selectOrAdd" name="formRetrieveUrl" value="{{ path('plainForm', {'className': form.vars.modelClass, 'captionProperty': form.vars.captionProperty, 'domainKey': "ajax"}) }}"/>
+    {# The add button #}
+    <button class="selectOrAdd add btn" type="button" data-toggle="modal" 
+            href="#modal_for_{{ id }}"
+            onclick="selectOrAdd_launchAddDialog.call(this)">
+        {{ form.vars.label }} {{ 'selectOrAdd.addBtn.suffix'|trans }}
+    </button>
+    
+    {# Supplementary data for the javascript #}
+    <input name="modalRetrieveUrl" type="hidden" class="selectOrAdd" 
+           value="{{ path('ajaxModalForm', {'className': form.vars.modelClass, 
+                                            'captionProperty': form.vars.captionProperty, 
+                                            'domainKey': "ajax"}) }}"/>
     
 {% endblock selectOrAdd_widget %}

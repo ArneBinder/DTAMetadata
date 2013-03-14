@@ -3,59 +3,59 @@
  * Allows either selection of an existing database entity or creation of a new one in a nested form (modal).
  */
 
-jQuery(document).ready(function(){
-    $(".selectOrAdd.btn.add").on("click",launchAddDialog);
-});
-
-function launchAddDialog(){
+/**
+ * Called when the add button of a select box. Creates a modal containing a 
+ * form to create a new entity. The modal is created only once.
+ */
+function selectOrAdd_launchAddDialog(){
     
     var $addButton = $(this);
-
-    var modal; // the dialog
     
     // create modal only once
-    if( ! $addButton.hasClass("modalCreated")){
+    if( ! $addButton.hasClass('modalCreated')){
         
-        var selectWidget = $addButton.parent().find("select");
-        modal = createModal($addButton.parent());
-        modal.data("selectWidget", selectWidget);
+        var $modal = createAjaxFormModal($addButton);
         
-        $addButton.attr("href", "#"+modal.prop("id"));
-        $addButton.data("modal", modal);
-        $addButton.addClass("modalCreated");
+        var selectWidget = $addButton.parent().children('select');
+        $modal.data('selectWidget', selectWidget);
+        
+        // avoid multiple requests by flagging the button and linking the created modal
+        $addButton.addClass('modalCreated');
+        $addButton.data('modal', $modal);
+        
     } else {
-        modal = $addButton.data("modal");
+        $addButton.data('modal').modal();
     }
     
-    // the url to the form generating controller routine is rendered from the template engine into a hidden input
-    var formRetrieveUrl = $(this).parent().find('input[name=formRetrieveUrl]').val();
-    modal.load(formRetrieveUrl, '', function(){ 
-        
-        // ajax behavior for the nested submit button
-        var submitButton = $(modal).find("input[type=submit]");
-        submitButton.on("click", function(clickEvent){submitFormData.apply(modal,[clickEvent])}); // set "this" to the modal, not the submit button
-      console.log(modal);  
-        modal.modal(); 
-    });
 }
 
-function submitFormData(clickEvent){
+/**
+ * Posts the data of the new entity to the server.
+ * Calls the update routine to add this dynamically 
+ */
+function selectOrAdd_submitFormData(modal){
 
-    var $modal = $(this);
+    var $modal = $(modal);
     
-    var form = $(this).find("form");
+    var form = $modal.find("form[method]");
     var formData = form.serialize();
     var targetUrl = form.attr("action");
     
-    jQuery.post(targetUrl, formData, function(data){updateSelectWidget.apply($modal,[data])} );
+    jQuery.post(targetUrl, formData, function(data){
+        $modal.modal('hide');
+        selectOrAdd_updateSelectWidget($modal,data)
+    } );
+    $modal.modal('loading');
 
-    clickEvent.preventDefault();
-    return false;
+//    clickEvent.preventDefault();
+//    return false;
 }
 
-function updateSelectWidget(data){
+/**
+ * Adds the newly created option to the select widget
+ */
+function selectOrAdd_updateSelectWidget($modal, data){
     
-    var $modal = $(this);
     var $selectWidget = $modal.data("selectWidget");
     
     // deselect all options before selecting the new one
@@ -69,16 +69,39 @@ function updateSelectWidget(data){
     $modal.modal('hide');
 }
 
-// formElement is the dom element with which the modal interacts
-function createModal(formElement){
+/**
+ * loads the form wrapped in modal markup (header, body, footer).
+ * The responsible controller action is DTABaseController->generateAjaxForm.
+ */
+function createAjaxFormModal(addButton){
     
-    var formDataUnit = $(formElement).parent();
-    var modalId = "modal_for_"+formDataUnit.prop("id");
-    console.log(modalId);
-    var modal = $('<div id="'+modalId+'" class="modal hide fade" tabindex="-1"/>');
+    // the href attribute is preset to '#modal_for_<select box id>'
+    // @see dtaFormExtensions.html.twig under {% block selectOrAdd_widget %} 
+    var modalId = $(addButton).attr('href');
+    var rawId = modalId.substr(1); // id without #
     
-    $(formElement).append(modal);
+    // the url to the form generating controller routine is rendered from the template engine into a hidden input
+    // @see dtaFormExtensions.html.twig under {% block selectOrAdd_widget %}
+    var modalRetrieveUrl = $(addButton).siblings('input[name=modalRetrieveUrl]').val();
     
-    return $('#'+modalId);
+    // the actual modal content is delivered wrapped around the form by the controller 
+    // this is useful because it allows for translation (model names into german) 
+    // and generation of the submit href based on internal routes
+    // @see DTABaseController generateAjaxModalForm
+    var $modal = $('<div id="'+modalId+'" class="modal hide fade" tabindex="-1">');
+    
+    // put modal in the containing div, although the position probably doesn't matter
+    $(addButton).parent().append($modal);
+    
+    // create the backdrop and wait for next modal to be triggered
+    $('body').modalmanager('loading');
+
+    // fill the modal with modal skeleton markup (header, body, footer) and form inputs
+    $modal.load(modalRetrieveUrl, '', function(data){
+        $modal.modal();
+    });
+        
+    return $modal;
 }
 
+    
