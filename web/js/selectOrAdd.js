@@ -3,8 +3,13 @@
  * Allows either selection of an existing database entity or creation of a new one in a nested form (modal).
  */
 
-$(function(){
-  $('.selectOrAdd.select.searchable').select2();
+jQuery(function(){
+    var searchableConfiguration = {};
+    // enable all searchable select boxes with typeahead functionality
+    jQuery('.selectOrAdd.select.searchable').select2(searchableConfiguration);
+    jQuery('body').on('DOMNodeInserted', function(e){
+        $(e.target).find('.selectOrAdd.select.searchable').select2(searchableConfiguration)
+    });
 });
 
 /**
@@ -68,7 +73,10 @@ function selectOrAdd_updateSelectWidget($modal, data){
     // add and select new option
     var $newOption = $(data);
     $selectWidget.append($newOption);
-    $newOption.attr('selected', true);
+
+    // select new value
+    $newOption.attr('selected', true);      // without searchable support
+    $($selectWidget).select2("val", $newOption.attr('value'));
     
     $modal.modal('hide');
 }

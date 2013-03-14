@@ -26,8 +26,9 @@ class PersonPublicationType extends BaseAbstractType
         ));
         $builder->add('person', new SelectOrAddType(), array(
             'class' => 'DTA\MetadataBundle\Model\Person',
-            'property' => 'selectBoxString',
-            'label' => 'Person'
+            'property' => 'SelectBoxString', // use personEntity->getSelectBoxString to fill the select box
+            'label' => 'Person',
+            'searchable' => true,      
             
         ));
 //        $builder->add('publicationId');
