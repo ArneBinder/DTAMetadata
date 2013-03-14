@@ -27,9 +27,9 @@ class PublicationType extends BaseAbstractType
             'allow_add' => true,
             'allow_delete' => true,
             'by_reference' => false,
-            'label' => 'Personalia',
             'inlineLabel' => false,
             'sortable' => false,
+            'label' => 'Publikationsbezogene Personalia',
         ));
         
         $builder->add('work', new WorkType());

@@ -54,10 +54,12 @@ li.sortableDragPlaceholder{
     padding-left: 7px;
 } 
 
+*/
 .form-horizontal .control-label{
-    padding-right: 10px;
-    border-right: 1px solid gray;
-}*/
+    /* Without absolute positioning, control labels with more than one line for some reason 
+        increase the height of the neighboring controls div. This leads to an uneven spacing of the li elements. */
+    position: absolute;
+}
 
 .form-inline * {
     /*margin-right: 7px;*/

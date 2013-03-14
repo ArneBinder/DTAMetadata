@@ -38,7 +38,7 @@
         {% endif %}
         
         {% for child in form %}
-        <li style='position: relative'>
+        <li>
             {{ sortable ? form.vars.modelClass|trans }}
             {#{ form_errors(child) }}
             {{ form_widget(child) }#}

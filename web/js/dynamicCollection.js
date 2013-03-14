@@ -111,20 +111,26 @@ function addFormElement(){
 function createElementControls(element, translatedModelClassName){
              
     var $collectionHolder = $(element).parent().parent(); // element: li, parent: ol, parent: collection holder
+    var elementId = $(element).attr('class');
+    
+    console.log(element, elementId);
     
     if(undefined === translatedModelClassName)
         translatedModelClassName = $collectionHolder
             .children('input[name=translatedModelClassName]')
             .val();
     
-    var removeButtonStr = '<a onclick="$(this).parent().parent().remove();"><i class="icon-remove"></i>'+translatedModelClassName+' entfernen</a>';
+    var removeButtonLink = $('<a>weg</a>')
+        .on('click', function(){ $(element).remove() })
+        .html('<i class="icon-remove"></i>'+translatedModelClassName+' entfernen');
+        
 //    var iconUpStr = '<i class="icon-arrow-up"></i>';
 //    var iconDownStr = '<i class="icon-arrow-down"></i>';
 //    var upStr = ' nach oben';
 //    var downStr = ' nach unten';
 //    var up   = $('<a href="#" class="sortable-up">'+ iconUpStr + /*translatedModelClassName + upStr + */'</a> ');
 //    var down = $('<a href="#" class="sortable-down">'+ iconDownStr + /*translatedModelClassName + downStr + */'</a>');
-    $(element).children('div').append(removeButtonStr);
-//    $(element).append(down);
+
+    $(element).children('div').append(removeButtonLink);
 }
 
