@@ -26,7 +26,7 @@ class PersonWorkType extends BaseAbstractType
         ));
         $builder->add('person', new SelectOrAddType(), array(
             'class' => 'DTA\MetadataBundle\Model\Person',
-            'property' => 'SelectBoxString', // use personEntity->getSelectBoxString to fill the select box
+            'property' => 'SelectBoxString', // combines all namefragments in a single string @see Person.php
             'label' => 'Person',
             'searchable' => true,      
             

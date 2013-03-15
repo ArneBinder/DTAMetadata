@@ -20,6 +20,8 @@ class PublicationType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->add('work', new WorkType());
+        
         $builder->add('title', new TitleType());
 
         $builder->add('personPublications', new DynamicCollectionType(), array(
@@ -32,10 +34,9 @@ class PublicationType extends BaseAbstractType
             'label' => 'Publikationsbezogene Personalia',
         ));
         
-        $builder->add('work', new WorkType());
-        
         $builder->add('place', new SelectOrAddType(), array(
             'class' => 'DTA\MetadataBundle\Model\Place',
+//            'property' => 'Name',
             'property' => 'Name',
             'label' => 'Druckort',
             'searchable' => true,

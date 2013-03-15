@@ -100,7 +100,7 @@ function createAjaxFormModal(addButton){
     // this is useful because it allows for translation (model names into german) 
     // and generation of the submit href based on internal routes
     // @see DTABaseController generateAjaxModalForm
-    var $modal = $('<div class="modal hide fade" tabindex="-1">')
+    var $modal = $('<div class="modal container hide fade" tabindex="-1">')
          .attr('id', rawId);
     
     // put modal in the containing div, although the position probably doesn't matter

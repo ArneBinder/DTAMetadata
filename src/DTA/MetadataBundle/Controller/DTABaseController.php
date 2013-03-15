@@ -183,9 +183,9 @@ class DTABaseController extends Controller {
      * @param string captionProperty For ajax use: Which attribute does the select use to describe the entities it lists? Used to generate a new select option via ajax.
      * @return HTML Option Element|nothing If the new action is called by a nested ajax form (selectOrAdd form type) the result is the option element to add to the nearby select.
      * 
-     * @Route("/genericNew/{domainKey}/{className}/{captionProperty}", name="genericNew", defaults={"captionProperty"="Id"})
+     * @Route("/genericNew/{domainKey}/{className}/{captionProperty}", name="genericNew", defaults={"captionProperty"="getId"})
      */
-    public function genericNewAction(Request $request, $className, $domainKey, $captionProperty = "Id") {
+    public function genericNewAction(Request $request, $className, $domainKey, $captionProperty = "getId") {
 
         $classNames = $this->relatedClassNames($className);
 
@@ -204,7 +204,7 @@ class DTABaseController extends Controller {
             if ("ajax" == $domainKey) {
                 // fetch data for the newly selectable option
                 $id = $obj->getId();
-                $getter = 'get' . $captionProperty;
+                $getter = $captionProperty;
                 $caption = $obj->$getter();
 
                 // return the new select option html fragment
