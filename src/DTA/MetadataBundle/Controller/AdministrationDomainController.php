@@ -20,7 +20,7 @@ class AdministrationDomainController extends DTABaseController {
      */
     public function indexAction() {
 
-        return $this->renderControllerSpecificAction('DTAMetadataBundle:AdministrationDomain:AdministrationDomain.html.twig', array(
+        return $this->renderControllerSpecificAction('DTAMetadataBundle:AdministrationDomain:index.html.twig', array(
                     ));
     }
 

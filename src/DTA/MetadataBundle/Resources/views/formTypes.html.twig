@@ -122,33 +122,13 @@
 {% endblock form_label %}
 
 {% block checkbox_row %}
-    <label class="checkbox">
-        {{ form_widget(form) }}
-        {{ label }}
-    </label>
+    {% if attr.expanded|default(false) %}
+        {{ form_row(form) }}
+    {% else %}
+        <label class="checkbox">
+            {{ form_widget(form) }}
+            {{ label }}
+        </label>
+    {% endif %}
+
 {% endblock checkbox_row %}
-
-{# --------------------- Title form types --------------------- #}
-    
-{#% block title_row %}
-<fieldset>
-    {{ form_row(form) }}
-    {{ form_widget(form) }}
-    {{ form_rest(form) }}
-</fieldset>
-{% endblock %#}
-
-{#% block titlefragment_row %#}
-    
- {#   <div class="control-group form-inline">
-        <div class="controls">
-            {{ form_widget(form.titlefragmenttype)}}
-            {{ form_widget(form.name) }} 
-            <label class="checkbox">
-                {{ form_widget(form.NameIsReconstructed) }} 
-                {{ form.NameIsReconstructed.vars.label }} 
-            </label>
-            {{form_rest(form)}}
-        </div>
-    </div>#}
-{#% endblock %#}

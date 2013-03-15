@@ -293,13 +293,21 @@
     <table name="user" phpName="User">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="username" type="LONGVARCHAR" required="false"/>
-        <column name="password" type="VARCHAR(512)" required="false"/>
-        <column name="salt" type="VARCHAR(512)" required="false"/>
-        <column name="name_id" type="INTEGER" required="true"/>
+        <column name="password" type="VARCHAR" size="512" required="false"/>
+        <column name="salt" type="VARCHAR" size="512" required="false"/>
         <column name="mail" type="LONGVARCHAR" required="false"/>
         <column name="phone" type="LONGVARCHAR" required="false"/>
-    
+        <column name="admin" type="BOOLEAN" default="false" required="false"/>
         <index name="AI_id_user"> <index-column name="id"/> </index>
+        
+        <behavior name="table_row_view">
+            <parameter name="Id" value="id"/>
+            <parameter name="Benutzername" value="username"/>
+            <parameter name="Mail" value="mail"/>
+            <parameter name="Telefon" value="phone"/>
+            <parameter name="Administratorrechte" value="accessor:adminToString"/>
+        </behavior>
+        
     </table>
 
     <table name="publicationGroup" phpName="Publicationgroup">

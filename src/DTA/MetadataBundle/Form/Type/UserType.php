@@ -18,9 +18,11 @@ class UserType extends BaseAbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('username');
-        $builder->add('passwordhash');
-        $builder->add('nameId');
         $builder->add('mail');
         $builder->add('phone');
+        $builder->add('admin', 'checkbox', array(
+            'label' => 'Administratorenrechte',
+            'attr' => array('expanded'=>true)
+        ));
     }
 }
