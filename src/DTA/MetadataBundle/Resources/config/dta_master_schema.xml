@@ -24,12 +24,10 @@
         <!-- atomic attributes -->
         <column description="Bezeichnung der Auflage" name="printRun"  type="LONGVARCHAR" required="false"/>
         <column name="edition" type="LONGVARCHAR" required="false"/>
-        <column name="editionNumerical" type="LONGVARCHAR" required="false"/>    <!-- Numerische Bezeichnung der Ausgabe --> 
+        <column name="editionNumerical" type="INTEGER" required="false"/>    <!-- Numerische Bezeichnung der Ausgabe --> 
         <column name="numPages" type="INTEGER" required="false"/>
         <column name="numPagesNormed" type="INTEGER" required="false"/>
         <column name="bibliographicCitation" type="LONGVARCHAR" required="false"/>
-        <column name="editionDescription" type="LONGVARCHAR" required="false"/>
-        <column name="editionDescriptionNumeric" type="INTEGER" required="false"/>
         
         <!-- non atomic attributes -->       
         <column name="title_id" type="INTEGER" required="true"/>
@@ -53,100 +51,56 @@
             <parameter name="embedColumnsTitle" value="title"/>
         </behavior>
         
-        <foreign-key foreignTable="work" name="editionVon">
-            <reference local="work_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="relatedSet" name="fk_publication_relatedSet1">
-            <reference local="relatedSet_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="title" name="fk_publikation_titel12">
-            <reference local="title_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="publishingCompany" name="fk_publikation_verlag1">
-            <reference local="publishingCompany_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="place" name="fk_publikation_ort1">
-            <reference local="place_id" foreign="id"/>
-        </foreign-key>
+        <foreign-key foreignTable="work" name="editionVon"> <reference local="work_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="relatedSet" name="fk_publication_relatedSet1"> <reference local="relatedSet_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="title" name="fk_publikation_titel12"> <reference local="title_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="publishingCompany" name="fk_publikation_verlag1"> <reference local="publishingCompany_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="place" name="fk_publikation_ort1"> <reference local="place_id" foreign="id"/> </foreign-key>
         
-        <foreign-key foreignTable="dateSpecification" name="fk_published">
-            <reference local="publicationDate_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="dateSpecification" name="fk_firstPublishedIn">
-            <reference local="firstPublicationDate_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="status" name="fk_werk_status1">
-            <reference local="status_id" foreign="id"/>
-        </foreign-key>
+        <foreign-key foreignTable="dateSpecification" name="fk_published"> <reference local="publicationDate_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="dateSpecification" name="fk_firstPublishedIn"> <reference local="firstPublicationDate_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="status" name="fk_werk_status1"> <reference local="status_id" foreign="id"/> </foreign-key>
         
-        <index name="editionVon">
-            <index-column name="work_id"/>
-        </index>
-        <index name="idx_pub_relatedSet1">
-            <index-column name="relatedSet_id"/>
-        </index>
-        <index name="idx_publikation_verlag1">
-            <index-column name="publishingCompany_id"/>
-        </index>
-        <index name="idx_publikation_ort1">
-            <index-column name="place_id"/>
-        </index>
-        <index name="idx_publication_publicationDateId1">
-            <index-column name="publicationDate_id"/>
-        </index>
-        <index name="idx_werk_status1">
-            <index-column name="status_id"/>
-        </index>
+        <index name="editionVon"> <index-column name="work_id"/> </index>
+        <index name="idx_pub_relatedSet1"> <index-column name="relatedSet_id"/> </index>
+        <index name="idx_publikation_verlag1"> <index-column name="publishingCompany_id"/> </index>
+        <index name="idx_publikation_ort1"> <index-column name="place_id"/> </index>
+        <index name="idx_publication_publicationDateId1"> <index-column name="publicationDate_id"/> </index>
+        <index name="idx_werk_status1"> <index-column name="status_id"/> </index>
     </table>
 
     <table name="monograph">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="publication_id" type="INTEGER" primaryKey="true" required="true"/>
+        <column name="publication_id" type="INTEGER" required="true"/>
         
         <behavior name="table_row_view">
             <parameter name="embedColumnsPublication" value="publication" />
         </behavior>
         
-        <foreign-key foreignTable="publication" name="fk_monograph_publicationValid">
-            <reference local="publication_id" foreign="id"/>
-        </foreign-key>
-        <index name="idx_monograph_publicationId">
-            <index-column name="publication_id"/>
-        </index>
+        <foreign-key foreignTable="publication" name="fk_monograph_publicationValid"> <reference local="publication_id" foreign="id"/> </foreign-key>
+        <index name="idx_monograph_publicationId"> <index-column name="publication_id"/> </index>
     </table>
     
     <table name="essay">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="publication_id" type="INTEGER" primaryKey="true" required="true"/>
-        <foreign-key foreignTable="publication" name="fk_essay_publicationValid">
-            <reference local="publication_id" foreign="id"/>
-        </foreign-key>
-        <index name="idx_essay_publicationId">
-            <index-column name="publication_id"/>
-        </index>
+        <foreign-key foreignTable="publication" name="fk_essay_publicationValid"> <reference local="publication_id" foreign="id"/> </foreign-key>
+        <index name="idx_essay_publicationId"> <index-column name="publication_id"/> </index>
     </table>
 
     <table name="magazine">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="publication_id" type="INTEGER" primaryKey="true" required="true"/>
-        <foreign-key foreignTable="publication" name="fk_magazine_publicationValid">
-            <reference local="publication_id" foreign="id"/>
-        </foreign-key>
-        <index name="idx_magazine_publicationId">
-            <index-column name="publication_id"/>
-        </index>
+        <foreign-key foreignTable="publication" name="fk_magazine_publicationValid"> <reference local="publication_id" foreign="id"/> </foreign-key>
+        <index name="idx_magazine_publicationId"> <index-column name="publication_id"/> </index>
     </table>
 
     <table name="series">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="publication_id" type="INTEGER" primaryKey="true" required="true"/>
         <column name="volume" type="LONGVARCHAR" required="false"/>
-        <foreign-key foreignTable="publication" name="fk_series_publicationValid">
-            <reference local="publication_id" foreign="id"/>
-        </foreign-key>
-        <index name="idx_series_publicationId">
-            <index-column name="publication_id"/>
-        </index>
+        <foreign-key foreignTable="publication" name="fk_series_publicationValid"> <reference local="publication_id" foreign="id"/> </foreign-key>
+        <index name="idx_series_publicationId"> <index-column name="publication_id"/> </index>
     </table>
 
     <table name="publishingCompany">
@@ -163,12 +117,8 @@
         <column name="totalVolumes" type="INTEGER" required="false"/>
         <column name="monograph_id" type="INTEGER" required="true"/>
         <column name="monograph_publication_id" type="INTEGER" required="true"/>
-        <foreign-key foreignTable="monograph" name="fk_volume_monograph1">
-            <reference local="monograph_id" foreign="id"/>
-        </foreign-key>
-        <index name="idx_volume_monograph1">
-            <index-column name="monograph_id"/>
-        </index>
+        <foreign-key foreignTable="monograph" name="fk_volume_monograph1"> <reference local="monograph_id" foreign="id"/> </foreign-key>
+        <index name="idx_volume_monograph1"> <index-column name="monograph_id"/> </index>
     </table>
 
     <!-- The core class representing an authors work. This is independent of the actual written form of the work which is represented by the Publication class. -->
@@ -184,54 +134,28 @@
         <column name="format" type="LONGVARCHAR" required="false"/>
         <column name="directoryName" type="LONGVARCHAR" required="false"/>
         
-        <foreign-key foreignTable="genre" name="fk_werk_genre1">
-            <reference local="genre_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="genre" name="fk_werk_genre2">
-            <reference local="subgenre_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="dwdsGenre" name="fk_werk_dwdsGenre2">
-            <reference local="dwdsGenre_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="dwdsGenre" name="fk_werk_dwdsGenre3">
-            <reference local="dwdsSubgenre_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="dateSpecification" name="fk_work_when_written">
-            <reference local="dateSpecification_id" foreign="id"/>
-        </foreign-key>
+        <foreign-key foreignTable="genre" name="fk_werk_genre1"> <reference local="genre_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="genre" name="fk_werk_genre2"> <reference local="subgenre_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="dwdsGenre" name="fk_werk_dwdsGenre2"> <reference local="dwdsGenre_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="dwdsGenre" name="fk_werk_dwdsGenre3"> <reference local="dwdsSubgenre_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="dateSpecification" name="fk_work_when_written"> <reference local="dateSpecification_id" foreign="id"/> </foreign-key>
         
-        <index name="idx_werk_genre1">
-            <index-column name="genre_id"/>
-        </index>
-        <index name="idx_werk_genre2">
-            <index-column name="subgenre_id"/>
-        </index>
-        <index name="idx_werk_dwdsGenre2">
-            <index-column name="dwdsGenre_id"/>
-        </index>
-        <index name="idx_werk_dwdsGenre3">
-            <index-column name="dwdsSubgenre_id"/>
-        </index>
-        <index name="idx_work_dateSpecification1">
-            <index-column name="dateSpecification_id"/>
-        </index>
+        <index name="idx_werk_genre1"> <index-column name="genre_id"/> </index>
+        <index name="idx_werk_genre2"> <index-column name="subgenre_id"/> </index>
+        <index name="idx_werk_dwdsGenre2"> <index-column name="dwdsGenre_id"/> </index>
+        <index name="idx_werk_dwdsGenre3"> <index-column name="dwdsSubgenre_id"/> </index>
+        <index name="idx_work_dateSpecification1"> <index-column name="dateSpecification_id"/> </index>
     </table>
  
     <table name="publication_publicationGroup" isCrossRef="true">
         <column name="publicationGroup_id" type="INTEGER" primaryKey="true" required="true"/>
         <column name="publication_id" type="INTEGER" primaryKey="true" required="true"/>
-        <foreign-key foreignTable="publicationGroup" name="fk_publicationGroupValid">
-            <reference local="publicationGroup_id" foreign="id"/>
-        </foreign-key>
+        <foreign-key foreignTable="publicationGroup" name="fk_publicationGroupValid"> <reference local="publicationGroup_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="publication">
             <reference local="publication_id" foreign="id"/>
         </foreign-key>
-        <!--        <index name="idx_publicationValid">
-            <index-column name="publication_id"/>
-        </index>
-        <index name="idx_publicationGroupValid">
-            <index-column name="publicationGroup_id"/>
-        </index>-->
+        <!--        <index name="idx_publicationValid"> <index-column name="publication_id"/> </index>
+        <index name="idx_publicationGroupValid"> <index-column name="publicationGroup_id"/> </index>-->
     </table>
     
     <!-- conceptual entities   
@@ -249,24 +173,16 @@
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
         <column name="childOf" type="INTEGER" required="false"/>
-        <foreign-key foreignTable="dwdsGenre" name="fk_subgenre0">
-            <reference local="childOf" foreign="id"/>
-        </foreign-key>
-        <index name="idx_nachfolgender_arbeitsschritt">
-            <index-column name="childOf"/>
-        </index>
+        <foreign-key foreignTable="dwdsGenre" name="fk_subgenre0"> <reference local="childOf" foreign="id"/> </foreign-key>
+        <index name="idx_nachfolgender_arbeitsschritt"> <index-column name="childOf"/> </index>
     </table>
 
     <table name="genre" phpName="Genre">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
         <column name="childOf" type="INTEGER" required="false"/>
-        <foreign-key foreignTable="genre" name="fk_subgenre">
-            <reference local="childOf" foreign="id"/>
-        </foreign-key>
-        <index name="idx_nachfolgender_arbeitsschritt">
-            <index-column name="childOf"/>
-        </index>
+        <foreign-key foreignTable="genre" name="fk_subgenre"> <reference local="childOf" foreign="id"/> </foreign-key>
+        <index name="idx_nachfolgender_arbeitsschritt"> <index-column name="childOf"/> </index>
     </table>
   
     <!-- workflow
@@ -286,35 +202,51 @@
         <column name="fax" type="LONGVARCHAR" required="false"/>
         <column name="log_last_change" type="TIMESTAMP" required="true"/>
         <column name="log_last_user" type="INTEGER" required="false"/>
-        <index name="idx_book_locations_2">
-            <index-column name="id"/>
-        </index>
+        <index name="idx_book_locations_2"> <index-column name="id"/> </index>
     </table>
 
     <table name="relatedSet" phpName="Relatedset">
-        <column name="id" type="INTEGER" primaryKey="true" required="true"/>
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
     </table>
+    
+<!--    <table name="library">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" type="LONGVARCHAR" required="true"/>
+        <column name="gnd" type="LONGVARCHAR" required="false"/>
+    </table>-->
 
-    <table name="source" phpName="Source">
+    <table name="license">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" type="LONGVARCHAR" required="true"/>
+        <column name="url" type="LONGVARCHAR" required="false"/>
+    </table>
+
+    <!--Quellenangabe fuer Bilddigitalisate-->
+    <table name="imageSource">
+        
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="publication_id" type="INTEGER" required="true"/>
-        <column name="quality" type="LONGVARCHAR" required="false"/>
-        <column name="name" type="LONGVARCHAR" required="false"/>
-        <column name="comments" type="LONGVARCHAR" required="false"/>
-        <column name="available" type="BOOLEAN" size="1" required="false"/>
-        <column name="signature" type="LONGVARCHAR"  required="false"/>
-        <column name="library" description="Besitzende Bibliothek" type="LONGVARCHAR" required="false"/>
-        <column name="libraryGnd" type="LONGVARCHAR" required="false"/>
-        <foreign-key foreignTable="publication" name="fk_quelle_edition1">
-            <reference local="publication_id" foreign="id"/>
-        </foreign-key>
-        <index name="idx_Fundstellen_3">
-            <index-column name="id"/>
-        </index>
-        <index name="idx_quelle_edition1">
-            <index-column name="publication_id"/>
-        </index>
+       
+        <column name="catalogueSignature" type="LONGVARCHAR"  required="false"/>
+        <column name="catalogueUrl" description="Link in den Katalog" type="LONGVARCHAR"  required="false"/>
+        
+        <column name="numFaksimiles" type="INTEGER"  required="false"/>
+        <column name="numPages" description="Umfang lt. Katalog" type="INTEGER"  required="false"/>
+
+        <column name="imageUrl" description="URL der Bilddigitalisate" type="LONGVARCHAR" required="false"/>
+        <column name="imageUrn" description="URN der Bilddigitalisate" type="LONGVARCHAR" required="false"/>
+        <column name="license_id" description="Lizenz" type="INTEGER" required="false"/>
+        
+        <!--<column name="available" type="BOOLEAN" size="1" required="false"/>-->
+        <!--<column name="libraryGnd" type="LONGVARCHAR" required="false"/>-->
+        <!--<column name="quality" type="LONGVARCHAR" required="false"/>-->
+        
+        <foreign-key foreignTable="publication" name="fk_quelle_edition1"> <reference local="publication_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="license" name="fk_quelle_lizenz"> <reference local="license_id" foreign="id"/> </foreign-key>
+        <index name="idx_Fundstellen_3"> <index-column name="id"/> </index>
+        <index name="idx_quelle_edition1"> <index-column name="publication_id"/> </index>
+        <index name="idx_quelle_lizenz"> <index-column name="license_id"/> </index>
     </table>
 
     <table name="status" phpName="Status">
@@ -337,43 +269,19 @@
         <column name="publication_id" type="INTEGER" required="false"/>
         <column name="responsibleUser_id" type="INTEGER" required="false"/>
         
-        <foreign-key foreignTable="taskType" name="fk_aufgabe_arbeitsschritt1">
-            <reference local="taskType_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="publicationGroup" name="fk_aufgabe_buchGruppe1">
-            <reference local="publicationGroup_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="publication" name="fk_aufgabe_schriftstueck1">
-            <reference local="publication_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="user" name="fk_task_responsibleUser1">
-            <reference local="responsibleUser_id" foreign="id"/>
-        </foreign-key>
+        <foreign-key foreignTable="taskType" name="fk_aufgabe_arbeitsschritt1"> <reference local="taskType_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="publicationGroup" name="fk_aufgabe_buchGruppe1"> <reference local="publicationGroup_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="publication" name="fk_aufgabe_schriftstueck1"> <reference local="publication_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="user" name="fk_task_responsibleUser1"> <reference local="responsibleUser_id" foreign="id"/> </foreign-key>
         
-        <index name="id_task_2">
-            <index-column name="id"/>
-        </index>
-        <index name="endtime">
-            <index-column name="end"/>
-        </index>
-        <index name="starttime">
-            <index-column name="start"/>
-        </index>
-        <index name="active">
-            <index-column name="done"/>
-        </index>
-        <index name="idx_aufgabe_arbeitsschritt1">
-            <index-column name="taskType_id"/>
-        </index>
-        <index name="idx_aufgabe_buchGruppe1">
-            <index-column name="publicationGroup_id"/>
-        </index>
-        <index name="idx_aufgabe_schriftstueck1">
-            <index-column name="publication_id"/>
-        </index>
-        <index name="idx_task_name1">
-            <index-column name="responsibleUser_id"/>
-        </index>
+        <index name="id_task_2"> <index-column name="id"/> </index>
+        <index name="endtime"> <index-column name="end"/> </index>
+        <index name="starttime"> <index-column name="start"/> </index>
+        <index name="active"> <index-column name="done"/> </index>
+        <index name="idx_aufgabe_arbeitsschritt1"> <index-column name="taskType_id"/> </index>
+        <index name="idx_aufgabe_buchGruppe1"> <index-column name="publicationGroup_id"/> </index>
+        <index name="idx_aufgabe_schriftstueck1"> <index-column name="publication_id"/> </index>
+        <index name="idx_task_name1"> <index-column name="responsibleUser_id"/> </index>
     </table>
 
     <table name="taskType" phpName="Tasktype">
@@ -390,17 +298,13 @@
         <column name="mail" type="LONGVARCHAR" required="false"/>
         <column name="phone" type="LONGVARCHAR" required="false"/>
     
-        <index name="AI_id_user">
-            <index-column name="id"/>
-        </index>
+        <index name="AI_id_user"> <index-column name="id"/> </index>
     </table>
 
     <table name="publicationGroup" phpName="Publicationgroup">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
-        <index name="AI_id_group">
-            <index-column name="id"/>
-        </index>
+        <index name="AI_id_group"> <index-column name="id"/> </index>
     </table>
   
     <!-- data / descriptive
@@ -431,12 +335,8 @@
             <parameter name="zugeordnet (Personen-ID)" value="person_id"/>
             <parameter name="Reihenfolge" value="accessor:getSortableRank"/>
         </behavior>
-        <foreign-key foreignTable="person" name="fk_personalName_person1">
-            <reference local="person_id" foreign="id"/>
-        </foreign-key>
-        <index name="idx_personalName_person1">
-            <index-column name="person_id"/>
-        </index>
+        <foreign-key foreignTable="person" name="fk_personalName_person1"> <reference local="person_id" foreign="id"/> </foreign-key>
+        <index name="idx_personalName_person1"> <index-column name="person_id"/> </index>
     </table>
     
     <!-- Namensfragmente sind Bestandteile eines Namens, z.B. Vor- oder Nachname. -->
@@ -456,18 +356,10 @@
             <parameter name="embedColumnsArt" value="nameFragmentType"/>
         </behavior>
         
-        <foreign-key foreignTable="nameFragmentType" name="fk_name_namensart1">
-            <reference local="nameFragmentTypeId" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="personalName" name="fk_nameFragment_personalName1">
-            <reference local="personalName_id" foreign="id"/>
-        </foreign-key>
-        <index name="idx_name_namensart1">
-            <index-column name="nameFragmentTypeId"/>
-        </index>
-        <index name="idx_nameFragment_personalName1">
-            <index-column name="personalName_id"/>
-        </index>
+        <foreign-key foreignTable="nameFragmentType" name="fk_name_namensart1"> <reference local="nameFragmentTypeId" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="personalName" name="fk_nameFragment_personalName1"> <reference local="personalName_id" foreign="id"/> </foreign-key>
+        <index name="idx_name_namensart1"> <index-column name="nameFragmentTypeId"/> </index>
+        <index name="idx_nameFragment_personalName1"> <index-column name="personalName_id"/> </index>
     </table>
     
     <!-- Verfuegbare Arten von Namensfragmenten. Vorname, Zuname, Kuenstlername, etc. -->
@@ -496,18 +388,10 @@
         <column name="name" type="LONGVARCHAR" required="true"/>
         <column name="title_id" type="INTEGER" required="true"/>
         <column name="titleFragmentType_id" type="INTEGER" required="true"/>
-        <foreign-key foreignTable="title" name="fk_titleFragment_title">
-            <reference local="title_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="titleFragmentType" name="fk_name_titelFragmentArt1">
-            <reference local="titleFragmentType_id" foreign="id"/>
-        </foreign-key>
-        <index name="idx_title_titleid2">
-            <index-column name="title_id"/>
-        </index>
-        <index name="idx_titleFragmentType_type2">
-            <index-column name="titleFragmentType_id"/>
-        </index>
+        <foreign-key foreignTable="title" name="fk_titleFragment_title"> <reference local="title_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="titleFragmentType" name="fk_name_titelFragmentArt1"> <reference local="titleFragmentType_id" foreign="id"/> </foreign-key>
+        <index name="idx_title_titleid2"> <index-column name="title_id"/> </index>
+        <index name="idx_titleFragmentType_type2"> <index-column name="titleFragmentType_id"/> </index>
         
         <behavior name="sortable">
             <parameter name="use_scope" value="true"/>
@@ -555,24 +439,12 @@
         <column name="person_id" phpName="PersonId" type="INTEGER" required="true"/>
         <column name="publication_id" phpName="PublicationId" type="INTEGER" required="true"/>
         
-        <foreign-key foreignTable="publicationRole" name="fk_person_publication_publicationRole1">
-            <reference local="publicationRole_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="person" name="fk_person_publication_person1">
-            <reference local="person_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="publication" name="fk_person_publication_publication1">
-            <reference local="publication_id" foreign="id"/>
-        </foreign-key>
-        <index name="fk_person_publication_publicationRole1_idx">
-            <index-column name="publicationRole_id"/>
-        </index>
-        <index name="fk_person_publication_person1_idx">
-            <index-column name="person_id"/>
-        </index>
-        <index name="fk_person_publication_publication1_idx">
-            <index-column name="publication_id"/>
-        </index>
+        <foreign-key foreignTable="publicationRole" name="fk_person_publication_publicationRole1"> <reference local="publicationRole_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="person" name="fk_person_publication_person1"> <reference local="person_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="publication" name="fk_person_publication_publication1"> <reference local="publication_id" foreign="id"/> </foreign-key>
+        <index name="fk_person_publication_publicationRole1_idx"> <index-column name="publicationRole_id"/> </index>
+        <index name="fk_person_publication_person1_idx"> <index-column name="person_id"/> </index>
+        <index name="fk_person_publication_publication1_idx"> <index-column name="publication_id"/> </index>
     </table>
     
     <table name="workRole" phpName="Workrole" idMethod="native">
@@ -585,24 +457,12 @@
         <column name="person_id" phpName="PersonId" type="INTEGER" required="true"/>
         <column name="workRole_id" phpName="WorkroleId" type="INTEGER" required="true"/>
         <column name="work_id" phpName="WorkId" type="INTEGER" required="true"/>
-        <foreign-key foreignTable="person" name="fk_person_publication_person10">
-            <reference local="person_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="workRole" name="fk_person_work_workRole1">
-            <reference local="workRole_id" foreign="id"/>
-        </foreign-key>
-        <foreign-key foreignTable="work" name="fk_person_publication_copy1_work1">
-            <reference local="work_id" foreign="id"/>
-        </foreign-key>
-        <index name="fk_person_publication_person1_idx">
-            <index-column name="person_id"/>
-        </index>
-        <index name="fk_person_publication_copy1_workRole1_idx">
-            <index-column name="workRole_id"/>
-        </index>
-        <index name="fk_person_publication_copy1_work1_idx">
-            <index-column name="work_id"/>
-        </index>
+        <foreign-key foreignTable="person" name="fk_person_publication_person10"> <reference local="person_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="workRole" name="fk_person_work_workRole1"> <reference local="workRole_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="work" name="fk_person_publication_copy1_work1"> <reference local="work_id" foreign="id"/> </foreign-key>
+        <index name="fk_person_publication_person1_idx"> <index-column name="person_id"/> </index>
+        <index name="fk_person_publication_copy1_workRole1_idx"> <index-column name="workRole_id"/> </index>
+        <index name="fk_person_publication_copy1_work1_idx"> <index-column name="work_id"/> </index>
     </table>
 
 </database>

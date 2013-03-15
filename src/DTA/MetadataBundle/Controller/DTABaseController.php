@@ -204,7 +204,7 @@ class DTABaseController extends Controller {
             if ("ajax" == $domainKey) {
                 // fetch data for the newly selectable option
                 $id = $obj->getId();
-                $getter = $captionProperty;
+                $getter = 'get' . $captionProperty;
                 $caption = $obj->$getter();
 
                 // return the new select option html fragment

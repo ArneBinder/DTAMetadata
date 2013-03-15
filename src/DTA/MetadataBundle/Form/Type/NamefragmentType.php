@@ -16,7 +16,7 @@ class NamefragmentType extends BaseAbstractType {
      *  {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options) {
-        $builder->add('namefragmenttype', new \DTA\MetadataBundle\Form\DerivedType\SelectOrAddType(), array(
+        $builder->add('namefragmenttype', 'model', array(
             'property' => 'Name',
             'class' => 'DTA\MetadataBundle\Model\Namefragmenttype',
         ));

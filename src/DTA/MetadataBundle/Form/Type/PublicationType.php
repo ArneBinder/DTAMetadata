@@ -58,6 +58,20 @@ class PublicationType extends BaseAbstractType
 //            'query' => \DTA\MetadataBundle\Model\StatusQuery::create()->orderByName()
         ));
         
+        $builder->add('edition', 'text', array(
+            'required' => false
+        ));
+        $builder->add('editionNumerical', null, array(
+            'label' => 'Edition (numerisch)',
+        ));
+        
+        $builder->add('publishingCompany', new SelectOrAddType(), array(
+            'class' => 'DTA\MetadataBundle\Model\PublishingCompany',
+            'property' => 'Name',
+            'label' => 'Verlag'
+        ));
+            
+        
 //        $builder->add('publishingcompanyId', new \DTA\MetadataBundle\Form\DerivedType\SelectOrAddType(), array(
 //            'class' => '\DTA\MetadataBundle\Model\Publishingcompany',
 //            'label' => 'Verlag'
