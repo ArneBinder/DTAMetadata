@@ -7,6 +7,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Response;
 
+use \Symfony\Component\Security\Core\SecurityContext;
+
 /**
  * Base class for all domain controllers. Contains generic actions (list all records, new record) 
  * that are derived from the database schema.
@@ -25,6 +27,34 @@ class DTABaseController extends Controller {
      * The inheritance should be detectable by the delegate behavior in the schema.xml
      */
     public static $domainMenu = array();
+
+    /**
+     * Displays the login form for the entire application.
+     * @Route("/Anmeldung", name="login")
+     */
+    public function loginFormAction() {
+
+        $request = $this->getRequest();
+        $session = $request->getSession();
+
+        // get the login error if there is one
+        if ($request->attributes->has(SecurityContext::AUTHENTICATION_ERROR)) {
+            $error = $request->attributes->get(
+                    SecurityContext::AUTHENTICATION_ERROR
+            );
+        } else {
+            $error = $session->get(SecurityContext::AUTHENTICATION_ERROR);
+            $session->remove(SecurityContext::AUTHENTICATION_ERROR);
+        }
+
+        return $this->render(
+                        'DTAMetadataBundle::login.html.twig', array(
+                    // last username entered by the user
+                    'last_username' => $session->get(SecurityContext::LAST_USERNAME),
+                    'error' => $error,
+                        )
+        );
+    }
 
     /**
      * Returns the fully qualified class names to autoload and generate objects and work with them using their class names.
@@ -73,13 +103,13 @@ class DTABaseController extends Controller {
     private function saveRecursively(\Symfony\Component\Form\Form $form) {
 
         $entity = $form->getData();
-        if(is_object($entity)){
+        if (is_object($entity)) {
             $rc = new \ReflectionClass($entity);
-            if($rc->hasMethod('save'))
+            if ($rc->hasMethod('save'))
                 $entity->save();
         }
 
-        foreach ($form->getChildren() as $child){
+        foreach ($form->getChildren() as $child) {
             $this->saveRecursively($child);
         }
     }
@@ -95,13 +125,13 @@ class DTABaseController extends Controller {
 
         // create object and its form
         $form = $this->dynamicForm($className, $recordId);
-        
+
         // save data on POST
         if ($request->isMethod("POST")) {
             // put form data on a virtual form
             $form->bindRequest($request);
             if ($form->isValid()) {
-                
+
                 // parse propel object from virtual form
                 $this->saveRecursively($form);
 
@@ -164,7 +194,7 @@ class DTABaseController extends Controller {
     public function generateAjaxModalFormAction($className, $recordId = 0, $captionProperty = "Id") {
 
 //        sleep(2);
-        
+
         $form = $this->dynamicForm($className, $recordId);
 
         // plain ajax response, without any menus or other html
@@ -199,7 +229,7 @@ class DTABaseController extends Controller {
             if ($form->isValid()) {
                 $obj->save();
             }
-            
+
             // AJAX case (nested form submit, no redirect)
             if ("ajax" == $domainKey) {
                 // fetch data for the newly selectable option
@@ -214,11 +244,11 @@ class DTABaseController extends Controller {
                 $this->get('session')->getFlashBag()->add('success', 'Änderungen vorgenommen.');
 
                 return $this->redirect($this->generateUrl('genericView', array(
-                                        'domainKey' => $domainKey,
-                                        'className' => $className,
-                                        // highlight the changed or added entity in the list of all entities
-                                        'updatedObjectId' => $form->getData()->getId(),
-                                    )));
+                                    'domainKey' => $domainKey,
+                                    'className' => $className,
+                                    // highlight the changed or added entity in the list of all entities
+                                    'updatedObjectId' => $form->getData()->getId(),
+                                )));
             }
         }
 

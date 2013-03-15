@@ -71,6 +71,9 @@ class PublicationType extends BaseAbstractType
             'label' => 'Verlag'
         ));
             
+        $builder->add('imageSource', new ImagesourceType(), array(
+            'label' => 'Bildquelle'
+        ));
         
 //        $builder->add('publishingcompanyId', new \DTA\MetadataBundle\Form\DerivedType\SelectOrAddType(), array(
 //            'class' => '\DTA\MetadataBundle\Model\Publishingcompany',

@@ -24,12 +24,14 @@ class DataDomainController extends DTABaseController {
                 array('modelClass' => 'Magazine'),
                 array('caption' => "Reihen", 'modelClass' => 'Series'),
                 array('caption' => "Essays", 'modelClass' => 'Essay'))),
-        array("caption" => "Personen", "children" => array(
-                array('caption' => "Alle Personen", 'route' => 'home'),
-                array('modelClass' => 'Author'),
-                array('caption' => "Verleger", 'modelClass' => 'Publisher'),
-                array('modelClass' => 'Translator'),
-                array('caption' => "Drucker", 'modelClass' => 'Printer'))),
+        array("caption" => "Personen", 'modelClass' => "Person"),
+// needs to be added via extra business logic since these classes don't exist anymore (instead, there's a role specification)
+//            "children" => array(
+//                array('caption' => "Alle Personen", 'route' => 'home'),
+//                array('modelClass' => 'Author'),
+//                array('caption' => "Verleger", 'modelClass' => 'Publisher'),
+//                array('modelClass' => 'Translator'),
+//                array('caption' => "Drucker", 'modelClass' => 'Printer'))),
         array("caption" => "Verlage", 'modelClass' => 'PublishingCompany'),
     );
     

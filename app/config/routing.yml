@@ -6,6 +6,17 @@ dta_metadata:
 dta_controller:
     resource: "@DTAMetadataBundle/Controller/"
     type:     annotation
+    
+login:
+    pattern:   /Anmeldung
+    defaults:  { _controller: DTAMetadataBundle:DTABase:loginForm }
+
+# Although this
+login_check:
+    pattern:   /login_check
+    
+logout:
+    pattern:   /logout
 
 # Internal routing configuration to handle ESI
 #_internal:

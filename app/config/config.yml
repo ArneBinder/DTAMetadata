@@ -70,6 +70,7 @@ propel:
         default_connection: DTAMetadata
         connections:
             DTAMetadata:
+              # the database parameters are stored in parameters.yml
               driver:     "%database_driver%"
               user:       "%database_user%"
               password:   "%database_password%"
