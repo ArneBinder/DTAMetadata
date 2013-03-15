@@ -1,22 +1,23 @@
 jms_security_extra:
     secure_all_services: false
     expressions: true
+#    util:
+#        secure_random: ~
 
 security:
     encoders:
+#        in_memory: plaintext
         Symfony\Component\Security\Core\User\User: plaintext
-        DTA\MetadataBundle\Model\User: plaintext
+        DTA\MetadataBundle\Model\User: 
+            # if changed, also change in User.php in method save()
+            algorithm: sha512
+            iterations: 5000
+            encode_as_base64: true
 
     role_hierarchy:
         ROLE_ADMIN:       ROLE_USER
         ROLE_SUPER_ADMIN: [ROLE_USER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
         
-    providers:
-        in_memory:
-            memory:
-                users:
-                    user:  { password: userpass, roles: [ 'ROLE_USER' ] }
-                    admin: { password: adminpass, roles: [ 'ROLE_ADMIN' ] }
                     
     firewalls:
         dev:
@@ -47,15 +48,15 @@ security:
                 
 
     providers:
-        main:
-            propel:
-                class: DTA\MetadataBundle\Model\User
-                property: username
 #        in_memory:
 #            memory:
 #                users:
 #                    user:  { password: userpass, roles: [ 'ROLE_USER' ] }
 #                    admin: { password: adminpass, roles: [ 'ROLE_ADMIN' ] }
+        main:
+            propel:
+                class: DTA\MetadataBundle\Model\User
+                property: username
                     
     access_control:
         - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }

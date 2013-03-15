@@ -98,6 +98,10 @@
 				<source>Place</source>
                 <target>Ort</target>
             </trans-unit>
+            <trans-unit id="25">
+				<source>Imagesource</source>
+                <target>Bildquelle</target>
+            </trans-unit>
             
 
         </body>

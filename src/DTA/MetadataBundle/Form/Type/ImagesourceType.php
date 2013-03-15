@@ -17,7 +17,6 @@ class ImagesourceType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('publicationId');
         $builder->add('cataloguesignature');
         $builder->add('catalogueurl');
         $builder->add('numfaksimiles');

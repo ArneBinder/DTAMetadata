@@ -40,9 +40,10 @@
         <column name="relatedSet_id" type="INTEGER" required="false"/>
         <column name="status_id" type="INTEGER" required="true"/>
         
-        <!-- Relations to other persons -->       
         <column name="work_id" type="INTEGER" required="true"/>
        
+        <!--Image sources are added on the imageSource table side, because publication:imageSource is 1:n-->
+
         <behavior name="table_row_view">
             <!--<parameter name="Id" value="id"/>-->
             <!--<parameter name="Geschrieben" value="accessor:getDateSpecificationRelatedByOrigindateId"/>-->
@@ -56,7 +57,7 @@
         <foreign-key foreignTable="title" name="fk_publikation_titel12"> <reference local="title_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="publishingCompany" name="fk_publikation_verlag1"> <reference local="publishingCompany_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="place" name="fk_publikation_ort1"> <reference local="place_id" foreign="id"/> </foreign-key>
-        
+
         <foreign-key foreignTable="dateSpecification" name="fk_published"> <reference local="publicationDate_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="dateSpecification" name="fk_firstPublishedIn"> <reference local="firstPublicationDate_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="status" name="fk_werk_status1"> <reference local="status_id" foreign="id"/> </foreign-key>

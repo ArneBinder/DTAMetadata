@@ -71,8 +71,14 @@ class PublicationType extends BaseAbstractType
             'label' => 'Verlag'
         ));
             
-        $builder->add('imageSource', new ImagesourceType(), array(
-            'label' => 'Bildquelle'
+        $builder->add('imageSources', new DynamicCollectionType(), array(
+            'type' => new ImagesourceType(),
+            'allow_add' => true,
+            'allow_delete' => true,
+            'by_reference' => false,
+            'inlineLabel' => true,
+            'sortable' => false,
+            'label' => 'Bildquellen'
         ));
         
 //        $builder->add('publishingcompanyId', new \DTA\MetadataBundle\Form\DerivedType\SelectOrAddType(), array(

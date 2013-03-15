@@ -110,3 +110,20 @@ swiftmailer:
 #    orm:
 #        auto_generate_proxy_classes: %kernel.debug%
 #        auto_mapping: true
+#
+#monolog:
+#    handlers:
+#        applog:
+#            type: stream
+#            path: /var/log/symfony.log
+#            level: error
+#        main:
+#            type: fingers_crossed
+#            action_level: warning
+#            handler: file
+#        file:
+#            type: stream
+#            level: debug
+#        syslog:
+#            type: syslog
+#            level: error
