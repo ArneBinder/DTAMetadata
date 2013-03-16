@@ -68,23 +68,10 @@
 {% else %} {# item has no children #}
     {# If the menu element is a model class, add view and create options #}
     {% if item.modelClass is defined %}
-        <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 
-                {{ item.caption }} 
-                <b class="caret"></b> 
-            </a>
-            <ul class="dropdown-menu">
-                <li>
-                    <a href="{{ path('genericView', {'domainKey':domainKey, 'className':item.modelClass}) }}"> 
-                        <i class="icon-list"></i> Anzeigen und bearbeiten
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ path('genericNew', {'domainKey':domainKey, 'className':item.modelClass}) }}"> {#, 'recordId':0, 'domainKey': domainKey#}
-                        <i class="icon-plus"></i> Neu anlegen
-                    </a>
-                </li>
-             </ul>
+        <li>
+               <a href="{{ path('genericView', {'domainKey':domainKey, 'className':item.modelClass}) }}"> 
+                      {{ item.caption }} 
+                </a>
         </li>
     {# The menu element is a simple link #}
     {% else %}

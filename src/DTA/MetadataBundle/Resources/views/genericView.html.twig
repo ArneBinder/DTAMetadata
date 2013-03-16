@@ -6,9 +6,13 @@
 
 {% block core %}
 
+{# dta-data-listing: The sidebar is overflown if the table is too wide, so add scrollbars. #}
 <div class="span12 dta-data-listing">
 
     <h3>{{ className|trans }}</h3>
+    
+    
+    
     <table class="table table-striped table-hover"> {# further bootstrap table classes: table-hover #}
         <thead>
             <th>{{ "listView.addColumn.caption"|trans }}</th>
@@ -18,6 +22,12 @@
         {% endfor %}
         </thead>
         <tbody>
+            <tr> <td colspan="20">
+                    <a class="btn btn-mini listView-add-button" href="{{ path('genericNew', {'domainKey':domainKey, 'className':className}) }}">
+                        <i class="icon-pencil"></i>
+                        {{ className|trans~"listView.add.row.buttonSuffix"|trans }}
+                    </a>
+            </td></tr>
         {% for datum in data %}
             {% set recordId = attribute(datum,"getId") %}
             <tr {% if recordId ==updatedObjectId %}class="success"{% endif %}>
@@ -35,13 +45,14 @@
             {% endfor %}
             </tr>
         {% endfor %}
-        </tbody>
-    </table>
+            <tr> <td colspan="20">
                     <a class="btn btn-mini listView-add-button" href="{{ path('genericNew', {'domainKey':domainKey, 'className':className}) }}">
                         <i class="icon-pencil"></i>
                         {{ className|trans~"listView.add.row.buttonSuffix"|trans }}
                     </a>
-    {#{dump(peer.getTableMap().getRelations())}#}
+            </td></tr>
+        </tbody>
+    </table>
     
 </div><!--/span-->
 
