@@ -21,6 +21,19 @@ class HomeController extends DTABaseController {
         array("caption" => "Zuletzt Bearbeitet", 'route' => 'home'),
         array("caption" => "Zuletzt Angesehen", 'route' => 'home'),
     );
+    
+    private function retrieveSubtree($root){
+        
+        $children = $root->getChildren();
+        $result = array();
+        
+        if(count($children) > 0){
+            foreach ($children as $child) {
+                $result[$child->getName()] = $this->retrieveSubtree($child);
+            }
+        }
+        return $result;
+    }
 
     /**
      * @return void
@@ -30,8 +43,16 @@ class HomeController extends DTABaseController {
 //        $p = new Model\Publication();
 //        $p->setNumpages(101);
 //        $p->save();
+        
+        $ttq = Model\TasktypeQuery::create();
+        $root = $ttq->findRoot();
+        
+        $tree = $this->retrieveSubtree($root);
+        
+//        $ttq->findOneById(9)->delete();
+        
         return $this->renderControllerSpecificAction('DTAMetadataBundle:Home:Home.html.twig', array(
-//            'testData' => $oldPassword,            
+            'testData' => $tree, 
         ));
     }
 

@@ -3,5 +3,5 @@
 {% block title %}DTA Metadatenbank{% endblock %}
 
 {% block core %}
-    {{ testData|default('') }}
+    {{ dump(testData|default('')) }}
 {% endblock %}

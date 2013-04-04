@@ -21,7 +21,10 @@ class TaskType extends BaseAbstractType
             'class' => '\DTA\MetadataBundle\Model\Tasktype',
             'property' => 'name',
         ));
-        $builder->add('done');
+        $builder->add('done', null, array(
+            'label' => 'erledigt',
+            'attr' => array('expanded'=>true),
+        ));
         $builder->add('start', null, array('years'=>array('2013'),'widget' => 'choice'));
         $builder->add('end');
         $builder->add('comments');

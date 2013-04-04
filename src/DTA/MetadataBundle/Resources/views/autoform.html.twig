@@ -23,7 +23,11 @@
         {# inlineLabel removes the additional column for the label. #}
         {{ form_row(form, {'inlineLabel':true, 'hideLabel':true}) }}
         {{ form_rest(form) }}
-         <input type="submit"/>
+        <div class="control-group">
+            <div class="controls">
+                <input type="submit" value="Senden"/>
+            </div>
+        </div>
     </form>
     
     <hr/>
