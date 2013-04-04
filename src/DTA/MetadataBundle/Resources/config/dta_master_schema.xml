@@ -47,7 +47,7 @@
         <behavior name="table_row_view">
             <!--<parameter name="Id" value="id"/>-->
             <!--<parameter name="Geschrieben" value="accessor:getDateSpecificationRelatedByOrigindateId"/>-->
-            <parameter name="Veröffentlicht" value="publicationDate_id"/>
+            <parameter name="Veröffentlicht" value="accessor:getDatespecificationRelatedByPublicationdateId"/>
             <parameter name="embedColumnsStatus" value="status"/>
             <parameter name="embedColumnsTitle" value="title"/>
         </behavior>

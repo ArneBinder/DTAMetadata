@@ -116,6 +116,7 @@ class DTABaseController extends Controller {
 
     /**
      * Used for creating an edit form for a specific database entity.
+     * Handles POST requests that have been set off due to editing a specific database entity.
      * @param type $domainKey
      * @param type $className
      * @param type $recordId

@@ -102,8 +102,10 @@
 				<source>Imagesource</source>
                 <target>Bildquelle</target>
             </trans-unit>
-            
-
+            <trans-unit id="26">
+				<source>Corpus</source>
+                <target>Korpus</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

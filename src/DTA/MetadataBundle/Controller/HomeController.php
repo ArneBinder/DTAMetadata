@@ -31,7 +31,7 @@ class HomeController extends DTABaseController {
 //        $p->setNumpages(101);
 //        $p->save();
         return $this->renderControllerSpecificAction('DTAMetadataBundle:Home:Home.html.twig', array(
-//            'testData' => $k->getNumpages(),            
+//            'testData' => $oldPassword,            
         ));
     }
 

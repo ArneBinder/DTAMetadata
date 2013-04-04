@@ -21,7 +21,7 @@ class WorkflowDomainController extends DTABaseController {
         array("caption" => "Nachweise", 'modelClass' => 'Source'),
         array("caption" => "Arbeitsschritte", 'modelClass' => 'Tasktype'),
         array("caption" => "Partner", 'modelClass' => 'Partner'),
-        array("caption" => "Statistiken", 'route' => 'reporting'),
+        array("caption" => "Reporting", 'route' => 'reporting'),
     );
 
     /**
@@ -31,7 +31,7 @@ class WorkflowDomainController extends DTABaseController {
      */
     public function indexAction() {
 
-        return $this->renderControllerSpecificAction('DTAMetadataBundle:WorkflowDomain:WorkflowDomain.html.twig', array(
+        return $this->renderControllerSpecificAction('DTAMetadataBundle:WorkflowDomain:index.html.twig', array(
                 ));
     }
 

@@ -26,7 +26,7 @@ class ConceptualDomainController extends DTABaseController {
      */
     public function indexAction() {
 
-        return $this->renderControllerSpecificAction('DTAMetadataBundle:ConceptualDomain:ConceptualDomain.html.twig', array(
+        return $this->renderControllerSpecificAction('DTAMetadataBundle:ConceptualDomain:index.html.twig', array(
         ));
     }
 
