@@ -106,6 +106,10 @@
 				<source>Corpus</source>
                 <target>Korpus</target>
             </trans-unit>
+            <trans-unit id="27">
+				<source>Tasktype</source>
+                <target>Arbeitsschritt</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

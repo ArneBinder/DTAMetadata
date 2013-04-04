@@ -57,7 +57,7 @@ propel:
       propel.behavior.table_row_view.class: src.DTA.MetadataBundle.Model.table_row_view.TableRowViewBehavior
 
       # TODO: for testing, non-enforcement of the foreign key constraints is more practical (set to MyISAM)
-      # propel.mysql.tableType: InnoDB
+      propel.mysql.tableType: InnoDB
       
       # multiple schemas with the same database name
       #propel.packageObjectModel: true

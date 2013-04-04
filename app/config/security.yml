@@ -28,6 +28,11 @@ security:
             pattern: ^/Anmeldung
             security: false
 
+#        only sensible after database deletion (because the login system will stay active)
+#        generateTestData:
+#            pattern: ^/daten/generateTestData
+#            security: false
+
         secured_area:
             security: true
             # default configuration for anonymous users

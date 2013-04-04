@@ -46,16 +46,8 @@ class DataDomainController extends DTABaseController {
      * @Route("/", name="dataDomain")
      */
     public function indexAction() {
-        $p = Model\PersonQuery::create()->findOneById(2);
-        $pname = Model\PersonalnameQuery::create()->filterByPersonId(2)->orderBySortableRank()->findOne();
-        $pname = $p->getPersonalnames();
-        $dsp = new Model\Datespecification();
-        $dsp->setYear(3000);
-        $pub = Model\PublicationQuery::create()->findOneById(1);
-        $pub->setDatespecificationRelatedByFirstpublicationdateId($dsp);
-        
         return $this->renderControllerSpecificAction('DTAMetadataBundle:DataDomain:index.html.twig', array(
-            "person" => "array_shift()" //$persont->getRelations() //count($p->getPersonalnames()->getArrayCopy())//[0]->__toString(),
+//            "person" => "array_shift()" //$persont->getRelations() //count($p->getPersonalnames()->getArrayCopy())//[0]->__toString(),
             // get_declared_classes()
         ));
     }
@@ -103,25 +95,15 @@ class DataDomainController extends DTABaseController {
         
 
         // users
+        $usernames = array("Frank", "Susanne", "Matthias", "Christian", "Carl", "Alexander");
         
-        $user = new Model\User();
-        $user->setUsername("Frank");
-        $user->save();
-        $user = new Model\User();
-        $user->setUsername("Susanne");
-        $user->save();
-        $user = new Model\User();
-        $user->setUsername("Matthias");
-        $user->save();
-        $user = new Model\User();
-        $user->setUsername("Christian");
-        $user->save();
-        $user = new Model\User();
-        $user->setUsername("Carl");
-        $user->save();
-        $user = new Model\User();
-        $user->setUsername("Alex");
-        $user->save();
+        foreach ($usernames as $username) {
+            $user = new Model\User();
+            $user->setUsername($username);
+            $user->save();  
+            $user->setPassword("\$dta010"); 
+            $user->save();
+        }
 
         // title types (main-, sub- and short title)
         

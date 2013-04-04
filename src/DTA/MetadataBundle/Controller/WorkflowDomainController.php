@@ -18,7 +18,7 @@ class WorkflowDomainController extends DTABaseController {
     public static $domainMenu = array(
         array("caption" => "Tasks", 'modelClass' => 'Task'),
         array("caption" => "Publikationsgruppen", 'modelClass' => 'Publicationgroup'),
-        array("caption" => "Nachweise", 'modelClass' => 'Source'),
+        array("caption" => "Nachweise", 'modelClass' => 'Imagesource'),
         array("caption" => "Arbeitsschritte", 'modelClass' => 'Tasktype'),
         array("caption" => "Partner", 'modelClass' => 'Partner'),
         array("caption" => "Reporting", 'route' => 'reporting'),
