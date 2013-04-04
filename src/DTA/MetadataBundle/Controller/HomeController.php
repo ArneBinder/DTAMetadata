@@ -48,8 +48,8 @@ class HomeController extends DTABaseController {
         $root = $ttq->findRoot();
         
         $tree = $this->retrieveSubtree($root);
-        
-//        $ttq->findOneById(9)->delete();
+//        doesn't work if foreign keys (tasks using this task type) impose integrity constraints.
+//        $ttq->findOneById(5)->delete();
         
         return $this->renderControllerSpecificAction('DTAMetadataBundle:Home:Home.html.twig', array(
             'testData' => $tree, 
