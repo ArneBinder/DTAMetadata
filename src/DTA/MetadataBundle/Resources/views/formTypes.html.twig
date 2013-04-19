@@ -1,11 +1,13 @@
-{# This defines how to render the specific forms representing the model classes.
-    For instance, that a title fragment is rendered on a single row is achieved 
-    with the titlefragment_* blocks.
+{# 
+    This defines how to render the form elements for specific model classes.
+    For instance, to render a title fragment on a single row, customize the 
+    titlefragment_row block as below.
+
+    The form_div_layout_dta.html.twig defines how to render basic form input elements such 
+    as text areas, password fields, select boxes, etc. and adds some extra options.
  #}
 
-{% extends 'form_div_layout.html.twig' %}
-
-{# --------------------- Form Type Configurations, e.g. as made available by the above code --------------------- #}
+{% extends 'form_div_layout_dta.html.twig' %}
 
 {# --------------------- Work and Publication --------------------- #}
 
@@ -78,57 +80,3 @@
             {{ form_rest(form) }}
     </div>
 {% endblock %}
-
-{# --------------------- Form base customizations --------------------- #}
-
-{% block form_row %}
-    
-    {# set default value false for the inlineControls variable #}
-    {% set inlineControls = inlineControls is defined ? inlineControls : false %}
-    
-        {# Wrap label and controls in separate columns, unless inline labels are requested #}
-        {% if not inlineLabel|default(false) and not inlined|default(false) %}
-        <div class="control-group">
-            {# form_label automatically generates a label tag, with the correct id specified, the label class, added, etc. #}
-            {{ form_label(form, null , {'label_attr':{'class':'control-label'} }) }}
-            <div class="controls {{ inlineControls ? 'form-inline' : 'labelled' }}">
-        {% endif %}
-
-        {% if inlineControls %}
-            {%for child in form.children %}
-                {{ form_row(child, {'inlined':true}) }}
-            {% endfor %}
-        {% else %}
-            {% if not hideLabel|default(false) and (inlineLabel|default(false) or inlined|default(false))  %}
-                {{ form_label(form) }} 
-            {% endif %}
-            {{ form_errors(form) }}
-            {{ form_widget(form) }}
-        {% endif %}            
-
-        {% if not inlineLabel|default(false) and not inlined|default(false) %}
-            </div>
-            {{ form_rest(form) }}
-        </div>
-        {% endif %}
-    
-            
-{% endblock form_row %}
-
-{% block form_label %}
-    {% if label != '@suppress' %}
-        {{ parent() }}
-    {% endif %}
-{% endblock form_label %}
-
-{% block checkbox_row %}
-    {% if attr.expanded|default(false) %}
-        {{ form_row(form) }}
-    {% else %}
-        <label class="checkbox">
-            {{ form_widget(form) }}
-            {{ label }}
-        </label>
-    {% endif %}
-
-{% endblock checkbox_row %}

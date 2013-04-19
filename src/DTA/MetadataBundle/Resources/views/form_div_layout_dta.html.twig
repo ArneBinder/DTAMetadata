@@ -1,0 +1,93 @@
+{# 
+    This defines adds some extra options to the default form rendering template form_div_layout.
+    These extra options are specific to the twitter bootstrap styles for rendering forms, 
+    specifically the form-horizontal styling (one column for labels and one nearby column for the inputs).
+    
+    Options to pass to form_row
+    ---------------------------
+    
+    The form_row is the generic twig block called for rendering any form input.
+    Usually, it renders a label, the widget (usually the actual html element such as a <textarea> tag)
+    and markup to display any form errors reported from the server.
+    
+    1. inlineControls = true|false
+    Whether to put label and controls in a single column. By default, an extra "column" is used for the label.
+
+    2. inlineControls = true|false
+    Whether to recursively put all children form inputs into a single line. This will result in a flat
+    label input label input ... structure instead of a nested two-column layout.
+
+    inlineControls = false (default)
+
+    Monograph |     Title | ...
+                    Year  |      Number | ...
+                                 recons | ...
+    inlineControls = true                    
+
+    Monograph | Title ... Number ... reconstructed ...
+
+    3. hideLabel = true | false
+    Whether or not to render the label at all. Works only for inline labels.
+
+    4. inlined = true | false
+    This is purely internal, as it is used as a flag that is passed on recursively to the children to
+    achieve a flattened structure for inline controls.
+ #}
+
+{#  The form_div_layout.html.twig defines how to render basic form input elements such 
+    as text areas, password fields, select boxes, etc. #}
+{% extends 'form_div_layout.html.twig' %}
+
+{% block form_row %}
+    
+    {# set default values #}
+    {% set inlineLabel = inlineLabel is defined ? inlineLabel : false %}
+    {% set inlineControls = inlineControls is defined ? inlineControls : false %}
+    {% set hideLabel = hideLabel is defined ? hideLabel : false %}
+    {% set inlined = inlined is defined ? inlined : false %}
+    
+        {% if not inlineLabel and not inlined %}
+        <div class="control-group">
+            {# form_label automatically generates a label tag, with the correct id specified, the label class, added, etc. #}
+            {{ form_label(form, null , {'label_attr':{'class':'control-label'} }) }}
+            <div class="controls {{ inlineControls ? 'form-inline' : 'labelled' }}">
+        {% endif %}
+
+        {% if inlineControls %}
+            {%for child in form.children %}
+                {{ form_row(child, {'inlined':true}) }}
+            {% endfor %}
+        {% else %}
+            {% if not hideLabel and (inlineLabel or inlined)  %}
+                {{ form_label(form) }} 
+            {% endif %}
+            {{ form_errors(form) }}
+            {{ form_widget(form) }}
+        {% endif %}            
+
+        {% if not inlineLabel and not inlined %}
+            </div>
+            {{ form_rest(form) }}
+        </div>
+        {% endif %}
+    
+            
+{% endblock form_row %}
+
+{% block form_label %}
+    {% if label != '@suppress' %}
+        {{ parent() }}
+    {% endif %}
+{% endblock form_label %}
+
+{% block checkbox_row %}
+    {% if attr.expanded|default(false) %}
+        {{ form_row(form) }}
+    {% else %}
+        <label class="checkbox">
+            {{ form_widget(form) }}
+            {{ label }}
+        </label>
+    {% endif %}
+
+{% endblock checkbox_row %}

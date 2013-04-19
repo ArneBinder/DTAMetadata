@@ -18,9 +18,11 @@ class TasktypeType extends BaseAbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('name');
+        $builder->add('id');
         $builder->add('parent', 'model', array(
             'property' => 'name',
-            'class' => 'DTA\MetadataBundle\Model\Tasktype'
+            'class' => 'DTA\MetadataBundle\Model\Tasktype',
+            'label' => 'Übergeordneter Arbeitsschritt'
         ));
     }
 }
