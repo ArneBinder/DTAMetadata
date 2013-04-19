@@ -52,18 +52,18 @@ class DataDomainController extends DTABaseController {
         ));
     }
 
-    /**
-     * New action, embedded into the data domain page.
-     * @param type $className
-     * @Route("/neu/{className}", name="DataDomainNewRecord")
-     */
-    public function newAction($className) {
-        $form = $this->dynamicForm($className, 0);
-        return $this->renderControllerSpecificAction('DTAMetadataBundle::formWrapper.html.twig', array(
-            'className' => $className,
-            'form' => $form->createView(),
-        ));
-    }
+//    /**
+//     * New action, embedded into the data domain page.
+//     * @param type $className
+//     * @Route("/neu/{className}", name="DataDomainNewRecord")
+//     */
+//    public function newAction($className) {
+//        $form = $this->dynamicForm($className, 0);
+//        return $this->renderControllerSpecificAction('DTAMetadataBundle:Form:formWrapper.html.twig', array(
+//            'className' => $className,
+//            'form' => $form->createView(),
+//        ));
+//    }
 
     /**
      * TODO: finalization. remove test data generator.

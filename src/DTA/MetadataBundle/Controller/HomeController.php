@@ -77,7 +77,7 @@ class HomeController extends DTABaseController {
                 $result = "saved.";
             }
         }
-        return $this->renderControllerSpecificAction('DTAMetadataBundle::autoform.html.twig', array(
+        return $this->renderControllerSpecificAction('DTAMetadataBundle:Form:autoform.html.twig', array(
                     'className' => 'Personalname',
                     'persistedObject' => $result,
                     'form' => $form->createView(),
@@ -100,7 +100,7 @@ class HomeController extends DTABaseController {
                 $obj->save();
         }
 
-        return $this->renderControllerSpecificAction('DTAMetadataBundle::autoform.html.twig', array(
+        return $this->renderControllerSpecificAction('DTAMetadataBundle:Form:autoform.html.twig', array(
                     'className' => 'Title',
                     'persistedObject' => 'persisted.',
                     'form' => $form->createView(),
@@ -124,7 +124,7 @@ class HomeController extends DTABaseController {
                 $obj->save();
         }
 
-        return $this->renderControllerSpecificAction('DTAMetadataBundle::autoform.html.twig', array(
+        return $this->renderControllerSpecificAction('DTAMetadataBundle:Form:autoform.html.twig', array(
                     'className' => $className,
                     'persistedObject' => 'persisted.',
                     'form' => $form->createView(),
@@ -149,7 +149,7 @@ class HomeController extends DTABaseController {
 //            }
 //        }
 //
-//        return $this->renderDomainSpecificAction('DTAMetadataBundle::autoform.html.twig', array(
+//        return $this->renderDomainSpecificAction('DTAMetadataBundle:Form:autoform.html.twig', array(
 //                    'className' => "Namefragment",
 //                    'persistedObject' => $obj,
 //                    'form' => $form->createView(),

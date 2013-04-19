@@ -149,7 +149,7 @@ class DTABaseController extends Controller {
                 var_dump($form->getErrors());
             }
         }
-        return $this->renderDomainKeySpecificAction($domainKey, "DTAMetadataBundle::formWrapper.html.twig", array(
+        return $this->renderDomainKeySpecificAction($domainKey, "DTAMetadataBundle:Form:formWrapper.html.twig", array(
                     'form' => $form->createView(),
                     'action' => 'edit',
                     'className' => $className,
@@ -199,7 +199,7 @@ class DTABaseController extends Controller {
         $form = $this->dynamicForm($className, $recordId);
 
         // plain ajax response, without any menus or other html
-        return $this->render("DTAMetadataBundle::ajaxModalForm.html.twig", array(
+        return $this->render("DTAMetadataBundle:Form:ajaxModalForm.html.twig", array(
                     'form' => $form->createView(),
                     'className' => $className,
                     'captionProperty' => $captionProperty,
@@ -254,7 +254,7 @@ class DTABaseController extends Controller {
         }
 
         // render the form
-        return $this->renderDomainKeySpecificAction($domainKey, 'DTAMetadataBundle::formWrapper.html.twig', array(
+        return $this->renderDomainKeySpecificAction($domainKey, 'DTAMetadataBundle:Form:formWrapper.html.twig', array(
                     'form' => $form->createView(),
                     'className' => $className,
                 ));

@@ -28,13 +28,15 @@ twig:
     # register custom form rendering resources
     form:
          resources:
+            # some additional options for the form rendering using divs
+             - 'DTAMetadataBundle:Form:form_div_layout_dta.html.twig'
             # how to render newly defined form input types such as the sortable collection
-             - 'DTAMetadataBundle::dtaFormExtensions.html.twig'
+             - 'DTAMetadataBundle:Form:dtaFormExtensions.html.twig'
             # how to render specific model classes (monograph, author, etc.)
-             - 'DTAMetadataBundle::formTypes.html.twig'
+             - 'DTAMetadataBundle:Form:formTypes.html.twig'
     # absolute path on the server to the web directory, needed sometimes for file_exists
     globals:
-        webPath: %kernel.root_dir%/../web
+        dtaMetadataBundlePath: %kernel.root_dir%/../src/DTA/MetadataBundle/
 
 
 # Assetic Configuration

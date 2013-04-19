@@ -2,6 +2,10 @@ parameters:
 #    dta_metadata.example.class: DTA\MetadataBundle\Example
 
 services:
+    dta.twig.fileExists_extension:
+        class: DTA\MetadataBundle\Twig\FileExistsExtension
+        tags:
+            - { name: twig.extension }
     dta.twig.currentTimeStamp_extension:
         class: DTA\MetadataBundle\Twig\CurrentTimestampExtension
         tags:

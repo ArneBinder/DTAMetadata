@@ -36,7 +36,6 @@ class PublicationType extends BaseAbstractType
         
         $builder->add('place', new SelectOrAddType(), array(
             'class' => 'DTA\MetadataBundle\Model\Place',
-//            'property' => 'Name',
             'property' => 'Name',
             'label' => 'Druckort',
             'searchable' => true,

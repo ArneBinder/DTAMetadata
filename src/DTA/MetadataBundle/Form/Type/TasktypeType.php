@@ -5,6 +5,8 @@ namespace DTA\MetadataBundle\Form\Type;
 use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
+use DTA\MetadataBundle\Form\DerivedType\SelectOrAddType;
+
 class TasktypeType extends BaseAbstractType
 {
     protected $options = array(
@@ -23,5 +25,10 @@ class TasktypeType extends BaseAbstractType
             'class' => 'DTA\MetadataBundle\Model\Tasktype',
             'label' => 'Übergeordneter Arbeitsschritt',
         ));
+//        $builder->add('parent', new SelectOrAddType(), array(
+//            'class' => 'DTA\MetadataBundle\Model\Tasktype',
+//            'property' => 'Name',
+//            'label' => 'Übergeordneter Aufgabentyp',
+//        ));
     }
 }

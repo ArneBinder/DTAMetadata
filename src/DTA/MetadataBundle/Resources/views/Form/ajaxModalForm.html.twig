@@ -18,15 +18,15 @@
     </div>
     <div class="modal-body">
 
-        {# Dummy form currently inserted to workaround a bug in the modal forms.
+        {# Dummy script tag currently inserted to workaround a bug in the modal forms.
             In chrome, the first form is erroneously deleted. In firefox, it's not. #}
-        <form></form>
+        <script></script>
         
         {% set submitURL = path('genericNew', { 'className':className, 
                                                 'captionProperty': captionProperty, 
                                                 'domainKey': domainKey|default("ajax")}) %}
-        <form action="{{ submitURL }}" method="post" {{ form_enctype(form) }}>
-            {{ form_rest(form) }}
+        <form action="{{ submitURL }}" method="post" {{ form_enctype(form) }} class="form-horizontal">
+            {% include 'DTAMetadataBundle:Form:autoform.html.twig' %}
         </form>
 
         {#<button class="btn" data-toggle="modal" href="#stack2">Launch modal</button>#}
