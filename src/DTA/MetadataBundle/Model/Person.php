@@ -13,7 +13,7 @@ class Person extends BasePerson
             return $a->getSortableRank() - $b->getSortableRank();
         });
         return $collection;
-    }
+}
     
     /**
      * Used to generate a select box of existing person entities.

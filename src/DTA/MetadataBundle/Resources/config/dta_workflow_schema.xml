@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+    Contains all entities related to the workflow of the project.
+    Tasks, tasktypes, related publications, sources, license types, etc.
+-->
+<database name="DTAMetadata" namespace="DTA\MetadataBundle\Model" defaultIdMethod="native">
+  
+    <!-- This parameter set is added to each entity that doesn't implement the table_row_view behavior. 
+    It is not added to tables/entities that define the bahavior. -->
+    <behavior name="table_row_view">
+        <!--If no parameters are defined, all columns are added. (WITHOUT embedding any related entities) -->
+    </behavior>
+    
+    <table name="relatedSet" phpName="Relatedset">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" type="LONGVARCHAR" required="true"/>
+    </table>
+
+    <!--currently not needed?-->
+<!--    <table name="status" phpName="Status">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" type="LONGVARCHAR" required="true"/>
+        <behavior name="table_row_view">
+            <parameter name="Status" value="name"/>
+        </behavior>
+    </table>-->
+
+    <table name="task" phpName="Task">
+        
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="taskType_id" type="INTEGER" required="true"/>
+        <column name="done" type="BOOLEAN" size="1" required="false"/>
+        <column name="start" type="DATE" required="false"/>
+        <column name="end" type="DATE" required="false"/>
+        <column name="comments" type="LONGVARCHAR" required="false"/>
+        <column name="publicationGroup_id" type="INTEGER" required="false"/>
+        <column name="publication_id" type="INTEGER" required="false"/>
+        <column name="responsibleUser_id" type="INTEGER" required="false"/>
+        
+        <foreign-key foreignTable="taskType"> <reference local="taskType_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="publicationGroup"> <reference local="publicationGroup_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="user"> <reference local="responsibleUser_id" foreign="id"/> </foreign-key>
+    </table>
+
+    <table name="taskType" phpName="Tasktype">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" type="LONGVARCHAR" required="true"/>
+        <behavior name="nested_set" />
+        <behavior name="table_row_view">
+<!--            <parameter name="Id" value="id"/>-->
+            <parameter name="Name" value="name"/>
+            <parameter name="Zugeordnet" value="accessor:getParent"/>
+        </behavior>
+    </table>
+    
+    <table name="partner" phpName="Partner">
+        <column name="id" type="INTEGER" size="10" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" type="LONGVARCHAR" required="false"/>
+        <column name="address" type="LONGVARCHAR" required="false"/>
+        <column name="person" type="LONGVARCHAR" required="false"/>
+        <column name="mail" type="LONGVARCHAR" required="false"/>
+        <column name="web" type="LONGVARCHAR" required="false"/>
+        <column name="comments" type="LONGVARCHAR" required="false"/>
+        <column name="phone1" type="LONGVARCHAR" required="false"/>
+        <column name="phone2" type="LONGVARCHAR" required="false"/>
+        <column name="phone3" type="LONGVARCHAR" required="false"/>
+        <column name="fax" type="LONGVARCHAR" required="false"/>
+        <column name="is_organization" type="BOOLEAN" required="false" default="false"/>
+    </table>
+
+    <!--Quellenangabe fuer Bilddigitalisate-->
+    <table name="imageSource">
+        
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="publication_id" type="INTEGER" required="true"/>
+       
+        <column description="Anbieter Leitdruck" name="partner_id" type="INTEGER"  required="false"/>
+        <column name="catalogueSignature" type="LONGVARCHAR"  required="false"/>
+        <column name="catalogueUrl" description="Link in den Katalog" type="LONGVARCHAR"  required="false"/>
+        
+        <column description="Anzahl Faksimiles" name="numFaksimiles" type="INTEGER"  required="false"/>
+        <column description="Umfang laut Katalog" name="extentAsOfCatalogue" type="LONGVARCHAR"  required="false"/>
+        <column name="numPages" description="Umfang lt. Katalog" type="INTEGER"  required="false"/>
+
+        <column description="URL der Bilddigitalisate" name="imageUrl" type="LONGVARCHAR" required="false"/>
+        <column description="URN der Bilddigitalisate" name="imageUrn" type="LONGVARCHAR" required="false"/>
+        <column name="license_id" description="Lizenz" type="INTEGER" required="false"/>
+        
+        <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="license"> <reference local="license_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="partner"> <reference local="partner_id" foreign="id"/> </foreign-key>
+    </table>
+    
+    <!--Quellenangabe fuer Textdigitalisate-->
+    <table name="textSource">
+        
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="publication_id" type="INTEGER" required="true"/>
+       
+        <column description="Anbieter Textdigitalisate" name="partner_id" type="INTEGER"  required="false"/>
+        
+        <column description="URL der Textdigitalisate" name="imageUrl" type="LONGVARCHAR" required="false"/>
+        <column name="license_id" description="Lizenz" type="INTEGER" required="false"/>
+        
+<!--        <column name="catalogueSignature" type="LONGVARCHAR"  required="false"/>
+        <column name="catalogueUrl" description="Link in den Katalog" type="LONGVARCHAR"  required="false"/>-->
+        <!--<column description="URN der Bilddigitalisate" name="imageUrn" type="LONGVARCHAR" required="false"/>-->
+        
+        <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="license"> <reference local="license_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="partner"> <reference local="partner_id" foreign="id"/> </foreign-key>
+    </table>
+    
+    <table name="license">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" type="LONGVARCHAR" required="true"/>
+        <column name="url" type="LONGVARCHAR" required="false"/>
+        <!--Ob diese Lizenz auf Bilder anwendbar ist -->
+        <column name="applicable_to_image" type="BOOLEAN" required="true" default="false"/>
+        <!--Ob diese Lizenz auf Text anwendbar ist -->
+        <column name="applicable_to_text" type="BOOLEAN" required="true" default="false"/>
+    </table>
+    
+    <table name="publicationGroup" phpName="Publicationgroup">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" type="LONGVARCHAR" required="true"/>
+    </table>
+    
+</database>

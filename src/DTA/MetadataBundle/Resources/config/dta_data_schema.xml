@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+    Contains all entities related to the historical truth.
+-->
+
+<!--The name attribute refers to the connection to use. See app/config/config.yml under
+    propel > dbal > connections for connection setup. -->
+<database name="DTAMetadata" namespace="DTA\MetadataBundle\Model" defaultIdMethod="native">
+  
+    <!-- This parameter set is added to each entity that doesn't implement the table_row_view behavior. 
+    It is not added to tables/entities that define the bahavior. -->
+    <behavior name="table_row_view">
+        <!--If no parameters are defined, all columns are added. (WITHOUT embedding any related entities) -->
+    </behavior>
+        
+    <!-- The base class for all publications. -->
+    <table name="publication">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+
+        <!--Werk das der Publikation zugrunde liegt-->
+        <column name="work_id" type="INTEGER" required="true"/>
+        
+        <!--Titelinformationen-->
+        <column name="title_id" type="INTEGER" required="true"/>
+        
+        <!--Personalia werden ueber Fremdschluessel von der Personenseite dargestellt.-->
+        
+        <!--Angaben zur Publikation der Vorlage-->
+        <column description="Druckort" name="place_id" type="INTEGER" required="false"/>
+        <column description="Erscheinungsjahr" name="publicationDate_id" type="INTEGER" required="false"/>
+        <column description="Erscheinungsjahr der Erstausgabe" name="firstPublicationDate_id" type="INTEGER" required="false"/>
+        <column description="Informationen zur Auflage" name="printRun_id" type="INTEGER" required="true"/>
+        <column description="Verlag" name="publishingCompany_id" type="INTEGER" required="false"/>
+        
+        <!--Image and text sources are added on the imageSource table side, because publication:imageSource is 1:n-->
+
+        <!--Editorisches-->        
+        <column description="Art der Ausgabe" name="editionDescription" type="LONGVARCHAR" required="false"/>
+        <column description="Bearbeiter der digitalen Edition" name="digitalEditionEditor" type="LONGVARCHAR" required="false"/>
+        <column description="Bemerkungen zu den Transkriptionsrichtlinien" name="transcriptionComment" type="LONGVARCHAR" required="false"/>
+        
+        <!--Klassifikation und Einordnung-->
+        <column description="Vorherrschende Schriftart" name="font_id" type="INTEGER" required="false"/>
+        <!--vorherrschende sprache, kategorien, schlagworte und genres sind durch das werk festgelegt.-->
+    
+        <column description="Anmerkungen" name="comment" type="LONGVARCHAR" required="false"/>
+        
+        <!--Workflow-Aspekte -->        
+        <column name="relatedSet_id" type="INTEGER" required="false"/>
+                
+        <!--<column name="status_id" type="INTEGER" required="true"/>-->
+
+        <behavior name="table_row_view">
+            <!--<parameter name="Id" value="id"/>-->
+            <!--<parameter name="Geschrieben" value="accessor:getDateSpecificationRelatedByOrigindateId"/>-->
+            <parameter name="Veröffentlicht" value="accessor:getDatespecificationRelatedByPublicationdateId"/>
+            <!--<parameter name="embedColumnsStatus" value="status"/>-->
+            <parameter name="embedColumnsTitle" value="title"/>
+        </behavior>
+        
+        <foreign-key foreignTable="work"> <reference local="work_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="title"> <reference local="title_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="publishingCompany"> <reference local="publishingCompany_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="place"> <reference local="place_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="printRun"> <reference local="printRun_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="relatedSet"> <reference local="relatedSet_id" foreign="id"/> </foreign-key>
+
+        <foreign-key foreignTable="dateSpecification"> <reference local="publicationDate_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="dateSpecification"> <reference local="firstPublicationDate_id" foreign="id"/> </foreign-key>
+        <!--<foreign-key foreignTable="status"> <reference local="status_id" foreign="id"/> </foreign-key>-->
+        <foreign-key foreignTable="font"> <reference local="font_id" foreign="id"/> </foreign-key>
+    </table>
+    
+    <!-- The core class representing an authors work. 
+         This is independent of the actual written form of the work which is represented by the Publication class. -->
+    <table name="work">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="dateSpecification_id" type="INTEGER" required="false"/>
+        <column name="doi" type="LONGVARCHAR" required="false"/>
+        <column name="comments" type="LONGVARCHAR" required="false"/>
+        <column name="format" type="LONGVARCHAR" required="false"/>
+        <column name="directoryName" type="LONGVARCHAR" required="false"/>
+        
+        <!--vorherrschende sprache, kategorien, schlagworte und genres sind durch n:n beziehungen gegeben. 
+            die entsprechenden cross-ref tabellen sind im master schema definiert. -->
+        
+        <foreign-key foreignTable="dateSpecification"> <reference local="dateSpecification_id" foreign="id"/> </foreign-key>
+    </table>
+
+    <!--Informationen zur Auflage.-->
+    <table name="printRun">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column description="Bezeichnung" name="name"  type="LONGVARCHAR" required="false"/>
+        <column description="Numerische Bezeichnung der Ausgabe" name="numeric" type="INTEGER" required="false"/>
+        <column name="numPages" type="INTEGER" required="false"/>
+        <column name="numPagesNormed" type="INTEGER" required="false"/>
+    </table>
+    
+    
+    <!-- Publication types. -->
+
+
+    <!--M: Einteilige Monographie.-->
+    <table name="publication_M" phpName="PublicationM">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="publication_id" type="INTEGER" required="true"/>
+        
+        <behavior name="table_row_view"> <parameter name="embedColumnsPublication" value="publication" /> </behavior>
+        <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
+    </table>
+    
+    <!--DM: Unselbstständiger Teil einer Monographie, z.B. Beitrag in Sammelband oder ein Buchkapitel.-->
+    <table name="publication_DM" phpName="PublicationDM">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="publication_id" type="INTEGER" required="true"/>
+        
+        <column description="Übergeordnetes Werk" name="parent" type="INTEGER"/>
+        <column description="Seitenangabe" name="pages" type="LONGVARCHAR"/>
+        
+        <behavior name="table_row_view"> <parameter name="embedColumnsPublication" value="publication" /> </behavior>
+        
+        <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="publication"> <reference local="parent" foreign="id"/> </foreign-key>
+    </table>   
+    
+    <!--MM: Teil einer mehrbändigen Monographie.-->
+    <table name="publication_MM" phpName="PublicationMM">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="publication_id" type="INTEGER" required="true"/>
+        
+        <column name="volume_id" type="INTEGER" required="true"/>
+        
+        <behavior name="table_row_view"> <parameter name="embedColumnsPublication" value="publication" /> </behavior>
+        
+        <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="volume"> <reference local="volume_id" foreign="id"/> </foreign-key>
+    </table> 
+    
+    <!--DS: Unselbständige Schrift in einem Band, der Teil einer Reihe ist.-->
+    <table name="publication_DS" phpName="PublicationDS">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="publication_id" type="INTEGER" required="true"/>
+        
+        <column name="series_id" type="INTEGER" required="true"/>
+        <column name="volume_id" type="INTEGER" required="true"/>
+        <column description="Seitenangabe" name="pages" type="LONGVARCHAR"/>
+        
+        <behavior name="table_row_view"> <parameter name="embedColumnsPublication" value="publication" /> </behavior>
+        
+        <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="volume"> <reference local="volume_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="series"> <reference local="series_id" foreign="id"/> </foreign-key>
+    </table> 
+    
+    <!--MS: Selbstständiger Band einer Reihe.-->
+    <table name="publication_MS" phpName="PublicationMS">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="publication_id" type="INTEGER" required="true"/>
+        
+        <column name="series_id" type="INTEGER" required="true"/>
+        <column description="Nummer des Bandes innerhalb der Reihe" name="volumeNumberInSeries" type="LONGVARCHAR"/>
+        
+        <behavior name="table_row_view"> <parameter name="embedColumnsPublication" value="publication" /> </behavior>
+        
+        <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="series"> <reference local="series_id" foreign="id"/> </foreign-key>
+    </table> 
+    
+    <!--JA: Artikel einer Zeitschrift/Zeitung.-->
+    <table name="publication_JA" phpName="PublicationJA">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="publication_id" type="INTEGER" required="true"/>
+        
+        <column description="Teil (bei einer mehrteiligen Publikation)" name="volume_id" type="INTEGER" required="true"/>
+        <column description="Zeitschrift, in der erschienen" name="parent" type="INTEGER" required="true"/>
+        
+        <behavior name="table_row_view"> <parameter name="embedColumnsPublication" value="publication" /> </behavior>
+        
+        <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="publication"> <reference local="parent" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="volume"> <reference local="volume_id" foreign="id"/> </foreign-key>
+    </table> 
+    
+    <!--MMS: Teil einer mehrbändigen Monographie, die ihrerseits Teil einer Reihe ist.-->
+    <table name="publication_MMS" phpName="PublicationMMS">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="publication_id" type="INTEGER" required="true"/>
+        
+        <column name="series_id" type="INTEGER" required="true"/>
+        <column name="volume_id" type="INTEGER" required="true"/>
+        
+        <behavior name="table_row_view"> <parameter name="embedColumnsPublication" value="publication" /> </behavior>
+        
+        <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="volume"> <reference local="volume_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="series"> <reference local="series_id" foreign="id"/> </foreign-key>
+    </table> 
+    
+    <!--J: Zeitschriften-/Zeitungsausgabe.-->
+    <table name="publication_J" phpName="PublicationJ">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="publication_id" type="INTEGER" required="true"/>
+        
+        <column description="Ausgabe" name="edition" type="LONGVARCHAR"/>
+        
+        <behavior name="table_row_view"> <parameter name="embedColumnsPublication" value="publication" /> </behavior>
+        
+        <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
+    </table> 
+    
+    <!--Ein Band einer mehrbaendigen etwas.-->
+    <table name="volume">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        
+        <column description="Bezeichnung des Bandes" name="volumeDescription" type="INTEGER"/>
+        <column description="Numerische Bezeichnung des Bandes" name="volumeNumeric" type="LONGVARCHAR"/>
+    </table>
+    
+    <!--Eine Reihe.-->
+    <table name="series">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        
+        <column name="title_id" type="INTEGER" required="true"/>
+        
+        <foreign-key foreignTable="title"> <reference local="title_id" foreign="id"/> </foreign-key>
+    </table>
+    
+    <!-- Other entities that can be considered historical facts. -->
+
+
+    <table name="publishingCompany">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" type="LONGVARCHAR" required="true"/>
+        <column name="gnd" type="VARCHAR" size="255" required="false"/> 
+        <unique> <unique-column name="gnd"/> </unique>
+    </table>
+
+    <table name="place">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" type="LONGVARCHAR" required="true"/>
+        <column name="gnd" type="VARCHAR" size="255" required="false"/> 
+        <unique> <unique-column name="gnd"/> </unique>
+    </table>
+
+    <table name="dateSpecification">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="year" type="INTEGER" required="false"/>
+        <column name="comments" type="LONGVARCHAR" required="false"/>
+        
+        <behavior name="reconstructed_flaggable">
+            <parameter name="column" value="year"/>
+        </behavior>
+    </table>
+    
+    <!-- Personenname, besteht aus mehreren Namensfragmenten (nameFragment). -->
+    <table name="personalName">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="person_id" type="INTEGER" required="true"/>
+        <behavior name="sortable">
+            <parameter name="scope_column" value="id"/>
+        </behavior>
+        <behavior name="table_row_view">
+            <parameter name="Id" value="id"/>
+            <parameter name="Name" value="accessor:__toString"/>
+            <parameter name="zugeordnet (Personen-ID)" value="person_id"/>
+            <parameter name="Reihenfolge" value="accessor:getSortableRank"/>
+        </behavior>
+        <foreign-key foreignTable="person"> <reference local="person_id" foreign="id"/> </foreign-key>
+    </table>
+    
+    <!-- Namensfragmente sind Bestandteile eines Namens, z.B. Vor- oder Nachname. -->
+    <table name="nameFragment">
+        <behavior name="sortable">
+            <parameter name="use_scope" value="true"/>
+            <parameter name="scope_column" value="personalName_id"/>
+        </behavior>
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="personalName_id" type="INTEGER" required="true"/>
+        <column name="name" type="LONGVARCHAR" required="true"/>
+        <column name="nameFragmentTypeId" type="INTEGER" required="true"/>
+        
+        <behavior name="table_row_view">
+            <parameter name="Id" value="id"/>
+            <parameter name="Bestandteil" value="name"/>
+            <parameter name="embedColumnsArt" value="nameFragmentType"/>
+        </behavior>
+        
+        <foreign-key foreignTable="nameFragmentType"> <reference local="nameFragmentTypeId" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="personalName"> <reference local="personalName_id" foreign="id"/> </foreign-key>
+    </table>
+    <table name="title">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <behavior name="table_row_view">
+            <!--<parameter name="Id" value="id"/>-->
+            <parameter name="Titel" value="accessor:__toString"/>
+        </behavior>
+    </table>
+    
+    <table name="titleFragment">
+        
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" type="LONGVARCHAR" required="true"/>
+        <column name="title_id" type="INTEGER" required="true"/>
+        <column name="titleFragmentType_id" type="INTEGER" required="true"/>
+        <foreign-key foreignTable="title"> <reference local="title_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="titleFragmentType"> <reference local="titleFragmentType_id" foreign="id"/> </foreign-key>
+        
+        <behavior name="sortable">
+            <parameter name="use_scope" value="true"/>
+            <parameter name="scope_column" value="title_id"/>
+        </behavior>
+        <behavior name="reconstructed_flaggable">
+            <parameter name="column" value="name"/>
+        </behavior>
+        
+    </table>
+    
+    <table name="person">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <!--255 is the maximum length for a limit of 1000 bytes. required to allow unique indexing-->
+        <column name="gnd" type="VARCHAR" size="255" required="false"/> 
+        <!--The name is added in the personalName table because it's a one-to-many relationship.-->
+        
+        <behavior name="table_row_view">
+            <parameter name="Erster Name@representative" value="personalName"/>
+            <parameter name="Namen gesamt@count" value="personalName"/>
+            <parameter name="GND" value="gnd"/>
+        </behavior>
+
+        <unique> <unique-column name="gnd"/> </unique>
+    </table>
+    
+    <table name="font">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" type="LONGVARCHAR" required="true"/>
+    </table>
+    
+    <table name="language">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" type="LONGVARCHAR" required="true"/>
+    </table>
+    
+</database>

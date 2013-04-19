@@ -23,9 +23,6 @@ class UserType extends BaseAbstractType
         $builder->add('password', 'password', array(
             'required' => false,
         ));
-//        $builder->add( $builder->create('password', 'password')
-//                ->addModelTransformer(new \DTA\MetadataBundle\Form\DataTransformer\PasswordTransformer())
-//        );
         $builder->add('admin', 'checkbox', array(
             'label' => 'Administratorenrechte',
             'attr' => array('expanded'=>true),

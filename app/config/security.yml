@@ -29,9 +29,9 @@ security:
             security: false
 
 #        only sensible after database deletion (because the login system will stay active)
-#        generateTestData:
-#            pattern: ^/daten/generateTestData
-#            security: false
+        generateTestData:
+            pattern: ^/daten/generateTestData
+            security: false
 
         secured_area:
             security: true

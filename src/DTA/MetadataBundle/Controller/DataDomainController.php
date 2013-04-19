@@ -17,31 +17,30 @@ class DataDomainController extends DTABaseController {
 
     /** @inheritdoc */
     public static $domainMenu = array(
-        array("caption" => "Werke", "modelClass" => "Work"),
-        array("caption" => "Publikationen", "children" => array(
-                array('caption' => "Alle Publikationsarten", 'route' => 'home'),
-                array('modelClass' => 'Monograph'),
-                array('modelClass' => 'Magazine'),
-                array('caption' => "Reihen", 'modelClass' => 'Series'),
-                array('caption' => "Essays", 'modelClass' => 'Essay'))),
-        array("caption" => "Personen", 'modelClass' => "Person"),
-// needs to be added via extra business logic since these classes don't exist anymore (instead, there's a role specification)
-//            "children" => array(
-//                array('caption' => "Alle Personen", 'route' => 'home'),
-//                array('modelClass' => 'Author'),
-//                array('caption' => "Verleger", 'modelClass' => 'Publisher'),
-//                array('modelClass' => 'Translator'),
-//                array('caption' => "Drucker", 'modelClass' => 'Printer'))),
-        array("caption" => "Verlage", 'modelClass' => 'PublishingCompany'),
+        'work' => array("caption" => "Werke", "modelClass" => "Work"),
+        'publication' => array("caption" => "Publikationen", "children"=>array() ),
+        'person' => array("caption" => "Personen", "children" => array() ),
+        'publishingCompany' => array("caption" => "Verlage", 'modelClass' => 'PublishingCompany'),
     );
-    
-    /**
-     * @Route("/someSelectValues")
-     */
-    public function someSelectValues(){
-        return new \Symfony\Component\HttpFoundation\Response("{ 'val1' : 12, 'val2' : 13 }");
-    }
 
+    public function __construct(){
+        
+        foreach( Model\PersonroleQuery::create()->find() as $pr ){
+            DataDomainController::$domainMenu['person']['children'][] = array("caption" => $pr->getName(), "route" => "home");
+        }
+
+        // contains the php model class names for each publication type
+        // see dta_data_schema for explanations of the single types.
+        $publicationTypes = array(
+            "PublicationM","PublicationDM","PublicationMM","PublicationDS",
+            "PublicationMS","PublicationJA","PublicationMMS","PublicationJ");
+        
+        foreach( $publicationTypes as $pt ){
+            DataDomainController::$domainMenu['publication']['children'][] = array("caption" => $pt, "modelClass" => $pt);
+        }
+        
+    }
+    
     /**
      * @Route("/", name="dataDomain")
      */
@@ -119,20 +118,24 @@ class DataDomainController extends DTABaseController {
         
         // person types: work and publication
         
-        $author = new Model\Workrole();
+        $author = new Model\Personrole();
         $author->setName('Autor');
+        $author->setApplicableToWork(true);
         $author->save();
         
-        $publisher = new Model\Publicationrole();
+        $publisher = new Model\Personrole();
         $publisher->setName('Verleger');
+        $author->setApplicableToPublication(true);
         $publisher->save();
         
-        $translator = new Model\Publicationrole();
+        $translator = new Model\Personrole();
         $translator->setName("Übersetzer");
+        $author->setApplicableToPublication(true);
         $translator->save();
         
-        $printer = new Model\Publicationrole();
+        $printer = new Model\Personrole();
         $printer->setName('Drucker');
+        $author->setApplicableToPublication(true);
         $printer->save();
 
         // Workflow, example task types
@@ -171,14 +174,14 @@ class DataDomainController extends DTABaseController {
         
         // workflow: publication statuses
         
-        $unpublished = new Model\Status();
-        $unpublished->setName("Unveröffentlicht");
-        $unpublished->save();
-        
-        $published = new Model\Status();
-        $published->setName("Veröffentlicht");
-        $published->save();
-        
+//        $unpublished = new Model\Status();
+//        $unpublished->setName("Unveröffentlicht");
+//        $unpublished->save();
+//        
+//        $published = new Model\Status();
+//        $published->setName("Veröffentlicht");
+//        $published->save();
+//        
 //        $rootTask = \DTA\MetadataBundle\Model\TasktypeQuery::create()->findRoot();
 
         return $this->forward("DTAMetadataBundle:Home:index");
