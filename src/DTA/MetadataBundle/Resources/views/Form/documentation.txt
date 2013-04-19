@@ -1,0 +1,4 @@
+This directory contains all templates that have to do with form rendering.
+
+Note that this is not a symfony nor a twig convention.
+The same applies to the Types subdirectory.

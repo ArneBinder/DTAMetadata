@@ -52,6 +52,7 @@ class User extends BaseUser implements \Symfony\Component\Security\Core\User\Use
             // force propel to execute the query although it thinks it has the object already, 
             // because it's currently filled with the form data
             \Propel::disableInstancePooling();
+
             $uq = UserQuery::create()->findOneById($this->getId());
             if( null !== $uq ){
                 $oldPassword = $uq->getPassword();

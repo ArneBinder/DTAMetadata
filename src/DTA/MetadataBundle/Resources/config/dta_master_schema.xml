@@ -290,7 +290,7 @@
         <column name="name" type="LONGVARCHAR" required="true"/>
         <behavior name="nested_set" />
         <behavior name="table_row_view">
-            <!--<parameter name="Id" value="id"/>-->
+            <parameter name="Id" value="id"/>
             <parameter name="Name" value="name"/>
             <parameter name="Zugeordnet" value="accessor:getParent"/>
         </behavior>

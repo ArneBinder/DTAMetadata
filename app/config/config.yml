@@ -25,16 +25,10 @@ framework:
 twig:
     debug:            %kernel.debug%
     strict_variables: %kernel.debug%
-    # register custom form rendering resources
     form:
         resources:
-            # how to render newly defined form input types such as the sortable collection
             - 'DTAMetadataBundle::dtaFormExtensions.html.twig'
-            # how to render specific model classes (monograph, author, etc.)
             - 'DTAMetadataBundle::formTypes.html.twig'
-    # absolute path on the server to the web directory, needed sometimes for file_exists
-    globals:
-        webPath: %kernel.root_dir%/../web
 
 
 # Assetic Configuration

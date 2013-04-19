@@ -1,0 +1,47 @@
+{# 
+    Template for rendering forms for any model type (i.e. database entity).
+    Used for creating and editing entities.
+    By default, a new entity is created.
+#}
+    
+{% block core %}
+
+    {# Determine where to post the form data (create or update the data) #}
+    {% if action|default("new") == "new" %}
+        {% set actionTarget = path('genericNew', {'className':className, 'domainKey': domainKey|default("none")}) %}
+        {# renders "<className> anlegen" as headline of the form #}
+        {% set headerSuffix = "form.create.suffix"|trans %}
+    {% endif %}
+    {% if action|default("") == "edit" %}
+        {# renders "<className> bearbeiten" as headline of the form #}
+        {% set actionTarget = path('viewRecord', {'domainKey': domainKey, 'className':className, 'recordId':recordId}) %}
+        {% set headerSuffix = "form.edit.suffix"|trans %}
+    {% endif %}
+
+    {# If a specific template has been defined for this form type, use it instead of the default one. #}
+
+    {% if file_exists('/home/sybio/www/website/picture.jpg') %}
+        
+        
+
+    {% else %}
+
+        <h3>{{className|trans}} {{ headerSuffix }} </h3>
+
+        <form action="{{ actionTarget }}" method="post" {{ form_enctype(form) }} class="form-horizontal">
+            {# inlineLabel removes the additional column for the label. #}
+            {{ form_row(form, {'inlineLabel':true, 'hideLabel':true}) }}
+            {{ form_rest(form) }}
+            <div class="control-group">
+                <div class="controls">
+                    <input type="submit" value="Senden"/>
+                </div>
+            </div>
+        </form>
+
+        <hr/>
+        
+    {% endif %}
+    
+    {#{dump(form.children)}#}   
+{% endblock %}

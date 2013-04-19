@@ -1,0 +1,20 @@
+{#  
+    The dynamic extend is for extending the template of the currently active domain,
+    which is basically for embedding the correct domain menu 
+    (tasks, reporting, ... for workflow, publications, persons, ... for data, etc).
+    The domainKey value is automatically passed by the renderWithDomainMenu method
+    of the DTABaseController, which 
+    The referenced index.html.twig files are located in 
+        src/DTA/MetadataBundle/Resources/views/<domainKey>/index.html.twig
+
+    The reason why this is an extra template is that the autoform template can render
+    a bare form, which makes it reusable for ajax form requests.
+    For static form requests the bare form is always wrapped with a domain menu, 
+    the page footer, etc. via this template.
+
+#}
+{% extends 'DTAMetadataBundle:'~ domainKey ~':index.html.twig' %}
+
+{% block core %}
+    {% include 'DTAMetadataBundle::autoform.html.twig' %}
+{% endblock core %}

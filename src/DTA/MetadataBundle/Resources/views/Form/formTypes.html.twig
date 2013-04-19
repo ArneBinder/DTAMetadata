@@ -1,0 +1,82 @@
+{# 
+    This defines how to render the form elements for specific model classes.
+    For instance, to render a title fragment on a single row, customize the 
+    titlefragment_row block as below.
+
+    The form_div_layout_dta.html.twig defines how to render basic form input elements such 
+    as text areas, password fields, select boxes, etc. and adds some extra options.
+ #}
+
+{% extends 'form_div_layout_dta.html.twig' %}
+
+{# --------------------- Work and Publication --------------------- #}
+
+{% block publication_row %}
+    {{ form_row(form, {'inlineLabel':false, 'hideLabel': true}) }}
+{% endblock %}
+{% block work_row %}    
+    {{ form_row(form, {'inlineLabel':false, 'hideLabel':false }) }}
+{% endblock %}
+
+{# ---------------------Personalia --------------------- #}
+
+{% block personpublication_row %}
+    <div class="control-group form-inline">
+            {{ form_errors(form.publicationrole) }}
+            {{ form_widget(form.publicationrole) }}
+            {{ form_errors(form.person) }}
+            {{ form_widget(form.person) }}
+            {#{ form_rest(form) }#}
+    </div>
+{% endblock %}
+{% block personwork_row %}
+    <div class="control-group form-inline">
+            {{ form_errors(form.workrole) }}
+            {{ form_widget(form.workrole) }}
+            {{ form_errors(form.person) }}
+            {{ form_widget(form.person) }}
+            {#{ form_rest(form) }#}
+    </div>
+{% endblock %}
+
+{# --------------------- Space and Time --------------------- #}
+
+{% block datespecification_row %}
+    {{ form_row(form, {'inlineControls':true }) }}
+{% endblock %}
+
+{# --------------------- Title --------------------- #}
+
+{% block title_row %}
+    {{ form_row(form, {'inlineLabel':false}) }}
+{% endblock %}
+
+{% block titlefragment_row %}
+    <div class="control-group form-inline">
+            {{ form_widget(form.titlefragmenttype)}}
+            {{ form_widget(form.name,{'attr':{'class':'medium-text'} }) }} 
+            <br/>
+            {{ form_row(form.NameIsReconstructed ) }}
+            {{ form_rest(form) }}
+    </div>
+{% endblock %}
+
+{# --------------------- Personal Name --------------------- #}
+
+{% block person_row %}
+    {{ form_row(form.personalNames, {'inlineLabel':false }) }}
+    {{ form_row(form.gnd) }}
+    {{ form_rest(form) }}
+{% endblock %}
+
+{% block personalname_row %}
+    {{ form_row(form, {'inlineLabel':true, 'hideLabel':true }) }}
+{% endblock %}
+
+{% block namefragment_row %}
+    <div class="control-group form-inline">
+            {{ form_widget(form.namefragmenttype)}}
+            {{ form_widget(form.name) }} 
+            {{ form_rest(form) }}
+    </div>
+{% endblock %}
