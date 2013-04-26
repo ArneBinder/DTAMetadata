@@ -7,7 +7,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Response;
 
-use \Symfony\Component\Security\Core\SecurityContext;
 
 /**
  * Base class for all domain controllers. Contains generic actions (list all records, new record) 
@@ -26,41 +25,13 @@ class DTABaseController extends Controller {
      * TODO: Generate this automatically. To avoid multiple edit locations on adding a new publication type
      * The inheritance should be detectable by the delegate behavior in the schema.xml
      */
-    public static $domainMenu = array();
-
-    /**
-     * Displays the login form for the entire application.
-     * @Route("/Anmeldung", name="login")
-     */
-    public function loginFormAction() {
-
-        $request = $this->getRequest();
-        $session = $request->getSession();
-
-        // get the login error if there is one
-        if ($request->attributes->has(SecurityContext::AUTHENTICATION_ERROR)) {
-            $error = $request->attributes->get(
-                    SecurityContext::AUTHENTICATION_ERROR
-            );
-        } else {
-            $error = $session->get(SecurityContext::AUTHENTICATION_ERROR);
-            $session->remove(SecurityContext::AUTHENTICATION_ERROR);
-        }
-
-        return $this->render(
-                        'DTAMetadataBundle::login.html.twig', array(
-                    // last username entered by the user
-                    'last_username' => $session->get(SecurityContext::LAST_USERNAME),
-                    'error' => $error,
-                        )
-        );
-    }
+    public $domainMenu = array();
 
     /**
      * Returns the fully qualified class names to autoload and generate objects and work with them using their class names.
      * @param String $className The basic name of the class, all lower-case except the first letter (Work, Personalname, Namefragmenttype)
      */
-    public function relatedClassNames($className) {
+    private function relatedClassNames($className) {
         return array(
             "model" => "DTA\\MetadataBundle\\Model\\" . $className, // the actual propel active record
             "query" => "DTA\\MetadataBundle\\Model\\" . $className . "Query", // utility class for generating queries
@@ -125,7 +96,7 @@ class DTABaseController extends Controller {
     public function genericViewOneAction(Request $request, $domainKey, $className, $recordId) {
 
         // create object and its form
-        $form = $this->dynamicForm($className, $recordId);
+        $form = $this->generateForm($className, $recordId);
 
         // save data on POST
         if ($request->isMethod("POST")) {
@@ -165,7 +136,7 @@ class DTABaseController extends Controller {
      * Since 1 is the first ID used by propel, 0 indicates that a new object shall be created.
      * @return The symfony form. If it is an edit form, with fetched data.
      */
-    public function dynamicForm($className, $recordId = 0) {
+    public function generateForm($className, $recordId = 0) {
 
         $classNames = $this->relatedClassNames($className);
 
@@ -182,10 +153,11 @@ class DTABaseController extends Controller {
     }
 
     /**
-     * Renders a dynamic form and returns the result for use in AJAX updating or creating database entities.
+     * Renders the form for the model without any surrounding elements. 
+     * Used via AJAX to update or create database entities.
      * 
-     * @param string $className   The name of the model class (e.g. Status, Title, Titlefragment)
-     * @param int    $recordId    The id of the record to edit. Zero indicates that a new record shall be created.
+     * @param string $className   The name of the model class (e.g. Publication, Title, Titlefragment)
+     * @param int    $recordId    The id of the record to edit. Zero indicates that a new record shall be created (since one is the smallest id)
      * @param string $captionProperty The property to use as caption for a select option (only for ajax use)
      * 
      * @Route("/ajaxModalForm/{className}/{recordId}/{captionProperty}", 
@@ -194,9 +166,7 @@ class DTABaseController extends Controller {
      */
     public function generateAjaxModalFormAction($className, $recordId = 0, $captionProperty = "Id") {
 
-//        sleep(2);
-
-        $form = $this->dynamicForm($className, $recordId);
+        $form = $this->generateForm($className, $recordId);
 
         // plain ajax response, without any menus or other html
         return $this->render("DTAMetadataBundle:Form:ajaxModalForm.html.twig", array(
@@ -260,8 +230,8 @@ class DTABaseController extends Controller {
                 ));
     }
 
-    private function getControllerReflectionClass($domainKey) {
-        return new \ReflectionClass("DTA\\MetadataBundle\\Controller\\" . $domainKey . "Controller");
+    private function getControllerClassName($domainKey) {
+        return "DTA\\MetadataBundle\\Controller\\" . $domainKey . "Controller";
     }
 
     private function getModelReflectionClass($className) {
@@ -270,11 +240,14 @@ class DTABaseController extends Controller {
 
     public function renderDomainKeySpecificAction($domainKey, $template, array $options = array()) {
 
-        $cr = $this->getControllerReflectionClass($domainKey);
-
+        $controllerName = $this->getControllerClassName($domainKey);
+        
+        $cr = new \ReflectionClass($controllerName);
+        $controller = new $controllerName;
+        
         // these are overriden by the calling subclass
         $defaultDomainMenu = array(
-            'domainMenu' => $cr->getStaticPropertyValue('domainMenu'),
+           'domainMenu' => $controller->domainMenu,
             "domainKey" => $cr->getStaticPropertyValue('domainKey'));
 
         // replaces the domain menu of $defaultDomainMenu with the domain menu of options, if both are set.
@@ -294,7 +267,7 @@ class DTABaseController extends Controller {
 
         // these are overriden by the calling subclass
         $defaultDomainMenu = array(
-            'domainMenu' => $controllerReflection->getStaticPropertyValue('domainMenu'),
+            'domainMenu' => $this->domainMenu,
             "domainKey" => $controllerReflection->getStaticPropertyValue('domainKey'));
 
         // replaces the domain menu of $defaultDomainMenu with the domain menu of options, if both are set.

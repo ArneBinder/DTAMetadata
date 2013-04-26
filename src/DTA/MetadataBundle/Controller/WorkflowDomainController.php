@@ -15,7 +15,7 @@ class WorkflowDomainController extends DTABaseController {
     public static $domainKey = "WorkflowDomain";
 
     /** @inheritdoc */
-    public static $domainMenu = array(
+    public  $domainMenu = array(
         array("caption" => "Tasks", 'modelClass' => 'Task'),
         array("caption" => "Publikationsgruppen", 'modelClass' => 'Publicationgroup'),
         array("caption" => "Nachweise", 'modelClass' => 'Imagesource'),

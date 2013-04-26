@@ -1,4 +1,4 @@
-{# Takes a domain menu data set and links it to the generic CRUD actions.
+{# Takes a nested set of model entities and creates a submenu with links to the CRUD actions on them.
     
     If the modelClass option is set on a menu entry, the view and create options are added automatically.
     For custom behavior, specify a route and optionally parameters, like in the data domain controller.
@@ -26,12 +26,12 @@
 </code>
 #}
 
-
 {% for item in domainMenu %}
 {% if item.children is defined %}
-    <li class="dropdown">
+    
+    <li class="dropdown"> 
         <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 
-            {{ item.caption }} 
+            {{ item.caption}} 
             <b class="caret"></b> 
         </a>
         <ul class="dropdown-menu">
@@ -79,23 +79,3 @@
     {% endif %}
 {% endif %}
 {% endfor %}
-
-{# 
-    old generic domain menu of the base template
-{% for item in domainMenu %}
-{% if item.children is defined %}
-    <li  class="dropdown" >
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 
-            {{ item.caption }} <b class="caret"></b> </a>
-        <ul class="dropdown-menu">
-        {% for child in item.children %}
-            <li><a href="{{ path(child.path) }}">{{ child.caption }}</a></li>
-        {% endfor %}
-        </ul>
-    </li>
-{% else %}
-    <li> 
-        <a href="{{ path(item.path) }}"> {{ item.caption }} </a>
-    </li>
-{% endif %}
-{% endfor %} #}

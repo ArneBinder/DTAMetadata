@@ -29,7 +29,7 @@
         
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="taskType_id" type="INTEGER" required="true"/>
-        <column name="done" type="BOOLEAN" size="1" required="false"/>
+        <column name="done" type="BOOLEAN" required="false"/>
         <column name="start" type="DATE" required="false"/>
         <column name="end" type="DATE" required="false"/>
         <column name="comments" type="LONGVARCHAR" required="false"/>
@@ -55,7 +55,7 @@
     </table>
     
     <table name="partner" phpName="Partner">
-        <column name="id" type="INTEGER" size="10" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="false"/>
         <column name="address" type="LONGVARCHAR" required="false"/>
         <column name="person" type="LONGVARCHAR" required="false"/>

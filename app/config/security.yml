@@ -40,8 +40,8 @@ security:
             # secure all URLs 
             pattern:    ^/
             form_login:
-                # The controler route "login" is used to display the login form.
-                # @see DTABaseController->loginFormAction() 
+                # The target of the route "login" is used to display the login form.
+                # @see AdministrationDomainController->loginFormAction() 
                 login_path: login       
                 # The symfony firewall automatically catches the credentials provided, so no custom implementation of this route is needed.
                 check_path: login_check

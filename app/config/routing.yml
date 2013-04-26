@@ -1,17 +1,14 @@
-dta_metadata:
-    resource: "@DTAMetadataBundle/Resources/config/routing.yml"
-    prefix:   /
-    
-# import routes from the controller directory
+# A route maps a requested url or a pattern or requested urls 
+# to a php function in some controller.
+# Working with routes is also an easy way to parse parameters from the url.
+
+# the routes are defined via annotations in the comments of the methods
 dta_controller:
     resource: "@DTAMetadataBundle/Controller/"
     type:     annotation
     
-login:
-    pattern:   /Anmeldung
-    defaults:  { _controller: DTAMetadataBundle:DTABase:loginForm }
-
-# Although this
+# These routes are needed for the symfony default login system
+# and their patterns are set to the default values
 login_check:
     pattern:   /login_check
     

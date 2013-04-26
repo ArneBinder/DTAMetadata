@@ -16,7 +16,7 @@ class HomeController extends DTABaseController {
     public static $domainKey = "Home";
 
     /** @inheritdoc */
-    public static $domainMenu = array(
+    public $domainMenu = array(
         array("caption" => "Zuletzt Angelegt", 'route' => 'home'),
         array("caption" => "Zuletzt Bearbeitet", 'route' => 'home'),
         array("caption" => "Zuletzt Angesehen", 'route' => 'home'),
@@ -44,15 +44,15 @@ class HomeController extends DTABaseController {
 //        $p->setNumpages(101);
 //        $p->save();
         
-        $ttq = Model\TasktypeQuery::create();
-        $root = $ttq->findRoot();
+//        $ttq = Model\TasktypeQuery::create();
+//        $root = $ttq->findRoot();
         
-        $tree = $this->retrieveSubtree($root);
+//        $tree = $this->retrieveSubtree($root);
 //        doesn't work if foreign keys (tasks using this task type) impose integrity constraints.
 //        $ttq->findOneById(5)->delete();
         
-        return $this->renderControllerSpecificAction('DTAMetadataBundle:Home:Home.html.twig', array(
-            'testData' => $tree, 
+        return $this->renderControllerSpecificAction('DTAMetadataBundle:Home:index.html.twig', array(
+            'testData' => 0,//$tree, 
         ));
     }
 

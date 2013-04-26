@@ -8,12 +8,20 @@
   </log>
   <propel>
     <datasources default="DTAMetadata">
-      <datasource id="DTAMetadata">
-        <adapter>mysql</adapter> <!-- sqlite, mysql, mssql, oracle, or pgsql -->
+<!--      <datasource id="DTAMetadata">
+        <adapter>mysql</adapter>  sqlite, mysql, mssql, oracle, or pgsql 
         <connection>
           <dsn>mysql:host=localhost;dbname=DTAMetadata</dsn>
           <user>root</user>
           <password>garamond4000</password>
+        </connection>
+      </datasource>-->
+      <datasource id="DTAMetadata">
+        <adapter>pgsql</adapter> <!-- sqlite, mysql, mssql, oracle, or pgsql -->
+        <connection>
+          <dsn>pgsql:host=localhost;dbname=DTAMetadata</dsn>
+          <user>postgres</user>
+          <password>root</password>
         </connection>
       </datasource>
     </datasources>

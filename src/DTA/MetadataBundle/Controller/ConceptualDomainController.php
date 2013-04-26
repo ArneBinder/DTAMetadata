@@ -10,7 +10,7 @@ class ConceptualDomainController extends DTABaseController {
     /** @inheritdoc */
     public static $domainKey = "ConceptualDomain";
     /** @inheritdoc */
-    public static $domainMenu = array(
+    public  $domainMenu = array(
         array("caption" => "Genres", 'route' => 'home',
             "children" => array(
                 array('caption' => "DTA", 'route' => 'home'),

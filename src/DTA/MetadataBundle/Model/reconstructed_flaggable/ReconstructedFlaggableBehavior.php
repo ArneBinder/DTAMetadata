@@ -54,7 +54,6 @@ class ReconstructedFlaggableBehavior extends Behavior {
                     $table->addColumn(array(
                         'name' => $flagColumn,
                         'type' => "BOOLEAN",
-                        'size' => "1",
                         'required' => "false",
                         'defaultValue' => "false"
                     ));

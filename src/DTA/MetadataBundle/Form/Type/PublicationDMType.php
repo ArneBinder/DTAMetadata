@@ -17,8 +17,18 @@ class PublicationDMType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('publicationId');
-        $builder->add('parent');
-        $builder->add('pages');
+        $builder->add('parent', new \DTA\MetadataBundle\Form\DerivedType\SelectOrAddType(), array(
+            'class' => '\DTA\MetadataBundle\Model\Publication',
+            'property' => 'id',
+            'label' => 'Übergeordnete Publikation'
+        ));
+        
+        $builder->add('pages', 'text', array(
+            'label' => 'Seiten',
+        ));
+        
+        $builder->add('publicationRelatedByPublicationId',new PublicationType(), array(
+            'label' => '@suppress'
+        ));
     }
 }
