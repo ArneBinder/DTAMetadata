@@ -1,11 +1,11 @@
 
 -----------------------------------------------------------------------
--- titleFragmentType
+-- titlefragmenttype
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "titleFragmentType" CASCADE;
+DROP TABLE IF EXISTS "titlefragmenttype" CASCADE;
 
-CREATE TABLE "titleFragmentType"
+CREATE TABLE "titlefragmenttype"
 (
     "id" serial NOT NULL,
     "name" TEXT NOT NULL,
@@ -13,12 +13,12 @@ CREATE TABLE "titleFragmentType"
 );
 
 -----------------------------------------------------------------------
--- nameFragmentType
+-- namefragmenttype
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "nameFragmentType" CASCADE;
+DROP TABLE IF EXISTS "namefragmenttype" CASCADE;
 
-CREATE TABLE "nameFragmentType"
+CREATE TABLE "namefragmenttype"
 (
     "id" serial NOT NULL,
     "name" TEXT NOT NULL,
@@ -26,12 +26,12 @@ CREATE TABLE "nameFragmentType"
 );
 
 -----------------------------------------------------------------------
--- personRole
+-- personrole
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "personRole" CASCADE;
+DROP TABLE IF EXISTS "personrole" CASCADE;
 
-CREATE TABLE "personRole"
+CREATE TABLE "personrole"
 (
     "id" serial NOT NULL,
     "name" TEXT NOT NULL,
@@ -89,7 +89,7 @@ CREATE TABLE "genre"
 (
     "id" serial NOT NULL,
     "name" TEXT NOT NULL,
-    "childOf" INTEGER,
+    "childof" INTEGER,
     PRIMARY KEY ("id")
 );
 
@@ -105,34 +105,34 @@ CREATE TABLE "publication"
     "work_id" INTEGER NOT NULL,
     "title_id" INTEGER NOT NULL,
     "place_id" INTEGER,
-    "publicationDate_id" INTEGER,
-    "firstPublicationDate_id" INTEGER,
-    "printRun_id" INTEGER NOT NULL,
-    "publishingCompany_id" INTEGER,
-    "editionDescription" TEXT,
-    "digitalEditionEditor" TEXT,
-    "transcriptionComment" TEXT,
+    "publicationdate_id" INTEGER,
+    "firstpublicationdate_id" INTEGER,
+    "printrun_id" INTEGER NOT NULL,
+    "publishingcompany_id" INTEGER,
+    "editiondescription" TEXT,
+    "digitaleditioneditor" TEXT,
+    "transcriptioncomment" TEXT,
     "font_id" INTEGER,
     "comment" TEXT,
-    "relatedSet_id" INTEGER,
+    "relatedset_id" INTEGER,
     PRIMARY KEY ("id")
 );
 
 COMMENT ON COLUMN "publication"."place_id" IS 'Druckort';
 
-COMMENT ON COLUMN "publication"."publicationDate_id" IS 'Erscheinungsjahr';
+COMMENT ON COLUMN "publication"."publicationdate_id" IS 'Erscheinungsjahr';
 
-COMMENT ON COLUMN "publication"."firstPublicationDate_id" IS 'Erscheinungsjahr der Erstausgabe';
+COMMENT ON COLUMN "publication"."firstpublicationdate_id" IS 'Erscheinungsjahr der Erstausgabe';
 
-COMMENT ON COLUMN "publication"."printRun_id" IS 'Informationen zur Auflage';
+COMMENT ON COLUMN "publication"."printrun_id" IS 'Informationen zur Auflage';
 
-COMMENT ON COLUMN "publication"."publishingCompany_id" IS 'Verlag';
+COMMENT ON COLUMN "publication"."publishingcompany_id" IS 'Verlag';
 
-COMMENT ON COLUMN "publication"."editionDescription" IS 'Art der Ausgabe';
+COMMENT ON COLUMN "publication"."editiondescription" IS 'Art der Ausgabe';
 
-COMMENT ON COLUMN "publication"."digitalEditionEditor" IS 'Bearbeiter der digitalen Edition';
+COMMENT ON COLUMN "publication"."digitaleditioneditor" IS 'Bearbeiter der digitalen Edition';
 
-COMMENT ON COLUMN "publication"."transcriptionComment" IS 'Bemerkungen zu den Transkriptionsrichtlinien';
+COMMENT ON COLUMN "publication"."transcriptioncomment" IS 'Bemerkungen zu den Transkriptionsrichtlinien';
 
 COMMENT ON COLUMN "publication"."font_id" IS 'Vorherrschende Schriftart';
 
@@ -147,41 +147,41 @@ DROP TABLE IF EXISTS "work" CASCADE;
 CREATE TABLE "work"
 (
     "id" serial NOT NULL,
-    "dateSpecification_id" INTEGER,
+    "datespecification_id" INTEGER,
     "doi" TEXT,
     "comments" TEXT,
     "format" TEXT,
-    "directoryName" TEXT,
+    "directoryname" TEXT,
     PRIMARY KEY ("id")
 );
 
 -----------------------------------------------------------------------
--- printRun
+-- printrun
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "printRun" CASCADE;
+DROP TABLE IF EXISTS "printrun" CASCADE;
 
-CREATE TABLE "printRun"
+CREATE TABLE "printrun"
 (
     "id" serial NOT NULL,
     "name" TEXT,
     "numeric" INTEGER,
-    "numPages" INTEGER,
-    "numPagesNormed" INTEGER,
+    "numpages" INTEGER,
+    "numpagesnormed" INTEGER,
     PRIMARY KEY ("id")
 );
 
-COMMENT ON COLUMN "printRun"."name" IS 'Bezeichnung';
+COMMENT ON COLUMN "printrun"."name" IS 'Bezeichnung';
 
-COMMENT ON COLUMN "printRun"."numeric" IS 'Numerische Bezeichnung der Ausgabe';
+COMMENT ON COLUMN "printrun"."numeric" IS 'Numerische Bezeichnung der Ausgabe';
 
 -----------------------------------------------------------------------
--- publication_M
+-- publication_m
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "publication_M" CASCADE;
+DROP TABLE IF EXISTS "publication_m" CASCADE;
 
-CREATE TABLE "publication_M"
+CREATE TABLE "publication_m"
 (
     "id" serial NOT NULL,
     "publication_id" INTEGER NOT NULL,
@@ -189,12 +189,12 @@ CREATE TABLE "publication_M"
 );
 
 -----------------------------------------------------------------------
--- publication_DM
+-- publication_dm
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "publication_DM" CASCADE;
+DROP TABLE IF EXISTS "publication_dm" CASCADE;
 
-CREATE TABLE "publication_DM"
+CREATE TABLE "publication_dm"
 (
     "id" serial NOT NULL,
     "publication_id" INTEGER NOT NULL,
@@ -203,17 +203,17 @@ CREATE TABLE "publication_DM"
     PRIMARY KEY ("id")
 );
 
-COMMENT ON COLUMN "publication_DM"."parent" IS 'Übergeordnetes Werk';
+COMMENT ON COLUMN "publication_dm"."parent" IS 'Übergeordnetes Werk';
 
-COMMENT ON COLUMN "publication_DM"."pages" IS 'Seitenangabe';
+COMMENT ON COLUMN "publication_dm"."pages" IS 'Seitenangabe';
 
 -----------------------------------------------------------------------
--- publication_MM
+-- publication_mm
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "publication_MM" CASCADE;
+DROP TABLE IF EXISTS "publication_mm" CASCADE;
 
-CREATE TABLE "publication_MM"
+CREATE TABLE "publication_mm"
 (
     "id" serial NOT NULL,
     "publication_id" INTEGER NOT NULL,
@@ -222,12 +222,12 @@ CREATE TABLE "publication_MM"
 );
 
 -----------------------------------------------------------------------
--- publication_DS
+-- publication_ds
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "publication_DS" CASCADE;
+DROP TABLE IF EXISTS "publication_ds" CASCADE;
 
-CREATE TABLE "publication_DS"
+CREATE TABLE "publication_ds"
 (
     "id" serial NOT NULL,
     "publication_id" INTEGER NOT NULL,
@@ -237,32 +237,32 @@ CREATE TABLE "publication_DS"
     PRIMARY KEY ("id")
 );
 
-COMMENT ON COLUMN "publication_DS"."pages" IS 'Seitenangabe';
+COMMENT ON COLUMN "publication_ds"."pages" IS 'Seitenangabe';
 
 -----------------------------------------------------------------------
--- publication_MS
+-- publication_ms
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "publication_MS" CASCADE;
+DROP TABLE IF EXISTS "publication_ms" CASCADE;
 
-CREATE TABLE "publication_MS"
+CREATE TABLE "publication_ms"
 (
     "id" serial NOT NULL,
     "publication_id" INTEGER NOT NULL,
     "series_id" INTEGER NOT NULL,
-    "volumeNumberInSeries" TEXT,
+    "volumenumberinseries" TEXT,
     PRIMARY KEY ("id")
 );
 
-COMMENT ON COLUMN "publication_MS"."volumeNumberInSeries" IS 'Nummer des Bandes innerhalb der Reihe';
+COMMENT ON COLUMN "publication_ms"."volumenumberinseries" IS 'Nummer des Bandes innerhalb der Reihe';
 
 -----------------------------------------------------------------------
--- publication_JA
+-- publication_ja
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "publication_JA" CASCADE;
+DROP TABLE IF EXISTS "publication_ja" CASCADE;
 
-CREATE TABLE "publication_JA"
+CREATE TABLE "publication_ja"
 (
     "id" serial NOT NULL,
     "publication_id" INTEGER NOT NULL,
@@ -271,17 +271,17 @@ CREATE TABLE "publication_JA"
     PRIMARY KEY ("id")
 );
 
-COMMENT ON COLUMN "publication_JA"."volume_id" IS 'Teil (bei einer mehrteiligen Publikation)';
+COMMENT ON COLUMN "publication_ja"."volume_id" IS 'Teil (bei einer mehrteiligen Publikation)';
 
-COMMENT ON COLUMN "publication_JA"."parent" IS 'Zeitschrift, in der erschienen';
+COMMENT ON COLUMN "publication_ja"."parent" IS 'Zeitschrift, in der erschienen';
 
 -----------------------------------------------------------------------
--- publication_MMS
+-- publication_mms
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "publication_MMS" CASCADE;
+DROP TABLE IF EXISTS "publication_mms" CASCADE;
 
-CREATE TABLE "publication_MMS"
+CREATE TABLE "publication_mms"
 (
     "id" serial NOT NULL,
     "publication_id" INTEGER NOT NULL,
@@ -291,12 +291,12 @@ CREATE TABLE "publication_MMS"
 );
 
 -----------------------------------------------------------------------
--- publication_J
+-- publication_j
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "publication_J" CASCADE;
+DROP TABLE IF EXISTS "publication_j" CASCADE;
 
-CREATE TABLE "publication_J"
+CREATE TABLE "publication_j"
 (
     "id" serial NOT NULL,
     "publication_id" INTEGER NOT NULL,
@@ -304,7 +304,7 @@ CREATE TABLE "publication_J"
     PRIMARY KEY ("id")
 );
 
-COMMENT ON COLUMN "publication_J"."edition" IS 'Ausgabe';
+COMMENT ON COLUMN "publication_j"."edition" IS 'Ausgabe';
 
 -----------------------------------------------------------------------
 -- volume
@@ -315,14 +315,14 @@ DROP TABLE IF EXISTS "volume" CASCADE;
 CREATE TABLE "volume"
 (
     "id" serial NOT NULL,
-    "volumeDescription" INTEGER,
-    "volumeNumeric" TEXT,
+    "volumedescription" INTEGER,
+    "volumenumeric" TEXT,
     PRIMARY KEY ("id")
 );
 
-COMMENT ON COLUMN "volume"."volumeDescription" IS 'Bezeichnung des Bandes';
+COMMENT ON COLUMN "volume"."volumedescription" IS 'Bezeichnung des Bandes';
 
-COMMENT ON COLUMN "volume"."volumeNumeric" IS 'Numerische Bezeichnung des Bandes';
+COMMENT ON COLUMN "volume"."volumenumeric" IS 'Numerische Bezeichnung des Bandes';
 
 -----------------------------------------------------------------------
 -- series
@@ -338,18 +338,18 @@ CREATE TABLE "series"
 );
 
 -----------------------------------------------------------------------
--- publishingCompany
+-- publishingcompany
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "publishingCompany" CASCADE;
+DROP TABLE IF EXISTS "publishingcompany" CASCADE;
 
-CREATE TABLE "publishingCompany"
+CREATE TABLE "publishingcompany"
 (
     "id" serial NOT NULL,
     "name" TEXT NOT NULL,
     "gnd" VARCHAR(255),
     PRIMARY KEY ("id"),
-    CONSTRAINT "publishingCompany_U_1" UNIQUE ("gnd")
+    CONSTRAINT "publishingcompany_U_1" UNIQUE ("gnd")
 );
 
 -----------------------------------------------------------------------
@@ -368,12 +368,12 @@ CREATE TABLE "place"
 );
 
 -----------------------------------------------------------------------
--- dateSpecification
+-- datespecification
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "dateSpecification" CASCADE;
+DROP TABLE IF EXISTS "datespecification" CASCADE;
 
-CREATE TABLE "dateSpecification"
+CREATE TABLE "datespecification"
 (
     "id" serial NOT NULL,
     "year" INTEGER,
@@ -383,12 +383,12 @@ CREATE TABLE "dateSpecification"
 );
 
 -----------------------------------------------------------------------
--- personalName
+-- personalname
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "personalName" CASCADE;
+DROP TABLE IF EXISTS "personalname" CASCADE;
 
-CREATE TABLE "personalName"
+CREATE TABLE "personalname"
 (
     "id" serial NOT NULL,
     "person_id" INTEGER NOT NULL,
@@ -397,17 +397,17 @@ CREATE TABLE "personalName"
 );
 
 -----------------------------------------------------------------------
--- nameFragment
+-- namefragment
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "nameFragment" CASCADE;
+DROP TABLE IF EXISTS "namefragment" CASCADE;
 
-CREATE TABLE "nameFragment"
+CREATE TABLE "namefragment"
 (
     "id" serial NOT NULL,
-    "personalName_id" INTEGER NOT NULL,
+    "personalname_id" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
-    "nameFragmentTypeId" INTEGER NOT NULL,
+    "namefragmenttypeid" INTEGER NOT NULL,
     "sortable_rank" INTEGER,
     PRIMARY KEY ("id")
 );
@@ -425,17 +425,17 @@ CREATE TABLE "title"
 );
 
 -----------------------------------------------------------------------
--- titleFragment
+-- titlefragment
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "titleFragment" CASCADE;
+DROP TABLE IF EXISTS "titlefragment" CASCADE;
 
-CREATE TABLE "titleFragment"
+CREATE TABLE "titlefragment"
 (
     "id" serial NOT NULL,
     "name" TEXT NOT NULL,
     "title_id" INTEGER NOT NULL,
-    "titleFragmentType_id" INTEGER NOT NULL,
+    "titlefragmenttype_id" INTEGER NOT NULL,
     "sortable_rank" INTEGER,
     "name_is_reconstructed" BOOLEAN DEFAULT 'f',
     PRIMARY KEY ("id")
@@ -534,16 +534,16 @@ CREATE TABLE "category_work"
 );
 
 -----------------------------------------------------------------------
--- publication_publicationGroup
+-- publication_publicationgroup
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "publication_publicationGroup" CASCADE;
+DROP TABLE IF EXISTS "publication_publicationgroup" CASCADE;
 
-CREATE TABLE "publication_publicationGroup"
+CREATE TABLE "publication_publicationgroup"
 (
-    "publicationGroup_id" INTEGER NOT NULL,
+    "publicationgroup_id" INTEGER NOT NULL,
     "publication_id" INTEGER NOT NULL,
-    PRIMARY KEY ("publicationGroup_id","publication_id")
+    PRIMARY KEY ("publicationgroup_id","publication_id")
 );
 
 -----------------------------------------------------------------------
@@ -555,7 +555,7 @@ DROP TABLE IF EXISTS "person_publication" CASCADE;
 CREATE TABLE "person_publication"
 (
     "id" serial NOT NULL,
-    "personRole_id" INTEGER NOT NULL,
+    "personrole_id" INTEGER NOT NULL,
     "person_id" INTEGER NOT NULL,
     "publication_id" INTEGER NOT NULL,
     PRIMARY KEY ("id")
@@ -571,18 +571,18 @@ CREATE TABLE "person_work"
 (
     "id" serial NOT NULL,
     "person_id" INTEGER NOT NULL,
-    "personRole_id" INTEGER NOT NULL,
+    "personrole_id" INTEGER NOT NULL,
     "work_id" INTEGER NOT NULL,
     PRIMARY KEY ("id")
 );
 
 -----------------------------------------------------------------------
--- user
+-- dta_user
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "user" CASCADE;
+DROP TABLE IF EXISTS "dta_user" CASCADE;
 
-CREATE TABLE "user"
+CREATE TABLE "dta_user"
 (
     "id" serial NOT NULL,
     "username" TEXT,
@@ -595,12 +595,12 @@ CREATE TABLE "user"
 );
 
 -----------------------------------------------------------------------
--- relatedSet
+-- relatedset
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "relatedSet" CASCADE;
+DROP TABLE IF EXISTS "relatedset" CASCADE;
 
-CREATE TABLE "relatedSet"
+CREATE TABLE "relatedset"
 (
     "id" serial NOT NULL,
     "name" TEXT NOT NULL,
@@ -616,24 +616,24 @@ DROP TABLE IF EXISTS "task" CASCADE;
 CREATE TABLE "task"
 (
     "id" serial NOT NULL,
-    "taskType_id" INTEGER NOT NULL,
+    "tasktype_id" INTEGER NOT NULL,
     "done" BOOLEAN,
     "start" DATE,
     "end" DATE,
     "comments" TEXT,
-    "publicationGroup_id" INTEGER,
+    "publicationgroup_id" INTEGER,
     "publication_id" INTEGER,
-    "responsibleUser_id" INTEGER,
+    "responsibleuser_id" INTEGER,
     PRIMARY KEY ("id")
 );
 
 -----------------------------------------------------------------------
--- taskType
+-- tasktype
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "taskType" CASCADE;
+DROP TABLE IF EXISTS "tasktype" CASCADE;
 
-CREATE TABLE "taskType"
+CREATE TABLE "tasktype"
 (
     "id" serial NOT NULL,
     "name" TEXT NOT NULL,
@@ -667,64 +667,64 @@ CREATE TABLE "partner"
 );
 
 -----------------------------------------------------------------------
--- imageSource
+-- imagesource
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "imageSource" CASCADE;
+DROP TABLE IF EXISTS "imagesource" CASCADE;
 
-CREATE TABLE "imageSource"
+CREATE TABLE "imagesource"
 (
     "id" serial NOT NULL,
     "publication_id" INTEGER NOT NULL,
     "partner_id" INTEGER,
-    "catalogueSignature" TEXT,
-    "catalogueUrl" TEXT,
-    "numFaksimiles" INTEGER,
-    "extentAsOfCatalogue" TEXT,
-    "numPages" INTEGER,
-    "imageUrl" TEXT,
-    "imageUrn" TEXT,
+    "cataloguesignature" TEXT,
+    "catalogueurl" TEXT,
+    "numfaksimiles" INTEGER,
+    "extentasofcatalogue" TEXT,
+    "numpages" INTEGER,
+    "imageurl" TEXT,
+    "imageurn" TEXT,
     "license_id" INTEGER,
     PRIMARY KEY ("id")
 );
 
-COMMENT ON COLUMN "imageSource"."partner_id" IS 'Anbieter Leitdruck';
+COMMENT ON COLUMN "imagesource"."partner_id" IS 'Anbieter Leitdruck';
 
-COMMENT ON COLUMN "imageSource"."catalogueUrl" IS 'Link in den Katalog';
+COMMENT ON COLUMN "imagesource"."catalogueurl" IS 'Link in den Katalog';
 
-COMMENT ON COLUMN "imageSource"."numFaksimiles" IS 'Anzahl Faksimiles';
+COMMENT ON COLUMN "imagesource"."numfaksimiles" IS 'Anzahl Faksimiles';
 
-COMMENT ON COLUMN "imageSource"."extentAsOfCatalogue" IS 'Umfang laut Katalog';
+COMMENT ON COLUMN "imagesource"."extentasofcatalogue" IS 'Umfang laut Katalog';
 
-COMMENT ON COLUMN "imageSource"."numPages" IS 'Umfang lt. Katalog';
+COMMENT ON COLUMN "imagesource"."numpages" IS 'Umfang lt. Katalog';
 
-COMMENT ON COLUMN "imageSource"."imageUrl" IS 'URL der Bilddigitalisate';
+COMMENT ON COLUMN "imagesource"."imageurl" IS 'URL der Bilddigitalisate';
 
-COMMENT ON COLUMN "imageSource"."imageUrn" IS 'URN der Bilddigitalisate';
+COMMENT ON COLUMN "imagesource"."imageurn" IS 'URN der Bilddigitalisate';
 
-COMMENT ON COLUMN "imageSource"."license_id" IS 'Lizenz';
+COMMENT ON COLUMN "imagesource"."license_id" IS 'Lizenz';
 
 -----------------------------------------------------------------------
--- textSource
+-- textsource
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "textSource" CASCADE;
+DROP TABLE IF EXISTS "textsource" CASCADE;
 
-CREATE TABLE "textSource"
+CREATE TABLE "textsource"
 (
     "id" serial NOT NULL,
     "publication_id" INTEGER NOT NULL,
     "partner_id" INTEGER,
-    "imageUrl" TEXT,
+    "imageurl" TEXT,
     "license_id" INTEGER,
     PRIMARY KEY ("id")
 );
 
-COMMENT ON COLUMN "textSource"."partner_id" IS 'Anbieter Textdigitalisate';
+COMMENT ON COLUMN "textsource"."partner_id" IS 'Anbieter Textdigitalisate';
 
-COMMENT ON COLUMN "textSource"."imageUrl" IS 'URL der Textdigitalisate';
+COMMENT ON COLUMN "textsource"."imageurl" IS 'URL der Textdigitalisate';
 
-COMMENT ON COLUMN "textSource"."license_id" IS 'Lizenz';
+COMMENT ON COLUMN "textsource"."license_id" IS 'Lizenz';
 
 -----------------------------------------------------------------------
 -- license
@@ -743,12 +743,12 @@ CREATE TABLE "license"
 );
 
 -----------------------------------------------------------------------
--- publicationGroup
+-- publicationgroup
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "publicationGroup" CASCADE;
+DROP TABLE IF EXISTS "publicationgroup" CASCADE;
 
-CREATE TABLE "publicationGroup"
+CREATE TABLE "publicationgroup"
 (
     "id" serial NOT NULL,
     "name" TEXT NOT NULL,
@@ -756,7 +756,7 @@ CREATE TABLE "publicationGroup"
 );
 
 ALTER TABLE "genre" ADD CONSTRAINT "genre_FK_1"
-    FOREIGN KEY ("childOf")
+    FOREIGN KEY ("childof")
     REFERENCES "genre" ("id");
 
 ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_1"
@@ -768,102 +768,102 @@ ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_2"
     REFERENCES "title" ("id");
 
 ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_3"
-    FOREIGN KEY ("publishingCompany_id")
-    REFERENCES "publishingCompany" ("id");
+    FOREIGN KEY ("publishingcompany_id")
+    REFERENCES "publishingcompany" ("id");
 
 ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_4"
     FOREIGN KEY ("place_id")
     REFERENCES "place" ("id");
 
 ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_5"
-    FOREIGN KEY ("printRun_id")
-    REFERENCES "printRun" ("id");
+    FOREIGN KEY ("printrun_id")
+    REFERENCES "printrun" ("id");
 
 ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_6"
-    FOREIGN KEY ("relatedSet_id")
-    REFERENCES "relatedSet" ("id");
+    FOREIGN KEY ("relatedset_id")
+    REFERENCES "relatedset" ("id");
 
 ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_7"
-    FOREIGN KEY ("publicationDate_id")
-    REFERENCES "dateSpecification" ("id");
+    FOREIGN KEY ("publicationdate_id")
+    REFERENCES "datespecification" ("id");
 
 ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_8"
-    FOREIGN KEY ("firstPublicationDate_id")
-    REFERENCES "dateSpecification" ("id");
+    FOREIGN KEY ("firstpublicationdate_id")
+    REFERENCES "datespecification" ("id");
 
 ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_9"
     FOREIGN KEY ("font_id")
     REFERENCES "font" ("id");
 
 ALTER TABLE "work" ADD CONSTRAINT "work_FK_1"
-    FOREIGN KEY ("dateSpecification_id")
-    REFERENCES "dateSpecification" ("id");
+    FOREIGN KEY ("datespecification_id")
+    REFERENCES "datespecification" ("id");
 
-ALTER TABLE "publication_M" ADD CONSTRAINT "publication_M_FK_1"
+ALTER TABLE "publication_m" ADD CONSTRAINT "publication_m_FK_1"
     FOREIGN KEY ("publication_id")
     REFERENCES "publication" ("id");
 
-ALTER TABLE "publication_DM" ADD CONSTRAINT "publication_DM_FK_1"
+ALTER TABLE "publication_dm" ADD CONSTRAINT "publication_dm_FK_1"
     FOREIGN KEY ("publication_id")
     REFERENCES "publication" ("id");
 
-ALTER TABLE "publication_DM" ADD CONSTRAINT "publication_DM_FK_2"
+ALTER TABLE "publication_dm" ADD CONSTRAINT "publication_dm_FK_2"
     FOREIGN KEY ("parent")
     REFERENCES "publication" ("id");
 
-ALTER TABLE "publication_MM" ADD CONSTRAINT "publication_MM_FK_1"
+ALTER TABLE "publication_mm" ADD CONSTRAINT "publication_mm_FK_1"
     FOREIGN KEY ("publication_id")
     REFERENCES "publication" ("id");
 
-ALTER TABLE "publication_MM" ADD CONSTRAINT "publication_MM_FK_2"
+ALTER TABLE "publication_mm" ADD CONSTRAINT "publication_mm_FK_2"
     FOREIGN KEY ("volume_id")
     REFERENCES "volume" ("id");
 
-ALTER TABLE "publication_DS" ADD CONSTRAINT "publication_DS_FK_1"
+ALTER TABLE "publication_ds" ADD CONSTRAINT "publication_ds_FK_1"
     FOREIGN KEY ("publication_id")
     REFERENCES "publication" ("id");
 
-ALTER TABLE "publication_DS" ADD CONSTRAINT "publication_DS_FK_2"
+ALTER TABLE "publication_ds" ADD CONSTRAINT "publication_ds_FK_2"
     FOREIGN KEY ("volume_id")
     REFERENCES "volume" ("id");
 
-ALTER TABLE "publication_DS" ADD CONSTRAINT "publication_DS_FK_3"
+ALTER TABLE "publication_ds" ADD CONSTRAINT "publication_ds_FK_3"
     FOREIGN KEY ("series_id")
     REFERENCES "series" ("id");
 
-ALTER TABLE "publication_MS" ADD CONSTRAINT "publication_MS_FK_1"
+ALTER TABLE "publication_ms" ADD CONSTRAINT "publication_ms_FK_1"
     FOREIGN KEY ("publication_id")
     REFERENCES "publication" ("id");
 
-ALTER TABLE "publication_MS" ADD CONSTRAINT "publication_MS_FK_2"
+ALTER TABLE "publication_ms" ADD CONSTRAINT "publication_ms_FK_2"
     FOREIGN KEY ("series_id")
     REFERENCES "series" ("id");
 
-ALTER TABLE "publication_JA" ADD CONSTRAINT "publication_JA_FK_1"
+ALTER TABLE "publication_ja" ADD CONSTRAINT "publication_ja_FK_1"
     FOREIGN KEY ("publication_id")
     REFERENCES "publication" ("id");
 
-ALTER TABLE "publication_JA" ADD CONSTRAINT "publication_JA_FK_2"
+ALTER TABLE "publication_ja" ADD CONSTRAINT "publication_ja_FK_2"
     FOREIGN KEY ("parent")
     REFERENCES "publication" ("id");
 
-ALTER TABLE "publication_JA" ADD CONSTRAINT "publication_JA_FK_3"
+ALTER TABLE "publication_ja" ADD CONSTRAINT "publication_ja_FK_3"
     FOREIGN KEY ("volume_id")
     REFERENCES "volume" ("id");
 
-ALTER TABLE "publication_MMS" ADD CONSTRAINT "publication_MMS_FK_1"
+ALTER TABLE "publication_mms" ADD CONSTRAINT "publication_mms_FK_1"
     FOREIGN KEY ("publication_id")
     REFERENCES "publication" ("id");
 
-ALTER TABLE "publication_MMS" ADD CONSTRAINT "publication_MMS_FK_2"
+ALTER TABLE "publication_mms" ADD CONSTRAINT "publication_mms_FK_2"
     FOREIGN KEY ("volume_id")
     REFERENCES "volume" ("id");
 
-ALTER TABLE "publication_MMS" ADD CONSTRAINT "publication_MMS_FK_3"
+ALTER TABLE "publication_mms" ADD CONSTRAINT "publication_mms_FK_3"
     FOREIGN KEY ("series_id")
     REFERENCES "series" ("id");
 
-ALTER TABLE "publication_J" ADD CONSTRAINT "publication_J_FK_1"
+ALTER TABLE "publication_j" ADD CONSTRAINT "publication_j_FK_1"
     FOREIGN KEY ("publication_id")
     REFERENCES "publication" ("id");
 
@@ -871,25 +871,25 @@ ALTER TABLE "series" ADD CONSTRAINT "series_FK_1"
     FOREIGN KEY ("title_id")
     REFERENCES "title" ("id");
 
-ALTER TABLE "personalName" ADD CONSTRAINT "personalName_FK_1"
+ALTER TABLE "personalname" ADD CONSTRAINT "personalname_FK_1"
     FOREIGN KEY ("person_id")
     REFERENCES "person" ("id");
 
-ALTER TABLE "nameFragment" ADD CONSTRAINT "nameFragment_FK_1"
-    FOREIGN KEY ("nameFragmentTypeId")
-    REFERENCES "nameFragmentType" ("id");
+ALTER TABLE "namefragment" ADD CONSTRAINT "namefragment_FK_1"
+    FOREIGN KEY ("namefragmenttypeid")
+    REFERENCES "namefragmenttype" ("id");
 
-ALTER TABLE "nameFragment" ADD CONSTRAINT "nameFragment_FK_2"
-    FOREIGN KEY ("personalName_id")
-    REFERENCES "personalName" ("id");
+ALTER TABLE "namefragment" ADD CONSTRAINT "namefragment_FK_2"
+    FOREIGN KEY ("personalname_id")
+    REFERENCES "personalname" ("id");
 
-ALTER TABLE "titleFragment" ADD CONSTRAINT "titleFragment_FK_1"
+ALTER TABLE "titlefragment" ADD CONSTRAINT "titlefragment_FK_1"
     FOREIGN KEY ("title_id")
     REFERENCES "title" ("id");
 
-ALTER TABLE "titleFragment" ADD CONSTRAINT "titleFragment_FK_2"
-    FOREIGN KEY ("titleFragmentType_id")
-    REFERENCES "titleFragmentType" ("id");
+ALTER TABLE "titlefragment" ADD CONSTRAINT "titlefragment_FK_2"
+    FOREIGN KEY ("titlefragmenttype_id")
+    REFERENCES "titlefragmenttype" ("id");
 
 ALTER TABLE "language_work" ADD CONSTRAINT "language_work_FK_1"
     FOREIGN KEY ("language_id")
@@ -923,17 +923,17 @@ ALTER TABLE "category_work" ADD CONSTRAINT "category_work_FK_2"
     FOREIGN KEY ("work_id")
     REFERENCES "work" ("id");
 
-ALTER TABLE "publication_publicationGroup" ADD CONSTRAINT "publication_publicationGrou_FK_1"
-    FOREIGN KEY ("publicationGroup_id")
-    REFERENCES "publicationGroup" ("id");
+ALTER TABLE "publication_publicationgroup" ADD CONSTRAINT "publication_publicationgrou_FK_1"
+    FOREIGN KEY ("publicationgroup_id")
+    REFERENCES "publicationgroup" ("id");
 
-ALTER TABLE "publication_publicationGroup" ADD CONSTRAINT "publication_publicationGrou_FK_2"
+ALTER TABLE "publication_publicationgroup" ADD CONSTRAINT "publication_publicationgrou_FK_2"
     FOREIGN KEY ("publication_id")
     REFERENCES "publication" ("id");
 
 ALTER TABLE "person_publication" ADD CONSTRAINT "person_publication_FK_1"
-    FOREIGN KEY ("personRole_id")
-    REFERENCES "personRole" ("id");
+    FOREIGN KEY ("personrole_id")
+    REFERENCES "personrole" ("id");
 
 ALTER TABLE "person_publication" ADD CONSTRAINT "person_publication_FK_2"
     FOREIGN KEY ("person_id")
@@ -948,49 +948,49 @@ ALTER TABLE "person_work" ADD CONSTRAINT "person_work_FK_1"
     REFERENCES "person" ("id");
 
 ALTER TABLE "person_work" ADD CONSTRAINT "person_work_FK_2"
-    FOREIGN KEY ("personRole_id")
-    REFERENCES "personRole" ("id");
+    FOREIGN KEY ("personrole_id")
+    REFERENCES "personrole" ("id");
 
 ALTER TABLE "person_work" ADD CONSTRAINT "person_work_FK_3"
     FOREIGN KEY ("work_id")
     REFERENCES "work" ("id");
 
 ALTER TABLE "task" ADD CONSTRAINT "task_FK_1"
-    FOREIGN KEY ("taskType_id")
-    REFERENCES "taskType" ("id");
+    FOREIGN KEY ("tasktype_id")
+    REFERENCES "tasktype" ("id");
 
 ALTER TABLE "task" ADD CONSTRAINT "task_FK_2"
-    FOREIGN KEY ("publicationGroup_id")
-    REFERENCES "publicationGroup" ("id");
+    FOREIGN KEY ("publicationgroup_id")
+    REFERENCES "publicationgroup" ("id");
 
 ALTER TABLE "task" ADD CONSTRAINT "task_FK_3"
     FOREIGN KEY ("publication_id")
     REFERENCES "publication" ("id");
 
 ALTER TABLE "task" ADD CONSTRAINT "task_FK_4"
-    FOREIGN KEY ("responsibleUser_id")
-    REFERENCES "user" ("id");
+    FOREIGN KEY ("responsibleuser_id")
+    REFERENCES "dta_user" ("id");
 
-ALTER TABLE "imageSource" ADD CONSTRAINT "imageSource_FK_1"
+ALTER TABLE "imagesource" ADD CONSTRAINT "imagesource_FK_1"
     FOREIGN KEY ("publication_id")
     REFERENCES "publication" ("id");
 
-ALTER TABLE "imageSource" ADD CONSTRAINT "imageSource_FK_2"
+ALTER TABLE "imagesource" ADD CONSTRAINT "imagesource_FK_2"
     FOREIGN KEY ("license_id")
     REFERENCES "license" ("id");
 
-ALTER TABLE "imageSource" ADD CONSTRAINT "imageSource_FK_3"
+ALTER TABLE "imagesource" ADD CONSTRAINT "imagesource_FK_3"
     FOREIGN KEY ("partner_id")
     REFERENCES "partner" ("id");
 
-ALTER TABLE "textSource" ADD CONSTRAINT "textSource_FK_1"
+ALTER TABLE "textsource" ADD CONSTRAINT "textsource_FK_1"
     FOREIGN KEY ("publication_id")
     REFERENCES "publication" ("id");
 
-ALTER TABLE "textSource" ADD CONSTRAINT "textSource_FK_2"
+ALTER TABLE "textsource" ADD CONSTRAINT "textsource_FK_2"
     FOREIGN KEY ("license_id")
     REFERENCES "license" ("id");
 
-ALTER TABLE "textSource" ADD CONSTRAINT "textSource_FK_3"
+ALTER TABLE "textsource" ADD CONSTRAINT "textsource_FK_3"
     FOREIGN KEY ("partner_id")
     REFERENCES "partner" ("id");

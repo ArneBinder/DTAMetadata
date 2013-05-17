@@ -15,19 +15,19 @@
     </behavior>
     
     <!-- Verfügbare Arten von Titelfragmenten. Zum Beispiel Haupttitel, Untertitel, Kurztitel, etc. -->
-    <table name="titleFragmentType">
+    <table name="titlefragmenttype">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
     </table>
 
     <!-- Verfuegbare Arten von Namensfragmenten. Zum Beispiel Vorname, Nachname, Kuenstlername, etc. -->
-    <table name="nameFragmentType">
+    <table name="namefragmenttype">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
     </table>
     
     <!--Beziehungstypen zwischen Personen und Publikationen oder Werken. Zum Beispiel Verleger, Drucker, Übersetzer oder Autor -->
-    <table name="personRole" idMethod="native">
+    <table name="personrole" idMethod="native">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
         <!--Ob diese Rolle auf eine Beziehung zwischen Personen und Publikationen angewandt werden darf (z.B. nicht Autor)-->
@@ -37,32 +37,32 @@
     </table>
   
     <!--Korpora.--> 
-    <table name="corpus" phpName="Corpus">
+    <table name="corpus">
         <column name="id" type="INTEGER" size="10" sqlType="int(10) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
         <!--        <unique name="korpusname_einzigartig">
-            <unique-column name="corpusNameHash"/>
+            <unique-column name="corpusnamehash"/>
         </unique>-->
     </table>
     
     <!--Kategorien. Zum Beispiel Ratgeber, Zeitschrift, etc. -->
-    <table name="category" phpName="Category">
+    <table name="category">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
     </table>
     
     <!--Schlagwörter. Zum Beispiel Bürgerliche Revolution, Köln, etc. -->
-    <table name="tag" phpName="Tag">
+    <table name="tag">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
     </table>
     
     <!--Genres (Baumstruktur) Zum Beispiel Sachliteratur (Fachliteratur, Gebrauchsliteratur, etc.), Belletristik, etc. -->
-    <table name="genre" phpName="Genre">
+    <table name="genre">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
-        <column name="childOf" type="INTEGER" required="false"/>
-        <foreign-key foreignTable="genre"> <reference local="childOf" foreign="id"/> </foreign-key>
+        <column name="childof" type="INTEGER" required="false"/>
+        <foreign-key foreignTable="genre"> <reference local="childof" foreign="id"/> </foreign-key>
     </table>
 </database>
     

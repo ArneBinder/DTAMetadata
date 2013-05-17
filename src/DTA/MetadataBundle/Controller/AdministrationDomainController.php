@@ -21,7 +21,7 @@ class AdministrationDomainController extends DTABaseController {
      * @Route("/Anmeldung", name="login")
      */
     public function loginFormAction() {
-
+        
         $request = $this->getRequest();
         $session = $request->getSession();
 

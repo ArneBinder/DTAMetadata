@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- 
-    Contains cross ref tables and the only entity of the administrative domain (User).
+    Contains cross ref tables and the only entity of the administrative domain (dta_user).
 -->
 
 <!--The name attribute refers to the connection to use. See app/config/config.yml under
@@ -41,10 +41,10 @@
         <foreign-key foreignTable="work"> <reference local="work_id" foreign="id"/> </foreign-key>
     </table>
     
-    <table name="publication_publicationGroup" isCrossRef="true">
-        <column name="publicationGroup_id" type="INTEGER" primaryKey="true" required="true"/>
+    <table name="publication_publicationgroup" isCrossRef="true">
+        <column name="publicationgroup_id" type="INTEGER" primaryKey="true" required="true"/>
         <column name="publication_id" type="INTEGER" primaryKey="true" required="true"/>
-        <foreign-key foreignTable="publicationGroup"> <reference local="publicationGroup_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="publicationgroup"> <reference local="publicationgroup_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="publication">
             <reference local="publication_id" foreign="id"/>
         </foreign-key>
@@ -52,11 +52,11 @@
 
     <table name="person_publication" idMethod="native">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="personRole_id" type="INTEGER" required="true"/>
+        <column name="personrole_id" type="INTEGER" required="true"/>
         <column name="person_id" type="INTEGER" required="true"/>
         <column name="publication_id" type="INTEGER" required="true"/>
         
-        <foreign-key foreignTable="personRole"> <reference local="personRole_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="personrole"> <reference local="personrole_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="person"> <reference local="person_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
     </table>
@@ -64,14 +64,14 @@
     <table name="person_work" idMethod="native">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="person_id" type="INTEGER" required="true"/>
-        <column name="personRole_id" type="INTEGER" required="true"/>
+        <column name="personrole_id" type="INTEGER" required="true"/>
         <column name="work_id" type="INTEGER" required="true"/>
         <foreign-key foreignTable="person"> <reference local="person_id" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="personRole"> <reference local="personRole_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="personrole"> <reference local="personrole_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="work"> <reference local="work_id" foreign="id"/> </foreign-key>
     </table>
 
-    <table name="user" phpName="User">
+    <table name="dta_user">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="username" type="LONGVARCHAR" required="false"/>
         <column name="password" type="VARCHAR" size="512" required="false"/>
@@ -81,11 +81,11 @@
         <column name="admin" type="BOOLEAN" default="false" required="false"/>
         
         <behavior name="table_row_view">
-            <parameter name="Id" value="id"/>
-            <parameter name="Benutzername" value="username"/>
-            <parameter name="Mail" value="mail"/>
-            <parameter name="Telefon" value="phone"/>
-            <parameter name="Administratorrechte" value="accessor:adminToString"/>
+            <parameter name="id" value="id"/>
+            <parameter name="benutzername" value="username"/>
+            <parameter name="mail" value="mail"/>
+            <parameter name="telefon" value="phone"/>
+            <parameter name="administratorrechte" value="accessor:adminToString"/>
         </behavior>
         
     </table>

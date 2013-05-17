@@ -2,10 +2,10 @@
 
 /**
  * Data object containing the SQL and PHP code to migrate the database
- * up to version 1362150903.
- * Generated on 2013-03-01 16:15:03 by carlwitt
+ * up to version 1368792315.
+ * Generated on 2013-05-17 14:05:15 by carlwitt
  */
-class PropelMigration_1362150903
+class PropelMigration_1368792315
 {
 
     public function preUp($manager)
@@ -38,12 +38,13 @@ class PropelMigration_1362150903
     {
         return array (
   'DTAMetadata' => '
-# This is a fix for InnoDB in MySQL >= 4.1.x
-# It "suspends judgement" for fkey relationships until are tables are set.
-SET FOREIGN_KEY_CHECKS = 0;
+ALTER TABLE "user" RENAME TO "dta_user";
 
-# This restores the fkey checks, after having unset them earlier
-SET FOREIGN_KEY_CHECKS = 1;
+ALTER TABLE "task" DROP CONSTRAINT "task_FK_4";
+
+ALTER TABLE "task" ADD CONSTRAINT "task_FK_4"
+    FOREIGN KEY ("responsibleuser_id")
+    REFERENCES "dta_user" ("id");
 ',
 );
     }
@@ -58,12 +59,13 @@ SET FOREIGN_KEY_CHECKS = 1;
     {
         return array (
   'DTAMetadata' => '
-# This is a fix for InnoDB in MySQL >= 4.1.x
-# It "suspends judgement" for fkey relationships until are tables are set.
-SET FOREIGN_KEY_CHECKS = 0;
+ALTER TABLE "dta_user" RENAME TO "user";
 
-# This restores the fkey checks, after having unset them earlier
-SET FOREIGN_KEY_CHECKS = 1;
+ALTER TABLE "task" DROP CONSTRAINT "task_FK_4";
+
+ALTER TABLE "task" ADD CONSTRAINT "task_FK_4"
+    FOREIGN KEY ("responsibleuser_id")
+    REFERENCES "user" ("id");
 ',
 );
     }

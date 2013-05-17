@@ -92,9 +92,9 @@ propel:
             DTAMetadata:
               # the database parameters are stored in parameters.yml
               driver:     "pgsql"
-              user:       "postgres"
+              user:       "carlwitt"
               password:   "root"
-              dsn:        "pgsql:host=%database_host%;dbname=%database_name%;"
+              dsn:        "pgsql:host=localhost;dbname=dtametadata"
               options:    {}
               attributes: {}
 # this was only used to generate a schema from an existing database (which was in turn generated with the mysql workbench graphical tools)
