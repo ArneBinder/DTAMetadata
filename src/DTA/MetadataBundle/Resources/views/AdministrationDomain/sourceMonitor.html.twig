@@ -16,6 +16,13 @@
     {% endif %}
 {% endfor %}
 
+{% if classesWithoutForm|length > 0 %}
+<h2> Basic Entities Without Form Type</h2>
+
+    {% for c in classesWithoutForm %}    
+        {{ c }} <br/>
+    {% endfor %}
+{% endif %}
             
 <h2> Basic Entities</h2>            
     <table class="table table-striped table-hover"> 

@@ -76,7 +76,6 @@ class AdministrationDomainController extends DTABaseController {
         );
         $modelLocation = "Model/";
         
-        
         $workingDir = $bundleDir . $modelLocation;
         $handle = opendir($workingDir);
         if (!$handle) { throw new Exception("Problems opening $bundleDir"); }
@@ -97,7 +96,7 @@ class AdministrationDomainController extends DTABaseController {
             $entities[] = array(
                 "filename" => $entry , 
                 "name" => substr( $entry, 0, strlen($entry)-strlen(".php") ), 
-                'last change' => date("l j.n Y H:i", filectime($workingDir.$entry)),
+                'last change' => date("l j. F Y H:i", filectime($workingDir.$entry)),
             );
         }
         
@@ -108,6 +107,7 @@ class AdministrationDomainController extends DTABaseController {
         $entityNames = array_map(function($e){return $e['name'];}, $entities);
             
         $strayClasses = array();
+        
         foreach ($locations as $type => $path) {
             $handle = opendir($bundleDir . $path);
             $strayClasses[$type] = array();
@@ -152,10 +152,32 @@ class AdministrationDomainController extends DTABaseController {
             }
         }
         
+        // 3. FIND BASIC ENTITIES WITHOUT FORM TYPE
+        $handle = opendir($bundleDir . $locations['form']);
+        // make a copy of classes without form
+        $classesWithoutForm = $entityNames;
+        while (false !== ($entry = readdir($handle)) ){
+
+            // ignore non php files
+            if( 0 !== substr_compare($entry, ".php", -strlen(".php"))) continue;
+
+            $formFor = $entry;
+
+            // remove the suffix Type.php if it exists
+            if( 0 === substr_compare($formFor, "Type.php", -strlen("Type.php")) )
+                $formFor = substr($formFor, 0, -strlen("Type.php"));
+
+            if( false !== ($idx = array_search($formFor, $entityNames, true)) )
+                unset($classesWithoutForm[$idx]);
+
+        }
+        
+        
         return $this->renderControllerSpecificAction('DTAMetadataBundle:AdministrationDomain:sourceMonitor.html.twig', array(
                 'columns' => $columns,
                 'entries' => $entities,
                 'strayTypes' => array('base', 'map', 'form'),
+                'classesWithoutForm' => $classesWithoutForm,
                 'strayClasses' => $strayClasses,
             
         ));

@@ -5,7 +5,7 @@ namespace DTA\MetadataBundle\Form\Type;
 use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class PublicationDMType extends BaseAbstractType
+class PublicationDmType extends BaseAbstractType
 {
     protected $options = array(
         'data_class' => 'DTA\MetadataBundle\Model\PublicationDM',

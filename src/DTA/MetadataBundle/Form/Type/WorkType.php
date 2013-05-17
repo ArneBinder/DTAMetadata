@@ -27,15 +27,15 @@ class WorkType extends BaseAbstractType
         $builder->add('datespecification', new DatespecificationType(), array(
             'label' => 'Entstehungsjahr'
         ));
-        $builder->add('personWorks', new DynamicCollectionType(), array(
-            'type' => new PersonworkType(),
-            'allow_add' => true,
-            'allow_delete' => true,
-            'by_reference' => false,
-            'inlineLabel' => false,
-            'sortable' => false,
-            'label' => 'Werkbezogene Personalia',
-        ));
+//        $builder->add('personWorks', new DynamicCollectionType(), array(
+//            'type' => new PersonworkType(),
+//            'allow_add' => true,
+//            'allow_delete' => true,
+//            'by_reference' => false,
+//            'inlineLabel' => false,
+//            'sortable' => false,
+//            'label' => 'Werkbezogene Personalia',
+//        ));
 //        $builder->add('genreId');
 //        $builder->add('subgenreId');
 //        $builder->add('dwdsgenreId');
