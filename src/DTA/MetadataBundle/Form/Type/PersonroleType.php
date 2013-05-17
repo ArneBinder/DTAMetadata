@@ -18,7 +18,11 @@ class PersonroleType extends BaseAbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('name');
-        $builder->add('applicableToPublication');
-        $builder->add('applicableToWork');
+        $builder->add('applicableToPublication', 'checkbox',array(
+            'label' => 'Bezieht sich auf Werke'
+        ));
+        $builder->add('applicableToWork', 'checkbox',array(
+            'label' => 'Bezieht sich auf Publikationen'
+        ));
     }
 }

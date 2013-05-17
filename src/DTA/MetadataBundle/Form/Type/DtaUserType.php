@@ -5,11 +5,11 @@ namespace DTA\MetadataBundle\Form\Type;
 use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class UserType extends BaseAbstractType
+class DtaUserType extends BaseAbstractType
 {
     protected $options = array(
-        'data_class' => 'DTA\MetadataBundle\Model\User',
-        'name'       => 'user',
+        'data_class' => 'DTA\MetadataBundle\Model\DtaUser',
+        'name'       => 'dtauser',
     );
 
     /**
@@ -17,9 +17,13 @@ class UserType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('username');
-        $builder->add('mail');
-        $builder->add('phone');
+        $builder->add('username','text');
+        $builder->add('mail','text', array(
+            'required' => false,
+        ));
+        $builder->add('phone','text', array(
+            'required' => false,
+        ));
         $builder->add('password', 'password', array(
             'required' => false,
         ));

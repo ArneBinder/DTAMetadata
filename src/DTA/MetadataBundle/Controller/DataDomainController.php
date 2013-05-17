@@ -35,8 +35,8 @@ class DataDomainController extends DTABaseController {
         // contains the php model class names for each publication type
         // see dta_data_schema for explanations of the single types.
         $publicationTypes = array(
-            "PublicationM","PublicationDM","PublicationMM","PublicationDS",
-            "PublicationMS","PublicationJA","PublicationMMS","PublicationJ");
+            "PublicationM","PublicationDm","PublicationMm","PublicationDs",
+            "PublicationMs","PublicationJa","PublicationMms","PublicationJ");
         
         foreach( $publicationTypes as $pt ){
             $this->domainMenu['publication']['children'][] = array("caption" => $pt, "modelClass" => $pt);
@@ -54,34 +54,33 @@ class DataDomainController extends DTABaseController {
         ));
     }
 
-    /**
+    /**acl
      * TODO: finalization. remove test data generator.
      * @Route("/generateTestData", name="generateTestData")
      */
     public function generateTestDataAction() {
         
         // name fragment types
-//        
-//        $vorname = new Model\Namefragmenttype();
-//        $vorname->setName("Vorname");
-//        $vorname->save();
-//
-//        $nachname = new Model\Namefragmenttype();
-//        $nachname->setName("Nachname");
-//        $nachname->save();
-//        
-//        $adelstitel = new Model\Namefragmenttype();
-//        $adelstitel->setName("Adelstitel");
-//        $adelstitel->save();
-//            
-//        $generation = new Model\Namefragmenttype();
-//        $generation->setName("Generation");
-//        $generation->save();
-//        
-//        $pseudonym = new Model\Namefragmenttype();
-//        $pseudonym->setName("Pseudonym");
-//        $pseudonym->save();
         
+        $vorname = new Model\Namefragmenttype();
+        $vorname->setName("Vorname");
+        $vorname->save();
+
+        $nachname = new Model\Namefragmenttype();
+        $nachname->setName("Nachname");
+        $nachname->save();
+        
+        $adelstitel = new Model\Namefragmenttype();
+        $adelstitel->setName("Adelstitel");
+        $adelstitel->save();
+            
+        $generation = new Model\Namefragmenttype();
+        $generation->setName("Generation");
+        $generation->save();
+        
+        $pseudonym = new Model\Namefragmenttype();
+        $pseudonym->setName("Pseudonym");
+        $pseudonym->save();
 
         // users
         $usernames = array("Frank", "Susanne", "Matthias", "Christian", "Carl", "Alexander");

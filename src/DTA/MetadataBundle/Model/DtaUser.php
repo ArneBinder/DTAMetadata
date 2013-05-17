@@ -53,7 +53,7 @@ class DtaUser extends BaseDtaUser implements \Symfony\Component\Security\Core\Us
             // because it's currently filled with the form data
             \Propel::disableInstancePooling();
 
-            $uq = UserQuery::create()->findOneById($this->getId());
+            $uq = DtaUserQuery::create()->findOneById($this->getId());
             if( null !== $uq ){
                 $oldPassword = $uq->getPassword();
                 $this->setPassword($oldPassword);

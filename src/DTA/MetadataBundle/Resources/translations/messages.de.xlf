@@ -7,7 +7,7 @@
                 <target>Werk</target>
             </trans-unit>
             <trans-unit id="2">
-                <source>User</source>
+                <source>DtaUser</source>
                 <target>Benutzer</target>
             </trans-unit>
             <trans-unit id="3">
@@ -111,11 +111,11 @@
                 <target>Arbeitsschritt</target>
             </trans-unit>
             <trans-unit id="28">
-				<source>PublicationDM</source>
+				<source>PublicationDm</source>
 				<target>Unselbstständiger Teil einer Monographie</target>
 			</trans-unit>
 			<trans-unit id="29">
-				<source>PublicationDS</source>
+				<source>PublicationDs</source>
 				<target>Unselbständige Schrift in einem Band, der Teil einer Reihe ist</target>
 			</trans-unit>
 			<trans-unit id="30">
@@ -123,7 +123,7 @@
 				<target>Zeitschriften-/Zeitungsausgabe</target>
 			</trans-unit>
 			<trans-unit id="31">
-				<source>PublicationJA</source>
+				<source>PublicationJa</source>
 				<target>Artikel einer Zeitschrift/Zeitung</target>
 			</trans-unit>
 			<trans-unit id="32">
@@ -131,15 +131,15 @@
 				<target>Einteilige Monographie</target>
 			</trans-unit>
 			<trans-unit id="33">
-				<source>PublicationMM</source>
+				<source>PublicationMm</source>
 				<target>Teil einer mehrbändigen Monographie</target>
 			</trans-unit>
 			<trans-unit id="34">
-				<source>PublicationMMS</source>
+				<source>PublicationMms</source>
 				<target>Teil einer mehrbändigen Monographie, die ihrerseits Teil einer Reihe ist</target>
 			</trans-unit>
 			<trans-unit id="35">
-				<source>PublicationMS</source>
+				<source>PublicationMs</source>
 				<target>Selbstständiger Band einer Reihe</target>
 			</trans-unit>
         </body>

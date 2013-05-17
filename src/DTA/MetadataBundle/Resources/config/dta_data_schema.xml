@@ -63,7 +63,9 @@
         <foreign-key foreignTable="publishingcompany"> <reference local="publishingcompany_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="place"> <reference local="place_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="printrun"> <reference local="printrun_id" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="relatedset"> <reference local="relatedset_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="relatedset"> 
+            <reference local="relatedset_id" foreign="id"/> 
+        </foreign-key>
 
         <foreign-key foreignTable="datespecification"> <reference local="publicationdate_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="datespecification"> <reference local="firstpublicationdate_id" foreign="id"/> </foreign-key>

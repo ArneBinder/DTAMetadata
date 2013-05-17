@@ -28,7 +28,7 @@ class WorkType extends BaseAbstractType
             'label' => 'Entstehungsjahr'
         ));
         $builder->add('personWorks', new DynamicCollectionType(), array(
-            'type' => new PersonWorkType(),
+            'type' => new PersonworkType(),
             'allow_add' => true,
             'allow_delete' => true,
             'by_reference' => false,

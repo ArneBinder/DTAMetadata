@@ -60,7 +60,7 @@ class DTABaseController extends Controller {
 //        $rc->getStaticPropertyValue("")
 
         return $this->renderDomainKeySpecificAction($domainKey, "DTAMetadataBundle::genericView.html.twig", array(
-                    'data' => $query->find(),
+                    'data' => $query->orderById()->find(),
                     'columns' => $modelClass::getTableViewColumnNames(),
                     'className' => $className,
                     'updatedObjectId' => $updatedObjectId,
