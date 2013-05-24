@@ -324,6 +324,7 @@
         <!--The name is added in the personalName table because it's a one-to-many relationship.-->
         
         <behavior name="table_row_view">
+            <parameter name="id" value="id"/>
             <parameter name="erster name@representative" value="personalname"/>
             <parameter name="namen gesamt@count" value="personalname"/>
             <parameter name="gnd" value="gnd"/>

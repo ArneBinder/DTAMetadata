@@ -29,15 +29,15 @@
             {#{ form_rest(form) }#}
     </div>
 {% endblock %}
-{% block personwork_row %}
+{#% block personwork_row %}
     <div class="control-group form-inline">
             {{ form_errors(form.workrole) }}
             {{ form_widget(form.workrole) }}
             {{ form_errors(form.person) }}
             {{ form_widget(form.person) }}
             {#{ form_rest(form) }#}
-    </div>
-{% endblock %}
+ {#   </div>
+{% endblock %#}
 
 {# --------------------- Space and Time --------------------- #}
 

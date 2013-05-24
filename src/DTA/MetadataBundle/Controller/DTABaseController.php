@@ -158,21 +158,24 @@ class DTABaseController extends Controller {
      * 
      * @param string $className   The name of the model class (e.g. Publication, Title, Titlefragment)
      * @param int    $recordId    The id of the record to edit. Zero indicates that a new record shall be created (since one is the smallest id)
-     * @param string $captionProperty The property to use as caption for a select option (only for ajax use)
+     * @param string $property The property to use as caption for a select option (only for ajax use)
      * 
-     * @Route("/ajaxModalForm/{className}/{recordId}/{captionProperty}", 
+     * @Route("/ajaxModalForm/{className}/{recordId}/{property}", 
      *      name="ajaxModalForm", 
      *      defaults={"recordId"=0, "captionProperty"="Id"})
      */
-    public function generateAjaxModalFormAction($className, $recordId = 0, $captionProperty = "Id") {
+    public function generateAjaxModalFormAction($className, $recordId = 0, $property = "Id") {
 
         $form = $this->generateForm($className, $recordId);
 
         // plain ajax response, without any menus or other html
         return $this->render("DTAMetadataBundle:Form:ajaxModalForm.html.twig", array(
                     'form' => $form->createView(),
-                    'className' => $className,
-                    'captionProperty' => $captionProperty,
+                    'newActionParameters' => array(
+                        'domainKey' => 'ajax',
+                        'className' => $className,
+                        'property' => $property,
+                    ),
                 ));
     }
 
@@ -184,9 +187,9 @@ class DTABaseController extends Controller {
      * @param string captionProperty For ajax use: Which attribute does the select use to describe the entities it lists? Used to generate a new select option via ajax.
      * @return HTML Option Element|nothing If the new action is called by a nested ajax form (selectOrAdd form type) the result is the option element to add to the nearby select.
      * 
-     * @Route("/genericNew/{domainKey}/{className}/{captionProperty}", name="genericNew", defaults={"captionProperty"="getId"})
+     * @Route("/genericNew/{domainKey}/{className}/{property}", name="genericNew", defaults={"property"="Id"})
      */
-    public function genericNewAction(Request $request, $className, $domainKey, $captionProperty = "getId") {
+    public function genericNewAction(Request $request, $className, $domainKey, $property = "Id") {
 
         $classNames = $this->relatedClassNames($className);
 
@@ -203,10 +206,18 @@ class DTABaseController extends Controller {
 
             // AJAX case (nested form submit, no redirect)
             if ("ajax" == $domainKey) {
+                
                 // fetch data for the newly selectable option
                 $id = $obj->getId();
-                $getter = 'get' . $captionProperty;
-                $caption = $obj->$getter();
+                
+                $captionAccessor = "get" . $property;
+                
+                // check whether the caption accessor function exists
+                $cr = new \ReflectionClass("\DTA\MetadataBundle\Model\\" . $className);
+                if( ! $cr->hasMethod($captionAccessor) )
+                    throw new \Exception("Can't retrieve caption via $captionAccessor from $className object.");
+                
+                $caption = $obj->$captionAccessor();
 
                 // return the new select option html fragment
                 return new Response("<option value='$id'>$caption</option>");

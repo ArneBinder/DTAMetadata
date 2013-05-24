@@ -28,8 +28,8 @@ class WorkType extends BaseAbstractType
         $builder->add('datespecification', new DatespecificationType(), array(
             'label' => 'Entstehungsjahr'
         ));
-//        $builder->add('personWorks', new DynamicCollectionType(), array(
-//            'type' => new PersonworkType(),
+//        $builder->add('PersonWorks', new DynamicCollectionType(), array(
+//            'type' => new PersonWorkType(),
 //            'allow_add' => true,
 //            'allow_delete' => true,
 //            'by_reference' => false,

@@ -17,7 +17,11 @@ class PersonWorkType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('personId');
+        $builder->add('person', new \DTA\MetadataBundle\Form\DerivedType\SelectOrAddType(), array(
+            'class' => 'DTA\MetadataBundle\Model\Person',
+            'property' => 'SelectBoxString',        // actually, this is thought for attributes, but if the attribute isn't found, the getter function is tried.
+            'searchable' => false
+        ));
         $builder->add('personroleId');
         $builder->add('workId');
     }

@@ -1,5 +1,16 @@
 <?php
-
+/**
+ * Adds an add button after the select box to extend the range of existing records if (e.g. add a person while creating a book written by that
+ * person without having to open another window and creating the person first, reloading the form and selecting it).
+ * 
+ * Options:
+ *  class               fully qualified class name, e.g. DTA\MetadataBundle\Model\Status
+ *  property            attribute to use for getting the string which is displayed in the select box.
+ *                      can be a function name that starts with get (since propel will try these automatically),
+ *                      but then, the "get"-prefix must be omitted (use 'property' => 'SelectBoxString') to 
+ *                      retrieve the caption via the getSelectBoxString function.
+ *  searchable          whether to apply the select2 plugin to add typeahead functionality
+ */
 namespace DTA\MetadataBundle\Form\DerivedType;
 
 use Symfony\Bridge\Propel1\Form\ChoiceList\ModelChoiceList;
@@ -47,19 +58,49 @@ class SelectOrAddType extends \Symfony\Bridge\Propel1\Form\Type\ModelType {
         $parts = explode('\\', $className);
         $modelClass = array_pop($parts);
         
-        $view->vars['modelClass'] = $modelClass;
-        $view->vars['captionProperty'] = $options['property'];
-        $view->vars['searchable'] = $options['searchable'];
+        $view->vars['selectOrAddConfiguration'] = array(
+            'modalRetrievePathParameters' => array(
+                'className' => $modelClass,
+                'domainKey' => 'ajax',                      // when posting the data, request ajax-friendly response 
+                                                            // in this case, the additional select box element (<option>) is returned
+                                                            // which is then added to the select box before the add button
+                'property' => $options['property'],
+            ),
+            'searchable' => $options['searchable'],
+        );
+            
     }
     
     public function setDefaultOptions(OptionsResolverInterface $resolver) {
+        
+        
+//        $choiceList = function (Options $options) {
+//            $captionAccessor = $options['captionAccessor'];
+//            // remove the "get" prefix, if it exists to generate a default 
+//            // for the property-option from the captionAccessor-option
+//            if( !array_key_exists('property', $options) || $options['property'] == null)
+//                if( 0 === substr_compare($captionAccessor, "get", strlen("get")) )
+//                    $options['property'] = substr($captionAccessor, strlen("get"));
+//            
+//            return new ModelChoiceList(
+//                $options['class'],
+//                $options['property'],
+//                $options['choices'],
+//                $options['query'],
+//                $options['group_by'],
+//                $options['preferred_choices']
+//            );
+//        };
+        
         parent::setDefaultOptions($resolver);
         
         $resolver->setDefaults(array(
-            'searchable' => false,   // whether to apply the select2 plugin to add typeahead functionality
-//            'captionProperty' => 'Id', // getId is available on all propel objects.
+            'searchable' => false,          // whether to apply the select2 plugin to add typeahead functionality
         ));
     }
+    
+        
+
 }
 
 ?>
