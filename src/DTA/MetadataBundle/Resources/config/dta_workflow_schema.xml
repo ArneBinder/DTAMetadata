@@ -30,8 +30,8 @@
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="tasktype_id" type="INTEGER" required="true"/>
         <column name="done" type="BOOLEAN" required="false"/>
-        <column name="start" type="DATE" required="false"/>
-        <column name="end" type="DATE" required="false"/>
+        <column name="startdate" type="DATE" required="false"/>
+        <column name="enddate" type="DATE" required="false"/>
         <column name="comments" type="LONGVARCHAR" required="false"/>
         <column name="publicationgroup_id" type="INTEGER" required="false"/>
         <column name="publication_id" type="INTEGER" required="false"/>

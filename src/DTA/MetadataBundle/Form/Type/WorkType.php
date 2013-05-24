@@ -24,6 +24,7 @@ class WorkType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        
         $builder->add('datespecification', new DatespecificationType(), array(
             'label' => 'Entstehungsjahr'
         ));
@@ -40,9 +41,9 @@ class WorkType extends BaseAbstractType
 //        $builder->add('subgenreId');
 //        $builder->add('dwdsgenreId');
 //        $builder->add('dwdssubgenreId');
-//        $builder->add('doi');
-//        $builder->add('comments');
-//        $builder->add('format');
-//        $builder->add('directoryname');
+        $builder->add('doi');
+        $builder->add('comments');
+        $builder->add('format');
+        $builder->add('directoryname');
     }
 }

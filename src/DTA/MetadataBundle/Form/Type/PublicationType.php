@@ -57,8 +57,8 @@ class PublicationType extends BaseAbstractType
 //            'label' => 'Edition (numerisch)',
 //        ));
         
-        $builder->add('publishingCompany', new SelectOrAddType(), array(
-            'class' => 'DTA\MetadataBundle\Model\PublishingCompany',
+        $builder->add('publishingcompany', new SelectOrAddType(), array(
+            'class' => 'DTA\MetadataBundle\Model\Publishingcompany',
             'property' => 'Name',
             'label' => 'Verlag'
         ));

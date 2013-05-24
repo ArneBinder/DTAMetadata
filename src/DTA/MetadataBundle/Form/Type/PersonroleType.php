@@ -19,10 +19,12 @@ class PersonroleType extends BaseAbstractType
     {
         $builder->add('name');
         $builder->add('applicableToPublication', 'checkbox',array(
-            'label' => 'Bezieht sich auf Werke'
+            'label' => 'Bezieht sich auf Werke',
+            'required' => false,
         ));
         $builder->add('applicableToWork', 'checkbox',array(
-            'label' => 'Bezieht sich auf Publikationen'
+            'label' => 'Bezieht sich auf Publikationen',
+            'required' => false,
         ));
     }
 }

@@ -21,9 +21,9 @@ class DataDomainController extends DTABaseController {
      */
     public $domainMenu = array(
         'work' => array("caption" => "Werke", "modelClass" => "Work"),
-        'publication' => array("caption" => "Publikationen", "children"=>array() ),
-        'person' => array("caption" => "Personen", "children" => array() ),
-        'publishingCompany' => array("caption" => "Verlage", 'modelClass' => 'PublishingCompany'),
+        'publication' => array("caption" => "Publikationen", "children"=>array() ), // dynamically added
+        'person' => array("caption" => "Personen", "children" => array() ),         // dynamically added
+        'publishingcompany' => array("caption" => "Verlage", 'modelClass' => 'Publishingcompany'),
     );
 
     public function __construct(){
@@ -54,7 +54,7 @@ class DataDomainController extends DTABaseController {
         ));
     }
 
-    /**acl
+    /**
      * TODO: finalization. remove test data generator.
      * @Route("/generateTestData", name="generateTestData")
      */
@@ -82,6 +82,13 @@ class DataDomainController extends DTABaseController {
         $pseudonym->setName("Pseudonym");
         $pseudonym->save();
 
+        // person types
+        
+        $authorRole = new Model\Personrole();
+        $authorRole->setName("Autor");
+        $authorRole->setApplicableToWork(true);
+        $authorRole->save();
+        
         // users
         $usernames = array("Frank", "Susanne", "Matthias", "Christian", "Carl", "Alexander");
         
@@ -93,10 +100,6 @@ class DataDomainController extends DTABaseController {
             $user->save();
         }
         
-        
-  return $this->forward("DTAMetadataBundle:Home:index");
-        
-
         // title types (main-, sub- and short title)
         
         $haupttitel = new Model\Titlefragmenttype();
@@ -165,6 +168,7 @@ class DataDomainController extends DTABaseController {
         $s7->insertAsFirstChildOf($groupB); // insert the node in the tree
         $s7->save();
         
+        return $this->forward("DTAMetadataBundle:Home:index");
     }
 
 }

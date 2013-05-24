@@ -115,7 +115,7 @@ class DTABaseController extends Controller {
                                     'updatedObjectId' => $form->getData()->getId(),
                                 )));
             } else {
-                // TODO compare form_row (form_div_layout.html.twig) error reporting mechanisms to the overriden version of form_row (formTypes.html.twig)
+                // TODO compare form_row (form_div_layout.html.twig) error reporting mechanisms to the overriden version of form_row (viewConfigurationForModels.html.twig)
                 // and test whether they work on different inputs.
                 var_dump($form->getErrors());
             }
