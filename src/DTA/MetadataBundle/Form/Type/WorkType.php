@@ -24,24 +24,25 @@ class WorkType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        
+        $builder->add('title', new TitleType());
         $builder->add('datespecification', new DatespecificationType(), array(
             'label' => 'Entstehungsjahr'
         ));
-//        $builder->add('PersonWorks', new DynamicCollectionType(), array(
-//            'type' => new PersonWorkType(),
-//            'allow_add' => true,
-//            'allow_delete' => true,
-//            'by_reference' => false,
-//            'inlineLabel' => false,
-//            'sortable' => false,
-//            'label' => 'Werkbezogene Personalia',
-//        ));
+        $builder->add('PersonWorks', new DynamicCollectionType(), array(
+            'type' => new PersonWorkType(),
+            'allow_add' => true,
+            'allow_delete' => true,
+            'by_reference' => false,
+            'inlineLabel' => false,
+            'sortable' => false,
+            'label' => 'Werkbezogene Personalia',
+            'options' => array('isWorkSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
+        ));
 //        $builder->add('genreId');
 //        $builder->add('subgenreId');
 //        $builder->add('dwdsgenreId');
 //        $builder->add('dwdssubgenreId');
-        $builder->add('doi');
+        $builder->add('doi', 'text', array('required' => false));
         $builder->add('comments');
         $builder->add('format');
         $builder->add('directoryname');
