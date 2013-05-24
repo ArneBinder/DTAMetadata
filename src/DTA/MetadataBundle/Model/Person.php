@@ -6,6 +6,7 @@ use DTA\MetadataBundle\Model\om\BasePerson;
 
 class Person extends BasePerson {
 
+    // overrides the basic function to guarantee order.
     public function getPersonalnames($criteria = NULL, PropelPDO $con = NULL) {
         $collection = parent::getPersonalnames();
         // sort by rank
@@ -15,9 +16,10 @@ class Person extends BasePerson {
         return $collection;
     }
 
-    public function __to4String() {
+    public function getRepresentativePersonalname() {
 
-        return "Personenname".rand(10,100);
+        $personalNames = $this->getPersonalNames();
+        return $personalNames->count() > 0 ? $personalNames[0] : "Kein Name gesetzt.";
     }
 
     /**

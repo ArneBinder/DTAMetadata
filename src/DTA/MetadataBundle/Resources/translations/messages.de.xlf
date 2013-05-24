@@ -142,6 +142,18 @@
 				<source>PublicationMs</source>
 				<target>Selbstständiger Band einer Reihe</target>
 			</trans-unit>
+			
+			<!-- form labels -->
+			
+			<trans-unit id="36">
+				<source>Directoryname</source>
+				<target>Verzeichnisname</target>
+			</trans-unit>
+			<trans-unit id="37">
+				<source>Comments</source>
+				<target>Kommentare</target>
+			</trans-unit>
+			
         </body>
     </file>
 </xliff>

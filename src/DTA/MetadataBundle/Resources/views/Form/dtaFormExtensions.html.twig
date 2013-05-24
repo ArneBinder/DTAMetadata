@@ -80,6 +80,8 @@
     {{ form_widget(form, {'attr':attr}) }} 
     {{ form_errors(form) }} 
 
+    {% if selectOrAddConfiguration.addButton %}
+
     {# The add button #}
     <button class="selectOrAdd add btn" type="button" data-toggle="modal" 
             href="modal_for_{{ id }}"
@@ -90,5 +92,7 @@
     {# Supplementary data for the javascript #}
     <input type="hidden" name="modalRetrieveUrl"  class="selectOrAdd" 
            value="{{ path('ajaxModalForm', selectOrAddConfiguration.modalRetrievePathParameters ) }}"/>
+    
+    {% endif %}
     
 {% endblock selectOrAdd_widget %}

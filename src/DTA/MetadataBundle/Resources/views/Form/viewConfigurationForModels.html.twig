@@ -80,3 +80,9 @@
             {{ form_rest(form) }}
     </div>
 {% endblock %}
+
+{# --------------------- Person / Work / Publication Relations --------------------- #}
+
+{% block personwork_row %}
+    {{ form_row(form, {'inlineLabel':true, 'hideLabel':true }) }}
+{% endblock %}
