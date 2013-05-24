@@ -67,35 +67,18 @@ class SelectOrAddType extends \Symfony\Bridge\Propel1\Form\Type\ModelType {
                 'property' => $options['property'],
             ),
             'searchable' => $options['searchable'],
+            'addButton'  => $options['addButton'],
         );
             
     }
     
     public function setDefaultOptions(OptionsResolverInterface $resolver) {
         
-        
-//        $choiceList = function (Options $options) {
-//            $captionAccessor = $options['captionAccessor'];
-//            // remove the "get" prefix, if it exists to generate a default 
-//            // for the property-option from the captionAccessor-option
-//            if( !array_key_exists('property', $options) || $options['property'] == null)
-//                if( 0 === substr_compare($captionAccessor, "get", strlen("get")) )
-//                    $options['property'] = substr($captionAccessor, strlen("get"));
-//            
-//            return new ModelChoiceList(
-//                $options['class'],
-//                $options['property'],
-//                $options['choices'],
-//                $options['query'],
-//                $options['group_by'],
-//                $options['preferred_choices']
-//            );
-//        };
-        
         parent::setDefaultOptions($resolver);
         
         $resolver->setDefaults(array(
             'searchable' => false,          // whether to apply the select2 plugin to add typeahead functionality
+            'addButton'  => true,
         ));
     }
     
