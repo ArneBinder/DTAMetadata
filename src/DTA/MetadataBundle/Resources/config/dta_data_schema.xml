@@ -77,6 +77,7 @@
          This is independent of the actual written form of the work which is represented by the Publication class. -->
     <table name="work">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="title_id" type="INTEGER" required="true"/>
         <column name="datespecification_id" type="INTEGER" required="false"/>
         <column name="doi" type="LONGVARCHAR" required="false"/>
         <column name="comments" type="LONGVARCHAR" required="false"/>
@@ -86,10 +87,20 @@
         <!--vorherrschende sprache, kategorien, schlagworte und genres sind durch n:n beziehungen gegeben. 
             die entsprechenden cross-ref tabellen sind im master schema definiert. -->
         
+        <foreign-key foreignTable="title"> <reference local="title_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="datespecification"> <reference local="datespecification_id" foreign="id"/> </foreign-key>
+        
+        <behavior name="table_row_view">
+            <parameter name="Titel" value="accessor:getTitle"/>
+            <parameter name="erster Autor" value="accessor:getFirstAuthor"/>
+            <parameter name="entstanden" value="accessor:getDatespecification"/>
+        </behavior>
     </table>
-
+    
+    <!--                          -->
     <!--Informationen zur Auflage.-->
+    <!--                          -->
+    
     <table name="printrun">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column description="Bezeichnung" name="name"  type="LONGVARCHAR" required="false"/>
@@ -101,8 +112,9 @@
     
     <!-- Publication types. -->
 
-
+    <!--                          -->
     <!--M: Einteilige Monographie.-->
+    <!--                          -->
     <table name="publication_m">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="publication_id" type="INTEGER" required="true"/>
@@ -111,7 +123,9 @@
         <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
     </table>
     
+    <!--                          -->
     <!--DM: Unselbstständiger Teil einer Monographie, z.B. Beitrag in Sammelband oder ein Buchkapitel.-->
+    <!--                          -->
     <table name="publication_dm">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="publication_id" type="INTEGER" required="true"/>
