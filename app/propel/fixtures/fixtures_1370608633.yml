@@ -1,0 +1,490 @@
+DTA\MetadataBundle\Model\Category:
+    Category_1:
+        name: Ratgeber
+    Category_2:
+        name: Schundbichler
+    Category_3:
+        name: Gramliteratur
+DTA\MetadataBundle\Model\Title:
+    Title_1: {  }
+DTA\MetadataBundle\Model\Datespecification:
+    Datespecification_1:
+        year: 1989
+        year_is_reconstructed: false
+DTA\MetadataBundle\Model\Work:
+    Work_1:
+        title_id: Title_1
+        datespecification_id: Datespecification_1
+DTA\MetadataBundle\Model\DtaUser:
+    DtaUser_3:
+        username: Matthias
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: false
+    DtaUser_4:
+        username: Christian
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: false
+    DtaUser_1:
+        username: Frank
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: false
+    DtaUser_2:
+        username: Susanne
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: true
+    DtaUser_5:
+        username: Carl
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: true
+    DtaUser_6:
+        username: Alexander
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: false
+    DtaUser_7:
+        username: Frank
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: false
+    DtaUser_8:
+        username: Susanne
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: false
+    DtaUser_9:
+        username: Matthias
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: false
+    DtaUser_10:
+        username: Christian
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: false
+    DtaUser_11:
+        username: Carl
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: false
+    DtaUser_12:
+        username: Alexander
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: false
+DTA\MetadataBundle\Model\Publishingcompany:
+    Publishingcompany_7:
+        name: Aufbau
+        gnd: '123'
+    Publishingcompany_8:
+        name: Gratschendorf
+        gnd: track
+DTA\MetadataBundle\Model\Person:
+    Person_1: {  }
+    Person_2: {  }
+    Person_3: {  }
+    Person_4: {  }
+    Person_5: {  }
+    Person_6: {  }
+    Person_7: {  }
+    Person_8: {  }
+    Person_9: {  }
+    Person_10: {  }
+    Person_11: {  }
+    Person_12: {  }
+    Person_13: {  }
+    Person_14: {  }
+    Person_15: {  }
+    Person_16: {  }
+    Person_17: {  }
+    Person_18: {  }
+    Person_19: {  }
+    Person_20: {  }
+    Person_21: {  }
+    Person_22: {  }
+    Person_23: {  }
+    Person_24: {  }
+    Person_25: {  }
+    Person_26: {  }
+DTA\MetadataBundle\Model\Personalname:
+    Personalname_1:
+        person_id: Person_1
+        sortable_rank: 1
+    Personalname_2:
+        person_id: Person_2
+        sortable_rank: 1
+    Personalname_3:
+        person_id: Person_3
+        sortable_rank: 1
+    Personalname_4:
+        person_id: Person_4
+        sortable_rank: 1
+    Personalname_5:
+        person_id: Person_5
+        sortable_rank: 1
+    Personalname_6:
+        person_id: Person_6
+        sortable_rank: 1
+    Personalname_7:
+        person_id: Person_7
+        sortable_rank: 1
+    Personalname_8:
+        person_id: Person_8
+        sortable_rank: 1
+    Personalname_9:
+        person_id: Person_9
+        sortable_rank: 1
+    Personalname_10:
+        person_id: Person_10
+        sortable_rank: 1
+    Personalname_11:
+        person_id: Person_11
+        sortable_rank: 1
+    Personalname_12:
+        person_id: Person_12
+        sortable_rank: 1
+    Personalname_13:
+        person_id: Person_13
+        sortable_rank: 1
+    Personalname_14:
+        person_id: Person_14
+        sortable_rank: 1
+    Personalname_15:
+        person_id: Person_15
+        sortable_rank: 1
+    Personalname_16:
+        person_id: Person_16
+        sortable_rank: 1
+    Personalname_17:
+        person_id: Person_17
+        sortable_rank: 1
+    Personalname_18:
+        person_id: Person_18
+        sortable_rank: 1
+    Personalname_19:
+        person_id: Person_19
+        sortable_rank: 1
+    Personalname_20:
+        person_id: Person_20
+        sortable_rank: 1
+    Personalname_21:
+        person_id: Person_21
+        sortable_rank: 1
+    Personalname_22:
+        person_id: Person_22
+        sortable_rank: 1
+    Personalname_23:
+        person_id: Person_23
+        sortable_rank: 1
+    Personalname_24:
+        person_id: Person_24
+        sortable_rank: 1
+    Personalname_25:
+        person_id: Person_25
+        sortable_rank: 1
+    Personalname_26:
+        person_id: Person_26
+        sortable_rank: 1
+DTA\MetadataBundle\Model\Namefragmenttype:
+    Namefragmenttype_1:
+        name: Vorname
+    Namefragmenttype_2:
+        name: Nachname
+    Namefragmenttype_3:
+        name: Adelstitel
+    Namefragmenttype_4:
+        name: Generation
+    Namefragmenttype_5:
+        name: Pseudonym
+DTA\MetadataBundle\Model\Namefragment:
+    Namefragment_1:
+        personalname_id: Personalname_1
+        name: Carl
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_2:
+        personalname_id: Personalname_1
+        name: Witt
+        namefragmenttypeid: Namefragmenttype_2
+        sortable_rank: 2
+    Namefragment_3:
+        personalname_id: Personalname_2
+        name: Carl
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_4:
+        personalname_id: Personalname_2
+        name: Witt
+        namefragmenttypeid: Namefragmenttype_2
+        sortable_rank: 2
+    Namefragment_5:
+        personalname_id: Personalname_3
+        name: Carl
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_6:
+        personalname_id: Personalname_3
+        name: Witt
+        namefragmenttypeid: Namefragmenttype_2
+        sortable_rank: 2
+    Namefragment_7:
+        personalname_id: Personalname_4
+        name: Carl
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_8:
+        personalname_id: Personalname_4
+        name: Witt
+        namefragmenttypeid: Namefragmenttype_2
+        sortable_rank: 2
+    Namefragment_9:
+        personalname_id: Personalname_5
+        name: Carl
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_10:
+        personalname_id: Personalname_5
+        name: Witt
+        namefragmenttypeid: Namefragmenttype_2
+        sortable_rank: 2
+    Namefragment_11:
+        personalname_id: Personalname_6
+        name: Carl
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_12:
+        personalname_id: Personalname_6
+        name: Witt
+        namefragmenttypeid: Namefragmenttype_2
+        sortable_rank: 2
+    Namefragment_13:
+        personalname_id: Personalname_7
+        name: Carl
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_14:
+        personalname_id: Personalname_7
+        name: Witt
+        namefragmenttypeid: Namefragmenttype_2
+        sortable_rank: 2
+    Namefragment_15:
+        personalname_id: Personalname_8
+        name: Frank
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_16:
+        personalname_id: Personalname_8
+        name: Wiegand
+        namefragmenttypeid: Namefragmenttype_2
+        sortable_rank: 2
+    Namefragment_17:
+        personalname_id: Personalname_9
+        name: Don
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_18:
+        personalname_id: Personalname_9
+        name: Schnurz
+        namefragmenttypeid: Namefragmenttype_2
+        sortable_rank: 2
+    Namefragment_19:
+        personalname_id: Personalname_10
+        name: Don
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_20:
+        personalname_id: Personalname_10
+        name: Schnurz
+        namefragmenttypeid: Namefragmenttype_2
+        sortable_rank: 2
+    Namefragment_21:
+        personalname_id: Personalname_11
+        name: Peter
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_22:
+        personalname_id: Personalname_11
+        name: Petrowitsch
+        namefragmenttypeid: Namefragmenttype_2
+        sortable_rank: 2
+    Namefragment_23:
+        personalname_id: Personalname_12
+        name: Once
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_24:
+        personalname_id: Personalname_13
+        name: Ibrahim
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_25:
+        personalname_id: Personalname_14
+        name: Daniel
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_26:
+        personalname_id: Personalname_15
+        name: Blondi
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_27:
+        personalname_id: Personalname_16
+        name: Bilan
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_28:
+        personalname_id: Personalname_17
+        name: Brian
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_29:
+        personalname_id: Personalname_18
+        name: Brian
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_30:
+        personalname_id: Personalname_19
+        name: Frances
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_31:
+        personalname_id: Personalname_20
+        name: Mia
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_32:
+        personalname_id: Personalname_20
+        name: Kozak
+        namefragmenttypeid: Namefragmenttype_2
+        sortable_rank: 2
+    Namefragment_33:
+        personalname_id: Personalname_21
+        name: Maisel
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_34:
+        personalname_id: Personalname_22
+        name: Lalelilolu
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_35:
+        personalname_id: Personalname_23
+        name: Cinderella
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_36:
+        personalname_id: Personalname_24
+        name: Gabi
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_37:
+        personalname_id: Personalname_25
+        name: Rosi
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_38:
+        personalname_id: Personalname_26
+        name: Honululu
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_39:
+        personalname_id: Personalname_26
+        name: Maike
+        namefragmenttypeid: Namefragmenttype_2
+        sortable_rank: 2
+    Namefragment_40:
+        personalname_id: Personalname_19
+        name: the
+        namefragmenttypeid: Namefragmenttype_3
+        sortable_rank: 2
+    Namefragment_41:
+        personalname_id: Personalname_19
+        name: Mute
+        namefragmenttypeid: Namefragmenttype_2
+        sortable_rank: 3
+DTA\MetadataBundle\Model\Personrole:
+    Personrole_1:
+        name: Autor
+        applicable_to_publication: true
+        applicable_to_work: false
+    Personrole_2:
+        name: Verleger
+        applicable_to_publication: false
+        applicable_to_work: true
+    Personrole_3:
+        name: Autor
+        applicable_to_publication: false
+        applicable_to_work: true
+    Personrole_4:
+        name: Verleger
+        applicable_to_publication: false
+        applicable_to_work: false
+    Personrole_5:
+        name: Übersetzer
+        applicable_to_publication: false
+        applicable_to_work: false
+    Personrole_6:
+        name: Drucker
+        applicable_to_publication: false
+        applicable_to_work: false
+    Personrole_7:
+        name: Übersetzer
+        applicable_to_publication: false
+        applicable_to_work: true
+DTA\MetadataBundle\Model\PersonWork:
+    PersonWork_1:
+        person_id: Person_19
+        personrole_id: Personrole_1
+        work_id: Work_1
+    PersonWork_3:
+        person_id: Person_26
+        personrole_id: Personrole_1
+        work_id: Work_1
+DTA\MetadataBundle\Model\Tasktype:
+    Tasktype_2:
+        name: 'Gruppe A: Double Keying'
+        tree_left: 2
+        tree_right: 9
+        tree_level: 1
+    Tasktype_3:
+        name: Textbeschaffung
+        tree_left: 3
+        tree_right: 8
+        tree_level: 2
+    Tasktype_4:
+        name: Vorkorrektur
+        tree_left: 4
+        tree_right: 7
+        tree_level: 3
+    Tasktype_5:
+        name: Zoning
+        tree_left: 5
+        tree_right: 6
+        tree_level: 4
+    Tasktype_1:
+        name: Aufgabentypen
+        tree_left: 1
+        tree_right: 14
+        tree_level: 0
+    Tasktype_6:
+        name: 'Gruppe B'
+        tree_left: 10
+        tree_right: 13
+        tree_level: 1
+    Tasktype_7:
+        name: GrobiZoning
+        tree_left: 11
+        tree_right: 12
+        tree_level: 2
+DTA\MetadataBundle\Model\Titlefragmenttype:
+    Titlefragmenttype_1:
+        name: Haupttitel
+    Titlefragmenttype_2:
+        name: Untertitel
+    Titlefragmenttype_3:
+        name: Kurztitel
+DTA\MetadataBundle\Model\Titlefragment:
+    Titlefragment_1:
+        name: 'Das Leben des Schrödter'
+        title_id: Title_1
+        titlefragmenttype_id: Titlefragmenttype_1
+        sortable_rank: 1
+        name_is_reconstructed: false
+    Titlefragment_2:
+        name: 'Warum es uns so dreckig ging'
+        title_id: Title_1
+        titlefragmenttype_id: Titlefragmenttype_2
+        sortable_rank: 2
+        name_is_reconstructed: true

@@ -81,7 +81,7 @@
 {% endblock form_label %}
 
 {% block checkbox_row %}
-    {% if attr.expanded|default(false) %}
+    {% if expanded|default(false) %}
         {{ form_row(form) }}
     {% else %}
         <label class="checkbox">

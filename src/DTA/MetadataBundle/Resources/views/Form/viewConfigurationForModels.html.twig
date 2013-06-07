@@ -18,6 +18,10 @@
     {{ form_row(form, {'inlineLabel':false, 'hideLabel':false }) }}
 {% endblock %}
 
+{% block _partner_isOrganization_row %}
+    {{ form_row(form, {'expanded':true}) }}
+{% endblock %}
+
 {# ---------------------Personalia --------------------- #}
 
 {% block personpublication_row %}

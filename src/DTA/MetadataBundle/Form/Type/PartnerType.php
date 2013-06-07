@@ -18,7 +18,11 @@ class PartnerType extends BaseAbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('name');
-        $builder->add('adress');
+        $builder->add('isOrganization', 'checkbox', array(
+            'label' => "Ist eine Organisation",
+            'required' => false
+        ));
+        $builder->add('address');
         $builder->add('person');
         $builder->add('mail');
         $builder->add('web');
@@ -27,7 +31,5 @@ class PartnerType extends BaseAbstractType
         $builder->add('phone2');
         $builder->add('phone3');
         $builder->add('fax');
-        $builder->add('logLastChange');
-        $builder->add('logLastUser');
     }
 }

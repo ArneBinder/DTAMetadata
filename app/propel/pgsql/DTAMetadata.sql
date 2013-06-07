@@ -35,8 +35,8 @@ CREATE TABLE "personrole"
 (
     "id" serial NOT NULL,
     "name" TEXT NOT NULL,
-    "applicable_to_publication" BOOLEAN DEFAULT 'f' NOT NULL,
-    "applicable_to_work" BOOLEAN DEFAULT 'f' NOT NULL,
+    "applicable_to_publication" BOOLEAN DEFAULT 'f',
+    "applicable_to_work" BOOLEAN DEFAULT 'f',
     PRIMARY KEY ("id")
 );
 
@@ -109,6 +109,7 @@ CREATE TABLE "publication"
     "firstpublicationdate_id" INTEGER,
     "printrun_id" INTEGER NOT NULL,
     "publishingcompany_id" INTEGER,
+    "partner_id" INTEGER,
     "editiondescription" TEXT,
     "digitaleditioneditor" TEXT,
     "transcriptioncomment" TEXT,
@@ -127,6 +128,8 @@ COMMENT ON COLUMN "publication"."firstpublicationdate_id" IS 'Erscheinungsjahr d
 COMMENT ON COLUMN "publication"."printrun_id" IS 'Informationen zur Auflage';
 
 COMMENT ON COLUMN "publication"."publishingcompany_id" IS 'Verlag';
+
+COMMENT ON COLUMN "publication"."partner_id" IS 'akquiriert über';
 
 COMMENT ON COLUMN "publication"."editiondescription" IS 'Art der Ausgabe';
 
@@ -147,6 +150,7 @@ DROP TABLE IF EXISTS "work" CASCADE;
 CREATE TABLE "work"
 (
     "id" serial NOT NULL,
+    "title_id" INTEGER NOT NULL,
     "datespecification_id" INTEGER,
     "doi" TEXT,
     "comments" TEXT,
@@ -796,6 +800,10 @@ ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_9"
     REFERENCES "font" ("id");
 
 ALTER TABLE "work" ADD CONSTRAINT "work_FK_1"
+    FOREIGN KEY ("title_id")
+    REFERENCES "title" ("id");
+
+ALTER TABLE "work" ADD CONSTRAINT "work_FK_2"
     FOREIGN KEY ("datespecification_id")
     REFERENCES "datespecification" ("id");
 
