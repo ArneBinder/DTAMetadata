@@ -34,6 +34,12 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  * The class determines which basic formtype will be used in the selectbox
  * The property determines which attribute will be used to summarize each entity in a select option
  * @author carlwitt
+ * 
+ * @todo A switch to control data transfer from the select box to the new entity dialog would be nice.
+ * Consider for instance selecting a category. If no match is found using the typeahead, the same data
+ * has to be entered into the new entity box again. 
+ * The problem is how parse an entity from a string. In case of a person, this is not trivial.
+ * But for entities that have only a name attribute, this is feasible.
  */
 
 class SelectOrAddType extends \Symfony\Bridge\Propel1\Form\Type\ModelType {

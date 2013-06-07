@@ -9,7 +9,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 
 use DTA\MetadataBundle\Form\DerivedType\SelectOrAddType;
-
 use DTA\MetadataBundle\Form\DerivedType\DynamicCollectionType;
 
 class WorkType extends BaseAbstractType
@@ -42,6 +41,9 @@ class WorkType extends BaseAbstractType
 //        $builder->add('subgenreId');
 //        $builder->add('dwdsgenreId');
 //        $builder->add('dwdssubgenreId');
+        $builder->add('categories', new SelectOrAddType(), array(
+            'class' => '\DTA\MetadataBundle\Model\Category',
+        ));
         $builder->add('doi', 'text', array('required' => false));
         $builder->add('comments');
         $builder->add('format');

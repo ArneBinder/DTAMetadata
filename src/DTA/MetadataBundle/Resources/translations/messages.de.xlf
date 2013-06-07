@@ -2,6 +2,15 @@
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
     <file source-language="en" datatype="plaintext" original="file.ext">
         <body>
+        
+        	<!-- entities -->
+        	
+        	<trans-unit id="40">
+                <source>Category</source>
+                <target>Kategorie</target>
+            </trans-unit>
+            
+            
             <trans-unit id="1">
                 <source>Work</source>
                 <target>Werk</target>
@@ -9,35 +18,8 @@
             <trans-unit id="2">
                 <source>DtaUser</source>
                 <target>Benutzer</target>
-            </trans-unit>
-            <trans-unit id="3">
-                <source>Id</source>
-                <target>#</target>
-            </trans-unit>
-            <trans-unit id="4">
-                <source>Username</source>
-                <target>Benutzername</target>
-            </trans-unit>
-            <trans-unit id="5"> 
-                <source>Monograph</source>
-                <target>Einteilige Monographie</target>
-            </trans-unit> 
-             <trans-unit id="6">
-                <source>selectOrAdd.addBtn.suffix</source>
-                <target>hinzufügen...</target>
-            </trans-unit>
-            <trans-unit id="7">
-                <source>Magazine</source>
-                <target>Zeitschrift</target>
-            </trans-unit>
-            <trans-unit id="8">
-                <source>form.edit.suffix</source>
-                <target> bearbeiten</target>
-            </trans-unit>
-            <trans-unit id="9">
-                <source>form.create.suffix</source>
-                <target> anlegen</target>
-            </trans-unit>
+            </trans-unit>            
+
             <trans-unit id="10">
                 <source>Translator</source>
                 <target>Übersetzer</target>
@@ -46,6 +28,7 @@
                 <source>Author</source>
                 <target>Autor</target>
             </trans-unit>
+            
             <trans-unit id="12">
                 <source>Personalname</source>
                 <target>Name</target>
@@ -53,18 +36,6 @@
             <trans-unit id="13">
                 <source>Namefragment</source>
                 <target>Namensbestandteil</target>
-            </trans-unit>
-            <trans-unit id="14">
-				<source>listView.edit.row.buttonSuffix</source>
-                <target> bearbeiten</target>
-            </trans-unit>
-            <trans-unit id="15">
-				<source>listView.add.row.buttonSuffix</source>
-                <target> hinzufügen</target>
-            </trans-unit>
-			<trans-unit id="16">
-				<source>listView.addColumn.caption</source>
-                <target>Datensatz bearbeiten</target>
             </trans-unit>
             <trans-unit id="17">
 				<source>Titlefragment</source>
@@ -77,14 +48,6 @@
             <trans-unit id="19">
 				<source>Publication</source>
                 <target>Publikation</target>
-            </trans-unit>
-            <trans-unit id="20">
-				<source>PublicationRole</source>
-                <target>Person/Publikation-Beziehungstyp</target>
-            </trans-unit>
-            <trans-unit id="21">
-				<source>WorkRole</source>
-                <target>Person/Werk-Beziehungstyp</target>
             </trans-unit>
             <trans-unit id="22">
 				<source>PersonWork</source>
@@ -110,6 +73,11 @@
 				<source>Tasktype</source>
                 <target>Arbeitsschritt</target>
             </trans-unit>
+        	
+        	<trans-unit id="5"> 
+                <source>PublicationM</source>
+                <target>Einteilige Monographie</target>
+            </trans-unit> 
             <trans-unit id="28">
 				<source>PublicationDm</source>
 				<target>Unselbstständiger Teil einer Monographie</target>
@@ -125,10 +93,6 @@
 			<trans-unit id="31">
 				<source>PublicationJa</source>
 				<target>Artikel einer Zeitschrift/Zeitung</target>
-			</trans-unit>
-			<trans-unit id="32">
-				<source>PublicationM</source>
-				<target>Einteilige Monographie</target>
 			</trans-unit>
 			<trans-unit id="33">
 				<source>PublicationMm</source>
@@ -153,7 +117,42 @@
 				<source>Comments</source>
 				<target>Kommentare</target>
 			</trans-unit>
-			
+			<trans-unit id="3">
+                <source>Id</source>
+                <target>#</target>
+            </trans-unit>
+            <trans-unit id="4">
+                <source>Username</source>
+                <target>Benutzername</target>
+            </trans-unit>
+            
+            <!-- form labels: controls -->
+            
+             <trans-unit id="6">
+                <source>selectOrAdd.addBtn.suffix</source>
+                <target>hinzufügen...</target>
+			</trans-unit>    
+            <trans-unit id="14">
+				<source>listView.edit.row.buttonSuffix</source>
+                <target> bearbeiten</target>
+            </trans-unit>
+            <trans-unit id="15">
+				<source>listView.add.row.buttonSuffix</source>
+                <target> hinzufügen</target>
+            </trans-unit>
+			<trans-unit id="16">
+				<source>listView.addColumn.caption</source>
+                <target>Datensatz bearbeiten</target>
+            </trans-unit>
+            <trans-unit id="8">
+                <source>form.edit.suffix</source>
+                <target> bearbeiten</target>
+            </trans-unit>
+            <trans-unit id="9">
+                <source>form.create.suffix</source>
+                <target> anlegen</target>
+            </trans-unit>
+            
         </body>
     </file>
 </xliff>
