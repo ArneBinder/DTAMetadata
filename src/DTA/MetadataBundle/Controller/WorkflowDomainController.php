@@ -9,7 +9,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
  * Route prefix for all action routes, i.e. this page.
  * @Route("/arbeitsfluss")
  */
-class WorkflowDomainController extends DTABaseController {
+class WorkflowDomainController extends DTADomainController {
 
     /** @inheritdoc */
     public static $domainKey = "WorkflowDomain";

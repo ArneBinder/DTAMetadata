@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
  * Base class for all domain controllers. Contains generic actions (list all records, new record) 
  * that are derived from the database schema.
  */
-class DTABaseController extends Controller {
+class ORMController extends Controller {
 
     /**
      * IMPLEMENT THIS IF CREATING A NEW DOMAIN 
@@ -162,13 +162,13 @@ class DTABaseController extends Controller {
      * 
      * @Route("/ajaxModalForm/{className}/{recordId}/{property}", 
      *      name="ajaxModalForm", 
-     *      defaults={"recordId"=0, "captionProperty"="Id"})
+     *      defaults={"recordId"=0, "property"="Id"})
      */
     public function generateAjaxModalFormAction($className, $recordId = 0, $property = "Id") {
 
         $form = $this->generateForm($className, $recordId);
 
-        // plain ajax response, without any menus or other html
+        // plain ajax response, html form wrapped in twitter bootstrap modal markup
         return $this->render("DTAMetadataBundle:Form:ajaxModalForm.html.twig", array(
                     'form' => $form->createView(),
                     'newActionParameters' => array(

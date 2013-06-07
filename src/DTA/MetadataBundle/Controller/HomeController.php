@@ -10,7 +10,7 @@ use DTA\MetadataBundle\Form;
 /**
  * Controls the functionality of the home page, e.g. the recently edited, viewed, created boxes.
  */
-class HomeController extends DTABaseController {
+class HomeController extends DTADomainController {
 
     /** @inheritdoc */
     public static $domainKey = "Home";

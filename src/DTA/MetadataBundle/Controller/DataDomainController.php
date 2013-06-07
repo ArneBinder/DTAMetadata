@@ -10,7 +10,7 @@ use \DTA\MetadataBundle\Model;
  * Route prefix for all action routes, i.e. this page.
  * @Route("/daten")
  */
-class DataDomainController extends DTABaseController {
+class DataDomainController extends DTADomainController{
 
     /** @inheritdoc */
     public static $domainKey = "DataDomain";
