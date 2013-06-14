@@ -1,0 +1,12 @@
+<h3>{{className|trans}} {{ headerSuffix }} </h3>
+
+    {{ form_row(form, {'inlineLabel':true, 'hideLabel':true}) }}
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#category_name").select2({
+                      tags:["red", "green", "blue"],
+                      tokenSeparators: [","]});
+
+    });
+</script>

@@ -16,35 +16,26 @@
 {% extends 'DTAMetadataBundle:'~ domainKey ~':index.html.twig' %}
 
 {% block core %}
+    
+    {# renders "<className> anlegen" as headline of the form #}
+    <h3> {{className|trans}} {{ "form.create.suffix"|trans }} </h3>
 
-    {% set action = action is defined ? action : 'new' %}
-    {# Determine where to post the form data (create or update the data) #}
-    {% if action == "new" %}
-        {% set actionTarget = path('genericNew', {'className':className, 'domainKey': domainKey|default("none")}) %}
-        {# renders "<className> anlegen" as headline of the form #}
-        {% set headerSuffix = "form.create.suffix"|trans %}
-    {% endif %}
-    {% if action == "edit" %}
-        {# renders "<className> bearbeiten" as headline of the form #}
-        {% set actionTarget = path('viewRecord', {'domainKey': domainKey, 'className':className, 'recordId':recordId}) %}
-        {% set headerSuffix = "form.edit.suffix"|trans %}
-    {% endif %}
-
-
-        <form action="{{ actionTarget }}" method="post" {{ form_enctype(form) }} class="form-horizontal">
+    {# where to post the form data #}
+    {% set actionTarget = path('genericNew', {'className':className, 'domainKey': domainKey|default("none")}) %}
+    <form action="{{ actionTarget }}" method="post" {{ form_enctype(form) }} class="form-horizontal">
             
-            {% include 'DTAMetadataBundle:Form:autoform.html.twig' %}
+        {% include 'DTAMetadataBundle:Form:autoform.html.twig' %}
         
         {# the dynamic collection adds default fragments if the form is for creation
             of a new entity. (action='new') #}
         <script type="text/javascript">
-            var formInfo = {'action': '{{action}}'};
+            var formInfo = {'action': 'new'};
         </script>
         <div class="control-group">
-                <div class="controls">
-                    <input type="submit" value="Senden"/>
-                </div>
+            <div class="controls">
+                <input type="submit" value="Senden"/>
             </div>
-        </form>
+        </div>
+    </form>
 
 {% endblock core %}
