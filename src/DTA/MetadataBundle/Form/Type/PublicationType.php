@@ -40,6 +40,14 @@ class PublicationType extends BaseAbstractType
 //            
 //        ));
 //
+        $builder->add('PersonPublications', new DynamicCollectionType(), array(
+            'type' => new PersonPublicationType(),
+            'inlineLabel' => false,
+            'sortable' => false,
+            'label' => 'Publikationsbezogene Personalia',
+            'options' => array('isPublicationSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
+        ));
+        
         $builder->add('DatespecificationRelatedByPublicationdateId', new DatespecificationType(), array(
             'label' => 'Erscheinungsjahr (f.a.)'
         ));

@@ -22,18 +22,6 @@
     {{ form_row(form, {'expanded':true}) }}
 {% endblock %}
 
-{# ---------------------Personalia --------------------- #}
-
-{% block personpublication_row %}
-    <div class="control-group form-inline">
-            {{ form_errors(form.publicationrole) }}
-            {{ form_widget(form.publicationrole) }}
-            {{ form_errors(form.person) }}
-            {{ form_widget(form.person) }}
-            {#{ form_rest(form) }#}
-    </div>
-{% endblock %}
-
 {# --------------------- Space and Time --------------------- #}
 
 {% block datespecification_row %}
@@ -79,8 +67,18 @@
 {# --------------------- Person / Work / Publication Relations --------------------- #}
 
 {% block personwork_row %}
-    {{ form_row(form, {'inlineLabel':true, 'hideLabel':true }) }}
+    <div class="control-group form-inline">
+        {{ form_row(form.personrole, {'inlineLabel':true,'hideLabel':true}) }}
+        {{ form_row(form.person, {'hideLabel':true,'inlineLabel':true}) }}
+    </div>
 {% endblock %}
+{% block personpublication_row %}
+    <div class="control-group form-inline">
+        {{ form_row(form.personrole, {'inlineLabel':true,'hideLabel':true}) }}
+        {{ form_row(form.person, {'hideLabel':true,'inlineLabel':true}) }}
+    </div>
+{% endblock %}
+
 
 {% block category_row %}
     <div class="control-group form-inline">

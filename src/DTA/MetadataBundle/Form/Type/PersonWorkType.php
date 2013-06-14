@@ -34,6 +34,7 @@ class PersonWorkType extends BaseAbstractType
         ));
         $builder->add('personrole', 'model', array(
             'class' => '\DTA\MetadataBundle\Model\Personrole',
+            'query' => \DTA\MetadataBundle\Model\PersonroleQuery::create()->filterByApplicableToWork(true),
             'property' => 'name',
         ));
 
