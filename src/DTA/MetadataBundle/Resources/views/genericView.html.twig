@@ -14,63 +14,62 @@
 <div class="span12 dta-data-listing">
 
     <h3>{{ className|trans }}
-    
-    {# add entity button  #}
-    <a class="btn btn-mini listView-add-button pull-right" href="{{ path('genericNew', {'domainKey':domainKey, 'className':className}) }}">
-        <i class="icon-plus"></i>
-        {{ className|trans~"listView.add.row.buttonSuffix"|trans }}
-    </a>
-        
-        </h3>
+        {# add entity button  #}
+        <a class="btn btn-mini listView-add-button pull-right" href="{{ path('genericNew', {'domainKey':domainKey, 'className':className}) }}">
+            <i class="icon-plus"></i>
+            {{ className|trans~"listView.add.row.buttonSuffix"|trans }}
+        </a>
+    </h3>
     
     <table class="table table-striped table-hover"> {# further bootstrap table classes: table-hover #}
+        
         <thead>
-            <th>{{ "listView.addColumn.caption"|trans }}</th>
-        {% for col in columns %}    
-            {# doesn't work {{ col|trans({},'tableHeaders')}} since the tableHeaders file is never added to the translation catalogue #}
-            <th> {{ col|trans }} </th>
-        {% endfor %}
+            {% for col in columns %}    
+                <th> {{ col|trans }} </th>
+            {% endfor %}
+            <th>Datensatz bearbeiten{#{ "listView.editColumn.caption"|trans }#}</th>
         </thead>
+        
         <tbody>
-           {# <tr> <td colspan="20">
-                    <a class="btn btn-mini listView-add-button" href="{{ path('genericNew', {'domainKey':domainKey, 'className':className}) }}">
-                        <i class="icon-pencil"></i>
-                        {{ className|trans~"listView.add.row.buttonSuffix"|trans }}
-                    </a>
-            </td></tr> #}
         {% for datum in data %}
-            {# because all propel objects implement this method #}
+            {# all propel objects implement this method #}
             {% set recordId = attribute(datum, "getId") %}
-            
             {# highlight affected record #}
             <tr {% if recordId == updatedObjectId %}class="success"{% endif %}>
             
-                {# Display edit buttons instead of Ids #}
-                <td>
-                    <a name="record{{recordId}}" class="btn btn-mini" href="{{ path('viewRecord', {'domainKey':domainKey, 'className':className, 'recordId':attribute(datum,"getId")}) }}">
-                        <i class="icon-pencil"></i>
-                        {{ className|trans~"listView.edit.row.buttonSuffix"|trans }}
-                    </a>
-                </td>
             {% for col in columns %}
                 <td>
                     {{ datum.getAttributeByTableViewColumName(col) }}
                 </td>
             {% endfor %}
+                {# Display edit buttons instead of Ids #}
+                <td>
+                    <a name="record{{recordId}}" class="btn btn-mini" 
+                       href="{{ path('viewRecord', {'domainKey':domainKey, 'className':className, 'recordId':recordId}) }}">
+                        <i class="icon-pencil"></i>
+                        {{ "listView.edit.row.buttonSuffix"|trans }} {#className|trans~#}
+                    </a>
+                    <a name="record{{recordId}}" class="btn btn-mini" 
+                       href="{{ path('deleteRecord', {'domainKey':domainKey, 'className':className, 'recordId':recordId }) }}">
+                        <i class="icon-warning-sign"></i>
+                        löschen {#className|trans~#}
+                    </a>
+                </td>
             </tr>
         {% endfor %}
         
-            
-        {#  second add button  <tr> <td colspan="20">
+        </tbody>
+    </table>
+    
+</div><!--/span-->
+
+{# full width button to add entities 
+                <tr> <td colspan="20">
                     <a class="btn btn-mini listView-add-button" href="{{ path('genericNew', {'domainKey':domainKey, 'className':className}) }}">
                         <i class="icon-pencil"></i>
                         {{ className|trans~"listView.add.row.buttonSuffix"|trans }}
                     </a>
             </td></tr> #}
-        </tbody>
-    </table>
-    
-</div><!--/span-->
 
 {#
 <div class="span4 dta-data-filter-box">
