@@ -9,6 +9,10 @@
                 <source>Category</source>
                 <target>Kategorie</target>
             </trans-unit>
+            <trans-unit id="41">
+                <source>Publishingcompany</source>
+                <target>Verlag</target>
+            </trans-unit>
             
             
             <trans-unit id="1">

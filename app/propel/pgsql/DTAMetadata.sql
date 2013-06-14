@@ -103,7 +103,6 @@ CREATE TABLE "publication"
 (
     "id" serial NOT NULL,
     "work_id" INTEGER NOT NULL,
-    "title_id" INTEGER NOT NULL,
     "place_id" INTEGER,
     "publicationdate_id" INTEGER,
     "firstpublicationdate_id" INTEGER,
@@ -768,34 +767,30 @@ ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_1"
     REFERENCES "work" ("id");
 
 ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_2"
-    FOREIGN KEY ("title_id")
-    REFERENCES "title" ("id");
-
-ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_3"
     FOREIGN KEY ("publishingcompany_id")
     REFERENCES "publishingcompany" ("id");
 
-ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_4"
+ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_3"
     FOREIGN KEY ("place_id")
     REFERENCES "place" ("id");
 
-ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_5"
+ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_4"
     FOREIGN KEY ("printrun_id")
     REFERENCES "printrun" ("id");
 
-ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_6"
+ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_5"
     FOREIGN KEY ("relatedset_id")
     REFERENCES "relatedset" ("id");
 
-ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_7"
+ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_6"
     FOREIGN KEY ("publicationdate_id")
     REFERENCES "datespecification" ("id");
 
-ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_8"
+ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_7"
     FOREIGN KEY ("firstpublicationdate_id")
     REFERENCES "datespecification" ("id");
 
-ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_9"
+ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_8"
     FOREIGN KEY ("font_id")
     REFERENCES "font" ("id");
 

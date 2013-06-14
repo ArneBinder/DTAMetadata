@@ -20,10 +20,8 @@ class PublicationType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-//        $builder->add('work', new WorkType());
-//        
-        $builder->add('title', new TitleType());
-//
+        $builder->add('work', new WorkType());
+
 //        $builder->add('personPublications', new DynamicCollectionType(), array(
 //            'type' => new PersonPublicationType(),
 //            'allow_add' => true,
@@ -46,11 +44,11 @@ class PublicationType extends BaseAbstractType
             'label' => 'Erscheinungsjahr (f.a.)'
         ));
         
-//        $builder->add('DatespecificationRelatedByFirstpublicationdateId', new DatespecificationType(), array(
-//            'label' => 'Erscheinungsjahr der Erstausgabe (f.a.)'
-//        ));
+        $builder->add('DatespecificationRelatedByFirstpublicationdateId', new DatespecificationType(), array(
+            'label' => 'Erscheinungsjahr der Erstausgabe (f.a.)'
+        ));
 //        
-        $builder->add('edition', 'text', array(
+        $builder->add('editiondescription', 'text', array(
             'required' => false
         ));
 //        $builder->add('editionNumerical', null, array(
