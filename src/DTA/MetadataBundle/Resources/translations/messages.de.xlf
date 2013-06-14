@@ -145,8 +145,12 @@
                 <target> hinzufügen</target>
             </trans-unit>
 			<trans-unit id="16">
-				<source>listView.addColumn.caption</source>
+				<source>listView.editColumn.caption</source>
                 <target>Datensatz bearbeiten</target>
+            </trans-unit>
+            <trans-unit id="42">
+				<source>listView.deleteColumn.caption</source>
+                <target>Datensatz löschen</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>form.edit.suffix</source>

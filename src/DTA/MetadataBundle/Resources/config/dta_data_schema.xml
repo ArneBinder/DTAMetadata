@@ -29,7 +29,7 @@
         <column description="Druckort" name="place_id" type="INTEGER" required="false"/>
         <column description="Erscheinungsjahr" name="publicationdate_id" type="INTEGER" required="false"/>
         <column description="Erscheinungsjahr der Erstausgabe" name="firstpublicationdate_id" type="INTEGER" required="false"/>
-        <column description="Informationen zur Auflage" name="printrun_id" type="INTEGER" required="true"/>
+        <column description="Informationen zur Auflage" name="printrun_id" type="INTEGER" required="false"/>
         <column description="Verlag" name="publishingcompany_id" type="INTEGER" required="false"/>
         
         <!--Image and text sources are added on the imageSource table side, because publication:imageSource is 1:n-->
@@ -55,6 +55,7 @@
         <behavior name="table_row_view">
             <!--<parameter name="id" value="id"/>-->
             <!--<parameter name="geschrieben" value="accessor:getDateSpecificationRelatedByOrigindateId"/>-->
+            <parameter name="embedColumnsForWork" value="work"/>
             <parameter name="veröffentlicht" value="accessor:getDatespecificationRelatedByPublicationdateId"/>
             <!--<parameter name="embedcolumnsstatus" value="status"/>-->
             <parameter name="embedcolumnstitle" value="title"/>
@@ -118,7 +119,7 @@
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="publication_id" type="INTEGER" required="true"/>
         
-        <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication" /> </behavior>
+        <behavior name="table_row_view"> <parameter name="embedColumnspublication" value="publication" /> </behavior>
         <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
     </table>
     

@@ -21,8 +21,14 @@ class DataDomainController extends DTADomainController{
      */
     public $domainMenu = array(
         'work' => array("caption" => "Werke", "modelClass" => "Work"),
-        'publication' => array("caption" => "Publikationen", "children"=>array() ), // dynamically added
-        'person' => array("caption" => "Personen", "children" => array() ),         // dynamically added
+        'publication' => array("caption" => "Publikationen", "children"=>array(
+            array("caption" => "Alle anzeigen", "route" => "home"),
+            // the rest is added in the controller constructor
+        )), 
+        'person' => array("caption" => "Personen", "children" => array(
+            array("caption" => "Alle anzeigen", "route" => "home"),
+            // the rest is added controller constructor
+        )),
         'publishingcompany' => array("caption" => "Verlage", 'modelClass' => 'Publishingcompany'),
     );
 
