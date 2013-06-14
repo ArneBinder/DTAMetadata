@@ -5,7 +5,7 @@
 
     This template can be overriden by simply defining a properly named template for the model class to render.
     The naming convention is <className>Form.html.twig where the according file must be placed under
-    the src/DTAMetadataBundle/Resources/views/Form/Type directory.
+    the src/DTAMetadataBundle/Resources/views/Form/standalone directory.
 
 #}
 
@@ -13,12 +13,12 @@
 
     {# If a specific template has been defined for this form type, use it instead of the default one. #}
     {% set specializedTemplate = specializedTemplate is defined ? specializedTemplate :
-           dtaMetadataBundlePath ~ 'Resources/views/Form/Type/' ~ className ~ 'Form.html.twig' %}
+           dtaMetadataBundlePath ~ 'Resources/views/Form/standalone/' ~ className ~ 'Form.html.twig' %}
 
 
     {% if file_exists(specializedTemplate) %}
 
-        {% include 'DTAMetadataBundle:Form/Type:'~className~'Form.html.twig' %}
+        {% include 'DTAMetadataBundle:Form/standalone:'~className~'Form.html.twig' %}
 
     {% else %}
 
