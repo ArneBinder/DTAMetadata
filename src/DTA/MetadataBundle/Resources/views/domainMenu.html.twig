@@ -26,10 +26,24 @@
 </code>
 #}
 
+{# to highlight the active entity #}
+{% set className = app.request.attributes.get('_route_params').className|default("no cn given") %}
+
 {% for item in domainMenu %}
 {% if item.children is defined %}
     
-    <li class="dropdown"> 
+    {% set isInSubMenu = false %}
+    {% for child in item.children %}
+        {% if child.modelClass is defined %}
+            {% set isInSubMenu = isInSubMenu or className == child.modelClass %}
+        {% endif %}
+    {% endfor %}
+
+    {% if isInSubMenu %}
+        <li class="dropdown active"> 
+    {% else %}
+        <li class="dropdown"> 
+    {% endif %}
         <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 
             {{ item.caption}} 
             <b class="caret"></b> 
@@ -68,7 +82,8 @@
 {% else %} {# item has no children #}
     {# If the menu element is a model class, add view and create options #}
     {% if item.modelClass is defined %}
-        <li>
+        {% set active = className == item.modelClass ? "active" : ""%}
+        <li class="{{active}}">
                <a href="{{ path('genericView', {'domainKey':domainKey, 'className':item.modelClass}) }}"> 
                       {{ item.caption }} 
                 </a>
