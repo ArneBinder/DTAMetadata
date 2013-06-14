@@ -7,6 +7,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * TODO: Nice to have: if the labels on the horizontal forms (column layout) would slide down the screen (position: fixed)
+ * to support orientation in vertically long forms (where only the left border is visible)
+ */
 
 /**
  * Base class for all domain controllers. Contains generic actions (list all records, new record) 
@@ -43,7 +47,7 @@ class ORMController extends Controller {
     /**
      * 
      * @param type $className
-     * @Route("/genericView/{domainKey}/{className}/{updatedObjectId}", 
+     * @Route("/showAll/{domainKey}/{className}/{updatedObjectId}", 
      *      defaults={"updatedObjectId"=0},
      *      name="genericView")
      */
@@ -86,12 +90,12 @@ class ORMController extends Controller {
     }
 
     /**
-     * Used for creating an edit form for a specific database entity.
+     * Displays an edit form for a specific database entity.
      * Handles POST requests that have been set off due to editing a specific database entity.
      * @param type $domainKey
      * @param type $className
      * @param type $recordId
-     * @Route("/zeigeDatensatz/{domainKey}/{className}/{recordId}", name="viewRecord")
+     * @Route("/showRecord/{domainKey}/{className}/{recordId}", name="viewRecord")
      */
     public function genericViewOneAction(Request $request, $domainKey, $className, $recordId) {
 
@@ -109,23 +113,57 @@ class ORMController extends Controller {
 
                 $this->get('session')->getFlashBag()->add('success', 'Änderungen vorgenommen.');
 
-                return $this->redirect($this->generateUrl('genericView', array(
-                                    'domainKey' => $domainKey,
-                                    'className' => $className,
-                                    'updatedObjectId' => $form->getData()->getId(),
-                                )));
+                return $this->genericViewAllAction($domainKey, $className, $form->getData()->getId());
+                
             } else {
                 // TODO compare form_row (form_div_layout.html.twig) error reporting mechanisms to the overriden version of form_row (viewConfigurationForModels.html.twig)
                 // and test whether they work on different inputs.
                 var_dump($form->getErrors());
             }
         }
-        return $this->renderDomainKeySpecificAction($domainKey, "DTAMetadataBundle:Form:formWrapper.html.twig", array(
+        return $this->renderDomainKeySpecificAction($domainKey, "DTAMetadataBundle:Form:genericEdit.html.twig", array(
                     'form' => $form->createView(),
-                    'action' => 'edit',
                     'className' => $className,
                     'recordId' => $recordId,
                 ));
+    }
+    
+    /**
+     * Deletes a record after a safety inquiry from the database.
+     * @param type $domainKey   like in genericViewOneAction
+     * @param type $className   like in genericViewOneAction
+     * @param type $recordId    like in genericViewOneAction
+     * @Route("/deleteRecord/{domainKey}/{className}/{recordId}", name="deleteRecord")
+     */
+    public function genericDeleteOneAction(Request $request, $domainKey, $className, $recordId) {
+
+        // really delete data on affirmative POST
+        if ($request->isMethod("POST")) {
+
+            if( $request->get("reallyDelete") && $request->get('recordId') ){
+                $classNames = $this->relatedClassNames($className);
+                $query = new $classNames['query'];
+                $record = $query->findOneById($recordId);
+                if($record === null) throw new \Exception("The record ($className #$recordId) to be deleted doesn't exist.");
+                $record->delete();
+            };
+            return $this->genericViewAllAction($domainKey, $className);
+            
+        } else {
+            
+            return $this->renderDomainKeySpecificAction($domainKey, "DTAMetadataBundle:ORM:confirmDelete.html.twig", array(
+                'className' => $className,
+                'recordId' => $recordId,
+            ));
+            
+        }
+        
+        
+//        return $this->renderDomainKeySpecificAction($domainKey, "DTAMetadataBundle:Form:genericEdit.html.twig", array(
+//                    'form' => $form->createView(),
+//                    'className' => $className,
+//                    'recordId' => $recordId,
+//                ));
     }
 
     /**
@@ -235,12 +273,12 @@ class ORMController extends Controller {
         }
 
         // render the form
-        return $this->renderDomainKeySpecificAction($domainKey, 'DTAMetadataBundle:Form:formWrapper.html.twig', array(
+        return $this->renderDomainKeySpecificAction($domainKey, 'DTAMetadataBundle:Form:genericNew.html.twig', array(
                     'form' => $form->createView(),
                     'className' => $className,
                 ));
     }
-
+    
     private function getControllerClassName($domainKey) {
         return "DTA\\MetadataBundle\\Controller\\" . $domainKey . "Controller";
     }
