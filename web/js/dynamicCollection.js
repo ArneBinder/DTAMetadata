@@ -19,12 +19,6 @@ function createGui(){
     // add up and down control elements for dynamic collections
     var dynamicElements = jQuery('.dynamic-collection.list li');
     
-    // formInfo is set within the formWrapper template
-    if(formInfo.action == 'new')
-        // create default fragment for empty collections
-        $('.dynamic-collection.list')
-    //      .filter(function(e){return $('.dynamic-collection.list li',e).length === 0}) // all collections should be empty when creating a new entity
-            .each(function(idx,e){$('.add-entity',$(e).parent()).click();});
     
     jQuery.each(dynamicElements, function(idx,element){
         createElementControls(element);
@@ -37,6 +31,12 @@ function createGui(){
         distance: 20
     });
 
+    // formInfo is set within the formWrapper template
+    if(formInfo.action == 'new'){
+        // create default fragment for empty collections
+        var holders = $('.dynamic-collection.list').parent();
+        $('a.add-entity', holders).click();
+    }
 }
 
 /* Propagates the new positions (in the ordered list) to the hidden sortable rank input fields.
