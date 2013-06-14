@@ -20,8 +20,8 @@
         <!--Werk das der Publikation zugrunde liegt-->
         <column name="work_id" type="INTEGER" required="true"/>
         
-        <!--Titelinformationen-->
-        <column name="title_id" type="INTEGER" required="true"/>
+        <!--Titelinformationen ergeben sich aus dem publizierten Werk-->
+        <!--<column name="title_id" type="INTEGER" required="true"/>-->
         
         <!--Personalia werden ueber Fremdschluessel von der Personenseite dargestellt.-->
         
@@ -43,7 +43,7 @@
         
         <!--Klassifikation und Einordnung-->
         <column description="Vorherrschende Schriftart" name="font_id" type="INTEGER" required="false"/>
-        <!--vorherrschende sprache, kategorien, schlagworte und genres sind durch das werk festgelegt.-->
+        <!--vorherrschende Sprache, Kategorien, Schlagworte und Genres sind durch das Werk festgelegt.-->
     
         <column description="Anmerkungen" name="comment" type="LONGVARCHAR" required="false"/>
         
@@ -61,14 +61,11 @@
         </behavior>
         
         <foreign-key foreignTable="work"> <reference local="work_id" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="title"> <reference local="title_id" foreign="id"/> </foreign-key>
+        <!--<foreign-key foreignTable="title"> <reference local="title_id" foreign="id"/> </foreign-key>-->
         <foreign-key foreignTable="publishingcompany"> <reference local="publishingcompany_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="place"> <reference local="place_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="printrun"> <reference local="printrun_id" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="relatedset"> 
-            <reference local="relatedset_id" foreign="id"/> 
-        </foreign-key>
-
+        <foreign-key foreignTable="relatedset"> <reference local="relatedset_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="datespecification"> <reference local="publicationdate_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="datespecification"> <reference local="firstpublicationdate_id" foreign="id"/> </foreign-key>
         <!--<foreign-key foreignTable="status"> <reference local="status_id" foreign="id"/> </foreign-key>-->
