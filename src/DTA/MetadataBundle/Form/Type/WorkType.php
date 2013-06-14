@@ -39,11 +39,18 @@ class WorkType extends BaseAbstractType
 //        $builder->add('dwdsgenreId');
 //        $builder->add('dwdssubgenreId');
 
-        $builder->add('Categories', new DynamicCollectionType(), array(
-            'type' => new CategoryType(),
+//        $builder->add('Categories', new DynamicCollectionType(), array(
+//            'type' => new CategoryType(),
+//            'inlineLabel' => false,
+//            'sortable' => false,
+//            'label' => 'Kategorien',
+//        ));
+        $builder->add('CategoryWorks', new DynamicCollectionType(), array(
+            'type' => new CategoryWorkType(),
             'inlineLabel' => false,
             'sortable' => false,
             'label' => 'Kategorien',
+            'options' => array('isWorkSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
         ));
         
 //        $builder->add('Categories', new SelectOrAddForType(array(

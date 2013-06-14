@@ -69,7 +69,7 @@ class PublicationType extends BaseAbstractType
             'label' => 'Verlag'
         ));
             
-        $builder->add('imageSources', new DynamicCollectionType(), array(
+        $builder->add('ImageSources', new DynamicCollectionType(), array(
             'type' => new ImagesourceType(),
             'allow_add' => true,
             'allow_delete' => true,

@@ -78,7 +78,9 @@
         {{ form_row(form.person, {'hideLabel':true,'inlineLabel':true}) }}
     </div>
 {% endblock %}
-
+{% block categorywork_row %}
+     {{ form_row(form, {'inlineLabel':true, 'hideLabel':true, 'inlineControls': true}) }}
+{% endblock %}
 
 {% block category_row %}
     <div class="control-group form-inline">
