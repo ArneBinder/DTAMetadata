@@ -18,6 +18,14 @@ function createGui(){
     
     // add up and down control elements for dynamic collections
     var dynamicElements = jQuery('.dynamic-collection.list li');
+    
+    // formInfo is set within the formWrapper template
+    if(formInfo.action == 'new')
+        // create default fragment for empty collections
+        $('.dynamic-collection.list')
+    //      .filter(function(e){return $('.dynamic-collection.list li',e).length === 0}) // all collections should be empty when creating a new entity
+            .each(function(idx,e){$('.add-entity',$(e).parent()).click();});
+    
     jQuery.each(dynamicElements, function(idx,element){
         createElementControls(element);
     });
@@ -39,7 +47,7 @@ function updateSortableRanks( event, ui ){
     
     // traverse in order of dom tree, push this 'visible' index to the hidden inputs
     $dynamicCollectionList.children('li').each(function(index, listElement){
-        console.log($(listElement), $(listElement).children().children('input[name*=sortableRank]').val());
+//        console.log($(listElement), $(listElement).children().children('input[name*=sortableRank]').val());
         $(listElement).children().children('input[name*=sortableRank]').val(index);
     });
 }
@@ -79,7 +87,7 @@ function addFormElement(){
     // generate proper name and id attributes for form input by replacing the ID placeholder with the index of the element
     prototype = prototype.replace(new RegExp('__'+ modelClassName +'ID__', 'g'), elementId);
 
-    console.log(prototype);
+//    console.log(prototype);
 
     // CREATE NEW DOM ELEMENT 
     var $newForm = $(prototype);
@@ -108,19 +116,20 @@ function addFormElement(){
     return false;
 }
 
+/* Adds remove button to each fragment */
 function createElementControls(element, translatedModelClassName){
              
     var $collectionHolder = $(element).parent().parent(); // element: li, parent: ol, parent: collection holder
     var elementId = $(element).attr('class');
     
-    console.log(element, elementId);
+//    console.log(element, elementId);
     
     if(undefined === translatedModelClassName)
         translatedModelClassName = $collectionHolder
             .children('input[name=translatedModelClassName]')
             .val();
     
-    var removeButtonLink = $('<a>weg</a>')
+    var removeButtonLink = $('<a></a>')
         .on('click', function(){ $(element).remove() })
         .html('<i class="icon-remove"></i>'+translatedModelClassName+' entfernen');
         

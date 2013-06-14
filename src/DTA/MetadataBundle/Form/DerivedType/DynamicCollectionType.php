@@ -30,6 +30,7 @@ class DynamicCollectionType extends \Symfony\Component\Form\Extension\Core\Type\
     
     /**
      * Builds the prototype with modified placeholders to allow nested collections.
+     * @todo The themeBlockName parameter might be unnecessary. I think symfony offers enough tools to achieve this without custom logic?
      * @param $options['themeBlockName']    allows individual styling of a collection, 
      *                                      e.g. based on the entity that's stored in it. Pass any string under the themeBlockName 
      *                                      option to override the dynamic collection form type name.
@@ -81,12 +82,16 @@ class DynamicCollectionType extends \Symfony\Component\Form\Extension\Core\Type\
         parent::setDefaultOptions($resolver);
         
         $resolver->setDefaults(array(
+            'allow_add' => true,
+            'allow_delete' => true,
+            'by_reference' => false,
             'themeBlockName' => null,   // see build form for parameter explanation
             'sortable' => true,
             'inlineLabel' => true,
         ));
     }
 
+    
 }
 
 ?>
