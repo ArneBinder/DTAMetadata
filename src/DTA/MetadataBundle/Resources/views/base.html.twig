@@ -92,7 +92,7 @@
                         </p>
                         <p class="navbar-text pull-right">
                             
-                            <a href="{{ path('logout') }}" class="na2vbar-link">Abmelden</a>
+                            <a href="{{ path('logout') }}" class="na2vbar-link">{{ app.user.username }} abmelden</a>
                         </p>
                     </div><!--/.row-fluid -->
                     
@@ -159,6 +159,7 @@
         {#<script src="{{ asset('js/jquery-ui.min.js') }}"></script>#}
         
         <script type="text/javascript">
+            // automatically focus the first form input
             $(document).ready(function() {
                 $('form:first *:input[type!=hidden]').add($("a.btn"))[0].focus();
             });

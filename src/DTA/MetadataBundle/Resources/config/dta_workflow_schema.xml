@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <!-- 
     Contains all entities related to the workflow of the project.
     Tasks, tasktypes, related publications, sources, license types, etc.
 -->
+
 <database name="DTAMetadata" namespace="DTA\MetadataBundle\Model" defaultIdMethod="native">
   
     <!-- This parameter set is added to each entity that doesn't implement the table_row_view behavior. 

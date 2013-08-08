@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <!-- 
-    Contains cross ref tables and the only entity of the administrative domain (dta_user).
+    Contains cross reference tables (auxiliary tables for m-to-m relationships)
+    and the only entity of the administrative domain (dta_user).
 -->
 
 <!--The name attribute refers to the connection to use. See app/config/config.yml under

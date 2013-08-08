@@ -19,9 +19,9 @@
       <datasource id="DTAMetadata">
         <adapter>pgsql</adapter> <!-- sqlite, mysql, mssql, oracle, or pgsql -->
         <connection>
-          <dsn>pgsql:host=localhost;dbname=dtametadata</dsn>
-          <user>postgres</user>
-          <password>root</password>
+          <dsn>pgsql:host=localhost;dbname=DTAMetadata</dsn>
+          <user>DTAMetadata</user>
+          <password>drSchultz</password>
         </connection>
       </datasource>
     </datasources>

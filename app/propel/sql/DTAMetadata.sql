@@ -106,7 +106,7 @@ CREATE TABLE "publication"
     "place_id" INTEGER,
     "publicationdate_id" INTEGER,
     "firstpublicationdate_id" INTEGER,
-    "printrun_id" INTEGER NOT NULL,
+    "printrun_id" INTEGER,
     "publishingcompany_id" INTEGER,
     "partner_id" INTEGER,
     "editiondescription" TEXT,

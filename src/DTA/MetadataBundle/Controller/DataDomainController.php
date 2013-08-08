@@ -34,6 +34,7 @@ class DataDomainController extends DTADomainController{
 
     public function __construct(){
         
+        
         foreach( Model\PersonroleQuery::create()->find() as $pr ){
             $this->domainMenu['person']['children'][] = array("caption" => $pr->getName(), "route" => "home");
         }

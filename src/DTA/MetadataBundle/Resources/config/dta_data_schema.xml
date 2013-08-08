@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <!-- 
-    Contains all entities related to the historical truth.
+    Contains all entities related to historical facts.
 -->
 
 <!--The name attribute refers to the connection to use. See app/config/config.yml under

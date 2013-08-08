@@ -62,9 +62,10 @@ propel:
       
       # database abstraction
       propel.database: pgsql
-      propel.sql.dir: ${propel.output.dir}/pgsql
+#      propel.sql.dir: ${propel.output.dir}/pgsql
       
       propel.builder.pluralizer.class: builder.util.StandardEnglishPluralizer
+      
       # custom behaviors
       propel.behavior.reconstructed_flaggable.class: src.DTA.MetadataBundle.Model.reconstructed_flaggable.ReconstructedFlaggableBehavior
       propel.behavior.table_row_view.class: src.DTA.MetadataBundle.Model.table_row_view.TableRowViewBehavior
@@ -74,6 +75,7 @@ propel:
       
       # multiple schemas with the same database name
       propel.packageObjectModel: true
+      
       # leads to problems with code location and autoloading
       #propel.namespace.autoPackage: true
 
@@ -82,7 +84,6 @@ propel:
         default_connection: DTAMetadata
         connections:
 #            DTAMetadata:
-              # the database parameters are stored in parameters.yml
 #              driver:     "mysql"
 #              user:       "root"
 #              password:   "root"
@@ -91,10 +92,11 @@ propel:
 #              attributes: {}
             DTAMetadata:
               # the database parameters are stored in parameters.yml
-              driver:     "pgsql"
-              user:       "carlwitt"
-              password:   "root"
-              dsn:        "pgsql:host=localhost;dbname=dtametadata"
+              driver:     %database_driver%
+              user:       %database_user%
+              password:   %database_password%
+#              dsn:        "pgsql:host=%database_host%;dbname=%database_name%"
+              dsn: pgsql:host=localhost;dbname=DTAMetadata
               options:    {}
               attributes: {}
 # this was only used to generate a schema from an existing database (which was in turn generated with the mysql workbench graphical tools)

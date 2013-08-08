@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <!-- 
-    Contains all entities that group or classify entities of the historical truth.
+    Contains all entities that group or classify historical facts.
     Genres, keywords, categories, etc.
 -->
 
