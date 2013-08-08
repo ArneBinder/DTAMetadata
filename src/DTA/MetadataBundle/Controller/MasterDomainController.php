@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use \Symfony\Component\Security\Core\SecurityContext;
 
-class AdministrationDomainController extends DTADomainController {
+class MasterDomainController extends DTADomainController {
 
     /** @inheritdoc */
     public static $domainKey = "AdministrationDomain";

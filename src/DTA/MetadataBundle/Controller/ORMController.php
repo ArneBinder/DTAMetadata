@@ -16,41 +16,46 @@ use Symfony\Component\HttpFoundation\Response;
  * Base class for all domain controllers. Contains generic actions (list all records, new record) 
  * that are derived from the database schema.
  */
-class ORMController extends Controller {
+class ORMController extends DTADomainController {
 
+    // TODO: pressing enter in a modal form leads to a form submit and all data is lost, because the server redirects to the ajax response page
+    
     /**
      * Returns the fully qualified class names to autoload and generate objects and work with them using their class names.
      * @param String $className The basic name of the class, all lower-case except the first letter (Work, Personalname, Namefragmenttype)
      */
     private function relatedClassNames($package, $className) {
         return array(
-            "model" => "DTA\\MetadataBundle\\Model\\$package\\$className",                // the actual propel active record
-            "query" => "DTA\\MetadataBundle\\Model\\$package\\" . $className . "Query",   // utility class for generating queries
-            "peer" => "DTA\\MetadataBundle\\Model\\$package\\" . $className . "Peer",             // utility class for reflection
-            "formType" => "DTA\\MetadataBundle\\Form\\Type\\" . $className . "Type",    // class for generating form inputs
+            "model"     => "DTA\\MetadataBundle\\Model\\$package\\" . $className,             // the actual propel active record
+            "query"     => "DTA\\MetadataBundle\\Model\\$package\\" . $className . "Query",   // utility class for generating queries
+            "peer"      => "DTA\\MetadataBundle\\Model\\$package\\" . $className . "Peer",    // utility class for reflection
+            "formType"  => "DTA\\MetadataBundle\\Form\\$package\\" . $className . "Type",     // class for generating form inputs
         );
     }
 
     /**
-     * 
-     * @param type $className
-     * @Route("/showAll/{domainKey}/{className}/{updatedObjectId}", 
-     *      defaults={"updatedObjectId"=0},
-     *      name="genericView")
+     * Renders a list of all entities of a certain type.
+     * Takes into account how the list should be rendered according to the XML schemata,
+     * where this can be specified using the table_row_view behavior.
+     * @param string $package     the domain/object model package (Data, Classification, Workflow, Master)
+     * @param string $className   
+     * @Route(
+     *      "{package}/showAll//{className}/{updatedObjectId}", 
+     *      defaults = {"updatedObjectId" = 0},
+     *      name = "genericView"
+     * )
      */
-    public function genericViewAllAction($domainKey, $className, $updatedObjectId = 0) {
+    public function genericViewAllAction($package, $className, $updatedObjectId = 0) {
 
-        $classNames = $this->relatedClassNames($className);
+        $classNames = $this->relatedClassNames($package, $className);
 
         // for retrieving the entities
         $query = new $classNames['query'];
+        
         // for retrieving the column names
         $modelClass = new $classNames["model"];
 
-//        $rc = new \ReflectionClass();
-//        $rc->getStaticPropertyValue("")
-
-        return $this->renderDomainKeySpecificAction($domainKey, "DTAMetadataBundle::genericView.html.twig", array(
+        return $this->renderDomainKeySpecificAction($package, "DTAMetadataBundle::genericView.html.twig", array(
                     'data' => $query->orderById()->find(),
                     'columns' => $modelClass::getTableViewColumnNames(),
                     'className' => $className,
@@ -266,8 +271,8 @@ class ORMController extends Controller {
                 ));
     }
     
-    private function getControllerClassName($domainKey) {
-        return "DTA\\MetadataBundle\\Controller\\" . $domainKey . "Controller";
+    private function getControllerClassName($package) {
+        return "DTA\\MetadataBundle\\Controller\\" . $package . "DomainController";
     }
 
     private function getModelReflectionClass($className) {

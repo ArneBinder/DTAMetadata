@@ -41,7 +41,7 @@ security:
             pattern:    ^/
             form_login:
                 # The target of the route "login" is used to display the login form.
-                # @see AdministrationDomainController->loginFormAction() 
+                # @see MasterDomainController->loginFormAction() 
                 login_path: login       
                 # The symfony firewall automatically catches the credentials provided, so no custom implementation of this route is needed.
                 check_path: login_check

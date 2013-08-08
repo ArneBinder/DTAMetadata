@@ -5,7 +5,7 @@ namespace DTA\MetadataBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
-class ConceptualDomainController extends DTADomainController {
+class ClassificationDomainController extends DTADomainController {
 
     /** @inheritdoc */
     public static $domainKey = "ConceptualDomain";

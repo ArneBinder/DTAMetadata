@@ -59,7 +59,7 @@
             </a>
                 <ul class="dropdown-menu">
                     <li>
-                        <a href="{{ path('genericView', {'domainKey': domainKey, 'className':child.modelClass}) }}"> 
+                        <a href="{{ path('genericView', {'package': domainKey, 'className':child.modelClass}) }}"> 
                             <i class="icon-list"></i> Anzeigen und bearbeiten
                         </a>
                     </li>
@@ -84,7 +84,7 @@
     {% if item.modelClass is defined %}
         {% set active = className == item.modelClass ? "active" : ""%}
         <li class="{{active}}">
-               <a href="{{ path('genericView', {'domainKey':domainKey, 'className':item.modelClass}) }}"> 
+               <a href="{{ path('genericView', {'package':domainKey, 'className':item.modelClass}) }}"> 
                       {{ item.caption }} 
                 </a>
         </li>

@@ -13,29 +13,41 @@ use \DTA\MetadataBundle\Model;
 class DataDomainController extends DTADomainController{
 
     /** @inheritdoc */
-    public static $domainKey = "DataDomain";
+    public static $domainKey = "Data";
 
     /** @inheritdoc 
      * The menu entries for the different kinds of persons and publications are dynamically added
      * from the database in the __construct() method.
      */
     public $domainMenu = array(
-        'work' => array("caption" => "Werke", "modelClass" => "Work"),
-        'publication' => array("caption" => "Publikationen", "children"=>array(
-            array("caption" => "Alle anzeigen", "route" => "home"),
-            // the rest is added in the controller constructor
+        'work' => array(
+            "caption" => "Werke",
+            "modelClass" => "Work"),
+        'publication' => array(
+            "caption" => "Publikationen", 
+            "children"=>array(
+                array(
+                    "caption" => "Alle anzeigen", 
+                    "route" => "home"),
+                // the rest is added in the controller constructor
         )), 
-        'person' => array("caption" => "Personen", "children" => array(
-            array("caption" => "Alle anzeigen", "route" => "home"),
-            // the rest is added controller constructor
+        'person' => array(
+            "caption" => "Personen", 
+            "children" => array(
+                array(
+                    "caption" => "Alle anzeigen", 
+                    "route" => "home"),
+                // the rest is added controller constructor
         )),
-        'publishingcompany' => array("caption" => "Verlage", 'modelClass' => 'Publishingcompany'),
+        'publishingcompany' => array(
+            "caption" => "Verlage", 
+            'modelClass' => 'Publishingcompany'),
     );
-
+        
     public function __construct(){
         
-        
-        foreach( Model\Classification\PersonroleQuery::create()->find() as $pr ){
+        $personRoles = Model\Classification\PersonroleQuery::create()->find();
+        foreach($personRoles as $pr ){
             $this->domainMenu['person']['children'][] = array("caption" => $pr->getName(), "route" => "home");
         }
 
