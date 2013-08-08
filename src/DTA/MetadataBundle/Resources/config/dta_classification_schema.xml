@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- 
+    Contains all entities that group or classify historical facts.
+    Genres, keywords, categories, etc.
+-->
+
+<!--The name attribute refers to the connection to use. See app/config/config.yml under
+    propel > dbal > connections for connection setup. -->
+<database name="DTAMetadata" namespace="DTA\MetadataBundle\Model\Classification" defaultIdMethod="native">
+  
+    <!-- This parameter set is added to each entity that doesn't implement the table_row_view behavior. 
+    It is not added to tables/entities that define the bahavior. -->
+    <behavior name="table_row_view">
+        <!--If no parameters are defined, all columns are shown in the list view (WITHOUT embedding any related entities) -->
+    </behavior>
+    
+    <!-- Verfügbare Arten von Titelfragmenten. Zum Beispiel Haupttitel, Untertitel, Kurztitel, etc. -->
+    <table name="titlefragmenttype">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" type="LONGVARCHAR" required="true"/>
+    </table>
+
+    <!-- Verfuegbare Arten von Namensfragmenten. Zum Beispiel Vorname, Nachname, Kuenstlername, etc. -->
+    <table name="namefragmenttype">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" type="LONGVARCHAR" required="true"/>
+    </table>
+    
+    <!--Beziehungstypen zwischen Personen und Publikationen oder Werken. Zum Beispiel Verleger, Drucker, Übersetzer oder Autor -->
+    <table name="personrole" idMethod="native">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" type="LONGVARCHAR" required="true"/>
+        <!--Ob diese Rolle auf eine Beziehung zwischen Personen und Publikationen angewandt werden darf (z.B. nicht Autor)-->
+        <column name="applicable_to_publication" type="BOOLEAN" required="false" default="false"/>
+        <!--Ob diese Rolle auf eine Beziehung zwischen Personen und Werken angewandt werden darf (z.B. nicht Drucker)-->
+        <column name="applicable_to_work" type="BOOLEAN" required="false" default="false"/>
+    </table>
+  
+    <!--Korpora.--> 
+    <table name="corpus">
+        <column name="id" type="INTEGER" size="10" sqlType="int(10) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" type="LONGVARCHAR" required="true"/>
+        <!--        <unique name="korpusname_einzigartig">
+            <unique-column name="corpusnamehash"/>
+        </unique>-->
+    </table>
+    
+    <!--Kategorien. Zum Beispiel Ratgeber, Zeitschrift, etc. -->
+    <table name="category">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" type="LONGVARCHAR" required="true"/>
+    </table>
+    
+    <!--Schlagwörter. Zum Beispiel Bürgerliche Revolution, Köln, etc. -->
+    <table name="tag">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" type="LONGVARCHAR" required="true"/>
+    </table>
+    
+    <!--Genres (Baumstruktur) Zum Beispiel Sachliteratur (Fachliteratur, Gebrauchsliteratur, etc.), Belletristik, etc. -->
+    <table name="genre">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" type="LONGVARCHAR" required="true"/>
+        <column name="childof" type="INTEGER" required="false"/>
+        <foreign-key foreignTable="genre"> <reference local="childof" foreign="id"/> </foreign-key>
+    </table>
+</database>
+    

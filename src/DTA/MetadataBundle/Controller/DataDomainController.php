@@ -35,7 +35,7 @@ class DataDomainController extends DTADomainController{
     public function __construct(){
         
         
-        foreach( Model\PersonroleQuery::create()->find() as $pr ){
+        foreach( Model\Classification\PersonroleQuery::create()->find() as $pr ){
             $this->domainMenu['person']['children'][] = array("caption" => $pr->getName(), "route" => "home");
         }
 
@@ -69,29 +69,29 @@ class DataDomainController extends DTADomainController{
         
         // name fragment types
         
-        $vorname = new Model\Namefragmenttype();
+        $vorname = new Model\Data\Namefragmenttype();
         $vorname->setName("Vorname");
         $vorname->save();
 
-        $nachname = new Model\Namefragmenttype();
+        $nachname = new Model\Data\Namefragmenttype();
         $nachname->setName("Nachname");
         $nachname->save();
         
-        $adelstitel = new Model\Namefragmenttype();
+        $adelstitel = new Model\Data\Namefragmenttype();
         $adelstitel->setName("Adelstitel");
         $adelstitel->save();
             
-        $generation = new Model\Namefragmenttype();
+        $generation = new Model\Data\Namefragmenttype();
         $generation->setName("Generation");
         $generation->save();
         
-        $pseudonym = new Model\Namefragmenttype();
+        $pseudonym = new Model\Data\Namefragmenttype();
         $pseudonym->setName("Pseudonym");
         $pseudonym->save();
 
         // person types
         
-        $authorRole = new Model\Personrole();
+        $authorRole = new Model\Classification\Personrole();
         $authorRole->setName("Autor");
         $authorRole->setApplicableToWork(true);
         $authorRole->save();

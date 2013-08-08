@@ -5,7 +5,7 @@
     Tasks, tasktypes, related publications, sources, license types, etc.
 -->
 
-<database name="DTAMetadata" namespace="DTA\MetadataBundle\Model" defaultIdMethod="native">
+<database name="DTAMetadata" namespace="DTA\MetadataBundle\Model\Workflow" defaultIdMethod="native">
   
     <!-- This parameter set is added to each entity that doesn't implement the table_row_view behavior. 
     It is not added to tables/entities that define the bahavior. -->

@@ -19,28 +19,15 @@ use Symfony\Component\HttpFoundation\Response;
 class ORMController extends Controller {
 
     /**
-     * IMPLEMENT THIS IF CREATING A NEW DOMAIN 
-     * The flag that it is set to true to indicate to the base template which domain to highlight in the main menu. */
-    public static $domainKey = "";
-
-    /**
-     * IMPLEMENT THIS IF CREATING A NEW DOMAIN 
-     * The options in the second menu, displayed right under the main (domain switch) menu.
-     * TODO: Generate this automatically. To avoid multiple edit locations on adding a new publication type
-     * The inheritance should be detectable by the delegate behavior in the schema.xml
-     */
-    public $domainMenu = array();
-
-    /**
      * Returns the fully qualified class names to autoload and generate objects and work with them using their class names.
      * @param String $className The basic name of the class, all lower-case except the first letter (Work, Personalname, Namefragmenttype)
      */
-    private function relatedClassNames($className) {
+    private function relatedClassNames($package, $className) {
         return array(
-            "model" => "DTA\\MetadataBundle\\Model\\" . $className, // the actual propel active record
-            "query" => "DTA\\MetadataBundle\\Model\\" . $className . "Query", // utility class for generating queries
-            "peer" => "DTA\\MetadataBundle\\Model\\" . $className . "Peer", // utility class for reflection
-            "formType" => "DTA\\MetadataBundle\\Form\\Type\\" . $className . "Type", // class for generating form inputs
+            "model" => "DTA\\MetadataBundle\\Model\\$package\\$className",                // the actual propel active record
+            "query" => "DTA\\MetadataBundle\\Model\\$package\\" . $className . "Query",   // utility class for generating queries
+            "peer" => "DTA\\MetadataBundle\\Model\\$package\\" . $className . "Peer",             // utility class for reflection
+            "formType" => "DTA\\MetadataBundle\\Form\\Type\\" . $className . "Type",    // class for generating form inputs
         );
     }
 

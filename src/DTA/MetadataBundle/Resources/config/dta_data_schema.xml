@@ -6,7 +6,7 @@
 
 <!--The name attribute refers to the connection to use. See app/config/config.yml under
     propel > dbal > connections for connection setup. -->
-<database name="DTAMetadata" namespace="DTA\MetadataBundle\Model" defaultIdMethod="native">
+<database name="DTAMetadata" namespace="DTA\MetadataBundle\Model\Data" defaultIdMethod="native">
   
     <!-- This parameter set is added to each entity that doesn't implement the table_row_view behavior. 
     It is not added to tables/entities that define the bahavior. -->

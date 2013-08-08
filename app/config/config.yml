@@ -60,24 +60,22 @@ propel:
 #     http://propelorm.org/reference/buildtime-configuration.html#general_build_settings
     build_properties:
       
-      # database abstraction
       propel.database: pgsql
 #      propel.sql.dir: ${propel.output.dir}/pgsql
       
-      propel.builder.pluralizer.class: builder.util.StandardEnglishPluralizer
-      
-      # custom behaviors
-      propel.behavior.reconstructed_flaggable.class: src.DTA.MetadataBundle.Model.reconstructed_flaggable.ReconstructedFlaggableBehavior
-      propel.behavior.table_row_view.class: src.DTA.MetadataBundle.Model.table_row_view.TableRowViewBehavior
-
       # TODO: for testing, non-enforcement of the foreign key constraints is more practical (set to MyISAM)
       propel.mysql.tableType: InnoDB
+      
+      propel.builder.pluralizer.class: builder.util.StandardEnglishPluralizer
       
       # multiple schemas with the same database name
       propel.packageObjectModel: true
       
-      # leads to problems with code location and autoloading
-      #propel.namespace.autoPackage: true
+      # derives the package attribute (which leads to subdirectories for model classes)
+      # from the namespace attribute
+#      propel.namespace.autoPackage: true
+#      propel.schema.autoNamespace: true
+
 
     # propel database connections
     dbal:
