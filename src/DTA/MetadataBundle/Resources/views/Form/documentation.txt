@@ -6,7 +6,7 @@ So feel free to move the files, as long as you update the references.
 
 Short overview: 
 
-Type subdirectory: templates for model forms that need additional logic to be
+./standalone: templates for model forms that need additional logic to be
 rendered. 
 
 ajaxModalForm: wraps the output of the autoform template with 

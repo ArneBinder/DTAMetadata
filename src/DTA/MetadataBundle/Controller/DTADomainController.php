@@ -14,15 +14,11 @@ use Symfony\Component\HttpFoundation\Response;
 class DTADomainController extends Controller {
 
     /**
-     * IMPLEMENT THIS IF CREATING A NEW DOMAIN 
-     * The flag that it is set to true to indicate to the base template which domain to highlight in the main menu. */
+     * The variable to indicate in the base template which domain to highlight in the main menu. */
     public static $domainKey = "";
 
     /**
-     * IMPLEMENT THIS IF CREATING A NEW DOMAIN 
      * The options in the second menu, displayed right under the main (domain switch) menu.
-     * TODO: Generate this automatically. To avoid multiple edit locations on adding a new publication type
-     * The inheritance should be detectable by the delegate behavior in the schema.xml
      */
     public $domainMenu = array();
 
@@ -58,7 +54,7 @@ class DTADomainController extends Controller {
             'domainMenu' => $this->domainMenu,
             "domainKey" => $controllerReflection->getStaticPropertyValue('domainKey'));
 
-        // replaces the domain menu of $defaultDomainMenu with the domain menu of options, if both are set.
+        // replaces the domain menu of $defaultDomainMenu with the domain menu of $options, if both are set.
         // adds the data for the view from $options
         $options = array_merge($defaultDomainMenu, $options);
 
