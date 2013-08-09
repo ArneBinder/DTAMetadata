@@ -8,12 +8,12 @@ use \DTA\MetadataBundle\Model;
 
 /**
  * Route prefix for all action routes, i.e. this page.
- * @Route("/daten")
+ * @Route("/Data")
  */
 class DataDomainController extends DTADomainController{
 
     /** @inheritdoc */
-    public static $domainKey = "Data";
+    public $package = "Data";
 
     /** @inheritdoc 
      * The menu entries for the different kinds of persons and publications are dynamically added
@@ -67,7 +67,7 @@ class DataDomainController extends DTADomainController{
      * @Route("/", name="dataDomain")
      */
     public function indexAction() {
-        return $this->renderControllerSpecificAction('DTAMetadataBundle:DataDomain:index.html.twig', array(
+        return $this->render('DTAMetadataBundle:DataDomain:index.html.twig', array(
 //            "person" => "array_shift()" //$persont->getRelations() //count($p->getPersonalnames()->getArrayCopy())//[0]->__toString(),
             // get_declared_classes()
         ));

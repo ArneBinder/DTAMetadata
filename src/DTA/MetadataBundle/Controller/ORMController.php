@@ -248,7 +248,7 @@ class ORMController extends DTADomainController {
      * @param string $package     the domain/object model package (Data, Classification, Workflow, Master)
      * @param string $className   
      * @Route(
-     *      "{package}/showAll//{className}/{updatedObjectId}", 
+     *      "{package}/showAll/{className}/{updatedObjectId}", 
      *      defaults = {"updatedObjectId" = 0},
      *      name = "genericView"
      * )
@@ -262,7 +262,7 @@ class ORMController extends DTADomainController {
         
         // for retrieving the column names
         $modelClass = new $classNames["model"];
-
+        
         return $this->renderDomainKeySpecificAction($package, "DTAMetadataBundle::genericView.html.twig", array(
                     'data' => $query->orderById()->find(),
                     'columns' => $modelClass::getTableViewColumnNames(),

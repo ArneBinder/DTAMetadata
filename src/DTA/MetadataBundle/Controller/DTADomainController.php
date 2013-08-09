@@ -22,43 +22,24 @@ class DTADomainController extends Controller {
      */
     public $domainMenu = array();
 
-    public function renderDomainKeySpecificAction($domainKey, $template, array $options = array()) {
-
-        $controllerName = $this->getControllerClassName($domainKey);
-        
-        $cr = new \ReflectionClass($controllerName);
-        $controller = new $controllerName;
-        
-        // these are overriden by the calling subclass
-        $defaultDomainMenu = array(
-           'domainMenu' => $controller->domainMenu,
-            "domainKey" => $cr->getStaticPropertyValue('domainKey'));
-
-        // replaces the domain menu of $defaultDomainMenu with the domain menu of options, if both are set.
-        $options = array_merge($defaultDomainMenu, $options);
-        return $this->render($template, $options);
-    }
-
     /**
      * Called by the _derived_ domain controllers. Automatically passes the domain key and menu of the derived class to the template.
      * @param $template Template to use for rendering, e.g. site specific as DTAMetadataBundle:DataDomain:index.html.twig
      * @param $options The data for the template to render 
      */
-    public function renderControllerSpecificAction($template, array $options = array()) {
-
-        // static properties cannot be accessed via $this
-        $controllerReflection = new \ReflectionClass($this);
+    public function render($template, array $options = array(), Response $response = NULL) {
 
         // these are overriden by the calling subclass
         $defaultDomainMenu = array(
             'domainMenu' => $this->domainMenu,
-            "domainKey" => $controllerReflection->getStaticPropertyValue('domainKey'));
+            'domainKey' => $this->package,
+        );
 
-        // replaces the domain menu of $defaultDomainMenu with the domain menu of $options, if both are set.
+        // adds the domain menu to the options
         // adds the data for the view from $options
         $options = array_merge($defaultDomainMenu, $options);
 
-        return $this->render($template, $options);
+        return parent::render($template, $options);
     }
 
 }

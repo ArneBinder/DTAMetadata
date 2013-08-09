@@ -47,76 +47,7 @@
     </head>
     <body style="min-width: 900px">
 
-        {#  ---------------------------------------------
-            The menu is highlighted using the domainKey variable
-            --------------------------------------------- #}
-
-        <div class="navbar navbar-fixed-top">
-            <div class="navbar-inner">
-                <div class="container-fluid">
-                    <div class="row-fluid">
-                        <a class="brand" href="{{ path('home') }}">
-                            DTA Projektdatenbank
-                        </a>
-                        <div class="nav">
-                            <ul class="nav">
-                            {% block domainMenu %}
-                                <li {% if domainKey == "Home" %} class='active' {% endif %} >
-                                <a href="{{ path('home') }}">
-                                    Startseite
-                                </a></li>
-                                <li {% if domainKey == "DataDomain" %} class='active' {% endif %} >
-                                    <a href="{{ path('dataDomain') }}">
-                                        Daten
-                                    </a></li>
-                                <li {% if domainKey == "ConceptualDomain" %} class='active' {% endif %} >
-                                    <a href="{{ path('conceptualDomain') }}">
-                                        Ordnungssysteme
-                                    </a></li>
-                                <li {% if domainKey == "WorkflowDomain" %} class='active' {% endif %} >
-                                    <a href="{{ path('workflowDomain') }}">
-                                        Arbeitsfluss
-                                    </a></li>
-                                <li {% if domainKey == "AdministrationDomain" %} class='active' {% endif %} >
-                                    <a href="{{ path('administrationDomain') }}">
-                                        Administration
-                                    </a></li>
-                            {% endblock %}
-                            </ul>
-                            {# <form class="navbar-search pull-left">
-                                <input type="text" class="search-query" placeholder="Suche">
-                            </form> #}
-                        </div><!--/.nav-collapse -->
-                        <p class="navbar-text pull-right">
-                            
-                        </p>
-                        <p class="navbar-text pull-right">
-                            
-                            <a href="{{ path('logout') }}" class="na2vbar-link">{{ app.user.username }} abmelden</a>
-                        </p>
-                    </div><!--/.row-fluid -->
-                    
-                    {#  ---------------------------------------------
-                        The submenu is built using the domainMenu data structure
-                        --------------------------------------------- #}
-                    
-                    <div style='border-top: 1px solid #DDD;'>
-                        <div class="nav ">
-                            <ul class="nav">
-                                
-                            {% block currentDomainMenu %}
-                                
-                                {% include 'DTAMetadataBundle::domainMenu.html.twig' %}
-                                    
-                            {% endblock %}<!-- domain menu -->
-                                    
-                            </ul>
-                        </div><!--/.nav-collapse -->
-                    </div><!--/.row-fluid -->
-                </div><!--/.container-fluid -->
-            </div><!--/.navbar-inner -->
-        </div>
-
+        {% include 'DTAMetadataBundle::mainMenu.html.twig' %}
         
         <div class="container-fluid">
             
@@ -139,16 +70,18 @@
             --------------------------------------------- #}
                 
             {# fluid: Allow stacking of sidebar and main content if too few space is available #}
-            <div class="row-fluid" id="core">
+            <div class="row-fluid" id="core" style="padding: 0 10px">
                 {% block core %}
                 {% endblock %}
             </div><!--/row-->
             
-            <hr/>
             
             <footer>
             {% block footer %}
-                <p>© DTA-Projektdatenbank (v 2.0)</p>
+                <!--
+                <hr/>
+                <p>© DTA(v 2.0)</p>
+                -->
             {% endblock %}
             </footer>
 

@@ -1,0 +1,55 @@
+<div class="navbar navbar-fixed-top">
+    <div class="container-fluid">
+        
+        <!-- --------------- main menu --------------- -->
+        
+        <div class="row-fluid">
+            <a class="navbar-brand" href="{{ path('home') }}">
+                DTA Projektdatenbank
+            </a>
+            <ul class="nav navbar-nav">
+            {% block domainMenu %}
+                <li {% if domainKey == "Home" %} class='active' {% endif %} >
+                    <a href="{{ path('home') }}">
+                        Startseite
+                    </a></li>
+                <li {% if domainKey == "Data" %} class='active' {% endif %} >
+                    <a href="{{ path('dataDomain') }}">
+                        Daten
+                    </a></li>
+                <li {% if domainKey == "Classification" %} class='active' {% endif %} >
+                    <a href="{{ path('conceptualDomain') }}">
+                        Ordnungssysteme
+                    </a></li>
+                <li {% if domainKey == "Workflow" %} class='active' {% endif %} >
+                    <a href="{{ path('workflowDomain') }}">
+                        Arbeitsfluss
+                    </a></li>
+                <li {% if domainKey == "Master" %} class='active' {% endif %} >
+                    <a href="{{ path('administrationDomain') }}">
+                        Administration
+                    </a>
+                </li>
+            {% endblock %}
+            </ul>
+            {# <form class="navbar-search pull-left">
+                <input type="text" class="search-query" placeholder="Suche">
+            </form> #}
+                
+            <!-- logout -->
+            <p class="navbar-text pull-right">
+                <a href="{{ path('logout') }}" class="na2vbar-link">{{ app.user.username }} abmelden</a>
+            </p>
+        </div><!--/.row-fluid -->
+
+        <!-- --------------- domain menu --------------- -->
+        <div class="row-fluid" style='border-top: 1px solid #DDD;'>
+        {% block currentDomainMenu %}
+
+            {% include 'DTAMetadataBundle::domainMenu.html.twig' %}
+
+        {% endblock %}<!-- domain menu -->
+        </div><!--/.row-fluid -->
+        
+    </div><!--/.container-fluid -->
+</div>

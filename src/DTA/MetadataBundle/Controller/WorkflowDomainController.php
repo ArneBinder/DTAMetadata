@@ -12,7 +12,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 class WorkflowDomainController extends DTADomainController {
 
     /** @inheritdoc */
-    public static $domainKey = "WorkflowDomain";
+    public $package = "Workflow";
 
     /** @inheritdoc */
     public  $domainMenu = array(
@@ -31,7 +31,7 @@ class WorkflowDomainController extends DTADomainController {
      */
     public function indexAction() {
 
-        return $this->renderControllerSpecificAction('DTAMetadataBundle:WorkflowDomain:index.html.twig', array(
+        return $this->render('DTAMetadataBundle:WorkflowDomain:index.html.twig', array(
                 ));
     }
 
@@ -39,7 +39,7 @@ class WorkflowDomainController extends DTADomainController {
      * @Route("/statistiken", name="reporting")
      */
     public function reportingAction() {
-        return $this->renderControllerSpecificAction('DTAMetadataBundle:WorkflowDomain:reporting.html.twig');
+        return $this->render('DTAMetadataBundle:WorkflowDomain:reporting.html.twig');
     }
 
 }

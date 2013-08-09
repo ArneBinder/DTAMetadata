@@ -9,7 +9,7 @@ use \Symfony\Component\Security\Core\SecurityContext;
 class MasterDomainController extends DTADomainController {
 
     /** @inheritdoc */
-    public static $domainKey = "AdministrationDomain";
+    public $package = "Master";
 
     /** @inheritdoc */
     public $domainMenu = array(
@@ -62,7 +62,7 @@ class MasterDomainController extends DTADomainController {
      */
     public function indexAction() {
 
-        return $this->renderControllerSpecificAction('DTAMetadataBundle:AdministrationDomain:index.html.twig', array(
+        return $this->render('DTAMetadataBundle:AdministrationDomain:index.html.twig', array(
                     'hash' => 200
                 ));
     }
@@ -187,7 +187,7 @@ class MasterDomainController extends DTADomainController {
         }
         
         
-        return $this->renderControllerSpecificAction('DTAMetadataBundle:AdministrationDomain:sourceMonitor.html.twig', array(
+        return $this->render('DTAMetadataBundle:AdministrationDomain:sourceMonitor.html.twig', array(
                 'columns' => $columns,
                 'entries' => $entities,
                 'strayTypes' => array('base', 'map', 'form'),

@@ -29,68 +29,80 @@
 {# to highlight the active entity #}
 {% set className = app.request.attributes.get('_route_params').className|default("no cn given") %}
 
-{% for item in domainMenu %}
-{% if item.children is defined %}
-    
-    {% set isInSubMenu = false %}
-    {% for child in item.children %}
-        {% if child.modelClass is defined %}
-            {% set isInSubMenu = isInSubMenu or className == child.modelClass %}
-        {% endif %}
-    {% endfor %}
+{% macro input(name, value, type, size) %}
+    <input type="{{ type|default('text') }}" name="{{ name }}" value="{{ value|e }}" size="{{ size|default(20) }}" />
+{% endmacro %}
 
-    {% if isInSubMenu %}
-        <li class="dropdown active"> 
-    {% else %}
-        <li class="dropdown"> 
-    {% endif %}
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 
-            {{ item.caption}} 
-            <b class="caret"></b> 
-        </a>
-        <ul class="dropdown-menu">
-        {% for child in item.children%}
+<div class="nav ">
+    <ul class="nav navbar-nav">
+            
+    {# render top level links #}
+    {% for item in domainMenu %}
+        
+        {# top level link with children #}
+        {% if item.children is defined %}
 
-        {# If the menu element is a model class, add view and create options #}
-        {% if child.modelClass is defined %}
-            <li class="dropdown-submenu">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 
-                {{ child.caption|default(child.modelClass|trans) }} 
-            </a>
-                <ul class="dropdown-menu">
-                    <li>
-                        <a href="{{ path('genericView', {'package': domainKey, 'className':child.modelClass}) }}"> 
-                            <i class="icon-list"></i> Anzeigen und bearbeiten
-                        </a>
+            {# find out whether to highlight the current item #}
+            {% set isInSubMenu = false %}
+            {% for child in item.children %}
+                {% if child.modelClass is defined %}
+                    {% set isInSubMenu = isInSubMenu or className == child.modelClass %}
+                {% endif %}
+            {% endfor %}
+
+            <li class="dropdown-submenu {{ isInSubMenu ? "active" : ""}}"> 
+                
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 
+                    {{ item.caption}} <b class="caret"></b> 
+                </a>
+                
+                {# the dropdown menu #}
+                <ul class="dropdown-menu" style="position: static; margin-bottom: 5px; *width: 180px;">
+                {% for child in item.children%}
+
+                    {# If the menu element is a model class, add view and create options #}
+                    {% if child.modelClass is defined %}
+                    <li class="dropdown-submenu">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 
+                        {{ child.caption|default(child.modelClass|trans) }} 
+                    </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="{{ path('genericView', {'package': domainKey, 'className':child.modelClass}) }}"> 
+                                    <i class="icon-list"></i> Anzeigen und bearbeiten
+                                </a>
+                            </li>
+                            {# Using the domainKey to dynamically generate the path also works:
+                                path(domainKey~'NewRecord', {'className':child.modelClass})
+                             #}
+                            <li>
+                                <a href="{{ path('genericCreateOrEdit', {'package':domainKey, 'className':child.modelClass}) }}"> {#, 'recordId':0, 'domainKey': domainKey#}
+                                    <i class="icon-plus"></i> Neu anlegen
+                                </a>
+                            </li>
+                        </ul>
                     </li>
-                    {# Using the domainKey to dynamically generate the path also works:
-                        path(domainKey~'NewRecord', {'className':child.modelClass})
-                     #}
-                    <li>
-                        <a href="{{ path('genericCreateOrEdit', {'package':domainKey, 'className':child.modelClass}) }}"> {#, 'recordId':0, 'domainKey': domainKey#}
-                            <i class="icon-plus"></i> Neu anlegen
-                        </a>
-                    </li>
-                </ul>
-            </li>
         {% else %}
             <li><a href="{{ path(child.route, child.options|default({})) }}">{{ child.caption }}</a></li>
-        {% endif %}
-        {% endfor %}
-        </ul>
-    </li>
+            {% endif %}
+                {% endfor %}
+                </ul>
+            </li>
 {% else %} {# item has no children #}
-    {# If the menu element is a model class, add view and create options #}
-    {% if item.modelClass is defined %}
-        {% set active = className == item.modelClass ? "active" : ""%}
-        <li class="{{active}}">
-               <a href="{{ path('genericView', {'package':domainKey, 'className':item.modelClass}) }}"> 
-                      {{ item.caption }} 
-                </a>
-        </li>
-    {# The menu element is a simple link #}
-    {% else %}
-        <li><a href="{{ path(item.route, item.options|default({})) }}">{{ item.caption }}</a></li>
+        {# If the menu element is a model class, add view and create options #}
+        {% if item.modelClass is defined %}
+            {% set active = className == item.modelClass ? "active" : ""%}
+            <li class="{{active}}">
+                   <a href="{{ path('genericView', {'package':domainKey, 'className':item.modelClass}) }}"> 
+                          {{ item.caption }} 
+                    </a>
+            </li>
+        {# The menu element is a simple link #}
+        {% else %}
+            <li><a href="{{ path(item.route, item.options|default({})) }}">{{ item.caption }}</a></li>
+        {% endif %}
     {% endif %}
-{% endif %}
-{% endfor %}
+    {% endfor %}
+                
+    </ul>       
+</div><!--/.nav-collapse -->

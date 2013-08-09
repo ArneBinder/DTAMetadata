@@ -8,7 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 class ClassificationDomainController extends DTADomainController {
 
     /** @inheritdoc */
-    public static $domainKey = "ConceptualDomain";
+    public $package = "Classification";
     /** @inheritdoc */
     public  $domainMenu = array(
 //        array("caption" => "Genres", 'route' => 'home',
@@ -31,7 +31,7 @@ class ClassificationDomainController extends DTADomainController {
      */
     public function indexAction() {
 
-        return $this->renderControllerSpecificAction('DTAMetadataBundle:ConceptualDomain:index.html.twig', array(
+        return $this->render('DTAMetadataBundle:ConceptualDomain:index.html.twig', array(
         ));
     }
 
