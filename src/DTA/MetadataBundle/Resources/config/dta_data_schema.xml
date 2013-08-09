@@ -13,7 +13,7 @@
     <behavior name="table_row_view">
         <!--If no parameters are defined, all columns are added. (WITHOUT embedding any related entities) -->
     </behavior>
-        
+    
     <!-- The base class for all publications. -->
     <table name="publication">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
@@ -344,7 +344,7 @@
             <parameter name="namen gesamt@count" value="personalname"/>
             <parameter name="gnd" value="gnd"/>
         </behavior>
-
+        
         <unique> <unique-column name="gnd"/> </unique>
     </table>
     

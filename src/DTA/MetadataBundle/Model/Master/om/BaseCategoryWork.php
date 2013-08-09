@@ -41,6 +41,12 @@ abstract class BaseCategoryWork extends BaseObject implements Persistent, \DTA\M
     protected $startCopy = false;
 
     /**
+     * The value for the id field.
+     * @var        int
+     */
+    protected $id;
+
+    /**
      * The value for the category_id field.
      * @var        int
      */
@@ -85,6 +91,16 @@ abstract class BaseCategoryWork extends BaseObject implements Persistent, \DTA\M
     // table_row_view behavior
     public static $tableRowViewCaptions = array();	public   $tableRowViewAccessors = array();
     /**
+     * Get the [id] column value.
+     *
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
      * Get the [category_id] column value.
      *
      * @return int
@@ -103,6 +119,27 @@ abstract class BaseCategoryWork extends BaseObject implements Persistent, \DTA\M
     {
         return $this->work_id;
     }
+
+    /**
+     * Set the value of [id] column.
+     *
+     * @param int $v new value
+     * @return CategoryWork The current object (for fluent API support)
+     */
+    public function setId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->id !== $v) {
+            $this->id = $v;
+            $this->modifiedColumns[] = CategoryWorkPeer::ID;
+        }
+
+
+        return $this;
+    } // setId()
 
     /**
      * Set the value of [category_id] column.
@@ -186,8 +223,9 @@ abstract class BaseCategoryWork extends BaseObject implements Persistent, \DTA\M
     {
         try {
 
-            $this->category_id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-            $this->work_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+            $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
+            $this->category_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+            $this->work_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -196,7 +234,7 @@ abstract class BaseCategoryWork extends BaseObject implements Persistent, \DTA\M
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 2; // 2 = CategoryWorkPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 3; // 3 = CategoryWorkPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating CategoryWork object", $e);
@@ -431,6 +469,9 @@ abstract class BaseCategoryWork extends BaseObject implements Persistent, \DTA\M
 
 
          // check the columns in natural order for more readable SQL queries
+        if ($this->isColumnModified(CategoryWorkPeer::ID)) {
+            $modifiedColumns[':p' . $index++]  = '"id"';
+        }
         if ($this->isColumnModified(CategoryWorkPeer::CATEGORY_ID)) {
             $modifiedColumns[':p' . $index++]  = '"category_id"';
         }
@@ -448,6 +489,9 @@ abstract class BaseCategoryWork extends BaseObject implements Persistent, \DTA\M
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
+                    case '"id"':
+                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
+                        break;
                     case '"category_id"':
                         $stmt->bindValue($identifier, $this->category_id, PDO::PARAM_INT);
                         break;
@@ -600,9 +644,12 @@ abstract class BaseCategoryWork extends BaseObject implements Persistent, \DTA\M
     {
         switch ($pos) {
             case 0:
-                return $this->getCategoryId();
+                return $this->getId();
                 break;
             case 1:
+                return $this->getCategoryId();
+                break;
+            case 2:
                 return $this->getWorkId();
                 break;
             default:
@@ -634,8 +681,9 @@ abstract class BaseCategoryWork extends BaseObject implements Persistent, \DTA\M
         $alreadyDumpedObjects['CategoryWork'][serialize($this->getPrimaryKey())] = true;
         $keys = CategoryWorkPeer::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getCategoryId(),
-            $keys[1] => $this->getWorkId(),
+            $keys[0] => $this->getId(),
+            $keys[1] => $this->getCategoryId(),
+            $keys[2] => $this->getWorkId(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aCategory) {
@@ -679,9 +727,12 @@ abstract class BaseCategoryWork extends BaseObject implements Persistent, \DTA\M
     {
         switch ($pos) {
             case 0:
-                $this->setCategoryId($value);
+                $this->setId($value);
                 break;
             case 1:
+                $this->setCategoryId($value);
+                break;
+            case 2:
                 $this->setWorkId($value);
                 break;
         } // switch()
@@ -708,8 +759,9 @@ abstract class BaseCategoryWork extends BaseObject implements Persistent, \DTA\M
     {
         $keys = CategoryWorkPeer::getFieldNames($keyType);
 
-        if (array_key_exists($keys[0], $arr)) $this->setCategoryId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setWorkId($arr[$keys[1]]);
+        if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
+        if (array_key_exists($keys[1], $arr)) $this->setCategoryId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setWorkId($arr[$keys[2]]);
     }
 
     /**
@@ -721,6 +773,7 @@ abstract class BaseCategoryWork extends BaseObject implements Persistent, \DTA\M
     {
         $criteria = new Criteria(CategoryWorkPeer::DATABASE_NAME);
 
+        if ($this->isColumnModified(CategoryWorkPeer::ID)) $criteria->add(CategoryWorkPeer::ID, $this->id);
         if ($this->isColumnModified(CategoryWorkPeer::CATEGORY_ID)) $criteria->add(CategoryWorkPeer::CATEGORY_ID, $this->category_id);
         if ($this->isColumnModified(CategoryWorkPeer::WORK_ID)) $criteria->add(CategoryWorkPeer::WORK_ID, $this->work_id);
 
@@ -738,6 +791,7 @@ abstract class BaseCategoryWork extends BaseObject implements Persistent, \DTA\M
     public function buildPkeyCriteria()
     {
         $criteria = new Criteria(CategoryWorkPeer::DATABASE_NAME);
+        $criteria->add(CategoryWorkPeer::ID, $this->id);
         $criteria->add(CategoryWorkPeer::CATEGORY_ID, $this->category_id);
         $criteria->add(CategoryWorkPeer::WORK_ID, $this->work_id);
 
@@ -752,8 +806,9 @@ abstract class BaseCategoryWork extends BaseObject implements Persistent, \DTA\M
     public function getPrimaryKey()
     {
         $pks = array();
-        $pks[0] = $this->getCategoryId();
-        $pks[1] = $this->getWorkId();
+        $pks[0] = $this->getId();
+        $pks[1] = $this->getCategoryId();
+        $pks[2] = $this->getWorkId();
 
         return $pks;
     }
@@ -766,8 +821,9 @@ abstract class BaseCategoryWork extends BaseObject implements Persistent, \DTA\M
      */
     public function setPrimaryKey($keys)
     {
-        $this->setCategoryId($keys[0]);
-        $this->setWorkId($keys[1]);
+        $this->setId($keys[0]);
+        $this->setCategoryId($keys[1]);
+        $this->setWorkId($keys[2]);
     }
 
     /**
@@ -777,7 +833,7 @@ abstract class BaseCategoryWork extends BaseObject implements Persistent, \DTA\M
     public function isPrimaryKeyNull()
     {
 
-        return (null === $this->getCategoryId()) && (null === $this->getWorkId());
+        return (null === $this->getId()) && (null === $this->getCategoryId()) && (null === $this->getWorkId());
     }
 
     /**
@@ -793,6 +849,7 @@ abstract class BaseCategoryWork extends BaseObject implements Persistent, \DTA\M
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
+        $copyObj->setId($this->getId());
         $copyObj->setCategoryId($this->getCategoryId());
         $copyObj->setWorkId($this->getWorkId());
 
@@ -961,6 +1018,7 @@ abstract class BaseCategoryWork extends BaseObject implements Persistent, \DTA\M
      */
     public function clear()
     {
+        $this->id = null;
         $this->category_id = null;
         $this->work_id = null;
         $this->alreadyInSave = false;

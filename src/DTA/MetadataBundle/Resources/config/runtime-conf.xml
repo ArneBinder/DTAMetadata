@@ -2,9 +2,10 @@
 <config>
   <log>
     <type>file</type>
-    <name>~/Metadatenbank/prototyp/propel-log</name>
-    <ident>propel-DTA</ident>
-    <level>7</level>
+    <name>propel.log</name>
+    <ident>propel</ident>
+    <level>7</level> <!-- PEAR_LOG_DEBUG -->
+    <conf></conf>
   </log>
   <propel>
     <datasources default="DTAMetadata">

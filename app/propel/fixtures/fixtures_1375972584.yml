@@ -20,18 +20,14 @@ DTA\MetadataBundle\Model\Classification\Personrole:
         applicable_to_publication: false
         applicable_to_work: true
     Personrole_2:
-        name: Autor
-        applicable_to_publication: false
-        applicable_to_work: true
-    Personrole_3:
         name: Verleger
         applicable_to_publication: false
         applicable_to_work: false
-    Personrole_4:
+    Personrole_3:
         name: Übersetzer
         applicable_to_publication: false
         applicable_to_work: false
-    Personrole_5:
+    Personrole_4:
         name: Drucker
         applicable_to_publication: false
         applicable_to_work: false

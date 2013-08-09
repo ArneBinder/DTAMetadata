@@ -60,7 +60,7 @@ propel:
 #     http://propelorm.org/reference/buildtime-configuration.html#general_build_settings
     build_properties:
       
-      propel.database: pgsql
+      propel.database: %database_vendor%
 #      propel.sql.dir: ${propel.output.dir}/pgsql
       
       # TODO: for testing, non-enforcement of the foreign key constraints is more practical (set to MyISAM)
@@ -75,7 +75,7 @@ propel:
       # from the namespace attribute
 #      propel.namespace.autoPackage: true
 #      propel.schema.autoNamespace: true
-
+    logging: true
 
     # propel database connections
     dbal:
@@ -93,8 +93,7 @@ propel:
               driver:     %database_driver%
               user:       %database_user%
               password:   %database_password%
-#              dsn:        "pgsql:host=%database_host%;dbname=%database_name%"
-              dsn: pgsql:host=localhost;dbname=DTAMetadata
+              dsn:        "%database_vendor%:host=%database_host%;dbname=%database_name%"
               options:    {}
               attributes: {}
 # this was only used to generate a schema from an existing database (which was in turn generated with the mysql workbench graphical tools)
@@ -131,19 +130,19 @@ swiftmailer:
 #        auto_generate_proxy_classes: %kernel.debug%
 #        auto_mapping: true
 #
-#monolog:
-#    handlers:
-#        applog:
-#            type: stream
-#            path: /var/log/symfony.log
-#            level: error
-#        main:
-#            type: fingers_crossed
-#            action_level: warning
-#            handler: file
-#        file:
-#            type: stream
-#            level: debug
-#        syslog:
-#            type: syslog
-#            level: error
+monolog:
+    handlers:
+        applog:
+            type: stream
+            path: ../app/logs/symfony.log
+            level: error
+        main:
+            type: fingers_crossed
+            action_level: warning
+            handler: file
+        file:
+            type: stream
+            level: debug
+        syslog:
+            type: syslog
+            level: error

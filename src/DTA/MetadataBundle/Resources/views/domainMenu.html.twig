@@ -67,7 +67,7 @@
                         path(domainKey~'NewRecord', {'className':child.modelClass})
                      #}
                     <li>
-                        <a href="{{ path('genericNew', {'domainKey':domainKey, 'className':child.modelClass}) }}"> {#, 'recordId':0, 'domainKey': domainKey#}
+                        <a href="{{ path('genericCreateOrEdit', {'package':domainKey, 'className':child.modelClass}) }}"> {#, 'recordId':0, 'domainKey': domainKey#}
                             <i class="icon-plus"></i> Neu anlegen
                         </a>
                     </li>

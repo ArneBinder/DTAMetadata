@@ -1,12 +1,18 @@
 # A route maps a requested url or a pattern or requested urls 
-# to a php function in some controller.
+# to a function in some controller.
 # Working with routes is also an easy way to parse parameters from the url.
 
-# the routes are defined via annotations in the comments of the methods
-dta_controller:
-    resource: "@DTAMetadataBundle/Controller/"
-    type:     annotation
-    
+# !! 
+# The order of the imports matters. First routes are matched first, so generic routes are listed last.
+# The same applied to methods within the controllers.
+# !!
+
+
+# the routes are defined via annotations of the methods
+Master:
+    resource: "DTA\MetadataBundle\Controller\MasterDomainController"
+    type: annotation
+
 # These routes are needed for the symfony default login system
 # and their patterns are set to the default values
 login_check:
@@ -15,7 +21,27 @@ login_check:
 logout:
     pattern:   /logout
 
-# Internal routing configuration to handle ESI
-#_internal:
-#    resource: "@FrameworkBundle/Resources/config/routing/internal.xml"
-#    prefix:   /_internal
+Home:
+    resource: "DTA\MetadataBundle\Controller\HomeController"
+    type: annotation
+    
+Data:
+    resource: "DTA\MetadataBundle\Controller\DataDomainController"
+    type: annotation
+
+Classification:
+    resource: "DTA\MetadataBundle\Controller\ClassificationDomainController"
+    type: annotation
+
+Workflow:
+    resource: "DTA\MetadataBundle\Controller\WorkflowDomainController"
+    type: annotation
+    
+Base:
+    resource: "DTA\MetadataBundle\Controller\DTADomainController"
+    type: annotation
+
+# catches generic CRUD requests that have no specialized counterpart in the domain controllers
+ORM:
+    resource: "DTA\MetadataBundle\Controller\ORMController"
+    type: annotation

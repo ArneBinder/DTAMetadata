@@ -43,6 +43,7 @@ class GenreWorkTableMap extends TableMap
         $this->setUseIdGenerator(false);
         $this->setIsCrossRef(true);
         // columns
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignPrimaryKey('genre_id', 'GenreId', 'INTEGER' , 'genre', 'id', true, null, null);
         $this->addForeignPrimaryKey('work_id', 'WorkId', 'INTEGER' , 'work', 'id', true, null, null);
         // validators
@@ -67,6 +68,7 @@ class GenreWorkTableMap extends TableMap
     {
         return array(
             'table_row_view' =>  array (
+  'Id' => 'id',
   'GenreId' => 'genre_id',
   'WorkId' => 'work_id',
 ),

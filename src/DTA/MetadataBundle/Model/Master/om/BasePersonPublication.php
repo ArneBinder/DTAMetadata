@@ -527,20 +527,6 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = PersonPublicationPeer::ID;
-        if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . PersonPublicationPeer::ID . ')');
-        }
-        if (null === $this->id) {
-            try {
-                $stmt = $con->query("SELECT nextval('person_publication_id_seq')");
-                $row = $stmt->fetch(PDO::FETCH_NUM);
-                $this->id = $row[0];
-            } catch (Exception $e) {
-                throw new PropelException('Unable to get sequence id.', $e);
-            }
-        }
-
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(PersonPublicationPeer::ID)) {

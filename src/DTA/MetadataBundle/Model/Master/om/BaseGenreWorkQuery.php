@@ -19,9 +19,11 @@ use DTA\MetadataBundle\Model\Master\GenreWorkPeer;
 use DTA\MetadataBundle\Model\Master\GenreWorkQuery;
 
 /**
+ * @method GenreWorkQuery orderById($order = Criteria::ASC) Order by the id column
  * @method GenreWorkQuery orderByGenreId($order = Criteria::ASC) Order by the genre_id column
  * @method GenreWorkQuery orderByWorkId($order = Criteria::ASC) Order by the work_id column
  *
+ * @method GenreWorkQuery groupById() Group by the id column
  * @method GenreWorkQuery groupByGenreId() Group by the genre_id column
  * @method GenreWorkQuery groupByWorkId() Group by the work_id column
  *
@@ -40,9 +42,11 @@ use DTA\MetadataBundle\Model\Master\GenreWorkQuery;
  * @method GenreWork findOne(PropelPDO $con = null) Return the first GenreWork matching the query
  * @method GenreWork findOneOrCreate(PropelPDO $con = null) Return the first GenreWork matching the query, or a new GenreWork object populated from the query conditions when no match is found
  *
+ * @method GenreWork findOneById(int $id) Return the first GenreWork filtered by the id column
  * @method GenreWork findOneByGenreId(int $genre_id) Return the first GenreWork filtered by the genre_id column
  * @method GenreWork findOneByWorkId(int $work_id) Return the first GenreWork filtered by the work_id column
  *
+ * @method array findById(int $id) Return GenreWork objects filtered by the id column
  * @method array findByGenreId(int $genre_id) Return GenreWork objects filtered by the genre_id column
  * @method array findByWorkId(int $work_id) Return GenreWork objects filtered by the work_id column
  */
@@ -90,11 +94,11 @@ abstract class BaseGenreWorkQuery extends ModelCriteria
      * Go fast if the query is untouched.
      *
      * <code>
-     * $obj = $c->findPk(array(12, 34), $con);
+     * $obj = $c->findPk(array(12, 34, 56), $con);
      * </code>
      *
      * @param array $key Primary key to use for the query
-                         A Primary key composition: [$genre_id, $work_id]
+                         A Primary key composition: [$id, $genre_id, $work_id]
      * @param     PropelPDO $con an optional connection object
      *
      * @return   GenreWork|GenreWork[]|mixed the result, formatted by the current formatter
@@ -104,7 +108,7 @@ abstract class BaseGenreWorkQuery extends ModelCriteria
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = GenreWorkPeer::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1]))))) && !$this->formatter) {
+        if ((null !== ($obj = GenreWorkPeer::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1], (string) $key[2]))))) && !$this->formatter) {
             // the object is alredy in the instance pool
             return $obj;
         }
@@ -133,11 +137,12 @@ abstract class BaseGenreWorkQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "genre_id", "work_id" FROM "genre_work" WHERE "genre_id" = :p0 AND "work_id" = :p1';
+        $sql = 'SELECT "id", "genre_id", "work_id" FROM "genre_work" WHERE "id" = :p0 AND "genre_id" = :p1 AND "work_id" = :p2';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
             $stmt->bindValue(':p1', $key[1], PDO::PARAM_INT);
+            $stmt->bindValue(':p2', $key[2], PDO::PARAM_INT);
             $stmt->execute();
         } catch (Exception $e) {
             Propel::log($e->getMessage(), Propel::LOG_ERR);
@@ -147,7 +152,7 @@ abstract class BaseGenreWorkQuery extends ModelCriteria
         if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
             $obj = new GenreWork();
             $obj->hydrate($row);
-            GenreWorkPeer::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1])));
+            GenreWorkPeer::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1], (string) $key[2])));
         }
         $stmt->closeCursor();
 
@@ -206,8 +211,9 @@ abstract class BaseGenreWorkQuery extends ModelCriteria
      */
     public function filterByPrimaryKey($key)
     {
-        $this->addUsingAlias(GenreWorkPeer::GENRE_ID, $key[0], Criteria::EQUAL);
-        $this->addUsingAlias(GenreWorkPeer::WORK_ID, $key[1], Criteria::EQUAL);
+        $this->addUsingAlias(GenreWorkPeer::ID, $key[0], Criteria::EQUAL);
+        $this->addUsingAlias(GenreWorkPeer::GENRE_ID, $key[1], Criteria::EQUAL);
+        $this->addUsingAlias(GenreWorkPeer::WORK_ID, $key[2], Criteria::EQUAL);
 
         return $this;
     }
@@ -225,13 +231,57 @@ abstract class BaseGenreWorkQuery extends ModelCriteria
             return $this->add(null, '1<>1', Criteria::CUSTOM);
         }
         foreach ($keys as $key) {
-            $cton0 = $this->getNewCriterion(GenreWorkPeer::GENRE_ID, $key[0], Criteria::EQUAL);
-            $cton1 = $this->getNewCriterion(GenreWorkPeer::WORK_ID, $key[1], Criteria::EQUAL);
+            $cton0 = $this->getNewCriterion(GenreWorkPeer::ID, $key[0], Criteria::EQUAL);
+            $cton1 = $this->getNewCriterion(GenreWorkPeer::GENRE_ID, $key[1], Criteria::EQUAL);
             $cton0->addAnd($cton1);
+            $cton2 = $this->getNewCriterion(GenreWorkPeer::WORK_ID, $key[2], Criteria::EQUAL);
+            $cton0->addAnd($cton2);
             $this->addOr($cton0);
         }
 
         return $this;
+    }
+
+    /**
+     * Filter the query on the id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterById(1234); // WHERE id = 1234
+     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
+     * </code>
+     *
+     * @param     mixed $id The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return GenreWorkQuery The current query, for fluid interface
+     */
+    public function filterById($id = null, $comparison = null)
+    {
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(GenreWorkPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(GenreWorkPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(GenreWorkPeer::ID, $id, $comparison);
     }
 
     /**
@@ -484,9 +534,10 @@ abstract class BaseGenreWorkQuery extends ModelCriteria
     public function prune($genreWork = null)
     {
         if ($genreWork) {
-            $this->addCond('pruneCond0', $this->getAliasedColName(GenreWorkPeer::GENRE_ID), $genreWork->getGenreId(), Criteria::NOT_EQUAL);
-            $this->addCond('pruneCond1', $this->getAliasedColName(GenreWorkPeer::WORK_ID), $genreWork->getWorkId(), Criteria::NOT_EQUAL);
-            $this->combine(array('pruneCond0', 'pruneCond1'), Criteria::LOGICAL_OR);
+            $this->addCond('pruneCond0', $this->getAliasedColName(GenreWorkPeer::ID), $genreWork->getId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond1', $this->getAliasedColName(GenreWorkPeer::GENRE_ID), $genreWork->getGenreId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond2', $this->getAliasedColName(GenreWorkPeer::WORK_ID), $genreWork->getWorkId(), Criteria::NOT_EQUAL);
+            $this->combine(array('pruneCond0', 'pruneCond1', 'pruneCond2'), Criteria::LOGICAL_OR);
         }
 
         return $this;

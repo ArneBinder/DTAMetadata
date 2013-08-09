@@ -1508,10 +1508,6 @@ abstract class BasePersonWorkPeer
             $criteria = $values->buildCriteria(); // build Criteria from PersonWork object
         }
 
-        if ($criteria->containsKey(PersonWorkPeer::ID) && $criteria->keyContainsValue(PersonWorkPeer::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.PersonWorkPeer::ID.')');
-        }
-
 
         // Set the correct dbName
         $criteria->setDbName(PersonWorkPeer::DATABASE_NAME);

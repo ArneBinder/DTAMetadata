@@ -43,6 +43,7 @@ class WorkTagTableMap extends TableMap
         $this->setUseIdGenerator(false);
         $this->setIsCrossRef(true);
         // columns
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignPrimaryKey('tag_id', 'TagId', 'INTEGER' , 'tag', 'id', true, null, null);
         $this->addForeignPrimaryKey('work_id', 'WorkId', 'INTEGER' , 'work', 'id', true, null, null);
         // validators
@@ -67,6 +68,7 @@ class WorkTagTableMap extends TableMap
     {
         return array(
             'table_row_view' =>  array (
+  'Id' => 'id',
   'TagId' => 'tag_id',
   'WorkId' => 'work_id',
 ),

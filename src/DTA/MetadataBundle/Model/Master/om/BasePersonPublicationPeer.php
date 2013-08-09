@@ -1508,10 +1508,6 @@ abstract class BasePersonPublicationPeer
             $criteria = $values->buildCriteria(); // build Criteria from PersonPublication object
         }
 
-        if ($criteria->containsKey(PersonPublicationPeer::ID) && $criteria->keyContainsValue(PersonPublicationPeer::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.PersonPublicationPeer::ID.')');
-        }
-
 
         // Set the correct dbName
         $criteria->setDbName(PersonPublicationPeer::DATABASE_NAME);

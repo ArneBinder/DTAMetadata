@@ -18,10 +18,12 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ORMController extends DTADomainController {
 
-    // TODO: pressing enter in a modal form leads to a form submit and all data is lost, because the server redirects to the ajax response page
+    // TODO: pressing enter in a modal form leads to a form submit and all data is lost, 
+    // because the server redirects to the ajax response page
     
     /**
-     * Returns the fully qualified class names to autoload and generate objects and work with them using their class names.
+     * Returns the fully qualified class names for generic loading.
+     * @param String $package   The namespace/package name of the class (Data/Workflow/Classification/Master)
      * @param String $className The basic name of the class, all lower-case except the first letter (Work, Personalname, Namefragmenttype)
      */
     private function relatedClassNames($package, $className) {
@@ -32,92 +34,173 @@ class ORMController extends DTADomainController {
             "formType"  => "DTA\\MetadataBundle\\Form\\$package\\" . $className . "Type",     // class for generating form inputs
         );
     }
+    
+    private function getControllerClassName($package) {
+        return "DTA\\MetadataBundle\\Controller\\" . $package . "DomainController";
+    }
+
+    private function getModelReflectionClass($className) {
+        return new \ReflectionClass("DTA\\MetadataBundle\\Model\\" . $className);
+    }
 
     /**
-     * Renders a list of all entities of a certain type.
-     * Takes into account how the list should be rendered according to the XML schemata,
-     * where this can be specified using the table_row_view behavior.
-     * @param string $package     the domain/object model package (Data, Classification, Workflow, Master)
-     * @param string $className   
-     * @Route(
-     *      "{package}/showAll//{className}/{updatedObjectId}", 
-     *      defaults = {"updatedObjectId" = 0},
-     *      name = "genericView"
-     * )
+     * Handles requests to generic create/edit request to any model class.
+     * If specialized handlers exist in the domain controllers (that match the same route pattern)
+     * these will be preferred by the router.
+     * @param String    $package            The namespace/package name (Data/Workflow/Classification/Master)
+     * @param String    $className          The model class name see src/DTA/MetadataBundle/Model/<$package>/ for classes
+     * @param int       $recordId           The id of the entity to edit, 0 if new 
+     * 
+     * @Route("{package}/{className}/{recordId}", name = "genericCreateOrEdit", defaults = {"recordId"=0})
      */
-    public function genericViewAllAction($package, $className, $updatedObjectId = 0) {
-
-        $classNames = $this->relatedClassNames($package, $className);
-
-        // for retrieving the entities
-        $query = new $classNames['query'];
+    public function genericCreateOrEditAction(Request $request, $package, $className, $recordId) {
         
-        // for retrieving the column names
-        $modelClass = new $classNames["model"];
+        $result = $this->genericCreateOrEdit(
+                $request, 
+                array(
+                    'package'   => $package, 
+                    'className' => $className, 
+                    'recordId'  => $recordId), 
+                function(){},
+                array()
+        );
 
-        return $this->renderDomainKeySpecificAction($package, "DTAMetadataBundle::genericView.html.twig", array(
-                    'data' => $query->orderById()->find(),
-                    'columns' => $modelClass::getTableViewColumnNames(),
-                    'className' => $className,
-                    'updatedObjectId' => $updatedObjectId,
-                ));
-    }
-
-    /**
-     * Visits recursively all nested form elements and saves them.
-     * @param Form $form The form object that contains the data defined by the top level form type (PersonType, NamefragmentType, ...)
-     */
-    private function saveRecursively(\Symfony\Component\Form\Form $form) {
-
-        $entity = $form->getData();
-        if (is_object($entity)) {
-            $rc = new \ReflectionClass($entity);
-            if ($rc->hasMethod('save'))
-                $entity->save();
-        }
-
-        foreach ($form->getChildren() as $child) {
-            $this->saveRecursively($child);
-        }
-    }
-
-    /**
-     * Displays an edit form for a specific database entity.
-     * Handles POST requests that have been set off due to editing a specific database entity.
-     * @param type $domainKey
-     * @param type $className
-     * @param type $recordId
-     * @Route("/showRecord/{domainKey}/{className}/{recordId}", name="viewRecord")
-     */
-    public function genericViewOneAction(Request $request, $domainKey, $className, $recordId) {
-
-        // create object and its form
-        $form = $this->generateForm($className, $recordId);
-
-        // save data on POST
-        if ($request->isMethod("POST")) {
-            // put form data on a virtual form
-            $form->bindRequest($request);
-            if ($form->isValid()) {
-
-                // parse propel object from virtual form
-                $this->saveRecursively($form);
-
-                $this->get('session')->getFlashBag()->add('success', 'Änderungen vorgenommen.');
-
-                return $this->genericViewAllAction($domainKey, $className, $form->getData()->getId());
-                
-            } else {
-                // TODO compare form_row (form_div_layout.html.twig) error reporting mechanisms to the overriden version of form_row (viewConfigurationForModels.html.twig)
-                // and test whether they work on different inputs.
-                var_dump($form->getErrors());
-            }
-        }
-        return $this->renderDomainKeySpecificAction($domainKey, "DTAMetadataBundle:Form:genericEdit.html.twig", array(
-                    'form' => $form->createView(),
+        switch( $result['transaction'] ){
+            case "recordNotFound":
+                $this->get('session')->getFlashBag()->add(
+                        'error', 
+                        "Der gewünschte Datensatz kann nicht bearbeitet werden, weil er nicht gefunden wurde.");
+                return $this->genericViewAllAction($package, $className, $result['recordId']);
+            case "complete":
+                $this->get('session')->getFlashBag()->add('success', "Änderungen vorgenommen.");
+                return $this->genericViewAllAction($package, $className, $result['recordId']);
+            case "edit":
+            case "create":
+                return $this->renderDomainKeySpecificAction($package, "DTAMetadataBundle:Form:genericEdit.html.twig", array(
+                    'form' => $result['form']->createView(),
+                    'transaction' => $result['transaction'],    // whether the form is for edit or create
                     'className' => $className,
                     'recordId' => $recordId,
                 ));
+        }
+    }
+    
+    /**
+     * Core logic for creating/editing entities. Database logic and form creation.
+     * Can be reused in the domain controllers and customized by passing additional options.
+     * Also handles the POST HTTP requests that have been set off by the form.
+     * @param array     $entity             Associative array with the parameters that identify a record: package, className, recordId
+     * @param function  $preSaveLogic       A closure that performs additional actions before saving.
+     * @param array     $formTypeOptions    Options to influence the mapping of the object to a form 
+     * 
+     * @return array    Contains two fields, transaction (either 'edit', 'create', 'complete' or 'recordNotFound') which indicates what happened and 
+     *                  depending on the transaction result a recordId of the created/updated record or the form.
+     */
+    protected function genericCreateOrEdit(
+            Request $request, 
+            $entity, 
+            $preSaveLogic, 
+            $formTypeOptions = array()) {
+        
+        // TODO compare form_row (form_div_layout.html.twig) error reporting mechanisms to the overriden version of form_row (viewConfigurationForModels.html.twig)
+        // and test whether they work on different inputs.
+        
+        $package = $entity['package'];
+        $className = $entity['className'];
+        $recordId = $entity['recordId'];
+        
+        $classNames = $this->relatedClassNames($className);
+        
+        if($recordId == 0){
+            
+            // create new object from class name
+            $obj = new $classNames['model'];
+            
+        } else {
+            
+            // fetch the object from the database
+            $queryObject = $classNames['query']::create();
+            $obj = $queryObject->findOneById($recordId);
+            if( is_null($obj) ){
+                return array('transaction'=>'recordNotFound');
+            }
+            
+        }
+
+        $form = $this->createForm(new $classNames['formType'], $obj, $formTypeOptions);
+
+        // handle form submission
+        if ($request->isMethod("POST")) {
+            
+            $form->handleRequest($request);
+
+            // symfony validation: required fields etc.
+            if ($form->isValid()) {
+
+                // propel validation: unique constraints etc.
+                if ($obj->validate()) {
+
+                    // user defined pre save logic closure.
+                    if(is_object($preSaveLogic) && ($preSaveLogic instanceof Closure)){
+                        $preSaveLogic();
+                    }
+                    
+//                  $this->saveRecursively($form);
+                    $obj->save();
+                    
+                    // return edited/created entity ID as transaction success receipt
+                    return array(
+                        'transaction'=>'complete', 
+                        'recordId'=>$form->getData()->getId()
+                    );
+                    
+                } else { // propel validation fails
+
+                    // add propel validation messages to flash bag
+                    foreach ($obj->getValidationFailures() as $failure) {
+                        $this->get('session')->getFlashBag()->add('error', $failure->getMessage());
+                    }
+                }
+            } else { // symfony form validation fails
+
+                // add symfony validation messages to flash bag
+                foreach ($form->getErrors() as $error) {
+                    $this->get('session')->getFlashBag()->add('error', $error->getMessage());
+                }
+            }
+        }
+        
+        return array(
+            'transaction'   => $recordId == 0 ? 'create' : 'edit', 
+            'form'          => $form
+        );
+        
+    }
+    
+//     * @param string captionProperty For ajax use: Which attribute does the select use to describe the entities it lists? Used to generate a new select option via ajax.
+//     * @return HTML Option Element|nothing If the new action is called by a nested ajax form (selectOrAdd form type) the result is the option element to add to the nearby select.
+//     * @Route("/genericNew/{domainKey}/{className}/{property}", name="genericNew", defaults={"property"="Id"})
+    public function genericNewAction(Request $request, $className, $domainKey, $property = "Id") {
+
+            // AJAX case (nested form submit, no redirect)
+            if ("ajax" == $domainKey) {
+                
+                // fetch data for the newly selectable option
+                $id = $obj->getId();
+                
+                $captionAccessor = "get" . $property;
+                
+                // check whether the caption accessor function exists
+                $cr = new \ReflectionClass("\DTA\MetadataBundle\Model\\" . $className);
+                if( ! $cr->hasMethod($captionAccessor) )
+                    throw new \Exception("Can't retrieve caption via $captionAccessor from $className object.");
+                
+                $caption = $obj->$captionAccessor();
+
+                // return the new select option html fragment
+                return new Response("<option value='$id'>$caption</option>");
+            } 
+        
     }
     
     /**
@@ -159,27 +242,33 @@ class ORMController extends DTADomainController {
     }
 
     /**
-     * Creates a form to EDIT or CREATE any database entity.
-     * @param string $className The name of the model class to create the form for (refer to the Model directory,
-     * the DTA\MetadataBundle\Model namespace members) 
-     * @param int recordId If the form shall be used for editing, the id of the entity to edit.
-     * Since 1 is the first ID used by propel, 0 indicates that a new object shall be created.
-     * @return The symfony form. If it is an edit form, with fetched data.
+     * Renders a list of all entities of a certain type.
+     * Takes into account how the list should be rendered according to the XML schemata,
+     * where this can be specified using the table_row_view behavior.
+     * @param string $package     the domain/object model package (Data, Classification, Workflow, Master)
+     * @param string $className   
+     * @Route(
+     *      "{package}/showAll//{className}/{updatedObjectId}", 
+     *      defaults = {"updatedObjectId" = 0},
+     *      name = "genericView"
+     * )
      */
-    public function generateForm($className, $recordId = 0) {
+    public function genericViewAllAction($package, $className, $updatedObjectId = 0) {
 
-        $classNames = $this->relatedClassNames($className);
+        $classNames = $this->relatedClassNames($package, $className);
 
-        $queryObject = $classNames['query']::create();
+        // for retrieving the entities
+        $query = new $classNames['query'];
+        
+        // for retrieving the column names
+        $modelClass = new $classNames["model"];
 
-        // ------------------------------------------------------------------------
-        // Try to fetch the object from the database to fill the form
-        $record = $queryObject->findOneById($recordId);
-        $obj = is_null($record) ? new $classNames['model'] : $record;
-
-        $form = $this->createForm(new $classNames['formType'], $obj);
-        return $form;
-//        return array('form'=>$form, 'object'=>$obj);
+        return $this->renderDomainKeySpecificAction($package, "DTAMetadataBundle::genericView.html.twig", array(
+                    'data' => $query->orderById()->find(),
+                    'columns' => $modelClass::getTableViewColumnNames(),
+                    'className' => $className,
+                    'updatedObjectId' => $updatedObjectId,
+                ));
     }
 
     /**
@@ -209,113 +298,24 @@ class ORMController extends DTADomainController {
                 ));
     }
 
+    
+    
     /**
-     * Handles POST requests that have been set off due to creating a new record.
-     * @param string $className See genericEditForm for a parameter documentation.
-     * @param string domainKey The domain where to redirect to, to view the created record. 
-     *                          If it is set to "none", the database update is performed without redirecting (ajax case)
-     * @param string captionProperty For ajax use: Which attribute does the select use to describe the entities it lists? Used to generate a new select option via ajax.
-     * @return HTML Option Element|nothing If the new action is called by a nested ajax form (selectOrAdd form type) the result is the option element to add to the nearby select.
-     * 
-     * @Route("/genericNew/{domainKey}/{className}/{property}", name="genericNew", defaults={"property"="Id"})
+     * Visits recursively all nested form elements and saves them.
+     * @param Form $form The form object that contains the data defined by the top level form type (PersonType, NamefragmentType, ...)
      */
-    public function genericNewAction(Request $request, $className, $domainKey, $property = "Id") {
+    private function saveRecursively(\Symfony\Component\Form\Form $form) {
 
-        $classNames = $this->relatedClassNames($className);
-
-        // create object and its form
-        $obj = new $classNames['model'];
-        $form = $this->createForm(new $classNames['formType'], $obj);
-
-        // save data on POST
-        if ($request->isMethod("POST")) {
-            $form->bind($request);
-            if ($form->isValid()) {
-                $obj->save();
-            }
-
-            // AJAX case (nested form submit, no redirect)
-            if ("ajax" == $domainKey) {
-                
-                // fetch data for the newly selectable option
-                $id = $obj->getId();
-                
-                $captionAccessor = "get" . $property;
-                
-                // check whether the caption accessor function exists
-                $cr = new \ReflectionClass("\DTA\MetadataBundle\Model\\" . $className);
-                if( ! $cr->hasMethod($captionAccessor) )
-                    throw new \Exception("Can't retrieve caption via $captionAccessor from $className object.");
-                
-                $caption = $obj->$captionAccessor();
-
-                // return the new select option html fragment
-                return new Response("<option value='$id'>$caption</option>");
-            } else {
-                // redirect to overview page on success
-                $this->get('session')->getFlashBag()->add('success', 'Änderungen vorgenommen.');
-
-                return $this->redirect($this->generateUrl('genericView', array(
-                                    'domainKey' => $domainKey,
-                                    'className' => $className,
-                                    // highlight the changed or added entity in the list of all entities
-                                    'updatedObjectId' => $form->getData()->getId(),
-                                )));
-            }
+        $entity = $form->getData();
+        if (is_object($entity)) {
+            $rc = new \ReflectionClass($entity);
+            if ($rc->hasMethod('save'))
+                $entity->save();
         }
 
-        // render the form
-        return $this->renderDomainKeySpecificAction($domainKey, 'DTAMetadataBundle:Form:genericNew.html.twig', array(
-                    'form' => $form->createView(),
-                    'className' => $className,
-                ));
-    }
-    
-    private function getControllerClassName($package) {
-        return "DTA\\MetadataBundle\\Controller\\" . $package . "DomainController";
-    }
-
-    private function getModelReflectionClass($className) {
-        return new \ReflectionClass("DTA\\MetadataBundle\\Model\\" . $className);
-    }
-
-    public function renderDomainKeySpecificAction($domainKey, $template, array $options = array()) {
-
-        $controllerName = $this->getControllerClassName($domainKey);
-        
-        $cr = new \ReflectionClass($controllerName);
-        $controller = new $controllerName;
-        
-        // these are overriden by the calling subclass
-        $defaultDomainMenu = array(
-           'domainMenu' => $controller->domainMenu,
-            "domainKey" => $cr->getStaticPropertyValue('domainKey'));
-
-        // replaces the domain menu of $defaultDomainMenu with the domain menu of options, if both are set.
-        $options = array_merge($defaultDomainMenu, $options);
-        return $this->render($template, $options);
-    }
-
-    /**
-     * Called by the _derived_ domain controllers. Automatically passes the domain key and menu of the derived class to the template.
-     * @param $template Template to use for rendering, e.g. site specific as DTAMetadataBundle:DataDomain:index.html.twig
-     * @param $options The data for the template to render 
-     */
-    public function renderControllerSpecificAction($template, array $options = array()) {
-
-        // static properties cannot be accessed via $this
-        $controllerReflection = new \ReflectionClass($this);
-
-        // these are overriden by the calling subclass
-        $defaultDomainMenu = array(
-            'domainMenu' => $this->domainMenu,
-            "domainKey" => $controllerReflection->getStaticPropertyValue('domainKey'));
-
-        // replaces the domain menu of $defaultDomainMenu with the domain menu of options, if both are set.
-        // adds the data for the view from $options
-        $options = array_merge($defaultDomainMenu, $options);
-
-        return $this->render($template, $options);
+        foreach ($form->getChildren() as $child) {
+            $this->saveRecursively($child);
+        }
     }
 
 }

@@ -41,6 +41,12 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
     protected $startCopy = false;
 
     /**
+     * The value for the id field.
+     * @var        int
+     */
+    protected $id;
+
+    /**
      * The value for the publicationgroup_id field.
      * @var        int
      */
@@ -85,6 +91,16 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
     // table_row_view behavior
     public static $tableRowViewCaptions = array();	public   $tableRowViewAccessors = array();
     /**
+     * Get the [id] column value.
+     *
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
      * Get the [publicationgroup_id] column value.
      *
      * @return int
@@ -103,6 +119,27 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
     {
         return $this->publication_id;
     }
+
+    /**
+     * Set the value of [id] column.
+     *
+     * @param int $v new value
+     * @return PublicationPublicationgroup The current object (for fluent API support)
+     */
+    public function setId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->id !== $v) {
+            $this->id = $v;
+            $this->modifiedColumns[] = PublicationPublicationgroupPeer::ID;
+        }
+
+
+        return $this;
+    } // setId()
 
     /**
      * Set the value of [publicationgroup_id] column.
@@ -186,8 +223,9 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
     {
         try {
 
-            $this->publicationgroup_id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-            $this->publication_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+            $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
+            $this->publicationgroup_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+            $this->publication_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -196,7 +234,7 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 2; // 2 = PublicationPublicationgroupPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 3; // 3 = PublicationPublicationgroupPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating PublicationPublicationgroup object", $e);
@@ -431,6 +469,9 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
 
 
          // check the columns in natural order for more readable SQL queries
+        if ($this->isColumnModified(PublicationPublicationgroupPeer::ID)) {
+            $modifiedColumns[':p' . $index++]  = '"id"';
+        }
         if ($this->isColumnModified(PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID)) {
             $modifiedColumns[':p' . $index++]  = '"publicationgroup_id"';
         }
@@ -448,6 +489,9 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
+                    case '"id"':
+                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
+                        break;
                     case '"publicationgroup_id"':
                         $stmt->bindValue($identifier, $this->publicationgroup_id, PDO::PARAM_INT);
                         break;
@@ -600,9 +644,12 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
     {
         switch ($pos) {
             case 0:
-                return $this->getPublicationgroupId();
+                return $this->getId();
                 break;
             case 1:
+                return $this->getPublicationgroupId();
+                break;
+            case 2:
                 return $this->getPublicationId();
                 break;
             default:
@@ -634,8 +681,9 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
         $alreadyDumpedObjects['PublicationPublicationgroup'][serialize($this->getPrimaryKey())] = true;
         $keys = PublicationPublicationgroupPeer::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getPublicationgroupId(),
-            $keys[1] => $this->getPublicationId(),
+            $keys[0] => $this->getId(),
+            $keys[1] => $this->getPublicationgroupId(),
+            $keys[2] => $this->getPublicationId(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aPublicationgroup) {
@@ -679,9 +727,12 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
     {
         switch ($pos) {
             case 0:
-                $this->setPublicationgroupId($value);
+                $this->setId($value);
                 break;
             case 1:
+                $this->setPublicationgroupId($value);
+                break;
+            case 2:
                 $this->setPublicationId($value);
                 break;
         } // switch()
@@ -708,8 +759,9 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
     {
         $keys = PublicationPublicationgroupPeer::getFieldNames($keyType);
 
-        if (array_key_exists($keys[0], $arr)) $this->setPublicationgroupId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setPublicationId($arr[$keys[1]]);
+        if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
+        if (array_key_exists($keys[1], $arr)) $this->setPublicationgroupId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setPublicationId($arr[$keys[2]]);
     }
 
     /**
@@ -721,6 +773,7 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
     {
         $criteria = new Criteria(PublicationPublicationgroupPeer::DATABASE_NAME);
 
+        if ($this->isColumnModified(PublicationPublicationgroupPeer::ID)) $criteria->add(PublicationPublicationgroupPeer::ID, $this->id);
         if ($this->isColumnModified(PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID)) $criteria->add(PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID, $this->publicationgroup_id);
         if ($this->isColumnModified(PublicationPublicationgroupPeer::PUBLICATION_ID)) $criteria->add(PublicationPublicationgroupPeer::PUBLICATION_ID, $this->publication_id);
 
@@ -738,6 +791,7 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
     public function buildPkeyCriteria()
     {
         $criteria = new Criteria(PublicationPublicationgroupPeer::DATABASE_NAME);
+        $criteria->add(PublicationPublicationgroupPeer::ID, $this->id);
         $criteria->add(PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID, $this->publicationgroup_id);
         $criteria->add(PublicationPublicationgroupPeer::PUBLICATION_ID, $this->publication_id);
 
@@ -752,8 +806,9 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
     public function getPrimaryKey()
     {
         $pks = array();
-        $pks[0] = $this->getPublicationgroupId();
-        $pks[1] = $this->getPublicationId();
+        $pks[0] = $this->getId();
+        $pks[1] = $this->getPublicationgroupId();
+        $pks[2] = $this->getPublicationId();
 
         return $pks;
     }
@@ -766,8 +821,9 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
      */
     public function setPrimaryKey($keys)
     {
-        $this->setPublicationgroupId($keys[0]);
-        $this->setPublicationId($keys[1]);
+        $this->setId($keys[0]);
+        $this->setPublicationgroupId($keys[1]);
+        $this->setPublicationId($keys[2]);
     }
 
     /**
@@ -777,7 +833,7 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
     public function isPrimaryKeyNull()
     {
 
-        return (null === $this->getPublicationgroupId()) && (null === $this->getPublicationId());
+        return (null === $this->getId()) && (null === $this->getPublicationgroupId()) && (null === $this->getPublicationId());
     }
 
     /**
@@ -793,6 +849,7 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
+        $copyObj->setId($this->getId());
         $copyObj->setPublicationgroupId($this->getPublicationgroupId());
         $copyObj->setPublicationId($this->getPublicationId());
 
@@ -961,6 +1018,7 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
      */
     public function clear()
     {
+        $this->id = null;
         $this->publicationgroup_id = null;
         $this->publication_id = null;
         $this->alreadyInSave = false;

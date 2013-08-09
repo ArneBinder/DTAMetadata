@@ -43,6 +43,7 @@ class PublicationPublicationgroupTableMap extends TableMap
         $this->setUseIdGenerator(false);
         $this->setIsCrossRef(true);
         // columns
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignPrimaryKey('publicationgroup_id', 'PublicationgroupId', 'INTEGER' , 'publicationgroup', 'id', true, null, null);
         $this->addForeignPrimaryKey('publication_id', 'PublicationId', 'INTEGER' , 'publication', 'id', true, null, null);
         // validators
@@ -67,6 +68,7 @@ class PublicationPublicationgroupTableMap extends TableMap
     {
         return array(
             'table_row_view' =>  array (
+  'Id' => 'id',
   'PublicationgroupId' => 'publicationgroup_id',
   'PublicationId' => 'publication_id',
 ),

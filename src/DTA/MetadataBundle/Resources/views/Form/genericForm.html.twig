@@ -16,20 +16,19 @@
 {% extends 'DTAMetadataBundle:'~ domainKey ~':index.html.twig' %}
 
 {% block core %}
-    
-    {# renders "<className> anlegen" as headline of the form #}
-    <h3> {{className|trans}} {{ "form.create.suffix"|trans }} </h3>
 
-    {# where to post the form data #}
-    {% set actionTarget = path('genericNew', {'className':className, 'domainKey': domainKey|default("none")}) %}
+    {# renders "<className> bearbeiten" as headline of the form #}
+    <h3> {{className|trans}} {{ "form." ~ transaction ~ ".suffix"|trans }} </h3>
+
+    {% set actionTarget = path('viewRecord', {'domainKey': domainKey, 'className':className, 'recordId':recordId}) %}
     <form action="{{ actionTarget }}" method="post" {{ form_enctype(form) }} class="form-horizontal">
             
         {% include 'DTAMetadataBundle:Form:autoform.html.twig' %}
         
-        {# the dynamic collection adds default fragments if the form is for creation
-            of a new entity. (action='new') #}
+    {# the dynamic collection adds default fragments if the form is for creation
+        of a new entity. (action='new') #}
         <script type="text/javascript">
-            var formInfo = {'action': 'new'};
+            var formInfo = {'action': 'edit'};
         </script>
         <div class="control-group">
             <div class="controls">

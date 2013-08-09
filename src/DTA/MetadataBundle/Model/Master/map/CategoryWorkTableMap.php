@@ -43,6 +43,7 @@ class CategoryWorkTableMap extends TableMap
         $this->setUseIdGenerator(false);
         $this->setIsCrossRef(true);
         // columns
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignPrimaryKey('category_id', 'CategoryId', 'INTEGER' , 'category', 'id', true, null, null);
         $this->addForeignPrimaryKey('work_id', 'WorkId', 'INTEGER' , 'work', 'id', true, null, null);
         // validators
@@ -67,6 +68,7 @@ class CategoryWorkTableMap extends TableMap
     {
         return array(
             'table_row_view' =>  array (
+  'Id' => 'id',
   'CategoryId' => 'category_id',
   'WorkId' => 'work_id',
 ),

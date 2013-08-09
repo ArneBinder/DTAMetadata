@@ -40,8 +40,7 @@ class PersonPublicationTableMap extends TableMap
         $this->setPhpName('PersonPublication');
         $this->setClassname('DTA\\MetadataBundle\\Model\\Master\\PersonPublication');
         $this->setPackage('src.DTA.MetadataBundle.Model.Master');
-        $this->setUseIdGenerator(true);
-        $this->setPrimaryKeyMethodInfo('person_publication_id_seq');
+        $this->setUseIdGenerator(false);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('personrole_id', 'PersonroleId', 'INTEGER', 'personrole', 'id', true, null, null);

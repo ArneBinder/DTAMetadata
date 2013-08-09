@@ -492,9 +492,10 @@ DROP TABLE IF EXISTS "language_work" CASCADE;
 
 CREATE TABLE "language_work"
 (
+    "id" INTEGER NOT NULL,
     "language_id" INTEGER NOT NULL,
     "work_id" INTEGER NOT NULL,
-    PRIMARY KEY ("language_id","work_id")
+    PRIMARY KEY ("id","language_id","work_id")
 );
 
 -----------------------------------------------------------------------
@@ -505,9 +506,10 @@ DROP TABLE IF EXISTS "genre_work" CASCADE;
 
 CREATE TABLE "genre_work"
 (
+    "id" INTEGER NOT NULL,
     "genre_id" INTEGER NOT NULL,
     "work_id" INTEGER NOT NULL,
-    PRIMARY KEY ("genre_id","work_id")
+    PRIMARY KEY ("id","genre_id","work_id")
 );
 
 -----------------------------------------------------------------------
@@ -518,9 +520,10 @@ DROP TABLE IF EXISTS "work_tag" CASCADE;
 
 CREATE TABLE "work_tag"
 (
+    "id" INTEGER NOT NULL,
     "tag_id" INTEGER NOT NULL,
     "work_id" INTEGER NOT NULL,
-    PRIMARY KEY ("tag_id","work_id")
+    PRIMARY KEY ("id","tag_id","work_id")
 );
 
 -----------------------------------------------------------------------
@@ -531,9 +534,10 @@ DROP TABLE IF EXISTS "category_work" CASCADE;
 
 CREATE TABLE "category_work"
 (
+    "id" INTEGER NOT NULL,
     "category_id" INTEGER NOT NULL,
     "work_id" INTEGER NOT NULL,
-    PRIMARY KEY ("category_id","work_id")
+    PRIMARY KEY ("id","category_id","work_id")
 );
 
 -----------------------------------------------------------------------
@@ -544,9 +548,10 @@ DROP TABLE IF EXISTS "publication_publicationgroup" CASCADE;
 
 CREATE TABLE "publication_publicationgroup"
 (
+    "id" INTEGER NOT NULL,
     "publicationgroup_id" INTEGER NOT NULL,
     "publication_id" INTEGER NOT NULL,
-    PRIMARY KEY ("publicationgroup_id","publication_id")
+    PRIMARY KEY ("id","publicationgroup_id","publication_id")
 );
 
 -----------------------------------------------------------------------
@@ -557,7 +562,7 @@ DROP TABLE IF EXISTS "person_publication" CASCADE;
 
 CREATE TABLE "person_publication"
 (
-    "id" serial NOT NULL,
+    "id" INTEGER NOT NULL,
     "personrole_id" INTEGER NOT NULL,
     "person_id" INTEGER NOT NULL,
     "publication_id" INTEGER NOT NULL,
@@ -572,7 +577,7 @@ DROP TABLE IF EXISTS "person_work" CASCADE;
 
 CREATE TABLE "person_work"
 (
-    "id" serial NOT NULL,
+    "id" INTEGER NOT NULL,
     "person_id" INTEGER NOT NULL,
     "personrole_id" INTEGER NOT NULL,
     "work_id" INTEGER NOT NULL,

@@ -40,8 +40,7 @@ class PersonWorkTableMap extends TableMap
         $this->setPhpName('PersonWork');
         $this->setClassname('DTA\\MetadataBundle\\Model\\Master\\PersonWork');
         $this->setPackage('src.DTA.MetadataBundle.Model.Master');
-        $this->setUseIdGenerator(true);
-        $this->setPrimaryKeyMethodInfo('person_work_id_seq');
+        $this->setUseIdGenerator(false);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('person_id', 'PersonId', 'INTEGER', 'person', 'id', true, null, null);

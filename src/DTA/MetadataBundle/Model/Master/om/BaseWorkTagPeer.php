@@ -31,13 +31,16 @@ abstract class BaseWorkTagPeer
     const TM_CLASS = 'WorkTagTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 2;
+    const NUM_COLUMNS = 3;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 2;
+    const NUM_HYDRATE_COLUMNS = 3;
+
+    /** the column name for the id field */
+    const ID = 'work_tag.id';
 
     /** the column name for the tag_id field */
     const TAG_ID = 'work_tag.tag_id';
@@ -64,12 +67,12 @@ abstract class BaseWorkTagPeer
      * e.g. WorkTagPeer::$fieldNames[WorkTagPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('TagId', 'WorkId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('tagId', 'workId', ),
-        BasePeer::TYPE_COLNAME => array (WorkTagPeer::TAG_ID, WorkTagPeer::WORK_ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('TAG_ID', 'WORK_ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('tag_id', 'work_id', ),
-        BasePeer::TYPE_NUM => array (0, 1, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'TagId', 'WorkId', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'tagId', 'workId', ),
+        BasePeer::TYPE_COLNAME => array (WorkTagPeer::ID, WorkTagPeer::TAG_ID, WorkTagPeer::WORK_ID, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TAG_ID', 'WORK_ID', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'tag_id', 'work_id', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
     /**
@@ -79,12 +82,12 @@ abstract class BaseWorkTagPeer
      * e.g. WorkTagPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('TagId' => 0, 'WorkId' => 1, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('tagId' => 0, 'workId' => 1, ),
-        BasePeer::TYPE_COLNAME => array (WorkTagPeer::TAG_ID => 0, WorkTagPeer::WORK_ID => 1, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('TAG_ID' => 0, 'WORK_ID' => 1, ),
-        BasePeer::TYPE_FIELDNAME => array ('tag_id' => 0, 'work_id' => 1, ),
-        BasePeer::TYPE_NUM => array (0, 1, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'TagId' => 1, 'WorkId' => 2, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'tagId' => 1, 'workId' => 2, ),
+        BasePeer::TYPE_COLNAME => array (WorkTagPeer::ID => 0, WorkTagPeer::TAG_ID => 1, WorkTagPeer::WORK_ID => 2, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TAG_ID' => 1, 'WORK_ID' => 2, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'tag_id' => 1, 'work_id' => 2, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
     /**
@@ -158,9 +161,11 @@ abstract class BaseWorkTagPeer
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
+            $criteria->addSelectColumn(WorkTagPeer::ID);
             $criteria->addSelectColumn(WorkTagPeer::TAG_ID);
             $criteria->addSelectColumn(WorkTagPeer::WORK_ID);
         } else {
+            $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.tag_id');
             $criteria->addSelectColumn($alias . '.work_id');
         }
@@ -289,7 +294,7 @@ abstract class BaseWorkTagPeer
     {
         if (Propel::isInstancePoolingEnabled()) {
             if ($key === null) {
-                $key = serialize(array((string) $obj->getTagId(), (string) $obj->getWorkId()));
+                $key = serialize(array((string) $obj->getId(), (string) $obj->getTagId(), (string) $obj->getWorkId()));
             } // if key === null
             WorkTagPeer::$instances[$key] = $obj;
         }
@@ -312,10 +317,10 @@ abstract class BaseWorkTagPeer
     {
         if (Propel::isInstancePoolingEnabled() && $value !== null) {
             if (is_object($value) && $value instanceof WorkTag) {
-                $key = serialize(array((string) $value->getTagId(), (string) $value->getWorkId()));
-            } elseif (is_array($value) && count($value) === 2) {
+                $key = serialize(array((string) $value->getId(), (string) $value->getTagId(), (string) $value->getWorkId()));
+            } elseif (is_array($value) && count($value) === 3) {
                 // assume we've been passed a primary key
-                $key = serialize(array((string) $value[0], (string) $value[1]));
+                $key = serialize(array((string) $value[0], (string) $value[1], (string) $value[2]));
             } else {
                 $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or WorkTag object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
                 throw $e;
@@ -384,11 +389,11 @@ abstract class BaseWorkTagPeer
     public static function getPrimaryKeyHashFromRow($row, $startcol = 0)
     {
         // If the PK cannot be derived from the row, return null.
-        if ($row[$startcol] === null && $row[$startcol + 1] === null) {
+        if ($row[$startcol] === null && $row[$startcol + 1] === null && $row[$startcol + 2] === null) {
             return null;
         }
 
-        return serialize(array((string) $row[$startcol], (string) $row[$startcol + 1]));
+        return serialize(array((string) $row[$startcol], (string) $row[$startcol + 1], (string) $row[$startcol + 2]));
     }
 
     /**
@@ -403,7 +408,7 @@ abstract class BaseWorkTagPeer
     public static function getPrimaryKeyFromRow($row, $startcol = 0)
     {
 
-        return array((int) $row[$startcol], (int) $row[$startcol + 1]);
+        return array((int) $row[$startcol], (int) $row[$startcol + 1], (int) $row[$startcol + 2]);
     }
 
     /**
@@ -1189,6 +1194,14 @@ abstract class BaseWorkTagPeer
         if ($values instanceof Criteria) {
             $criteria = clone $values; // rename for clarity
 
+            $comparison = $criteria->getComparison(WorkTagPeer::ID);
+            $value = $criteria->remove(WorkTagPeer::ID);
+            if ($value) {
+                $selectCriteria->add(WorkTagPeer::ID, $value, $comparison);
+            } else {
+                $selectCriteria->setPrimaryTableName(WorkTagPeer::TABLE_NAME);
+            }
+
             $comparison = $criteria->getComparison(WorkTagPeer::TAG_ID);
             $value = $criteria->remove(WorkTagPeer::TAG_ID);
             if ($value) {
@@ -1286,8 +1299,9 @@ abstract class BaseWorkTagPeer
                 $values = array($values);
             }
             foreach ($values as $value) {
-                $criterion = $criteria->getNewCriterion(WorkTagPeer::TAG_ID, $value[0]);
-                $criterion->addAnd($criteria->getNewCriterion(WorkTagPeer::WORK_ID, $value[1]));
+                $criterion = $criteria->getNewCriterion(WorkTagPeer::ID, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(WorkTagPeer::TAG_ID, $value[1]));
+                $criterion->addAnd($criteria->getNewCriterion(WorkTagPeer::WORK_ID, $value[2]));
                 $criteria->addOr($criterion);
                 // we can invalidate the cache for this single PK
                 WorkTagPeer::removeInstanceFromPool($value);
@@ -1354,13 +1368,14 @@ abstract class BaseWorkTagPeer
 
     /**
      * Retrieve object using using composite pkey values.
+     * @param   int $id
      * @param   int $tag_id
      * @param   int $work_id
      * @param      PropelPDO $con
      * @return   WorkTag
      */
-    public static function retrieveByPK($tag_id, $work_id, PropelPDO $con = null) {
-        $_instancePoolKey = serialize(array((string) $tag_id, (string) $work_id));
+    public static function retrieveByPK($id, $tag_id, $work_id, PropelPDO $con = null) {
+        $_instancePoolKey = serialize(array((string) $id, (string) $tag_id, (string) $work_id));
          if (null !== ($obj = WorkTagPeer::getInstanceFromPool($_instancePoolKey))) {
              return $obj;
         }
@@ -1369,6 +1384,7 @@ abstract class BaseWorkTagPeer
             $con = Propel::getConnection(WorkTagPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
         $criteria = new Criteria(WorkTagPeer::DATABASE_NAME);
+        $criteria->add(WorkTagPeer::ID, $id);
         $criteria->add(WorkTagPeer::TAG_ID, $tag_id);
         $criteria->add(WorkTagPeer::WORK_ID, $work_id);
         $v = WorkTagPeer::doSelect($criteria, $con);

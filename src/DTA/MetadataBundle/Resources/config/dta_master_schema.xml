@@ -16,6 +16,7 @@
     </behavior>
     
     <table name="language_work" isCrossRef="true">
+        <column name="id" type="INTEGER" primaryKey="true" required="true"/>
         <column name="language_id" type="INTEGER" primaryKey="true" required="true"/>
         <column name="work_id" type="INTEGER" primaryKey="true" required="true"/>
         <foreign-key foreignTable="language"> <reference local="language_id" foreign="id"/> </foreign-key>
@@ -23,6 +24,7 @@
     </table>
     
     <table name="genre_work" isCrossRef="true">
+        <column name="id" type="INTEGER" primaryKey="true" required="true"/>
         <column name="genre_id" type="INTEGER" primaryKey="true" required="true"/>
         <column name="work_id" type="INTEGER" primaryKey="true" required="true"/>
         <foreign-key foreignTable="genre"> <reference local="genre_id" foreign="id"/> </foreign-key>
@@ -30,6 +32,7 @@
     </table>
     
     <table name="work_tag" isCrossRef="true">
+        <column name="id" type="INTEGER" primaryKey="true" required="true"/>
         <column name="tag_id" type="INTEGER" primaryKey="true" required="true"/>
         <column name="work_id" type="INTEGER" primaryKey="true" required="true"/>
         <foreign-key foreignTable="tag"> <reference local="tag_id" foreign="id"/> </foreign-key>
@@ -37,6 +40,7 @@
     </table>
     
     <table name="category_work" isCrossRef="true">
+        <column name="id" type="INTEGER" primaryKey="true" required="true"/>
         <column name="category_id" type="INTEGER" primaryKey="true" required="true"/>
         <column name="work_id" type="INTEGER" primaryKey="true" required="true"/>
         <foreign-key foreignTable="category"> <reference local="category_id" foreign="id"/> </foreign-key>
@@ -44,6 +48,7 @@
     </table>
     
     <table name="publication_publicationgroup" isCrossRef="true">
+        <column name="id" type="INTEGER" primaryKey="true" required="true"/>
         <column name="publicationgroup_id" type="INTEGER" primaryKey="true" required="true"/>
         <column name="publication_id" type="INTEGER" primaryKey="true" required="true"/>
         <foreign-key foreignTable="publicationgroup"> <reference local="publicationgroup_id" foreign="id"/> </foreign-key>
@@ -53,7 +58,7 @@
     </table>
 
     <table name="person_publication" idMethod="native">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="id" type="INTEGER" primaryKey="true" required="true"/>
         <column name="personrole_id" type="INTEGER" required="true"/>
         <column name="person_id" type="INTEGER" required="true"/>
         <column name="publication_id" type="INTEGER" required="true"/>
@@ -64,7 +69,7 @@
     </table>
     
     <table name="person_work" idMethod="native">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="id" type="INTEGER" primaryKey="true" required="true"/>
         <column name="person_id" type="INTEGER" required="true"/>
         <column name="personrole_id" type="INTEGER" required="true"/>
         <column name="work_id" type="INTEGER" required="true"/>

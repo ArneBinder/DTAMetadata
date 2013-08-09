@@ -31,13 +31,16 @@ abstract class BaseCategoryWorkPeer
     const TM_CLASS = 'CategoryWorkTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 2;
+    const NUM_COLUMNS = 3;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 2;
+    const NUM_HYDRATE_COLUMNS = 3;
+
+    /** the column name for the id field */
+    const ID = 'category_work.id';
 
     /** the column name for the category_id field */
     const CATEGORY_ID = 'category_work.category_id';
@@ -64,12 +67,12 @@ abstract class BaseCategoryWorkPeer
      * e.g. CategoryWorkPeer::$fieldNames[CategoryWorkPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('CategoryId', 'WorkId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('categoryId', 'workId', ),
-        BasePeer::TYPE_COLNAME => array (CategoryWorkPeer::CATEGORY_ID, CategoryWorkPeer::WORK_ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('CATEGORY_ID', 'WORK_ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('category_id', 'work_id', ),
-        BasePeer::TYPE_NUM => array (0, 1, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'CategoryId', 'WorkId', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'categoryId', 'workId', ),
+        BasePeer::TYPE_COLNAME => array (CategoryWorkPeer::ID, CategoryWorkPeer::CATEGORY_ID, CategoryWorkPeer::WORK_ID, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'CATEGORY_ID', 'WORK_ID', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'category_id', 'work_id', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
     /**
@@ -79,12 +82,12 @@ abstract class BaseCategoryWorkPeer
      * e.g. CategoryWorkPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('CategoryId' => 0, 'WorkId' => 1, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('categoryId' => 0, 'workId' => 1, ),
-        BasePeer::TYPE_COLNAME => array (CategoryWorkPeer::CATEGORY_ID => 0, CategoryWorkPeer::WORK_ID => 1, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('CATEGORY_ID' => 0, 'WORK_ID' => 1, ),
-        BasePeer::TYPE_FIELDNAME => array ('category_id' => 0, 'work_id' => 1, ),
-        BasePeer::TYPE_NUM => array (0, 1, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CategoryId' => 1, 'WorkId' => 2, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'categoryId' => 1, 'workId' => 2, ),
+        BasePeer::TYPE_COLNAME => array (CategoryWorkPeer::ID => 0, CategoryWorkPeer::CATEGORY_ID => 1, CategoryWorkPeer::WORK_ID => 2, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'CATEGORY_ID' => 1, 'WORK_ID' => 2, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'category_id' => 1, 'work_id' => 2, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
     /**
@@ -158,9 +161,11 @@ abstract class BaseCategoryWorkPeer
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
+            $criteria->addSelectColumn(CategoryWorkPeer::ID);
             $criteria->addSelectColumn(CategoryWorkPeer::CATEGORY_ID);
             $criteria->addSelectColumn(CategoryWorkPeer::WORK_ID);
         } else {
+            $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.category_id');
             $criteria->addSelectColumn($alias . '.work_id');
         }
@@ -289,7 +294,7 @@ abstract class BaseCategoryWorkPeer
     {
         if (Propel::isInstancePoolingEnabled()) {
             if ($key === null) {
-                $key = serialize(array((string) $obj->getCategoryId(), (string) $obj->getWorkId()));
+                $key = serialize(array((string) $obj->getId(), (string) $obj->getCategoryId(), (string) $obj->getWorkId()));
             } // if key === null
             CategoryWorkPeer::$instances[$key] = $obj;
         }
@@ -312,10 +317,10 @@ abstract class BaseCategoryWorkPeer
     {
         if (Propel::isInstancePoolingEnabled() && $value !== null) {
             if (is_object($value) && $value instanceof CategoryWork) {
-                $key = serialize(array((string) $value->getCategoryId(), (string) $value->getWorkId()));
-            } elseif (is_array($value) && count($value) === 2) {
+                $key = serialize(array((string) $value->getId(), (string) $value->getCategoryId(), (string) $value->getWorkId()));
+            } elseif (is_array($value) && count($value) === 3) {
                 // assume we've been passed a primary key
-                $key = serialize(array((string) $value[0], (string) $value[1]));
+                $key = serialize(array((string) $value[0], (string) $value[1], (string) $value[2]));
             } else {
                 $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or CategoryWork object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
                 throw $e;
@@ -384,11 +389,11 @@ abstract class BaseCategoryWorkPeer
     public static function getPrimaryKeyHashFromRow($row, $startcol = 0)
     {
         // If the PK cannot be derived from the row, return null.
-        if ($row[$startcol] === null && $row[$startcol + 1] === null) {
+        if ($row[$startcol] === null && $row[$startcol + 1] === null && $row[$startcol + 2] === null) {
             return null;
         }
 
-        return serialize(array((string) $row[$startcol], (string) $row[$startcol + 1]));
+        return serialize(array((string) $row[$startcol], (string) $row[$startcol + 1], (string) $row[$startcol + 2]));
     }
 
     /**
@@ -403,7 +408,7 @@ abstract class BaseCategoryWorkPeer
     public static function getPrimaryKeyFromRow($row, $startcol = 0)
     {
 
-        return array((int) $row[$startcol], (int) $row[$startcol + 1]);
+        return array((int) $row[$startcol], (int) $row[$startcol + 1], (int) $row[$startcol + 2]);
     }
 
     /**
@@ -1189,6 +1194,14 @@ abstract class BaseCategoryWorkPeer
         if ($values instanceof Criteria) {
             $criteria = clone $values; // rename for clarity
 
+            $comparison = $criteria->getComparison(CategoryWorkPeer::ID);
+            $value = $criteria->remove(CategoryWorkPeer::ID);
+            if ($value) {
+                $selectCriteria->add(CategoryWorkPeer::ID, $value, $comparison);
+            } else {
+                $selectCriteria->setPrimaryTableName(CategoryWorkPeer::TABLE_NAME);
+            }
+
             $comparison = $criteria->getComparison(CategoryWorkPeer::CATEGORY_ID);
             $value = $criteria->remove(CategoryWorkPeer::CATEGORY_ID);
             if ($value) {
@@ -1286,8 +1299,9 @@ abstract class BaseCategoryWorkPeer
                 $values = array($values);
             }
             foreach ($values as $value) {
-                $criterion = $criteria->getNewCriterion(CategoryWorkPeer::CATEGORY_ID, $value[0]);
-                $criterion->addAnd($criteria->getNewCriterion(CategoryWorkPeer::WORK_ID, $value[1]));
+                $criterion = $criteria->getNewCriterion(CategoryWorkPeer::ID, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(CategoryWorkPeer::CATEGORY_ID, $value[1]));
+                $criterion->addAnd($criteria->getNewCriterion(CategoryWorkPeer::WORK_ID, $value[2]));
                 $criteria->addOr($criterion);
                 // we can invalidate the cache for this single PK
                 CategoryWorkPeer::removeInstanceFromPool($value);
@@ -1354,13 +1368,14 @@ abstract class BaseCategoryWorkPeer
 
     /**
      * Retrieve object using using composite pkey values.
+     * @param   int $id
      * @param   int $category_id
      * @param   int $work_id
      * @param      PropelPDO $con
      * @return   CategoryWork
      */
-    public static function retrieveByPK($category_id, $work_id, PropelPDO $con = null) {
-        $_instancePoolKey = serialize(array((string) $category_id, (string) $work_id));
+    public static function retrieveByPK($id, $category_id, $work_id, PropelPDO $con = null) {
+        $_instancePoolKey = serialize(array((string) $id, (string) $category_id, (string) $work_id));
          if (null !== ($obj = CategoryWorkPeer::getInstanceFromPool($_instancePoolKey))) {
              return $obj;
         }
@@ -1369,6 +1384,7 @@ abstract class BaseCategoryWorkPeer
             $con = Propel::getConnection(CategoryWorkPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
         $criteria = new Criteria(CategoryWorkPeer::DATABASE_NAME);
+        $criteria->add(CategoryWorkPeer::ID, $id);
         $criteria->add(CategoryWorkPeer::CATEGORY_ID, $category_id);
         $criteria->add(CategoryWorkPeer::WORK_ID, $work_id);
         $v = CategoryWorkPeer::doSelect($criteria, $con);

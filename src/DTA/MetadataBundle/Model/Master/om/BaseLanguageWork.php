@@ -41,6 +41,12 @@ abstract class BaseLanguageWork extends BaseObject implements Persistent, \DTA\M
     protected $startCopy = false;
 
     /**
+     * The value for the id field.
+     * @var        int
+     */
+    protected $id;
+
+    /**
      * The value for the language_id field.
      * @var        int
      */
@@ -85,6 +91,16 @@ abstract class BaseLanguageWork extends BaseObject implements Persistent, \DTA\M
     // table_row_view behavior
     public static $tableRowViewCaptions = array();	public   $tableRowViewAccessors = array();
     /**
+     * Get the [id] column value.
+     *
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
      * Get the [language_id] column value.
      *
      * @return int
@@ -103,6 +119,27 @@ abstract class BaseLanguageWork extends BaseObject implements Persistent, \DTA\M
     {
         return $this->work_id;
     }
+
+    /**
+     * Set the value of [id] column.
+     *
+     * @param int $v new value
+     * @return LanguageWork The current object (for fluent API support)
+     */
+    public function setId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->id !== $v) {
+            $this->id = $v;
+            $this->modifiedColumns[] = LanguageWorkPeer::ID;
+        }
+
+
+        return $this;
+    } // setId()
 
     /**
      * Set the value of [language_id] column.
@@ -186,8 +223,9 @@ abstract class BaseLanguageWork extends BaseObject implements Persistent, \DTA\M
     {
         try {
 
-            $this->language_id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-            $this->work_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+            $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
+            $this->language_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+            $this->work_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -196,7 +234,7 @@ abstract class BaseLanguageWork extends BaseObject implements Persistent, \DTA\M
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 2; // 2 = LanguageWorkPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 3; // 3 = LanguageWorkPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating LanguageWork object", $e);
@@ -431,6 +469,9 @@ abstract class BaseLanguageWork extends BaseObject implements Persistent, \DTA\M
 
 
          // check the columns in natural order for more readable SQL queries
+        if ($this->isColumnModified(LanguageWorkPeer::ID)) {
+            $modifiedColumns[':p' . $index++]  = '"id"';
+        }
         if ($this->isColumnModified(LanguageWorkPeer::LANGUAGE_ID)) {
             $modifiedColumns[':p' . $index++]  = '"language_id"';
         }
@@ -448,6 +489,9 @@ abstract class BaseLanguageWork extends BaseObject implements Persistent, \DTA\M
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
+                    case '"id"':
+                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
+                        break;
                     case '"language_id"':
                         $stmt->bindValue($identifier, $this->language_id, PDO::PARAM_INT);
                         break;
@@ -600,9 +644,12 @@ abstract class BaseLanguageWork extends BaseObject implements Persistent, \DTA\M
     {
         switch ($pos) {
             case 0:
-                return $this->getLanguageId();
+                return $this->getId();
                 break;
             case 1:
+                return $this->getLanguageId();
+                break;
+            case 2:
                 return $this->getWorkId();
                 break;
             default:
@@ -634,8 +681,9 @@ abstract class BaseLanguageWork extends BaseObject implements Persistent, \DTA\M
         $alreadyDumpedObjects['LanguageWork'][serialize($this->getPrimaryKey())] = true;
         $keys = LanguageWorkPeer::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getLanguageId(),
-            $keys[1] => $this->getWorkId(),
+            $keys[0] => $this->getId(),
+            $keys[1] => $this->getLanguageId(),
+            $keys[2] => $this->getWorkId(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aLanguage) {
@@ -679,9 +727,12 @@ abstract class BaseLanguageWork extends BaseObject implements Persistent, \DTA\M
     {
         switch ($pos) {
             case 0:
-                $this->setLanguageId($value);
+                $this->setId($value);
                 break;
             case 1:
+                $this->setLanguageId($value);
+                break;
+            case 2:
                 $this->setWorkId($value);
                 break;
         } // switch()
@@ -708,8 +759,9 @@ abstract class BaseLanguageWork extends BaseObject implements Persistent, \DTA\M
     {
         $keys = LanguageWorkPeer::getFieldNames($keyType);
 
-        if (array_key_exists($keys[0], $arr)) $this->setLanguageId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setWorkId($arr[$keys[1]]);
+        if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
+        if (array_key_exists($keys[1], $arr)) $this->setLanguageId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setWorkId($arr[$keys[2]]);
     }
 
     /**
@@ -721,6 +773,7 @@ abstract class BaseLanguageWork extends BaseObject implements Persistent, \DTA\M
     {
         $criteria = new Criteria(LanguageWorkPeer::DATABASE_NAME);
 
+        if ($this->isColumnModified(LanguageWorkPeer::ID)) $criteria->add(LanguageWorkPeer::ID, $this->id);
         if ($this->isColumnModified(LanguageWorkPeer::LANGUAGE_ID)) $criteria->add(LanguageWorkPeer::LANGUAGE_ID, $this->language_id);
         if ($this->isColumnModified(LanguageWorkPeer::WORK_ID)) $criteria->add(LanguageWorkPeer::WORK_ID, $this->work_id);
 
@@ -738,6 +791,7 @@ abstract class BaseLanguageWork extends BaseObject implements Persistent, \DTA\M
     public function buildPkeyCriteria()
     {
         $criteria = new Criteria(LanguageWorkPeer::DATABASE_NAME);
+        $criteria->add(LanguageWorkPeer::ID, $this->id);
         $criteria->add(LanguageWorkPeer::LANGUAGE_ID, $this->language_id);
         $criteria->add(LanguageWorkPeer::WORK_ID, $this->work_id);
 
@@ -752,8 +806,9 @@ abstract class BaseLanguageWork extends BaseObject implements Persistent, \DTA\M
     public function getPrimaryKey()
     {
         $pks = array();
-        $pks[0] = $this->getLanguageId();
-        $pks[1] = $this->getWorkId();
+        $pks[0] = $this->getId();
+        $pks[1] = $this->getLanguageId();
+        $pks[2] = $this->getWorkId();
 
         return $pks;
     }
@@ -766,8 +821,9 @@ abstract class BaseLanguageWork extends BaseObject implements Persistent, \DTA\M
      */
     public function setPrimaryKey($keys)
     {
-        $this->setLanguageId($keys[0]);
-        $this->setWorkId($keys[1]);
+        $this->setId($keys[0]);
+        $this->setLanguageId($keys[1]);
+        $this->setWorkId($keys[2]);
     }
 
     /**
@@ -777,7 +833,7 @@ abstract class BaseLanguageWork extends BaseObject implements Persistent, \DTA\M
     public function isPrimaryKeyNull()
     {
 
-        return (null === $this->getLanguageId()) && (null === $this->getWorkId());
+        return (null === $this->getId()) && (null === $this->getLanguageId()) && (null === $this->getWorkId());
     }
 
     /**
@@ -793,6 +849,7 @@ abstract class BaseLanguageWork extends BaseObject implements Persistent, \DTA\M
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
+        $copyObj->setId($this->getId());
         $copyObj->setLanguageId($this->getLanguageId());
         $copyObj->setWorkId($this->getWorkId());
 
@@ -961,6 +1018,7 @@ abstract class BaseLanguageWork extends BaseObject implements Persistent, \DTA\M
      */
     public function clear()
     {
+        $this->id = null;
         $this->language_id = null;
         $this->work_id = null;
         $this->alreadyInSave = false;
