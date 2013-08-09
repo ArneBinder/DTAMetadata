@@ -50,49 +50,41 @@
                 {% endif %}
             {% endfor %}
 
-            <li class="dropdown-submenu {{ isInSubMenu ? "active" : ""}}"> 
+            <li class="dropdown {{ isInSubMenu ? "active" : ""}}"> 
                 
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 
-                    {{ item.caption}} <b class="caret"></b> 
+                <a data-toggle="dropdown" class="dropdown-toggle" href="#"> 
+                    {{ item.caption}}
+                    <b class="caret"></b>
                 </a>
                 
                 {# the dropdown menu #}
-                <ul class="dropdown-menu" style="position: static; margin-bottom: 5px; *width: 180px;">
+                <ul class="dropdown-menu" role="menu" style="min-width:180px">
                 {% for child in item.children%}
-
+                        
+                    {% if child.kind|default('') == 'divider' %}
+                    <li class="divider"></li>
                     {# If the menu element is a model class, add view and create options #}
-                    {% if child.modelClass is defined %}
-                    <li class="dropdown-submenu">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 
-                        {{ child.caption|default(child.modelClass|trans) }} 
-                    </a>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a href="{{ path('genericView', {'package': domainKey, 'className':child.modelClass}) }}"> 
-                                    <i class="icon-list"></i> Anzeigen und bearbeiten
-                                </a>
-                            </li>
-                            {# Using the domainKey to dynamically generate the path also works:
-                                path(domainKey~'NewRecord', {'className':child.modelClass})
-                             #}
-                            <li>
-                                <a href="{{ path('genericCreateOrEdit', {'package':domainKey, 'className':child.modelClass}) }}"> {#, 'recordId':0, 'domainKey': domainKey#}
-                                    <i class="icon-plus"></i> Neu anlegen
-                                </a>
-                            </li>
-                        </ul>
+                    {% elseif child.modelClass is defined %}
+                    <li>
+                        <a href="{{ path('genericView', {'package':domainKey, 'className':child.modelClass}) }}">{{ child.caption|default(child.modelClass|trans)}}</a>
+                    {#<p style="padding: 0 10px"> 
+                        &nbsp;{{ child.caption|default(child.modelClass|trans) }} 
+                        <a href="#" class="glyphicon glyphicon-plus pull-right">&nbsp;</a>
+                        <a href="#" class="glyphicon glyphicon-eye-open pull-right">&nbsp;</a>
+                    </p>#}
                     </li>
-        {% else %}
-            <li><a href="{{ path(child.route, child.options|default({})) }}">{{ child.caption }}</a></li>
-            {% endif %}
+                    {% else %}
+                    <li><a href="{{ path(child.route, child.options|default({})) }}">{{ child.caption }}</a></li>
+                    {% endif %}
                 {% endfor %}
                 </ul>
             </li>
-{% else %} {# item has no children #}
+        {% else %} {# item has no children #}
         {# If the menu element is a model class, add view and create options #}
         {% if item.modelClass is defined %}
             {% set active = className == item.modelClass ? "active" : ""%}
             <li class="{{active}}">
+                
                    <a href="{{ path('genericView', {'package':domainKey, 'className':item.modelClass}) }}"> 
                           {{ item.caption }} 
                     </a>

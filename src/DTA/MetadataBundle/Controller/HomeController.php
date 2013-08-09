@@ -51,7 +51,7 @@ class HomeController extends DTADomainController {
 //        doesn't work if foreign keys (tasks using this task type) impose integrity constraints.
 //        $ttq->findOneById(5)->delete();
         
-        return $this->render('DTAMetadataBundle:Home:index.html.twig', array(
+        return $this->renderWithDomainData('DTAMetadataBundle:Home:index.html.twig', array(
             'testData' => 0,//$tree, 
         ));
     }
@@ -77,7 +77,7 @@ class HomeController extends DTADomainController {
                 $result = "saved.";
             }
         }
-        return $this->render('DTAMetadataBundle:Form:autoform.html.twig', array(
+        return $this->renderWithDomainData('DTAMetadataBundle:Form:autoform.html.twig', array(
                     'className' => 'Personalname',
                     'persistedObject' => $result,
                     'form' => $form->createView(),
@@ -100,7 +100,7 @@ class HomeController extends DTADomainController {
                 $obj->save();
         }
 
-        return $this->render('DTAMetadataBundle:Form:autoform.html.twig', array(
+        return $this->renderWithDomainData('DTAMetadataBundle:Form:autoform.html.twig', array(
                     'className' => 'Title',
                     'persistedObject' => 'persisted.',
                     'form' => $form->createView(),
@@ -124,7 +124,7 @@ class HomeController extends DTADomainController {
                 $obj->save();
         }
 
-        return $this->render('DTAMetadataBundle:Form:autoform.html.twig', array(
+        return $this->renderWithDomainData('DTAMetadataBundle:Form:autoform.html.twig', array(
                     'className' => $className,
                     'persistedObject' => 'persisted.',
                     'form' => $form->createView(),

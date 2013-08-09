@@ -7,6 +7,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Response;
 
+//require 'DTADomainController.php';
+
 /**
  * TODO: Nice to have: if the labels on the horizontal forms (column layout) would slide down the screen (position: fixed)
  * to support orientation in vertically long forms (where only the left border is visible)
@@ -18,6 +20,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ORMController extends DTADomainController {
 
+    public $package = 'none';
+    
     // TODO: pressing enter in a modal form leads to a form submit and all data is lost, 
     // because the server redirects to the ajax response page
     
@@ -41,6 +45,161 @@ class ORMController extends DTADomainController {
 
     private function getModelReflectionClass($className) {
         return new \ReflectionClass("DTA\\MetadataBundle\\Model\\" . $className);
+    }
+
+//     * @param string captionProperty For ajax use: Which attribute does the select use to describe the entities it lists? Used to generate a new select option via ajax.
+//     * @return HTML Option Element|nothing If the new action is called by a nested ajax form (selectOrAdd form type) the result is the option element to add to the nearby select.
+//     * @Route("/genericNew/{domainKey}/{className}/{property}", name="genericNew", defaults={"property"="Id"})
+    public function genericNewAction(Request $request, $className, $domainKey, $property = "Id") {
+
+            // AJAX case (nested form submit, no redirect)
+            if ("ajax" == $domainKey) {
+                
+                // fetch data for the newly selectable option
+                $id = $obj->getId();
+                
+                $captionAccessor = "get" . $property;
+                
+                // check whether the caption accessor function exists
+                $cr = new \ReflectionClass("\DTA\MetadataBundle\Model\\" . $className);
+                if( ! $cr->hasMethod($captionAccessor) )
+                    throw new \Exception("Can't retrieve caption via $captionAccessor from $className object.");
+                
+                $caption = $obj->$captionAccessor();
+
+                // return the new select option html fragment
+                return new Response("<option value='$id'>$caption</option>");
+            } 
+        
+    }
+    
+    /**
+     * Deletes a record after a safety inquiry from the database.
+     * @param type $domainKey   like in genericViewOneAction
+     * @param type $className   like in genericViewOneAction
+     * @param type $recordId    like in genericViewOneAction
+     * @Route("/deleteRecord/{domainKey}/{className}/{recordId}", name="deleteRecord")
+     */
+    public function genericDeleteOneAction(Request $request, $domainKey, $className, $recordId) {
+
+        // really delete data on affirmative POST
+        if ($request->isMethod("POST")) {
+
+            if( $request->get("reallyDelete") && $request->get('recordId') ){
+                $classNames = $this->relatedClassNames($className);
+                $query = new $classNames['query'];
+                $record = $query->findOneById($recordId);
+                if($record === null) throw new \Exception("The record ($className #$recordId) to be deleted doesn't exist.");
+                $record->delete();
+            };
+            return $this->genericViewAllAction($domainKey, $className);
+            
+        } else {
+            
+            return $this->renderDomainKeySpecificAction($domainKey, "DTAMetadataBundle:ORM:confirmDelete.html.twig", array(
+                'className' => $className,
+                'recordId' => $recordId,
+            ));
+            
+        }
+        
+        
+//        return $this->renderDomainKeySpecificAction($domainKey, "DTAMetadataBundle:Form:genericEdit.html.twig", array(
+//                    'form' => $form->createView(),
+//                    'className' => $className,
+//                    'recordId' => $recordId,
+//                ));
+    }
+
+    /**
+     * Renders a list of all entities of a certain type.
+     * Takes into account how the list should be rendered according to the XML schemata,
+     * where this can be specified using the table_row_view behavior.
+     * @param string $package     the domain/object model package (Data, Classification, Workflow, Master)
+     * @param string $className   
+     * @Route(
+     *      "{package}/showAll/{className}/{updatedObjectId}", 
+     *      defaults = {"updatedObjectId" = 0},
+     *      name = "genericView"
+     * )
+     */
+    
+    public function genericViewAllAction($package, $className, $updatedObjectId = 0) {
+
+        // route to inherited methods (since routes are parsed from the code, which is not affected by the controller inheritance)
+        if($this->package === 'none'){
+            // get right controller for that package
+            $controllerName = $this->getControllerClassName($package);
+            $controller = new $controllerName;
+            // setting the container is crucial for all kinds of things to work
+            $controller->setContainer($this->container);
+            return $controller->genericViewAllAction($package, $className, $updatedObjectId);
+        }
+        
+        $classNames = $this->relatedClassNames($package, $className);
+
+        // for retrieving the entities
+        $query = new $classNames['query'];
+        
+        // for retrieving the column names
+        $modelClass = new $classNames["model"];
+        
+        $records = $query->orderById()->find();
+        
+//        var_dump($query->orderById()->find());
+        return $this->renderWithDomainData("DTAMetadataBundle::genericView.html.twig", array(
+                    'data' => $records,
+                    'columns' => $modelClass::getTableViewColumnNames(),
+                    'className' => $className,
+                    'updatedObjectId' => $updatedObjectId,
+                ));
+    }
+
+    /**
+     * Renders the form for the model without any surrounding elements. 
+     * Used via AJAX to update or create database entities.
+     * 
+     * @param string $className   The name of the model class (e.g. Publication, Title, Titlefragment)
+     * @param int    $recordId    The id of the record to edit. Zero indicates that a new record shall be created (since one is the smallest id)
+     * @param string $property The property to use as caption for a select option (only for ajax use)
+     * 
+     * @Route("/ajaxModalForm/{className}/{recordId}/{property}", 
+     *      name="ajaxModalForm", 
+     *      defaults={"recordId"=0, "property"="Id"})
+     */
+    public function generateAjaxModalFormAction($className, $recordId = 0, $property = "Id") {
+
+        $form = $this->generateForm($className, $recordId);
+
+        // plain ajax response, html form wrapped in twitter bootstrap modal markup
+        return $this->render("DTAMetadataBundle:Form:ajaxModalForm.html.twig", array(
+                    'form' => $form->createView(),
+                    'newActionParameters' => array(
+                        'domainKey' => 'ajax',
+                        'className' => $className,
+                        'property' => $property,
+                    ),
+                ));
+    }
+
+    
+    
+    /**
+     * Visits recursively all nested form elements and saves them.
+     * @param Form $form The form object that contains the data defined by the top level form type (PersonType, NamefragmentType, ...)
+     */
+    private function saveRecursively(\Symfony\Component\Form\Form $form) {
+
+        $entity = $form->getData();
+        if (is_object($entity)) {
+            $rc = new \ReflectionClass($entity);
+            if ($rc->hasMethod('save'))
+                $entity->save();
+        }
+
+        foreach ($form->getChildren() as $child) {
+            $this->saveRecursively($child);
+        }
     }
 
     /**
@@ -177,145 +336,4 @@ class ORMController extends DTADomainController {
         
     }
     
-//     * @param string captionProperty For ajax use: Which attribute does the select use to describe the entities it lists? Used to generate a new select option via ajax.
-//     * @return HTML Option Element|nothing If the new action is called by a nested ajax form (selectOrAdd form type) the result is the option element to add to the nearby select.
-//     * @Route("/genericNew/{domainKey}/{className}/{property}", name="genericNew", defaults={"property"="Id"})
-    public function genericNewAction(Request $request, $className, $domainKey, $property = "Id") {
-
-            // AJAX case (nested form submit, no redirect)
-            if ("ajax" == $domainKey) {
-                
-                // fetch data for the newly selectable option
-                $id = $obj->getId();
-                
-                $captionAccessor = "get" . $property;
-                
-                // check whether the caption accessor function exists
-                $cr = new \ReflectionClass("\DTA\MetadataBundle\Model\\" . $className);
-                if( ! $cr->hasMethod($captionAccessor) )
-                    throw new \Exception("Can't retrieve caption via $captionAccessor from $className object.");
-                
-                $caption = $obj->$captionAccessor();
-
-                // return the new select option html fragment
-                return new Response("<option value='$id'>$caption</option>");
-            } 
-        
-    }
-    
-    /**
-     * Deletes a record after a safety inquiry from the database.
-     * @param type $domainKey   like in genericViewOneAction
-     * @param type $className   like in genericViewOneAction
-     * @param type $recordId    like in genericViewOneAction
-     * @Route("/deleteRecord/{domainKey}/{className}/{recordId}", name="deleteRecord")
-     */
-    public function genericDeleteOneAction(Request $request, $domainKey, $className, $recordId) {
-
-        // really delete data on affirmative POST
-        if ($request->isMethod("POST")) {
-
-            if( $request->get("reallyDelete") && $request->get('recordId') ){
-                $classNames = $this->relatedClassNames($className);
-                $query = new $classNames['query'];
-                $record = $query->findOneById($recordId);
-                if($record === null) throw new \Exception("The record ($className #$recordId) to be deleted doesn't exist.");
-                $record->delete();
-            };
-            return $this->genericViewAllAction($domainKey, $className);
-            
-        } else {
-            
-            return $this->renderDomainKeySpecificAction($domainKey, "DTAMetadataBundle:ORM:confirmDelete.html.twig", array(
-                'className' => $className,
-                'recordId' => $recordId,
-            ));
-            
-        }
-        
-        
-//        return $this->renderDomainKeySpecificAction($domainKey, "DTAMetadataBundle:Form:genericEdit.html.twig", array(
-//                    'form' => $form->createView(),
-//                    'className' => $className,
-//                    'recordId' => $recordId,
-//                ));
-    }
-
-    /**
-     * Renders a list of all entities of a certain type.
-     * Takes into account how the list should be rendered according to the XML schemata,
-     * where this can be specified using the table_row_view behavior.
-     * @param string $package     the domain/object model package (Data, Classification, Workflow, Master)
-     * @param string $className   
-     * @Route(
-     *      "{package}/showAll/{className}/{updatedObjectId}", 
-     *      defaults = {"updatedObjectId" = 0},
-     *      name = "genericView"
-     * )
-     */
-    public function genericViewAllAction($package, $className, $updatedObjectId = 0) {
-
-        $classNames = $this->relatedClassNames($package, $className);
-
-        // for retrieving the entities
-        $query = new $classNames['query'];
-        
-        // for retrieving the column names
-        $modelClass = new $classNames["model"];
-        
-        return $this->renderDomainKeySpecificAction($package, "DTAMetadataBundle::genericView.html.twig", array(
-                    'data' => $query->orderById()->find(),
-                    'columns' => $modelClass::getTableViewColumnNames(),
-                    'className' => $className,
-                    'updatedObjectId' => $updatedObjectId,
-                ));
-    }
-
-    /**
-     * Renders the form for the model without any surrounding elements. 
-     * Used via AJAX to update or create database entities.
-     * 
-     * @param string $className   The name of the model class (e.g. Publication, Title, Titlefragment)
-     * @param int    $recordId    The id of the record to edit. Zero indicates that a new record shall be created (since one is the smallest id)
-     * @param string $property The property to use as caption for a select option (only for ajax use)
-     * 
-     * @Route("/ajaxModalForm/{className}/{recordId}/{property}", 
-     *      name="ajaxModalForm", 
-     *      defaults={"recordId"=0, "property"="Id"})
-     */
-    public function generateAjaxModalFormAction($className, $recordId = 0, $property = "Id") {
-
-        $form = $this->generateForm($className, $recordId);
-
-        // plain ajax response, html form wrapped in twitter bootstrap modal markup
-        return $this->render("DTAMetadataBundle:Form:ajaxModalForm.html.twig", array(
-                    'form' => $form->createView(),
-                    'newActionParameters' => array(
-                        'domainKey' => 'ajax',
-                        'className' => $className,
-                        'property' => $property,
-                    ),
-                ));
-    }
-
-    
-    
-    /**
-     * Visits recursively all nested form elements and saves them.
-     * @param Form $form The form object that contains the data defined by the top level form type (PersonType, NamefragmentType, ...)
-     */
-    private function saveRecursively(\Symfony\Component\Form\Form $form) {
-
-        $entity = $form->getData();
-        if (is_object($entity)) {
-            $rc = new \ReflectionClass($entity);
-            if ($rc->hasMethod('save'))
-                $entity->save();
-        }
-
-        foreach ($form->getChildren() as $child) {
-            $this->saveRecursively($child);
-        }
-    }
-
 }

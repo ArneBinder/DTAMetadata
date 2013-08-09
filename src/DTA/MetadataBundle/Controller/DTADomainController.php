@@ -27,7 +27,7 @@ class DTADomainController extends Controller {
      * @param $template Template to use for rendering, e.g. site specific as DTAMetadataBundle:DataDomain:index.html.twig
      * @param $options The data for the template to render 
      */
-    public function render($template, array $options = array(), Response $response = NULL) {
+    public function renderWithDomainData($template, array $options = array(), Response $response = NULL) {
 
         // these are overriden by the calling subclass
         $defaultDomainMenu = array(
@@ -39,7 +39,7 @@ class DTADomainController extends Controller {
         // adds the data for the view from $options
         $options = array_merge($defaultDomainMenu, $options);
 
-        return parent::render($template, $options);
+        return $this->render($template, $options);
     }
 
 }

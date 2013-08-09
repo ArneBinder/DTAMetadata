@@ -15,7 +15,7 @@
 
     <h3>{{ className|trans }}
         {# add entity button  #}
-        <a class="btn btn-mini listView-add-button pull-right" href="{{ path('genericNew', {'domainKey':domainKey, 'className':className}) }}">
+        <a class="btn btn-mini listView-add-button pull-right" href="{{ path('genericCreateOrEdit', {'package':domainKey, 'className':className}) }}">
             <i class="icon-plus"></i>
             {{ className|trans~"listView.add.row.buttonSuffix"|trans }}
         </a>
