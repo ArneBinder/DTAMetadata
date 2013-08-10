@@ -41,5 +41,15 @@ class DTADomainController extends Controller {
 
         return $this->render($template, $options);
     }
+    
+    public function addErrorFlash($message){
+        $this->get('session')->getFlashBag()->add('error', $message);
+    }
+    public function addSuccessFlash($message){
+        $this->get('session')->getFlashBag()->add('success', $message);
+    }
+    public function addWarningFlash($message){
+        $this->get('session')->getFlashBag()->add('warning', $message);
+    }
 
 }

@@ -67,3 +67,28 @@ li.sortableDragPlaceholder{
 .form-inline * {
     /*margin-right: 7px;*/
 }
+
+/*Bootstrap fieldsets are like headings with a <hr>, I want real borders*/
+fieldset{
+    padding: 10px 20px 20px;
+    margin: inherit;
+    border: 1px solid #c0c0c0;
+    border-radius: 4px;
+}
+
+fieldset p {
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+fieldset legend{
+    display: inline;
+    width: auto;
+    padding: 0 2px 0px 2px;
+    /*margin-bottom: inherit;*/
+    font-size: 21px;
+    /*line-height: inherit;*/
+    /*color: #333333;*/
+    border: 0;
+    margin-bottom: 0;
+}

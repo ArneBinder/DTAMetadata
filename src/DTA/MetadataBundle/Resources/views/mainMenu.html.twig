@@ -32,14 +32,16 @@
                 </li>
             {% endblock %}
             </ul>
+                
+                <!-- logout -->
+                <a href="{{ path('logout') }}" class="pull-right">
+                    <button type="button" class="btn btn-default navbar-btn">{{ app.user.username }} abmelden</button>
+                </a>
             {# <form class="navbar-search pull-left">
                 <input type="text" class="search-query" placeholder="Suche">
             </form> #}
                 
-            <!-- logout -->
-            <p class="navbar-text pull-right">
-                <a href="{{ path('logout') }}" class="na2vbar-link">{{ app.user.username }} abmelden</a>
-            </p>
+
         </div><!--/.row-fluid -->
 
         <!-- --------------- domain menu --------------- -->

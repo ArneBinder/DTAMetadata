@@ -23,6 +23,9 @@ class DataDomainController extends ORMController {
         'work' => array(
             "caption" => "Werke",
             "modelClass" => "Work"),
+        'test' => array(
+            "caption" => "Test CSS",
+            "route" => "testCss"),
         'publication' => array(
             "caption" => "Publikationen", 
             "children"=>array(
@@ -72,6 +75,16 @@ class DataDomainController extends ORMController {
         ));
     }
 
+    /**
+     * @Route("/testCss", name="testCss")
+     */
+    public function testCSSAction() {
+        return $this->renderWithDomainData('DTAMetadataBundle:DataDomain:PublicationMForm.html.twig', array(
+//            "person" => "array_shift()" //$persont->getRelations() //count($p->getPersonalnames()->getArrayCopy())//[0]->__toString(),
+            // get_declared_classes()
+        ));
+    }
+    
     /**
      * TODO: finalization. remove test data generator.
      * @Route("/generateTestData", name="generateTestData")

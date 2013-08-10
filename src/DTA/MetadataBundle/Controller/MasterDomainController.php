@@ -22,20 +22,6 @@ class MasterDomainController extends DTADomainController {
      */
     public function loginFormAction() {
         
-        $dtaUser = new \DTA\MetadataBundle\Model\Master\DtaUser();
-        
-        $config = \Propel::getConfiguration(\PropelConfiguration::TYPE_OBJECT);
-        $config->setParameter('debugpdo.logging.details.method.enabled', true);
-        $config->setParameter('debugpdo.logging.details.time.enabled', true);
-        $config->setParameter('debugpdo.logging.details.mem.enabled', true);
-        
-        $con = \Propel::getConnection(\DTA\MetadataBundle\Model\Master\DtaUserPeer::DATABASE_NAME);
-        $con->useDebug(true);
-        $dtaUser
-                ->setUsername("cc")
-                ->setPassword("x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==")
-                ->save($con);
-        
         $request = $this->getRequest();
         $session = $request->getSession();
 

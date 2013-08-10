@@ -1,0 +1,1269 @@
+{# Data Domain Base Template 
+    Fills the domain menu template slot with the special option structure 
+    for the data domain (view and search, create options for each model class).
+    The other data domain templates extend this one (this saves includes for the domain menu all the time).
+#}
+
+{% extends 'DTAMetadataBundle::base.html.twig' %}
+
+{% block title %}Daten{% endblock %}
+
+{% block core %}
+<style type="text/css">
+    
+      p.dta-p { text-indent:2em }
+      .dta-sp p { text-indent:0 !important }
+      .dta-p-in-sp-really { padding-top:10px }
+    
+
+    #xsltext .speaker    { background:#def; font-weight:normal }
+    #xsltext .speaker *  { background:#def }
+    #xsltext .stage      { font-style:normal; background:#fed }
+    #xsltext .stage .c, #xsltext .stage .et { font-style:normal; background:#fed }
+    .fr         { font-family:Georgia !important; border:1px dotted silver }
+    .dta-salute { text-indent:3em; background:#F5F6CE; white-space:nowrap }
+    .c.dta-salute { text-indent:0em !important; margin-bottom:.5em }
+    .dta-closer { text-align:right; margin-right:10em }
+    .dta-lg     { margin-bottom:10px; margin-top:0 !important; margin-left:2em; /*background:url(static/images/bg-lg.png) repeat-y*/ }
+    .footnotesep, .footnotesep-long { margin-top:15px }
+    #xsltext q.quote, #xsltext q.quote * { background:#effddf }
+    p           { margin-bottom:10px; margin-top:0 !important }
+
+    
+
+    
+      #header { background:#A2C35C }
+      a       { color:#89A54E }
+    
+  </style>
+<form method="post" action="http://www.deutschestextarchiv.de/dtae/submit/clarin/genheader" id="fs-form" target="_blank">
+<div class="alert alert-info">
+  <button type="button" class="close" data-dismiss="alert">&times;</button>
+        Felder, in denen mehrere Angaben sinnvoll erscheinen (z.&nbsp;B.
+      <i>Verlag<sup>;</sup></i> oder <i>Schlagwörter<sup>;</sup></i>&nbsp;), können mit eben solchen versehen werden,
+      wenn diese durch ein Semikolon getrennt werden.
+
+</div>
+<fieldset>
+    {# <span class="glyphicon glyphicon-minus"></span>&nbsp; #}
+    <legend data-toggle="collapse" data-target="#demo">Einordnung der Vorlage </legend>
+    <div class="collapse in" id="demo">
+    <table>
+      <tr>
+        <td>
+    <button onclick="fsToggle('fs-M'); return false" class="fs-button button-fs-M" disabled="disabled">Einteilige Monographie (M)</button><br />
+    <button onclick="fsToggle('fs-MM'); return false" class="fs-button button-fs-MM">Teil einer mehrbändigen Monographie (MM)</button><br />
+    <button onclick="fsToggle('fs-MS'); return false" class="fs-button button-fs-MS">Selbstständiger Band einer Reihe (MS)</button><br />
+    <button onclick="fsToggle('fs-MMS'); return false" class="fs-button button-fs-MMS">Teil einer mehrbändigen Monographie, die ihrerseits Teil einer Reihe ist (MMS)</button>
+        </td>
+        <td>
+    <button onclick="fsToggle('fs-DM'); return false" class="fs-button button-fs-DM">Unselbständiger Teil einer Monographie (z. B. Beitrag in Sammelband, Buchkapitel) (DM)</button><br />
+    <button onclick="fsToggle('fs-DS'); return false" class="fs-button button-fs-DS">Unselbständige Schrift in einem Band, der Teil einer Reihe ist (DS)</button><br />
+    <button onclick="fsToggle('fs-JA'); return false" class="fs-button button-fs-JA">Artikel einer Zeitschrift/Zeitung (JA)</button><br />
+    <button onclick="fsToggle('fs-J'); return false" class="fs-button button-fs-J">Zeitschriften-/Zeitungsausgabe (J)</button>
+        </td>
+      </tr>
+    </table>
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>Titelei</legend>
+    <table>
+      <tr>
+        <td>Haupttitel</td>
+        <td><input name="title" class="mandatory form-control" id="title" type="text" /></td>
+      </tr>
+      <tr id="subtitle-row-1">
+  <td>
+    Untertitel (1)
+    
+  </td>
+  <td>
+    <input name="subtitle-1" id="subtitle-1" type="text" />
+  </td>
+</tr>
+
+      <tr id="after-subtitle" class="f-opt fs-MS fs-DS fs-MMS">
+        <td>Haupttitel der Reihe</td>
+        <td><input name="series-title" class="mandatory" id="" type="text" placeholder="Korpuslinguistik gestern und heute" /></td>
+      </tr>
+      <tr class="f-opt fs-MS fs-DS fs-MMS">
+        <td>Untertitel der Reihe</td>
+        <td><input name="series-subtitle" id="" type="text" placeholder="Theoretische Schriften zum Aufbau historischer Korpora" /></td>
+      </tr>
+      <tr class="f-opt fs-MM fs-DS fs-MMS">
+        <td>Band</td>
+        <td>
+          Bezeichnung:
+          <input style="width:274px" name="volume-title" id="" type="text" placeholder="Teil 2: Mehrbändige Monographien" />
+          &nbsp;&nbsp;
+          numerisch: <input style="width:30px" name="volume-no" id="" type="text" placeholder="2" />
+        </td>
+      </tr>
+      <tr class="f-opt fs-DM">
+        <td>Haupttitel des übergeordneten Werkes</td>
+        <td><input name="title-superior" id="" type="text" placeholder="Erfassung von Metadaten" /></td>
+      </tr>
+      <tr class="f-opt fs-DM">
+        <td>Untertitel des übergeordneten Werkes</td>
+        <td><input name="subtitle-superior" id="" type="text" placeholder="Ein Lehrbuch zur Verwendung des CLARIN-D-Metadatenformulars " /></td>
+      </tr>
+      <tr class="f-opt fs-DM fs-DS">
+        <td>Seitenangabe</td>
+        <td><input name="pages" id="" type="text" placeholder="12-34" /></td>
+      </tr>
+      <tr class="f-opt fs-MS"> 
+        <td>Nummer des Bandes innerhalb der Reihe</td>
+        <td><input name="volume-series-no" id="" type="text" placeholder="2" /></td>
+      </tr>
+      <tr class="f-opt fs-JA">
+        <td>Teil (bei mehrteiligen Publikationen)</td>
+        <td>
+          Bezeichnung: <input style="width:274px" name="journal-part" id="" type="text" placeholder="Fortsetzung und Schluß" />
+          &nbsp;&nbsp;
+          numerisch: <input style="width:30px" name="journal-part-no" id="" type="text" placeholder="2" />
+        </td>
+      </tr>
+      <tr class="f-opt fs-JA">
+        <td>Haupttitel der Zeitschrift</td>
+        <td><input name="journal-title" class="mandatory" id="" type="text" placeholder="Korpuslinguistik gestern und heute" /></td>
+      </tr>
+      <tr class="f-opt fs-JA">
+        <td>Untertitel der Zeitschrift</td>
+        <td><input name="journal-subtitle" id="" type="text" placeholder="Theoretische Schriften zum Aufbau historischer Korpora " /></td>
+        <td></td>
+      </tr>
+      <tr class="f-opt fs-JA">
+        <td>&nbsp;</td>
+        <td>
+          Jahrgang:
+          <input style="width:70px" name="ja-volume" id="" type="text" placeholder="53" />
+          &nbsp;&nbsp;
+          Heft:
+          <input style="width:70px" name="ja-issue" id="" type="text" placeholder="2" />
+          &nbsp;&nbsp;
+          Seitenangabe:
+          <input style="width:98px" name="ja-pages" id="" type="text" placeholder="12-34" />
+        </td>
+      </tr>
+      <tr class="f-opt fs-J">
+        <td>Ausgabe</td>
+        <td>
+          <input name="j-issue" id="" type="text" placeholder="Beilage zu Nr. 10 vom 10. Juni 1848" />
+        </td>
+      </tr>
+      <tr>
+      <tr>
+        <td>Kurztitel</td>
+        <td>
+          <textarea name="title-short" id="title-short" style="width:484px" rows="3" cols=""></textarea><a style="float:right" target="_blank" href="http://www.deutschestextarchiv.de/doku/basisformat_header#die_kurztitelan"><img src="static/images/help.gif" /></a>
+        </td>
+        <td></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <button onclick="addSubtitle(); return false">weiterer Untertitel</button>
+        </td>
+        <td></td>
+      </tr>
+    </table>
+  </fieldset>
+  <fieldset>
+    <legend>Personalia</legend>
+    <table>
+      <tr class="person-row-1">
+  <td>Rolle (1)</td>
+  <td>
+    <select name="role-1" id="role-1">
+      <option value="author">Autor</option>
+      <option value="translator">Übersetzer</option>
+      <option value="publisher">Herausgeber</option>
+    </select>
+    
+  </td>
+</tr>
+<tr class="person-row-1">
+  <td>Vorname (1)</td>
+  <td>
+    <input name="forename-1" id="forename-1" type="text" placeholder="Dorothea" />
+  </td>
+</tr>
+<tr class="person-row-1">
+  <td>Nachname (1)</td>
+  <td>
+    <input name="surname-1" id="surname-1" type="text" placeholder="Ehrnweiten" />
+  </td>
+</tr>
+
+<tr class="person-row-1">
+  <td>GND-Nummer (1)</td>
+  <td>
+    <input style="width:138px" name="pnd-1" id="pnd-1" type="text" placeholder="012345678" />
+    <button onclick="PNDinfo(1); return false">DNB-Namensinformationen holen</button>
+    <button onclick="PNDnumber(1); return false">GND von DNB holen</button>
+  </td>
+</tr>
+<tr id="after-person-1" class="person-row-1">
+  <td style="padding-bottom:20px"></td>
+  <td style="padding-bottom:20px">
+    weiteres Feld zur Person:
+    <select name="" id="add-name-field-1" onchange="addNameField(this, 1)">
+      <option value=""></option>
+      <option value="nameLink">Adelstitel</option>
+      <option value="genName">Generation</option>
+      <option value="addName">weiterer Name (z.&nbsp;B. Pseudonym)</option>
+      <option value="roleName">Funktion</option>
+    </select>
+  </td>
+</tr>
+
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+        
+        
+      
+      <tr>
+        <td>&nbsp;</td>
+        <td>
+          <button onclick="addPerson(); return false">weitere Person anlegen</button>
+        </td>
+        <td></td>
+      </tr>
+    </table>
+  </fieldset>
+  <fieldset>
+    <legend>Angaben zur Publikation der Vorlage</legend>
+    <table>
+      <tr>
+        <td>Druckort<sup>;</sup></td>
+        <td><input name="place" id="place" type="text" /></td>
+      </tr>
+      <tr>
+        <td>Datierung</td>
+        <td>
+          <table style="width:100%">
+            <tr>
+              <td style="text-align:right; white-space:nowrap; width:393px">Erscheinungsjahr:</td>
+              <td><input style="width:100px" name="year" id="year" type="text" /></td>
+            </tr>
+            <tr>
+              <td style="text-align:right; white-space:nowrap">Erscheinungsjahr der Erstausgabe (falls abweichend):</td>
+              <td><input style="width:100px" name="year-first" id="year-first" type="text" /></td>
+            </tr>
+            <tr>
+              <td style="text-align:right; white-space:nowrap">Entstehungsjahr des Textes (falls abweichend):</td>
+              <td><input style="width:100px" name="year-creation" id="year-creation" type="text" /></td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td>Auflage</td>
+        <td>
+          Bezeichnung: <input style="width:273px" name="edition" id="edition" type="text" placeholder="Zweite, vollständig überarbeitete Ausgabe" />
+          &nbsp;&nbsp;
+          numerisch: <input style="width:31px" name="edition-no" id="edition-no" type="text" placeholder="2" />
+        </td>
+      </tr>
+      <tr>
+        <td>Verlag/Drucker<sup>;</sup></td>
+        <td><input name="publisher" id="publisher" type="text" placeholder="Akademieverlag Berlin" /></td>
+      </tr>
+    </table>
+  </fieldset>
+  <fieldset>
+    <legend>Angaben zur Bildquelle</legend>
+    <table>
+      <tr class="imagesource-row-1">
+  <td>
+    
+    Anbieter Leitdruck
+    
+  </td>
+  <td>
+    <input name="images-owner-1" id="" type="text" placeholder="Bibliothek der Berlin-Brandenburgischen Akademie der Wissenschaften" />
+  </td>
+</tr>
+<tr class="imagesource-row-1">
+  <td>Katalogeintrag</td>
+  <td>
+    Signatur: <input style="width:130px" name="shelfmark-1" id="shelfmark-1" type="text" />
+    URL: <input style="width:258px" name="bib-url-1" id="bib-url-1" type="text" placeholder="http://www.example.com/katalogdatensatz" />
+  </td>
+</tr>
+
+<tr class="imagesource-row-1">
+  <td>Umfang</td>
+  <td>
+    Faksimiles: <input style="width:31px" name="extent-images" id="extent-images" type="text" />
+    &nbsp;&nbsp;
+    lt. Katalog: <input style="width:289px" name="extent" id="extent" type="text" />
+  </td>
+</tr>
+
+<tr class="imagesource-row-1">
+  <td>URL Bilddigitalisate</td>
+  <td><input name="images-url-1" id="images-url-1" type="text" placeholder="http://www.example.com/bilddigitalisate" /></td>
+</tr>
+<tr class="imagesource-row-1">
+  <td>URN Bilddigitalisate</td>
+  <td><input name="images-urn-1" id="" type="text" placeholder="urn:nbn:de:565:3-93738" /></td>
+</tr>
+<tr class="imagesource-row-1">
+  <td style="vertical-align:top">Lizenz der Bilddigitalisate</td>
+  <td>
+    <select name="images-license-1" id="images-license-1">
+      <option value="unknown"></option>
+      <option value="cc-0">gemeinfrei (CC0)</option>
+      <option value="cc-by-sa-2.0-de">CC by-sa 2.0 (de)</option>
+      <option value="cc-by-nc-3.0-de">CC by-nc 3.0 (de)</option>
+      <option value="other">andere</option>
+    </select>
+    <table id="table-images-license-1" style="display:none">
+      <tr>
+        <td style="width:120px; text-align:right">Lizenzbeschreibung:</td>
+        <td><input style="width:300px" name="images-license-name-1" id="images-license-name-1" type="text" /></td>
+      </tr>
+      <tr>
+        <td style="width:120px; text-align:right">URL:</td>
+        <td><input style="width:300px" name="images-license-url-1" id="images-license-url-1" type="text" /></td>
+      </tr>
+    </table>
+    <script type="text/javascript">
+      jQuery('#images-license-1').change( function() {
+        var el = jQuery(this);
+        if ( el.val() == 'other' ) {
+          jQuery('#table-images-license-1').show();
+        }
+        else {
+          jQuery('#table-images-license-1').hide();
+          jQuery('#images-license-name-1').val( '' );
+          jQuery('#images-license-url-1').val( '' );
+        }
+      });
+
+      jQuery('#images-url-1, #images-license-url-1, #bib-url-1').change( function() {
+        var el = jQuery(this);
+        if ( el.val() && el.val().search( /^http:\/\// ) == -1 ) {
+          el.css( 'background', '#F78181' );
+          alert( 'Der eingegebene Wert "' + el.val() + '" ist keine URL und wird nicht in den TEI-Header übernommen.' );
+        }
+        else {
+          el.css( 'background', '#fff' ); 
+        }
+      } );
+    </script>
+  </td>
+</tr>
+<tr class="imagesource-row-1" class="imagesource-row-1"><td colspan="2">&nbsp;</td></tr>
+
+      <tr id="after-imagesource">
+        <td></td>
+        <td>
+          <button onclick="addImageSource(); return false">weitere Bildquelle</button>
+        </td>
+        <td></td>
+      </tr>
+    </table>
+  </fieldset>
+  <fieldset>
+    <legend>Angaben zur Textquelle</legend>
+    <table>
+      <tr class="textsource-row-1">
+  <td>
+    Anbieter Textdigitalisate<sup>;</sup> (1)
+    
+  </td>
+  <td>
+    <input style="width:373px" name="text-owner-1" id="text-owner-1" type="text" placeholder="Dietrich Armin Quentin" />
+    &nbsp;&nbsp;&nbsp;
+    <select name="text-owner-type-1" id="text-owner-type-1">
+      <option value="person">Person</option>
+      <option value="organization">Organisation</option>
+    </select>
+    <script type="text/javascript">
+      jQuery('#text-owner-type-1').change( function() {
+        var el = jQuery(this);
+        if ( el.val() == 'person' ) {
+          jQuery('#text-owner-1').attr( 'placeholder', 'Dietrich Armin Quentin' );
+        }
+        else {
+          jQuery('#text-owner-1').attr( 'placeholder', 'Text-Anbieter Inc.' );
+        }
+      } );
+    </script>
+  </td>
+</tr>
+<tr class="textsource-row-1">
+  <td>URL der Textdigitalisate</td>
+  <td><input name="text-url-1" id="text-url-1" type="text" placeholder="http://www.example.com/textdigitalisate" /></td>
+</tr>
+<tr class="textsource-row-1">
+  <td style="vertical-align:top">Lizenz der Textdigitalisate</td>
+  <td>
+    <select name="text-license-1" id="text-license-1">
+      <option value="unknown"></option>
+      <option value="cc-0">gemeinfrei (CC0)</option>
+      <option value="cc-by-sa-2.0-de">CC by-sa 2.0 (de)</option>
+      <option value="cc-by-nc-3.0-de">CC by-nc 3.0 (de)</option>
+      <option value="other">andere</option>
+    </select>
+    <table id="table-text-license-1" style="display:none">
+      <tr>
+        <td style="width:120px; text-align:right">Lizenzbeschreibung:</td>
+        <td><input style="width:300px" name="text-license-name-1" id="text-license-name-1" type="text" /></td>
+      </tr>
+      <tr>
+        <td style="width:120px; text-align:right">URL:</td>
+        <td><input style="width:300px" name="text-license-url-1" id="text-license-url-1" type="text" /></td>
+      </tr>
+    </table>
+    <script type="text/javascript">
+      jQuery('#text-license-1').change( function() {
+        var el = jQuery(this);
+        if ( el.val() == 'other' ) {
+          jQuery('#table-text-license-1').show();
+        }
+        else {
+          jQuery('#table-text-license-1').hide();
+          jQuery('#text-license-name-1').val( '' );
+          jQuery('#text-license-url-1').val( '' );
+        }
+      });
+      jQuery('#text-url-1, #text-license-url-1').change( function() {
+        var el = jQuery(this);
+        if ( el.val() && el.val().search( /^http:\/\// ) == -1 ) {
+          el.css( 'background', '#F78181' );
+          alert( 'Der eingegebene Wert "' + el.val() + '" ist keine URL und wird nicht in den TEI-Header übernommen.' );
+        }
+        else {
+          el.css( 'background', '#fff' ); 
+        }
+      } );
+    </script>
+  </td>
+</tr>
+<tr>
+  <td>Attributionszeile</td>
+  <td><input name="text-attribution-1" type="text" /></td>
+</tr>
+<tr class="textsource-row-1"><td colspan="2">&nbsp;</td></tr>
+
+      <tr id="after-textsource">
+        <td></td>
+        <td>
+          <button onclick="addTextSource(); return false">weitere Textquelle</button>
+        </td>
+        <td></td>
+      </tr>
+    </table>
+  </fieldset>
+  <fieldset>
+    <legend>Editorisches</legend>
+    <table>
+      <tr>
+        <td>Art der Textausgabe</td>
+        <td><input value="Vollständige digitalisierte Ausgabe." name="type-of-edition" type="text" /></td>
+      </tr>
+      <tr>
+        <td>Bearbeiter der dig. Edition<sup>;</sup></td>
+        <td><input name="edition-editor" id="" type="text" placeholder="Dieter Thomas Anders" /></td>
+      </tr>
+    </table>
+    <button id="checklistButton">Editionskriterien &ndash; Checkliste anzeigen</button><br />
+    <table id="checklist" style="display:none">
+      <tr id="guidelines-row-1">
+  <td>
+    dokumentierte Richtlinien (1)
+    
+  </td>
+  <td><input style="width:450px" name="url-guidelines-1" id="url-guidelines-1" type="text" placeholder="http://www.deutschestextarchiv.de/doku/basisformat" /> (URL)</td>
+</tr>
+
+<script type="text/javascript">
+  jQuery('#url-guidelines-1').change( function() {
+    var el = jQuery(this);
+    if ( el.val() && el.val().search( /^http:\/\// ) == -1 ) {
+      el.css( 'background', '#F78181' );
+      alert( 'Der eingegebene Wert "' + el.val() + '" ist keine URL und wird nicht in den TEI-Header übernommen.' );
+    }
+    else {
+      el.css( 'background', '#fff' ); 
+    }
+  } );
+</script>
+
+      <tr id="after-guidelines">
+        <td></td>
+        <td>
+          <button onclick="addGuidelines(); return false">weitere URL</button>
+        </td>
+        <td></td>
+      </tr>
+
+      <tr>
+        <td>Verfahren der Texterfassung</td>
+        <td>
+          <select name="transcription-method">
+            <option></option>
+            <option value="manuell (einfach erfasst)">manuell (einfach erfasst)</option>
+            <option value="manuell (doppelt erfasst)">manuell (doppelt erfasst)</option>
+            <option value="OCR ohne Nachkorrektur">OCR ohne Nachkorrektur</option>
+            <option value="OCR mit Nachkorrektur">OCR mit Nachkorrektur</option>
+          </select>
+        </td>
+      </tr>
+
+      
+
+      
+        
+      <tr>
+        <td>Vollständigkeit</td>
+        <td>
+          <table>
+            <tr>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input checked="checked" value="keine Angabe" name="tr-completeness" id="tr-completeness-na" type="radio" />
+                  <label for="tr-completeness-na">keine Angabe</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="vollständig erfasst" name="tr-completeness" id="tr-completeness-complete" type="radio" />
+                  <label for="tr-completeness-complete">vollständig erfasst</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="teilweise erfasst" name="tr-completeness" id="tr-completeness-partial" type="radio" />
+                  <label for="tr-completeness-partial">teilweise erfasst</label>
+                </td>
+              
+              <td>&nbsp;</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      
+      
+        
+      <tr>
+        <td>Seitenumbrüche markiert</td>
+        <td>
+          <table>
+            <tr>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input checked="checked" value="keine Angabe" name="tr-pb" id="tr-pb-na" type="radio" />
+                  <label for="tr-pb-na">keine Angabe</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="ja" name="tr-pb" id="tr-pb-yes" type="radio" />
+                  <label for="tr-pb-yes">ja</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="nein" name="tr-pb" id="tr-pb-no" type="radio" />
+                  <label for="tr-pb-no">nein</label>
+                </td>
+              
+              <td>&nbsp;</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      
+      
+        
+      <tr>
+        <td>Zeilenumbrüche markiert</td>
+        <td>
+          <table>
+            <tr>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input checked="checked" value="keine Angabe" name="tr-lb" id="tr-lb-na" type="radio" />
+                  <label for="tr-lb-na">keine Angabe</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="ja" name="tr-lb" id="tr-lb-yes" type="radio" />
+                  <label for="tr-lb-yes">ja</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="nein" name="tr-lb" id="tr-lb-no" type="radio" />
+                  <label for="tr-lb-no">nein</label>
+                </td>
+              
+              <td>&nbsp;</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      
+      
+        
+      <tr>
+        <td>Silbentrennung</td>
+        <td>
+          <table>
+            <tr>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input checked="checked" value="keine Angabe" name="tr-hyphenation" id="tr-hyphenation-na" type="radio" />
+                  <label for="tr-hyphenation-na">keine Angabe</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="wie Vorlage" name="tr-hyphenation" id="tr-hyphenation-orig" type="radio" />
+                  <label for="tr-hyphenation-orig">wie Vorlage</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="aufgelöst" name="tr-hyphenation" id="tr-hyphenation-no" type="radio" />
+                  <label for="tr-hyphenation-no">aufgelöst</label>
+                </td>
+              
+              <td>&nbsp;</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      
+      
+        
+      <tr>
+        <td>langes s (ſ)</td>
+        <td>
+          <table>
+            <tr>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input checked="checked" value="keine Angabe" name="tr-long-s" id="tr-long-s-na" type="radio" />
+                  <label for="tr-long-s-na">keine Angabe</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="wie Vorlage" name="tr-long-s" id="tr-long-s-orig" type="radio" />
+                  <label for="tr-long-s-orig">wie Vorlage</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="als s transkribiert" name="tr-long-s" id="tr-long-s-norm" type="radio" />
+                  <label for="tr-long-s-norm">als s transkribiert</label>
+                </td>
+              
+              <td>&nbsp;</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      
+      
+        
+      <tr>
+        <td>rundes r (&#xa75b;)</td>
+        <td>
+          <table>
+            <tr>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input checked="checked" value="keine Angabe" name="tr-round-r" id="tr-round-r-na" type="radio" />
+                  <label for="tr-round-r-na">keine Angabe</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="wie Vorlage" name="tr-round-r" id="tr-round-r-orig" type="radio" />
+                  <label for="tr-round-r-orig">wie Vorlage</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="als r/et transkribiert" name="tr-round-r" id="tr-round-r-norm" type="radio" />
+                  <label for="tr-round-r-norm">als r/et transkribiert</label>
+                </td>
+              
+              <td>&nbsp;</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      
+      
+        
+      <tr>
+        <td>I/J in Fraktur</td>
+        <td>
+          <table>
+            <tr>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input checked="checked" value="keine Angabe" name="tr-ij-majuskel" id="tr-ij-majuskel-na" type="radio" />
+                  <label for="tr-ij-majuskel-na">keine Angabe</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="wie Vorlage" name="tr-ij-majuskel" id="tr-ij-majuskel-orig" type="radio" />
+                  <label for="tr-ij-majuskel-orig">wie Vorlage</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="Lautwert transkribiert" name="tr-ij-majuskel" id="tr-ij-majuskel-norm" type="radio" />
+                  <label for="tr-ij-majuskel-norm">Lautwert transkribiert</label>
+                </td>
+              
+              <td>&nbsp;</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      
+      
+        
+      <tr>
+        <td>i/j in Fraktur</td>
+        <td>
+          <table>
+            <tr>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input checked="checked" value="keine Angabe" name="tr-ij-minuskel" id="tr-ij-minuskel-na" type="radio" />
+                  <label for="tr-ij-minuskel-na">keine Angabe</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="wie Vorlage" name="tr-ij-minuskel" id="tr-ij-minuskel-orig" type="radio" />
+                  <label for="tr-ij-minuskel-orig">wie Vorlage</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="Lautwert transkribiert" name="tr-ij-minuskel" id="tr-ij-minuskel-norm" type="radio" />
+                  <label for="tr-ij-minuskel-norm">Lautwert transkribiert</label>
+                </td>
+              
+              <td>&nbsp;</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      
+      
+        
+      <tr>
+        <td>u/v bzw. U/V</td>
+        <td>
+          <table>
+            <tr>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input checked="checked" value="keine Angabe" name="tr-uv" id="tr-uv-na" type="radio" />
+                  <label for="tr-uv-na">keine Angabe</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="wie Vorlage" name="tr-uv" id="tr-uv-orig" type="radio" />
+                  <label for="tr-uv-orig">wie Vorlage</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="Lautwert transkribiert" name="tr-uv" id="tr-uv-norm" type="radio" />
+                  <label for="tr-uv-norm">Lautwert transkribiert</label>
+                </td>
+              
+              <td>&nbsp;</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      
+      
+        
+      <tr>
+        <td>Vokale mit übergest. e</td>
+        <td>
+          <table>
+            <tr>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input checked="checked" value="keine Angabe" name="tr-umlaut" id="tr-umlaut-na" type="radio" />
+                  <label for="tr-umlaut-na">keine Angabe</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="wie Vorlage" name="tr-umlaut" id="tr-umlaut-orig" type="radio" />
+                  <label for="tr-umlaut-orig">wie Vorlage</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="als ä/ö/ü transkribiert" name="tr-umlaut" id="tr-umlaut-norm" type="radio" />
+                  <label for="tr-umlaut-norm">als ä/ö/ü transkribiert</label>
+                </td>
+              
+              <td>&nbsp;</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      
+      
+        
+      <tr>
+        <td>Geminations-/Abkürzungsstriche</td>
+        <td>
+          <table>
+            <tr>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input checked="checked" value="keine Angabe" name="tr-gemination" id="tr-gemination-na" type="radio" />
+                  <label for="tr-gemination-na">keine Angabe</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="wie Vorlage" name="tr-gemination" id="tr-gemination-orig" type="radio" />
+                  <label for="tr-gemination-orig">wie Vorlage</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="expandiert, markiert" name="tr-gemination" id="tr-gemination-marked" type="radio" />
+                  <label for="tr-gemination-marked">expandiert, markiert</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="nur expandiert" name="tr-gemination" id="tr-gemination-expan" type="radio" />
+                  <label for="tr-gemination-expan">nur expandiert</label>
+                </td>
+              
+              
+            </tr>
+          </table>
+        </td>
+      </tr>
+      
+      
+        
+      <tr>
+        <td>Zeichensetzung</td>
+        <td>
+          <table>
+            <tr>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input checked="checked" value="keine Angabe" name="tr-punct" id="tr-punct-na" type="radio" />
+                  <label for="tr-punct-na">keine Angabe</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="wie Vorlage" name="tr-punct" id="tr-punct-orig" type="radio" />
+                  <label for="tr-punct-orig">wie Vorlage</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="DTABf-getreu" name="tr-punct" id="tr-punct-dtabf" type="radio" />
+                  <label for="tr-punct-dtabf">DTABf-getreu</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="normalisiert" name="tr-punct" id="tr-punct-norm" type="radio" />
+                  <label for="tr-punct-norm">normalisiert</label>
+                </td>
+              
+              
+            </tr>
+          </table>
+        </td>
+      </tr>
+      
+      
+        
+      <tr>
+        <td>Hervorhebungen (Antiqua, Sperrschrift, Kursive etc.)</td>
+        <td>
+          <table>
+            <tr>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input checked="checked" value="keine Angabe" name="tr-hi" id="tr-hi-na" type="radio" />
+                  <label for="tr-hi-na">keine Angabe</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="wie Vorlage" name="tr-hi" id="tr-hi-orig" type="radio" />
+                  <label for="tr-hi-orig">wie Vorlage</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="gekennzeichnet" name="tr-hi" id="tr-hi-marked" type="radio" />
+                  <label for="tr-hi-marked">gekennzeichnet</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="nicht ausgezeichnet" name="tr-hi" id="tr-hi-no" type="radio" />
+                  <label for="tr-hi-no">nicht ausgezeichnet</label>
+                </td>
+              
+              
+            </tr>
+          </table>
+        </td>
+      </tr>
+      
+      
+        
+      <tr>
+        <td>Kolumnentitel</td>
+        <td>
+          <table>
+            <tr>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input checked="checked" value="keine Angabe" name="tr-kt" id="tr-kt-na" type="radio" />
+                  <label for="tr-kt-na">keine Angabe</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="gekennzeichnet" name="tr-kt" id="tr-kt-orig" type="radio" />
+                  <label for="tr-kt-orig">gekennzeichnet</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="nicht gekennzeichnet" name="tr-kt" id="tr-kt-nomark" type="radio" />
+                  <label for="tr-kt-nomark">nicht gekennzeichnet</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="nicht übernommen" name="tr-kt" id="tr-kt-no" type="radio" />
+                  <label for="tr-kt-no">nicht übernommen</label>
+                </td>
+              
+              
+            </tr>
+          </table>
+        </td>
+      </tr>
+      
+      
+        
+      <tr>
+        <td>Bogensignaturen</td>
+        <td>
+          <table>
+            <tr>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input checked="checked" value="keine Angabe" name="tr-sig" id="tr-sig-na" type="radio" />
+                  <label for="tr-sig-na">keine Angabe</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="gekennzeichnet" name="tr-sig" id="tr-sig-orig" type="radio" />
+                  <label for="tr-sig-orig">gekennzeichnet</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="nicht gekennzeichnet" name="tr-sig" id="tr-sig-nomark" type="radio" />
+                  <label for="tr-sig-nomark">nicht gekennzeichnet</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="nicht übernommen" name="tr-sig" id="tr-sig-no" type="radio" />
+                  <label for="tr-sig-no">nicht übernommen</label>
+                </td>
+              
+              
+            </tr>
+          </table>
+        </td>
+      </tr>
+      
+      
+        
+      <tr>
+        <td>Kustoden</td>
+        <td>
+          <table>
+            <tr>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input checked="checked" value="keine Angabe" name="tr-catch" id="tr-catch-na" type="radio" />
+                  <label for="tr-catch-na">keine Angabe</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="gekennzeichnet" name="tr-catch" id="tr-catch-orig" type="radio" />
+                  <label for="tr-catch-orig">gekennzeichnet</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="nicht gekennzeichnet" name="tr-catch" id="tr-catch-nomark" type="radio" />
+                  <label for="tr-catch-nomark">nicht gekennzeichnet</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="nicht übernommen" name="tr-catch" id="tr-catch-no" type="radio" />
+                  <label for="tr-catch-no">nicht übernommen</label>
+                </td>
+              
+              
+            </tr>
+          </table>
+        </td>
+      </tr>
+      
+      
+        
+      <tr>
+        <td>Normalisierungen</td>
+        <td>
+          <table>
+            <tr>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input checked="checked" value="keine Angabe" name="tr-norm" id="tr-norm-na" type="radio" />
+                  <label for="tr-norm-na">keine Angabe</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="keine" name="tr-norm" id="tr-norm-orig" type="radio" />
+                  <label for="tr-norm-orig">keine</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="dokumentiert" name="tr-norm" id="tr-norm-documented" type="radio" />
+                  <label for="tr-norm-documented">dokumentiert</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="stillschweigend" name="tr-norm" id="tr-norm-silent" type="radio" />
+                  <label for="tr-norm-silent">stillschweigend</label>
+                </td>
+              
+              
+            </tr>
+          </table>
+        </td>
+      </tr>
+      
+      
+        
+      <tr>
+        <td>Druckfehler</td>
+        <td>
+          <table>
+            <tr>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input checked="checked" value="keine Angabe" name="tr-errata" id="tr-errata-na" type="radio" />
+                  <label for="tr-errata-na">keine Angabe</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="dokumentiert" name="tr-errata" id="tr-errata-documented" type="radio" />
+                  <label for="tr-errata-documented">dokumentiert</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="stillschweigend korrigiert" name="tr-errata" id="tr-errata-silent" type="radio" />
+                  <label for="tr-errata-silent">stillschweigend korrigiert</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="ignoriert" name="tr-errata" id="tr-errata-ignored" type="radio" />
+                  <label for="tr-errata-ignored">ignoriert</label>
+                </td>
+              
+              
+            </tr>
+          </table>
+        </td>
+      </tr>
+      
+      
+        
+      <tr>
+        <td>fremdsprachliches Material</td>
+        <td>
+          <table>
+            <tr>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input checked="checked" value="keine Angabe" name="tr-fm" id="tr-fm-na" type="radio" />
+                  <label for="tr-fm-na">keine Angabe</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="gekennzeichnet" name="tr-fm" id="tr-fm-marked" type="radio" />
+                  <label for="tr-fm-marked">gekennzeichnet</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="nur Fremdskripte gekennzeichnet" name="tr-fm" id="tr-fm-scripts" type="radio" />
+                  <label for="tr-fm-scripts">nur Fremdskripte gekennzeichnet</label>
+                </td>
+              
+                <td style="width:190px;white-space:nowrap">
+                  <input value="nicht gekennzeichnet" name="tr-fm" id="tr-fm-no" type="radio" />
+                  <label for="tr-fm-no">nicht gekennzeichnet</label>
+                </td>
+              
+              
+            </tr>
+          </table>
+        </td>
+      </tr>
+      
+      
+    </table>
+    <label>Sonstige Bemerkungen zu den Transkriptionsrichtlinien</label><br />
+    <textarea name="encoding-desc" id="" rows="5" cols="" placeholder="Zusammenschreibungen vor Majuskel wurden aufgehoben."></textarea><br />
+  </fieldset>
+  <fieldset>
+    <legend>Klassifikation und Einordnung</legend>
+    <table>
+      <tr>
+        <td>vorherrschende Schriftart</td>
+        <td>
+          <select name="font" id="">
+            <option value=""></option>
+            <option value="Textur">Textur</option>
+            <option value="Rotunda">Rotunda</option>
+            <option value="Schwabacher">Schwabacher</option>
+            <option value="Fraktur">Fraktur</option>
+            <option value="Antiqua">Antiqua</option>
+            <option value="Handschrift">Handschrift</option>
+          </select>
+        </td>
+      </tr>
+      <tr id="textsource-row-1">
+  <td>
+    vorherrschende Sprache (1)
+    
+  </td>
+  <td>
+    <select name="language-1" id="" style="width:200px">
+      <option value=""></option>
+      
+        <option value="deu">(Früh-)Neuhochdeutsch</option>
+      
+        <option value="gmh">Mittelhochdeutsch</option>
+      
+        <option value="goh">Althochdeutsch</option>
+      
+        <option value="bar">Bayerisch</option>
+      
+        <option value="osx">Altsächsisch</option>
+      
+        <option value="sxu">Obersächsisch</option>
+      
+        <option value="swg">Schwäbisch</option>
+      
+        <option value="wae">Walser-Dialekt</option>
+      
+        <option value="gsw">Schweizerdeutsch, Allemannisch, Elsässisch</option>
+      
+        <option value="ydd">Ost-Jiddisch</option>
+      
+        <option value="ylh">West-Jiddisch</option>
+      
+        <option value="gml">Mittelniederdeutsch</option>
+      
+        <option value="nds">Niederdeutsch</option>
+      
+        <option value="lat">Latein</option>
+      
+    </select>
+  </td>
+</tr>
+
+      <tr id="after-language">
+        <td></td>
+        <td>
+          <button onclick="addLanguage(); return false">weitere Sprache</button>
+        </td>
+        <td></td>
+      </tr>
+      <tr id="genre-row-1">
+  <td>
+    Genre (1)
+    
+  </td>
+  <td>
+    <select name="genre-1" id="genre-1" class="genre">
+      <option></option>
+      <option>Belletristik</option>
+      <option>Sachliteratur</option>
+    </select>
+
+    <select name="genre-belletristik-1" id="subgenres-belletristik-1" style="display:none">
+      <option></option>
+      <option>Lyrik</option>
+      <option>Epik</option>
+      <option>Dramatik</option>
+    </select>
+
+    <select name="genre-sachliteratur-1" id="subgenres-sachliteratur-1" style="display:none">
+      <option></option>
+      <option>Gebrauchsliteratur</option>
+      <option>Fachliteratur</option>
+    </select>
+
+    <script type="text/javascript">
+      jQuery('#genre-1').change( function() {
+        var el = jQuery(this);
+        if ( el.val() == 'Sachliteratur' ) {
+          jQuery('#subgenres-sachliteratur-1').show();
+          jQuery('#subgenres-belletristik-1').hide();
+        }
+        else if ( el.val() == 'Belletristik' ) {
+          jQuery('#subgenres-sachliteratur-1').hide();
+          jQuery('#subgenres-belletristik-1').show();
+        }
+      });
+    </script>
+  </td>
+</tr>
+
+      <tr id="after-genre">
+        <td>Kategorien<sup>;</sup></td>
+        <!-- <td><input type="text" name="categories" id="categories" style="width:484px" /><a target="_blank" href="http://www.deutschestextarchiv.de/doku/klassifikation2"><img src="static/images/help.gif" /></a></td> -->
+        <td><input name="categories" id="categories" type="text" /></td>
+      </tr>
+      <tr>
+        <td>Schlagworte<sup>;</sup></td>
+        <td><input name="tags" id="tags" type="text" /></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <button onclick="addGenre(); return false">weiteres Genre</button>
+        </td>
+        <td></td>
+      </tr>
+    </table>
+  </fieldset>
+  <fieldset>
+    <legend>Anmerkungen</legend>
+    <textarea name="note" id="" rows="5" cols="" placeholder="Vorlage beschädigt (Wasserschaden); Text dadurch an einigen Stellen schwer entzifferbar"></textarea>
+  </fieldset>
+  <fieldset>
+    <legend>Optionen</legend>
+    <button disabled="disabled">Daten in DTAE speichern</button>
+    <button onclick="genTEIHeader(); return false">TEI-Header generieren</button>
+    <button onclick="dlTEIHeader(); return false">TEI-Header herunterladen</button>
+    <span id="tei-has-been-created" style="display:none">Der TEI-Header wird in unten stehendem Feld angezeigt.</span>
+    <div id="tei-not-valid" style="color:red"></div>
+  </fieldset>
+</form>
+{% endblock %}
+
+
+

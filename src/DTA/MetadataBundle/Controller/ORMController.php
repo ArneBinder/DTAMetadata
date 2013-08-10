@@ -226,12 +226,10 @@ class ORMController extends DTADomainController {
 
         switch( $result['transaction'] ){
             case "recordNotFound":
-                $this->get('session')->getFlashBag()->add(
-                        'error', 
-                        "Der gewünschte Datensatz kann nicht bearbeitet werden, weil er nicht gefunden wurde.");
+                $this->addErrorFlash("Der gewünschte Datensatz kann nicht bearbeitet werden, weil er nicht gefunden wurde.");
                 return $this->genericViewAllAction($package, $className, $result['recordId']);
             case "complete":
-                $this->get('session')->getFlashBag()->add('success', "Änderungen vorgenommen.");
+                $this->addSuccessFlash("Änderungen vorgenommen.");
                 return $this->genericViewAllAction($package, $className, $result['recordId']);
             case "edit":
             case "create":
@@ -317,14 +315,14 @@ class ORMController extends DTADomainController {
 
                     // add propel validation messages to flash bag
                     foreach ($obj->getValidationFailures() as $failure) {
-                        $this->get('session')->getFlashBag()->add('error', $failure->getMessage());
+                        $this->addErrorFlash($failure->getMessage());
                     }
                 }
             } else { // symfony form validation fails
 
                 // add symfony validation messages to flash bag
                 foreach ($form->getErrors() as $error) {
-                    $this->get('session')->getFlashBag()->add('error', $error->getMessage());
+                    $this->addErrorFlash($error->getMessage());
                 }
             }
         }
