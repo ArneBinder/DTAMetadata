@@ -1,6 +1,6 @@
 <?php
 
-namespace DTA\MetadataBundle\Form\Type;
+namespace DTA\MetadataBundle\Form\Classification;
 
 use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 class TagType extends BaseAbstractType
 {
     protected $options = array(
-        'data_class' => 'DTA\MetadataBundle\Model\Tag',
+        'data_class' => 'DTA\MetadataBundle\Model\Classification\Tag',
         'name'       => 'tag',
     );
 

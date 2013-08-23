@@ -7,7 +7,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use \DTA\MetadataBundle\Model;
 
 /**
- * Route prefix for all action routes, i.e. this page.
+ * Route prefix for all action routes.
+ * Must match the package name.
  * @Route("/Data")
  */
 class DataDomainController extends ORMController {
@@ -45,20 +46,27 @@ class DataDomainController extends ORMController {
             "caption" => "Verlage", 
             'modelClass' => 'Publishingcompany'),
     );
-        
+    
+    /**
+     * Dynamically generate the domain menu.
+     */
     public function __construct(){
         
+        // retrieve different person roles (Autor, Verleger, Drucker, etc.)        
         $personRoles = Model\Classification\PersonroleQuery::create()->find();
         foreach($personRoles as $pr ){
-            $this->domainMenu['person']['children'][] = array("caption" => $pr->getName(), "route" => "home");
+            $this->domainMenu['person']['children'][] = array(
+                "caption" => $pr->getName(), 
+                "route" => "showPersonsByRole", 
+                "parameters" => array('personRoleId'=>$pr->getId())
+            );
         }
 
-        // contains the php model class names for each publication type
-        // see dta_data_schema for explanations of the single types.
+        // render different publication types
+        // see dta_data_schema for explanations on the single types.
         $publicationTypes = array(
             "PublicationM","PublicationDm","PublicationMm","PublicationDs",
             "PublicationMs","PublicationJa","PublicationMms","PublicationJ");
-        
         foreach( $publicationTypes as $pt ){
             $this->domainMenu['publication']['children'][] = array("caption" => "", "modelClass" => $pt);
         }
@@ -69,9 +77,25 @@ class DataDomainController extends ORMController {
      * @Route("/", name="dataDomain")
      */
     public function indexAction() {
-        return $this->renderWithDomainData('DTAMetadataBundle:DataDomain:index.html.twig', array(
+        return $this->renderWithDomainData('DTAMetadataBundle:Package_Data:index.html.twig', array(
 //            "person" => "array_shift()" //$persont->getRelations() //count($p->getPersonalnames()->getArrayCopy())//[0]->__toString(),
             // get_declared_classes()
+        ));
+    }
+    
+    /**
+     * @Route("/showPersonsByRole/{personRoleId}", name="showPersonsByRole")
+     */
+    public function showPersonsByRoleAction() {
+        $records = Model\Data\PersonQuery::create()
+                ->joinPersonPublication()
+                ->findOne();
+                
+        return $this->renderWithDomainData('DTAMetadataBundle:ORM:genericView.html.twig', array(
+            'data' => $records,
+            'columns' => Model\Data\Person::getTableViewColumnNames(),
+            'className' => 'Person',
+//            'updatedObjectId' => 0,
         ));
     }
 
@@ -79,7 +103,7 @@ class DataDomainController extends ORMController {
      * @Route("/testCss", name="testCss")
      */
     public function testCSSAction() {
-        return $this->renderWithDomainData('DTAMetadataBundle:DataDomain:PublicationMForm.html.twig', array(
+        return $this->renderWithDomainData('DTAMetadataBundle:Package_Data:PublicationMForm.html.twig', array(
 //            "person" => "array_shift()" //$persont->getRelations() //count($p->getPersonalnames()->getArrayCopy())//[0]->__toString(),
             // get_declared_classes()
         ));

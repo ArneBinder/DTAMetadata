@@ -4,7 +4,7 @@
     The other data domain templates extend this one (this saves includes for the domain menu all the time).
 #}
 
-{% extends 'DTAMetadataBundle::base.html.twig' %}
+{% extends 'DTAMetadataBundle:Layout:base.html.twig' %}
 
 {% block title %}Daten{% endblock %}
 
@@ -64,6 +64,28 @@
         </td>
       </tr>
     </table>
+        <fieldset>
+        {# <span class="glyphicon glyphicon-minus"></span>&nbsp; #}
+        <legend data-toggle="collapse" data-target="#demo2">Einordnung der Vorlage </legend>
+        <div class="collapse in" id="demo2">
+        <table>
+          <tr>
+            <td>
+        <button onclick="fsToggle('fs-M'); return false" class="fs-button button-fs-M" disabled="disabled">Einteilige Monographie (M)</button><br />
+        <button onclick="fsToggle('fs-MM'); return false" class="fs-button button-fs-MM">Teil einer mehrbändigen Monographie (MM)</button><br />
+        <button onclick="fsToggle('fs-MS'); return false" class="fs-button button-fs-MS">Selbstständiger Band einer Reihe (MS)</button><br />
+        <button onclick="fsToggle('fs-MMS'); return false" class="fs-button button-fs-MMS">Teil einer mehrbändigen Monographie, die ihrerseits Teil einer Reihe ist (MMS)</button>
+            </td>
+            <td>
+        <button onclick="fsToggle('fs-DM'); return false" class="fs-button button-fs-DM">Unselbständiger Teil einer Monographie (z. B. Beitrag in Sammelband, Buchkapitel) (DM)</button><br />
+        <button onclick="fsToggle('fs-DS'); return false" class="fs-button button-fs-DS">Unselbständige Schrift in einem Band, der Teil einer Reihe ist (DS)</button><br />
+        <button onclick="fsToggle('fs-JA'); return false" class="fs-button button-fs-JA">Artikel einer Zeitschrift/Zeitung (JA)</button><br />
+        <button onclick="fsToggle('fs-J'); return false" class="fs-button button-fs-J">Zeitschriften-/Zeitungsausgabe (J)</button>
+            </td>
+          </tr>
+        </table>
+        </div>
+      </fieldset>
     </div>
   </fieldset>
   <fieldset>

@@ -6,6 +6,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use \Symfony\Component\Security\Core\SecurityContext;
 
+/**
+ * Route prefix for all action routes.
+ * Must match the package name.
+ * @Route("/Master")
+ */
 class MasterDomainController extends DTADomainController {
 
     /** @inheritdoc */
@@ -35,7 +40,7 @@ class MasterDomainController extends DTADomainController {
             $session->remove(SecurityContext::AUTHENTICATION_ERROR);
         }
 
-        return $this->render('DTAMetadataBundle::login.html.twig', array(
+        return $this->renderWithDomainData('DTAMetadataBundle:Package_Master:login.html.twig', array(
                     // last username entered by the user
                     'last_username' => $session->get(SecurityContext::LAST_USERNAME),
                     'error' => $error,
@@ -48,7 +53,7 @@ class MasterDomainController extends DTADomainController {
      */
     public function indexAction() {
 
-        return $this->render('DTAMetadataBundle:AdministrationDomain:index.html.twig', array(
+        return $this->renderWithDomainData('DTAMetadataBundle:Package_Master:index.html.twig', array(
                     'hash' => 200
                 ));
     }
@@ -173,7 +178,7 @@ class MasterDomainController extends DTADomainController {
         }
         
         
-        return $this->render('DTAMetadataBundle:AdministrationDomain:sourceMonitor.html.twig', array(
+        return $this->renderWithDomainData('DTAMetadataBundle:Package_Master:sourceMonitor.html.twig', array(
                 'columns' => $columns,
                 'entries' => $entities,
                 'strayTypes' => array('base', 'map', 'form'),

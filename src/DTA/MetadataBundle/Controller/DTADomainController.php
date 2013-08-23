@@ -14,25 +14,26 @@ use Symfony\Component\HttpFoundation\Response;
 class DTADomainController extends Controller {
 
     /**
-     * The variable to indicate in the base template which domain to highlight in the main menu. */
-    public static $domainKey = "";
+     * Indicates which model classes are handled by this domain. 
+     * Equals one of the namespaces defined in the xml schemata (Classification, Data, Master, Workflow) */
+    public $package = null;
 
     /**
-     * The options in the second menu, displayed right under the main (domain switch) menu.
+     * The options in the lower menu, displayed under the main menu.
      */
     public $domainMenu = array();
 
     /**
-     * Called by the _derived_ domain controllers. Automatically passes the domain key and menu of the derived class to the template.
-     * @param $template Template to use for rendering, e.g. site specific as DTAMetadataBundle:DataDomain:index.html.twig
+     * Called by the inheriting domain controllers. Automatically passes the model package name and domain menu of the derived class to the template.
+     * @param $template Template to use for rendering, e.g. site specific as DTAMetadataBundle:Package_Data:index.html.twig
      * @param $options The data for the template to render 
      */
     public function renderWithDomainData($template, array $options = array(), Response $response = NULL) {
 
         // these are overriden by the calling subclass
         $defaultDomainMenu = array(
+            'package' => $this->package,
             'domainMenu' => $this->domainMenu,
-            'domainKey' => $this->package,
         );
 
         // adds the domain menu to the options
@@ -42,6 +43,10 @@ class DTADomainController extends Controller {
         return $this->render($template, $options);
     }
     
+    /**
+     * Short cuts for adding session messages that report the state of some transaction.
+     * @param String $message The message to display
+     */
     public function addErrorFlash($message){
         $this->get('session')->getFlashBag()->add('error', $message);
     }

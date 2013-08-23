@@ -1,6 +1,6 @@
 <?php
 
-namespace DTA\MetadataBundle\Form\Type;
+namespace DTA\MetadataBundle\Form\Data;
 
 use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 class PublicationMmsType extends BaseAbstractType
 {
     protected $options = array(
-        'data_class' => 'DTA\MetadataBundle\Model\PublicationMMS',
+        'data_class' => 'DTA\MetadataBundle\Model\Data\PublicationMMS',
         'name'       => 'publicationmms',
     );
 

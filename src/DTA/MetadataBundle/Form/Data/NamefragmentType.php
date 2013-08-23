@@ -1,6 +1,6 @@
 <?php
 
-namespace DTA\MetadataBundle\Form\Type;
+namespace DTA\MetadataBundle\Form\Data;
 
 use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 class NamefragmentType extends BaseAbstractType {
 
     protected $options = array(
-        'data_class' => 'DTA\MetadataBundle\Model\Namefragment',
+        'data_class' => 'DTA\MetadataBundle\Model\Data\Namefragment',
         'name' => 'namefragment',
     );
 
@@ -18,7 +18,7 @@ class NamefragmentType extends BaseAbstractType {
     public function buildForm(FormBuilderInterface $builder, array $options) {
         $builder->add('namefragmenttype', 'model', array(
             'property' => 'Name',
-            'class' => 'DTA\MetadataBundle\Model\Namefragmenttype',
+            'class' => 'DTA\MetadataBundle\Model\Classification\Namefragmenttype',
         ));
         $builder->add('name', 'text');
         $builder->add('sortableRank', 'hidden');     

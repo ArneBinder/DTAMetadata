@@ -6,8 +6,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 /**
- * Route prefix for all action routes, i.e. this page.
- * @Route("/arbeitsfluss")
+ * Route prefix for all action routes.
+ * Must match the package name.
+ * @Route("/Workflow")
  */
 class WorkflowDomainController extends DTADomainController {
 
@@ -31,7 +32,7 @@ class WorkflowDomainController extends DTADomainController {
      */
     public function indexAction() {
 
-        return $this->render('DTAMetadataBundle:WorkflowDomain:index.html.twig', array(
+        return $this->renderWithDomainData('DTAMetadataBundle:Package_Workflow:index.html.twig', array(
                 ));
     }
 
@@ -39,7 +40,7 @@ class WorkflowDomainController extends DTADomainController {
      * @Route("/statistiken", name="reporting")
      */
     public function reportingAction() {
-        return $this->render('DTAMetadataBundle:WorkflowDomain:reporting.html.twig');
+        return $this->renderWithDomainData('DTAMetadataBundle:Package_Workflow:reporting.html.twig');
     }
 
 }

@@ -7,6 +7,10 @@ imports:
 # Precautionary include in case anyone should wish to register the DTA form types as services.
 # This would make them available in the form builders under aliases e.g. 'dynamicCollection', 'selectOrAdd', ...
     - { resource: '@DTAMetadataBundle/Resources/config/services.yml' }
+
+parameters:
+    # propel supports pgsql|mysql|sqlite|mssql|oracle
+    database_vendor: pgsql
     
 framework:
     #esi:             ~

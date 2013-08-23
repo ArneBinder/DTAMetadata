@@ -1,6 +1,6 @@
 <?php
 
-namespace DTA\MetadataBundle\Form\Type;
+namespace DTA\MetadataBundle\Form\Workflow;
 
 use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -10,7 +10,7 @@ use DTA\MetadataBundle\Form\DerivedType\SelectOrAddType;
 class TasktypeType extends BaseAbstractType
 {
     protected $options = array(
-        'data_class' => 'DTA\MetadataBundle\Model\Tasktype',
+        'data_class' => 'DTA\MetadataBundle\Model\Workflow\Tasktype',
         'name'       => 'tasktype',
     );
 
@@ -22,11 +22,11 @@ class TasktypeType extends BaseAbstractType
         $builder->add('name');
         $builder->add('parent', 'model', array(
             'property' => 'name',
-            'class' => 'DTA\MetadataBundle\Model\Tasktype',
+            'class' => 'DTA\MetadataBundle\Model\Workflow\Tasktype',
             'label' => 'Übergeordneter Arbeitsschritt',
         ));
 //        $builder->add('parent', new SelectOrAddType(), array(
-//            'class' => 'DTA\MetadataBundle\Model\Tasktype',
+//            'class' => 'DTA\MetadataBundle\Model\Workflow\Tasktype',
 //            'property' => 'Name',
 //            'label' => 'Übergeordneter Aufgabentyp',
 //        ));

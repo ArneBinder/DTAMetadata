@@ -9,23 +9,23 @@
             </a>
             <ul class="nav navbar-nav">
             {% block domainMenu %}
-                <li {% if domainKey == "Home" %} class='active' {% endif %} >
+                <li {% if package == "Home" %} class='active' {% endif %} >
                     <a href="{{ path('home') }}">
                         Startseite
                     </a></li>
-                <li {% if domainKey == "Data" %} class='active' {% endif %} >
+                <li {% if package == "Data" %} class='active' {% endif %} >
                     <a href="{{ path('dataDomain') }}">
                         Daten
                     </a></li>
-                <li {% if domainKey == "Classification" %} class='active' {% endif %} >
+                <li {% if package == "Classification" %} class='active' {% endif %} >
                     <a href="{{ path('conceptualDomain') }}">
                         Ordnungssysteme
                     </a></li>
-                <li {% if domainKey == "Workflow" %} class='active' {% endif %} >
+                <li {% if package == "Workflow" %} class='active' {% endif %} >
                     <a href="{{ path('workflowDomain') }}">
                         Arbeitsfluss
                     </a></li>
-                <li {% if domainKey == "Master" %} class='active' {% endif %} >
+                <li {% if package == "Master" %} class='active' {% endif %} >
                     <a href="{{ path('administrationDomain') }}">
                         Administration
                     </a>
@@ -48,7 +48,7 @@
         <div class="row-fluid" style='border-top: 1px solid #DDD;'>
         {% block currentDomainMenu %}
 
-            {% include 'DTAMetadataBundle::domainMenu.html.twig' %}
+            {% include 'DTAMetadataBundle:Layout:domainMenu.html.twig' %}
 
         {% endblock %}<!-- domain menu -->
         </div><!--/.row-fluid -->

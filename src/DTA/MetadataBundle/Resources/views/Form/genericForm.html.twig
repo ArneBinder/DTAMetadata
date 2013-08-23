@@ -2,10 +2,10 @@
     The dynamic extend is for extending the template of the currently active domain,
     which is basically for embedding the correct domain menu 
     (tasks, reporting, ... for workflow, publications, persons, ... for data, etc).
-    The domainKey value is automatically passed by the renderWithDomainMenu method
+    The package value is automatically passed by the renderWithDomainMenu method
     of the DTABaseController, which 
     The referenced index.html.twig files are located in 
-        src/DTA/MetadataBundle/Resources/views/<domainKey>/index.html.twig
+        src/DTA/MetadataBundle/Resources/views/<package>/index.html.twig
 
     The reason why this is an extra template is that the autoform template can render
     a bare form, which makes it reusable for ajax form requests.
@@ -13,14 +13,14 @@
     the page footer, etc. via this template.
 
 #}
-{% extends 'DTAMetadataBundle:'~ domainKey ~':index.html.twig' %}
+{% extends 'DTAMetadataBundle:Layout:base.html.twig' %}
 
 {% block core %}
 
     {# renders "<className> bearbeiten" as headline of the form #}
     <h3> {{className|trans}} {{ "form." ~ transaction ~ ".suffix"|trans }} </h3>
 
-    {% set actionTarget = path('viewRecord', {'domainKey': domainKey, 'className':className, 'recordId':recordId}) %}
+    {% set actionTarget = path('viewRecord', {'package': package, 'className':className, 'recordId':recordId}) %}
     <form action="{{ actionTarget }}" method="post" {{ form_enctype(form) }} class="form-horizontal">
             
         {% include 'DTAMetadataBundle:Form:autoform.html.twig' %}

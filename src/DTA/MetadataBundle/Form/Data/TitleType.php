@@ -1,6 +1,6 @@
 <?php
 
-namespace DTA\MetadataBundle\Form\Type;
+namespace DTA\MetadataBundle\Form\Data;
 
 use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -10,7 +10,7 @@ use \DTA\MetadataBundle\Form;
 class TitleType extends BaseAbstractType {
 
     protected $options = array(
-        'data_class' => 'DTA\MetadataBundle\Model\Title',
+        'data_class' => 'DTA\MetadataBundle\Model\Data\Title',
         'name' => 'title',
     );
 

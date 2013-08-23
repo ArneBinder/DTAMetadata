@@ -5,6 +5,11 @@ namespace DTA\MetadataBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
+/**
+ * Route prefix for all action routes.
+ * Must match the package name.
+ * @Route("/Classification")
+ */
 class ClassificationDomainController extends DTADomainController {
 
     /** @inheritdoc */
@@ -31,7 +36,7 @@ class ClassificationDomainController extends DTADomainController {
      */
     public function indexAction() {
 
-        return $this->render('DTAMetadataBundle:ConceptualDomain:index.html.twig', array(
+        return $this->renderWithDomainData('DTAMetadataBundle:Package_Classification:index.html.twig', array(
         ));
     }
 

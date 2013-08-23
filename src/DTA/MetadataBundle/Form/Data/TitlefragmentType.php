@@ -1,6 +1,6 @@
 <?php
 
-namespace DTA\MetadataBundle\Form\Type;
+namespace DTA\MetadataBundle\Form\Data;
 
 use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 class TitlefragmentType extends BaseAbstractType {
 
     protected $options = array(
-        'data_class' => 'DTA\MetadataBundle\Model\Titlefragment',
+        'data_class' => 'DTA\MetadataBundle\Model\Data\Titlefragment',
         'name' => 'titlefragment',
     );
     
@@ -18,7 +18,7 @@ class TitlefragmentType extends BaseAbstractType {
     public function buildForm(FormBuilderInterface $builder, array $options) {
         $builder->add('titlefragmenttype', 'model', array(
             'property' => 'name',
-            'class' => 'DTA\MetadataBundle\Model\Titlefragmenttype',
+            'class' => 'DTA\MetadataBundle\Model\Classification\Titlefragmenttype',
         ));
         
         $builder->add('name', 'text');

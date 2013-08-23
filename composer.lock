@@ -512,16 +512,16 @@
         },
         {
             "name": "phing/phing",
-            "version": "2.5.0",
+            "version": "2.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phingofficial/phing.git",
-                "reference": "2.5.0"
+                "reference": "5500c5012520203523fd4ea05dabf1f51c331267"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phingofficial/phing/zipball/2.5.0",
-                "reference": "2.5.0",
+                "url": "https://api.github.com/repos/phingofficial/phing/zipball/5500c5012520203523fd4ea05dabf1f51c331267",
+                "reference": "5500c5012520203523fd4ea05dabf1f51c331267",
                 "shasum": ""
             },
             "require": {
@@ -560,7 +560,7 @@
                 "task",
                 "tool"
             ],
-            "time": "2013-02-16 14:23:57"
+            "time": "2013-08-21 08:31:44"
         },
         {
             "name": "propel/propel-bundle",

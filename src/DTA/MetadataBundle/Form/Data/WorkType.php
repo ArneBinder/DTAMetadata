@@ -1,6 +1,6 @@
 <?php
 
-namespace DTA\MetadataBundle\Form\Type;
+namespace DTA\MetadataBundle\Form\Data;
 
 use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -11,10 +11,15 @@ use Symfony\Component\Form\FormInterface;
 use DTA\MetadataBundle\Form\DerivedType\SelectOrAddType;
 use DTA\MetadataBundle\Form\DerivedType\DynamicCollectionType;
 
+use DTA\MetadataBundle\Form\Master;
+use DTA\MetadataBundle\Form\Data;
+use DTA\MetadataBundle\Form\Workflow;
+use DTA\MetadataBundle\Form\Classification;
+
 class WorkType extends BaseAbstractType
 {
     protected $options = array(
-        'data_class' => 'DTA\MetadataBundle\Model\Work',
+        'data_class' => 'DTA\MetadataBundle\Model\Data\Work',
         'name'       => 'work',
     );
 
@@ -24,11 +29,11 @@ class WorkType extends BaseAbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('title', new TitleType());
-        $builder->add('datespecification', new DatespecificationType(), array(
+        $builder->add('datespecification', new Data\DatespecificationType(), array(
             'label' => 'Entstehungsjahr, f.a.'
         ));
         $builder->add('PersonWorks', new DynamicCollectionType(), array(
-            'type' => new PersonWorkType(),
+            'type' => new Master\PersonWorkType(),
             'inlineLabel' => false,
             'sortable' => false,
             'label' => 'Werkbezogene Personalia',
@@ -46,7 +51,7 @@ class WorkType extends BaseAbstractType
 //            'label' => 'Kategorien',
 //        ));
         $builder->add('CategoryWorks', new DynamicCollectionType(), array(
-            'type' => new CategoryWorkType(),
+            'type' => new Master\CategoryWorkType(),
             'inlineLabel' => false,
             'sortable' => false,
             'label' => 'Kategorien',
@@ -54,7 +59,7 @@ class WorkType extends BaseAbstractType
         ));
         
 //        $builder->add('Categories', new SelectOrAddForType(array(
-//                    'class' => '\DTA\MetadataBundle\Model\Category',
+//                    'class' => '\DTA\MetadataBundle\Model\Data\Category',
 //                    'property' => 'Name',
 //                    'multiple' => true,
 //                )),array());
@@ -63,7 +68,7 @@ class WorkType extends BaseAbstractType
  * @todo A more compact version using the select2 capabilities is strongly desirable.
  */
 //        $builder->add('categories', new SelectOrAddType(), array(
-//            'class' => '\DTA\MetadataBundle\Model\Category',
+//            'class' => '\DTA\MetadataBundle\Model\Data\Category',
 //            'property' => 'Name',
 //            'multiple' => true,
 //        ));

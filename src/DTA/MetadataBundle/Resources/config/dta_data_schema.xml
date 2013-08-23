@@ -104,8 +104,8 @@
     
     <table name="printrun">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column description="Bezeichnung" name="name"  type="LONGVARCHAR" required="false"/>
-        <column description="Numerische Bezeichnung der Ausgabe" name="numeric" type="INTEGER" required="false"/>
+        <column name="name" type="LONGVARCHAR" required="false" description="Bezeichnung" />
+        <column name="numeric" type="INTEGER" required="false" description="Numerische Bezeichnung der Ausgabe" />
         <column name="numpages" type="INTEGER" required="false"/>
         <column name="numpagesnormed" type="INTEGER" required="false"/>
     </table>

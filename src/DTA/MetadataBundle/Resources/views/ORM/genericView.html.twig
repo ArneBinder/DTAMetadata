@@ -4,7 +4,7 @@
     implement a getId method for highlighting 
  #}
 
-{% extends 'DTAMetadataBundle:'~ domainKey ~'Domain:index.html.twig' %}
+{% extends 'DTAMetadataBundle:Layout:base.html.twig' %}
 
 {% block title %} Zeige: {{ className|trans }} {% endblock %}
 
@@ -15,7 +15,7 @@
 
     <h3>{{ className|trans }}
         {# add entity button  #}
-        <a class="btn btn-mini listView-add-button pull-right" href="{{ path('genericCreateOrEdit', {'package':domainKey, 'className':className}) }}">
+        <a class="btn btn-mini listView-add-button pull-right" href="{{ path('genericCreateOrEdit', {'package':package, 'className':className}) }}">
             <i class="icon-plus"></i>
             {{ className|trans~"listView.add.row.buttonSuffix"|trans }}
         </a>
@@ -45,12 +45,12 @@
                 {# Display edit buttons instead of Ids #}
                 <td>
                     <a name="record{{recordId}}" class="btn btn-mini" 
-                       href="{{ path('viewRecord', {'domainKey':domainKey, 'className':className, 'recordId':recordId}) }}">
+                       href="{{ path('genericCreateOrEdit', {'package':package, 'className':className, 'recordId':recordId}) }}">
                         <i class="icon-pencil"></i>
                         {{ "listView.edit.row.buttonSuffix"|trans }} {#className|trans~#}
                     </a>
                     <a name="record{{recordId}}" class="btn btn-mini" 
-                       href="{{ path('deleteRecord', {'domainKey':domainKey, 'className':className, 'recordId':recordId }) }}">
+                       href="{{ path('deleteRecord', {'package':package, 'className':className, 'recordId':recordId }) }}">
                         <i class="icon-warning-sign"></i>
                         löschen {#className|trans~#}
                     </a>
@@ -65,7 +65,7 @@
 
 {# full width button to add entities 
                 <tr> <td colspan="20">
-                    <a class="btn btn-mini listView-add-button" href="{{ path('genericNew', {'domainKey':domainKey, 'className':className}) }}">
+                    <a class="btn btn-mini listView-add-button" href="{{ path('genericNew', {'package':package, 'className':className}) }}">
                         <i class="icon-pencil"></i>
                         {{ className|trans~"listView.add.row.buttonSuffix"|trans }}
                     </a>

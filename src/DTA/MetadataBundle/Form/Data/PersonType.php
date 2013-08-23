@@ -1,6 +1,6 @@
 <?php
 
-namespace DTA\MetadataBundle\Form\Type;
+namespace DTA\MetadataBundle\Form\Data;
 
 use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -9,7 +9,7 @@ use \DTA\MetadataBundle\Form;
 class PersonType extends BaseAbstractType {
 
     protected $options = array(
-        'data_class' => 'DTA\MetadataBundle\Model\Person',
+        'data_class' => 'DTA\MetadataBundle\Model\Data\Person',
         'name' => 'person',
     );
 
