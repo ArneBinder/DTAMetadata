@@ -282,7 +282,7 @@
             <parameter name="zugeordnet (personen-id)" value="person_id"/>
             <parameter name="reihenfolge" value="accessor:getSortableRank"/>
         </behavior>
-        <foreign-key foreignTable="person"> <reference local="person_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="person" onDelete="cascade"> <reference local="person_id" foreign="id"/> </foreign-key>
     </table>
     
     <!-- Namensfragmente sind Bestandteile eines Namens, z.B. Vor- oder Nachname. -->
@@ -303,7 +303,7 @@
         </behavior>
         
         <foreign-key foreignTable="namefragmenttype"> <reference local="namefragmenttypeid" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="personalname"> <reference local="personalname_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="personalname" onDelete="cascade"> <reference local="personalname_id" foreign="id"/> </foreign-key>
     </table>
     <table name="title">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
@@ -319,7 +319,7 @@
         <column name="name" type="LONGVARCHAR" required="true"/>
         <column name="title_id" type="INTEGER" required="true"/>
         <column name="titlefragmenttype_id" type="INTEGER" required="true"/>
-        <foreign-key foreignTable="title"> <reference local="title_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="title" onDelete="cascade"> <reference local="title_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="titlefragmenttype"> <reference local="titlefragmenttype_id" foreign="id"/> </foreign-key>
         
         <behavior name="sortable">
