@@ -1,0 +1,103 @@
+{# Renders all database entities of a certain type.
+    
+    Assumes that the objects stored in data are propel objects, or, more specifically
+    implement a getId method for highlighting 
+ #}
+
+{% extends 'DTAMetadataBundle:Layout:base.html.twig' %}
+{% import "DTAMetadataBundle:form:buildingBlocks.html.twig" as dta %}
+
+{% block title %} Zeige: {{ className|trans }} {% endblock %}
+
+{% block core %}
+
+{# dta-data-listing: The sidebar is overflown if the table is too wide, so add scrollbars. #}
+<div class="span12 dta-data-listing">
+
+    <h3>{{ className|trans }}
+        {# add entity button  #}
+        <a class="btn btn-mini listView-add-button pull-right" href="{{ path('genericCreateOrEdit', {'package':package, 'className':className}) }}">
+            <i class="icon-plus"></i>
+            {{ className|trans~"listView.add.row.buttonSuffix"|trans }}
+        </a>
+    </h3>
+    
+    <table class="table table-striped table-hover"> {# further bootstrap table classes: table-hover #}
+        
+        <thead>
+            {% for col in columns %}    
+                <th> {{ col|trans }} </th>
+            {% endfor %}
+            <th>Datensatz bearbeiten{#{ "listView.editColumn.caption"|trans }#}</th>
+        </thead>
+        
+        <tbody>
+        {% for datum in data %}
+            {# all propel objects implement this method #}
+            {% set recordId = attribute(datum, "getId") %}
+            {# highlight affected record #}
+            <tr {% if recordId == updatedObjectId %}class="success"{% endif %}>
+            
+            {% for col in columns %}
+                <td>
+                    {{ datum.getAttributeByTableViewColumName(col) }}
+                </td>
+            {% endfor %}
+                {# Display edit buttons instead of Ids #}
+                <td>
+                    <a name="record{{recordId}}" class="btn btn-mini" 
+                       href="{{ path('genericCreateOrEdit', {'package':package, 'className':className, 'recordId':recordId}) }}">
+                        <i class="icon-pencil"></i>
+                        {{ "listView.edit.row.buttonSuffix"|trans }} {#className|trans~#}
+                    </a>
+                    <a data-toggle="modal" href="#confirmDeleteModal{{recordId}}" class="btn btn-mini glyphicon glyphicon-remove">
+                        <i class="icon-warning-sign"></i>
+                        löschen {#className|trans~#}
+                    </a>
+                    {{ dta.beginModal('Achtung!','confirmDeleteModal'~recordId)}}
+                        Den Datensatz {{recordId}} wirklich löschen?
+                    {{ dta.endModal({
+                        'target':
+                         path('deleteRecord', {'package':package, 'className':className, 'recordId':recordId }),
+                        'caption':'Löschen'}) }}
+                        
+
+                </td>
+            </tr>
+        {% endfor %}
+        
+        </tbody>
+    </table>
+    
+</div>
+
+{% import "DTAMetadataBundle:form:buildingBlocks.html.twig" as dta %}
+
+
+<!--/span-->
+
+{# full width button to add entities 
+                <tr> <td colspan="20">
+                    <a class="btn btn-mini listView-add-button" href="{{ path('genericNew', {'package':package, 'className':className}) }}">
+                        <i class="icon-pencil"></i>
+                        {{ className|trans~"listView.add.row.buttonSuffix"|trans }}
+                    </a>
+            </td></tr> #}
+
+{#
+<div class="span4 dta-data-filter-box">
+
+    <h3>Suchoptionen</h3>
+    
+    <div class="sidebar-nav well">
+        <ul class="nav nav-list">
+            {% for col in columns %}
+                {% if col != '#' and col|capitalize != 'Id'|capitalize %}
+                <li><i class="icon-chevron-right" onmouseover="$(this).toggleClass('icon-chevron-right').toggleClass('icon-chevron-down')"></i>{{ col|trans }}</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div><!--/.well -->
+</div><!--/span-->
+#}
+{% endblock core %}
