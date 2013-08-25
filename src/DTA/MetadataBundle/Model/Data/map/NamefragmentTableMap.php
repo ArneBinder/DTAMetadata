@@ -57,7 +57,7 @@ class NamefragmentTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Namefragmenttype', 'DTA\\MetadataBundle\\Model\\Classification\\Namefragmenttype', RelationMap::MANY_TO_ONE, array('namefragmenttypeid' => 'id', ), null, null);
-        $this->addRelation('Personalname', 'DTA\\MetadataBundle\\Model\\Data\\Personalname', RelationMap::MANY_TO_ONE, array('personalname_id' => 'id', ), null, null);
+        $this->addRelation('Personalname', 'DTA\\MetadataBundle\\Model\\Data\\Personalname', RelationMap::MANY_TO_ONE, array('personalname_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
     /**

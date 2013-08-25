@@ -11,6 +11,7 @@ use \PropelException;
 use \PropelPDO;
 use DTA\MetadataBundle\Model\Data\Title;
 use DTA\MetadataBundle\Model\Data\TitlePeer;
+use DTA\MetadataBundle\Model\Data\TitlefragmentPeer;
 use DTA\MetadataBundle\Model\Data\map\TitleTableMap;
 
 abstract class BaseTitlePeer
@@ -362,6 +363,9 @@ abstract class BaseTitlePeer
      */
     public static function clearRelatedInstancePool()
     {
+        // Invalidate objects in TitlefragmentPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        TitlefragmentPeer::clearInstancePool();
     }
 
     /**

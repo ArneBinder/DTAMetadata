@@ -24,7 +24,7 @@
         
         {% set submitURL = path('genericNew', newActionParameters) %}
         <form action="{{ submitURL }}" method="post" {{ form_enctype(form) }} class="form-horizontal">
-            {% include 'DTAMetadataBundle:Form:autoform.html.twig' with {'className': newActionParameters.className }%}
+            {% include 'DTAMetadataBundle:Form:genericBaseForm.html.twig' with {'className': newActionParameters.className }%}
         </form>
 
         {#<button class="btn" data-toggle="modal" href="#stack2">Launch modal</button>#}

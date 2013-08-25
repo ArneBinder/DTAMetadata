@@ -22,20 +22,24 @@
     {{ form_row(form, {'expanded':true}) }}
 {% endblock %}
 
+{% block printrun_row %}
+    {{ form_row(form, {'inlineChildren':true }) }}
+{% endblock %}
+
 {# --------------------- Space and Time --------------------- #}
 
 {% block datespecification_row %}
-    {{ form_row(form, {'inlineControls':true }) }}
+    {{ form_row(form, {'inlineChildren':true }) }}
 {% endblock %}
 
 {# --------------------- Title --------------------- #}
 
 {% block title_row %}
-    {{ form_row(form, {'inlineLabel':false}) }}
+    {{ form_row(form, {'inlineLabel':false,'hideLabel':false}) }}
 {% endblock %}
 
 {% block titlefragment_row %}
-    <div class="control-group form-inline">
+    <div class="form-group form-inline">
             {{ form_widget(form.titlefragmenttype)}}
             {{ form_widget(form.name,{'attr':{'class':'medium-text'} }) }} 
             <br/>
@@ -57,7 +61,7 @@
 {% endblock %}
 
 {% block namefragment_row %}
-    <div class="control-group form-inline">
+    <div class="form-group form-inline">
             {{ form_widget(form.namefragmenttype)}}
             {{ form_widget(form.name) }} 
             {{ form_rest(form) }}
@@ -67,23 +71,21 @@
 {# --------------------- Person / Work / Publication Relations --------------------- #}
 
 {% block personwork_row %}
-    <div class="control-group form-inline">
+    <div class="form-group form-inline">
         {{ form_row(form.personrole, {'inlineLabel':true,'hideLabel':true}) }}
         {{ form_row(form.person, {'hideLabel':true,'inlineLabel':true}) }}
     </div>
 {% endblock %}
 {% block personpublication_row %}
-    <div class="control-group form-inline">
         {{ form_row(form.personrole, {'inlineLabel':true,'hideLabel':true}) }}
         {{ form_row(form.person, {'hideLabel':true,'inlineLabel':true}) }}
-    </div>
 {% endblock %}
 {% block categorywork_row %}
-     {{ form_row(form, {'inlineLabel':true, 'hideLabel':true, 'inlineControls': true}) }}
+     {{ form_row(form, {'inlineLabel':true, 'hideLabel':true, 'inlineChildren': true}) }}
 {% endblock %}
 
 {% block category_row %}
-    <div class="control-group form-inline">
-        {{ form_row(form, {'inlineLabel':true, 'hideLabel':true, 'inlineControls': true}) }}
+    <div class="form-group form-inline">
+        {{ form_row(form, {'inlineLabel':true, 'hideLabel':true, 'inlineChildren': true}) }}
     </div>
 {% endblock %}

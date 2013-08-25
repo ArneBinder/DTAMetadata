@@ -73,6 +73,10 @@ class ORMController extends DTADomainController {
      */
     public function genericDeleteOneAction(Request $request, $package, $className, $recordId) {
 
+        if($this->package === null){
+            return $this->useSpecializedImplementation($package, __METHOD__, array('request'=>$request, 'package'=>$package, 'className'=>$className, 'recordId' => $recordId));
+        }
+        
         // get confirmation
         if ( ! $request->isMethod("POST")) {
 
@@ -87,7 +91,7 @@ class ORMController extends DTADomainController {
             // confirmed
             if( $request->get("reallyDelete") ){                                    // && $request->get('recordId')
                 
-                $classNames = $this->relatedClassNames($className);
+                $classNames = $this->relatedClassNames($package, $className);
                 $query = new $classNames['query'];
                 $record = $query->findOneById($recordId);
                 
@@ -150,7 +154,7 @@ class ORMController extends DTADomainController {
      * @param string $className    model class
      * @Route(
      *      "{package}/showAll/{className}", 
-     *      name = "genericView"
+     *      name = "genericViewAll"
      * )
      */
     public function genericViewAllAction($package, $className, $updatedObjectId = 0) {
@@ -169,7 +173,7 @@ class ORMController extends DTADomainController {
         
         $records = $query->orderById()->find();
         
-        return $this->renderWithDomainData("DTAMetadataBundle:ORM:genericView.html.twig", array(
+        return $this->renderWithDomainData("DTAMetadataBundle:ORM:genericViewAll.html.twig", array(
                     'className' => $className,
                     'columns' => $modelClass::getTableViewColumnNames(),
                     'data' => $records,
@@ -238,8 +242,8 @@ class ORMController extends DTADomainController {
                         $preSaveLogic();
                     }
                     
-//                  $this->saveRecursively($form);
-                    $obj->save();
+                    $this->saveRecursively($form);
+//                    $obj->save();
                     
                     // return edited/created entity ID as transaction success receipt
                     return array(
@@ -303,13 +307,16 @@ class ORMController extends DTADomainController {
         switch( $result['transaction'] ){
             case "recordNotFound":
                 $this->addErrorFlash("Der gewünschte Datensatz kann nicht bearbeitet werden, weil er nicht gefunden wurde.");
-                return $this->genericViewAllAction($package, $className, $result['recordId']);
+                $target = $this->generateUrl('genericViewAll',array('package'=>$package, 'className'=>$className));
+                
+                return $this->redirect($target);
             case "complete":
                 $this->addSuccessFlash("Änderungen vorgenommen.");
-                return $this->genericViewAllAction($package, $className, $result['recordId']);
+                $target = $this->generateUrl('genericViewAll',array('package'=>$package, 'className'=>$className));
+                return $this->redirect($target);
             case "edit":
             case "create":
-                return $this->renderWithDomainData("DTAMetadataBundle:Form:genericForm.html.twig", array(
+                return $this->renderWithDomainData("DTAMetadataBundle:ORM:createOrEdit.html.twig", array(
                     'form' => $result['form']->createView(),
                     'transaction' => $result['transaction'],    // whether the form is for edit or create
                     'className' => $className,
@@ -360,7 +367,7 @@ class ORMController extends DTADomainController {
                 $entity->save();
         }
 
-        foreach ($form->getChildren() as $child) {
+        foreach ($form->all() as $child) {
             $this->saveRecursively($child);
         }
     }

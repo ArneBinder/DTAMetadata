@@ -41,12 +41,6 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
     protected $startCopy = false;
 
     /**
-     * The value for the id field.
-     * @var        int
-     */
-    protected $id;
-
-    /**
      * The value for the publicationgroup_id field.
      * @var        int
      */
@@ -57,6 +51,12 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
      * @var        int
      */
     protected $publication_id;
+
+    /**
+     * The value for the id field.
+     * @var        int
+     */
+    protected $id;
 
     /**
      * @var        Publicationgroup
@@ -91,16 +91,6 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
     // table_row_view behavior
     public static $tableRowViewCaptions = array();	public   $tableRowViewAccessors = array();
     /**
-     * Get the [id] column value.
-     *
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
      * Get the [publicationgroup_id] column value.
      *
      * @return int
@@ -121,25 +111,14 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
     }
 
     /**
-     * Set the value of [id] column.
+     * Get the [id] column value.
      *
-     * @param int $v new value
-     * @return PublicationPublicationgroup The current object (for fluent API support)
+     * @return int
      */
-    public function setId($v)
+    public function getId()
     {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->id !== $v) {
-            $this->id = $v;
-            $this->modifiedColumns[] = PublicationPublicationgroupPeer::ID;
-        }
-
-
-        return $this;
-    } // setId()
+        return $this->id;
+    }
 
     /**
      * Set the value of [publicationgroup_id] column.
@@ -192,6 +171,27 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
     } // setPublicationId()
 
     /**
+     * Set the value of [id] column.
+     *
+     * @param int $v new value
+     * @return PublicationPublicationgroup The current object (for fluent API support)
+     */
+    public function setId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->id !== $v) {
+            $this->id = $v;
+            $this->modifiedColumns[] = PublicationPublicationgroupPeer::ID;
+        }
+
+
+        return $this;
+    } // setId()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -223,9 +223,9 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
     {
         try {
 
-            $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-            $this->publicationgroup_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-            $this->publication_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+            $this->publicationgroup_id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
+            $this->publication_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+            $this->id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -467,16 +467,30 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
         $modifiedColumns = array();
         $index = 0;
 
+        $this->modifiedColumns[] = PublicationPublicationgroupPeer::ID;
+        if (null !== $this->id) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . PublicationPublicationgroupPeer::ID . ')');
+        }
+        if (null === $this->id) {
+            try {
+                $stmt = $con->query("SELECT nextval('publication_publicationgroup_id_seq')");
+                $row = $stmt->fetch(PDO::FETCH_NUM);
+                $this->id = $row[0];
+            } catch (Exception $e) {
+                throw new PropelException('Unable to get sequence id.', $e);
+            }
+        }
+
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(PublicationPublicationgroupPeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '"id"';
-        }
         if ($this->isColumnModified(PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID)) {
             $modifiedColumns[':p' . $index++]  = '"publicationgroup_id"';
         }
         if ($this->isColumnModified(PublicationPublicationgroupPeer::PUBLICATION_ID)) {
             $modifiedColumns[':p' . $index++]  = '"publication_id"';
+        }
+        if ($this->isColumnModified(PublicationPublicationgroupPeer::ID)) {
+            $modifiedColumns[':p' . $index++]  = '"id"';
         }
 
         $sql = sprintf(
@@ -489,14 +503,14 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '"id"':
-                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
-                        break;
                     case '"publicationgroup_id"':
                         $stmt->bindValue($identifier, $this->publicationgroup_id, PDO::PARAM_INT);
                         break;
                     case '"publication_id"':
                         $stmt->bindValue($identifier, $this->publication_id, PDO::PARAM_INT);
+                        break;
+                    case '"id"':
+                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -644,13 +658,13 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
     {
         switch ($pos) {
             case 0:
-                return $this->getId();
-                break;
-            case 1:
                 return $this->getPublicationgroupId();
                 break;
-            case 2:
+            case 1:
                 return $this->getPublicationId();
+                break;
+            case 2:
+                return $this->getId();
                 break;
             default:
                 return null;
@@ -675,15 +689,15 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
      */
     public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['PublicationPublicationgroup'][serialize($this->getPrimaryKey())])) {
+        if (isset($alreadyDumpedObjects['PublicationPublicationgroup'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['PublicationPublicationgroup'][serialize($this->getPrimaryKey())] = true;
+        $alreadyDumpedObjects['PublicationPublicationgroup'][$this->getPrimaryKey()] = true;
         $keys = PublicationPublicationgroupPeer::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getId(),
-            $keys[1] => $this->getPublicationgroupId(),
-            $keys[2] => $this->getPublicationId(),
+            $keys[0] => $this->getPublicationgroupId(),
+            $keys[1] => $this->getPublicationId(),
+            $keys[2] => $this->getId(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aPublicationgroup) {
@@ -727,13 +741,13 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
     {
         switch ($pos) {
             case 0:
-                $this->setId($value);
-                break;
-            case 1:
                 $this->setPublicationgroupId($value);
                 break;
-            case 2:
+            case 1:
                 $this->setPublicationId($value);
+                break;
+            case 2:
+                $this->setId($value);
                 break;
         } // switch()
     }
@@ -759,9 +773,9 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
     {
         $keys = PublicationPublicationgroupPeer::getFieldNames($keyType);
 
-        if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setPublicationgroupId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setPublicationId($arr[$keys[2]]);
+        if (array_key_exists($keys[0], $arr)) $this->setPublicationgroupId($arr[$keys[0]]);
+        if (array_key_exists($keys[1], $arr)) $this->setPublicationId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setId($arr[$keys[2]]);
     }
 
     /**
@@ -773,9 +787,9 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
     {
         $criteria = new Criteria(PublicationPublicationgroupPeer::DATABASE_NAME);
 
-        if ($this->isColumnModified(PublicationPublicationgroupPeer::ID)) $criteria->add(PublicationPublicationgroupPeer::ID, $this->id);
         if ($this->isColumnModified(PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID)) $criteria->add(PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID, $this->publicationgroup_id);
         if ($this->isColumnModified(PublicationPublicationgroupPeer::PUBLICATION_ID)) $criteria->add(PublicationPublicationgroupPeer::PUBLICATION_ID, $this->publication_id);
+        if ($this->isColumnModified(PublicationPublicationgroupPeer::ID)) $criteria->add(PublicationPublicationgroupPeer::ID, $this->id);
 
         return $criteria;
     }
@@ -792,38 +806,28 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
     {
         $criteria = new Criteria(PublicationPublicationgroupPeer::DATABASE_NAME);
         $criteria->add(PublicationPublicationgroupPeer::ID, $this->id);
-        $criteria->add(PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID, $this->publicationgroup_id);
-        $criteria->add(PublicationPublicationgroupPeer::PUBLICATION_ID, $this->publication_id);
 
         return $criteria;
     }
 
     /**
-     * Returns the composite primary key for this object.
-     * The array elements will be in same order as specified in XML.
-     * @return array
+     * Returns the primary key for this object (row).
+     * @return int
      */
     public function getPrimaryKey()
     {
-        $pks = array();
-        $pks[0] = $this->getId();
-        $pks[1] = $this->getPublicationgroupId();
-        $pks[2] = $this->getPublicationId();
-
-        return $pks;
+        return $this->getId();
     }
 
     /**
-     * Set the [composite] primary key.
+     * Generic method to set the primary key (id column).
      *
-     * @param array $keys The elements of the composite key (order must match the order in XML file).
+     * @param  int $key Primary key.
      * @return void
      */
-    public function setPrimaryKey($keys)
+    public function setPrimaryKey($key)
     {
-        $this->setId($keys[0]);
-        $this->setPublicationgroupId($keys[1]);
-        $this->setPublicationId($keys[2]);
+        $this->setId($key);
     }
 
     /**
@@ -833,7 +837,7 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
     public function isPrimaryKeyNull()
     {
 
-        return (null === $this->getId()) && (null === $this->getPublicationgroupId()) && (null === $this->getPublicationId());
+        return null === $this->getId();
     }
 
     /**
@@ -849,7 +853,6 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setId($this->getId());
         $copyObj->setPublicationgroupId($this->getPublicationgroupId());
         $copyObj->setPublicationId($this->getPublicationId());
 
@@ -866,6 +869,7 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
 
         if ($makeNew) {
             $copyObj->setNew(true);
+            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1018,9 +1022,9 @@ abstract class BasePublicationPublicationgroup extends BaseObject implements Per
      */
     public function clear()
     {
-        $this->id = null;
         $this->publicationgroup_id = null;
         $this->publication_id = null;
+        $this->id = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;

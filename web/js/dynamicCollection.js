@@ -32,7 +32,7 @@ function createGui(){
     });
 
     // formInfo is set within the formWrapper template
-    if(formInfo.action == 'new'){
+    if(typeof formInfo != 'undefined' && formInfo.action == 'new'){
         // create default fragment for empty collections
         var holders = $('.dynamic-collection.list').parent();
         $('a.add-entity', holders).click();

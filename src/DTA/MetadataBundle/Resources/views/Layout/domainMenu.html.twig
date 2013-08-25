@@ -65,7 +65,11 @@
                     {% elseif child.modelClass is defined %}
                     {# If the menu element is a model class, add view and create options #}
                     <li>
-                        <a href="{{ path('genericView', {'package':package, 'className':child.modelClass}) }}">{{ child.caption|default(child.modelClass|trans)}}</a>
+                        <a href="{{ path('genericViewAll', {'package':package, 'className':child.modelClass}) }}">
+                            {{ child.caption|default(child.modelClass|trans)}} 
+                            {#<span class="glyphicon glyphicon-plus pull-right"></span>
+                            <span class="glyphicon glyphicon-list pull-right"></span>#}
+                        </a>
                     {#<p style="padding: 0 10px"> 
                         &nbsp;{{ child.caption|default(child.modelClass|trans) }} 
                         <a href="#" class="glyphicon glyphicon-plus pull-right">&nbsp;</a>
@@ -84,7 +88,7 @@
             {% set active = className == item.modelClass ? "active" : ""%}
             <li class="{{active}}">
                 
-                   <a href="{{ path('genericView', {'package':package, 'className':item.modelClass}) }}"> 
+                   <a href="{{ path('genericViewAll', {'package':package, 'className':item.modelClass}) }}"> 
                           {{ item.caption }} 
                     </a>
             </li>

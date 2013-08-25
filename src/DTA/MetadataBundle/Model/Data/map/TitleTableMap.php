@@ -54,7 +54,7 @@ class TitleTableMap extends TableMap
     {
         $this->addRelation('Work', 'DTA\\MetadataBundle\\Model\\Data\\Work', RelationMap::ONE_TO_MANY, array('id' => 'title_id', ), null, null, 'Works');
         $this->addRelation('Series', 'DTA\\MetadataBundle\\Model\\Data\\Series', RelationMap::ONE_TO_MANY, array('id' => 'title_id', ), null, null, 'Series');
-        $this->addRelation('Titlefragment', 'DTA\\MetadataBundle\\Model\\Data\\Titlefragment', RelationMap::ONE_TO_MANY, array('id' => 'title_id', ), null, null, 'Titlefragments');
+        $this->addRelation('Titlefragment', 'DTA\\MetadataBundle\\Model\\Data\\Titlefragment', RelationMap::ONE_TO_MANY, array('id' => 'title_id', ), 'CASCADE', null, 'Titlefragments');
     } // buildRelations()
 
     /**

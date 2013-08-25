@@ -40,9 +40,6 @@ abstract class BasePersonPublicationPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 4;
 
-    /** the column name for the id field */
-    const ID = 'person_publication.id';
-
     /** the column name for the personrole_id field */
     const PERSONROLE_ID = 'person_publication.personrole_id';
 
@@ -51,6 +48,9 @@ abstract class BasePersonPublicationPeer
 
     /** the column name for the publication_id field */
     const PUBLICATION_ID = 'person_publication.publication_id';
+
+    /** the column name for the id field */
+    const ID = 'person_publication.id';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -71,11 +71,11 @@ abstract class BasePersonPublicationPeer
      * e.g. PersonPublicationPeer::$fieldNames[PersonPublicationPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'PersonroleId', 'PersonId', 'PublicationId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'personroleId', 'personId', 'publicationId', ),
-        BasePeer::TYPE_COLNAME => array (PersonPublicationPeer::ID, PersonPublicationPeer::PERSONROLE_ID, PersonPublicationPeer::PERSON_ID, PersonPublicationPeer::PUBLICATION_ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PERSONROLE_ID', 'PERSON_ID', 'PUBLICATION_ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'personrole_id', 'person_id', 'publication_id', ),
+        BasePeer::TYPE_PHPNAME => array ('PersonroleId', 'PersonId', 'PublicationId', 'Id', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('personroleId', 'personId', 'publicationId', 'id', ),
+        BasePeer::TYPE_COLNAME => array (PersonPublicationPeer::PERSONROLE_ID, PersonPublicationPeer::PERSON_ID, PersonPublicationPeer::PUBLICATION_ID, PersonPublicationPeer::ID, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('PERSONROLE_ID', 'PERSON_ID', 'PUBLICATION_ID', 'ID', ),
+        BasePeer::TYPE_FIELDNAME => array ('personrole_id', 'person_id', 'publication_id', 'id', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
@@ -86,11 +86,11 @@ abstract class BasePersonPublicationPeer
      * e.g. PersonPublicationPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PersonroleId' => 1, 'PersonId' => 2, 'PublicationId' => 3, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'personroleId' => 1, 'personId' => 2, 'publicationId' => 3, ),
-        BasePeer::TYPE_COLNAME => array (PersonPublicationPeer::ID => 0, PersonPublicationPeer::PERSONROLE_ID => 1, PersonPublicationPeer::PERSON_ID => 2, PersonPublicationPeer::PUBLICATION_ID => 3, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PERSONROLE_ID' => 1, 'PERSON_ID' => 2, 'PUBLICATION_ID' => 3, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'personrole_id' => 1, 'person_id' => 2, 'publication_id' => 3, ),
+        BasePeer::TYPE_PHPNAME => array ('PersonroleId' => 0, 'PersonId' => 1, 'PublicationId' => 2, 'Id' => 3, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('personroleId' => 0, 'personId' => 1, 'publicationId' => 2, 'id' => 3, ),
+        BasePeer::TYPE_COLNAME => array (PersonPublicationPeer::PERSONROLE_ID => 0, PersonPublicationPeer::PERSON_ID => 1, PersonPublicationPeer::PUBLICATION_ID => 2, PersonPublicationPeer::ID => 3, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('PERSONROLE_ID' => 0, 'PERSON_ID' => 1, 'PUBLICATION_ID' => 2, 'ID' => 3, ),
+        BasePeer::TYPE_FIELDNAME => array ('personrole_id' => 0, 'person_id' => 1, 'publication_id' => 2, 'id' => 3, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
@@ -165,15 +165,15 @@ abstract class BasePersonPublicationPeer
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(PersonPublicationPeer::ID);
             $criteria->addSelectColumn(PersonPublicationPeer::PERSONROLE_ID);
             $criteria->addSelectColumn(PersonPublicationPeer::PERSON_ID);
             $criteria->addSelectColumn(PersonPublicationPeer::PUBLICATION_ID);
+            $criteria->addSelectColumn(PersonPublicationPeer::ID);
         } else {
-            $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.personrole_id');
             $criteria->addSelectColumn($alias . '.person_id');
             $criteria->addSelectColumn($alias . '.publication_id');
+            $criteria->addSelectColumn($alias . '.id');
         }
     }
 
@@ -395,11 +395,11 @@ abstract class BasePersonPublicationPeer
     public static function getPrimaryKeyHashFromRow($row, $startcol = 0)
     {
         // If the PK cannot be derived from the row, return null.
-        if ($row[$startcol] === null) {
+        if ($row[$startcol + 3] === null) {
             return null;
         }
 
-        return (string) $row[$startcol];
+        return (string) $row[$startcol + 3];
     }
 
     /**
@@ -414,7 +414,7 @@ abstract class BasePersonPublicationPeer
     public static function getPrimaryKeyFromRow($row, $startcol = 0)
     {
 
-        return (int) $row[$startcol];
+        return (int) $row[$startcol + 3];
     }
 
     /**
@@ -1506,6 +1506,10 @@ abstract class BasePersonPublicationPeer
             $criteria = clone $values; // rename for clarity
         } else {
             $criteria = $values->buildCriteria(); // build Criteria from PersonPublication object
+        }
+
+        if ($criteria->containsKey(PersonPublicationPeer::ID) && $criteria->keyContainsValue(PersonPublicationPeer::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.PersonPublicationPeer::ID.')');
         }
 
 

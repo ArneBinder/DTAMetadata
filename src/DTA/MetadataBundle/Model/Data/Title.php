@@ -25,6 +25,9 @@ class Title extends BaseTitle
             else
                 $fragmentStrings[] = $nf->getName();
         }
+//        won't work because of output escaping.
+//        implement a specialized view here.
+//        $fragmentStrings = array_map(function($el){return "<span title='select'> $el </span>";}, $fragmentStrings);
         return implode(" ~ ", $fragmentStrings);
     }
 }

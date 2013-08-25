@@ -39,14 +39,14 @@ abstract class BaseGenreWorkPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 3;
 
-    /** the column name for the id field */
-    const ID = 'genre_work.id';
-
     /** the column name for the genre_id field */
     const GENRE_ID = 'genre_work.genre_id';
 
     /** the column name for the work_id field */
     const WORK_ID = 'genre_work.work_id';
+
+    /** the column name for the id field */
+    const ID = 'genre_work.id';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -67,11 +67,11 @@ abstract class BaseGenreWorkPeer
      * e.g. GenreWorkPeer::$fieldNames[GenreWorkPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'GenreId', 'WorkId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'genreId', 'workId', ),
-        BasePeer::TYPE_COLNAME => array (GenreWorkPeer::ID, GenreWorkPeer::GENRE_ID, GenreWorkPeer::WORK_ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'GENRE_ID', 'WORK_ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'genre_id', 'work_id', ),
+        BasePeer::TYPE_PHPNAME => array ('GenreId', 'WorkId', 'Id', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('genreId', 'workId', 'id', ),
+        BasePeer::TYPE_COLNAME => array (GenreWorkPeer::GENRE_ID, GenreWorkPeer::WORK_ID, GenreWorkPeer::ID, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('GENRE_ID', 'WORK_ID', 'ID', ),
+        BasePeer::TYPE_FIELDNAME => array ('genre_id', 'work_id', 'id', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
@@ -82,11 +82,11 @@ abstract class BaseGenreWorkPeer
      * e.g. GenreWorkPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'GenreId' => 1, 'WorkId' => 2, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'genreId' => 1, 'workId' => 2, ),
-        BasePeer::TYPE_COLNAME => array (GenreWorkPeer::ID => 0, GenreWorkPeer::GENRE_ID => 1, GenreWorkPeer::WORK_ID => 2, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'GENRE_ID' => 1, 'WORK_ID' => 2, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'genre_id' => 1, 'work_id' => 2, ),
+        BasePeer::TYPE_PHPNAME => array ('GenreId' => 0, 'WorkId' => 1, 'Id' => 2, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('genreId' => 0, 'workId' => 1, 'id' => 2, ),
+        BasePeer::TYPE_COLNAME => array (GenreWorkPeer::GENRE_ID => 0, GenreWorkPeer::WORK_ID => 1, GenreWorkPeer::ID => 2, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('GENRE_ID' => 0, 'WORK_ID' => 1, 'ID' => 2, ),
+        BasePeer::TYPE_FIELDNAME => array ('genre_id' => 0, 'work_id' => 1, 'id' => 2, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
@@ -161,13 +161,13 @@ abstract class BaseGenreWorkPeer
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(GenreWorkPeer::ID);
             $criteria->addSelectColumn(GenreWorkPeer::GENRE_ID);
             $criteria->addSelectColumn(GenreWorkPeer::WORK_ID);
+            $criteria->addSelectColumn(GenreWorkPeer::ID);
         } else {
-            $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.genre_id');
             $criteria->addSelectColumn($alias . '.work_id');
+            $criteria->addSelectColumn($alias . '.id');
         }
     }
 
@@ -294,7 +294,7 @@ abstract class BaseGenreWorkPeer
     {
         if (Propel::isInstancePoolingEnabled()) {
             if ($key === null) {
-                $key = serialize(array((string) $obj->getId(), (string) $obj->getGenreId(), (string) $obj->getWorkId()));
+                $key = (string) $obj->getId();
             } // if key === null
             GenreWorkPeer::$instances[$key] = $obj;
         }
@@ -317,10 +317,10 @@ abstract class BaseGenreWorkPeer
     {
         if (Propel::isInstancePoolingEnabled() && $value !== null) {
             if (is_object($value) && $value instanceof GenreWork) {
-                $key = serialize(array((string) $value->getId(), (string) $value->getGenreId(), (string) $value->getWorkId()));
-            } elseif (is_array($value) && count($value) === 3) {
+                $key = (string) $value->getId();
+            } elseif (is_scalar($value)) {
                 // assume we've been passed a primary key
-                $key = serialize(array((string) $value[0], (string) $value[1], (string) $value[2]));
+                $key = (string) $value;
             } else {
                 $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or GenreWork object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
                 throw $e;
@@ -389,11 +389,11 @@ abstract class BaseGenreWorkPeer
     public static function getPrimaryKeyHashFromRow($row, $startcol = 0)
     {
         // If the PK cannot be derived from the row, return null.
-        if ($row[$startcol] === null && $row[$startcol + 1] === null && $row[$startcol + 2] === null) {
+        if ($row[$startcol + 2] === null) {
             return null;
         }
 
-        return serialize(array((string) $row[$startcol], (string) $row[$startcol + 1], (string) $row[$startcol + 2]));
+        return (string) $row[$startcol + 2];
     }
 
     /**
@@ -408,7 +408,7 @@ abstract class BaseGenreWorkPeer
     public static function getPrimaryKeyFromRow($row, $startcol = 0)
     {
 
-        return array((int) $row[$startcol], (int) $row[$startcol + 1], (int) $row[$startcol + 2]);
+        return (int) $row[$startcol + 2];
     }
 
     /**
@@ -1156,6 +1156,10 @@ abstract class BaseGenreWorkPeer
             $criteria = $values->buildCriteria(); // build Criteria from GenreWork object
         }
 
+        if ($criteria->containsKey(GenreWorkPeer::ID) && $criteria->keyContainsValue(GenreWorkPeer::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.GenreWorkPeer::ID.')');
+        }
+
 
         // Set the correct dbName
         $criteria->setDbName(GenreWorkPeer::DATABASE_NAME);
@@ -1198,22 +1202,6 @@ abstract class BaseGenreWorkPeer
             $value = $criteria->remove(GenreWorkPeer::ID);
             if ($value) {
                 $selectCriteria->add(GenreWorkPeer::ID, $value, $comparison);
-            } else {
-                $selectCriteria->setPrimaryTableName(GenreWorkPeer::TABLE_NAME);
-            }
-
-            $comparison = $criteria->getComparison(GenreWorkPeer::GENRE_ID);
-            $value = $criteria->remove(GenreWorkPeer::GENRE_ID);
-            if ($value) {
-                $selectCriteria->add(GenreWorkPeer::GENRE_ID, $value, $comparison);
-            } else {
-                $selectCriteria->setPrimaryTableName(GenreWorkPeer::TABLE_NAME);
-            }
-
-            $comparison = $criteria->getComparison(GenreWorkPeer::WORK_ID);
-            $value = $criteria->remove(GenreWorkPeer::WORK_ID);
-            if ($value) {
-                $selectCriteria->add(GenreWorkPeer::WORK_ID, $value, $comparison);
             } else {
                 $selectCriteria->setPrimaryTableName(GenreWorkPeer::TABLE_NAME);
             }
@@ -1292,19 +1280,10 @@ abstract class BaseGenreWorkPeer
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(GenreWorkPeer::DATABASE_NAME);
-            // primary key is composite; we therefore, expect
-            // the primary key passed to be an array of pkey values
-            if (count($values) == count($values, COUNT_RECURSIVE)) {
-                // array is not multi-dimensional
-                $values = array($values);
-            }
-            foreach ($values as $value) {
-                $criterion = $criteria->getNewCriterion(GenreWorkPeer::ID, $value[0]);
-                $criterion->addAnd($criteria->getNewCriterion(GenreWorkPeer::GENRE_ID, $value[1]));
-                $criterion->addAnd($criteria->getNewCriterion(GenreWorkPeer::WORK_ID, $value[2]));
-                $criteria->addOr($criterion);
-                // we can invalidate the cache for this single PK
-                GenreWorkPeer::removeInstanceFromPool($value);
+            $criteria->add(GenreWorkPeer::ID, (array) $values, Criteria::IN);
+            // invalidate the cache for this object(s)
+            foreach ((array) $values as $singleval) {
+                GenreWorkPeer::removeInstanceFromPool($singleval);
             }
         }
 
@@ -1367,30 +1346,58 @@ abstract class BaseGenreWorkPeer
     }
 
     /**
-     * Retrieve object using using composite pkey values.
-     * @param   int $id
-     * @param   int $genre_id
-     * @param   int $work_id
-     * @param      PropelPDO $con
-     * @return   GenreWork
+     * Retrieve a single object by pkey.
+     *
+     * @param      int $pk the primary key.
+     * @param      PropelPDO $con the connection to use
+     * @return GenreWork
      */
-    public static function retrieveByPK($id, $genre_id, $work_id, PropelPDO $con = null) {
-        $_instancePoolKey = serialize(array((string) $id, (string) $genre_id, (string) $work_id));
-         if (null !== ($obj = GenreWorkPeer::getInstanceFromPool($_instancePoolKey))) {
-             return $obj;
+    public static function retrieveByPK($pk, PropelPDO $con = null)
+    {
+
+        if (null !== ($obj = GenreWorkPeer::getInstanceFromPool((string) $pk))) {
+            return $obj;
         }
 
         if ($con === null) {
             $con = Propel::getConnection(GenreWorkPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
+
         $criteria = new Criteria(GenreWorkPeer::DATABASE_NAME);
-        $criteria->add(GenreWorkPeer::ID, $id);
-        $criteria->add(GenreWorkPeer::GENRE_ID, $genre_id);
-        $criteria->add(GenreWorkPeer::WORK_ID, $work_id);
+        $criteria->add(GenreWorkPeer::ID, $pk);
+
         $v = GenreWorkPeer::doSelect($criteria, $con);
 
-        return !empty($v) ? $v[0] : null;
+        return !empty($v) > 0 ? $v[0] : null;
     }
+
+    /**
+     * Retrieve multiple objects by pkey.
+     *
+     * @param      array $pks List of primary keys
+     * @param      PropelPDO $con the connection to use
+     * @return GenreWork[]
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function retrieveByPKs($pks, PropelPDO $con = null)
+    {
+        if ($con === null) {
+            $con = Propel::getConnection(GenreWorkPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $objs = null;
+        if (empty($pks)) {
+            $objs = array();
+        } else {
+            $criteria = new Criteria(GenreWorkPeer::DATABASE_NAME);
+            $criteria->add(GenreWorkPeer::ID, $pks, Criteria::IN);
+            $objs = GenreWorkPeer::doSelect($criteria, $con);
+        }
+
+        return $objs;
+    }
+
 } // BaseGenreWorkPeer
 
 // This is the static code needed to register the TableMap for this table with the main Propel class.

@@ -1,26 +1,9 @@
 <!DOCTYPE html><html lang="de">
+    
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta charset="utf-8" />
-        <title>{% block title %}Projektdatenbank des Deutschen Textarchivs{% endblock %} - DTADB</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="description" content="DTA Metadatenbank" />
-        <meta name="author" content="Deutsches Textarchiv / Berlin-Brandenburgische Akademie der Wissenschaften" />
-
-    {% block stylesheets %}
-        <link href="{{ asset('css/layout.css') }}" type="text/css" rel="stylesheet" /> 
-        <link href="{{ asset('css/genericHtml.css') }}" type="text/css" rel="stylesheet" />
-        <link href="{{ asset('css/formWidgets/dynamicGUI.css') }}" rel="stylesheet" />
-        <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet" />
-        <link href="{{ asset('css/bootstrap-responsive.css') }}" rel="stylesheet" />
-        <link href="{{ asset('css/templateStyles.css') }}" rel="stylesheet" />
-        <link href="{{ asset('js/bootstrap-extra-modals/bootstrap-modal.css') }}" rel="stylesheet" />
-        <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.1/themes/base/jquery-ui.css">
-  
-        <!--[if lt IE 9]> <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script> <![endif]-->
-    {% endblock %}
-
+        {% include("DTAMetadataBundle::head.html.twig") %}
     </head>
+    
     <body style="min-width: 900px; padding-top: 60px">
 
         
@@ -54,26 +37,24 @@
                     
                 <form action="{{ path('login_check') }}" method="post" class="form-horizontal">
                     
-                    <div class="control-group">
-                        <label for="username" class="control-label">Benutzername</label>
-                        <div class="controls">
-                            <input type="text" id="username" name="_username" value="{{ last_username }}" />
+                    <div class="form-group">
+                        <label for="username" class="control-label col-lg-{{2}}">Benutzername</label>
+                        <div class="col-lg-{{2}}">
+                            <input type="text" id="username" name="_username" value="{{ last_username }}" class="form-control" />
                         </div>
                     </div>
-                    <div class="control-group">
-                        <label class="control-label" for="password">Passwort</label>
-                        <div class="controls">
-                            <input type="password" id="password" name="_password" />
-                        </div>
-                    </div>
-
-                    
-                    <div class="control-group">
-                        <div class="controls">
-                            <button type="submit">Anmelden</button>
+                    <div class="form-group">
+                        <label for="password" class="control-label col-{{2}}">Passwort</label>
+                        <div class="col-lg-{{2}}">
+                            <input type="password" id="password" name="_password" class="form-control" />
                         </div>
                     </div>
                     
+                    <div class="form-group">
+                        <div class="col-lg-offset-{{2}} col-lg-{{2}}">
+                            <input type="submit" value="Anmelden" class="btn btn-default"/>
+                        </div>
+                    </div>
                 </form>
             
                     

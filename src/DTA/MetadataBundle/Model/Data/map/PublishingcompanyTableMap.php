@@ -67,9 +67,8 @@ class PublishingcompanyTableMap extends TableMap
     {
         return array(
             'table_row_view' =>  array (
-  'Id' => 'id',
   'Name' => 'name',
-  'Gnd' => 'gnd',
+  'GND' => 'gnd',
 ),
         );
     } // getBehaviors()

@@ -40,9 +40,6 @@ abstract class BasePersonWorkPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 4;
 
-    /** the column name for the id field */
-    const ID = 'person_work.id';
-
     /** the column name for the person_id field */
     const PERSON_ID = 'person_work.person_id';
 
@@ -51,6 +48,9 @@ abstract class BasePersonWorkPeer
 
     /** the column name for the work_id field */
     const WORK_ID = 'person_work.work_id';
+
+    /** the column name for the id field */
+    const ID = 'person_work.id';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -71,11 +71,11 @@ abstract class BasePersonWorkPeer
      * e.g. PersonWorkPeer::$fieldNames[PersonWorkPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'PersonId', 'PersonroleId', 'WorkId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'personId', 'personroleId', 'workId', ),
-        BasePeer::TYPE_COLNAME => array (PersonWorkPeer::ID, PersonWorkPeer::PERSON_ID, PersonWorkPeer::PERSONROLE_ID, PersonWorkPeer::WORK_ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PERSON_ID', 'PERSONROLE_ID', 'WORK_ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'person_id', 'personrole_id', 'work_id', ),
+        BasePeer::TYPE_PHPNAME => array ('PersonId', 'PersonroleId', 'WorkId', 'Id', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('personId', 'personroleId', 'workId', 'id', ),
+        BasePeer::TYPE_COLNAME => array (PersonWorkPeer::PERSON_ID, PersonWorkPeer::PERSONROLE_ID, PersonWorkPeer::WORK_ID, PersonWorkPeer::ID, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('PERSON_ID', 'PERSONROLE_ID', 'WORK_ID', 'ID', ),
+        BasePeer::TYPE_FIELDNAME => array ('person_id', 'personrole_id', 'work_id', 'id', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
@@ -86,11 +86,11 @@ abstract class BasePersonWorkPeer
      * e.g. PersonWorkPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PersonId' => 1, 'PersonroleId' => 2, 'WorkId' => 3, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'personId' => 1, 'personroleId' => 2, 'workId' => 3, ),
-        BasePeer::TYPE_COLNAME => array (PersonWorkPeer::ID => 0, PersonWorkPeer::PERSON_ID => 1, PersonWorkPeer::PERSONROLE_ID => 2, PersonWorkPeer::WORK_ID => 3, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PERSON_ID' => 1, 'PERSONROLE_ID' => 2, 'WORK_ID' => 3, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'person_id' => 1, 'personrole_id' => 2, 'work_id' => 3, ),
+        BasePeer::TYPE_PHPNAME => array ('PersonId' => 0, 'PersonroleId' => 1, 'WorkId' => 2, 'Id' => 3, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('personId' => 0, 'personroleId' => 1, 'workId' => 2, 'id' => 3, ),
+        BasePeer::TYPE_COLNAME => array (PersonWorkPeer::PERSON_ID => 0, PersonWorkPeer::PERSONROLE_ID => 1, PersonWorkPeer::WORK_ID => 2, PersonWorkPeer::ID => 3, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('PERSON_ID' => 0, 'PERSONROLE_ID' => 1, 'WORK_ID' => 2, 'ID' => 3, ),
+        BasePeer::TYPE_FIELDNAME => array ('person_id' => 0, 'personrole_id' => 1, 'work_id' => 2, 'id' => 3, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
@@ -165,15 +165,15 @@ abstract class BasePersonWorkPeer
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(PersonWorkPeer::ID);
             $criteria->addSelectColumn(PersonWorkPeer::PERSON_ID);
             $criteria->addSelectColumn(PersonWorkPeer::PERSONROLE_ID);
             $criteria->addSelectColumn(PersonWorkPeer::WORK_ID);
+            $criteria->addSelectColumn(PersonWorkPeer::ID);
         } else {
-            $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.person_id');
             $criteria->addSelectColumn($alias . '.personrole_id');
             $criteria->addSelectColumn($alias . '.work_id');
+            $criteria->addSelectColumn($alias . '.id');
         }
     }
 
@@ -395,11 +395,11 @@ abstract class BasePersonWorkPeer
     public static function getPrimaryKeyHashFromRow($row, $startcol = 0)
     {
         // If the PK cannot be derived from the row, return null.
-        if ($row[$startcol] === null) {
+        if ($row[$startcol + 3] === null) {
             return null;
         }
 
-        return (string) $row[$startcol];
+        return (string) $row[$startcol + 3];
     }
 
     /**
@@ -414,7 +414,7 @@ abstract class BasePersonWorkPeer
     public static function getPrimaryKeyFromRow($row, $startcol = 0)
     {
 
-        return (int) $row[$startcol];
+        return (int) $row[$startcol + 3];
     }
 
     /**
@@ -1506,6 +1506,10 @@ abstract class BasePersonWorkPeer
             $criteria = clone $values; // rename for clarity
         } else {
             $criteria = $values->buildCriteria(); // build Criteria from PersonWork object
+        }
+
+        if ($criteria->containsKey(PersonWorkPeer::ID) && $criteria->keyContainsValue(PersonWorkPeer::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.PersonWorkPeer::ID.')');
         }
 
 

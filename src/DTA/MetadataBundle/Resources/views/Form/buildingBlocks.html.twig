@@ -1,0 +1,76 @@
+{# ------------------------------ labelled inputs (see getbootstrap.com/css/#forms-horizontal) ------------------------------ #}
+
+{% macro beginLabelledControl(controlId, labelCaption) %}
+<div class="form-group">
+    <label for="{{controlId}}" class="col-{{formLabelWidth}} control-label">{{labelCaption}}</label>
+    <div class="col-{{formWidgetWidth}}">
+{% endmacro %}
+
+{% macro endLabelledControl() %}
+    </div>
+</div>
+{% endmacro %}
+
+
+{# ------------------------------ collapsible field sets ------------------------------ #}
+
+{# example usage: 
+
+{{ dta.beginFieldset('the caption', 'fs1') }}
+    First content
+    {{ dta.beginFieldset('nested set caption', 'fs2') }}
+        hoola!
+    {{ dta.endFieldSet() }}
+{{ dta.endFieldSet() }}
+
+#}
+{% macro beginFieldset(caption, collapsed, id) %}
+    {% set id = id|default('randomId'~random()) %}
+    <fieldset>
+        {# <span class="glyphicon glyphicon-minus"></span>&nbsp; #}
+        <legend data-toggle="collapse" data-target="#{{id}}">
+            {{caption}}
+        </legend>
+        <div class="collapse {{ collapsed|default(false) ? '' : 'in'}}" id="{{id}}">
+
+{% endmacro %}
+
+{% macro endFieldset() %}
+    </div>
+</fieldset>
+{% endmacro %}      
+
+{# ------------------------------ modals ------------------------------ #}
+
+{% macro btnLaunchModal(caption, id, class) %}
+    <a data-toggle="modal" href="#{{id}}" class="{{class|default('btn btn-primary btn-lg')}}">{{caption}}</a>
+{% endmacro %}
+
+{% macro beginModal(caption, id) %}
+{% spaceless %}
+  <!-- Modal -->
+  <div class="modal fade" id="{{id}}" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title">{{caption}}</h4>
+        </div>
+        <div class="modal-body">
+{% endspaceless %}
+{% endmacro %}
+
+{% macro endModal(confirm, dismissMessage) %}
+{% spaceless %}        
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">{{dismissMessage|default('modal.closeWithoutAction'|trans)}}</button>
+          <a href="{{confirm.target}}">
+            <button type="button" class="btn btn-primary">{{confirm.caption}}</button>
+          </a>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+{% endspaceless %}
+{% endmacro %}  

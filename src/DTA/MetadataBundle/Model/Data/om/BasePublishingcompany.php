@@ -85,7 +85,7 @@ abstract class BasePublishingcompany extends BaseObject implements Persistent, \
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Id', 'Name', 'Gnd', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'Name'=>'Name', 'Gnd'=>'Gnd', );
+    public static $tableRowViewCaptions = array('Name', 'GND', );	public   $tableRowViewAccessors = array('Name'=>'Name', 'GND'=>'Gnd', );
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection

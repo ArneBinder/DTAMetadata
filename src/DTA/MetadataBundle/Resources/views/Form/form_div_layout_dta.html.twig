@@ -10,19 +10,19 @@
     Usually, it renders a label, the widget (usually the actual html element such as a <textarea> tag)
     and markup to display any form errors reported from the server.
     
-    1. inlineControls = true|false
+    1. inlineLabel = true|false
     Whether to put label and controls in a single column. By default, an extra "column" is used for the label.
 
-    2. inlineControls = true|false
+    2. inlineChildren = true|false
     Whether to recursively put all children form inputs into a single line. This will result in a flat
     label input label input ... structure instead of a nested two-column layout.
 
-    inlineControls = false (default)
+    Example with inlineChildren = false (default)
 
     Monograph |     Title | ...
                     Year  |      Number | ...
                                  recons | ...
-    inlineControls = true                    
+    Example with inlineChildren = true                    
 
     Monograph | Title ... Number ... reconstructed ...
 
@@ -38,24 +38,38 @@
     as text areas, password fields, select boxes, etc. #}
 {% extends 'form_div_layout.html.twig' %}
 
+{# uncomment this to add the form-control class to all inputs #}
+{#% block widget_attributes %}
+{% spaceless %}
+
+    {% set attr = attr|merge({'class':'form-control'})%}
+
+    id="{{ id }}" name="{{ full_name }}"{% if read_only %} readonly="readonly"{% endif %}{% if disabled %} disabled="disabled"{% endif %}{% if required %} required="required"{% endif %}{% if max_length %} maxlength="{{ max_length }}"{% endif %}{% if pattern %} pattern="{{ pattern }}"{% endif %}
+    {% for attrname, attrvalue in attr %}{% if attrname in ['placeholder', 'title'] %}{{ attrname }}="{{ attrvalue|trans({}, translation_domain) }}" {% else %}{{ attrname }}="{{ attrvalue }}" {% endif %}{% endfor %}
+{% endspaceless %}
+{% endblock widget_attributes %#}
+
 {% block form_row %}
     
-    {# set default values #}
-    {% set inlineLabel = inlineLabel is defined ? inlineLabel : false %}
-    {% set inlineControls = inlineControls is defined ? inlineControls : false %}
-    {% set hideLabel = hideLabel is defined ? hideLabel : false %}
-    {% set inlined = inlined is defined ? inlined : false %}
+    {# see documentation above. setting default values #}
+    {% set inlineLabel = inlineLabel|default(false) %}
+    {% set inlineChildren = inlineChildren|default(false) %}
+    {% set hideLabel = hideLabel|default(false) %}
+    {% set inlined = inlined|default(false) %}
     
         {% if not inlineLabel and not inlined %}
-        <div class="control-group">
+        <div class="form-group">
             {# form_label automatically generates a label tag, with the correct id specified, the label class, added, etc. #}
-            {{ form_label(form, null , {'label_attr':{'class':'control-label'} }) }}
-            <div class="controls {{ inlineControls ? 'form-inline' : 'labelled' }}">
+            {{ form_label(form, null , {'label_attr':{'class':'control-label col-'~formLabelWidth} }) }}
+            <div class="col-{{formWidgetWidth}} {#{ inlineChildren ? 'form-inline' : 'labelled' }#}">
         {% endif %}
+        
 
-        {% if inlineControls %}
+        {% if inlineChildren %}
             {%for child in form.children %}
-                {{ form_row(child, {'inlined':true}) }}
+                {{ form_label(child, null , {'label_attr':{'class':'control-label'} }) }}
+                {{ form_errors(child) }}
+                {{ form_widget(child, {'inlined':true}) }} {# , 'attr':{'class':'form-control','style':'width:50px; display: inline'}  #}
             {% endfor %}
         {% else %}
             {% if not hideLabel and (inlineLabel or inlined)  %}
@@ -70,15 +84,32 @@
             {{ form_rest(form) }}
         </div>
         {% endif %}
-    
             
 {% endblock form_row %}
 
+
+
 {% block form_label %}
-    {% if label != '@suppress' %}
-        {{ parent() }}
+{% spaceless %}
+    {% if (label is not sameas(false)) and (label != "@suppress") %}
+
+        {% if not compound %}
+            {% set label_attr = label_attr|merge({'for': id}) %}
+        {% endif %}
+        {% if required %}
+            {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
+        {% endif %}
+        {% if label is empty %}
+            {% set label = name|humanize %}
+        {% endif %}
+        <label for="{{id}}" {% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+            {{ label|trans({}, translation_domain) }}
+        </label>
     {% endif %}
+{% endspaceless %}
 {% endblock form_label %}
+
+
 
 {% block checkbox_row %}
     {% if expanded|default(false) %}

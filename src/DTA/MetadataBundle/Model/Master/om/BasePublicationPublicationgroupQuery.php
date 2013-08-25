@@ -19,13 +19,13 @@ use DTA\MetadataBundle\Model\Master\PublicationPublicationgroupQuery;
 use DTA\MetadataBundle\Model\Workflow\Publicationgroup;
 
 /**
- * @method PublicationPublicationgroupQuery orderById($order = Criteria::ASC) Order by the id column
  * @method PublicationPublicationgroupQuery orderByPublicationgroupId($order = Criteria::ASC) Order by the publicationgroup_id column
  * @method PublicationPublicationgroupQuery orderByPublicationId($order = Criteria::ASC) Order by the publication_id column
+ * @method PublicationPublicationgroupQuery orderById($order = Criteria::ASC) Order by the id column
  *
- * @method PublicationPublicationgroupQuery groupById() Group by the id column
  * @method PublicationPublicationgroupQuery groupByPublicationgroupId() Group by the publicationgroup_id column
  * @method PublicationPublicationgroupQuery groupByPublicationId() Group by the publication_id column
+ * @method PublicationPublicationgroupQuery groupById() Group by the id column
  *
  * @method PublicationPublicationgroupQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method PublicationPublicationgroupQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -42,13 +42,12 @@ use DTA\MetadataBundle\Model\Workflow\Publicationgroup;
  * @method PublicationPublicationgroup findOne(PropelPDO $con = null) Return the first PublicationPublicationgroup matching the query
  * @method PublicationPublicationgroup findOneOrCreate(PropelPDO $con = null) Return the first PublicationPublicationgroup matching the query, or a new PublicationPublicationgroup object populated from the query conditions when no match is found
  *
- * @method PublicationPublicationgroup findOneById(int $id) Return the first PublicationPublicationgroup filtered by the id column
  * @method PublicationPublicationgroup findOneByPublicationgroupId(int $publicationgroup_id) Return the first PublicationPublicationgroup filtered by the publicationgroup_id column
  * @method PublicationPublicationgroup findOneByPublicationId(int $publication_id) Return the first PublicationPublicationgroup filtered by the publication_id column
  *
- * @method array findById(int $id) Return PublicationPublicationgroup objects filtered by the id column
  * @method array findByPublicationgroupId(int $publicationgroup_id) Return PublicationPublicationgroup objects filtered by the publicationgroup_id column
  * @method array findByPublicationId(int $publication_id) Return PublicationPublicationgroup objects filtered by the publication_id column
+ * @method array findById(int $id) Return PublicationPublicationgroup objects filtered by the id column
  */
 abstract class BasePublicationPublicationgroupQuery extends ModelCriteria
 {
@@ -94,11 +93,10 @@ abstract class BasePublicationPublicationgroupQuery extends ModelCriteria
      * Go fast if the query is untouched.
      *
      * <code>
-     * $obj = $c->findPk(array(12, 34, 56), $con);
+     * $obj  = $c->findPk(12, $con);
      * </code>
      *
-     * @param array $key Primary key to use for the query
-                         A Primary key composition: [$id, $publicationgroup_id, $publication_id]
+     * @param mixed $key Primary key to use for the query
      * @param     PropelPDO $con an optional connection object
      *
      * @return   PublicationPublicationgroup|PublicationPublicationgroup[]|mixed the result, formatted by the current formatter
@@ -108,7 +106,7 @@ abstract class BasePublicationPublicationgroupQuery extends ModelCriteria
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = PublicationPublicationgroupPeer::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1], (string) $key[2]))))) && !$this->formatter) {
+        if ((null !== ($obj = PublicationPublicationgroupPeer::getInstanceFromPool((string) $key))) && !$this->formatter) {
             // the object is alredy in the instance pool
             return $obj;
         }
@@ -126,6 +124,20 @@ abstract class BasePublicationPublicationgroupQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 PublicationPublicationgroup A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
@@ -137,12 +149,10 @@ abstract class BasePublicationPublicationgroupQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "publicationgroup_id", "publication_id" FROM "publication_publicationgroup" WHERE "id" = :p0 AND "publicationgroup_id" = :p1 AND "publication_id" = :p2';
+        $sql = 'SELECT "publicationgroup_id", "publication_id", "id" FROM "publication_publicationgroup" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
-            $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
-            $stmt->bindValue(':p1', $key[1], PDO::PARAM_INT);
-            $stmt->bindValue(':p2', $key[2], PDO::PARAM_INT);
+            $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
             $stmt->execute();
         } catch (Exception $e) {
             Propel::log($e->getMessage(), Propel::LOG_ERR);
@@ -152,7 +162,7 @@ abstract class BasePublicationPublicationgroupQuery extends ModelCriteria
         if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
             $obj = new PublicationPublicationgroup();
             $obj->hydrate($row);
-            PublicationPublicationgroupPeer::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1], (string) $key[2])));
+            PublicationPublicationgroupPeer::addInstanceToPool($obj, (string) $key);
         }
         $stmt->closeCursor();
 
@@ -181,7 +191,7 @@ abstract class BasePublicationPublicationgroupQuery extends ModelCriteria
     /**
      * Find objects by primary key
      * <code>
-     * $objs = $c->findPks(array(array(12, 56), array(832, 123), array(123, 456)), $con);
+     * $objs = $c->findPks(array(12, 56, 832), $con);
      * </code>
      * @param     array $keys Primary keys to use for the query
      * @param     PropelPDO $con an optional connection object
@@ -211,11 +221,8 @@ abstract class BasePublicationPublicationgroupQuery extends ModelCriteria
      */
     public function filterByPrimaryKey($key)
     {
-        $this->addUsingAlias(PublicationPublicationgroupPeer::ID, $key[0], Criteria::EQUAL);
-        $this->addUsingAlias(PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID, $key[1], Criteria::EQUAL);
-        $this->addUsingAlias(PublicationPublicationgroupPeer::PUBLICATION_ID, $key[2], Criteria::EQUAL);
 
-        return $this;
+        return $this->addUsingAlias(PublicationPublicationgroupPeer::ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -227,61 +234,8 @@ abstract class BasePublicationPublicationgroupQuery extends ModelCriteria
      */
     public function filterByPrimaryKeys($keys)
     {
-        if (empty($keys)) {
-            return $this->add(null, '1<>1', Criteria::CUSTOM);
-        }
-        foreach ($keys as $key) {
-            $cton0 = $this->getNewCriterion(PublicationPublicationgroupPeer::ID, $key[0], Criteria::EQUAL);
-            $cton1 = $this->getNewCriterion(PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID, $key[1], Criteria::EQUAL);
-            $cton0->addAnd($cton1);
-            $cton2 = $this->getNewCriterion(PublicationPublicationgroupPeer::PUBLICATION_ID, $key[2], Criteria::EQUAL);
-            $cton0->addAnd($cton2);
-            $this->addOr($cton0);
-        }
 
-        return $this;
-    }
-
-    /**
-     * Filter the query on the id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterById(1234); // WHERE id = 1234
-     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id >= 12
-     * $query->filterById(array('max' => 12)); // WHERE id <= 12
-     * </code>
-     *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return PublicationPublicationgroupQuery The current query, for fluid interface
-     */
-    public function filterById($id = null, $comparison = null)
-    {
-        if (is_array($id)) {
-            $useMinMax = false;
-            if (isset($id['min'])) {
-                $this->addUsingAlias(PublicationPublicationgroupPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($id['max'])) {
-                $this->addUsingAlias(PublicationPublicationgroupPeer::ID, $id['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(PublicationPublicationgroupPeer::ID, $id, $comparison);
+        return $this->addUsingAlias(PublicationPublicationgroupPeer::ID, $keys, Criteria::IN);
     }
 
     /**
@@ -370,6 +324,48 @@ abstract class BasePublicationPublicationgroupQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(PublicationPublicationgroupPeer::PUBLICATION_ID, $publicationId, $comparison);
+    }
+
+    /**
+     * Filter the query on the id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterById(1234); // WHERE id = 1234
+     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
+     * </code>
+     *
+     * @param     mixed $id The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return PublicationPublicationgroupQuery The current query, for fluid interface
+     */
+    public function filterById($id = null, $comparison = null)
+    {
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(PublicationPublicationgroupPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(PublicationPublicationgroupPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(PublicationPublicationgroupPeer::ID, $id, $comparison);
     }
 
     /**
@@ -534,10 +530,7 @@ abstract class BasePublicationPublicationgroupQuery extends ModelCriteria
     public function prune($publicationPublicationgroup = null)
     {
         if ($publicationPublicationgroup) {
-            $this->addCond('pruneCond0', $this->getAliasedColName(PublicationPublicationgroupPeer::ID), $publicationPublicationgroup->getId(), Criteria::NOT_EQUAL);
-            $this->addCond('pruneCond1', $this->getAliasedColName(PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID), $publicationPublicationgroup->getPublicationgroupId(), Criteria::NOT_EQUAL);
-            $this->addCond('pruneCond2', $this->getAliasedColName(PublicationPublicationgroupPeer::PUBLICATION_ID), $publicationPublicationgroup->getPublicationId(), Criteria::NOT_EQUAL);
-            $this->combine(array('pruneCond0', 'pruneCond1', 'pruneCond2'), Criteria::LOGICAL_OR);
+            $this->addUsingAlias(PublicationPublicationgroupPeer::ID, $publicationPublicationgroup->getId(), Criteria::NOT_EQUAL);
         }
 
         return $this;

@@ -9,6 +9,7 @@ use \PDOStatement;
 use \Propel;
 use \PropelException;
 use \PropelPDO;
+use DTA\MetadataBundle\Model\Data\NamefragmentPeer;
 use DTA\MetadataBundle\Model\Data\PersonPeer;
 use DTA\MetadataBundle\Model\Data\Personalname;
 use DTA\MetadataBundle\Model\Data\PersonalnamePeer;
@@ -381,6 +382,9 @@ abstract class BasePersonalnamePeer
      */
     public static function clearRelatedInstancePool()
     {
+        // Invalidate objects in NamefragmentPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        NamefragmentPeer::clearInstancePool();
     }
 
     /**

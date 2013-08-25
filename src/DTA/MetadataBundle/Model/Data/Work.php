@@ -3,7 +3,7 @@
 namespace DTA\MetadataBundle\Model\Data;
 
 use DTA\MetadataBundle\Model\Data\om\BaseWork;
-
+use DTA\MetadataBundle\Model\Master;
 class Work extends BaseWork
 {
     /**
@@ -20,7 +20,7 @@ class Work extends BaseWork
      */
     public function getFirstAuthor(){
         $id = $this->getId();
-        $query = PersonWorkQuery::create()->findAuthors($id);
+        $query = Master\PersonWorkQuery::create()->findAuthors($id);
         $author = $query->findOne();
         if($author === null)
             return "keine Angabe";

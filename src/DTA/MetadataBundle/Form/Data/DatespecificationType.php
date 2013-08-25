@@ -18,7 +18,7 @@ class DatespecificationType extends BaseAbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('year', null, array(
-            'label' => '@suppress',
+            'label' => false,
         ));
         $builder->add('comments', 'text', array(
             'label' => 'Kommentare',

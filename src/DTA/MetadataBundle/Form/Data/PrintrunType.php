@@ -17,9 +17,9 @@ class PrintrunType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('name');
+        $builder->add('name', 'text', array('label'=>'Bezeichnung'));
         $builder->add('numeric');
-        $builder->add('numpages');
-        $builder->add('numpagesnormed');
+//        $builder->add('numpages');
+//        $builder->add('numpagesnormed');
     }
 }

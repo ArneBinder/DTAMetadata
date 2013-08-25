@@ -24,9 +24,6 @@ class DataDomainController extends ORMController {
         'work' => array(
             "caption" => "Werke",
             "modelClass" => "Work"),
-        'test' => array(
-            "caption" => "Test CSS",
-            "route" => "testCss"),
         'publication' => array(
             "caption" => "Publikationen", 
             "children"=>array(
@@ -39,12 +36,14 @@ class DataDomainController extends ORMController {
             "children" => array(
                 array(
                     "caption" => "Alle anzeigen", 
-                    "route" => "home"),
+                    "modelClass" => "Person"),
                 // the rest is added controller constructor
         )),
         'publishingcompany' => array(
             "caption" => "Verlage", 
             'modelClass' => 'Publishingcompany'),
+        array("caption" => "Schriftarten", "modelClass" => 'Font'),
+        array("caption" => "Sprachen", "modelClass" => 'Language'),
     );
     
     /**
@@ -57,7 +56,7 @@ class DataDomainController extends ORMController {
         foreach($personRoles as $pr ){
             $this->domainMenu['person']['children'][] = array(
                 "caption" => $pr->getName(), 
-                "route" => "showPersonsByRole", 
+                "route" => "viewPersonsByRole", 
                 "parameters" => array('personRoleId'=>$pr->getId())
             );
         }
@@ -84,28 +83,18 @@ class DataDomainController extends ORMController {
     }
     
     /**
-     * @Route("/showPersonsByRole/{personRoleId}", name="showPersonsByRole")
+     * @Route("/viewPersonsByRole/{personRoleId}", name="viewPersonsByRole")
      */
-    public function showPersonsByRoleAction() {
+    public function viewPersonsByRoleAction() {
         $records = Model\Data\PersonQuery::create()
                 ->joinPersonPublication()
                 ->findOne();
                 
-        return $this->renderWithDomainData('DTAMetadataBundle:ORM:genericView.html.twig', array(
+        return $this->renderWithDomainData('DTAMetadataBundle:ORM:genericViewAll.html.twig', array(
             'data' => $records,
             'columns' => Model\Data\Person::getTableViewColumnNames(),
             'className' => 'Person',
 //            'updatedObjectId' => 0,
-        ));
-    }
-
-    /**
-     * @Route("/testCss", name="testCss")
-     */
-    public function testCSSAction() {
-        return $this->renderWithDomainData('DTAMetadataBundle:Package_Data:PublicationMForm.html.twig', array(
-//            "person" => "array_shift()" //$persont->getRelations() //count($p->getPersonalnames()->getArrayCopy())//[0]->__toString(),
-            // get_declared_classes()
         ));
     }
     

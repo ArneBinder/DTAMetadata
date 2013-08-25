@@ -1,307 +1,48 @@
-{# Data Domain Base Template 
-    Fills the domain menu template slot with the special option structure 
-    for the data domain (view and search, create options for each model class).
-    The other data domain templates extend this one (this saves includes for the domain menu all the time).
-#}
 
-{% extends 'DTAMetadataBundle:Layout:base.html.twig' %}
+{% import "DTAMetadataBundle:form:buildingBlocks.html.twig" as dta %}
+   
+<!--div class="alert alert-info">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    Felder, in denen mehrere Angaben sinnvoll erscheinen (z.&nbsp;B. <i>Verlag<sup>;</sup></i> oder <i>Schlagwörter<sup>;</sup></i>&nbsp;), 
+    können mit eben solchen versehen werden, wenn diese durch ein Semikolon getrennt werden.
 
-{% block title %}Daten{% endblock %}
-
-{% block core %}
-<style type="text/css">
+</div-->
     
-      p.dta-p { text-indent:2em }
-      .dta-sp p { text-indent:0 !important }
-      .dta-p-in-sp-really { padding-top:10px }
+{{ dta.beginFieldset('Werk')}}
+        
+    {{ form_row(form.publication.work.title) }}
     
-
-    #xsltext .speaker    { background:#def; font-weight:normal }
-    #xsltext .speaker *  { background:#def }
-    #xsltext .stage      { font-style:normal; background:#fed }
-    #xsltext .stage .c, #xsltext .stage .et { font-style:normal; background:#fed }
-    .fr         { font-family:Georgia !important; border:1px dotted silver }
-    .dta-salute { text-indent:3em; background:#F5F6CE; white-space:nowrap }
-    .c.dta-salute { text-indent:0em !important; margin-bottom:.5em }
-    .dta-closer { text-align:right; margin-right:10em }
-    .dta-lg     { margin-bottom:10px; margin-top:0 !important; margin-left:2em; /*background:url(static/images/bg-lg.png) repeat-y*/ }
-    .footnotesep, .footnotesep-long { margin-top:15px }
-    #xsltext q.quote, #xsltext q.quote * { background:#effddf }
-    p           { margin-bottom:10px; margin-top:0 !important }
-
+    {{ form_row(form.publication.work.PersonWorks) }}
+    
+    
+{{ dta.endFieldset()}}
+    
+{{ dta.beginFieldset('Publikation', true)}}
     
 
-    
-      #header { background:#A2C35C }
-      a       { color:#89A54E }
-    
-  </style>
-<form method="post" action="http://www.deutschestextarchiv.de/dtae/submit/clarin/genheader" id="fs-form" target="_blank">
-<div class="alert alert-info">
-  <button type="button" class="close" data-dismiss="alert">&times;</button>
-        Felder, in denen mehrere Angaben sinnvoll erscheinen (z.&nbsp;B.
-      <i>Verlag<sup>;</sup></i> oder <i>Schlagwörter<sup>;</sup></i>&nbsp;), können mit eben solchen versehen werden,
-      wenn diese durch ein Semikolon getrennt werden.
+    {{ form_row(form.publication.place) }}
 
-</div>
-<fieldset>
-    {# <span class="glyphicon glyphicon-minus"></span>&nbsp; #}
-    <legend data-toggle="collapse" data-target="#demo">Einordnung der Vorlage </legend>
-    <div class="collapse in" id="demo">
-    <table>
-      <tr>
-        <td>
-    <button onclick="fsToggle('fs-M'); return false" class="fs-button button-fs-M" disabled="disabled">Einteilige Monographie (M)</button><br />
-    <button onclick="fsToggle('fs-MM'); return false" class="fs-button button-fs-MM">Teil einer mehrbändigen Monographie (MM)</button><br />
-    <button onclick="fsToggle('fs-MS'); return false" class="fs-button button-fs-MS">Selbstständiger Band einer Reihe (MS)</button><br />
-    <button onclick="fsToggle('fs-MMS'); return false" class="fs-button button-fs-MMS">Teil einer mehrbändigen Monographie, die ihrerseits Teil einer Reihe ist (MMS)</button>
-        </td>
-        <td>
-    <button onclick="fsToggle('fs-DM'); return false" class="fs-button button-fs-DM">Unselbständiger Teil einer Monographie (z. B. Beitrag in Sammelband, Buchkapitel) (DM)</button><br />
-    <button onclick="fsToggle('fs-DS'); return false" class="fs-button button-fs-DS">Unselbständige Schrift in einem Band, der Teil einer Reihe ist (DS)</button><br />
-    <button onclick="fsToggle('fs-JA'); return false" class="fs-button button-fs-JA">Artikel einer Zeitschrift/Zeitung (JA)</button><br />
-    <button onclick="fsToggle('fs-J'); return false" class="fs-button button-fs-J">Zeitschriften-/Zeitungsausgabe (J)</button>
-        </td>
-      </tr>
-    </table>
-        <fieldset>
-        {# <span class="glyphicon glyphicon-minus"></span>&nbsp; #}
-        <legend data-toggle="collapse" data-target="#demo2">Einordnung der Vorlage </legend>
-        <div class="collapse in" id="demo2">
-        <table>
-          <tr>
-            <td>
-        <button onclick="fsToggle('fs-M'); return false" class="fs-button button-fs-M" disabled="disabled">Einteilige Monographie (M)</button><br />
-        <button onclick="fsToggle('fs-MM'); return false" class="fs-button button-fs-MM">Teil einer mehrbändigen Monographie (MM)</button><br />
-        <button onclick="fsToggle('fs-MS'); return false" class="fs-button button-fs-MS">Selbstständiger Band einer Reihe (MS)</button><br />
-        <button onclick="fsToggle('fs-MMS'); return false" class="fs-button button-fs-MMS">Teil einer mehrbändigen Monographie, die ihrerseits Teil einer Reihe ist (MMS)</button>
-            </td>
-            <td>
-        <button onclick="fsToggle('fs-DM'); return false" class="fs-button button-fs-DM">Unselbständiger Teil einer Monographie (z. B. Beitrag in Sammelband, Buchkapitel) (DM)</button><br />
-        <button onclick="fsToggle('fs-DS'); return false" class="fs-button button-fs-DS">Unselbständige Schrift in einem Band, der Teil einer Reihe ist (DS)</button><br />
-        <button onclick="fsToggle('fs-JA'); return false" class="fs-button button-fs-JA">Artikel einer Zeitschrift/Zeitung (JA)</button><br />
-        <button onclick="fsToggle('fs-J'); return false" class="fs-button button-fs-J">Zeitschriften-/Zeitungsausgabe (J)</button>
-            </td>
-          </tr>
-        </table>
-        </div>
-      </fieldset>
-    </div>
-  </fieldset>
-  <fieldset>
-    <legend>Titelei</legend>
-    <table>
-      <tr>
-        <td>Haupttitel</td>
-        <td><input name="title" class="mandatory form-control" id="title" type="text" /></td>
-      </tr>
-      <tr id="subtitle-row-1">
-  <td>
-    Untertitel (1)
+    {{ dta.beginLabelledControl('me', 'Datierung') }}
+        {{ form_row(form.publication.DatespecificationRelatedByPublicationdateId) }}
+        {{ form_row(form.publication.DatespecificationRelatedByFirstpublicationdateId) }}
+        {{ form_row(form.publication.work.datespecification) }}
+    {{ dta.endLabelledControl() }}
     
-  </td>
-  <td>
-    <input name="subtitle-1" id="subtitle-1" type="text" />
-  </td>
-</tr>
-
-      <tr id="after-subtitle" class="f-opt fs-MS fs-DS fs-MMS">
-        <td>Haupttitel der Reihe</td>
-        <td><input name="series-title" class="mandatory" id="" type="text" placeholder="Korpuslinguistik gestern und heute" /></td>
-      </tr>
-      <tr class="f-opt fs-MS fs-DS fs-MMS">
-        <td>Untertitel der Reihe</td>
-        <td><input name="series-subtitle" id="" type="text" placeholder="Theoretische Schriften zum Aufbau historischer Korpora" /></td>
-      </tr>
-      <tr class="f-opt fs-MM fs-DS fs-MMS">
-        <td>Band</td>
-        <td>
-          Bezeichnung:
-          <input style="width:274px" name="volume-title" id="" type="text" placeholder="Teil 2: Mehrbändige Monographien" />
-          &nbsp;&nbsp;
-          numerisch: <input style="width:30px" name="volume-no" id="" type="text" placeholder="2" />
-        </td>
-      </tr>
-      <tr class="f-opt fs-DM">
-        <td>Haupttitel des übergeordneten Werkes</td>
-        <td><input name="title-superior" id="" type="text" placeholder="Erfassung von Metadaten" /></td>
-      </tr>
-      <tr class="f-opt fs-DM">
-        <td>Untertitel des übergeordneten Werkes</td>
-        <td><input name="subtitle-superior" id="" type="text" placeholder="Ein Lehrbuch zur Verwendung des CLARIN-D-Metadatenformulars " /></td>
-      </tr>
-      <tr class="f-opt fs-DM fs-DS">
-        <td>Seitenangabe</td>
-        <td><input name="pages" id="" type="text" placeholder="12-34" /></td>
-      </tr>
-      <tr class="f-opt fs-MS"> 
-        <td>Nummer des Bandes innerhalb der Reihe</td>
-        <td><input name="volume-series-no" id="" type="text" placeholder="2" /></td>
-      </tr>
-      <tr class="f-opt fs-JA">
-        <td>Teil (bei mehrteiligen Publikationen)</td>
-        <td>
-          Bezeichnung: <input style="width:274px" name="journal-part" id="" type="text" placeholder="Fortsetzung und Schluß" />
-          &nbsp;&nbsp;
-          numerisch: <input style="width:30px" name="journal-part-no" id="" type="text" placeholder="2" />
-        </td>
-      </tr>
-      <tr class="f-opt fs-JA">
-        <td>Haupttitel der Zeitschrift</td>
-        <td><input name="journal-title" class="mandatory" id="" type="text" placeholder="Korpuslinguistik gestern und heute" /></td>
-      </tr>
-      <tr class="f-opt fs-JA">
-        <td>Untertitel der Zeitschrift</td>
-        <td><input name="journal-subtitle" id="" type="text" placeholder="Theoretische Schriften zum Aufbau historischer Korpora " /></td>
-        <td></td>
-      </tr>
-      <tr class="f-opt fs-JA">
-        <td>&nbsp;</td>
-        <td>
-          Jahrgang:
-          <input style="width:70px" name="ja-volume" id="" type="text" placeholder="53" />
-          &nbsp;&nbsp;
-          Heft:
-          <input style="width:70px" name="ja-issue" id="" type="text" placeholder="2" />
-          &nbsp;&nbsp;
-          Seitenangabe:
-          <input style="width:98px" name="ja-pages" id="" type="text" placeholder="12-34" />
-        </td>
-      </tr>
-      <tr class="f-opt fs-J">
-        <td>Ausgabe</td>
-        <td>
-          <input name="j-issue" id="" type="text" placeholder="Beilage zu Nr. 10 vom 10. Juni 1848" />
-        </td>
-      </tr>
-      <tr>
-      <tr>
-        <td>Kurztitel</td>
-        <td>
-          <textarea name="title-short" id="title-short" style="width:484px" rows="3" cols=""></textarea><a style="float:right" target="_blank" href="http://www.deutschestextarchiv.de/doku/basisformat_header#die_kurztitelan"><img src="static/images/help.gif" /></a>
-        </td>
-        <td></td>
-      </tr>
-      <tr>
-        <td></td>
-        <td>
-          <button onclick="addSubtitle(); return false">weiterer Untertitel</button>
-        </td>
-        <td></td>
-      </tr>
-    </table>
-  </fieldset>
-  <fieldset>
-    <legend>Personalia</legend>
-    <table>
-      <tr class="person-row-1">
-  <td>Rolle (1)</td>
-  <td>
-    <select name="role-1" id="role-1">
-      <option value="author">Autor</option>
-      <option value="translator">Übersetzer</option>
-      <option value="publisher">Herausgeber</option>
-    </select>
+    {{ form_row(form.publication.printrun) }}
     
-  </td>
-</tr>
-<tr class="person-row-1">
-  <td>Vorname (1)</td>
-  <td>
-    <input name="forename-1" id="forename-1" type="text" placeholder="Dorothea" />
-  </td>
-</tr>
-<tr class="person-row-1">
-  <td>Nachname (1)</td>
-  <td>
-    <input name="surname-1" id="surname-1" type="text" placeholder="Ehrnweiten" />
-  </td>
-</tr>
+    {{ form_row(form.publication.publishingcompany) }}
+    
+{{ dta.endFieldset()}}
 
-<tr class="person-row-1">
-  <td>GND-Nummer (1)</td>
-  <td>
-    <input style="width:138px" name="pnd-1" id="pnd-1" type="text" placeholder="012345678" />
-    <button onclick="PNDinfo(1); return false">DNB-Namensinformationen holen</button>
-    <button onclick="PNDnumber(1); return false">GND von DNB holen</button>
-  </td>
-</tr>
-<tr id="after-person-1" class="person-row-1">
-  <td style="padding-bottom:20px"></td>
-  <td style="padding-bottom:20px">
-    weiteres Feld zur Person:
-    <select name="" id="add-name-field-1" onchange="addNameField(this, 1)">
-      <option value=""></option>
-      <option value="nameLink">Adelstitel</option>
-      <option value="genName">Generation</option>
-      <option value="addName">weiterer Name (z.&nbsp;B. Pseudonym)</option>
-      <option value="roleName">Funktion</option>
-    </select>
-  </td>
-</tr>
+{{ dta.beginFieldset('Rest', true)}}
+{{ form_rest(form) }}
+{{ dta.endFieldset()}}
 
-      
-        
-        
-      
-        
-        
-      
-        
-        
-      
-        
-        
-      
-      <tr>
-        <td>&nbsp;</td>
-        <td>
-          <button onclick="addPerson(); return false">weitere Person anlegen</button>
-        </td>
-        <td></td>
-      </tr>
-    </table>
-  </fieldset>
-  <fieldset>
-    <legend>Angaben zur Publikation der Vorlage</legend>
-    <table>
-      <tr>
-        <td>Druckort<sup>;</sup></td>
-        <td><input name="place" id="place" type="text" /></td>
-      </tr>
-      <tr>
-        <td>Datierung</td>
-        <td>
-          <table style="width:100%">
-            <tr>
-              <td style="text-align:right; white-space:nowrap; width:393px">Erscheinungsjahr:</td>
-              <td><input style="width:100px" name="year" id="year" type="text" /></td>
-            </tr>
-            <tr>
-              <td style="text-align:right; white-space:nowrap">Erscheinungsjahr der Erstausgabe (falls abweichend):</td>
-              <td><input style="width:100px" name="year-first" id="year-first" type="text" /></td>
-            </tr>
-            <tr>
-              <td style="text-align:right; white-space:nowrap">Entstehungsjahr des Textes (falls abweichend):</td>
-              <td><input style="width:100px" name="year-creation" id="year-creation" type="text" /></td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-      <tr>
-        <td>Auflage</td>
-        <td>
-          Bezeichnung: <input style="width:273px" name="edition" id="edition" type="text" placeholder="Zweite, vollständig überarbeitete Ausgabe" />
-          &nbsp;&nbsp;
-          numerisch: <input style="width:31px" name="edition-no" id="edition-no" type="text" placeholder="2" />
-        </td>
-      </tr>
-      <tr>
-        <td>Verlag/Drucker<sup>;</sup></td>
-        <td><input name="publisher" id="publisher" type="text" placeholder="Akademieverlag Berlin" /></td>
-      </tr>
-    </table>
-  </fieldset>
+
+<!--
+    
+  
+    
   <fieldset>
     <legend>Angaben zur Bildquelle</legend>
     <table>
@@ -1256,7 +997,7 @@
 
       <tr id="after-genre">
         <td>Kategorien<sup>;</sup></td>
-        <!-- <td><input type="text" name="categories" id="categories" style="width:484px" /><a target="_blank" href="http://www.deutschestextarchiv.de/doku/klassifikation2"><img src="static/images/help.gif" /></a></td> -->
+        <td><input type="text" name="categories" id="categories" style="width:484px" /><a target="_blank" href="http://www.deutschestextarchiv.de/doku/klassifikation2"><img src="{{asset('img/help.gif')}}" /></a></td>
         <td><input name="categories" id="categories" type="text" /></td>
       </tr>
       <tr>
@@ -1283,9 +1024,4 @@
     <button onclick="dlTEIHeader(); return false">TEI-Header herunterladen</button>
     <span id="tei-has-been-created" style="display:none">Der TEI-Header wird in unten stehendem Feld angezeigt.</span>
     <div id="tei-not-valid" style="color:red"></div>
-  </fieldset>
-</form>
-{% endblock %}
-
-
-
+  </fieldset>-->

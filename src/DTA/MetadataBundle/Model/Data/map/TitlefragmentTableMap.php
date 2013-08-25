@@ -57,7 +57,7 @@ class TitlefragmentTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Title', 'DTA\\MetadataBundle\\Model\\Data\\Title', RelationMap::MANY_TO_ONE, array('title_id' => 'id', ), null, null);
+        $this->addRelation('Title', 'DTA\\MetadataBundle\\Model\\Data\\Title', RelationMap::MANY_TO_ONE, array('title_id' => 'id', ), 'CASCADE', null);
         $this->addRelation('Titlefragmenttype', 'DTA\\MetadataBundle\\Model\\Classification\\Titlefragmenttype', RelationMap::MANY_TO_ONE, array('titlefragmenttype_id' => 'id', ), null, null);
     } // buildRelations()
 

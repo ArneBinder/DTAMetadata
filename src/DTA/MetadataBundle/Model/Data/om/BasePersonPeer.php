@@ -11,6 +11,7 @@ use \PropelException;
 use \PropelPDO;
 use DTA\MetadataBundle\Model\Data\Person;
 use DTA\MetadataBundle\Model\Data\PersonPeer;
+use DTA\MetadataBundle\Model\Data\PersonalnamePeer;
 use DTA\MetadataBundle\Model\Data\map\PersonTableMap;
 
 abstract class BasePersonPeer
@@ -367,6 +368,9 @@ abstract class BasePersonPeer
      */
     public static function clearRelatedInstancePool()
     {
+        // Invalidate objects in PersonalnamePeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        PersonalnamePeer::clearInstancePool();
     }
 
     /**

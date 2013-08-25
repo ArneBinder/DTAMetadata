@@ -40,12 +40,13 @@ class CategoryWorkTableMap extends TableMap
         $this->setPhpName('CategoryWork');
         $this->setClassname('DTA\\MetadataBundle\\Model\\Master\\CategoryWork');
         $this->setPackage('src.DTA.MetadataBundle.Model.Master');
-        $this->setUseIdGenerator(false);
+        $this->setUseIdGenerator(true);
+        $this->setPrimaryKeyMethodInfo('category_work_id_seq');
         $this->setIsCrossRef(true);
         // columns
+        $this->addForeignKey('category_id', 'CategoryId', 'INTEGER', 'category', 'id', true, null, null);
+        $this->addForeignKey('work_id', 'WorkId', 'INTEGER', 'work', 'id', true, null, null);
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignPrimaryKey('category_id', 'CategoryId', 'INTEGER' , 'category', 'id', true, null, null);
-        $this->addForeignPrimaryKey('work_id', 'WorkId', 'INTEGER' , 'work', 'id', true, null, null);
         // validators
     } // initialize()
 
@@ -68,9 +69,14 @@ class CategoryWorkTableMap extends TableMap
     {
         return array(
             'table_row_view' =>  array (
-  'Id' => 'id',
   'CategoryId' => 'category_id',
   'WorkId' => 'work_id',
+  'Id' => 'id',
+),
+            'auto_add_pk' =>  array (
+  'name' => 'id',
+  'autoIncrement' => 'true',
+  'type' => 'INTEGER',
 ),
         );
     } // getBehaviors()

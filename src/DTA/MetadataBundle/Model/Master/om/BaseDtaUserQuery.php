@@ -18,21 +18,21 @@ use DTA\MetadataBundle\Model\Master\DtaUserQuery;
 use DTA\MetadataBundle\Model\Workflow\Task;
 
 /**
- * @method DtaUserQuery orderById($order = Criteria::ASC) Order by the id column
  * @method DtaUserQuery orderByUsername($order = Criteria::ASC) Order by the username column
  * @method DtaUserQuery orderByPassword($order = Criteria::ASC) Order by the password column
  * @method DtaUserQuery orderBySalt($order = Criteria::ASC) Order by the salt column
  * @method DtaUserQuery orderByMail($order = Criteria::ASC) Order by the mail column
  * @method DtaUserQuery orderByPhone($order = Criteria::ASC) Order by the phone column
  * @method DtaUserQuery orderByAdmin($order = Criteria::ASC) Order by the admin column
+ * @method DtaUserQuery orderById($order = Criteria::ASC) Order by the id column
  *
- * @method DtaUserQuery groupById() Group by the id column
  * @method DtaUserQuery groupByUsername() Group by the username column
  * @method DtaUserQuery groupByPassword() Group by the password column
  * @method DtaUserQuery groupBySalt() Group by the salt column
  * @method DtaUserQuery groupByMail() Group by the mail column
  * @method DtaUserQuery groupByPhone() Group by the phone column
  * @method DtaUserQuery groupByAdmin() Group by the admin column
+ * @method DtaUserQuery groupById() Group by the id column
  *
  * @method DtaUserQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method DtaUserQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -52,13 +52,13 @@ use DTA\MetadataBundle\Model\Workflow\Task;
  * @method DtaUser findOneByPhone(string $phone) Return the first DtaUser filtered by the phone column
  * @method DtaUser findOneByAdmin(boolean $admin) Return the first DtaUser filtered by the admin column
  *
- * @method array findById(int $id) Return DtaUser objects filtered by the id column
  * @method array findByUsername(string $username) Return DtaUser objects filtered by the username column
  * @method array findByPassword(string $password) Return DtaUser objects filtered by the password column
  * @method array findBySalt(string $salt) Return DtaUser objects filtered by the salt column
  * @method array findByMail(string $mail) Return DtaUser objects filtered by the mail column
  * @method array findByPhone(string $phone) Return DtaUser objects filtered by the phone column
  * @method array findByAdmin(boolean $admin) Return DtaUser objects filtered by the admin column
+ * @method array findById(int $id) Return DtaUser objects filtered by the id column
  */
 abstract class BaseDtaUserQuery extends ModelCriteria
 {
@@ -160,7 +160,7 @@ abstract class BaseDtaUserQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "username", "password", "salt", "mail", "phone", "admin" FROM "dta_user" WHERE "id" = :p0';
+        $sql = 'SELECT "username", "password", "salt", "mail", "phone", "admin", "id" FROM "dta_user" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -247,48 +247,6 @@ abstract class BaseDtaUserQuery extends ModelCriteria
     {
 
         return $this->addUsingAlias(DtaUserPeer::ID, $keys, Criteria::IN);
-    }
-
-    /**
-     * Filter the query on the id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterById(1234); // WHERE id = 1234
-     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id >= 12
-     * $query->filterById(array('max' => 12)); // WHERE id <= 12
-     * </code>
-     *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return DtaUserQuery The current query, for fluid interface
-     */
-    public function filterById($id = null, $comparison = null)
-    {
-        if (is_array($id)) {
-            $useMinMax = false;
-            if (isset($id['min'])) {
-                $this->addUsingAlias(DtaUserPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($id['max'])) {
-                $this->addUsingAlias(DtaUserPeer::ID, $id['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(DtaUserPeer::ID, $id, $comparison);
     }
 
     /**
@@ -461,6 +419,48 @@ abstract class BaseDtaUserQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(DtaUserPeer::ADMIN, $admin, $comparison);
+    }
+
+    /**
+     * Filter the query on the id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterById(1234); // WHERE id = 1234
+     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
+     * </code>
+     *
+     * @param     mixed $id The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return DtaUserQuery The current query, for fluid interface
+     */
+    public function filterById($id = null, $comparison = null)
+    {
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(DtaUserPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(DtaUserPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(DtaUserPeer::ID, $id, $comparison);
     }
 
     /**

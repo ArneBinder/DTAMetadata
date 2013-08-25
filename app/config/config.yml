@@ -44,6 +44,10 @@ twig:
     # absolute path on the server to the web directory, needed sometimes for file_exists
     globals:
         dtaMetadataBundlePath: %kernel.root_dir%/../src/DTA/MetadataBundle/
+        # for horizontal forms (getbootstrap.com/css/#forms)
+        # sets the number of grid columns for the label and widget form columns
+        formLabelWidth: 2
+        formWidgetWidth: 10
 
 
 # Assetic Configuration

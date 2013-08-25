@@ -28,7 +28,7 @@ class PublicationDmType extends BaseAbstractType
         ));
         
         $builder->add('publicationRelatedByPublicationId',new PublicationType(), array(
-            'label' => '@suppress'
+            'label' => false
         ));
     }
 }

@@ -39,14 +39,14 @@ abstract class BasePublicationPublicationgroupPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 3;
 
-    /** the column name for the id field */
-    const ID = 'publication_publicationgroup.id';
-
     /** the column name for the publicationgroup_id field */
     const PUBLICATIONGROUP_ID = 'publication_publicationgroup.publicationgroup_id';
 
     /** the column name for the publication_id field */
     const PUBLICATION_ID = 'publication_publicationgroup.publication_id';
+
+    /** the column name for the id field */
+    const ID = 'publication_publicationgroup.id';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -67,11 +67,11 @@ abstract class BasePublicationPublicationgroupPeer
      * e.g. PublicationPublicationgroupPeer::$fieldNames[PublicationPublicationgroupPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationgroupId', 'PublicationId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationgroupId', 'publicationId', ),
-        BasePeer::TYPE_COLNAME => array (PublicationPublicationgroupPeer::ID, PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID, PublicationPublicationgroupPeer::PUBLICATION_ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATIONGROUP_ID', 'PUBLICATION_ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'publicationgroup_id', 'publication_id', ),
+        BasePeer::TYPE_PHPNAME => array ('PublicationgroupId', 'PublicationId', 'Id', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('publicationgroupId', 'publicationId', 'id', ),
+        BasePeer::TYPE_COLNAME => array (PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID, PublicationPublicationgroupPeer::PUBLICATION_ID, PublicationPublicationgroupPeer::ID, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('PUBLICATIONGROUP_ID', 'PUBLICATION_ID', 'ID', ),
+        BasePeer::TYPE_FIELDNAME => array ('publicationgroup_id', 'publication_id', 'id', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
@@ -82,11 +82,11 @@ abstract class BasePublicationPublicationgroupPeer
      * e.g. PublicationPublicationgroupPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationgroupId' => 1, 'PublicationId' => 2, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationgroupId' => 1, 'publicationId' => 2, ),
-        BasePeer::TYPE_COLNAME => array (PublicationPublicationgroupPeer::ID => 0, PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID => 1, PublicationPublicationgroupPeer::PUBLICATION_ID => 2, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATIONGROUP_ID' => 1, 'PUBLICATION_ID' => 2, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publicationgroup_id' => 1, 'publication_id' => 2, ),
+        BasePeer::TYPE_PHPNAME => array ('PublicationgroupId' => 0, 'PublicationId' => 1, 'Id' => 2, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('publicationgroupId' => 0, 'publicationId' => 1, 'id' => 2, ),
+        BasePeer::TYPE_COLNAME => array (PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID => 0, PublicationPublicationgroupPeer::PUBLICATION_ID => 1, PublicationPublicationgroupPeer::ID => 2, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('PUBLICATIONGROUP_ID' => 0, 'PUBLICATION_ID' => 1, 'ID' => 2, ),
+        BasePeer::TYPE_FIELDNAME => array ('publicationgroup_id' => 0, 'publication_id' => 1, 'id' => 2, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
@@ -161,13 +161,13 @@ abstract class BasePublicationPublicationgroupPeer
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(PublicationPublicationgroupPeer::ID);
             $criteria->addSelectColumn(PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID);
             $criteria->addSelectColumn(PublicationPublicationgroupPeer::PUBLICATION_ID);
+            $criteria->addSelectColumn(PublicationPublicationgroupPeer::ID);
         } else {
-            $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.publicationgroup_id');
             $criteria->addSelectColumn($alias . '.publication_id');
+            $criteria->addSelectColumn($alias . '.id');
         }
     }
 
@@ -294,7 +294,7 @@ abstract class BasePublicationPublicationgroupPeer
     {
         if (Propel::isInstancePoolingEnabled()) {
             if ($key === null) {
-                $key = serialize(array((string) $obj->getId(), (string) $obj->getPublicationgroupId(), (string) $obj->getPublicationId()));
+                $key = (string) $obj->getId();
             } // if key === null
             PublicationPublicationgroupPeer::$instances[$key] = $obj;
         }
@@ -317,10 +317,10 @@ abstract class BasePublicationPublicationgroupPeer
     {
         if (Propel::isInstancePoolingEnabled() && $value !== null) {
             if (is_object($value) && $value instanceof PublicationPublicationgroup) {
-                $key = serialize(array((string) $value->getId(), (string) $value->getPublicationgroupId(), (string) $value->getPublicationId()));
-            } elseif (is_array($value) && count($value) === 3) {
+                $key = (string) $value->getId();
+            } elseif (is_scalar($value)) {
                 // assume we've been passed a primary key
-                $key = serialize(array((string) $value[0], (string) $value[1], (string) $value[2]));
+                $key = (string) $value;
             } else {
                 $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or PublicationPublicationgroup object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
                 throw $e;
@@ -389,11 +389,11 @@ abstract class BasePublicationPublicationgroupPeer
     public static function getPrimaryKeyHashFromRow($row, $startcol = 0)
     {
         // If the PK cannot be derived from the row, return null.
-        if ($row[$startcol] === null && $row[$startcol + 1] === null && $row[$startcol + 2] === null) {
+        if ($row[$startcol + 2] === null) {
             return null;
         }
 
-        return serialize(array((string) $row[$startcol], (string) $row[$startcol + 1], (string) $row[$startcol + 2]));
+        return (string) $row[$startcol + 2];
     }
 
     /**
@@ -408,7 +408,7 @@ abstract class BasePublicationPublicationgroupPeer
     public static function getPrimaryKeyFromRow($row, $startcol = 0)
     {
 
-        return array((int) $row[$startcol], (int) $row[$startcol + 1], (int) $row[$startcol + 2]);
+        return (int) $row[$startcol + 2];
     }
 
     /**
@@ -1156,6 +1156,10 @@ abstract class BasePublicationPublicationgroupPeer
             $criteria = $values->buildCriteria(); // build Criteria from PublicationPublicationgroup object
         }
 
+        if ($criteria->containsKey(PublicationPublicationgroupPeer::ID) && $criteria->keyContainsValue(PublicationPublicationgroupPeer::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.PublicationPublicationgroupPeer::ID.')');
+        }
+
 
         // Set the correct dbName
         $criteria->setDbName(PublicationPublicationgroupPeer::DATABASE_NAME);
@@ -1198,22 +1202,6 @@ abstract class BasePublicationPublicationgroupPeer
             $value = $criteria->remove(PublicationPublicationgroupPeer::ID);
             if ($value) {
                 $selectCriteria->add(PublicationPublicationgroupPeer::ID, $value, $comparison);
-            } else {
-                $selectCriteria->setPrimaryTableName(PublicationPublicationgroupPeer::TABLE_NAME);
-            }
-
-            $comparison = $criteria->getComparison(PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID);
-            $value = $criteria->remove(PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID);
-            if ($value) {
-                $selectCriteria->add(PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID, $value, $comparison);
-            } else {
-                $selectCriteria->setPrimaryTableName(PublicationPublicationgroupPeer::TABLE_NAME);
-            }
-
-            $comparison = $criteria->getComparison(PublicationPublicationgroupPeer::PUBLICATION_ID);
-            $value = $criteria->remove(PublicationPublicationgroupPeer::PUBLICATION_ID);
-            if ($value) {
-                $selectCriteria->add(PublicationPublicationgroupPeer::PUBLICATION_ID, $value, $comparison);
             } else {
                 $selectCriteria->setPrimaryTableName(PublicationPublicationgroupPeer::TABLE_NAME);
             }
@@ -1292,19 +1280,10 @@ abstract class BasePublicationPublicationgroupPeer
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(PublicationPublicationgroupPeer::DATABASE_NAME);
-            // primary key is composite; we therefore, expect
-            // the primary key passed to be an array of pkey values
-            if (count($values) == count($values, COUNT_RECURSIVE)) {
-                // array is not multi-dimensional
-                $values = array($values);
-            }
-            foreach ($values as $value) {
-                $criterion = $criteria->getNewCriterion(PublicationPublicationgroupPeer::ID, $value[0]);
-                $criterion->addAnd($criteria->getNewCriterion(PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID, $value[1]));
-                $criterion->addAnd($criteria->getNewCriterion(PublicationPublicationgroupPeer::PUBLICATION_ID, $value[2]));
-                $criteria->addOr($criterion);
-                // we can invalidate the cache for this single PK
-                PublicationPublicationgroupPeer::removeInstanceFromPool($value);
+            $criteria->add(PublicationPublicationgroupPeer::ID, (array) $values, Criteria::IN);
+            // invalidate the cache for this object(s)
+            foreach ((array) $values as $singleval) {
+                PublicationPublicationgroupPeer::removeInstanceFromPool($singleval);
             }
         }
 
@@ -1367,30 +1346,58 @@ abstract class BasePublicationPublicationgroupPeer
     }
 
     /**
-     * Retrieve object using using composite pkey values.
-     * @param   int $id
-     * @param   int $publicationgroup_id
-     * @param   int $publication_id
-     * @param      PropelPDO $con
-     * @return   PublicationPublicationgroup
+     * Retrieve a single object by pkey.
+     *
+     * @param      int $pk the primary key.
+     * @param      PropelPDO $con the connection to use
+     * @return PublicationPublicationgroup
      */
-    public static function retrieveByPK($id, $publicationgroup_id, $publication_id, PropelPDO $con = null) {
-        $_instancePoolKey = serialize(array((string) $id, (string) $publicationgroup_id, (string) $publication_id));
-         if (null !== ($obj = PublicationPublicationgroupPeer::getInstanceFromPool($_instancePoolKey))) {
-             return $obj;
+    public static function retrieveByPK($pk, PropelPDO $con = null)
+    {
+
+        if (null !== ($obj = PublicationPublicationgroupPeer::getInstanceFromPool((string) $pk))) {
+            return $obj;
         }
 
         if ($con === null) {
             $con = Propel::getConnection(PublicationPublicationgroupPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
+
         $criteria = new Criteria(PublicationPublicationgroupPeer::DATABASE_NAME);
-        $criteria->add(PublicationPublicationgroupPeer::ID, $id);
-        $criteria->add(PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID, $publicationgroup_id);
-        $criteria->add(PublicationPublicationgroupPeer::PUBLICATION_ID, $publication_id);
+        $criteria->add(PublicationPublicationgroupPeer::ID, $pk);
+
         $v = PublicationPublicationgroupPeer::doSelect($criteria, $con);
 
-        return !empty($v) ? $v[0] : null;
+        return !empty($v) > 0 ? $v[0] : null;
     }
+
+    /**
+     * Retrieve multiple objects by pkey.
+     *
+     * @param      array $pks List of primary keys
+     * @param      PropelPDO $con the connection to use
+     * @return PublicationPublicationgroup[]
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function retrieveByPKs($pks, PropelPDO $con = null)
+    {
+        if ($con === null) {
+            $con = Propel::getConnection(PublicationPublicationgroupPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $objs = null;
+        if (empty($pks)) {
+            $objs = array();
+        } else {
+            $criteria = new Criteria(PublicationPublicationgroupPeer::DATABASE_NAME);
+            $criteria->add(PublicationPublicationgroupPeer::ID, $pks, Criteria::IN);
+            $objs = PublicationPublicationgroupPeer::doSelect($criteria, $con);
+        }
+
+        return $objs;
+    }
+
 } // BasePublicationPublicationgroupPeer
 
 // This is the static code needed to register the TableMap for this table with the main Propel class.

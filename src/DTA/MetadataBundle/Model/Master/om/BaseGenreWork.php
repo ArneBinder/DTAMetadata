@@ -41,12 +41,6 @@ abstract class BaseGenreWork extends BaseObject implements Persistent, \DTA\Meta
     protected $startCopy = false;
 
     /**
-     * The value for the id field.
-     * @var        int
-     */
-    protected $id;
-
-    /**
      * The value for the genre_id field.
      * @var        int
      */
@@ -57,6 +51,12 @@ abstract class BaseGenreWork extends BaseObject implements Persistent, \DTA\Meta
      * @var        int
      */
     protected $work_id;
+
+    /**
+     * The value for the id field.
+     * @var        int
+     */
+    protected $id;
 
     /**
      * @var        Genre
@@ -91,16 +91,6 @@ abstract class BaseGenreWork extends BaseObject implements Persistent, \DTA\Meta
     // table_row_view behavior
     public static $tableRowViewCaptions = array();	public   $tableRowViewAccessors = array();
     /**
-     * Get the [id] column value.
-     *
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
      * Get the [genre_id] column value.
      *
      * @return int
@@ -121,25 +111,14 @@ abstract class BaseGenreWork extends BaseObject implements Persistent, \DTA\Meta
     }
 
     /**
-     * Set the value of [id] column.
+     * Get the [id] column value.
      *
-     * @param int $v new value
-     * @return GenreWork The current object (for fluent API support)
+     * @return int
      */
-    public function setId($v)
+    public function getId()
     {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->id !== $v) {
-            $this->id = $v;
-            $this->modifiedColumns[] = GenreWorkPeer::ID;
-        }
-
-
-        return $this;
-    } // setId()
+        return $this->id;
+    }
 
     /**
      * Set the value of [genre_id] column.
@@ -192,6 +171,27 @@ abstract class BaseGenreWork extends BaseObject implements Persistent, \DTA\Meta
     } // setWorkId()
 
     /**
+     * Set the value of [id] column.
+     *
+     * @param int $v new value
+     * @return GenreWork The current object (for fluent API support)
+     */
+    public function setId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->id !== $v) {
+            $this->id = $v;
+            $this->modifiedColumns[] = GenreWorkPeer::ID;
+        }
+
+
+        return $this;
+    } // setId()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -223,9 +223,9 @@ abstract class BaseGenreWork extends BaseObject implements Persistent, \DTA\Meta
     {
         try {
 
-            $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-            $this->genre_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-            $this->work_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+            $this->genre_id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
+            $this->work_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+            $this->id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -467,16 +467,30 @@ abstract class BaseGenreWork extends BaseObject implements Persistent, \DTA\Meta
         $modifiedColumns = array();
         $index = 0;
 
+        $this->modifiedColumns[] = GenreWorkPeer::ID;
+        if (null !== $this->id) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . GenreWorkPeer::ID . ')');
+        }
+        if (null === $this->id) {
+            try {
+                $stmt = $con->query("SELECT nextval('genre_work_id_seq')");
+                $row = $stmt->fetch(PDO::FETCH_NUM);
+                $this->id = $row[0];
+            } catch (Exception $e) {
+                throw new PropelException('Unable to get sequence id.', $e);
+            }
+        }
+
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(GenreWorkPeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '"id"';
-        }
         if ($this->isColumnModified(GenreWorkPeer::GENRE_ID)) {
             $modifiedColumns[':p' . $index++]  = '"genre_id"';
         }
         if ($this->isColumnModified(GenreWorkPeer::WORK_ID)) {
             $modifiedColumns[':p' . $index++]  = '"work_id"';
+        }
+        if ($this->isColumnModified(GenreWorkPeer::ID)) {
+            $modifiedColumns[':p' . $index++]  = '"id"';
         }
 
         $sql = sprintf(
@@ -489,14 +503,14 @@ abstract class BaseGenreWork extends BaseObject implements Persistent, \DTA\Meta
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '"id"':
-                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
-                        break;
                     case '"genre_id"':
                         $stmt->bindValue($identifier, $this->genre_id, PDO::PARAM_INT);
                         break;
                     case '"work_id"':
                         $stmt->bindValue($identifier, $this->work_id, PDO::PARAM_INT);
+                        break;
+                    case '"id"':
+                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -644,13 +658,13 @@ abstract class BaseGenreWork extends BaseObject implements Persistent, \DTA\Meta
     {
         switch ($pos) {
             case 0:
-                return $this->getId();
-                break;
-            case 1:
                 return $this->getGenreId();
                 break;
-            case 2:
+            case 1:
                 return $this->getWorkId();
+                break;
+            case 2:
+                return $this->getId();
                 break;
             default:
                 return null;
@@ -675,15 +689,15 @@ abstract class BaseGenreWork extends BaseObject implements Persistent, \DTA\Meta
      */
     public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['GenreWork'][serialize($this->getPrimaryKey())])) {
+        if (isset($alreadyDumpedObjects['GenreWork'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['GenreWork'][serialize($this->getPrimaryKey())] = true;
+        $alreadyDumpedObjects['GenreWork'][$this->getPrimaryKey()] = true;
         $keys = GenreWorkPeer::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getId(),
-            $keys[1] => $this->getGenreId(),
-            $keys[2] => $this->getWorkId(),
+            $keys[0] => $this->getGenreId(),
+            $keys[1] => $this->getWorkId(),
+            $keys[2] => $this->getId(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aGenre) {
@@ -727,13 +741,13 @@ abstract class BaseGenreWork extends BaseObject implements Persistent, \DTA\Meta
     {
         switch ($pos) {
             case 0:
-                $this->setId($value);
-                break;
-            case 1:
                 $this->setGenreId($value);
                 break;
-            case 2:
+            case 1:
                 $this->setWorkId($value);
+                break;
+            case 2:
+                $this->setId($value);
                 break;
         } // switch()
     }
@@ -759,9 +773,9 @@ abstract class BaseGenreWork extends BaseObject implements Persistent, \DTA\Meta
     {
         $keys = GenreWorkPeer::getFieldNames($keyType);
 
-        if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setGenreId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setWorkId($arr[$keys[2]]);
+        if (array_key_exists($keys[0], $arr)) $this->setGenreId($arr[$keys[0]]);
+        if (array_key_exists($keys[1], $arr)) $this->setWorkId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setId($arr[$keys[2]]);
     }
 
     /**
@@ -773,9 +787,9 @@ abstract class BaseGenreWork extends BaseObject implements Persistent, \DTA\Meta
     {
         $criteria = new Criteria(GenreWorkPeer::DATABASE_NAME);
 
-        if ($this->isColumnModified(GenreWorkPeer::ID)) $criteria->add(GenreWorkPeer::ID, $this->id);
         if ($this->isColumnModified(GenreWorkPeer::GENRE_ID)) $criteria->add(GenreWorkPeer::GENRE_ID, $this->genre_id);
         if ($this->isColumnModified(GenreWorkPeer::WORK_ID)) $criteria->add(GenreWorkPeer::WORK_ID, $this->work_id);
+        if ($this->isColumnModified(GenreWorkPeer::ID)) $criteria->add(GenreWorkPeer::ID, $this->id);
 
         return $criteria;
     }
@@ -792,38 +806,28 @@ abstract class BaseGenreWork extends BaseObject implements Persistent, \DTA\Meta
     {
         $criteria = new Criteria(GenreWorkPeer::DATABASE_NAME);
         $criteria->add(GenreWorkPeer::ID, $this->id);
-        $criteria->add(GenreWorkPeer::GENRE_ID, $this->genre_id);
-        $criteria->add(GenreWorkPeer::WORK_ID, $this->work_id);
 
         return $criteria;
     }
 
     /**
-     * Returns the composite primary key for this object.
-     * The array elements will be in same order as specified in XML.
-     * @return array
+     * Returns the primary key for this object (row).
+     * @return int
      */
     public function getPrimaryKey()
     {
-        $pks = array();
-        $pks[0] = $this->getId();
-        $pks[1] = $this->getGenreId();
-        $pks[2] = $this->getWorkId();
-
-        return $pks;
+        return $this->getId();
     }
 
     /**
-     * Set the [composite] primary key.
+     * Generic method to set the primary key (id column).
      *
-     * @param array $keys The elements of the composite key (order must match the order in XML file).
+     * @param  int $key Primary key.
      * @return void
      */
-    public function setPrimaryKey($keys)
+    public function setPrimaryKey($key)
     {
-        $this->setId($keys[0]);
-        $this->setGenreId($keys[1]);
-        $this->setWorkId($keys[2]);
+        $this->setId($key);
     }
 
     /**
@@ -833,7 +837,7 @@ abstract class BaseGenreWork extends BaseObject implements Persistent, \DTA\Meta
     public function isPrimaryKeyNull()
     {
 
-        return (null === $this->getId()) && (null === $this->getGenreId()) && (null === $this->getWorkId());
+        return null === $this->getId();
     }
 
     /**
@@ -849,7 +853,6 @@ abstract class BaseGenreWork extends BaseObject implements Persistent, \DTA\Meta
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setId($this->getId());
         $copyObj->setGenreId($this->getGenreId());
         $copyObj->setWorkId($this->getWorkId());
 
@@ -866,6 +869,7 @@ abstract class BaseGenreWork extends BaseObject implements Persistent, \DTA\Meta
 
         if ($makeNew) {
             $copyObj->setNew(true);
+            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1018,9 +1022,9 @@ abstract class BaseGenreWork extends BaseObject implements Persistent, \DTA\Meta
      */
     public function clear()
     {
-        $this->id = null;
         $this->genre_id = null;
         $this->work_id = null;
+        $this->id = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;

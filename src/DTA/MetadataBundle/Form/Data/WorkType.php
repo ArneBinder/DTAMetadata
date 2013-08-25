@@ -30,7 +30,7 @@ class WorkType extends BaseAbstractType
     {
         $builder->add('title', new TitleType());
         $builder->add('datespecification', new Data\DatespecificationType(), array(
-            'label' => 'Entstehungsjahr, f.a.'
+            'label' => 'Entstehungsjahr des Textes'
         ));
         $builder->add('PersonWorks', new DynamicCollectionType(), array(
             'type' => new Master\PersonWorkType(),

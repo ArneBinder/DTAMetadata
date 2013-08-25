@@ -10,7 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
  * Must match the package name.
  * @Route("/Classification")
  */
-class ClassificationDomainController extends DTADomainController {
+class ClassificationDomainController extends ORMController {
 
     /** @inheritdoc */
     public $package = "Classification";
@@ -24,8 +24,6 @@ class ClassificationDomainController extends DTADomainController {
         array("caption" => "Korpora", "modelClass" => 'Corpus'),
         array("caption" => "Kategorien", "modelClass" => 'Category'),
         array("caption" => "Tags", "modelClass" => 'Tag'),
-        array("caption" => "Schriftarten", "modelClass" => 'Font'),
-        array("caption" => "Sprachen", "modelClass" => 'Language'),
         array("caption" => "Verwandte Werke", 'route' => 'home'),
     );
 

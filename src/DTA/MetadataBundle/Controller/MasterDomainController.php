@@ -11,7 +11,7 @@ use \Symfony\Component\Security\Core\SecurityContext;
  * Must match the package name.
  * @Route("/Master")
  */
-class MasterDomainController extends DTADomainController {
+class MasterDomainController extends ORMController {
 
     /** @inheritdoc */
     public $package = "Master";

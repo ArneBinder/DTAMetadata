@@ -37,9 +37,6 @@ abstract class BaseDtaUserPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 7;
 
-    /** the column name for the id field */
-    const ID = 'dta_user.id';
-
     /** the column name for the username field */
     const USERNAME = 'dta_user.username';
 
@@ -57,6 +54,9 @@ abstract class BaseDtaUserPeer
 
     /** the column name for the admin field */
     const ADMIN = 'dta_user.admin';
+
+    /** the column name for the id field */
+    const ID = 'dta_user.id';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -77,11 +77,11 @@ abstract class BaseDtaUserPeer
      * e.g. DtaUserPeer::$fieldNames[DtaUserPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Username', 'Password', 'Salt', 'Mail', 'Phone', 'Admin', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'username', 'password', 'salt', 'mail', 'phone', 'admin', ),
-        BasePeer::TYPE_COLNAME => array (DtaUserPeer::ID, DtaUserPeer::USERNAME, DtaUserPeer::PASSWORD, DtaUserPeer::SALT, DtaUserPeer::MAIL, DtaUserPeer::PHONE, DtaUserPeer::ADMIN, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'USERNAME', 'PASSWORD', 'SALT', 'MAIL', 'PHONE', 'ADMIN', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'username', 'password', 'salt', 'mail', 'phone', 'admin', ),
+        BasePeer::TYPE_PHPNAME => array ('Username', 'Password', 'Salt', 'Mail', 'Phone', 'Admin', 'Id', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('username', 'password', 'salt', 'mail', 'phone', 'admin', 'id', ),
+        BasePeer::TYPE_COLNAME => array (DtaUserPeer::USERNAME, DtaUserPeer::PASSWORD, DtaUserPeer::SALT, DtaUserPeer::MAIL, DtaUserPeer::PHONE, DtaUserPeer::ADMIN, DtaUserPeer::ID, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('USERNAME', 'PASSWORD', 'SALT', 'MAIL', 'PHONE', 'ADMIN', 'ID', ),
+        BasePeer::TYPE_FIELDNAME => array ('username', 'password', 'salt', 'mail', 'phone', 'admin', 'id', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
     );
 
@@ -92,11 +92,11 @@ abstract class BaseDtaUserPeer
      * e.g. DtaUserPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Username' => 1, 'Password' => 2, 'Salt' => 3, 'Mail' => 4, 'Phone' => 5, 'Admin' => 6, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'username' => 1, 'password' => 2, 'salt' => 3, 'mail' => 4, 'phone' => 5, 'admin' => 6, ),
-        BasePeer::TYPE_COLNAME => array (DtaUserPeer::ID => 0, DtaUserPeer::USERNAME => 1, DtaUserPeer::PASSWORD => 2, DtaUserPeer::SALT => 3, DtaUserPeer::MAIL => 4, DtaUserPeer::PHONE => 5, DtaUserPeer::ADMIN => 6, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'USERNAME' => 1, 'PASSWORD' => 2, 'SALT' => 3, 'MAIL' => 4, 'PHONE' => 5, 'ADMIN' => 6, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'username' => 1, 'password' => 2, 'salt' => 3, 'mail' => 4, 'phone' => 5, 'admin' => 6, ),
+        BasePeer::TYPE_PHPNAME => array ('Username' => 0, 'Password' => 1, 'Salt' => 2, 'Mail' => 3, 'Phone' => 4, 'Admin' => 5, 'Id' => 6, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('username' => 0, 'password' => 1, 'salt' => 2, 'mail' => 3, 'phone' => 4, 'admin' => 5, 'id' => 6, ),
+        BasePeer::TYPE_COLNAME => array (DtaUserPeer::USERNAME => 0, DtaUserPeer::PASSWORD => 1, DtaUserPeer::SALT => 2, DtaUserPeer::MAIL => 3, DtaUserPeer::PHONE => 4, DtaUserPeer::ADMIN => 5, DtaUserPeer::ID => 6, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('USERNAME' => 0, 'PASSWORD' => 1, 'SALT' => 2, 'MAIL' => 3, 'PHONE' => 4, 'ADMIN' => 5, 'ID' => 6, ),
+        BasePeer::TYPE_FIELDNAME => array ('username' => 0, 'password' => 1, 'salt' => 2, 'mail' => 3, 'phone' => 4, 'admin' => 5, 'id' => 6, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
     );
 
@@ -171,21 +171,21 @@ abstract class BaseDtaUserPeer
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(DtaUserPeer::ID);
             $criteria->addSelectColumn(DtaUserPeer::USERNAME);
             $criteria->addSelectColumn(DtaUserPeer::PASSWORD);
             $criteria->addSelectColumn(DtaUserPeer::SALT);
             $criteria->addSelectColumn(DtaUserPeer::MAIL);
             $criteria->addSelectColumn(DtaUserPeer::PHONE);
             $criteria->addSelectColumn(DtaUserPeer::ADMIN);
+            $criteria->addSelectColumn(DtaUserPeer::ID);
         } else {
-            $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.username');
             $criteria->addSelectColumn($alias . '.password');
             $criteria->addSelectColumn($alias . '.salt');
             $criteria->addSelectColumn($alias . '.mail');
             $criteria->addSelectColumn($alias . '.phone');
             $criteria->addSelectColumn($alias . '.admin');
+            $criteria->addSelectColumn($alias . '.id');
         }
     }
 
@@ -407,11 +407,11 @@ abstract class BaseDtaUserPeer
     public static function getPrimaryKeyHashFromRow($row, $startcol = 0)
     {
         // If the PK cannot be derived from the row, return null.
-        if ($row[$startcol] === null) {
+        if ($row[$startcol + 6] === null) {
             return null;
         }
 
-        return (string) $row[$startcol];
+        return (string) $row[$startcol + 6];
     }
 
     /**
@@ -426,7 +426,7 @@ abstract class BaseDtaUserPeer
     public static function getPrimaryKeyFromRow($row, $startcol = 0)
     {
 
-        return (int) $row[$startcol];
+        return (int) $row[$startcol + 6];
     }
 
     /**

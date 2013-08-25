@@ -40,12 +40,13 @@ class GenreWorkTableMap extends TableMap
         $this->setPhpName('GenreWork');
         $this->setClassname('DTA\\MetadataBundle\\Model\\Master\\GenreWork');
         $this->setPackage('src.DTA.MetadataBundle.Model.Master');
-        $this->setUseIdGenerator(false);
+        $this->setUseIdGenerator(true);
+        $this->setPrimaryKeyMethodInfo('genre_work_id_seq');
         $this->setIsCrossRef(true);
         // columns
+        $this->addForeignKey('genre_id', 'GenreId', 'INTEGER', 'genre', 'id', true, null, null);
+        $this->addForeignKey('work_id', 'WorkId', 'INTEGER', 'work', 'id', true, null, null);
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignPrimaryKey('genre_id', 'GenreId', 'INTEGER' , 'genre', 'id', true, null, null);
-        $this->addForeignPrimaryKey('work_id', 'WorkId', 'INTEGER' , 'work', 'id', true, null, null);
         // validators
     } // initialize()
 
@@ -68,9 +69,14 @@ class GenreWorkTableMap extends TableMap
     {
         return array(
             'table_row_view' =>  array (
-  'Id' => 'id',
   'GenreId' => 'genre_id',
   'WorkId' => 'work_id',
+  'Id' => 'id',
+),
+            'auto_add_pk' =>  array (
+  'name' => 'id',
+  'autoIncrement' => 'true',
+  'type' => 'INTEGER',
 ),
         );
     } // getBehaviors()

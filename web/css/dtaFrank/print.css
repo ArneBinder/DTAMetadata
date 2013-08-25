@@ -1,0 +1,13 @@
+#help-toc-container { display:none }
+.back-to-top        { display:none }
+.phasex-nb          { display:none }
+#header             { display:none }
+.bf-toc             { display:none }
+.noprint            { display:none }
+
+#foot               { display:none }
+#foot-print         { margin-top:20px; border-bottom:1px solid #333; padding-top:10px }
+.print              { display:block !important }
+
+#nav, #topnav       { display:none }
+.help-content       { width:100% !important; border:none !important; font-size:14pt !important }

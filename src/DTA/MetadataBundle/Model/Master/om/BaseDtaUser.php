@@ -41,12 +41,6 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     protected $startCopy = false;
 
     /**
-     * The value for the id field.
-     * @var        int
-     */
-    protected $id;
-
-    /**
      * The value for the username field.
      * @var        string
      */
@@ -82,6 +76,12 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
      * @var        boolean
      */
     protected $admin;
+
+    /**
+     * The value for the id field.
+     * @var        int
+     */
+    protected $id;
 
     /**
      * @var        PropelObjectCollection|Task[] Collection to store aggregation of Task objects.
@@ -136,16 +136,6 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     {
         parent::__construct();
         $this->applyDefaultValues();
-    }
-
-    /**
-     * Get the [id] column value.
-     *
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
     }
 
     /**
@@ -209,25 +199,14 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     }
 
     /**
-     * Set the value of [id] column.
+     * Get the [id] column value.
      *
-     * @param int $v new value
-     * @return DtaUser The current object (for fluent API support)
+     * @return int
      */
-    public function setId($v)
+    public function getId()
     {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->id !== $v) {
-            $this->id = $v;
-            $this->modifiedColumns[] = DtaUserPeer::ID;
-        }
-
-
-        return $this;
-    } // setId()
+        return $this->id;
+    }
 
     /**
      * Set the value of [username] column.
@@ -364,6 +343,27 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     } // setAdmin()
 
     /**
+     * Set the value of [id] column.
+     *
+     * @param int $v new value
+     * @return DtaUser The current object (for fluent API support)
+     */
+    public function setId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->id !== $v) {
+            $this->id = $v;
+            $this->modifiedColumns[] = DtaUserPeer::ID;
+        }
+
+
+        return $this;
+    } // setId()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -399,13 +399,13 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     {
         try {
 
-            $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-            $this->username = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
-            $this->password = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-            $this->salt = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-            $this->mail = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-            $this->phone = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-            $this->admin = ($row[$startcol + 6] !== null) ? (boolean) $row[$startcol + 6] : null;
+            $this->username = ($row[$startcol + 0] !== null) ? (string) $row[$startcol + 0] : null;
+            $this->password = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
+            $this->salt = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+            $this->mail = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+            $this->phone = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+            $this->admin = ($row[$startcol + 5] !== null) ? (boolean) $row[$startcol + 5] : null;
+            $this->id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -656,9 +656,6 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
 
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(DtaUserPeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '"id"';
-        }
         if ($this->isColumnModified(DtaUserPeer::USERNAME)) {
             $modifiedColumns[':p' . $index++]  = '"username"';
         }
@@ -677,6 +674,9 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
         if ($this->isColumnModified(DtaUserPeer::ADMIN)) {
             $modifiedColumns[':p' . $index++]  = '"admin"';
         }
+        if ($this->isColumnModified(DtaUserPeer::ID)) {
+            $modifiedColumns[':p' . $index++]  = '"id"';
+        }
 
         $sql = sprintf(
             'INSERT INTO "dta_user" (%s) VALUES (%s)',
@@ -688,9 +688,6 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '"id"':
-                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
-                        break;
                     case '"username"':
                         $stmt->bindValue($identifier, $this->username, PDO::PARAM_STR);
                         break;
@@ -708,6 +705,9 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
                         break;
                     case '"admin"':
                         $stmt->bindValue($identifier, $this->admin, PDO::PARAM_BOOL);
+                        break;
+                    case '"id"':
+                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -845,25 +845,25 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     {
         switch ($pos) {
             case 0:
-                return $this->getId();
-                break;
-            case 1:
                 return $this->getUsername();
                 break;
-            case 2:
+            case 1:
                 return $this->getPassword();
                 break;
-            case 3:
+            case 2:
                 return $this->getSalt();
                 break;
-            case 4:
+            case 3:
                 return $this->getMail();
                 break;
-            case 5:
+            case 4:
                 return $this->getPhone();
                 break;
-            case 6:
+            case 5:
                 return $this->getAdmin();
+                break;
+            case 6:
+                return $this->getId();
                 break;
             default:
                 return null;
@@ -894,13 +894,13 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
         $alreadyDumpedObjects['DtaUser'][$this->getPrimaryKey()] = true;
         $keys = DtaUserPeer::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getId(),
-            $keys[1] => $this->getUsername(),
-            $keys[2] => $this->getPassword(),
-            $keys[3] => $this->getSalt(),
-            $keys[4] => $this->getMail(),
-            $keys[5] => $this->getPhone(),
-            $keys[6] => $this->getAdmin(),
+            $keys[0] => $this->getUsername(),
+            $keys[1] => $this->getPassword(),
+            $keys[2] => $this->getSalt(),
+            $keys[3] => $this->getMail(),
+            $keys[4] => $this->getPhone(),
+            $keys[5] => $this->getAdmin(),
+            $keys[6] => $this->getId(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->collTasks) {
@@ -941,25 +941,25 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     {
         switch ($pos) {
             case 0:
-                $this->setId($value);
-                break;
-            case 1:
                 $this->setUsername($value);
                 break;
-            case 2:
+            case 1:
                 $this->setPassword($value);
                 break;
-            case 3:
+            case 2:
                 $this->setSalt($value);
                 break;
-            case 4:
+            case 3:
                 $this->setMail($value);
                 break;
-            case 5:
+            case 4:
                 $this->setPhone($value);
                 break;
-            case 6:
+            case 5:
                 $this->setAdmin($value);
+                break;
+            case 6:
+                $this->setId($value);
                 break;
         } // switch()
     }
@@ -985,13 +985,13 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     {
         $keys = DtaUserPeer::getFieldNames($keyType);
 
-        if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setUsername($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setPassword($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setSalt($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setMail($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setPhone($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setAdmin($arr[$keys[6]]);
+        if (array_key_exists($keys[0], $arr)) $this->setUsername($arr[$keys[0]]);
+        if (array_key_exists($keys[1], $arr)) $this->setPassword($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setSalt($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setMail($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setPhone($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setAdmin($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setId($arr[$keys[6]]);
     }
 
     /**
@@ -1003,13 +1003,13 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     {
         $criteria = new Criteria(DtaUserPeer::DATABASE_NAME);
 
-        if ($this->isColumnModified(DtaUserPeer::ID)) $criteria->add(DtaUserPeer::ID, $this->id);
         if ($this->isColumnModified(DtaUserPeer::USERNAME)) $criteria->add(DtaUserPeer::USERNAME, $this->username);
         if ($this->isColumnModified(DtaUserPeer::PASSWORD)) $criteria->add(DtaUserPeer::PASSWORD, $this->password);
         if ($this->isColumnModified(DtaUserPeer::SALT)) $criteria->add(DtaUserPeer::SALT, $this->salt);
         if ($this->isColumnModified(DtaUserPeer::MAIL)) $criteria->add(DtaUserPeer::MAIL, $this->mail);
         if ($this->isColumnModified(DtaUserPeer::PHONE)) $criteria->add(DtaUserPeer::PHONE, $this->phone);
         if ($this->isColumnModified(DtaUserPeer::ADMIN)) $criteria->add(DtaUserPeer::ADMIN, $this->admin);
+        if ($this->isColumnModified(DtaUserPeer::ID)) $criteria->add(DtaUserPeer::ID, $this->id);
 
         return $criteria;
     }
@@ -1457,13 +1457,13 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
      */
     public function clear()
     {
-        $this->id = null;
         $this->username = null;
         $this->password = null;
         $this->salt = null;
         $this->mail = null;
         $this->phone = null;
         $this->admin = null;
+        $this->id = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;

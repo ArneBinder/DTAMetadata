@@ -5,7 +5,7 @@ namespace DTA\MetadataBundle\Model\Data;
 use DTA\MetadataBundle\Model\Data\om\BasePerson;
 
 class Person extends BasePerson {
-
+    
     // overrides the basic function to guarantee order.
     public function getPersonalnames($criteria = NULL, PropelPDO $con = NULL) {
         $collection = parent::getPersonalnames();

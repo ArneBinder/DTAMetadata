@@ -54,8 +54,8 @@ class PersonalnameTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Person', 'DTA\\MetadataBundle\\Model\\Data\\Person', RelationMap::MANY_TO_ONE, array('person_id' => 'id', ), null, null);
-        $this->addRelation('Namefragment', 'DTA\\MetadataBundle\\Model\\Data\\Namefragment', RelationMap::ONE_TO_MANY, array('id' => 'personalname_id', ), null, null, 'Namefragments');
+        $this->addRelation('Person', 'DTA\\MetadataBundle\\Model\\Data\\Person', RelationMap::MANY_TO_ONE, array('person_id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('Namefragment', 'DTA\\MetadataBundle\\Model\\Data\\Namefragment', RelationMap::ONE_TO_MANY, array('id' => 'personalname_id', ), 'CASCADE', null, 'Namefragments');
     } // buildRelations()
 
     /**

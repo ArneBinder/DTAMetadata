@@ -236,7 +236,6 @@
     <!--Eine Reihe.-->
     <table name="series">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        
         <column name="title_id" type="INTEGER" required="true"/>
         
         <foreign-key foreignTable="title"> <reference local="title_id" foreign="id"/> </foreign-key>
@@ -249,6 +248,7 @@
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
         <column name="gnd" type="VARCHAR" size="255" required="false"/> 
+        <behavior name="table_row_view"> <parameter name="Name" value="name" /><parameter name="GND" value="gnd" /> </behavior>
         <unique> <unique-column name="gnd"/> </unique>
     </table>
 

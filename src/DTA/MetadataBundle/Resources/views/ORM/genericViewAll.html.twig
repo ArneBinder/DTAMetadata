@@ -22,7 +22,7 @@
         </a>
     </h3>
     
-    <table class="table table-striped table-hover"> {# further bootstrap table classes: table-hover #}
+    <table class="table table-striped table-hover" style="table-layout: fixed"> {# further bootstrap table classes: table-hover #}
         
         <thead>
             {% for col in columns %}    
@@ -45,23 +45,15 @@
             {% endfor %}
                 {# Display edit buttons instead of Ids #}
                 <td>
-                    <a name="record{{recordId}}" class="btn btn-mini" 
+                    <a name="record{{recordId}}" 
+                       class="glyphicon glyphicon-edit" 
                        href="{{ path('genericCreateOrEdit', {'package':package, 'className':className, 'recordId':recordId}) }}">
-                        <i class="icon-pencil"></i>
-                        {{ "listView.edit.row.buttonSuffix"|trans }} {#className|trans~#}
-                    </a>
-                    <a data-toggle="modal" href="#confirmDeleteModal{{recordId}}" class="btn btn-mini glyphicon glyphicon-remove">
-                        <i class="icon-warning-sign"></i>
+                        {{ "listView.edit.row.buttonSuffix"|trans }}</a>
+                    <a href="{{path('deleteRecord', {'package':package, 'className':className, 'recordId':recordId })}}" 
+                       title="Den Datensatz {{recordId}} wirklich löschen?"
+                       class="confirmClick glyphicon glyphicon-trash">
                         löschen {#className|trans~#}
                     </a>
-                    {{ dta.beginModal('Achtung!','confirmDeleteModal'~recordId)}}
-                        Den Datensatz {{recordId}} wirklich löschen?
-                    {{ dta.endModal({
-                        'target':
-                         path('deleteRecord', {'package':package, 'className':className, 'recordId':recordId }),
-                        'caption':'Löschen'}) }}
-                        
-
                 </td>
             </tr>
         {% endfor %}

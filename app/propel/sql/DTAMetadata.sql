@@ -492,10 +492,10 @@ DROP TABLE IF EXISTS "language_work" CASCADE;
 
 CREATE TABLE "language_work"
 (
-    "id" INTEGER NOT NULL,
     "language_id" INTEGER NOT NULL,
     "work_id" INTEGER NOT NULL,
-    PRIMARY KEY ("id","language_id","work_id")
+    "id" serial NOT NULL,
+    PRIMARY KEY ("id")
 );
 
 -----------------------------------------------------------------------
@@ -506,10 +506,10 @@ DROP TABLE IF EXISTS "genre_work" CASCADE;
 
 CREATE TABLE "genre_work"
 (
-    "id" INTEGER NOT NULL,
     "genre_id" INTEGER NOT NULL,
     "work_id" INTEGER NOT NULL,
-    PRIMARY KEY ("id","genre_id","work_id")
+    "id" serial NOT NULL,
+    PRIMARY KEY ("id")
 );
 
 -----------------------------------------------------------------------
@@ -520,10 +520,10 @@ DROP TABLE IF EXISTS "work_tag" CASCADE;
 
 CREATE TABLE "work_tag"
 (
-    "id" INTEGER NOT NULL,
     "tag_id" INTEGER NOT NULL,
     "work_id" INTEGER NOT NULL,
-    PRIMARY KEY ("id","tag_id","work_id")
+    "id" serial NOT NULL,
+    PRIMARY KEY ("id")
 );
 
 -----------------------------------------------------------------------
@@ -534,10 +534,10 @@ DROP TABLE IF EXISTS "category_work" CASCADE;
 
 CREATE TABLE "category_work"
 (
-    "id" INTEGER NOT NULL,
     "category_id" INTEGER NOT NULL,
     "work_id" INTEGER NOT NULL,
-    PRIMARY KEY ("id","category_id","work_id")
+    "id" serial NOT NULL,
+    PRIMARY KEY ("id")
 );
 
 -----------------------------------------------------------------------
@@ -548,10 +548,10 @@ DROP TABLE IF EXISTS "publication_publicationgroup" CASCADE;
 
 CREATE TABLE "publication_publicationgroup"
 (
-    "id" INTEGER NOT NULL,
     "publicationgroup_id" INTEGER NOT NULL,
     "publication_id" INTEGER NOT NULL,
-    PRIMARY KEY ("id","publicationgroup_id","publication_id")
+    "id" serial NOT NULL,
+    PRIMARY KEY ("id")
 );
 
 -----------------------------------------------------------------------
@@ -562,10 +562,10 @@ DROP TABLE IF EXISTS "person_publication" CASCADE;
 
 CREATE TABLE "person_publication"
 (
-    "id" INTEGER NOT NULL,
     "personrole_id" INTEGER NOT NULL,
     "person_id" INTEGER NOT NULL,
     "publication_id" INTEGER NOT NULL,
+    "id" serial NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -577,10 +577,10 @@ DROP TABLE IF EXISTS "person_work" CASCADE;
 
 CREATE TABLE "person_work"
 (
-    "id" INTEGER NOT NULL,
     "person_id" INTEGER NOT NULL,
     "personrole_id" INTEGER NOT NULL,
     "work_id" INTEGER NOT NULL,
+    "id" serial NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -592,13 +592,13 @@ DROP TABLE IF EXISTS "dta_user" CASCADE;
 
 CREATE TABLE "dta_user"
 (
-    "id" serial NOT NULL,
     "username" TEXT,
     "password" VARCHAR(512),
     "salt" VARCHAR(512),
     "mail" TEXT,
     "phone" TEXT,
     "admin" BOOLEAN DEFAULT 'f',
+    "id" serial NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -881,7 +881,8 @@ ALTER TABLE "series" ADD CONSTRAINT "series_FK_1"
 
 ALTER TABLE "personalname" ADD CONSTRAINT "personalname_FK_1"
     FOREIGN KEY ("person_id")
-    REFERENCES "person" ("id");
+    REFERENCES "person" ("id")
+    ON DELETE CASCADE;
 
 ALTER TABLE "namefragment" ADD CONSTRAINT "namefragment_FK_1"
     FOREIGN KEY ("namefragmenttypeid")
@@ -889,11 +890,13 @@ ALTER TABLE "namefragment" ADD CONSTRAINT "namefragment_FK_1"
 
 ALTER TABLE "namefragment" ADD CONSTRAINT "namefragment_FK_2"
     FOREIGN KEY ("personalname_id")
-    REFERENCES "personalname" ("id");
+    REFERENCES "personalname" ("id")
+    ON DELETE CASCADE;
 
 ALTER TABLE "titlefragment" ADD CONSTRAINT "titlefragment_FK_1"
     FOREIGN KEY ("title_id")
-    REFERENCES "title" ("id");
+    REFERENCES "title" ("id")
+    ON DELETE CASCADE;
 
 ALTER TABLE "titlefragment" ADD CONSTRAINT "titlefragment_FK_2"
     FOREIGN KEY ("titlefragmenttype_id")

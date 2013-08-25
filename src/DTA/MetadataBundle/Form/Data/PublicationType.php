@@ -27,24 +27,6 @@ class PublicationType extends BaseAbstractType
     {
         $builder->add('work', new WorkType());
 
-//        $builder->add('personPublications', new DynamicCollectionType(), array(
-//            'type' => new PersonPublicationType(),
-//            'allow_add' => true,
-//            'allow_delete' => true,
-//            'by_reference' => false,
-//            'inlineLabel' => false,
-//            'sortable' => false,
-//            'label' => 'Publikationsbezogene Personalia',
-//        ));
-//        
-//        $builder->add('place', new SelectOrAddType(), array(
-//            'class' => 'DTA\MetadataBundle\Model\Data\Place',
-//            'property' => 'Name',
-//            'label' => 'Druckort',
-//            'searchable' => true,
-//            
-//        ));
-//
         $builder->add('PersonPublications', new DynamicCollectionType(), array(
             'type' => new Master\PersonPublicationType(),
             'inlineLabel' => false,
@@ -53,14 +35,26 @@ class PublicationType extends BaseAbstractType
             'options' => array('isPublicationSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
         ));
         
+        $builder->add('place', new SelectOrAddType(), array(
+            'class' => 'DTA\MetadataBundle\Model\Data\Place',
+            'property' => 'Name',
+            'label' => 'Druckort',
+            'searchable' => true,
+            
+        ));
+        
         $builder->add('DatespecificationRelatedByPublicationdateId', new Data\DatespecificationType(), array(
-            'label' => 'Erscheinungsjahr (f.a.)'
+            'label' => 'Erscheinungsjahr'
         ));
         
         $builder->add('DatespecificationRelatedByFirstpublicationdateId', new Data\DatespecificationType(), array(
-            'label' => 'Erscheinungsjahr der Erstausgabe (f.a.)'
+            'label' => 'Erscheinungsjahr der Erstausgabe'
         ));
-//        
+
+        $builder->add('printrun', new Data\PrintrunType(), array(
+            'label' => 'Auflage'
+        ));
+        
         $builder->add('editiondescription', 'text', array(
             'required' => false
         ));

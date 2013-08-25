@@ -53,7 +53,7 @@ class PersonTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Personalname', 'DTA\\MetadataBundle\\Model\\Data\\Personalname', RelationMap::ONE_TO_MANY, array('id' => 'person_id', ), null, null, 'Personalnames');
+        $this->addRelation('Personalname', 'DTA\\MetadataBundle\\Model\\Data\\Personalname', RelationMap::ONE_TO_MANY, array('id' => 'person_id', ), 'CASCADE', null, 'Personalnames');
         $this->addRelation('PersonPublication', 'DTA\\MetadataBundle\\Model\\Master\\PersonPublication', RelationMap::ONE_TO_MANY, array('id' => 'person_id', ), null, null, 'PersonPublications');
         $this->addRelation('PersonWork', 'DTA\\MetadataBundle\\Model\\Master\\PersonWork', RelationMap::ONE_TO_MANY, array('id' => 'person_id', ), null, null, 'PersonWorks');
     } // buildRelations()

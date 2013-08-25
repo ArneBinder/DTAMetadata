@@ -40,12 +40,13 @@ class PersonPublicationTableMap extends TableMap
         $this->setPhpName('PersonPublication');
         $this->setClassname('DTA\\MetadataBundle\\Model\\Master\\PersonPublication');
         $this->setPackage('src.DTA.MetadataBundle.Model.Master');
-        $this->setUseIdGenerator(false);
+        $this->setUseIdGenerator(true);
+        $this->setPrimaryKeyMethodInfo('person_publication_id_seq');
         // columns
-        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('personrole_id', 'PersonroleId', 'INTEGER', 'personrole', 'id', true, null, null);
         $this->addForeignKey('person_id', 'PersonId', 'INTEGER', 'person', 'id', true, null, null);
         $this->addForeignKey('publication_id', 'PublicationId', 'INTEGER', 'publication', 'id', true, null, null);
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         // validators
     } // initialize()
 
@@ -69,10 +70,15 @@ class PersonPublicationTableMap extends TableMap
     {
         return array(
             'table_row_view' =>  array (
-  'Id' => 'id',
   'PersonroleId' => 'personrole_id',
   'PersonId' => 'person_id',
   'PublicationId' => 'publication_id',
+  'Id' => 'id',
+),
+            'auto_add_pk' =>  array (
+  'name' => 'id',
+  'autoIncrement' => 'true',
+  'type' => 'INTEGER',
 ),
         );
     } // getBehaviors()
