@@ -9,6 +9,8 @@
     propel > dbal > connections for connection setup or ./runtime-conf.xml if that doesn't work -->
 <database name="DTAMetadata" namespace="DTA\MetadataBundle\Model\Master" defaultIdMethod="native">
   
+    <behavior name="auto_add_pk" />
+    
     <!-- This parameter set is added to each entity that doesn't implement the table_row_view behavior. 
     It is not added to tables/entities that define the bahavior. -->
     <behavior name="table_row_view">
@@ -16,41 +18,36 @@
     </behavior>
     
     <table name="language_work" isCrossRef="true">
-        <column name="id" type="INTEGER" primaryKey="true" required="true"/>
-        <column name="language_id" type="INTEGER" primaryKey="true" required="true"/>
-        <column name="work_id" type="INTEGER" primaryKey="true" required="true"/>
+        <column name="language_id" type="INTEGER" required="true"/>
+        <column name="work_id" type="INTEGER" required="true"/>
         <foreign-key foreignTable="language"> <reference local="language_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="work"> <reference local="work_id" foreign="id"/> </foreign-key>
     </table>
     
     <table name="genre_work" isCrossRef="true">
-        <column name="id" type="INTEGER" primaryKey="true" required="true"/>
-        <column name="genre_id" type="INTEGER" primaryKey="true" required="true"/>
-        <column name="work_id" type="INTEGER" primaryKey="true" required="true"/>
+        <column name="genre_id" type="INTEGER" required="true"/>
+        <column name="work_id" type="INTEGER" required="true"/>
         <foreign-key foreignTable="genre"> <reference local="genre_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="work"> <reference local="work_id" foreign="id"/> </foreign-key>
     </table>
     
     <table name="work_tag" isCrossRef="true">
-        <column name="id" type="INTEGER" primaryKey="true" required="true"/>
-        <column name="tag_id" type="INTEGER" primaryKey="true" required="true"/>
-        <column name="work_id" type="INTEGER" primaryKey="true" required="true"/>
+        <column name="tag_id" type="INTEGER" required="true"/>
+        <column name="work_id" type="INTEGER" required="true"/>
         <foreign-key foreignTable="tag"> <reference local="tag_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="work"> <reference local="work_id" foreign="id"/> </foreign-key>
     </table>
     
     <table name="category_work" isCrossRef="true">
-        <column name="id" type="INTEGER" primaryKey="true" required="true"/>
-        <column name="category_id" type="INTEGER" primaryKey="true" required="true"/>
-        <column name="work_id" type="INTEGER" primaryKey="true" required="true"/>
+        <column name="category_id" type="INTEGER" required="true"/>
+        <column name="work_id" type="INTEGER" required="true"/>
         <foreign-key foreignTable="category"> <reference local="category_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="work"> <reference local="work_id" foreign="id"/> </foreign-key>
     </table>
     
     <table name="publication_publicationgroup" isCrossRef="true">
-        <column name="id" type="INTEGER" primaryKey="true" required="true"/>
-        <column name="publicationgroup_id" type="INTEGER" primaryKey="true" required="true"/>
-        <column name="publication_id" type="INTEGER" primaryKey="true" required="true"/>
+        <column name="publicationgroup_id" type="INTEGER" required="true"/>
+        <column name="publication_id" type="INTEGER" required="true"/>
         <foreign-key foreignTable="publicationgroup"> <reference local="publicationgroup_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="publication">
             <reference local="publication_id" foreign="id"/>
@@ -58,7 +55,6 @@
     </table>
 
     <table name="person_publication" idMethod="native">
-        <column name="id" type="INTEGER" primaryKey="true" required="true"/>
         <column name="personrole_id" type="INTEGER" required="true"/>
         <column name="person_id" type="INTEGER" required="true"/>
         <column name="publication_id" type="INTEGER" required="true"/>
@@ -69,7 +65,6 @@
     </table>
     
     <table name="person_work" idMethod="native">
-        <column name="id" type="INTEGER" primaryKey="true" required="true"/>
         <column name="person_id" type="INTEGER" required="true"/>
         <column name="personrole_id" type="INTEGER" required="true"/>
         <column name="work_id" type="INTEGER" required="true"/>
@@ -79,7 +74,6 @@
     </table>
 
     <table name="dta_user">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="username" type="LONGVARCHAR" required="false"/>
         <column name="password" type="VARCHAR" size="512" required="false"/>
         <column name="salt" type="VARCHAR" size="512" required="false"/>
