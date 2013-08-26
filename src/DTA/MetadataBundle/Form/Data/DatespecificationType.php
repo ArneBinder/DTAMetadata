@@ -20,7 +20,7 @@ class DatespecificationType extends BaseAbstractType
         $builder->add('year', null, array(
             'label' => false,
         ));
-        $builder->add('comments', 'text', array(
+        $builder->add('comments', 'textarea', array(
             'label' => 'Kommentare',
             'required' => false,
         ));

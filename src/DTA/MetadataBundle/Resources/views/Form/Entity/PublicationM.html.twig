@@ -8,7 +8,7 @@
 
 </div-->
     
-{{ dta.beginFieldset('Werk')}}
+{{ dta.beginFieldset({'caption':'Werk'})}}
         
     {{ form_row(form.publication.work.title) }}
     
@@ -17,12 +17,12 @@
     
 {{ dta.endFieldset()}}
     
-{{ dta.beginFieldset('Publikation', true)}}
+{{ dta.beginFieldset({'caption':'Publikation'})}}
     
 
     {{ form_row(form.publication.place) }}
 
-    {{ dta.beginLabelledControl('me', 'Datierung') }}
+    {{ dta.beginLabelledControl({'controlId':'none', 'labelCaption':'Datierung'}) }}
         {{ form_row(form.publication.DatespecificationRelatedByPublicationdateId) }}
         {{ form_row(form.publication.DatespecificationRelatedByFirstpublicationdateId) }}
         {{ form_row(form.publication.work.datespecification) }}
@@ -34,7 +34,7 @@
     
 {{ dta.endFieldset()}}
 
-{{ dta.beginFieldset('Rest', true)}}
+{{ dta.beginFieldset({'caption':'Rest', 'collapsed':true})}}
 {{ form_rest(form) }}
 {{ dta.endFieldset()}}
 

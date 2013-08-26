@@ -6,6 +6,7 @@ return array(
     'Author' => 'Autor',
     'Category' => 'Kategorie',
     'Corpus' => 'Korpus',
+    'Datespecification' => 'Datumsangabe',
     'DtaUser' => 'Benutzer',
     'Font' => 'Schriftart',
     'Imagesource' => 'Bildquelle',

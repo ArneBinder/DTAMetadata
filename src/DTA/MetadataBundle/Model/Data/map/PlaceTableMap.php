@@ -47,6 +47,7 @@ class PlaceTableMap extends TableMap
         $this->addColumn('name', 'Name', 'LONGVARCHAR', true, null, null);
         $this->addColumn('gnd', 'Gnd', 'VARCHAR', false, 255, null);
         // validators
+        $this->addValidator('gnd', 'unique', 'propel.validator.UniqueValidator', '', 'GND ist schon vergeben!');
     } // initialize()
 
     /**

@@ -707,6 +707,9 @@ abstract class BasePublishingcompanyPeer
             }
         } else {
 
+        if ($obj->isNew() || $obj->isColumnModified(PublishingcompanyPeer::GND))
+            $columns[PublishingcompanyPeer::GND] = $obj->getGnd();
+
         }
 
         return BasePeer::doValidate(PublishingcompanyPeer::DATABASE_NAME, PublishingcompanyPeer::TABLE_NAME, $columns);

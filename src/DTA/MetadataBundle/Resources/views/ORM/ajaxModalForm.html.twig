@@ -11,27 +11,25 @@
 
  #}
 
-    {# twitter/bootstrap modal elements #}
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3>{{ newActionParameters.className|trans }}</h3>
-    </div>
-    <div class="modal-body">
+    {# modal markup generation helper is imported from here #}
+    {% import "DTAMetadataBundle:form:buildingBlocks.html.twig" as dta %}
 
-        {# Dummy script tag currently inserted to workaround a bug in the modal forms.
-            In chrome, the first form is erroneously deleted. In firefox, it's not. #}
-        <script></script>
+    {{ dta.beginModal({
+            'id': modalId,
+            'title': submitRouteParameters.className|trans
+       })            
+    }}
         
-        {% set submitURL = path('genericNew', newActionParameters) %}
+        {% set submitURL = path('ajaxModalForm', submitRouteParameters) %}
         <form action="{{ submitURL }}" method="post" {{ form_enctype(form) }} class="form-horizontal">
-            {% include 'DTAMetadataBundle:Form:genericBaseForm.html.twig' with {'className': newActionParameters.className }%}
+            
+            {% include 'DTAMetadataBundle:Form:genericBaseForm.html.twig' with {'className': submitRouteParameters.className }%}
+            
         </form>
 
-        {#<button class="btn" data-toggle="modal" href="#stack2">Launch modal</button>#}
-    </div>
-    <div class="modal-footer">
-        <button type="button" data-dismiss="modal" class="btn">Schließen</button>
-        <button type="button" class="btn btn-primary" 
-                {# pass the modal to the submitFormData function #}
-                onclick="selectOrAdd_submitFormData($(this).parent().parent())">Neu anlegen</button>
-    </div>
+    {{ dta.endModal({
+            'id': modalId,
+            'cancelCaption': 'Abbrechen',
+            'confirm': { 'caption':'Hinzufügen', 'target': submitURL}
+       })
+    }}

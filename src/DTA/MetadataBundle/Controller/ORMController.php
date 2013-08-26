@@ -4,7 +4,7 @@ namespace DTA\MetadataBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-//use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * TODO: Nice to have: if the labels on the horizontal forms (column layout) would slide down the screen (position: fixed)
@@ -189,8 +189,9 @@ class ORMController extends DTADomainController {
      * @param function  $preSaveLogic       A closure that performs additional actions before saving.
      * @param array     $formTypeOptions    Options to influence the mapping of the object to a form 
      * 
-     * @return array    Contains two fields, transaction (either 'edit', 'create', 'complete' or 'recordNotFound') which indicates what happened and 
-     *                  depending on the transaction result a recordId of the created/updated record or the form.
+     * @return array    Contains two fields, transaction (either 'edit', 'create', 'complete' or 'recordNotFound') which indicates 
+     *                  what happened and depending on the transaction outcome 
+     *                  the created entity, its id or the form to create it.
      */
     protected function genericCreateOrEdit(
             Request $request, 
@@ -223,7 +224,6 @@ class ORMController extends DTADomainController {
             
         }
 
-//        print_r($classNames);
         $form = $this->createForm(new $classNames['formType'], $obj, $formTypeOptions);
 
         // handle form submission
@@ -243,12 +243,12 @@ class ORMController extends DTADomainController {
                     }
                     
                     $this->saveRecursively($form);
-//                    $obj->save();
                     
                     // return edited/created entity ID as transaction success receipt
                     return array(
                         'transaction'=>'complete', 
-                        'recordId'=>$form->getData()->getId()
+                        'recordId'=>$form->getData()->getId(),
+                        'object' => $obj,
                     );
                     
                 } else { // propel validation fails
@@ -327,29 +327,68 @@ class ORMController extends DTADomainController {
     
     /**
      * Renders the form for the model without any surrounding elements. 
-     * Used via AJAX to update or create database entities.
+     * Used via AJAX to create database entities.
      * 
-     * @param string $className   The name of the model class (e.g. Publication, Title, Titlefragment)
-     * @param int    $recordId    The id of the record to edit. Zero indicates that a new record shall be created (since one is the smallest id)
-     * @param string $property The property to use as caption for a select option (only for ajax use)
+     * @param string $package       see above
+     * @param string $className     name of the model class (e.g. Publication, Title, Titlefragment)
+     * @param string $modalId       html id tag content for the modal to generate (for access in JS)
+     * @param string $property      class member to access for getting a caption for the generated select option
+     * @param int    $recordId       id of the record to edit. Zero indicates that a new record shall be created (since one is the smallest id)
      * 
-     * @Route("/ajaxModalForm/{className}/{recordId}/{property}", 
+     * @Route("{package}/ajaxModalForm/{className}/{modalId}/{property}/{recordId}", 
      *      name="ajaxModalForm", 
      *      defaults={"recordId"=0, "property"="Id"})
      */
-    public function generateAjaxModalFormAction($className, $recordId = 0, $property = "Id") {
+    public function ajaxModalFormAction(Request $request, $package, $className, $modalId, $property = "Id", $recordId = 0) {
 
-        $form = $this->generateForm($className, $recordId);
+        if($this->package === null){
+            return $this->useSpecializedImplementation($package, __METHOD__, array('request'=>$request, 
+                'package'=>$package, 'className'=>$className, 'modalId' => $modalId, 'recordId' => $recordId, 'property'=>$property));
+        }
+        
+        $result = $this->genericCreateOrEdit(
+                $request, 
+                array(
+                    'package'   => $package, 
+                    'className' => $className, 
+                    'recordId'  => $recordId), 
+                function(){},
+                array()
+        );
 
-        // plain ajax response, html form wrapped in twitter bootstrap modal markup
-        return $this->render("DTAMetadataBundle:Form:ajaxModalForm.html.twig", array(
-                    'form' => $form->createView(),
-                    'newActionParameters' => array(
-                        'domainKey' => 'ajax',
-                        'className' => $className,
-                        'property' => $property,
-                    ),
-                ));
+        switch( $result['transaction'] ){
+            case "complete":
+                // return an option for the select box to select the new entity
+                $obj = $result['object'];
+                $id = $obj->getId();
+                $captionAccessor = "get" . $property;
+                
+                // check whether the caption accessor function exists
+                $classNames = $this->relatedClassNames($package, $className);
+                $cr = new \ReflectionClass($classNames['model']);
+                if( ! $cr->hasMethod($captionAccessor) )
+                    throw new \Exception("Can't retrieve caption via $captionAccessor from $className object.");
+                
+                $caption = $obj->$captionAccessor();
+                return new Response("<option value='$id'>$caption</option>");
+                
+            case "edit":
+            case "create":
+                // plain ajax response, html form wrapped in twitter bootstrap modal markup
+                return $this->renderWithDomainData("DTAMetadataBundle:ORM:ajaxModalForm.html.twig", array(
+                            'form' => $result['form']->createView(),
+                            'submitRouteParameters' => array(      // for generating the submit url
+                                'package' => $package,
+                                'recordId' => $recordId,
+                                'className' => $className,
+                                'modalId' => $modalId,
+                                'property' => $property,
+                            ),
+                            'modalId' => $modalId,
+                        )
+                );
+        }
+                
     }
 
     
@@ -363,8 +402,13 @@ class ORMController extends DTADomainController {
         $entity = $form->getData();
         if (is_object($entity)) {
             $rc = new \ReflectionClass($entity);
-            if ($rc->hasMethod('save'))
+            if($rc->getName() === "PropelObjectCollection"){
+                foreach($entity as $e){
+                    $e->save();                    
+                }
+            } elseif ($rc->hasMethod('save')){
                 $entity->save();
+            }
         }
 
         foreach ($form->all() as $child) {

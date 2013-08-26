@@ -1,8 +1,13 @@
 {# ------------------------------ labelled inputs (see getbootstrap.com/css/#forms-horizontal) ------------------------------ #}
 
-{% macro beginLabelledControl(controlId, labelCaption) %}
+{#
+    pass:
+        controlId:      id of the control to label
+        labelCaption:   label text
+#}
+{% macro beginLabelledControl(configuration) %}
 <div class="form-group">
-    <label for="{{controlId}}" class="col-{{formLabelWidth}} control-label">{{labelCaption}}</label>
+    <label for="{{configuration.controlId}}" class="col-{{formLabelWidth}} control-label">{{configuration.labelCaption}}</label>
     <div class="col-{{formWidgetWidth}}">
 {% endmacro %}
 
@@ -14,24 +19,19 @@
 
 {# ------------------------------ collapsible field sets ------------------------------ #}
 
-{# example usage: 
-
-{{ dta.beginFieldset('the caption', 'fs1') }}
-    First content
-    {{ dta.beginFieldset('nested set caption', 'fs2') }}
-        hoola!
-    {{ dta.endFieldSet() }}
-{{ dta.endFieldSet() }}
-
+{# pass the following: 
+    caption: legend of the fieldset
+    collapsed: whether or not the fieldset shall be initially collapsed
+    id: an optional id for the fieldset
 #}
-{% macro beginFieldset(caption, collapsed, id) %}
-    {% set id = id|default('randomId'~random()) %}
+{% macro beginFieldset(configuration) %}
+    {% set id = configuration.id|default('randomId'~random()) %}
     <fieldset>
         {# <span class="glyphicon glyphicon-minus"></span>&nbsp; #}
         <legend data-toggle="collapse" data-target="#{{id}}">
-            {{caption}}
+            {{configuration.caption}}
         </legend>
-        <div class="collapse {{ collapsed|default(false) ? '' : 'in'}}" id="{{id}}">
+        <div class="collapse {{ configuration.collapsed|default(false) ? '' : 'in'}}" id="{{id}}">
 
 {% endmacro %}
 
@@ -42,31 +42,54 @@
 
 {# ------------------------------ modals ------------------------------ #}
 
-{% macro btnLaunchModal(caption, id, class) %}
-    <a data-toggle="modal" href="#{{id}}" class="{{class|default('btn btn-primary btn-lg')}}">{{caption}}</a>
+{# pass the following: 
+    id: id of the modal to toggle
+    class: css class to apply to the button
+    caption: title of the button
+#}
+{% macro btnLaunchModal(configuration) %}
+    <a data-toggle="modal" href="#{{configuration.id}}" class="{{configuration.class|default('btn btn-default btn-xs')}}">{{configuration.caption}}</a>
 {% endmacro %}
 
-{% macro beginModal(caption, id) %}
+{# pass the following: 
+    id: id of the modal
+    title: headline of the window
+#}
+{% macro beginModal(configuration) %}
 {% spaceless %}
   <!-- Modal -->
-  <div class="modal fade" id="{{id}}" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog">
+  <div class="modal fade" id="{{configuration.id}}" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" style="width:90%">
       <div class="modal-content">
         <div class="modal-header">
+          {% if not configuration.hideWindowCloser|default(false) %}
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          <h4 class="modal-title">{{caption}}</h4>
+          {% endif %}
+          <h4 id="{{configuration.id}}-title"class="modal-title">{{configuration.title}}</h4>
         </div>
         <div class="modal-body">
 {% endspaceless %}
 {% endmacro %}
 
-{% macro endModal(confirm, dismissMessage) %}
+{# pass the following: 
+    id: id of the modal
+    target: URL for the submit button to link to
+    confirm: 
+        caption:    caption of the submit button
+        onClick:    javascript to execute
+    cancelCaption: caption of the abort button
+#}
+{% macro endModal(configuration) %}
 {% spaceless %}        
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">{{dismissMessage|default('modal.closeWithoutAction'|trans)}}</button>
-          <a href="{{confirm.target}}">
-            <button type="button" class="btn btn-primary">{{confirm.caption}}</button>
+          
+          {% if not configuration.hideCancelButton|default(false) %}
+          <button type="button" class="btn btn-default" data-dismiss="modal">{{configuration.cancelCaption|default('modal.closeWithoutAction'|trans)}}</button>
+          {% endif %}
+        
+          <a id="{{configuration.id}}-submitLink" href="{{configuration.confirm.target}}" {% for attrname, attrvalue in configuration.confirm.attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+            <button type="button" class="btn btn-primary">{{configuration.confirm.caption}}</button>
           </a>
         </div>
       </div><!-- /.modal-content -->

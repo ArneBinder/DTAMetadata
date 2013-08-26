@@ -707,6 +707,9 @@ abstract class BasePlacePeer
             }
         } else {
 
+        if ($obj->isNew() || $obj->isColumnModified(PlacePeer::GND))
+            $columns[PlacePeer::GND] = $obj->getGnd();
+
         }
 
         return BasePeer::doValidate(PlacePeer::DATABASE_NAME, PlacePeer::TABLE_NAME, $columns);

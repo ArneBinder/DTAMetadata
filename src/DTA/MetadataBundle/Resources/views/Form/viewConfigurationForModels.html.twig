@@ -27,9 +27,43 @@
 {% endblock %}
 
 {# --------------------- Space and Time --------------------- #}
-
+        
 {% block datespecification_row %}
-    {{ form_row(form, {'inlineChildren':true }) }}
+    {% import  'DTAMetadataBundle:form:buildingBlocks.html.twig' as dta %}
+    
+    {{ dta.beginLabelledControl({'controlId':id, 'labelCaption': form.vars.label }) }}
+ 
+            {{ form_errors(form.year) }}
+            {{ form_label(form.year) }}
+            {{ form_widget(form.year) }}
+
+
+            {# add addtional options to a modal #}
+            {% set modalId = 'extraOptionsModalFor'~id %}
+            {{ dta.btnLaunchModal({'id':modalId, 'caption':'mehr...'})}}
+
+            {{ dta.beginModal({
+                    'id': modalId,
+                    'title': 'Weitere Optionen zur Datumsangabe',
+                    'hideWindowCloser': true 
+               })            
+            }}
+            
+            {{ form_row(form.comments) }}
+            
+            {{ dta.beginLabelledControl({'controlId':form.yearIsReconstructed.vars.id, 'labelCaption': form.yearIsReconstructed.vars.label }) }}
+                {{ form_widget(form.yearIsReconstructed) }}
+            {{ dta.endLabelledControl() }}
+
+            {{ dta.endModal({
+                    'id': modalId,
+                    'confirm': {'caption': 'Fertig', 'target': '#', 'attr':{'data-dismiss':'modal'} },
+                    'hideCancelButton': true,
+               })
+            }}
+    
+    {{ dta.endLabelledControl() }}
+
 {% endblock %}
 
 {# --------------------- Title --------------------- #}

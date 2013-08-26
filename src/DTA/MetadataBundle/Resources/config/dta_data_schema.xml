@@ -250,6 +250,7 @@
         <column name="gnd" type="VARCHAR" size="255" required="false"/> 
         <behavior name="table_row_view"> <parameter name="Name" value="name" /><parameter name="GND" value="gnd" /> </behavior>
         <unique> <unique-column name="gnd"/> </unique>
+        <validator column="gnd"> <rule name="unique" message="GND ist schon vergeben!" /> </validator>
     </table>
 
     <table name="place">
@@ -257,6 +258,7 @@
         <column name="name" type="LONGVARCHAR" required="true"/>
         <column name="gnd" type="VARCHAR" size="255" required="false"/> 
         <unique> <unique-column name="gnd"/> </unique>
+        <validator column="gnd"> <rule name="unique" message="GND ist schon vergeben!" /> </validator>
     </table>
 
     <table name="datespecification">
