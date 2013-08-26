@@ -106,7 +106,6 @@ function createAjaxFormModal(addButton){
     $body.modalmanager('loading');
 
     var selectWidget = $(addButton).parent().children('select.selectOrAdd');
-    var modal;
     
     // fill the modal with modal skeleton markup (header, body, footer) and form inputs
     $.get(modalRetrieveUrl, '', function(data){
@@ -118,12 +117,12 @@ function createAjaxFormModal(addButton){
         $body.append(data);        
         $("#"+modalId+"-submitLink").on('click',function(e){selectOrAdd_submitFormData($("#"+modalId)); e.preventDefault();});
         
-        modal = $("#"+modalId);
+        var modal = $("#"+modalId);
         modal.data('selectWidget', selectWidget);
         modal.modal();
     });
 
-    return modal;
+    return $("#"+modalId);
 }
 
     

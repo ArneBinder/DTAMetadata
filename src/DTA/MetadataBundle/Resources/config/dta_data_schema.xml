@@ -57,6 +57,7 @@
             <!--<parameter name="id" value="id"/>-->
             <!--<parameter name="geschrieben" value="accessor:getDateSpecificationRelatedByOrigindateId"/>-->
             <parameter name="embedColumnsForWork" value="work"/>
+            <parameter name="Verlag" value="accessor:getPublishingCompany"/>
             <parameter name="veröffentlicht" value="accessor:getDatespecificationRelatedByPublicationdateId"/>
             <!--<parameter name="embedcolumnsstatus" value="status"/>-->
             <parameter name="embedcolumnstitle" value="title"/>

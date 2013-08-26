@@ -10,7 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
  * Must match the package name.
  * @Route("/Workflow")
  */
-class WorkflowDomainController extends DTADomainController {
+class WorkflowDomainController extends ORMController {
 
     /** @inheritdoc */
     public $package = "Workflow";

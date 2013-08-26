@@ -76,7 +76,7 @@ abstract class BasePublicationM extends BaseObject implements Persistent, \DTA\M
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Titel', 'erster Autor', 'entstanden', 'veröffentlicht', );	public   $tableRowViewAccessors = array('Titel'=>'accessor:getEmbeddedColumn1OfPublication', 'erster Autor'=>'accessor:getEmbeddedColumn2OfPublication', 'entstanden'=>'accessor:getEmbeddedColumn3OfPublication', 'veröffentlicht'=>'accessor:getEmbeddedColumn4OfPublication', );
+    public static $tableRowViewCaptions = array('Titel', 'erster Autor', 'entstanden', 'Verlag', 'veröffentlicht', );	public   $tableRowViewAccessors = array('Titel'=>'accessor:getEmbeddedColumn1OfPublication', 'erster Autor'=>'accessor:getEmbeddedColumn2OfPublication', 'entstanden'=>'accessor:getEmbeddedColumn3OfPublication', 'Verlag'=>'accessor:getEmbeddedColumn4OfPublication', 'veröffentlicht'=>'accessor:getEmbeddedColumn5OfPublication', );
     /**
      * Get the [id] column value.
      *
@@ -1002,6 +1002,15 @@ abstract class BasePublicationM extends BaseObject implements Persistent, \DTA\M
      */
 
     public function getEmbeddedColumn4OfPublication(){
+
+        $relatedEntity = $this->getPublication();
+        return $relatedEntity->getAttributeByTableViewColumName("Verlag");
+
+    }    /**
+     * Cascades the get to a related entity (possibly recursively)
+     */
+
+    public function getEmbeddedColumn5OfPublication(){
 
         $relatedEntity = $this->getPublication();
         return $relatedEntity->getAttributeByTableViewColumName("veröffentlicht");

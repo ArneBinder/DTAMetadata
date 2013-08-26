@@ -75,7 +75,7 @@ class PublicationType extends BaseAbstractType
             'by_reference' => false,
             'inlineLabel' => true,
             'sortable' => false,
-            'label' => 'Bildquellen'
+            'label' => false
         ));
         
     }

@@ -88,7 +88,7 @@
           <button type="button" class="btn btn-default" data-dismiss="modal">{{configuration.cancelCaption|default('modal.closeWithoutAction'|trans)}}</button>
           {% endif %}
         
-          <a id="{{configuration.id}}-submitLink" href="{{configuration.confirm.target}}" {% for attrname, attrvalue in configuration.confirm.attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+          <a id="{{configuration.id}}-submitLink" href="{{configuration.confirm.target}}" {% for attrname, attrvalue in configuration.confirm.attr|default({}) %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
             <button type="button" class="btn btn-primary">{{configuration.confirm.caption}}</button>
           </a>
         </div>
