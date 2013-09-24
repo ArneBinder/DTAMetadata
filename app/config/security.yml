@@ -25,7 +25,7 @@ security:
             security: false
 
         login:
-            pattern: ^/Master/Anmeldung
+            pattern: ^/Login
             security: false
 
 #        only sensible after database deletion (because the login system will stay active)

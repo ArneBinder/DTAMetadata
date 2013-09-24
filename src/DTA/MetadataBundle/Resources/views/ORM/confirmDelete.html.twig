@@ -4,7 +4,7 @@
 
 {% block core %}
 
-    <form action="{{ path('deleteRecord',{'package':package, 'className':className, 'recordId': recordId}) }}" method="POST">
+    <form action="{{ path(package~'_deleteRecord',{'package':package, 'className':className, 'recordId': recordId}) }}" method="POST">
         <label class="checkbox">
             <input type="checkbox" name="reallyDelete" checked="checked">
             Really delete record {{ recordId }}

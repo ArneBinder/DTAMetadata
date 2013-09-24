@@ -66,10 +66,6 @@ class ORMController extends DTADomainController {
      * @param type $package   like in genericViewOneAction
      * @param type $className   like in genericViewOneAction
      * @param type $recordId    like in genericViewOneAction
-     * @Route(
-     *      "/{package}/delete/{className}/{recordId}", 
-     *      name="deleteRecord"
-     * )
      */
     public function genericDeleteOneAction(Request $request, $package, $className, $recordId) {
 
@@ -122,10 +118,6 @@ class ORMController extends DTADomainController {
      * @param string $package      domain/object model package (Data, Classification, Workflow, Master)
      * @param string $className    model class
      * @param int    $recordId     
-     * @Route(
-     *      "{package}/show/{className}/{recordId}", 
-     *      name = "viewRecord"
-     * )
      */
     public function genericViewAction($package, $className, $recordId) {
         
@@ -152,10 +144,6 @@ class ORMController extends DTADomainController {
      * In the schema this can be specified using the table_row_view behavior.
      * @param string $package      domain/object model package (Data, Classification, Workflow, Master)
      * @param string $className    model class
-     * @Route(
-     *      "{package}/showAll/{className}", 
-     *      name = "genericViewAll"
-     * )
      */
     public function genericViewAllAction($package, $className, $updatedObjectId = 0) {
         
@@ -281,12 +269,6 @@ class ORMController extends DTADomainController {
      * @param String    $package            The namespace/package name (Data/Workflow/Classification/Master)
      * @param String    $className          The model class name see src/DTA/MetadataBundle/Model/<$package>/ for classes
      * @param int       $recordId           The id of the entity to edit, 0 if new 
-     * 
-     * @Route(
-     *      "{package}/edit/{className}/{recordId}", 
-     *      name = "genericCreateOrEdit", 
-     *      defaults = {"recordId"=0}
-     * )
      */
     public function genericCreateOrEditAction(Request $request, $package, $className, $recordId) {
         
@@ -307,12 +289,12 @@ class ORMController extends DTADomainController {
         switch( $result['transaction'] ){
             case "recordNotFound":
                 $this->addErrorFlash("Der gewünschte Datensatz kann nicht bearbeitet werden, weil er nicht gefunden wurde.");
-                $target = $this->generateUrl('genericViewAll',array('package'=>$package, 'className'=>$className));
+                $target = $this->generateUrl($package.'_genericViewAll',array('package'=>$package, 'className'=>$className));
                 
                 return $this->redirect($target);
             case "complete":
                 $this->addSuccessFlash("Änderungen vorgenommen.");
-                $target = $this->generateUrl('genericViewAll',array('package'=>$package, 'className'=>$className));
+                $target = $this->generateUrl($package.'_genericViewAll',array('package'=>$package, 'className'=>$className));
                 return $this->redirect($target);
             case "edit":
             case "create":
@@ -335,9 +317,6 @@ class ORMController extends DTADomainController {
      * @param string $property      class member to access for getting a caption for the generated select option
      * @param int    $recordId       id of the record to edit. Zero indicates that a new record shall be created (since one is the smallest id)
      * 
-     * @Route("{package}/ajaxModalForm/{className}/{modalId}/{property}/{recordId}", 
-     *      name="ajaxModalForm", 
-     *      defaults={"recordId"=0, "property"="Id"})
      */
     public function ajaxModalFormAction(Request $request, $package, $className, $modalId, $property = "Id", $recordId = 0) {
 
@@ -424,11 +403,6 @@ class ORMController extends DTADomainController {
      *      Used to generate a new select option via ajax.
      * @return HTML Option Element|nothing 
      *      If the new action is called by a nested ajax form (selectOrAdd form type) the result is the option element to add to the nearby select.
-     * @Route(
-     *      "{package}/new/{className}/{property}", 
-     *      name="genericNew", 
-     *      defaults={"property"="Id"}
-     * )
      */
 //    public function genericNewAction(Request $request, $className, $domainKey, $property = "Id") {
 //

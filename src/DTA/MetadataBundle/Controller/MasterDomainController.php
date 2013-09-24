@@ -2,15 +2,8 @@
 
 namespace DTA\MetadataBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use \Symfony\Component\Security\Core\SecurityContext;
 
-/**
- * Route prefix for all action routes.
- * Must match the package name.
- * @Route("/Master")
- */
 class MasterDomainController extends ORMController {
 
     /** @inheritdoc */
@@ -23,7 +16,6 @@ class MasterDomainController extends ORMController {
 
     /**
      * Displays the login form for the entire application.
-     * @Route("/Anmeldung", name="login")
      */
     public function loginFormAction() {
         
@@ -48,9 +40,6 @@ class MasterDomainController extends ORMController {
         );
     }
 
-    /**
-     * @Route("/administration/", name="administrationDomain")
-     */
     public function indexAction() {
 
         return $this->renderWithDomainData('DTAMetadataBundle:Package_Master:index.html.twig', array(
@@ -65,7 +54,6 @@ class MasterDomainController extends ORMController {
      *          Peer class: For introspection
      *          Query class: For Retrieval
      *          Form type: For the view
-     * @Route("/administration/sourceMonitor")
      */
     public function sourceMonitor(){
            

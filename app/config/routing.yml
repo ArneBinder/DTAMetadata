@@ -2,10 +2,34 @@
 # to a php function in some controller.
 # Working with routes is also an easy way to parse parameters from the url.
 
-# the routes are defined via annotations in the comments of the methods
-dta_controller:
-    resource: "@DTAMetadataBundle/Controller/"
-    type:     annotation
+# specifying the routes via annotations (in the comments of the methods) is problematic, 
+# since the controllers inherit methods, which won't inherit the annotations. 
+#dta_controller:
+#    resource: "@DTAMetadataBundle/Controller/"
+#    type:     annotation
+
+#dta_master_domain:
+#    resource: "@DTAMetadataBundle/Resources/config/dta_master_routing.yml"
+#    prefix:   /Master
+
+#dta_data_domain:
+#    resource: "@DTAMetadataBundle/Resources/config/dta_data_routing.yml"
+#    prefix:   /Data
+#
+#dta_classification_domain:
+#    resource: "@DTAMetadataBundle/Resources/config/dta_classification_routing.yml"
+#    prefix:   /Classification
+#
+#dta_workflow_domain:
+#    resource: "@DTAMetadataBundle/Resources/config/dta_workflow_routing.yml"
+#    prefix:   /Workflow
+
+dta_controllers:
+    resource: "@DTAMetadataBundle/Resources/config/routing.yml"
+  
+login: 
+  path: /Login
+  defaults: { _controller: DTAMetadataBundle:MasterDomain:loginForm }
 
 # These routes are needed for the symfony default login system
 # and their patterns are set to the default values
@@ -14,6 +38,11 @@ login_check:
     
 logout:
     pattern:   /logout
+
+
+
+
+
 
 # Internal routing configuration to handle ESI
 #_internal:

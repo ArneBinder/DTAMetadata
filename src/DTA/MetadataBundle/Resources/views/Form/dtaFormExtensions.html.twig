@@ -93,7 +93,7 @@
 
     {# Supplementary data for the javascript #}
         <input type="hidden" name="modalRetrieveUrl"  class="selectOrAdd" 
-               value="{{ path('ajaxModalForm', selectOrAddConfiguration.modalRetrievePathParameters|merge({'modalId':modalId }) ) }}"/>
+               value="{{ path(selectOrAddConfiguration.modalRetrievePathParameters.package~'_ajaxModalForm', selectOrAddConfiguration.modalRetrievePathParameters|merge({'modalId':modalId }) ) }}"/>
     {% endif %}
 
 

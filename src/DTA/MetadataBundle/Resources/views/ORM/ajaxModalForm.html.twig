@@ -20,7 +20,7 @@
        })            
     }}
         
-        {% set submitURL = path('ajaxModalForm', submitRouteParameters) %}
+        {% set submitURL = path(package~'_ajaxModalForm', submitRouteParameters) %}
         <form action="{{ submitURL }}" method="post" {{ form_enctype(form) }} class="form-horizontal">
             
             {% include 'DTAMetadataBundle:Form:genericBaseForm.html.twig' with {'className': submitRouteParameters.className }%}

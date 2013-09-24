@@ -1,0 +1,227 @@
+# ==============================================================================
+# home controller
+# ==============================================================================
+
+home: 
+  path: /Home
+  defaults: { _controller: DTAMetadataBundle:Home:index }
+
+# ==============================================================================
+# master domain controller
+# ==============================================================================
+
+administrationDomain:
+  path: /Admin
+  defaults: { _controller: DTAMetadataBundle:MasterDomain:index }
+  
+sourceMonitor:
+  path: /Dev/sourceMonitor
+  defaults: { _controller: DTAMetadataBundle:MasterDomain:sourceMonitor }
+
+# ------------------------------------------------------------
+# inherited ORM methods
+# ------------------------------------------------------------
+
+Master_deleteRecord:
+  path: /Master/delete/{className}/{recordId}
+  defaults: 
+    _controller: DTAMetadataBundle:MasterDomain:deleteRecord
+    package: Master
+
+Master_viewRecord:
+  path: /Master/show/{className}/{recordId}
+  defaults: 
+    _controller: DTAMetadataBundle:MasterDomain:viewRecord
+    package: Master
+
+Master_genericViewAll:
+  path: /Master/showAll/{className}
+  defaults: 
+    _controller: DTAMetadataBundle:MasterDomain:genericViewAll
+    package: Master
+
+Master_genericCreateOrEdit:
+  path: /Master/edit/{className}/{recordId}
+  defaults: 
+    _controller: DTAMetadataBundle:MasterDomain:genericCreateOrEdit
+    package: Master
+    recordId: 0
+
+Master_ajaxModalForm:
+  path: /Master/ajaxModalForm/{className}/{modalId}/{property}/{recordId}
+  defaults: 
+    _controller: DTAMetadataBundle:MasterDomain:ajaxModalForm
+    package: Master
+    recordId: 0
+    property: Id
+    
+Master_genericNew:
+  path: /Master/new/{className}/{property}
+  defaults: 
+    _controller: DTAMetadataBundle:MasterDomain:genericNew
+    package: Master
+    property: Id
+    
+# ==============================================================================
+# data domain controller
+# ==============================================================================
+
+dataDomain:
+  path: /Data/
+  defaults: { _controller: DTAMetadataBundle:DataDomain:index }
+
+viewPersonsByRole:
+  path: /Data/viewPersonsByRole/{personRoleId}
+  defaults: { _controller: DTAMetadataBundle:DataDomain:viewPersonsByRole }
+  
+# ------------------------------------------------------------
+# inherited ORM methods
+# ------------------------------------------------------------
+
+Data_deleteRecord:
+  path: /Data/delete/{className}/{recordId}
+  defaults: 
+    _controller: DTAMetadataBundle:DataDomain:deleteRecord
+    package: Data
+
+Data_viewRecord:
+  path: /Data/show/{className}/{recordId}
+  defaults: 
+    _controller: DTAMetadataBundle:DataDomain:viewRecord
+    package: Data
+
+Data_genericViewAll:
+  path: /Data/showAll/{className}
+  defaults: 
+    _controller: DTAMetadataBundle:DataDomain:genericViewAll
+    package: Data
+
+Data_genericCreateOrEdit:
+  path: /Data/edit/{className}/{recordId}
+  defaults: 
+    _controller: DTAMetadataBundle:DataDomain:genericCreateOrEdit
+    package: Data
+    recordId: 0
+
+Data_ajaxModalForm:
+  path: /Data/ajaxModalForm/{className}/{modalId}/{property}/{recordId}
+  defaults: 
+    _controller: DTAMetadataBundle:DataDomain:ajaxModalForm
+    package: Data
+    recordId: 0
+    property: Id
+    
+Data_genericNew:
+  path: /Data/new/{className}/{property}
+  defaults: 
+    _controller: DTAMetadataBundle:DataDomain:genericNew
+    package: Data
+    property: Id
+    
+# ==============================================================================
+# classification domain controller
+# ==============================================================================
+
+classificationDomain:
+  path: /Classification/
+  defaults: { _controller: DTAMetadataBundle:ClassificationDomain:index }
+
+# ------------------------------------------------------------
+# inherited ORM methods
+# ------------------------------------------------------------
+
+Classification_deleteRecord:
+  path: /Classification/delete/{className}/{recordId}
+  defaults: 
+    _controller: DTAMetadataBundle:ClassificationDomain:deleteRecord
+    package: Classification
+
+Classification_viewRecord:
+  path: /Classification/show/{className}/{recordId}
+  defaults: 
+    _controller: DTAMetadataBundle:ClassificationDomain:viewRecord
+    package: Classification
+
+Classification_genericViewAll:
+  path: /Classification/showAll/{className}
+  defaults: 
+    _controller: DTAMetadataBundle:ClassificationDomain:genericViewAll
+    package: Classification
+
+Classification_genericCreateOrEdit:
+  path: /Classification/edit/{className}/{recordId}
+  defaults: 
+    _controller: DTAMetadataBundle:ClassificationDomain:genericCreateOrEdit
+    package: Classification
+    recordId: 0
+
+Classification_ajaxModalForm:
+  path: /Classification/ajaxModalForm/{className}/{modalId}/{property}/{recordId}
+  defaults: 
+    _controller: DTAMetadataBundle:ClassificationDomain:ajaxModalForm
+    package: Classification
+    recordId: 0
+    property: Id
+    
+Classification_genericNew:
+  path: /Classification/new/{className}/{property}
+  defaults: 
+    _controller: DTAMetadataBundle:ClassificationDomain:genericNew
+    package: Classification
+    property: Id
+
+# ==============================================================================
+# workflow domain controller
+# ==============================================================================
+
+workflowDomain:
+  path: /Workflow/
+  defaults: { _controller: DTAMetadataBundle:WorkflowDomain:index }
+  
+reporting:
+  path: /Workflow/Statistics 
+  defaults: { _controller: DTAMetadataBundle:WorkflowDomain:reporting }
+
+# ------------------------------------------------------------
+# inherited ORM methods
+# ------------------------------------------------------------
+
+Workflow_deleteRecord:
+  path: /Workflow/delete/{className}/{recordId}
+  defaults: 
+    _controller: DTAMetadataBundle:WorkflowDomain:deleteRecord
+    package: Workflow
+
+Workflow_viewRecord:
+  path: /Workflow/show/{className}/{recordId}
+  defaults: 
+    _controller: DTAMetadataBundle:WorkflowDomain:viewRecord
+    package: Workflow
+
+Workflow_genericViewAll:
+  path: /Workflow/showAll/{className}
+  defaults: 
+    _controller: DTAMetadataBundle:WorkflowDomain:genericViewAll
+    package: Workflow
+
+Workflow_genericCreateOrEdit:
+  path: /Workflow/edit/{className}/{recordId}
+  defaults: 
+    _controller: DTAMetadataBundle:WorkflowDomain:genericCreateOrEdit
+    package: Workflow
+    recordId: 0
+
+Workflow_ajaxModalForm:
+  path: /Workflow/ajaxModalForm/{className}/{modalId}/{property}/{recordId}
+  defaults: 
+    _controller: DTAMetadataBundle:WorkflowDomain:ajaxModalForm
+    package: Workflow
+    recordId: 0
+    property: Id
+    
+Workflow_genericNew:
+  path: /Workflow/new/{className}/{property}
+  defaults: 
+    _controller: DTAMetadataBundle:WorkflowDomain:genericNew
+    package: Workflow
+    property: Id

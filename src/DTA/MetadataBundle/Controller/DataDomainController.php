@@ -2,15 +2,8 @@
 
 namespace DTA\MetadataBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use \DTA\MetadataBundle\Model;
 
-/**
- * Route prefix for all action routes.
- * Must match the package name.
- * @Route("/Data")
- */
 class DataDomainController extends ORMController {
 
     /** @inheritdoc */
@@ -72,9 +65,6 @@ class DataDomainController extends ORMController {
         
     }
     
-    /**
-     * @Route("/", name="dataDomain")
-     */
     public function indexAction() {
         return $this->renderWithDomainData('DTAMetadataBundle:Package_Data:index.html.twig', array(
 //            "person" => "array_shift()" //$persont->getRelations() //count($p->getPersonalnames()->getArrayCopy())//[0]->__toString(),
@@ -82,15 +72,12 @@ class DataDomainController extends ORMController {
         ));
     }
     
-    /**
-     * @Route("/viewPersonsByRole/{personRoleId}", name="viewPersonsByRole")
-     */
     public function viewPersonsByRoleAction() {
         $records = Model\Data\PersonQuery::create()
                 ->joinPersonPublication()
                 ->findOne();
                 
-        return $this->renderWithDomainData('DTAMetadataBundle:ORM:genericViewAll.html.twig', array(
+        return $this->renderWithDomainData('DTAMetadataBundle:DataDomain:genericViewAll.html.twig', array(
             'data' => $records,
             'columns' => Model\Data\Person::getTableViewColumnNames(),
             'className' => 'Person',
