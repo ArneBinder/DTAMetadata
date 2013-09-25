@@ -33,7 +33,7 @@
         <column description="Informationen zur Auflage" name="printrun_id" type="INTEGER" required="false"/>
         <column description="Verlag" name="publishingcompany_id" type="INTEGER" required="false"/>
         
-        <!--Image and text sources are added on the imageSource table side, because publication:imageSource is 1:n-->
+        <!-- Bild- und Textquellen über die imageSource Tabelle dargestellt, da publication:imageSource eine 1:n Beziehung ist -->
 
         <column description="akquiriert über" name="partner_id" type="INTEGER" required="false"/>
 
@@ -57,7 +57,7 @@
             <!--<parameter name="id" value="id"/>-->
             <!--<parameter name="geschrieben" value="accessor:getDateSpecificationRelatedByOrigindateId"/>-->
             <parameter name="embedColumnsForWork" value="work"/>
-            <parameter name="Verlag" value="accessor:getPublishingCompany"/>
+            <!--<parameter name="Verlag" value="accessor:getPublishingCompany"/>-->
             <parameter name="veröffentlicht" value="accessor:getDatespecificationRelatedByPublicationdateId"/>
             <!--<parameter name="embedcolumnsstatus" value="status"/>-->
             <parameter name="embedcolumnstitle" value="title"/>

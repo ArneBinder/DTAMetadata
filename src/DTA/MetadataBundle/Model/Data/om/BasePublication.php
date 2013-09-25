@@ -320,7 +320,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Titel', 'erster Autor', 'entstanden', 'Verlag', 'veröffentlicht', );	public   $tableRowViewAccessors = array('Titel'=>'accessor:getEmbeddedColumn1OfWork', 'erster Autor'=>'accessor:getEmbeddedColumn2OfWork', 'entstanden'=>'accessor:getEmbeddedColumn3OfWork', 'Verlag'=>'accessor:getPublishingCompany', 'veröffentlicht'=>'accessor:getDatespecificationRelatedByPublicationdateId', );
+    public static $tableRowViewCaptions = array('Titel', 'erster Autor', 'entstanden', 'veröffentlicht', );	public   $tableRowViewAccessors = array('Titel'=>'accessor:getEmbeddedColumn1OfWork', 'erster Autor'=>'accessor:getEmbeddedColumn2OfWork', 'entstanden'=>'accessor:getEmbeddedColumn3OfWork', 'veröffentlicht'=>'accessor:getDatespecificationRelatedByPublicationdateId', );
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection

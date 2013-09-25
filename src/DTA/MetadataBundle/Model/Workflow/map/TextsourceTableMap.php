@@ -46,8 +46,9 @@ class TextsourceTableMap extends TableMap
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('publication_id', 'PublicationId', 'INTEGER', 'publication', 'id', true, null, null);
         $this->addForeignKey('partner_id', 'PartnerId', 'INTEGER', 'partner', 'id', false, null, null);
-        $this->addColumn('imageurl', 'Imageurl', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('texturl', 'Texturl', 'LONGVARCHAR', false, null, null);
         $this->addForeignKey('license_id', 'LicenseId', 'INTEGER', 'license', 'id', false, null, null);
+        $this->addColumn('attribution', 'Attribution', 'LONGVARCHAR', false, null, null);
         // validators
     } // initialize()
 
@@ -74,8 +75,9 @@ class TextsourceTableMap extends TableMap
   'Id' => 'id',
   'PublicationId' => 'publication_id',
   'PartnerId' => 'partner_id',
-  'Imageurl' => 'imageurl',
+  'Texturl' => 'texturl',
   'LicenseId' => 'license_id',
+  'Attribution' => 'attribution',
 ),
         );
     } // getBehaviors()

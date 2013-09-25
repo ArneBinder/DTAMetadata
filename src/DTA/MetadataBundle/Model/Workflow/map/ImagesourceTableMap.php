@@ -50,7 +50,8 @@ class ImagesourceTableMap extends TableMap
         $this->addColumn('catalogueurl', 'Catalogueurl', 'LONGVARCHAR', false, null, null);
         $this->addColumn('numfaksimiles', 'Numfaksimiles', 'INTEGER', false, null, null);
         $this->addColumn('extentasofcatalogue', 'Extentasofcatalogue', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('numpages', 'Numpages', 'INTEGER', false, null, null);
+        $this->addColumn('faksimilerefrange', 'Faksimilerefrange', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('originalrefrange', 'Originalrefrange', 'LONGVARCHAR', false, null, null);
         $this->addColumn('imageurl', 'Imageurl', 'LONGVARCHAR', false, null, null);
         $this->addColumn('imageurn', 'Imageurn', 'LONGVARCHAR', false, null, null);
         $this->addForeignKey('license_id', 'LicenseId', 'INTEGER', 'license', 'id', false, null, null);
@@ -84,7 +85,8 @@ class ImagesourceTableMap extends TableMap
   'Catalogueurl' => 'catalogueurl',
   'Numfaksimiles' => 'numfaksimiles',
   'Extentasofcatalogue' => 'extentasofcatalogue',
-  'Numpages' => 'numpages',
+  'Faksimilerefrange' => 'faksimilerefrange',
+  'Originalrefrange' => 'originalrefrange',
   'Imageurl' => 'imageurl',
   'Imageurn' => 'imageurn',
   'LicenseId' => 'license_id',

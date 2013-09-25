@@ -78,5 +78,19 @@ class PublicationType extends BaseAbstractType
             'label' => false
         ));
         
+        $builder->add('TextSources', new DynamicCollectionType(), array(
+            'type' => new Workflow\TextsourceType(),
+            'allow_add' => true,
+            'allow_delete' => true,
+            'by_reference' => false,
+            'inlineLabel' => true,
+            'sortable' => false,
+            'label' => false
+        ));
+        
+        $builder->add('comment', 'textarea', array(
+            'required' => false,
+        ));
+        
     }
 }

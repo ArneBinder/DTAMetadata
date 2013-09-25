@@ -689,7 +689,8 @@ CREATE TABLE "imagesource"
     "catalogueurl" TEXT,
     "numfaksimiles" INTEGER,
     "extentasofcatalogue" TEXT,
-    "numpages" INTEGER,
+    "faksimilerefrange" TEXT,
+    "originalrefrange" TEXT,
     "imageurl" TEXT,
     "imageurn" TEXT,
     "license_id" INTEGER,
@@ -704,7 +705,9 @@ COMMENT ON COLUMN "imagesource"."numfaksimiles" IS 'Anzahl Faksimiles';
 
 COMMENT ON COLUMN "imagesource"."extentasofcatalogue" IS 'Umfang laut Katalog';
 
-COMMENT ON COLUMN "imagesource"."numpages" IS 'Umfang lt. Katalog';
+COMMENT ON COLUMN "imagesource"."faksimilerefrange" IS 'Referenzierte Faksimileseitenzahlen';
+
+COMMENT ON COLUMN "imagesource"."originalrefrange" IS 'Referenzierte Originalseitenzahlen';
 
 COMMENT ON COLUMN "imagesource"."imageurl" IS 'URL der Bilddigitalisate';
 
@@ -723,16 +726,19 @@ CREATE TABLE "textsource"
     "id" serial NOT NULL,
     "publication_id" INTEGER NOT NULL,
     "partner_id" INTEGER,
-    "imageurl" TEXT,
+    "texturl" TEXT,
     "license_id" INTEGER,
+    "attribution" TEXT,
     PRIMARY KEY ("id")
 );
 
 COMMENT ON COLUMN "textsource"."partner_id" IS 'Anbieter Textdigitalisate';
 
-COMMENT ON COLUMN "textsource"."imageurl" IS 'URL der Textdigitalisate';
+COMMENT ON COLUMN "textsource"."texturl" IS 'URL der Textdigitalisate';
 
 COMMENT ON COLUMN "textsource"."license_id" IS 'Lizenz';
+
+COMMENT ON COLUMN "textsource"."attribution" IS 'Attributionszeile';
 
 -----------------------------------------------------------------------
 -- license

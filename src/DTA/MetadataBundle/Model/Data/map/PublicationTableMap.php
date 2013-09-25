@@ -102,7 +102,6 @@ class PublicationTableMap extends TableMap
         return array(
             'table_row_view' =>  array (
   'embedColumnsForWork' => 'work',
-  'Verlag' => 'accessor:getPublishingCompany',
   'veröffentlicht' => 'accessor:getDatespecificationRelatedByPublicationdateId',
   'embedcolumnstitle' => 'title',
 ),

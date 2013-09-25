@@ -17,15 +17,26 @@ class ImagesourceType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('cataloguesignature');
-        $builder->add('catalogueurl');
-        $builder->add('numfaksimiles');
-        $builder->add('numpages');
-        $builder->add('imageurl');
-        $builder->add('imageurn');
+        $builder->add('partner', new \DTA\MetadataBundle\Form\DerivedType\SelectOrAddType(), array(
+            'class' => 'DTA\MetadataBundle\Model\Workflow\Partner',
+            'property' => 'Name',
+            'label' => 'Anbieter Leitdruck',
+            'searchable' => true,
+        ));
+        $builder->add('cataloguesignature', 'text', array('required'=>false));
+        $builder->add('catalogueurl', 'text', array('required'=>false));
+        
+        $builder->add('numfaksimiles', 'number', array('required'=>false));
+        $builder->add('extentasofcatalogue', 'text', array('required'=>false));
+        $builder->add('faksimilerefrange', 'text', array('required'=>false));
+        $builder->add('originalrefrange', 'text', array('required'=>false));
+        
+        $builder->add('imageurl', 'text', array('required'=>false));
+        $builder->add('imageurn', 'text', array('required'=>false));
         $builder->add('license', new \DTA\MetadataBundle\Form\DerivedType\SelectOrAddType(), array(
             'class' => 'DTA\MetadataBundle\Model\Workflow\License',
             'property' => 'Name',
+            'label' => 'Lizenz Bilddigitalisate',
         ));
     }
 }

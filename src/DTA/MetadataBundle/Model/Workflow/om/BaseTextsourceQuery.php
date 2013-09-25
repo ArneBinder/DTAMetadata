@@ -23,14 +23,16 @@ use DTA\MetadataBundle\Model\Workflow\TextsourceQuery;
  * @method TextsourceQuery orderById($order = Criteria::ASC) Order by the id column
  * @method TextsourceQuery orderByPublicationId($order = Criteria::ASC) Order by the publication_id column
  * @method TextsourceQuery orderByPartnerId($order = Criteria::ASC) Order by the partner_id column
- * @method TextsourceQuery orderByImageurl($order = Criteria::ASC) Order by the imageurl column
+ * @method TextsourceQuery orderByTexturl($order = Criteria::ASC) Order by the texturl column
  * @method TextsourceQuery orderByLicenseId($order = Criteria::ASC) Order by the license_id column
+ * @method TextsourceQuery orderByAttribution($order = Criteria::ASC) Order by the attribution column
  *
  * @method TextsourceQuery groupById() Group by the id column
  * @method TextsourceQuery groupByPublicationId() Group by the publication_id column
  * @method TextsourceQuery groupByPartnerId() Group by the partner_id column
- * @method TextsourceQuery groupByImageurl() Group by the imageurl column
+ * @method TextsourceQuery groupByTexturl() Group by the texturl column
  * @method TextsourceQuery groupByLicenseId() Group by the license_id column
+ * @method TextsourceQuery groupByAttribution() Group by the attribution column
  *
  * @method TextsourceQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method TextsourceQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -53,14 +55,16 @@ use DTA\MetadataBundle\Model\Workflow\TextsourceQuery;
  *
  * @method Textsource findOneByPublicationId(int $publication_id) Return the first Textsource filtered by the publication_id column
  * @method Textsource findOneByPartnerId(int $partner_id) Return the first Textsource filtered by the partner_id column
- * @method Textsource findOneByImageurl(string $imageurl) Return the first Textsource filtered by the imageurl column
+ * @method Textsource findOneByTexturl(string $texturl) Return the first Textsource filtered by the texturl column
  * @method Textsource findOneByLicenseId(int $license_id) Return the first Textsource filtered by the license_id column
+ * @method Textsource findOneByAttribution(string $attribution) Return the first Textsource filtered by the attribution column
  *
  * @method array findById(int $id) Return Textsource objects filtered by the id column
  * @method array findByPublicationId(int $publication_id) Return Textsource objects filtered by the publication_id column
  * @method array findByPartnerId(int $partner_id) Return Textsource objects filtered by the partner_id column
- * @method array findByImageurl(string $imageurl) Return Textsource objects filtered by the imageurl column
+ * @method array findByTexturl(string $texturl) Return Textsource objects filtered by the texturl column
  * @method array findByLicenseId(int $license_id) Return Textsource objects filtered by the license_id column
+ * @method array findByAttribution(string $attribution) Return Textsource objects filtered by the attribution column
  */
 abstract class BaseTextsourceQuery extends ModelCriteria
 {
@@ -162,7 +166,7 @@ abstract class BaseTextsourceQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "publication_id", "partner_id", "imageurl", "license_id" FROM "textsource" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "publication_id", "partner_id", "texturl", "license_id", "attribution" FROM "textsource" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -382,32 +386,32 @@ abstract class BaseTextsourceQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the imageurl column
+     * Filter the query on the texturl column
      *
      * Example usage:
      * <code>
-     * $query->filterByImageurl('fooValue');   // WHERE imageurl = 'fooValue'
-     * $query->filterByImageurl('%fooValue%'); // WHERE imageurl LIKE '%fooValue%'
+     * $query->filterByTexturl('fooValue');   // WHERE texturl = 'fooValue'
+     * $query->filterByTexturl('%fooValue%'); // WHERE texturl LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $imageurl The value to use as filter.
+     * @param     string $texturl The value to use as filter.
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return TextsourceQuery The current query, for fluid interface
      */
-    public function filterByImageurl($imageurl = null, $comparison = null)
+    public function filterByTexturl($texturl = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (is_array($imageurl)) {
+            if (is_array($texturl)) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $imageurl)) {
-                $imageurl = str_replace('*', '%', $imageurl);
+            } elseif (preg_match('/[\%\*]/', $texturl)) {
+                $texturl = str_replace('*', '%', $texturl);
                 $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(TextsourcePeer::IMAGEURL, $imageurl, $comparison);
+        return $this->addUsingAlias(TextsourcePeer::TEXTURL, $texturl, $comparison);
     }
 
     /**
@@ -452,6 +456,35 @@ abstract class BaseTextsourceQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(TextsourcePeer::LICENSE_ID, $licenseId, $comparison);
+    }
+
+    /**
+     * Filter the query on the attribution column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByAttribution('fooValue');   // WHERE attribution = 'fooValue'
+     * $query->filterByAttribution('%fooValue%'); // WHERE attribution LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $attribution The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return TextsourceQuery The current query, for fluid interface
+     */
+    public function filterByAttribution($attribution = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($attribution)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $attribution)) {
+                $attribution = str_replace('*', '%', $attribution);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(TextsourcePeer::ATTRIBUTION, $attribution, $comparison);
     }
 
     /**

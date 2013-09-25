@@ -27,7 +27,8 @@ use DTA\MetadataBundle\Model\Workflow\Partner;
  * @method ImagesourceQuery orderByCatalogueurl($order = Criteria::ASC) Order by the catalogueurl column
  * @method ImagesourceQuery orderByNumfaksimiles($order = Criteria::ASC) Order by the numfaksimiles column
  * @method ImagesourceQuery orderByExtentasofcatalogue($order = Criteria::ASC) Order by the extentasofcatalogue column
- * @method ImagesourceQuery orderByNumpages($order = Criteria::ASC) Order by the numpages column
+ * @method ImagesourceQuery orderByFaksimilerefrange($order = Criteria::ASC) Order by the faksimilerefrange column
+ * @method ImagesourceQuery orderByOriginalrefrange($order = Criteria::ASC) Order by the originalrefrange column
  * @method ImagesourceQuery orderByImageurl($order = Criteria::ASC) Order by the imageurl column
  * @method ImagesourceQuery orderByImageurn($order = Criteria::ASC) Order by the imageurn column
  * @method ImagesourceQuery orderByLicenseId($order = Criteria::ASC) Order by the license_id column
@@ -39,7 +40,8 @@ use DTA\MetadataBundle\Model\Workflow\Partner;
  * @method ImagesourceQuery groupByCatalogueurl() Group by the catalogueurl column
  * @method ImagesourceQuery groupByNumfaksimiles() Group by the numfaksimiles column
  * @method ImagesourceQuery groupByExtentasofcatalogue() Group by the extentasofcatalogue column
- * @method ImagesourceQuery groupByNumpages() Group by the numpages column
+ * @method ImagesourceQuery groupByFaksimilerefrange() Group by the faksimilerefrange column
+ * @method ImagesourceQuery groupByOriginalrefrange() Group by the originalrefrange column
  * @method ImagesourceQuery groupByImageurl() Group by the imageurl column
  * @method ImagesourceQuery groupByImageurn() Group by the imageurn column
  * @method ImagesourceQuery groupByLicenseId() Group by the license_id column
@@ -69,7 +71,8 @@ use DTA\MetadataBundle\Model\Workflow\Partner;
  * @method Imagesource findOneByCatalogueurl(string $catalogueurl) Return the first Imagesource filtered by the catalogueurl column
  * @method Imagesource findOneByNumfaksimiles(int $numfaksimiles) Return the first Imagesource filtered by the numfaksimiles column
  * @method Imagesource findOneByExtentasofcatalogue(string $extentasofcatalogue) Return the first Imagesource filtered by the extentasofcatalogue column
- * @method Imagesource findOneByNumpages(int $numpages) Return the first Imagesource filtered by the numpages column
+ * @method Imagesource findOneByFaksimilerefrange(string $faksimilerefrange) Return the first Imagesource filtered by the faksimilerefrange column
+ * @method Imagesource findOneByOriginalrefrange(string $originalrefrange) Return the first Imagesource filtered by the originalrefrange column
  * @method Imagesource findOneByImageurl(string $imageurl) Return the first Imagesource filtered by the imageurl column
  * @method Imagesource findOneByImageurn(string $imageurn) Return the first Imagesource filtered by the imageurn column
  * @method Imagesource findOneByLicenseId(int $license_id) Return the first Imagesource filtered by the license_id column
@@ -81,7 +84,8 @@ use DTA\MetadataBundle\Model\Workflow\Partner;
  * @method array findByCatalogueurl(string $catalogueurl) Return Imagesource objects filtered by the catalogueurl column
  * @method array findByNumfaksimiles(int $numfaksimiles) Return Imagesource objects filtered by the numfaksimiles column
  * @method array findByExtentasofcatalogue(string $extentasofcatalogue) Return Imagesource objects filtered by the extentasofcatalogue column
- * @method array findByNumpages(int $numpages) Return Imagesource objects filtered by the numpages column
+ * @method array findByFaksimilerefrange(string $faksimilerefrange) Return Imagesource objects filtered by the faksimilerefrange column
+ * @method array findByOriginalrefrange(string $originalrefrange) Return Imagesource objects filtered by the originalrefrange column
  * @method array findByImageurl(string $imageurl) Return Imagesource objects filtered by the imageurl column
  * @method array findByImageurn(string $imageurn) Return Imagesource objects filtered by the imageurn column
  * @method array findByLicenseId(int $license_id) Return Imagesource objects filtered by the license_id column
@@ -186,7 +190,7 @@ abstract class BaseImagesourceQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "publication_id", "partner_id", "cataloguesignature", "catalogueurl", "numfaksimiles", "extentasofcatalogue", "numpages", "imageurl", "imageurn", "license_id" FROM "imagesource" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "publication_id", "partner_id", "cataloguesignature", "catalogueurl", "numfaksimiles", "extentasofcatalogue", "faksimilerefrange", "originalrefrange", "imageurl", "imageurn", "license_id" FROM "imagesource" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -535,45 +539,61 @@ abstract class BaseImagesourceQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the numpages column
+     * Filter the query on the faksimilerefrange column
      *
      * Example usage:
      * <code>
-     * $query->filterByNumpages(1234); // WHERE numpages = 1234
-     * $query->filterByNumpages(array(12, 34)); // WHERE numpages IN (12, 34)
-     * $query->filterByNumpages(array('min' => 12)); // WHERE numpages >= 12
-     * $query->filterByNumpages(array('max' => 12)); // WHERE numpages <= 12
+     * $query->filterByFaksimilerefrange('fooValue');   // WHERE faksimilerefrange = 'fooValue'
+     * $query->filterByFaksimilerefrange('%fooValue%'); // WHERE faksimilerefrange LIKE '%fooValue%'
      * </code>
      *
-     * @param     mixed $numpages The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $faksimilerefrange The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ImagesourceQuery The current query, for fluid interface
      */
-    public function filterByNumpages($numpages = null, $comparison = null)
+    public function filterByFaksimilerefrange($faksimilerefrange = null, $comparison = null)
     {
-        if (is_array($numpages)) {
-            $useMinMax = false;
-            if (isset($numpages['min'])) {
-                $this->addUsingAlias(ImagesourcePeer::NUMPAGES, $numpages['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($numpages['max'])) {
-                $this->addUsingAlias(ImagesourcePeer::NUMPAGES, $numpages['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
+        if (null === $comparison) {
+            if (is_array($faksimilerefrange)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $faksimilerefrange)) {
+                $faksimilerefrange = str_replace('*', '%', $faksimilerefrange);
+                $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(ImagesourcePeer::NUMPAGES, $numpages, $comparison);
+        return $this->addUsingAlias(ImagesourcePeer::FAKSIMILEREFRANGE, $faksimilerefrange, $comparison);
+    }
+
+    /**
+     * Filter the query on the originalrefrange column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByOriginalrefrange('fooValue');   // WHERE originalrefrange = 'fooValue'
+     * $query->filterByOriginalrefrange('%fooValue%'); // WHERE originalrefrange LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $originalrefrange The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ImagesourceQuery The current query, for fluid interface
+     */
+    public function filterByOriginalrefrange($originalrefrange = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($originalrefrange)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $originalrefrange)) {
+                $originalrefrange = str_replace('*', '%', $originalrefrange);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(ImagesourcePeer::ORIGINALREFRANGE, $originalrefrange, $comparison);
     }
 
     /**

@@ -32,13 +32,13 @@ abstract class BaseImagesourcePeer
     const TM_CLASS = 'ImagesourceTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 11;
+    const NUM_COLUMNS = 12;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 11;
+    const NUM_HYDRATE_COLUMNS = 12;
 
     /** the column name for the id field */
     const ID = 'imagesource.id';
@@ -61,8 +61,11 @@ abstract class BaseImagesourcePeer
     /** the column name for the extentasofcatalogue field */
     const EXTENTASOFCATALOGUE = 'imagesource.extentasofcatalogue';
 
-    /** the column name for the numpages field */
-    const NUMPAGES = 'imagesource.numpages';
+    /** the column name for the faksimilerefrange field */
+    const FAKSIMILEREFRANGE = 'imagesource.faksimilerefrange';
+
+    /** the column name for the originalrefrange field */
+    const ORIGINALREFRANGE = 'imagesource.originalrefrange';
 
     /** the column name for the imageurl field */
     const IMAGEURL = 'imagesource.imageurl';
@@ -92,12 +95,12 @@ abstract class BaseImagesourcePeer
      * e.g. ImagesourcePeer::$fieldNames[ImagesourcePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'PartnerId', 'Cataloguesignature', 'Catalogueurl', 'Numfaksimiles', 'Extentasofcatalogue', 'Numpages', 'Imageurl', 'Imageurn', 'LicenseId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'partnerId', 'cataloguesignature', 'catalogueurl', 'numfaksimiles', 'extentasofcatalogue', 'numpages', 'imageurl', 'imageurn', 'licenseId', ),
-        BasePeer::TYPE_COLNAME => array (ImagesourcePeer::ID, ImagesourcePeer::PUBLICATION_ID, ImagesourcePeer::PARTNER_ID, ImagesourcePeer::CATALOGUESIGNATURE, ImagesourcePeer::CATALOGUEURL, ImagesourcePeer::NUMFAKSIMILES, ImagesourcePeer::EXTENTASOFCATALOGUE, ImagesourcePeer::NUMPAGES, ImagesourcePeer::IMAGEURL, ImagesourcePeer::IMAGEURN, ImagesourcePeer::LICENSE_ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'PARTNER_ID', 'CATALOGUESIGNATURE', 'CATALOGUEURL', 'NUMFAKSIMILES', 'EXTENTASOFCATALOGUE', 'NUMPAGES', 'IMAGEURL', 'IMAGEURN', 'LICENSE_ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'partner_id', 'cataloguesignature', 'catalogueurl', 'numfaksimiles', 'extentasofcatalogue', 'numpages', 'imageurl', 'imageurn', 'license_id', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'PartnerId', 'Cataloguesignature', 'Catalogueurl', 'Numfaksimiles', 'Extentasofcatalogue', 'Faksimilerefrange', 'Originalrefrange', 'Imageurl', 'Imageurn', 'LicenseId', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'partnerId', 'cataloguesignature', 'catalogueurl', 'numfaksimiles', 'extentasofcatalogue', 'faksimilerefrange', 'originalrefrange', 'imageurl', 'imageurn', 'licenseId', ),
+        BasePeer::TYPE_COLNAME => array (ImagesourcePeer::ID, ImagesourcePeer::PUBLICATION_ID, ImagesourcePeer::PARTNER_ID, ImagesourcePeer::CATALOGUESIGNATURE, ImagesourcePeer::CATALOGUEURL, ImagesourcePeer::NUMFAKSIMILES, ImagesourcePeer::EXTENTASOFCATALOGUE, ImagesourcePeer::FAKSIMILEREFRANGE, ImagesourcePeer::ORIGINALREFRANGE, ImagesourcePeer::IMAGEURL, ImagesourcePeer::IMAGEURN, ImagesourcePeer::LICENSE_ID, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'PARTNER_ID', 'CATALOGUESIGNATURE', 'CATALOGUEURL', 'NUMFAKSIMILES', 'EXTENTASOFCATALOGUE', 'FAKSIMILEREFRANGE', 'ORIGINALREFRANGE', 'IMAGEURL', 'IMAGEURN', 'LICENSE_ID', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'partner_id', 'cataloguesignature', 'catalogueurl', 'numfaksimiles', 'extentasofcatalogue', 'faksimilerefrange', 'originalrefrange', 'imageurl', 'imageurn', 'license_id', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
     );
 
     /**
@@ -107,12 +110,12 @@ abstract class BaseImagesourcePeer
      * e.g. ImagesourcePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'PartnerId' => 2, 'Cataloguesignature' => 3, 'Catalogueurl' => 4, 'Numfaksimiles' => 5, 'Extentasofcatalogue' => 6, 'Numpages' => 7, 'Imageurl' => 8, 'Imageurn' => 9, 'LicenseId' => 10, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'partnerId' => 2, 'cataloguesignature' => 3, 'catalogueurl' => 4, 'numfaksimiles' => 5, 'extentasofcatalogue' => 6, 'numpages' => 7, 'imageurl' => 8, 'imageurn' => 9, 'licenseId' => 10, ),
-        BasePeer::TYPE_COLNAME => array (ImagesourcePeer::ID => 0, ImagesourcePeer::PUBLICATION_ID => 1, ImagesourcePeer::PARTNER_ID => 2, ImagesourcePeer::CATALOGUESIGNATURE => 3, ImagesourcePeer::CATALOGUEURL => 4, ImagesourcePeer::NUMFAKSIMILES => 5, ImagesourcePeer::EXTENTASOFCATALOGUE => 6, ImagesourcePeer::NUMPAGES => 7, ImagesourcePeer::IMAGEURL => 8, ImagesourcePeer::IMAGEURN => 9, ImagesourcePeer::LICENSE_ID => 10, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'PARTNER_ID' => 2, 'CATALOGUESIGNATURE' => 3, 'CATALOGUEURL' => 4, 'NUMFAKSIMILES' => 5, 'EXTENTASOFCATALOGUE' => 6, 'NUMPAGES' => 7, 'IMAGEURL' => 8, 'IMAGEURN' => 9, 'LICENSE_ID' => 10, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'partner_id' => 2, 'cataloguesignature' => 3, 'catalogueurl' => 4, 'numfaksimiles' => 5, 'extentasofcatalogue' => 6, 'numpages' => 7, 'imageurl' => 8, 'imageurn' => 9, 'license_id' => 10, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'PartnerId' => 2, 'Cataloguesignature' => 3, 'Catalogueurl' => 4, 'Numfaksimiles' => 5, 'Extentasofcatalogue' => 6, 'Faksimilerefrange' => 7, 'Originalrefrange' => 8, 'Imageurl' => 9, 'Imageurn' => 10, 'LicenseId' => 11, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'partnerId' => 2, 'cataloguesignature' => 3, 'catalogueurl' => 4, 'numfaksimiles' => 5, 'extentasofcatalogue' => 6, 'faksimilerefrange' => 7, 'originalrefrange' => 8, 'imageurl' => 9, 'imageurn' => 10, 'licenseId' => 11, ),
+        BasePeer::TYPE_COLNAME => array (ImagesourcePeer::ID => 0, ImagesourcePeer::PUBLICATION_ID => 1, ImagesourcePeer::PARTNER_ID => 2, ImagesourcePeer::CATALOGUESIGNATURE => 3, ImagesourcePeer::CATALOGUEURL => 4, ImagesourcePeer::NUMFAKSIMILES => 5, ImagesourcePeer::EXTENTASOFCATALOGUE => 6, ImagesourcePeer::FAKSIMILEREFRANGE => 7, ImagesourcePeer::ORIGINALREFRANGE => 8, ImagesourcePeer::IMAGEURL => 9, ImagesourcePeer::IMAGEURN => 10, ImagesourcePeer::LICENSE_ID => 11, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'PARTNER_ID' => 2, 'CATALOGUESIGNATURE' => 3, 'CATALOGUEURL' => 4, 'NUMFAKSIMILES' => 5, 'EXTENTASOFCATALOGUE' => 6, 'FAKSIMILEREFRANGE' => 7, 'ORIGINALREFRANGE' => 8, 'IMAGEURL' => 9, 'IMAGEURN' => 10, 'LICENSE_ID' => 11, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'partner_id' => 2, 'cataloguesignature' => 3, 'catalogueurl' => 4, 'numfaksimiles' => 5, 'extentasofcatalogue' => 6, 'faksimilerefrange' => 7, 'originalrefrange' => 8, 'imageurl' => 9, 'imageurn' => 10, 'license_id' => 11, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
     );
 
     /**
@@ -193,7 +196,8 @@ abstract class BaseImagesourcePeer
             $criteria->addSelectColumn(ImagesourcePeer::CATALOGUEURL);
             $criteria->addSelectColumn(ImagesourcePeer::NUMFAKSIMILES);
             $criteria->addSelectColumn(ImagesourcePeer::EXTENTASOFCATALOGUE);
-            $criteria->addSelectColumn(ImagesourcePeer::NUMPAGES);
+            $criteria->addSelectColumn(ImagesourcePeer::FAKSIMILEREFRANGE);
+            $criteria->addSelectColumn(ImagesourcePeer::ORIGINALREFRANGE);
             $criteria->addSelectColumn(ImagesourcePeer::IMAGEURL);
             $criteria->addSelectColumn(ImagesourcePeer::IMAGEURN);
             $criteria->addSelectColumn(ImagesourcePeer::LICENSE_ID);
@@ -205,7 +209,8 @@ abstract class BaseImagesourcePeer
             $criteria->addSelectColumn($alias . '.catalogueurl');
             $criteria->addSelectColumn($alias . '.numfaksimiles');
             $criteria->addSelectColumn($alias . '.extentasofcatalogue');
-            $criteria->addSelectColumn($alias . '.numpages');
+            $criteria->addSelectColumn($alias . '.faksimilerefrange');
+            $criteria->addSelectColumn($alias . '.originalrefrange');
             $criteria->addSelectColumn($alias . '.imageurl');
             $criteria->addSelectColumn($alias . '.imageurn');
             $criteria->addSelectColumn($alias . '.license_id');

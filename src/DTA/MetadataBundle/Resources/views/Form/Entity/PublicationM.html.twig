@@ -2,6 +2,7 @@
 {% import "DTAMetadataBundle:form:buildingBlocks.html.twig" as dta %}
 
 <!--div class="alert alert-info">
+
     <button type="button" class="close" data-dismiss="alert">&times;</button>
     Felder, in denen mehrere Angaben sinnvoll erscheinen (z.&nbsp;B. <i>Verlag<sup>;</sup></i> oder <i>Schlagwörter<sup>;</sup></i>&nbsp;), 
     können mit eben solchen versehen werden, wenn diese durch ein Semikolon getrennt werden.
@@ -24,11 +25,11 @@
 
     {{ form_row(form.publication.place) }}
     
-    {{ dta.beginLabelledControl({'controlId':'none', 'labelCaption':'Datierung'}) }}
+    {{ dta.beginLabelledContent({'controlId':'none', 'labelCaption':'Datierung'}) }}
         {{ form_row(form.publication.DatespecificationRelatedByPublicationdateId) }}
         {{ form_row(form.publication.DatespecificationRelatedByFirstpublicationdateId) }}
         {{ form_row(form.publication.work.datespecification) }}
-    {{ dta.endLabelledControl() }}
+    {{ dta.endLabelledContent() }}
     
     {{ form_row(form.publication.printrun) }}
     
@@ -45,12 +46,24 @@
 
 {{ dta.endFieldset()}}
 
+{{ dta.beginFieldset({'caption':'Angaben zur Textquelle'})}}
 
-{{ dta.beginFieldset({'caption':'Rest', 'collapsed':true})}}
+    {{ form_row(form.publication.TextSources) }}
+
+{{ dta.endFieldset()}}
+
+{{ dta.beginFieldset({'caption':'Anmerkungen', 'collapsed': false})}}
+
+    {{ form_widget(form.publication.comment, {'attr':{'style':'width:100%'} }) }}
+
+{{ dta.endFieldset()}}
+
+{{ dta.beginFieldset({'caption':'Rest', 'collapsed': false})}}
 
     {{ form_rest(form) }}
 
 {{ dta.endFieldset()}}
+
 
 
 <!--

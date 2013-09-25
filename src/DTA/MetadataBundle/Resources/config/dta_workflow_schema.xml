@@ -78,12 +78,14 @@
         <column name="publication_id" type="INTEGER" required="true"/>
        
         <column description="Anbieter Leitdruck" name="partner_id" type="INTEGER"  required="false"/>
-        <column name="cataloguesignature" type="LONGVARCHAR"  required="false"/>
+        <column name="cataloguesignature" type="LONGVARCHAR" required="false"/>
         <column name="catalogueurl" description="Link in den Katalog" type="LONGVARCHAR"  required="false"/>
         
         <column description="Anzahl Faksimiles" name="numfaksimiles" type="INTEGER"  required="false"/>
         <column description="Umfang laut Katalog" name="extentasofcatalogue" type="LONGVARCHAR"  required="false"/>
-        <column name="numpages" description="Umfang lt. Katalog" type="INTEGER"  required="false"/>
+        <!--Bilddigitalisate können teilweise aus anderen Quellen kommen.-->
+        <column description="Referenzierte Faksimileseitenzahlen" name="faksimilerefrange" type="LONGVARCHAR"  required="false"/>
+        <column description="Referenzierte Originalseitenzahlen" name="originalrefrange" type="LONGVARCHAR"  required="false"/>
 
         <column description="URL der Bilddigitalisate" name="imageurl" type="LONGVARCHAR" required="false"/>
         <column description="URN der Bilddigitalisate" name="imageurn" type="LONGVARCHAR" required="false"/>
@@ -102,8 +104,9 @@
        
         <column description="Anbieter Textdigitalisate" name="partner_id" type="INTEGER"  required="false"/>
         
-        <column description="URL der Textdigitalisate" name="imageurl" type="LONGVARCHAR" required="false"/>
+        <column description="URL der Textdigitalisate" name="texturl" type="LONGVARCHAR" required="false"/>
         <column name="license_id" description="Lizenz" type="INTEGER" required="false"/>
+        <column description="Attributionszeile" name="attribution" type="LONGVARCHAR" required="false"/>
         
 <!--        <column name="cataloguesignature" type="LONGVARCHAR"  required="false"/>
         <column name="catalogueurl" description="Link in den Katalog" type="LONGVARCHAR"  required="false"/>-->

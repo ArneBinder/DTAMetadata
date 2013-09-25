@@ -61,16 +61,22 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
     protected $partner_id;
 
     /**
-     * The value for the imageurl field.
+     * The value for the texturl field.
      * @var        string
      */
-    protected $imageurl;
+    protected $texturl;
 
     /**
      * The value for the license_id field.
      * @var        int
      */
     protected $license_id;
+
+    /**
+     * The value for the attribution field.
+     * @var        string
+     */
+    protected $attribution;
 
     /**
      * @var        Publication
@@ -108,7 +114,7 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Id', 'PublicationId', 'PartnerId', 'Imageurl', 'LicenseId', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'PublicationId'=>'PublicationId', 'PartnerId'=>'PartnerId', 'Imageurl'=>'Imageurl', 'LicenseId'=>'LicenseId', );
+    public static $tableRowViewCaptions = array('Id', 'PublicationId', 'PartnerId', 'Texturl', 'LicenseId', 'Attribution', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'PublicationId'=>'PublicationId', 'PartnerId'=>'PartnerId', 'Texturl'=>'Texturl', 'LicenseId'=>'LicenseId', 'Attribution'=>'Attribution', );
     /**
      * Get the [id] column value.
      *
@@ -140,13 +146,13 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
     }
 
     /**
-     * Get the [imageurl] column value.
+     * Get the [texturl] column value.
      * URL der Textdigitalisate
      * @return string
      */
-    public function getImageurl()
+    public function getTexturl()
     {
-        return $this->imageurl;
+        return $this->texturl;
     }
 
     /**
@@ -157,6 +163,16 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
     public function getLicenseId()
     {
         return $this->license_id;
+    }
+
+    /**
+     * Get the [attribution] column value.
+     * Attributionszeile
+     * @return string
+     */
+    public function getAttribution()
+    {
+        return $this->attribution;
     }
 
     /**
@@ -231,25 +247,25 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
     } // setPartnerId()
 
     /**
-     * Set the value of [imageurl] column.
+     * Set the value of [texturl] column.
      * URL der Textdigitalisate
      * @param string $v new value
      * @return Textsource The current object (for fluent API support)
      */
-    public function setImageurl($v)
+    public function setTexturl($v)
     {
         if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
-        if ($this->imageurl !== $v) {
-            $this->imageurl = $v;
-            $this->modifiedColumns[] = TextsourcePeer::IMAGEURL;
+        if ($this->texturl !== $v) {
+            $this->texturl = $v;
+            $this->modifiedColumns[] = TextsourcePeer::TEXTURL;
         }
 
 
         return $this;
-    } // setImageurl()
+    } // setTexturl()
 
     /**
      * Set the value of [license_id] column.
@@ -275,6 +291,27 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
 
         return $this;
     } // setLicenseId()
+
+    /**
+     * Set the value of [attribution] column.
+     * Attributionszeile
+     * @param string $v new value
+     * @return Textsource The current object (for fluent API support)
+     */
+    public function setAttribution($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->attribution !== $v) {
+            $this->attribution = $v;
+            $this->modifiedColumns[] = TextsourcePeer::ATTRIBUTION;
+        }
+
+
+        return $this;
+    } // setAttribution()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -311,8 +348,9 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->publication_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
             $this->partner_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
-            $this->imageurl = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+            $this->texturl = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
             $this->license_id = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
+            $this->attribution = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -321,7 +359,7 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 5; // 5 = TextsourcePeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = TextsourcePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Textsource object", $e);
@@ -590,11 +628,14 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
         if ($this->isColumnModified(TextsourcePeer::PARTNER_ID)) {
             $modifiedColumns[':p' . $index++]  = '"partner_id"';
         }
-        if ($this->isColumnModified(TextsourcePeer::IMAGEURL)) {
-            $modifiedColumns[':p' . $index++]  = '"imageurl"';
+        if ($this->isColumnModified(TextsourcePeer::TEXTURL)) {
+            $modifiedColumns[':p' . $index++]  = '"texturl"';
         }
         if ($this->isColumnModified(TextsourcePeer::LICENSE_ID)) {
             $modifiedColumns[':p' . $index++]  = '"license_id"';
+        }
+        if ($this->isColumnModified(TextsourcePeer::ATTRIBUTION)) {
+            $modifiedColumns[':p' . $index++]  = '"attribution"';
         }
 
         $sql = sprintf(
@@ -616,11 +657,14 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
                     case '"partner_id"':
                         $stmt->bindValue($identifier, $this->partner_id, PDO::PARAM_INT);
                         break;
-                    case '"imageurl"':
-                        $stmt->bindValue($identifier, $this->imageurl, PDO::PARAM_STR);
+                    case '"texturl"':
+                        $stmt->bindValue($identifier, $this->texturl, PDO::PARAM_STR);
                         break;
                     case '"license_id"':
                         $stmt->bindValue($identifier, $this->license_id, PDO::PARAM_INT);
+                        break;
+                    case '"attribution"':
+                        $stmt->bindValue($identifier, $this->attribution, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -783,10 +827,13 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
                 return $this->getPartnerId();
                 break;
             case 3:
-                return $this->getImageurl();
+                return $this->getTexturl();
                 break;
             case 4:
                 return $this->getLicenseId();
+                break;
+            case 5:
+                return $this->getAttribution();
                 break;
             default:
                 return null;
@@ -820,8 +867,9 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
             $keys[0] => $this->getId(),
             $keys[1] => $this->getPublicationId(),
             $keys[2] => $this->getPartnerId(),
-            $keys[3] => $this->getImageurl(),
+            $keys[3] => $this->getTexturl(),
             $keys[4] => $this->getLicenseId(),
+            $keys[5] => $this->getAttribution(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aPublication) {
@@ -877,10 +925,13 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
                 $this->setPartnerId($value);
                 break;
             case 3:
-                $this->setImageurl($value);
+                $this->setTexturl($value);
                 break;
             case 4:
                 $this->setLicenseId($value);
+                break;
+            case 5:
+                $this->setAttribution($value);
                 break;
         } // switch()
     }
@@ -909,8 +960,9 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setPublicationId($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setPartnerId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setImageurl($arr[$keys[3]]);
+        if (array_key_exists($keys[3], $arr)) $this->setTexturl($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setLicenseId($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setAttribution($arr[$keys[5]]);
     }
 
     /**
@@ -925,8 +977,9 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
         if ($this->isColumnModified(TextsourcePeer::ID)) $criteria->add(TextsourcePeer::ID, $this->id);
         if ($this->isColumnModified(TextsourcePeer::PUBLICATION_ID)) $criteria->add(TextsourcePeer::PUBLICATION_ID, $this->publication_id);
         if ($this->isColumnModified(TextsourcePeer::PARTNER_ID)) $criteria->add(TextsourcePeer::PARTNER_ID, $this->partner_id);
-        if ($this->isColumnModified(TextsourcePeer::IMAGEURL)) $criteria->add(TextsourcePeer::IMAGEURL, $this->imageurl);
+        if ($this->isColumnModified(TextsourcePeer::TEXTURL)) $criteria->add(TextsourcePeer::TEXTURL, $this->texturl);
         if ($this->isColumnModified(TextsourcePeer::LICENSE_ID)) $criteria->add(TextsourcePeer::LICENSE_ID, $this->license_id);
+        if ($this->isColumnModified(TextsourcePeer::ATTRIBUTION)) $criteria->add(TextsourcePeer::ATTRIBUTION, $this->attribution);
 
         return $criteria;
     }
@@ -992,8 +1045,9 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
     {
         $copyObj->setPublicationId($this->getPublicationId());
         $copyObj->setPartnerId($this->getPartnerId());
-        $copyObj->setImageurl($this->getImageurl());
+        $copyObj->setTexturl($this->getTexturl());
         $copyObj->setLicenseId($this->getLicenseId());
+        $copyObj->setAttribution($this->getAttribution());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1216,8 +1270,9 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
         $this->id = null;
         $this->publication_id = null;
         $this->partner_id = null;
-        $this->imageurl = null;
+        $this->texturl = null;
         $this->license_id = null;
+        $this->attribution = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;

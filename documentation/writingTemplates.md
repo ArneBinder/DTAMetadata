@@ -27,24 +27,24 @@ public function buildForm(FormBuilderInterface $builder, array $options)
 
 The file ```buildingBlocks.html.twig``` contains macros to ease recurring tasks. 
 
-- labelled controls
+- labelled content
 
     The command generates an extra column for the label and the enclosed content is displayed indented.
     
     ```php
-    {{ dta.beginLabelledControl({'controlId':'none', 'labelCaption':'Datierung'}) }}
+    {{ dta.beginLabelledContent({'controlId':'none', 'labelCaption':'Datierung'}) }}
         {{ form_row(form.publication.DatespecificationRelatedByPublicationdateId) }}
         {{ form_row(form.publication.DatespecificationRelatedByFirstpublicationdateId) }}
         {{ form_row(form.publication.work.datespecification) }}
-    {{ dta.endLabelledControl() }}
+    {{ dta.endLabelledContent() }}
     ```
 
     renders
 
-    ![labelled control example][labelledControl]
+    ![labelled control example][labelledContent]
 
 - field sets 
 
 - modals 
 
-[labelledControl]: img/labelledControl.png "The left column is created by the labelled control macro."
+[labelledContent]: img/labelledContent.png "The left column is created by the labelled control macro."

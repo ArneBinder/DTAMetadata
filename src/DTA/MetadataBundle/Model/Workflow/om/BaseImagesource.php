@@ -85,10 +85,16 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
     protected $extentasofcatalogue;
 
     /**
-     * The value for the numpages field.
-     * @var        int
+     * The value for the faksimilerefrange field.
+     * @var        string
      */
-    protected $numpages;
+    protected $faksimilerefrange;
+
+    /**
+     * The value for the originalrefrange field.
+     * @var        string
+     */
+    protected $originalrefrange;
 
     /**
      * The value for the imageurl field.
@@ -144,7 +150,7 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Id', 'PublicationId', 'PartnerId', 'Cataloguesignature', 'Catalogueurl', 'Numfaksimiles', 'Extentasofcatalogue', 'Numpages', 'Imageurl', 'Imageurn', 'LicenseId', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'PublicationId'=>'PublicationId', 'PartnerId'=>'PartnerId', 'Cataloguesignature'=>'Cataloguesignature', 'Catalogueurl'=>'Catalogueurl', 'Numfaksimiles'=>'Numfaksimiles', 'Extentasofcatalogue'=>'Extentasofcatalogue', 'Numpages'=>'Numpages', 'Imageurl'=>'Imageurl', 'Imageurn'=>'Imageurn', 'LicenseId'=>'LicenseId', );
+    public static $tableRowViewCaptions = array('Id', 'PublicationId', 'PartnerId', 'Cataloguesignature', 'Catalogueurl', 'Numfaksimiles', 'Extentasofcatalogue', 'Faksimilerefrange', 'Originalrefrange', 'Imageurl', 'Imageurn', 'LicenseId', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'PublicationId'=>'PublicationId', 'PartnerId'=>'PartnerId', 'Cataloguesignature'=>'Cataloguesignature', 'Catalogueurl'=>'Catalogueurl', 'Numfaksimiles'=>'Numfaksimiles', 'Extentasofcatalogue'=>'Extentasofcatalogue', 'Faksimilerefrange'=>'Faksimilerefrange', 'Originalrefrange'=>'Originalrefrange', 'Imageurl'=>'Imageurl', 'Imageurn'=>'Imageurn', 'LicenseId'=>'LicenseId', );
     /**
      * Get the [id] column value.
      *
@@ -216,13 +222,23 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
     }
 
     /**
-     * Get the [numpages] column value.
-     * Umfang lt. Katalog
-     * @return int
+     * Get the [faksimilerefrange] column value.
+     * Referenzierte Faksimileseitenzahlen
+     * @return string
      */
-    public function getNumpages()
+    public function getFaksimilerefrange()
     {
-        return $this->numpages;
+        return $this->faksimilerefrange;
+    }
+
+    /**
+     * Get the [originalrefrange] column value.
+     * Referenzierte Originalseitenzahlen
+     * @return string
+     */
+    public function getOriginalrefrange()
+    {
+        return $this->originalrefrange;
     }
 
     /**
@@ -411,25 +427,46 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
     } // setExtentasofcatalogue()
 
     /**
-     * Set the value of [numpages] column.
-     * Umfang lt. Katalog
-     * @param int $v new value
+     * Set the value of [faksimilerefrange] column.
+     * Referenzierte Faksimileseitenzahlen
+     * @param string $v new value
      * @return Imagesource The current object (for fluent API support)
      */
-    public function setNumpages($v)
+    public function setFaksimilerefrange($v)
     {
         if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
+            $v = (string) $v;
         }
 
-        if ($this->numpages !== $v) {
-            $this->numpages = $v;
-            $this->modifiedColumns[] = ImagesourcePeer::NUMPAGES;
+        if ($this->faksimilerefrange !== $v) {
+            $this->faksimilerefrange = $v;
+            $this->modifiedColumns[] = ImagesourcePeer::FAKSIMILEREFRANGE;
         }
 
 
         return $this;
-    } // setNumpages()
+    } // setFaksimilerefrange()
+
+    /**
+     * Set the value of [originalrefrange] column.
+     * Referenzierte Originalseitenzahlen
+     * @param string $v new value
+     * @return Imagesource The current object (for fluent API support)
+     */
+    public function setOriginalrefrange($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->originalrefrange !== $v) {
+            $this->originalrefrange = $v;
+            $this->modifiedColumns[] = ImagesourcePeer::ORIGINALREFRANGE;
+        }
+
+
+        return $this;
+    } // setOriginalrefrange()
 
     /**
      * Set the value of [imageurl] column.
@@ -537,10 +574,11 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
             $this->catalogueurl = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
             $this->numfaksimiles = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
             $this->extentasofcatalogue = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-            $this->numpages = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-            $this->imageurl = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-            $this->imageurn = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-            $this->license_id = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
+            $this->faksimilerefrange = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+            $this->originalrefrange = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+            $this->imageurl = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+            $this->imageurn = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+            $this->license_id = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -549,7 +587,7 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 11; // 11 = ImagesourcePeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 12; // 12 = ImagesourcePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Imagesource object", $e);
@@ -830,8 +868,11 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
         if ($this->isColumnModified(ImagesourcePeer::EXTENTASOFCATALOGUE)) {
             $modifiedColumns[':p' . $index++]  = '"extentasofcatalogue"';
         }
-        if ($this->isColumnModified(ImagesourcePeer::NUMPAGES)) {
-            $modifiedColumns[':p' . $index++]  = '"numpages"';
+        if ($this->isColumnModified(ImagesourcePeer::FAKSIMILEREFRANGE)) {
+            $modifiedColumns[':p' . $index++]  = '"faksimilerefrange"';
+        }
+        if ($this->isColumnModified(ImagesourcePeer::ORIGINALREFRANGE)) {
+            $modifiedColumns[':p' . $index++]  = '"originalrefrange"';
         }
         if ($this->isColumnModified(ImagesourcePeer::IMAGEURL)) {
             $modifiedColumns[':p' . $index++]  = '"imageurl"';
@@ -874,8 +915,11 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
                     case '"extentasofcatalogue"':
                         $stmt->bindValue($identifier, $this->extentasofcatalogue, PDO::PARAM_STR);
                         break;
-                    case '"numpages"':
-                        $stmt->bindValue($identifier, $this->numpages, PDO::PARAM_INT);
+                    case '"faksimilerefrange"':
+                        $stmt->bindValue($identifier, $this->faksimilerefrange, PDO::PARAM_STR);
+                        break;
+                    case '"originalrefrange"':
+                        $stmt->bindValue($identifier, $this->originalrefrange, PDO::PARAM_STR);
                         break;
                     case '"imageurl"':
                         $stmt->bindValue($identifier, $this->imageurl, PDO::PARAM_STR);
@@ -1059,15 +1103,18 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
                 return $this->getExtentasofcatalogue();
                 break;
             case 7:
-                return $this->getNumpages();
+                return $this->getFaksimilerefrange();
                 break;
             case 8:
-                return $this->getImageurl();
+                return $this->getOriginalrefrange();
                 break;
             case 9:
-                return $this->getImageurn();
+                return $this->getImageurl();
                 break;
             case 10:
+                return $this->getImageurn();
+                break;
+            case 11:
                 return $this->getLicenseId();
                 break;
             default:
@@ -1106,10 +1153,11 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
             $keys[4] => $this->getCatalogueurl(),
             $keys[5] => $this->getNumfaksimiles(),
             $keys[6] => $this->getExtentasofcatalogue(),
-            $keys[7] => $this->getNumpages(),
-            $keys[8] => $this->getImageurl(),
-            $keys[9] => $this->getImageurn(),
-            $keys[10] => $this->getLicenseId(),
+            $keys[7] => $this->getFaksimilerefrange(),
+            $keys[8] => $this->getOriginalrefrange(),
+            $keys[9] => $this->getImageurl(),
+            $keys[10] => $this->getImageurn(),
+            $keys[11] => $this->getLicenseId(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aPublication) {
@@ -1177,15 +1225,18 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
                 $this->setExtentasofcatalogue($value);
                 break;
             case 7:
-                $this->setNumpages($value);
+                $this->setFaksimilerefrange($value);
                 break;
             case 8:
-                $this->setImageurl($value);
+                $this->setOriginalrefrange($value);
                 break;
             case 9:
-                $this->setImageurn($value);
+                $this->setImageurl($value);
                 break;
             case 10:
+                $this->setImageurn($value);
+                break;
+            case 11:
                 $this->setLicenseId($value);
                 break;
         } // switch()
@@ -1219,10 +1270,11 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
         if (array_key_exists($keys[4], $arr)) $this->setCatalogueurl($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setNumfaksimiles($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setExtentasofcatalogue($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setNumpages($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setImageurl($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setImageurn($arr[$keys[9]]);
-        if (array_key_exists($keys[10], $arr)) $this->setLicenseId($arr[$keys[10]]);
+        if (array_key_exists($keys[7], $arr)) $this->setFaksimilerefrange($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setOriginalrefrange($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setImageurl($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setImageurn($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setLicenseId($arr[$keys[11]]);
     }
 
     /**
@@ -1241,7 +1293,8 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
         if ($this->isColumnModified(ImagesourcePeer::CATALOGUEURL)) $criteria->add(ImagesourcePeer::CATALOGUEURL, $this->catalogueurl);
         if ($this->isColumnModified(ImagesourcePeer::NUMFAKSIMILES)) $criteria->add(ImagesourcePeer::NUMFAKSIMILES, $this->numfaksimiles);
         if ($this->isColumnModified(ImagesourcePeer::EXTENTASOFCATALOGUE)) $criteria->add(ImagesourcePeer::EXTENTASOFCATALOGUE, $this->extentasofcatalogue);
-        if ($this->isColumnModified(ImagesourcePeer::NUMPAGES)) $criteria->add(ImagesourcePeer::NUMPAGES, $this->numpages);
+        if ($this->isColumnModified(ImagesourcePeer::FAKSIMILEREFRANGE)) $criteria->add(ImagesourcePeer::FAKSIMILEREFRANGE, $this->faksimilerefrange);
+        if ($this->isColumnModified(ImagesourcePeer::ORIGINALREFRANGE)) $criteria->add(ImagesourcePeer::ORIGINALREFRANGE, $this->originalrefrange);
         if ($this->isColumnModified(ImagesourcePeer::IMAGEURL)) $criteria->add(ImagesourcePeer::IMAGEURL, $this->imageurl);
         if ($this->isColumnModified(ImagesourcePeer::IMAGEURN)) $criteria->add(ImagesourcePeer::IMAGEURN, $this->imageurn);
         if ($this->isColumnModified(ImagesourcePeer::LICENSE_ID)) $criteria->add(ImagesourcePeer::LICENSE_ID, $this->license_id);
@@ -1314,7 +1367,8 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
         $copyObj->setCatalogueurl($this->getCatalogueurl());
         $copyObj->setNumfaksimiles($this->getNumfaksimiles());
         $copyObj->setExtentasofcatalogue($this->getExtentasofcatalogue());
-        $copyObj->setNumpages($this->getNumpages());
+        $copyObj->setFaksimilerefrange($this->getFaksimilerefrange());
+        $copyObj->setOriginalrefrange($this->getOriginalrefrange());
         $copyObj->setImageurl($this->getImageurl());
         $copyObj->setImageurn($this->getImageurn());
         $copyObj->setLicenseId($this->getLicenseId());
@@ -1544,7 +1598,8 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
         $this->catalogueurl = null;
         $this->numfaksimiles = null;
         $this->extentasofcatalogue = null;
-        $this->numpages = null;
+        $this->faksimilerefrange = null;
+        $this->originalrefrange = null;
         $this->imageurl = null;
         $this->imageurn = null;
         $this->license_id = null;

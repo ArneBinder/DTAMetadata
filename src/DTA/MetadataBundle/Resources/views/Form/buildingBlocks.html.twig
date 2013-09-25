@@ -5,13 +5,13 @@
         controlId:      id of the control to label
         labelCaption:   label text
 #}
-{% macro beginLabelledControl(configuration) %}
+{% macro beginLabelledContent(configuration) %}
 <div class="form-group">
     <label for="{{configuration.controlId}}" class="col-{{formLabelWidth}} control-label">{{configuration.labelCaption}}</label>
     <div class="col-{{formWidgetWidth}}">
 {% endmacro %}
 
-{% macro endLabelledControl() %}
+{% macro endLabelledContent() %}
     </div>
 </div>
 {% endmacro %}

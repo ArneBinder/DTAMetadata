@@ -26,12 +26,68 @@
     {{ form_row(form, {'inlineChildren':true }) }}
 {% endblock %}
 
+{% block imagesource_row %}
+    {% import  'DTAMetadataBundle:form:buildingBlocks.html.twig' as dta %}
+    <div>
+    {{ form_row(form.partner) }}
+            
+    {{ dta.beginLabelledContent({'labelCaption':'Katalogeintrag', 'controlId':'none'}) }}
+        {{ form_row(form.cataloguesignature, {'inlineLabel':true}) }}
+        {{ form_row(form.catalogueurl, {'inlineLabel':true}) }}
+    {{ dta.endLabelledContent() }}
+    
+    {{ dta.beginLabelledContent({'labelCaption':'Umfang', 'controlId':'none'}) }}
+        {{ form_row(form.numfaksimiles, {'inlineLabel':true}) }}
+        {{ form_row(form.extentasofcatalogue, {'inlineLabel':true}) }}
+    {{ dta.endLabelledContent() }}
+            
+    {% set modalId = 'extraOptionsModalFor'~id %}
+    
+    {{ dta.beginLabelledContent({'labelCaption':'', 'controlId':'none'}) }}
+        {{ dta.btnLaunchModal({'id':modalId, 'caption':'weitere Angaben...'})}}
+    {{ dta.endLabelledContent() }}
+
+
+    {{ dta.beginModal({
+            'id': modalId,
+            'title': 'Weitere Angaben zur Bildquelle',
+            'hideWindowCloser': true 
+       })            
+    }}
+
+        {{ form_row(form.faksimilerefrange, {'attr':{'placeholder':'5-11'} }) }}
+        {{ form_row(form.originalrefrange, {'attr':{'placeholder':'2-8'} }) }}
+        {{ form_row(form.imageurl) }}
+        {{ form_row(form.imageurn) }}
+        {{ form_row(form.license) }}
+
+    {{ dta.endModal({
+            'id': modalId,
+            'confirm': {'caption': 'Fertig', 'target': '#', 'attr':{'data-dismiss':'modal'} },
+            'hideCancelButton': true,
+       })
+    }}
+
+    </div>
+{% endblock %}
+
+{% block textsource_row %}
+    {% import  'DTAMetadataBundle:form:buildingBlocks.html.twig' as dta %}
+    <div>
+        {{ form_row(form.partner) }}
+        {{ form_row(form.texturl) }}
+        {{ form_row(form.attribution) }}
+        {{ form_row(form.license) }}
+    </div>
+{% endblock %}
+
+
 {# --------------------- Space and Time --------------------- #}
         
 {% block datespecification_row %}
     {% import  'DTAMetadataBundle:form:buildingBlocks.html.twig' as dta %}
     
-    {{ dta.beginLabelledControl({'controlId':id, 'labelCaption': form.vars.label }) }}
+    {{ dta.beginLabelledContent({'controlId':id, 'labelCaption': form.vars.label }) }}
  
             {{ form_errors(form.year) }}
             {{ form_label(form.year) }}
@@ -51,9 +107,9 @@
             
             {{ form_row(form.comments) }}
             
-            {{ dta.beginLabelledControl({'controlId':form.yearIsReconstructed.vars.id, 'labelCaption': form.yearIsReconstructed.vars.label }) }}
+            {{ dta.beginLabelledContent({'controlId':form.yearIsReconstructed.vars.id, 'labelCaption': form.yearIsReconstructed.vars.label }) }}
                 {{ form_widget(form.yearIsReconstructed) }}
-            {{ dta.endLabelledControl() }}
+            {{ dta.endLabelledContent() }}
 
             {{ dta.endModal({
                     'id': modalId,
@@ -62,7 +118,7 @@
                })
             }}
     
-    {{ dta.endLabelledControl() }}
+    {{ dta.endLabelledContent() }}
 
 {% endblock %}
 
@@ -105,10 +161,12 @@
 {# --------------------- Person / Work / Publication Relations --------------------- #}
 
 {% block personwork_row %}
+{% spaceless %}
     <div class="form-group form-inline">
         {{ form_row(form.personrole, {'inlineLabel':true,'hideLabel':true}) }}
         {{ form_row(form.person, {'hideLabel':true,'inlineLabel':true}) }}
     </div>
+{% endspaceless %}
 {% endblock %}
 {% block personpublication_row %}
         {{ form_row(form.personrole, {'inlineLabel':true,'hideLabel':true}) }}

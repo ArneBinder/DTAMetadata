@@ -11,6 +11,7 @@ return array(
     'Font' => 'Schriftart',
     'Imagesource' => 'Bildquelle',
     'Language' => 'Sprache',
+    'License' => 'Lizenz',
     'Namefragment' => 'Namensbestandteil',
     'Personalname' => 'Name',
     'PersonPublication' => 'Publikationspersonalie',
@@ -27,6 +28,7 @@ return array(
     'PublicationMs' => 'Selbstständiger Band einer Reihe',
     'Publishingcompany' => 'Verlag',
     'Tasktype' => 'Arbeitsschritt',
+    'Textsource' => 'Textquelle',
     'Title' => 'Titel',
     'Titlefragment' => 'Titelbestandteil',
     'Translator' => 'Übersetzer',
@@ -44,6 +46,19 @@ return array(
     
         // print run
         'Numeric' => 'numerisch',
+    
+        // image and text source
+        'Cataloguesignature' => 'Signatur',
+        'Catalogueurl' => 'URL',
+        'Numfaksimiles' => 'Faksimiles',
+        'Extentasofcatalogue' => 'lt. Katalog',
+        'Imageurl' => 'URL Bilddigitalisate',
+        'Imageurn' => 'URN Bilddigitalisate',
+        'Faksimilerefrange' => 'für Faksimile-Seiten',
+        'Originalrefrange' => 'original Seitenzahlen',
+    
+        'Texturl' => 'URL Textdigitalisate',
+        'Attribution' => 'Attributionszeile',
 
     // form labels: controls
 
