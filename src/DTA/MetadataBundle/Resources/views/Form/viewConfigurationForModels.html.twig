@@ -73,7 +73,7 @@
 {% endblock %}
 
 {% block titlefragment_row %}
-    <div class="form-group form-inline">
+    <div class="form-inline">
             {{ form_widget(form.titlefragmenttype)}}
             {{ form_widget(form.name,{'attr':{'class':'medium-text'} }) }} 
             <br/>
@@ -95,7 +95,7 @@
 {% endblock %}
 
 {% block namefragment_row %}
-    <div class="form-group form-inline">
+    <div class="form-inline">
             {{ form_widget(form.namefragmenttype)}}
             {{ form_widget(form.name) }} 
             {{ form_rest(form) }}

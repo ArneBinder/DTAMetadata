@@ -40,11 +40,7 @@
 
         {% for child in form %}
         <li>
-            {{ sortable ? form.vars.modelClass|trans }}
-            {#{ form_errors(child) }}
-            {{ form_widget(child) }#}
-            {# omit the default label (just a zero-based index) for each fragment 
-            {{ form_errors(child) }}    #}
+            
             {{ form_row(child) }}
             </li>
         {% endfor %}

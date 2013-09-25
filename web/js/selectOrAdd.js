@@ -37,7 +37,7 @@ function selectOrAdd_launchAddDialog(){
         $addButton.data('modal', $modal);
         
     } else {
-        $addButton.data('modal').modal();
+        $($addButton.data('modal').selector).modal();
     }
     
 }
