@@ -1,5 +1,16 @@
+# Writing Templates
 
-# form templates
+This part of the documentation is mainly about two things.
+The basics of twig, the template language used and the custom template mechanisms developed to ease the process of creating views.
+Some additional details are given where specific bootstrap classes are used.
+
+# Forms
+
+## General Architecture
+
+### Determining how a database entity is rendered
+
+## Forms Cookbook
 
 ### Setting HTML attributes of form elements
 
@@ -25,7 +36,20 @@ public function buildForm(FormBuilderInterface $builder, array $options)
 ```
 ### Using pre-defined Macros
 
-The file ```buildingBlocks.html.twig``` contains macros to ease recurring tasks. 
+The file ```buildingBlocks.html.twig``` contains macros to ease recurring tasks.
+It can be included using the following directive.
+```php
+{# template PublicationM.html.twig #}
+{% import  'DTAMetadataBundle:form:buildingBlocks.html.twig' as dta %}
+```
+Sometimes it might be necessary to include within a block to use it: 
+```php
+{% block imagesource_row %}
+    {% import  'DTAMetadataBundle:form:buildingBlocks.html.twig' as dta %}
+    ...
+```
+
+It provides the following macros, available through the variable ```dta```.
 
 - labelled content
 

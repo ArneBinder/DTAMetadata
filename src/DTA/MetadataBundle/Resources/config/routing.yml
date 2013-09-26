@@ -25,13 +25,13 @@ sourceMonitor:
 Master_deleteRecord:
   path: /Master/delete/{className}/{recordId}
   defaults: 
-    _controller: DTAMetadataBundle:MasterDomain:deleteRecord
+    _controller: DTAMetadataBundle:MasterDomain:genericDeleteOne
     package: Master
 
 Master_viewRecord:
   path: /Master/show/{className}/{recordId}
   defaults: 
-    _controller: DTAMetadataBundle:MasterDomain:viewRecord
+    _controller: DTAMetadataBundle:MasterDomaingen:genericView
     package: Master
 
 Master_genericViewAll:
@@ -81,13 +81,13 @@ viewPersonsByRole:
 Data_deleteRecord:
   path: /Data/delete/{className}/{recordId}
   defaults: 
-    _controller: DTAMetadataBundle:DataDomain:deleteRecord
+    _controller: DTAMetadataBundle:DataDomain:genericDeleteOne
     package: Data
 
 Data_viewRecord:
   path: /Data/show/{className}/{recordId}
   defaults: 
-    _controller: DTAMetadataBundle:DataDomain:viewRecord
+    _controller: DTAMetadataBundle:DataDomain:genericView
     package: Data
 
 Data_genericViewAll:
@@ -133,13 +133,13 @@ classificationDomain:
 Classification_deleteRecord:
   path: /Classification/delete/{className}/{recordId}
   defaults: 
-    _controller: DTAMetadataBundle:ClassificationDomain:deleteRecord
+    _controller: DTAMetadataBundle:ClassificationDomain:genericDeleteOne
     package: Classification
 
 Classification_viewRecord:
   path: /Classification/show/{className}/{recordId}
   defaults: 
-    _controller: DTAMetadataBundle:ClassificationDomain:viewRecord
+    _controller: DTAMetadataBundle:ClassificationDomain:genericView
     package: Classification
 
 Classification_genericViewAll:
@@ -189,13 +189,13 @@ reporting:
 Workflow_deleteRecord:
   path: /Workflow/delete/{className}/{recordId}
   defaults: 
-    _controller: DTAMetadataBundle:WorkflowDomain:deleteRecord
+    _controller: DTAMetadataBundle:WorkflowDomain:genericDeleteOne
     package: Workflow
 
 Workflow_viewRecord:
   path: /Workflow/show/{className}/{recordId}
   defaults: 
-    _controller: DTAMetadataBundle:WorkflowDomain:viewRecord
+    _controller: DTAMetadataBundle:WorkflowDomain:genericView
     package: Workflow
 
 Workflow_genericViewAll:

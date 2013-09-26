@@ -1,0 +1,574 @@
+DTA\MetadataBundle\Model\Classification\Category:
+    Category_1:
+        name: Sachbuch
+    Category_2:
+        name: Ratgeber
+DTA\MetadataBundle\Model\Classification\Namefragmenttype:
+    Namefragmenttype_1:
+        name: Vorname
+    Namefragmenttype_2:
+        name: Nachname
+    Namefragmenttype_3:
+        name: Adelstitel
+    Namefragmenttype_4:
+        name: Generation
+    Namefragmenttype_5:
+        name: Pseudonym
+DTA\MetadataBundle\Model\Classification\Personrole:
+    Personrole_1:
+        name: Autor
+        applicable_to_publication: false
+        applicable_to_work: true
+    Personrole_2:
+        name: Verleger
+        applicable_to_publication: true
+        applicable_to_work: false
+    Personrole_3:
+        name: Übersetzer
+        applicable_to_publication: true
+        applicable_to_work: false
+    Personrole_4:
+        name: Drucker
+        applicable_to_publication: true
+        applicable_to_work: false
+DTA\MetadataBundle\Model\Classification\Titlefragmenttype:
+    Titlefragmenttype_1:
+        name: Haupttitel
+    Titlefragmenttype_2:
+        name: Untertitel
+    Titlefragmenttype_3:
+        name: Kurztitel
+DTA\MetadataBundle\Model\Data\Datespecification:
+    Datespecification_4:
+        year_is_reconstructed: false
+    Datespecification_5:
+        year_is_reconstructed: false
+    Datespecification_6:
+        year_is_reconstructed: false
+    Datespecification_3:
+        comments: yweit
+        year_is_reconstructed: true
+    Datespecification_2:
+        comments: 'ein Kommentar'
+        year_is_reconstructed: false
+    Datespecification_1:
+        year: 1721
+        comments: "eins zwei drei,\r\ndie katze auf dem heißen Blechdach"
+        year_is_reconstructed: false
+DTA\MetadataBundle\Model\Data\Font:
+    Font_1:
+        name: Textur
+    Font_2:
+        name: Rotunda
+    Font_3:
+        name: Schwabacher
+    Font_4:
+        name: Fraktur
+    Font_5:
+        name: Antiqua
+    Font_6:
+        name: Handschrift
+DTA\MetadataBundle\Model\Data\Language:
+    Language_1:
+        name: Neuhochdeutsch
+    Language_2:
+        name: Mittelhochdeutsch
+    Language_3:
+        name: Althochdeutsch
+    Language_4:
+        name: Bayerisch
+    Language_5:
+        name: Altsächsisch
+    Language_6:
+        name: Obersächsisch
+    Language_7:
+        name: Schwäbisch
+    Language_8:
+        name: Walser-Dialekt
+    Language_9:
+        name: 'Schweizerdeutsch, Allemannisch, Elsässisch'
+    Language_10:
+        name: Ost-Jiddisch
+    Language_11:
+        name: West-Jiddisch
+    Language_12:
+        name: Mittelniederdeutsch
+    Language_13:
+        name: Niederdeutsch
+    Language_14:
+        name: Latein
+DTA\MetadataBundle\Model\Data\Person:
+    Person_1: {  }
+    Person_2:
+        gnd: '12345'
+    Person_3: {  }
+    Person_7: {  }
+    Person_8: {  }
+    Person_9: {  }
+    Person_10: {  }
+    Person_11: {  }
+    Person_12: {  }
+    Person_13: {  }
+    Person_14: {  }
+    Person_15: {  }
+    Person_16: {  }
+    Person_17: {  }
+    Person_18: {  }
+    Person_19: {  }
+    Person_20: {  }
+DTA\MetadataBundle\Model\Data\Personalname:
+    Personalname_1:
+        person_id: Person_2
+        sortable_rank: 1
+    Personalname_2:
+        person_id: Person_1
+        sortable_rank: 1
+    Personalname_6:
+        person_id: Person_3
+        sortable_rank: 1
+    Personalname_7:
+        person_id: Person_7
+        sortable_rank: 1
+    Personalname_8:
+        person_id: Person_8
+        sortable_rank: 1
+    Personalname_9:
+        person_id: Person_10
+        sortable_rank: 1
+    Personalname_10:
+        person_id: Person_11
+        sortable_rank: 1
+    Personalname_11:
+        person_id: Person_12
+        sortable_rank: 1
+    Personalname_12:
+        person_id: Person_13
+        sortable_rank: 1
+    Personalname_13:
+        person_id: Person_14
+        sortable_rank: 1
+    Personalname_14:
+        person_id: Person_15
+        sortable_rank: 1
+    Personalname_15:
+        person_id: Person_16
+        sortable_rank: 1
+    Personalname_16:
+        person_id: Person_17
+        sortable_rank: 1
+    Personalname_17:
+        person_id: Person_18
+        sortable_rank: 1
+    Personalname_18:
+        person_id: Person_19
+        sortable_rank: 1
+    Personalname_19:
+        person_id: Person_9
+        sortable_rank: 1
+    Personalname_20:
+        person_id: Person_19
+        sortable_rank: 2
+    Personalname_21:
+        person_id: Person_20
+        sortable_rank: 1
+DTA\MetadataBundle\Model\Data\Namefragment:
+    Namefragment_1:
+        personalname_id: Personalname_1
+        name: Witt
+        namefragmenttypeid: Namefragmenttype_2
+        sortable_rank: 2
+    Namefragment_2:
+        personalname_id: Personalname_2
+        name: Carl
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_3:
+        personalname_id: Personalname_2
+        name: Witt
+        namefragmenttypeid: Namefragmenttype_2
+        sortable_rank: 2
+    Namefragment_4:
+        personalname_id: Personalname_1
+        name: Frenzel
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 0
+    Namefragment_5:
+        personalname_id: Personalname_1
+        name: Carl2
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_9:
+        personalname_id: Personalname_6
+        name: Christian
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_10:
+        personalname_id: Personalname_6
+        name: Kracht
+        namefragmenttypeid: Namefragmenttype_2
+        sortable_rank: 2
+    Namefragment_11:
+        personalname_id: Personalname_7
+        name: Rainer
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_12:
+        personalname_id: Personalname_7
+        name: Fabio
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 2
+    Namefragment_13:
+        personalname_id: Personalname_7
+        name: Frenzel
+        namefragmenttypeid: Namefragmenttype_2
+        sortable_rank: 3
+    Namefragment_15:
+        personalname_id: Personalname_9
+        name: Abraham
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_16:
+        personalname_id: Personalname_9
+        name: Lincoln
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 2
+    Namefragment_17:
+        personalname_id: Personalname_9
+        name: II
+        namefragmenttypeid: Namefragmenttype_4
+        sortable_rank: 3
+    Namefragment_18:
+        personalname_id: Personalname_10
+        name: Don
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_19:
+        personalname_id: Personalname_10
+        name: Sullivan
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 2
+    Namefragment_20:
+        personalname_id: Personalname_11
+        name: 'Pepe Juan'
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_21:
+        personalname_id: Personalname_12
+        name: 'Lobbe Lobbster'
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_22:
+        personalname_id: Personalname_13
+        name: Jacobi
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_23:
+        personalname_id: Personalname_13
+        name: Banana
+        namefragmenttypeid: Namefragmenttype_2
+        sortable_rank: 2
+    Namefragment_24:
+        personalname_id: Personalname_14
+        name: Anon.
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_25:
+        personalname_id: Personalname_15
+        name: Braeburn
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_26:
+        personalname_id: Personalname_16
+        name: Cornelius
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_27:
+        personalname_id: Personalname_16
+        name: Fudge
+        namefragmenttypeid: Namefragmenttype_2
+        sortable_rank: 2
+    Namefragment_28:
+        personalname_id: Personalname_17
+        name: Johannis
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_29:
+        personalname_id: Personalname_17
+        name: Paul
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 2
+    Namefragment_30:
+        personalname_id: Personalname_17
+        name: I
+        namefragmenttypeid: Namefragmenttype_4
+        sortable_rank: 3
+    Namefragment_31:
+        personalname_id: Personalname_18
+        name: Ronald
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_14:
+        personalname_id: Personalname_8
+        name: Clemens
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_33:
+        personalname_id: Personalname_8
+        name: J.
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 2
+    Namefragment_34:
+        personalname_id: Personalname_8
+        name: Setz
+        namefragmenttypeid: Namefragmenttype_2
+        sortable_rank: 3
+    Namefragment_35:
+        personalname_id: Personalname_19
+        name: Juli
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_36:
+        personalname_id: Personalname_19
+        name: Zeh
+        namefragmenttypeid: Namefragmenttype_2
+        sortable_rank: 2
+    Namefragment_37:
+        personalname_id: Personalname_20
+        name: Voltaire
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_32:
+        personalname_id: Personalname_18
+        name: Regenschein
+        namefragmenttypeid: Namefragmenttype_2
+        sortable_rank: 0
+    Namefragment_38:
+        personalname_id: Personalname_21
+        name: Francis
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 1
+    Namefragment_39:
+        personalname_id: Personalname_21
+        name: Hahnenbuch
+        namefragmenttypeid: Namefragmenttype_1
+        sortable_rank: 2
+DTA\MetadataBundle\Model\Data\Place:
+    Place_1:
+        name: Berlin
+        gnd: '1'
+    Place_2:
+        name: Leipzig
+    Place_3:
+        name: Garmisch-Partenkirchen
+        gnd: '0'
+    Place_4:
+        name: Frankreich
+    Place_5:
+        name: Grauenheim
+    Place_6:
+        name: Rosenheim
+    Place_7:
+        name: 'Monet en la Isle'
+        gnd: '2'
+DTA\MetadataBundle\Model\Data\Printrun:
+    Printrun_2: {  }
+    Printrun_1:
+        name: 'Zweite, vollständig überarbeitete Ausgabe'
+        numeric: 2
+DTA\MetadataBundle\Model\Data\Title:
+    Title_1: {  }
+    Title_2: {  }
+DTA\MetadataBundle\Model\Data\Work:
+    Work_1:
+        title_id: Title_1
+        datespecification_id: Datespecification_1
+    Work_2:
+        title_id: Title_2
+        datespecification_id: Datespecification_4
+DTA\MetadataBundle\Model\Data\Publishingcompany:
+    Publishingcompany_1:
+        name: Inselverlag
+    Publishingcompany_2:
+        name: Aufbauverlag
+    Publishingcompany_3:
+        name: Verbrecherverlag
+    Publishingcompany_4:
+        name: Suhrkamp
+DTA\MetadataBundle\Model\Data\Publication:
+    Publication_2:
+        work_id: Work_2
+        place_id: Place_2
+        publicationdate_id: Datespecification_5
+        firstpublicationdate_id: Datespecification_6
+        printrun_id: Printrun_2
+        publishingcompany_id: Publishingcompany_1
+    Publication_1:
+        work_id: Work_1
+        place_id: Place_1
+        publicationdate_id: Datespecification_2
+        firstpublicationdate_id: Datespecification_3
+        printrun_id: Printrun_1
+        publishingcompany_id: Publishingcompany_4
+DTA\MetadataBundle\Model\Data\PublicationM:
+    PublicationM_1:
+        publication_id: Publication_1
+DTA\MetadataBundle\Model\Data\Titlefragment:
+    Titlefragment_3:
+        name: 'Leipziger einerlei'
+        title_id: Title_2
+        titlefragmenttype_id: Titlefragmenttype_1
+        sortable_rank: 1
+        name_is_reconstructed: false
+    Titlefragment_1:
+        name: 'Don Quijote'
+        title_id: Title_1
+        titlefragmenttype_id: Titlefragmenttype_1
+        sortable_rank: 0
+        name_is_reconstructed: false
+    Titlefragment_2:
+        name: 'Gegen die Windmühlen'
+        title_id: Title_1
+        titlefragmenttype_id: Titlefragmenttype_2
+        sortable_rank: 1
+        name_is_reconstructed: false
+DTA\MetadataBundle\Model\Master\DtaUser:
+    DtaUser_1:
+        username: Susanne
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: false
+    DtaUser_2:
+        username: Matthias
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: false
+    DtaUser_3:
+        username: Christian
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: false
+    DtaUser_4:
+        username: Alexander
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: false
+    DtaUser_5:
+        username: Frank
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: true
+    DtaUser_6:
+        username: Carl
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: true
+    DtaUser_7:
+        username: cc
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: false
+    DtaUser_8:
+        username: cc
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: false
+    DtaUser_9:
+        username: cc
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: false
+    DtaUser_10:
+        username: cc
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: false
+    DtaUser_11:
+        username: cc
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: false
+    DtaUser_12:
+        username: cc
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: false
+    DtaUser_13:
+        username: cc
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: false
+    DtaUser_14:
+        username: cc
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: false
+DTA\MetadataBundle\Model\Master\PersonPublication:
+    PersonPublication_1:
+        personrole_id: Personrole_2
+        person_id: Person_7
+        publication_id: Publication_1
+    PersonPublication_2:
+        personrole_id: Personrole_4
+        person_id: Person_11
+        publication_id: Publication_1
+    PersonPublication_3:
+        personrole_id: Personrole_3
+        person_id: Person_12
+        publication_id: Publication_1
+DTA\MetadataBundle\Model\Master\PersonWork:
+    PersonWork_4:
+        person_id: Person_8
+        personrole_id: Personrole_1
+        work_id: Work_1
+DTA\MetadataBundle\Model\Workflow\Partner:
+    Partner_1:
+        name: 'Privater Buchgeber'
+        address: A
+        is_organization: true
+    Partner_2:
+        name: 'Bibliothek der Berlin-Brandenburgischen Akademie der Wissenschaften'
+        is_organization: false
+DTA\MetadataBundle\Model\Workflow\License:
+    License_1:
+        name: 'gemeinfrei (CC0)'
+        applicable_to_image: false
+        applicable_to_text: false
+    License_2:
+        name: 'CC-by-SA 2.0 (de)'
+        applicable_to_image: false
+        applicable_to_text: false
+DTA\MetadataBundle\Model\Workflow\Imagesource:
+    Imagesource_1:
+        publication_id: Publication_1
+        partner_id: Partner_2
+        faksimilerefrange: 1-10
+        originalrefrange: 2-11
+        license_id: License_2
+    Imagesource_2:
+        publication_id: Publication_1
+        partner_id: Partner_1
+        faksimilerefrange: 3-100
+        originalrefrange: 4-101
+        license_id: License_1
+DTA\MetadataBundle\Model\Workflow\Tasktype:
+    Tasktype_1:
+        name: 'Gruppe A: Double Keying'
+        tree_left: 2
+        tree_right: 9
+        tree_level: 1
+    Tasktype_2:
+        name: Textbeschaffung
+        tree_left: 3
+        tree_right: 8
+        tree_level: 2
+    Tasktype_3:
+        name: Vorkorrektur
+        tree_left: 4
+        tree_right: 7
+        tree_level: 3
+    Tasktype_4:
+        name: Zoning
+        tree_left: 5
+        tree_right: 6
+        tree_level: 4
+    Tasktype_5:
+        name: Aufgabentypen
+        tree_left: 1
+        tree_right: 14
+        tree_level: 0
+    Tasktype_6:
+        name: 'Gruppe B'
+        tree_left: 10
+        tree_right: 13
+        tree_level: 1
+    Tasktype_7:
+        name: GrobiZoning
+        tree_left: 11
+        tree_right: 12
+        tree_level: 2
