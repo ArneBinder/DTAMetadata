@@ -5,12 +5,15 @@ return array(
 
     'Author' => 'Autor',
     'Category' => 'Kategorie',
+    'CategoryWork' => 'Kategorie',
     'Corpus' => 'Korpus',
     'Datespecification' => 'Datumsangabe',
     'DtaUser' => 'Benutzer',
     'Font' => 'Schriftart',
+    'GenreWork' => 'Genre',
     'Imagesource' => 'Bildquelle',
     'Language' => 'Sprache',
+    'LanguageWork' => 'Sprache',
     'License' => 'Lizenz',
     'Namefragment' => 'Namensbestandteil',
     'Personalname' => 'Name',
@@ -27,6 +30,7 @@ return array(
     'PublicationMms' => 'Teil einer mehrbändigen Monographie, die ihrerseits Teil einer Reihe ist',
     'PublicationMs' => 'Selbstständiger Band einer Reihe',
     'Publishingcompany' => 'Verlag',
+    'Tag' => 'Schlagwort',
     'Tasktype' => 'Arbeitsschritt',
     'Textsource' => 'Textquelle',
     'Title' => 'Titel',
@@ -54,11 +58,16 @@ return array(
         'Extentasofcatalogue' => 'lt. Katalog',
         'Imageurl' => 'URL Bilddigitalisate',
         'Imageurn' => 'URN Bilddigitalisate',
-        'Faksimilerefrange' => 'für Faksimile-Seiten',
+        'Faksimilerefrange' => 'Faksimile-Seiten',
         'Originalrefrange' => 'original Seitenzahlen',
     
         'Texturl' => 'URL Textdigitalisate',
         'Attribution' => 'Attributionszeile',
+    
+        // editorial notes
+        'Editiondescription' => 'Art der Textausgabe',
+        'Digitaleditioneditor' => 'Bearbeiter der digitalen Edition',
+        'Transcriptioncomment' => 'Sonstige Bemerkungen zu den Transkriptionsrichtlinien',
 
     // form labels: controls
 

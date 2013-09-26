@@ -14,9 +14,9 @@ class DataDomainController extends ORMController {
      * from the database in the __construct() method.
      */
     public $domainMenu = array(
-        'work' => array(
-            "caption" => "Werke",
-            "modelClass" => "Work"),
+//        'work' => array(
+//            "caption" => "Werke",
+//            "modelClass" => "Work"),
         'publication' => array(
             "caption" => "Publikationen", 
             "children"=>array(
@@ -77,7 +77,7 @@ class DataDomainController extends ORMController {
                 ->joinPersonPublication()
                 ->findOne();
                 
-        return $this->renderWithDomainData('DTAMetadataBundle:DataDomain:genericViewAll.html.twig', array(
+        return $this->renderWithDomainData('DTAMetadataBundle:ORM:genericViewAll.html.twig', array(
             'data' => $records,
             'columns' => Model\Data\Person::getTableViewColumnNames(),
             'className' => 'Person',

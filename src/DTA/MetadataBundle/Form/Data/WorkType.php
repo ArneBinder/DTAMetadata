@@ -73,10 +73,50 @@ class WorkType extends BaseAbstractType
 //            'multiple' => true,
 //        ));
         
+        $builder->add('LanguageWorks', new DynamicCollectionType(), array(
+            'type' => new Master\LanguageWorkType(),
+            // TODO remove inlineLabel option from the dynamic collection type.
+            'inlineLabel' => false,
+            'sortable' => true,
+            'label' => 'vorherrschende Sprache',
+//            'options' => array('isWorkSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
+        ));
+        
+        $builder->add('GenreWorks', new DynamicCollectionType(), array(
+            'type' => new Master\GenreWorkType(),
+            'inlineLabel' => false,
+            'sortable' => false,
+            'label' => 'Genres',
+        ));
+        
+        $builder->add('CategoryWorks', new DynamicCollectionType(), array(
+            'type' => new Master\CategoryWorkType(),
+            'inlineLabel' => false,
+            'sortable' => false,
+            'label' => 'Kategorien',
+            'options' => array('isWorkSelectable'=>false),
+        ));
+        
+        $builder->add('WorkTags', new DynamicCollectionType(), array(
+            'type' => new Master\WorkTagType(),
+            'inlineLabel' => false,
+            'sortable' => false,
+            'label' => 'Schlagworte',
+        ));
+        
         
         $builder->add('doi', 'text', array('required' => false));
         $builder->add('comments');
         $builder->add('format', 'text', array('required' => false));
         $builder->add('directoryname', 'text', array('required' => false));
+        
+//        // with tagging
+//        $builder->add('languages', new SelectOrAddType(), array(
+//            'class' => '\DTA\MetadataBundle\Model\Data\Language',
+//            'property' => 'Name',
+//            'label' => 'vorherrschende Sprache',
+//            'multiple' => true,
+//        ));
+        
     }
 }

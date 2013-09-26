@@ -103,7 +103,7 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Id', 'Name', 'Childof', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'Name'=>'Name', 'Childof'=>'Childof', );
+    public static $tableRowViewCaptions = array('name', 'zugeordnet', );	public   $tableRowViewAccessors = array('name'=>'Name', 'zugeordnet'=>'accessor:getParent', );
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection

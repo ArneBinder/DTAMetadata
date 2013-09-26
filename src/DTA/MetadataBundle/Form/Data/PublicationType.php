@@ -39,7 +39,6 @@ class PublicationType extends BaseAbstractType
             'class' => 'DTA\MetadataBundle\Model\Data\Place',
             'property' => 'Name',
             'label' => 'Druckort',
-            'searchable' => true,
             
         ));
         
@@ -65,7 +64,7 @@ class PublicationType extends BaseAbstractType
         $builder->add('publishingcompany', new SelectOrAddType(), array(
             'class' => 'DTA\MetadataBundle\Model\Data\Publishingcompany',
             'property' => 'Name',
-            'label' => 'Verlag'
+            'label' => 'Verlag',
         ));
             
         $builder->add('ImageSources', new DynamicCollectionType(), array(
@@ -86,6 +85,16 @@ class PublicationType extends BaseAbstractType
             'inlineLabel' => true,
             'sortable' => false,
             'label' => false
+        ));
+        
+        $builder->add('editiondescription', 'textarea', array('required'=>false));
+        $builder->add('digitaleditioneditor', 'text', array('required'=>false));
+        $builder->add('transcriptioncomment', 'textarea', array('required'=>false));
+        
+        $builder->add('font', new SelectOrAddType(), array(
+            'class' => '\DTA\MetadataBundle\Model\Data\Font',
+            'property' => 'Name',
+            'label' => 'vorherrschende Schriftart',
         ));
         
         $builder->add('comment', 'textarea', array(

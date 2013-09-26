@@ -17,5 +17,9 @@ class WorkTagType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->add('tag', new \DTA\MetadataBundle\Form\DerivedType\SelectOrAddType(), array(
+            'class' => '\DTA\MetadataBundle\Model\Classification\Tag',
+            'property' => 'Name',
+        ));
     }
 }

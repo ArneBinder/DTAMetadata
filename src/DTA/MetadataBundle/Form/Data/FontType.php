@@ -17,6 +17,12 @@ class FontType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('name');
+        $builder->add('name', 'text');
+        $builder->add('whatever', 'file', array(
+            'mapped' => false,
+            'attr' => array(
+                'multiple' => true  
+            ),
+        ));
     }
 }

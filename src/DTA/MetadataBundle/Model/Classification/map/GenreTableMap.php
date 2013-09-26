@@ -70,9 +70,8 @@ class GenreTableMap extends TableMap
     {
         return array(
             'table_row_view' =>  array (
-  'Id' => 'id',
-  'Name' => 'name',
-  'Childof' => 'childof',
+  'name' => 'name',
+  'zugeordnet' => 'accessor:getParent',
 ),
         );
     } // getBehaviors()

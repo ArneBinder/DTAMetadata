@@ -86,8 +86,10 @@ class SelectOrAddType extends \Symfony\Bridge\Propel1\Form\Type\ModelType {
         parent::setDefaultOptions($resolver);
         
         $resolver->setDefaults(array(
-            'searchable' => false,          // whether to apply the select2 plugin to add typeahead functionality
+            'searchable' => true,          // whether to apply the select2 plugin to add typeahead functionality
             'addButton'  => true,
+            'empty_value' => 'Keine Auswahl',
+            'empty_data' => 0,
         ));
     }
     

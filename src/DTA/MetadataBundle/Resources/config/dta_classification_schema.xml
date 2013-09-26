@@ -64,6 +64,11 @@
         <column name="name" type="LONGVARCHAR" required="true"/>
         <column name="childof" type="INTEGER" required="false"/>
         <foreign-key foreignTable="genre"> <reference local="childof" foreign="id"/> </foreign-key>
+        <behavior name="table_row_view">
+            <parameter name="name" value="name"/>
+            <parameter name="zugeordnet" value="accessor:getParent"/>
+        </behavior>
+
     </table>
 </database>
     

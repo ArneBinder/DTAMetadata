@@ -18,7 +18,7 @@ class ClassificationDomainController extends ORMController {
         array("caption" => "Genres", "modelClass" => 'Genre'),
         array("caption" => "Korpora", "modelClass" => 'Corpus'),
         array("caption" => "Kategorien", "modelClass" => 'Category'),
-        array("caption" => "Tags", "modelClass" => 'Tag'),
+        array("caption" => "Schlagworte", "modelClass" => 'Tag'),
         array("caption" => "Verwandte Werke", 'route' => 'home'),
     );
 

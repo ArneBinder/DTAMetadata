@@ -32,13 +32,20 @@
     {{ form_row(form.partner) }}
             
     {{ dta.beginLabelledContent({'labelCaption':'Katalogeintrag', 'controlId':'none'}) }}
-        {{ form_row(form.cataloguesignature, {'inlineLabel':true}) }}
-        {{ form_row(form.catalogueurl, {'inlineLabel':true}) }}
+        {{ form_widget(form.cataloguesignature, {'label':false, 'attr':{'placeholder':'Signatur'} }) }}
+        {{ form_widget(form.catalogueurl, {'label':false, 'attr':{'placeholder':'URL'} }) }}
     {{ dta.endLabelledContent() }}
     
     {{ dta.beginLabelledContent({'labelCaption':'Umfang', 'controlId':'none'}) }}
         {{ form_row(form.numfaksimiles, {'inlineLabel':true}) }}
         {{ form_row(form.extentasofcatalogue, {'inlineLabel':true}) }}
+    {{ dta.endLabelledContent() }}
+            
+    {{ dta.beginLabelledContent({'labelCaption':'Quellenangabe für', 'controlId':'none'}) }}
+        <div class="form-inline">
+            {{ form_row(form.faksimilerefrange, {'inlineLabel':true, 'attr':{'placeholder':'5-11'} }) }}
+            {{ form_row(form.originalrefrange, {'inlineLabel':true,'attr':{'placeholder':'2-8'} }) }}
+        </div>
     {{ dta.endLabelledContent() }}
             
     {% set modalId = 'extraOptionsModalFor'~id %}
@@ -55,8 +62,6 @@
        })            
     }}
 
-        {{ form_row(form.faksimilerefrange, {'attr':{'placeholder':'5-11'} }) }}
-        {{ form_row(form.originalrefrange, {'attr':{'placeholder':'2-8'} }) }}
         {{ form_row(form.imageurl) }}
         {{ form_row(form.imageurn) }}
         {{ form_row(form.license) }}
@@ -72,7 +77,6 @@
 {% endblock %}
 
 {% block textsource_row %}
-    {% import  'DTAMetadataBundle:form:buildingBlocks.html.twig' as dta %}
     <div>
         {{ form_row(form.partner) }}
         {{ form_row(form.texturl) }}
@@ -162,22 +166,44 @@
 
 {% block personwork_row %}
 {% spaceless %}
-    <div class="form-group form-inline">
+    <div class="form-inline">
         {{ form_row(form.personrole, {'inlineLabel':true,'hideLabel':true}) }}
         {{ form_row(form.person, {'hideLabel':true,'inlineLabel':true}) }}
     </div>
 {% endspaceless %}
 {% endblock %}
+
 {% block personpublication_row %}
-        {{ form_row(form.personrole, {'inlineLabel':true,'hideLabel':true}) }}
-        {{ form_row(form.person, {'hideLabel':true,'inlineLabel':true}) }}
+    {{ form_row(form.personrole, {'inlineLabel':true,'hideLabel':true}) }}
+    {{ form_row(form.person, {'hideLabel':true,'inlineLabel':true}) }}
 {% endblock %}
+
 {% block categorywork_row %}
-     {{ form_row(form, {'inlineLabel':true, 'hideLabel':true, 'inlineChildren': true}) }}
+    <div>
+        {{ form_row(form, {'inlineLabel':true, 'hideLabel':true, 'inlineChildren': true}) }}
+    </div>
 {% endblock %}
 
 {% block category_row %}
-    <div class="form-group form-inline">
+    <div class="form-inline">
         {{ form_row(form, {'inlineLabel':true, 'hideLabel':true, 'inlineChildren': true}) }}
+    </div>
+{% endblock %}
+
+{% block languagework_row %}
+    <div class="form-inline">
+        {{ form_widget(form.language)}}
+    </div>
+{% endblock %}
+
+{% block genrework_row %}
+    <div class="form-inline">
+        {{ form_widget(form.genre)}}
+    </div>
+{% endblock %}
+
+{% block worktag_row %}
+    <div class="form-inline">
+        {{ form_widget(form.tag)}}
     </div>
 {% endblock %}

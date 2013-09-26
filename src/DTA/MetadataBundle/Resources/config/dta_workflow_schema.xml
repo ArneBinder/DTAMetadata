@@ -93,7 +93,7 @@
         
         <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="license"> <reference local="license_id" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="partner"> <reference local="partner_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="partner" onDelete="setnull"> <reference local="partner_id" foreign="id"/> </foreign-key>
     </table>
     
     <!--Quellenangabe fuer Textdigitalisate-->
@@ -114,7 +114,7 @@
         
         <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="license"> <reference local="license_id" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="partner"> <reference local="partner_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="partner" onDelete="setnull"> <reference local="partner_id" foreign="id"/> </foreign-key>
     </table>
     
     <table name="license">
