@@ -68,7 +68,6 @@ class PersonTableMap extends TableMap
     {
         return array(
             'table_row_view' =>  array (
-  'id' => 'id',
   'erster name@representative' => 'personalname',
   'namen gesamt@count' => 'personalname',
   'gnd' => 'gnd',

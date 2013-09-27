@@ -51,10 +51,10 @@ abstract class BasePublicationDm extends BaseObject implements Persistent, \DTA\
     protected $publication_id;
 
     /**
-     * The value for the parent field.
+     * The value for the title_id field.
      * @var        int
      */
-    protected $parent;
+    protected $title_id;
 
     /**
      * The value for the pages field.
@@ -65,12 +65,7 @@ abstract class BasePublicationDm extends BaseObject implements Persistent, \DTA\
     /**
      * @var        Publication
      */
-    protected $aPublicationRelatedByPublicationId;
-
-    /**
-     * @var        Publication
-     */
-    protected $aPublicationRelatedByParent;
+    protected $aPublication;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -115,13 +110,13 @@ abstract class BasePublicationDm extends BaseObject implements Persistent, \DTA\
     }
 
     /**
-     * Get the [parent] column value.
-     * Übergeordnetes Werk
+     * Get the [title_id] column value.
+     * Titel des übergeordneten Werkes
      * @return int
      */
-    public function getParent()
+    public function getTitleId()
     {
-        return $this->parent;
+        return $this->title_id;
     }
 
     /**
@@ -172,8 +167,8 @@ abstract class BasePublicationDm extends BaseObject implements Persistent, \DTA\
             $this->modifiedColumns[] = PublicationDmPeer::PUBLICATION_ID;
         }
 
-        if ($this->aPublicationRelatedByPublicationId !== null && $this->aPublicationRelatedByPublicationId->getId() !== $v) {
-            $this->aPublicationRelatedByPublicationId = null;
+        if ($this->aPublication !== null && $this->aPublication->getId() !== $v) {
+            $this->aPublication = null;
         }
 
 
@@ -181,29 +176,25 @@ abstract class BasePublicationDm extends BaseObject implements Persistent, \DTA\
     } // setPublicationId()
 
     /**
-     * Set the value of [parent] column.
-     * Übergeordnetes Werk
+     * Set the value of [title_id] column.
+     * Titel des übergeordneten Werkes
      * @param int $v new value
      * @return PublicationDm The current object (for fluent API support)
      */
-    public function setParent($v)
+    public function setTitleId($v)
     {
         if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
-        if ($this->parent !== $v) {
-            $this->parent = $v;
-            $this->modifiedColumns[] = PublicationDmPeer::PARENT;
-        }
-
-        if ($this->aPublicationRelatedByParent !== null && $this->aPublicationRelatedByParent->getId() !== $v) {
-            $this->aPublicationRelatedByParent = null;
+        if ($this->title_id !== $v) {
+            $this->title_id = $v;
+            $this->modifiedColumns[] = PublicationDmPeer::TITLE_ID;
         }
 
 
         return $this;
-    } // setParent()
+    } // setTitleId()
 
     /**
      * Set the value of [pages] column.
@@ -260,7 +251,7 @@ abstract class BasePublicationDm extends BaseObject implements Persistent, \DTA\
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->publication_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-            $this->parent = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+            $this->title_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
             $this->pages = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
             $this->resetModified();
 
@@ -293,11 +284,8 @@ abstract class BasePublicationDm extends BaseObject implements Persistent, \DTA\
     public function ensureConsistency()
     {
 
-        if ($this->aPublicationRelatedByPublicationId !== null && $this->publication_id !== $this->aPublicationRelatedByPublicationId->getId()) {
-            $this->aPublicationRelatedByPublicationId = null;
-        }
-        if ($this->aPublicationRelatedByParent !== null && $this->parent !== $this->aPublicationRelatedByParent->getId()) {
-            $this->aPublicationRelatedByParent = null;
+        if ($this->aPublication !== null && $this->publication_id !== $this->aPublication->getId()) {
+            $this->aPublication = null;
         }
     } // ensureConsistency
 
@@ -338,8 +326,7 @@ abstract class BasePublicationDm extends BaseObject implements Persistent, \DTA\
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aPublicationRelatedByPublicationId = null;
-            $this->aPublicationRelatedByParent = null;
+            $this->aPublication = null;
         } // if (deep)
     }
 
@@ -458,18 +445,11 @@ abstract class BasePublicationDm extends BaseObject implements Persistent, \DTA\
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aPublicationRelatedByPublicationId !== null) {
-                if ($this->aPublicationRelatedByPublicationId->isModified() || $this->aPublicationRelatedByPublicationId->isNew()) {
-                    $affectedRows += $this->aPublicationRelatedByPublicationId->save($con);
+            if ($this->aPublication !== null) {
+                if ($this->aPublication->isModified() || $this->aPublication->isNew()) {
+                    $affectedRows += $this->aPublication->save($con);
                 }
-                $this->setPublicationRelatedByPublicationId($this->aPublicationRelatedByPublicationId);
-            }
-
-            if ($this->aPublicationRelatedByParent !== null) {
-                if ($this->aPublicationRelatedByParent->isModified() || $this->aPublicationRelatedByParent->isNew()) {
-                    $affectedRows += $this->aPublicationRelatedByParent->save($con);
-                }
-                $this->setPublicationRelatedByParent($this->aPublicationRelatedByParent);
+                $this->setPublication($this->aPublication);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -525,8 +505,8 @@ abstract class BasePublicationDm extends BaseObject implements Persistent, \DTA\
         if ($this->isColumnModified(PublicationDmPeer::PUBLICATION_ID)) {
             $modifiedColumns[':p' . $index++]  = '"publication_id"';
         }
-        if ($this->isColumnModified(PublicationDmPeer::PARENT)) {
-            $modifiedColumns[':p' . $index++]  = '"parent"';
+        if ($this->isColumnModified(PublicationDmPeer::TITLE_ID)) {
+            $modifiedColumns[':p' . $index++]  = '"title_id"';
         }
         if ($this->isColumnModified(PublicationDmPeer::PAGES)) {
             $modifiedColumns[':p' . $index++]  = '"pages"';
@@ -548,8 +528,8 @@ abstract class BasePublicationDm extends BaseObject implements Persistent, \DTA\
                     case '"publication_id"':
                         $stmt->bindValue($identifier, $this->publication_id, PDO::PARAM_INT);
                         break;
-                    case '"parent"':
-                        $stmt->bindValue($identifier, $this->parent, PDO::PARAM_INT);
+                    case '"title_id"':
+                        $stmt->bindValue($identifier, $this->title_id, PDO::PARAM_INT);
                         break;
                     case '"pages"':
                         $stmt->bindValue($identifier, $this->pages, PDO::PARAM_STR);
@@ -646,15 +626,9 @@ abstract class BasePublicationDm extends BaseObject implements Persistent, \DTA\
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aPublicationRelatedByPublicationId !== null) {
-                if (!$this->aPublicationRelatedByPublicationId->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aPublicationRelatedByPublicationId->getValidationFailures());
-                }
-            }
-
-            if ($this->aPublicationRelatedByParent !== null) {
-                if (!$this->aPublicationRelatedByParent->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aPublicationRelatedByParent->getValidationFailures());
+            if ($this->aPublication !== null) {
+                if (!$this->aPublication->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aPublication->getValidationFailures());
                 }
             }
 
@@ -706,7 +680,7 @@ abstract class BasePublicationDm extends BaseObject implements Persistent, \DTA\
                 return $this->getPublicationId();
                 break;
             case 2:
-                return $this->getParent();
+                return $this->getTitleId();
                 break;
             case 3:
                 return $this->getPages();
@@ -742,15 +716,12 @@ abstract class BasePublicationDm extends BaseObject implements Persistent, \DTA\
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getPublicationId(),
-            $keys[2] => $this->getParent(),
+            $keys[2] => $this->getTitleId(),
             $keys[3] => $this->getPages(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aPublicationRelatedByPublicationId) {
-                $result['PublicationRelatedByPublicationId'] = $this->aPublicationRelatedByPublicationId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->aPublicationRelatedByParent) {
-                $result['PublicationRelatedByParent'] = $this->aPublicationRelatedByParent->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aPublication) {
+                $result['Publication'] = $this->aPublication->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -793,7 +764,7 @@ abstract class BasePublicationDm extends BaseObject implements Persistent, \DTA\
                 $this->setPublicationId($value);
                 break;
             case 2:
-                $this->setParent($value);
+                $this->setTitleId($value);
                 break;
             case 3:
                 $this->setPages($value);
@@ -824,7 +795,7 @@ abstract class BasePublicationDm extends BaseObject implements Persistent, \DTA\
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setPublicationId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setParent($arr[$keys[2]]);
+        if (array_key_exists($keys[2], $arr)) $this->setTitleId($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setPages($arr[$keys[3]]);
     }
 
@@ -839,7 +810,7 @@ abstract class BasePublicationDm extends BaseObject implements Persistent, \DTA\
 
         if ($this->isColumnModified(PublicationDmPeer::ID)) $criteria->add(PublicationDmPeer::ID, $this->id);
         if ($this->isColumnModified(PublicationDmPeer::PUBLICATION_ID)) $criteria->add(PublicationDmPeer::PUBLICATION_ID, $this->publication_id);
-        if ($this->isColumnModified(PublicationDmPeer::PARENT)) $criteria->add(PublicationDmPeer::PARENT, $this->parent);
+        if ($this->isColumnModified(PublicationDmPeer::TITLE_ID)) $criteria->add(PublicationDmPeer::TITLE_ID, $this->title_id);
         if ($this->isColumnModified(PublicationDmPeer::PAGES)) $criteria->add(PublicationDmPeer::PAGES, $this->pages);
 
         return $criteria;
@@ -905,7 +876,7 @@ abstract class BasePublicationDm extends BaseObject implements Persistent, \DTA\
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setPublicationId($this->getPublicationId());
-        $copyObj->setParent($this->getParent());
+        $copyObj->setTitleId($this->getTitleId());
         $copyObj->setPages($this->getPages());
 
         if ($deepCopy && !$this->startCopy) {
@@ -972,7 +943,7 @@ abstract class BasePublicationDm extends BaseObject implements Persistent, \DTA\
      * @return PublicationDm The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setPublicationRelatedByPublicationId(Publication $v = null)
+    public function setPublication(Publication $v = null)
     {
         if ($v === null) {
             $this->setPublicationId(NULL);
@@ -980,12 +951,12 @@ abstract class BasePublicationDm extends BaseObject implements Persistent, \DTA\
             $this->setPublicationId($v->getId());
         }
 
-        $this->aPublicationRelatedByPublicationId = $v;
+        $this->aPublication = $v;
 
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the Publication object, it will not be re-added.
         if ($v !== null) {
-            $v->addPublicationDmRelatedByPublicationId($this);
+            $v->addPublicationDm($this);
         }
 
 
@@ -1001,72 +972,20 @@ abstract class BasePublicationDm extends BaseObject implements Persistent, \DTA\
      * @return Publication The associated Publication object.
      * @throws PropelException
      */
-    public function getPublicationRelatedByPublicationId(PropelPDO $con = null, $doQuery = true)
+    public function getPublication(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aPublicationRelatedByPublicationId === null && ($this->publication_id !== null) && $doQuery) {
-            $this->aPublicationRelatedByPublicationId = PublicationQuery::create()->findPk($this->publication_id, $con);
+        if ($this->aPublication === null && ($this->publication_id !== null) && $doQuery) {
+            $this->aPublication = PublicationQuery::create()->findPk($this->publication_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aPublicationRelatedByPublicationId->addPublicationDmsRelatedByPublicationId($this);
+                $this->aPublication->addPublicationDms($this);
              */
         }
 
-        return $this->aPublicationRelatedByPublicationId;
-    }
-
-    /**
-     * Declares an association between this object and a Publication object.
-     *
-     * @param             Publication $v
-     * @return PublicationDm The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setPublicationRelatedByParent(Publication $v = null)
-    {
-        if ($v === null) {
-            $this->setParent(NULL);
-        } else {
-            $this->setParent($v->getId());
-        }
-
-        $this->aPublicationRelatedByParent = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Publication object, it will not be re-added.
-        if ($v !== null) {
-            $v->addPublicationDmRelatedByParent($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated Publication object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @param $doQuery Executes a query to get the object if required
-     * @return Publication The associated Publication object.
-     * @throws PropelException
-     */
-    public function getPublicationRelatedByParent(PropelPDO $con = null, $doQuery = true)
-    {
-        if ($this->aPublicationRelatedByParent === null && ($this->parent !== null) && $doQuery) {
-            $this->aPublicationRelatedByParent = PublicationQuery::create()->findPk($this->parent, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aPublicationRelatedByParent->addPublicationDmsRelatedByParent($this);
-             */
-        }
-
-        return $this->aPublicationRelatedByParent;
+        return $this->aPublication;
     }
 
     /**
@@ -1076,7 +995,7 @@ abstract class BasePublicationDm extends BaseObject implements Persistent, \DTA\
     {
         $this->id = null;
         $this->publication_id = null;
-        $this->parent = null;
+        $this->title_id = null;
         $this->pages = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
@@ -1100,18 +1019,14 @@ abstract class BasePublicationDm extends BaseObject implements Persistent, \DTA\
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
-            if ($this->aPublicationRelatedByPublicationId instanceof Persistent) {
-              $this->aPublicationRelatedByPublicationId->clearAllReferences($deep);
-            }
-            if ($this->aPublicationRelatedByParent instanceof Persistent) {
-              $this->aPublicationRelatedByParent->clearAllReferences($deep);
+            if ($this->aPublication instanceof Persistent) {
+              $this->aPublication->clearAllReferences($deep);
             }
 
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
-        $this->aPublicationRelatedByPublicationId = null;
-        $this->aPublicationRelatedByParent = null;
+        $this->aPublication = null;
     }
 
     /**

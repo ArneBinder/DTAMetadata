@@ -74,13 +74,11 @@ class PublicationTableMap extends TableMap
         $this->addRelation('DatespecificationRelatedByFirstpublicationdateId', 'DTA\\MetadataBundle\\Model\\Data\\Datespecification', RelationMap::MANY_TO_ONE, array('firstpublicationdate_id' => 'id', ), null, null);
         $this->addRelation('Font', 'DTA\\MetadataBundle\\Model\\Data\\Font', RelationMap::MANY_TO_ONE, array('font_id' => 'id', ), null, null);
         $this->addRelation('PublicationM', 'DTA\\MetadataBundle\\Model\\Data\\PublicationM', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationMs');
-        $this->addRelation('PublicationDmRelatedByPublicationId', 'DTA\\MetadataBundle\\Model\\Data\\PublicationDm', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationDmsRelatedByPublicationId');
-        $this->addRelation('PublicationDmRelatedByParent', 'DTA\\MetadataBundle\\Model\\Data\\PublicationDm', RelationMap::ONE_TO_MANY, array('id' => 'parent', ), null, null, 'PublicationDmsRelatedByParent');
+        $this->addRelation('PublicationDm', 'DTA\\MetadataBundle\\Model\\Data\\PublicationDm', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationDms');
         $this->addRelation('PublicationMm', 'DTA\\MetadataBundle\\Model\\Data\\PublicationMm', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationMms');
         $this->addRelation('PublicationDs', 'DTA\\MetadataBundle\\Model\\Data\\PublicationDs', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationDss');
         $this->addRelation('PublicationMs', 'DTA\\MetadataBundle\\Model\\Data\\PublicationMs', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationMss');
-        $this->addRelation('PublicationJaRelatedByPublicationId', 'DTA\\MetadataBundle\\Model\\Data\\PublicationJa', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationJasRelatedByPublicationId');
-        $this->addRelation('PublicationJaRelatedByParent', 'DTA\\MetadataBundle\\Model\\Data\\PublicationJa', RelationMap::ONE_TO_MANY, array('id' => 'parent', ), null, null, 'PublicationJasRelatedByParent');
+        $this->addRelation('PublicationJa', 'DTA\\MetadataBundle\\Model\\Data\\PublicationJa', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationJas');
         $this->addRelation('PublicationMms', 'DTA\\MetadataBundle\\Model\\Data\\PublicationMms', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationMmss');
         $this->addRelation('PublicationJ', 'DTA\\MetadataBundle\\Model\\Data\\PublicationJ', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationJs');
         $this->addRelation('PublicationPublicationgroup', 'DTA\\MetadataBundle\\Model\\Master\\PublicationPublicationgroup', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationPublicationgroups');

@@ -33,13 +33,9 @@ use DTA\MetadataBundle\Model\Data\Volume;
  * @method PublicationJaQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method PublicationJaQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method PublicationJaQuery leftJoinPublicationRelatedByPublicationId($relationAlias = null) Adds a LEFT JOIN clause to the query using the PublicationRelatedByPublicationId relation
- * @method PublicationJaQuery rightJoinPublicationRelatedByPublicationId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the PublicationRelatedByPublicationId relation
- * @method PublicationJaQuery innerJoinPublicationRelatedByPublicationId($relationAlias = null) Adds a INNER JOIN clause to the query using the PublicationRelatedByPublicationId relation
- *
- * @method PublicationJaQuery leftJoinPublicationRelatedByParent($relationAlias = null) Adds a LEFT JOIN clause to the query using the PublicationRelatedByParent relation
- * @method PublicationJaQuery rightJoinPublicationRelatedByParent($relationAlias = null) Adds a RIGHT JOIN clause to the query using the PublicationRelatedByParent relation
- * @method PublicationJaQuery innerJoinPublicationRelatedByParent($relationAlias = null) Adds a INNER JOIN clause to the query using the PublicationRelatedByParent relation
+ * @method PublicationJaQuery leftJoinPublication($relationAlias = null) Adds a LEFT JOIN clause to the query using the Publication relation
+ * @method PublicationJaQuery rightJoinPublication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Publication relation
+ * @method PublicationJaQuery innerJoinPublication($relationAlias = null) Adds a INNER JOIN clause to the query using the Publication relation
  *
  * @method PublicationJaQuery leftJoinVolume($relationAlias = null) Adds a LEFT JOIN clause to the query using the Volume relation
  * @method PublicationJaQuery rightJoinVolume($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Volume relation
@@ -299,7 +295,7 @@ abstract class BasePublicationJaQuery extends ModelCriteria
      * $query->filterByPublicationId(array('max' => 12)); // WHERE publication_id <= 12
      * </code>
      *
-     * @see       filterByPublicationRelatedByPublicationId()
+     * @see       filterByPublication()
      *
      * @param     mixed $publicationId The value to use as filter.
      *              Use scalar values for equality.
@@ -387,8 +383,6 @@ abstract class BasePublicationJaQuery extends ModelCriteria
      * $query->filterByParent(array('max' => 12)); // WHERE parent <= 12
      * </code>
      *
-     * @see       filterByPublicationRelatedByParent()
-     *
      * @param     mixed $parent The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -429,7 +423,7 @@ abstract class BasePublicationJaQuery extends ModelCriteria
      * @return                 PublicationJaQuery The current query, for fluid interface
      * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterByPublicationRelatedByPublicationId($publication, $comparison = null)
+    public function filterByPublication($publication, $comparison = null)
     {
         if ($publication instanceof Publication) {
             return $this
@@ -442,22 +436,22 @@ abstract class BasePublicationJaQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(PublicationJaPeer::PUBLICATION_ID, $publication->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByPublicationRelatedByPublicationId() only accepts arguments of type Publication or PropelCollection');
+            throw new PropelException('filterByPublication() only accepts arguments of type Publication or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the PublicationRelatedByPublicationId relation
+     * Adds a JOIN clause to the query using the Publication relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return PublicationJaQuery The current query, for fluid interface
      */
-    public function joinPublicationRelatedByPublicationId($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinPublication($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('PublicationRelatedByPublicationId');
+        $relationMap = $tableMap->getRelation('Publication');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -472,14 +466,14 @@ abstract class BasePublicationJaQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'PublicationRelatedByPublicationId');
+            $this->addJoinObject($join, 'Publication');
         }
 
         return $this;
     }
 
     /**
-     * Use the PublicationRelatedByPublicationId relation Publication object
+     * Use the Publication relation Publication object
      *
      * @see       useQuery()
      *
@@ -489,87 +483,11 @@ abstract class BasePublicationJaQuery extends ModelCriteria
      *
      * @return   \DTA\MetadataBundle\Model\Data\PublicationQuery A secondary query class using the current class as primary query
      */
-    public function usePublicationRelatedByPublicationIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function usePublicationQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinPublicationRelatedByPublicationId($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'PublicationRelatedByPublicationId', '\DTA\MetadataBundle\Model\Data\PublicationQuery');
-    }
-
-    /**
-     * Filter the query by a related Publication object
-     *
-     * @param   Publication|PropelObjectCollection $publication The related object(s) to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 PublicationJaQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByPublicationRelatedByParent($publication, $comparison = null)
-    {
-        if ($publication instanceof Publication) {
-            return $this
-                ->addUsingAlias(PublicationJaPeer::PARENT, $publication->getId(), $comparison);
-        } elseif ($publication instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(PublicationJaPeer::PARENT, $publication->toKeyValue('PrimaryKey', 'Id'), $comparison);
-        } else {
-            throw new PropelException('filterByPublicationRelatedByParent() only accepts arguments of type Publication or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the PublicationRelatedByParent relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return PublicationJaQuery The current query, for fluid interface
-     */
-    public function joinPublicationRelatedByParent($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('PublicationRelatedByParent');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'PublicationRelatedByParent');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the PublicationRelatedByParent relation Publication object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\Data\PublicationQuery A secondary query class using the current class as primary query
-     */
-    public function usePublicationRelatedByParentQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinPublicationRelatedByParent($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'PublicationRelatedByParent', '\DTA\MetadataBundle\Model\Data\PublicationQuery');
+            ->joinPublication($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Publication', '\DTA\MetadataBundle\Model\Data\PublicationQuery');
     }
 
     /**

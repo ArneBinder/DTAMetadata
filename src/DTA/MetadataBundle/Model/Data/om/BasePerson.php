@@ -95,7 +95,7 @@ abstract class BasePerson extends BaseObject implements Persistent, \DTA\Metadat
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('id', 'erster name', 'namen gesamt', 'gnd', );	public   $tableRowViewAccessors = array('id'=>'Id', 'erster name'=>'accessor:getRepresentativePersonalname', 'namen gesamt'=>'accessor:countPersonalnames', 'gnd'=>'Gnd', );
+    public static $tableRowViewCaptions = array('erster name', 'namen gesamt', 'gnd', );	public   $tableRowViewAccessors = array('erster name'=>'accessor:getRepresentativePersonalname', 'namen gesamt'=>'accessor:countPersonalnames', 'gnd'=>'Gnd', );
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection

@@ -74,6 +74,10 @@ viewPersonsByRole:
   path: /Data/viewPersonsByRole/{personRoleId}
   defaults: { _controller: DTAMetadataBundle:DataDomain:viewPersonsByRole }
   
+viewPersons:
+  path: /Data/showAll/Person
+  defaults: {_controller: DTAMetadataBundle:DataDomain:viewPersons }
+  
 # ------------------------------------------------------------
 # inherited ORM methods
 # ------------------------------------------------------------

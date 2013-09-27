@@ -6,11 +6,6 @@
         Styles generic html elements, independently of context.
 */
 
-body {
-    padding-top: 120px;
-    padding-bottom: 40px;
-}
-
 /* forms */
 
 textarea{

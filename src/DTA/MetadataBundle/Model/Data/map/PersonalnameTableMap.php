@@ -73,7 +73,6 @@ class PersonalnameTableMap extends TableMap
   'scope_column' => 'id',
 ),
             'table_row_view' =>  array (
-  'id' => 'id',
   'name' => 'accessor:__toString',
   'zugeordnet (personen-id)' => 'person_id',
   'reihenfolge' => 'accessor:getSortableRank',

@@ -132,13 +132,12 @@
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="publication_id" type="INTEGER" required="true"/>
         
-        <column description="Übergeordnetes Werk" name="parent" type="INTEGER"/>
+        <column description="Titel des übergeordneten Werkes" name="title_id" type="INTEGER" required="true"/>
         <column description="Seitenangabe" name="pages" type="LONGVARCHAR"/>
         
         <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication" /> </behavior>
         
         <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="publication"> <reference local="parent" foreign="id"/> </foreign-key>
     </table>   
     
     <!--MM: Teil einer mehrbändigen Monographie.-->
@@ -195,7 +194,6 @@
         <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication" /> </behavior>
         
         <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="publication"> <reference local="parent" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="volume"> <reference local="volume_id" foreign="id"/> </foreign-key>
     </table> 
     
@@ -280,7 +278,6 @@
             <parameter name="scope_column" value="id"/>
         </behavior>
         <behavior name="table_row_view">
-            <parameter name="id" value="id"/>
             <parameter name="name" value="accessor:__toString"/>
             <parameter name="zugeordnet (personen-id)" value="person_id"/>
             <parameter name="reihenfolge" value="accessor:getSortableRank"/>
@@ -300,7 +297,6 @@
         <column name="namefragmenttypeid" type="INTEGER" required="true"/>
         
         <behavior name="table_row_view">
-            <parameter name="id" value="id"/>
             <parameter name="bestandteil" value="name"/>
             <parameter name="embedcolumnsart" value="namefragmenttype"/>
         </behavior>
@@ -342,7 +338,6 @@
         <!--The name is added in the personalName table because it's a one-to-many relationship.-->
         
         <behavior name="table_row_view">
-            <parameter name="id" value="id"/>
             <parameter name="erster name@representative" value="personalname"/>
             <parameter name="namen gesamt@count" value="personalname"/>
             <parameter name="gnd" value="gnd"/>

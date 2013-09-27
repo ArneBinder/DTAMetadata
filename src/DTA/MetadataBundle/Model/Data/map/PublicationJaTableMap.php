@@ -46,7 +46,7 @@ class PublicationJaTableMap extends TableMap
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('publication_id', 'PublicationId', 'INTEGER', 'publication', 'id', true, null, null);
         $this->addForeignKey('volume_id', 'VolumeId', 'INTEGER', 'volume', 'id', true, null, null);
-        $this->addForeignKey('parent', 'Parent', 'INTEGER', 'publication', 'id', true, null, null);
+        $this->addColumn('parent', 'Parent', 'INTEGER', true, null, null);
         // validators
     } // initialize()
 
@@ -55,8 +55,7 @@ class PublicationJaTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('PublicationRelatedByPublicationId', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::MANY_TO_ONE, array('publication_id' => 'id', ), null, null);
-        $this->addRelation('PublicationRelatedByParent', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::MANY_TO_ONE, array('parent' => 'id', ), null, null);
+        $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::MANY_TO_ONE, array('publication_id' => 'id', ), null, null);
         $this->addRelation('Volume', 'DTA\\MetadataBundle\\Model\\Data\\Volume', RelationMap::MANY_TO_ONE, array('volume_id' => 'id', ), null, null);
     } // buildRelations()
 

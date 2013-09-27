@@ -115,7 +115,7 @@ abstract class BaseNamefragment extends BaseObject implements Persistent, \DTA\M
     protected $oldScope;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('id', 'bestandteil', );	public   $tableRowViewAccessors = array('id'=>'Id', 'bestandteil'=>'Name', );
+    public static $tableRowViewCaptions = array('bestandteil', );	public   $tableRowViewAccessors = array('bestandteil'=>'Name', );
     /**
      * Get the [id] column value.
      *

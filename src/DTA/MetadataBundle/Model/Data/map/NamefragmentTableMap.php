@@ -75,7 +75,6 @@ class NamefragmentTableMap extends TableMap
   'scope_column' => 'personalname_id',
 ),
             'table_row_view' =>  array (
-  'id' => 'id',
   'bestandteil' => 'name',
   'embedcolumnsart' => 'namefragmenttype',
 ),

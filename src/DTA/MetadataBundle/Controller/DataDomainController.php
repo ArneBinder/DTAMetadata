@@ -2,6 +2,8 @@
 
 namespace DTA\MetadataBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
+
 use \DTA\MetadataBundle\Model;
 
 class DataDomainController extends ORMController {
@@ -71,17 +73,86 @@ class DataDomainController extends ORMController {
             // get_declared_classes()
         ));
     }
+
+//    public function lexicographicalComparison($s1, $s2){
+//        for($i = 0; $i < max(array(count($s1),count($s2))); $i++){
+//            if(ord($s1[$i]) > ord($s2[$i]))
+//                return 1;
+//            elseif(ord($s1[$i]) < ord($s2[$i]))
+//                return -1;
+//        }
+//        return 0;
+//    }
     
-    public function viewPersonsByRoleAction() {
-        $records = Model\Data\PersonQuery::create()
-                ->joinPersonPublication()
-                ->findOne();
-                
+    public function viewPersonsAction() {
+        $persons = Model\Data\PersonQuery::create()
+                ->find();
+        $sortByPersonalname = function($p1, $p2){ return strcmp($p1->getRepresentativePersonalname()->__toString(), $p2->getRepresentativePersonalname()->__toString());};
+        
+        $records = array();
+        foreach($persons as $person){
+            $records[] = $person;
+        }
+        @uasort($records, $sortByPersonalname);
         return $this->renderWithDomainData('DTAMetadataBundle:ORM:genericViewAll.html.twig', array(
-            'data' => $records,
-            'columns' => Model\Data\Person::getTableViewColumnNames(),
-            'className' => 'Person',
-//            'updatedObjectId' => 0,
+                'className' => 'Person',
+                'columns' => Model\Data\Person::getTableViewColumnNames(),
+                'data' => $records,
+            ));
+    }
+
+    public function viewPersonsByRoleAction($personRoleId) {
+        
+        $role = Model\Classification\PersonroleQuery::create()
+                ->findOneById($personRoleId);
+        
+        $rows = array();//new \ArrayObject();
+        
+        if( $role->getApplicableToPublication() ) {
+            $personPublications = Model\Master\PersonPublicationQuery::create()
+                    ->filterByPersonroleId($personRoleId)
+                    ->find();
+            foreach ($personPublications as $pp) {
+                
+                // the concrete publication object (PublicationM, PublicationJ, etc.) for which the publication provides the basic data fields
+                $wrapper = $pp->getPublication()->getWrapperPublication();
+                $wrapperClassName = $pp->getPublication()->getWrapperPublicationClass();
+                // generate a link to the publication 
+                $linkTarget = $this->generateUrl("Data_genericCreateOrEdit", array(
+                        'className'=> $wrapperClassName,
+                        'recordId'=>$wrapper->getId()
+                    )
+                );
+                
+                $linkTo = function($href,$title){return '<a href="'.$href.'">'.$title.'</a>';};
+                $rows[] = array(
+                    'repName' => $pp->getPerson()->getRepresentativePersonalname()->__toString(),
+                    'context' => $linkTo($linkTarget, $pp->getPublication()->getWork()->getTitle())
+                );
+            }
+        }
+        
+        if( $role->getApplicableToWork() ) {
+            $personWorks = Model\Master\PersonWorkQuery::create()
+                    ->filterByPersonroleId($personRoleId)
+                    ->find();
+            foreach ($personWorks as $pp) {
+                $rows[] = array(
+                    'repName' => $pp->getPerson()->getRepresentativePersonalname()->__toString(),
+                    'context' => $pp->getWork()->getTitle()
+                );
+            }
+        }
+        
+        $columns = array('Name', 'Publikation/Werk');
+        $accessors = array('repName', 'context');
+        $compareRow = function($a, $b){ return strcmp($a['repName'],$b['repName']); };
+        uasort($rows, $compareRow);
+        return $this->renderWithDomainData('DTAMetadataBundle::listView.html.twig', array(
+            'rows' => $rows,
+            'columns' => $columns,
+            'accessors' => $accessors,
+            'title' => $role->getName()
         ));
     }
     

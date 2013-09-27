@@ -998,7 +998,8 @@ ALTER TABLE "imagesource" ADD CONSTRAINT "imagesource_FK_2"
 
 ALTER TABLE "imagesource" ADD CONSTRAINT "imagesource_FK_3"
     FOREIGN KEY ("partner_id")
-    REFERENCES "partner" ("id");
+    REFERENCES "partner" ("id")
+    ON DELETE SET NULL;
 
 ALTER TABLE "textsource" ADD CONSTRAINT "textsource_FK_1"
     FOREIGN KEY ("publication_id")
@@ -1010,4 +1011,5 @@ ALTER TABLE "textsource" ADD CONSTRAINT "textsource_FK_2"
 
 ALTER TABLE "textsource" ADD CONSTRAINT "textsource_FK_3"
     FOREIGN KEY ("partner_id")
-    REFERENCES "partner" ("id");
+    REFERENCES "partner" ("id")
+    ON DELETE SET NULL;

@@ -54,14 +54,14 @@
     {# see documentation above. setting default values #}
     {% set inlineLabel = inlineLabel|default(false) %}
     {% set inlineChildren = inlineChildren|default(false) %}
-    {% set hideLabel = hideLabel|default(false) %}
+    {% set hideLabelClass = hideLabel|default(false) ? 'sr-only' : '' %}
     {% set inlined = inlined|default(false) %}
 
         {% if not inlineLabel and not inlined %}
         <div class="form-group">
             {# form_label automatically generates a label tag, with the correct id specified, the label class, added, etc. #}
-            {{ form_label(form, null , {'label_attr':{'class':'control-label col-'~formLabelWidth} }) }}
-            <div class="col-{{formWidgetWidth}} {#{ inlineChildren ? 'form-inline' : 'labelled' }#}">
+            {{ form_label(form, null , {'label_attr':{'class': hideLabelClass ~ 'control-label col-lg-'~formLabelWidth} }) }}
+            <div class="col-lg-{{formWidgetWidth}} {#{ inlineChildren ? 'form-inline' : 'labelled' }#}">
         {% endif %}
         
 
@@ -72,8 +72,8 @@
                 {{ form_widget(child, {'inlined':true}) }} {# , 'attr':{'class':'form-control','style':'width:50px; display: inline'}  #}
             {% endfor %}
         {% else %}
-            {% if not hideLabel and (inlineLabel or inlined)  %}
-                {{ form_label(form) }} 
+            {% if inlineLabel or inlined %}
+                {{ form_label(form, null, {'label_attr':{'class': hideLabelClass} }) }} 
             {% endif %}
             {{ form_errors(form) }}
             {{ form_widget(form) }}
@@ -108,8 +108,6 @@
     {% endif %}
 {% endspaceless %}
 {% endblock form_label %}
-
-
 
 {% block checkbox_row %}
     {% if expanded|default(false) %}

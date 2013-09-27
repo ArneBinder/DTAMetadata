@@ -45,7 +45,7 @@ class PublicationDmTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('publication_id', 'PublicationId', 'INTEGER', 'publication', 'id', true, null, null);
-        $this->addForeignKey('parent', 'Parent', 'INTEGER', 'publication', 'id', false, null, null);
+        $this->addColumn('title_id', 'TitleId', 'INTEGER', true, null, null);
         $this->addColumn('pages', 'Pages', 'LONGVARCHAR', false, null, null);
         // validators
     } // initialize()
@@ -55,8 +55,7 @@ class PublicationDmTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('PublicationRelatedByPublicationId', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::MANY_TO_ONE, array('publication_id' => 'id', ), null, null);
-        $this->addRelation('PublicationRelatedByParent', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::MANY_TO_ONE, array('parent' => 'id', ), null, null);
+        $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::MANY_TO_ONE, array('publication_id' => 'id', ), null, null);
     } // buildRelations()
 
     /**

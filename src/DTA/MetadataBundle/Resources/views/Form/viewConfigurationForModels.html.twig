@@ -165,27 +165,27 @@
 {# --------------------- Person / Work / Publication Relations --------------------- #}
 
 {% block personwork_row %}
-{% spaceless %}
-    <div class="form-inline">
+    <div class="dynamic-collection-deletable">
         {{ form_row(form.personrole, {'inlineLabel':true,'hideLabel':true}) }}
         {{ form_row(form.person, {'hideLabel':true,'inlineLabel':true}) }}
     </div>
-{% endspaceless %}
 {% endblock %}
 
 {% block personpublication_row %}
+  <div class="dynamic-collection-deletable">
     {{ form_row(form.personrole, {'inlineLabel':true,'hideLabel':true}) }}
     {{ form_row(form.person, {'hideLabel':true,'inlineLabel':true}) }}
+  </div>
 {% endblock %}
 
 {% block categorywork_row %}
-    <div>
+    <div class="dynamic-collection-deletable">
         {{ form_row(form, {'inlineLabel':true, 'hideLabel':true, 'inlineChildren': true}) }}
     </div>
 {% endblock %}
 
 {% block category_row %}
-    <div class="form-inline">
+    <div class="dynamic-collection-deletable">
         {{ form_row(form, {'inlineLabel':true, 'hideLabel':true, 'inlineChildren': true}) }}
     </div>
 {% endblock %}

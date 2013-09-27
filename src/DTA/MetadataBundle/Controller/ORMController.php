@@ -39,27 +39,27 @@ class ORMController extends DTADomainController {
     private function getControllerClassName($package) {
         return "DTA\\MetadataBundle\\Controller\\" . $package . "DomainController";
     }
-    
-    /**
-     * Routes a request to specialized methods.
-     * This is necessary since routes are parsed from annotations, and these are not inherited to the controllers.
-     * So the only route that exists is that in the base class, causing each request to end up there.
-     * The base class then calls the according method, that a specialized class has inherited from it.
-     * @param type $package             Controller to address
-     * @param type $methodName          Method to call
-     * @param type $methodParameters    Parameters to pass to the call
-     */
-    private function useSpecializedImplementation($package, $methodName, $methodParameters){
-        
-        // get right controller for that package
-        $controllerName = $this->getControllerClassName($package);
-        $controller = new $controllerName;
-        
-        // setting the container is crucial for all kinds of things to work
-        $controller->setContainer($this->container);
-        
-        return call_user_func_array( array($controller, $methodName), $methodParameters );
-    }
+//    
+//    /**
+//     * Routes a request to specialized methods.
+//     * This is necessary since routes are parsed from annotations, and these are not inherited to the controllers.
+//     * So the only route that exists is that in the base class, causing each request to end up there.
+//     * The base class then calls the according method, that a specialized class has inherited from it.
+//     * @param type $package             Controller to address
+//     * @param type $methodName          Method to call
+//     * @param type $methodParameters    Parameters to pass to the call
+//     */
+//    private function useSpecializedImplementation($package, $methodName, $methodParameters){
+//        
+//        // get right controller for that package
+//        $controllerName = $this->getControllerClassName($package);
+//        $controller = new $controllerName;
+//        
+//        // setting the container is crucial for all kinds of things to work
+//        $controller->setContainer($this->container);
+//        
+//        return call_user_func_array( array($controller, $methodName), $methodParameters );
+//    }
 
     /**
      * Deletes a record from the database after having asked for a confirmation.
@@ -147,9 +147,9 @@ class ORMController extends DTADomainController {
      */
     public function genericViewAllAction($package, $className, $updatedObjectId = 0) {
         
-        if($this->package === null){ // called through a HTTP request, not from another controller
-            return $this->useSpecializedImplementation($package, __METHOD__, array('package'=>$package, 'className'=>$className, 'updatedObjectId' => $updatedObjectId));
-        }
+//        if($this->package === null){ // called through a HTTP request, not from another controller
+//            return $this->useSpecializedImplementation($package, __METHOD__, array('package'=>$package, 'className'=>$className, 'updatedObjectId' => $updatedObjectId));
+//        }
         
         $classNames = $this->relatedClassNames($package, $className);
 

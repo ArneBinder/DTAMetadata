@@ -100,7 +100,7 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
     protected $sortableQueries = array();
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('id', 'name', 'zugeordnet (personen-id)', 'reihenfolge', );	public   $tableRowViewAccessors = array('id'=>'Id', 'name'=>'accessor:__toString', 'zugeordnet (personen-id)'=>'PersonId', 'reihenfolge'=>'accessor:getSortableRank', );
+    public static $tableRowViewCaptions = array('name', 'zugeordnet (personen-id)', 'reihenfolge', );	public   $tableRowViewAccessors = array('name'=>'accessor:__toString', 'zugeordnet (personen-id)'=>'PersonId', 'reihenfolge'=>'accessor:getSortableRank', );
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
