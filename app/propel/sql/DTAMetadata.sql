@@ -102,19 +102,24 @@ DROP TABLE IF EXISTS "publication" CASCADE;
 CREATE TABLE "publication"
 (
     "id" serial NOT NULL,
+    "wwwReady" INTEGER,
     "work_id" INTEGER NOT NULL,
     "place_id" INTEGER,
     "publicationdate_id" INTEGER,
     "firstpublicationdate_id" INTEGER,
-    "printrun_id" INTEGER,
     "publishingcompany_id" INTEGER,
     "partner_id" INTEGER,
     "editiondescription" TEXT,
     "digitaleditioneditor" TEXT,
     "transcriptioncomment" TEXT,
     "font_id" INTEGER,
+    "volume_alphanumeric" TEXT,
+    "volume_numeric" TEXT,
+    "volumes_total" TEXT,
+    "numpages" INTEGER,
+    "numpagesnormed" INTEGER,
     "comment" TEXT,
-    "relatedset_id" INTEGER,
+    "publishingcompany_id_is_reconstructed" BOOLEAN DEFAULT 'f',
     PRIMARY KEY ("id")
 );
 
@@ -123,8 +128,6 @@ COMMENT ON COLUMN "publication"."place_id" IS 'Druckort';
 COMMENT ON COLUMN "publication"."publicationdate_id" IS 'Erscheinungsjahr';
 
 COMMENT ON COLUMN "publication"."firstpublicationdate_id" IS 'Erscheinungsjahr der Erstausgabe';
-
-COMMENT ON COLUMN "publication"."printrun_id" IS 'Informationen zur Auflage';
 
 COMMENT ON COLUMN "publication"."publishingcompany_id" IS 'Verlag';
 
@@ -137,6 +140,12 @@ COMMENT ON COLUMN "publication"."digitaleditioneditor" IS 'Bearbeiter der digita
 COMMENT ON COLUMN "publication"."transcriptioncomment" IS 'Bemerkungen zu den Transkriptionsrichtlinien';
 
 COMMENT ON COLUMN "publication"."font_id" IS 'Vorherrschende Schriftart';
+
+COMMENT ON COLUMN "publication"."volume_alphanumeric" IS 'Band (alphanumerisch)';
+
+COMMENT ON COLUMN "publication"."volume_numeric" IS 'Band (numerisch)';
+
+COMMENT ON COLUMN "publication"."volumes_total" IS 'Anzahl Bände';
 
 COMMENT ON COLUMN "publication"."comment" IS 'Anmerkungen';
 
@@ -157,26 +166,6 @@ CREATE TABLE "work"
     "directoryname" TEXT,
     PRIMARY KEY ("id")
 );
-
------------------------------------------------------------------------
--- printrun
------------------------------------------------------------------------
-
-DROP TABLE IF EXISTS "printrun" CASCADE;
-
-CREATE TABLE "printrun"
-(
-    "id" serial NOT NULL,
-    "name" TEXT,
-    "numeric" INTEGER,
-    "numpages" INTEGER,
-    "numpagesnormed" INTEGER,
-    PRIMARY KEY ("id")
-);
-
-COMMENT ON COLUMN "printrun"."name" IS 'Bezeichnung';
-
-COMMENT ON COLUMN "printrun"."numeric" IS 'Numerische Bezeichnung der Ausgabe';
 
 -----------------------------------------------------------------------
 -- publication_m
@@ -201,12 +190,12 @@ CREATE TABLE "publication_dm"
 (
     "id" serial NOT NULL,
     "publication_id" INTEGER NOT NULL,
-    "parent" INTEGER,
+    "title_id" INTEGER NOT NULL,
     "pages" TEXT,
     PRIMARY KEY ("id")
 );
 
-COMMENT ON COLUMN "publication_dm"."parent" IS 'Übergeordnetes Werk';
+COMMENT ON COLUMN "publication_dm"."title_id" IS 'Titel des übergeordneten Werkes';
 
 COMMENT ON COLUMN "publication_dm"."pages" IS 'Seitenangabe';
 
@@ -603,19 +592,6 @@ CREATE TABLE "dta_user"
 );
 
 -----------------------------------------------------------------------
--- relatedset
------------------------------------------------------------------------
-
-DROP TABLE IF EXISTS "relatedset" CASCADE;
-
-CREATE TABLE "relatedset"
-(
-    "id" serial NOT NULL,
-    "name" TEXT NOT NULL,
-    PRIMARY KEY ("id")
-);
-
------------------------------------------------------------------------
 -- task
 -----------------------------------------------------------------------
 
@@ -625,13 +601,17 @@ CREATE TABLE "task"
 (
     "id" serial NOT NULL,
     "tasktype_id" INTEGER NOT NULL,
-    "done" BOOLEAN,
-    "startdate" DATE,
-    "enddate" DATE,
+    "active" BOOLEAN,
+    "start_date" DATE,
+    "end_date" DATE,
+    "activated_date" DATE,
     "comments" TEXT,
     "publicationgroup_id" INTEGER,
     "publication_id" INTEGER,
+    "partner_id" INTEGER,
     "responsibleuser_id" INTEGER,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -661,18 +641,14 @@ CREATE TABLE "partner"
 (
     "id" serial NOT NULL,
     "name" TEXT,
-    "address" TEXT,
     "person" TEXT,
-    "mail" TEXT,
-    "web" TEXT,
+    "contact_data" TEXT,
     "comments" TEXT,
-    "phone1" TEXT,
-    "phone2" TEXT,
-    "phone3" TEXT,
-    "fax" TEXT,
     "is_organization" BOOLEAN DEFAULT 'f',
     PRIMARY KEY ("id")
 );
+
+COMMENT ON COLUMN "partner"."person" IS 'Ansprechpartner';
 
 -----------------------------------------------------------------------
 -- imagesource
@@ -786,22 +762,14 @@ ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_3"
     REFERENCES "place" ("id");
 
 ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_4"
-    FOREIGN KEY ("printrun_id")
-    REFERENCES "printrun" ("id");
-
-ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_5"
-    FOREIGN KEY ("relatedset_id")
-    REFERENCES "relatedset" ("id");
-
-ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_6"
     FOREIGN KEY ("publicationdate_id")
     REFERENCES "datespecification" ("id");
 
-ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_7"
+ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_5"
     FOREIGN KEY ("firstpublicationdate_id")
     REFERENCES "datespecification" ("id");
 
-ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_8"
+ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_6"
     FOREIGN KEY ("font_id")
     REFERENCES "font" ("id");
 
@@ -819,10 +787,6 @@ ALTER TABLE "publication_m" ADD CONSTRAINT "publication_m_FK_1"
 
 ALTER TABLE "publication_dm" ADD CONSTRAINT "publication_dm_FK_1"
     FOREIGN KEY ("publication_id")
-    REFERENCES "publication" ("id");
-
-ALTER TABLE "publication_dm" ADD CONSTRAINT "publication_dm_FK_2"
-    FOREIGN KEY ("parent")
     REFERENCES "publication" ("id");
 
 ALTER TABLE "publication_mm" ADD CONSTRAINT "publication_mm_FK_1"
@@ -858,10 +822,6 @@ ALTER TABLE "publication_ja" ADD CONSTRAINT "publication_ja_FK_1"
     REFERENCES "publication" ("id");
 
 ALTER TABLE "publication_ja" ADD CONSTRAINT "publication_ja_FK_2"
-    FOREIGN KEY ("parent")
-    REFERENCES "publication" ("id");
-
-ALTER TABLE "publication_ja" ADD CONSTRAINT "publication_ja_FK_3"
     FOREIGN KEY ("volume_id")
     REFERENCES "volume" ("id");
 
@@ -985,6 +945,10 @@ ALTER TABLE "task" ADD CONSTRAINT "task_FK_3"
     REFERENCES "publication" ("id");
 
 ALTER TABLE "task" ADD CONSTRAINT "task_FK_4"
+    FOREIGN KEY ("partner_id")
+    REFERENCES "partner" ("id");
+
+ALTER TABLE "task" ADD CONSTRAINT "task_FK_5"
     FOREIGN KEY ("responsibleuser_id")
     REFERENCES "dta_user" ("id");
 

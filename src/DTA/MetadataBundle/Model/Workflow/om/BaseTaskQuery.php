@@ -14,6 +14,7 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use DTA\MetadataBundle\Model\Data\Publication;
 use DTA\MetadataBundle\Model\Master\DtaUser;
+use DTA\MetadataBundle\Model\Workflow\Partner;
 use DTA\MetadataBundle\Model\Workflow\Publicationgroup;
 use DTA\MetadataBundle\Model\Workflow\Task;
 use DTA\MetadataBundle\Model\Workflow\TaskPeer;
@@ -24,22 +25,28 @@ use DTA\MetadataBundle\Model\Workflow\Tasktype;
  * @method TaskQuery orderById($order = Criteria::ASC) Order by the id column
  * @method TaskQuery orderByTasktypeId($order = Criteria::ASC) Order by the tasktype_id column
  * @method TaskQuery orderByDone($order = Criteria::ASC) Order by the done column
- * @method TaskQuery orderByStartdate($order = Criteria::ASC) Order by the startdate column
- * @method TaskQuery orderByEnddate($order = Criteria::ASC) Order by the enddate column
+ * @method TaskQuery orderByStartDate($order = Criteria::ASC) Order by the start_date column
+ * @method TaskQuery orderByEndDate($order = Criteria::ASC) Order by the end_date column
  * @method TaskQuery orderByComments($order = Criteria::ASC) Order by the comments column
  * @method TaskQuery orderByPublicationgroupId($order = Criteria::ASC) Order by the publicationgroup_id column
  * @method TaskQuery orderByPublicationId($order = Criteria::ASC) Order by the publication_id column
+ * @method TaskQuery orderByPartnerId($order = Criteria::ASC) Order by the partner_id column
  * @method TaskQuery orderByResponsibleuserId($order = Criteria::ASC) Order by the responsibleuser_id column
+ * @method TaskQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method TaskQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method TaskQuery groupById() Group by the id column
  * @method TaskQuery groupByTasktypeId() Group by the tasktype_id column
  * @method TaskQuery groupByDone() Group by the done column
- * @method TaskQuery groupByStartdate() Group by the startdate column
- * @method TaskQuery groupByEnddate() Group by the enddate column
+ * @method TaskQuery groupByStartDate() Group by the start_date column
+ * @method TaskQuery groupByEndDate() Group by the end_date column
  * @method TaskQuery groupByComments() Group by the comments column
  * @method TaskQuery groupByPublicationgroupId() Group by the publicationgroup_id column
  * @method TaskQuery groupByPublicationId() Group by the publication_id column
+ * @method TaskQuery groupByPartnerId() Group by the partner_id column
  * @method TaskQuery groupByResponsibleuserId() Group by the responsibleuser_id column
+ * @method TaskQuery groupByCreatedAt() Group by the created_at column
+ * @method TaskQuery groupByUpdatedAt() Group by the updated_at column
  *
  * @method TaskQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method TaskQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -57,6 +64,10 @@ use DTA\MetadataBundle\Model\Workflow\Tasktype;
  * @method TaskQuery rightJoinPublication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Publication relation
  * @method TaskQuery innerJoinPublication($relationAlias = null) Adds a INNER JOIN clause to the query using the Publication relation
  *
+ * @method TaskQuery leftJoinPartner($relationAlias = null) Adds a LEFT JOIN clause to the query using the Partner relation
+ * @method TaskQuery rightJoinPartner($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Partner relation
+ * @method TaskQuery innerJoinPartner($relationAlias = null) Adds a INNER JOIN clause to the query using the Partner relation
+ *
  * @method TaskQuery leftJoinDtaUser($relationAlias = null) Adds a LEFT JOIN clause to the query using the DtaUser relation
  * @method TaskQuery rightJoinDtaUser($relationAlias = null) Adds a RIGHT JOIN clause to the query using the DtaUser relation
  * @method TaskQuery innerJoinDtaUser($relationAlias = null) Adds a INNER JOIN clause to the query using the DtaUser relation
@@ -66,22 +77,28 @@ use DTA\MetadataBundle\Model\Workflow\Tasktype;
  *
  * @method Task findOneByTasktypeId(int $tasktype_id) Return the first Task filtered by the tasktype_id column
  * @method Task findOneByDone(boolean $done) Return the first Task filtered by the done column
- * @method Task findOneByStartdate(string $startdate) Return the first Task filtered by the startdate column
- * @method Task findOneByEnddate(string $enddate) Return the first Task filtered by the enddate column
+ * @method Task findOneByStartDate(string $start_date) Return the first Task filtered by the start_date column
+ * @method Task findOneByEndDate(string $end_date) Return the first Task filtered by the end_date column
  * @method Task findOneByComments(string $comments) Return the first Task filtered by the comments column
  * @method Task findOneByPublicationgroupId(int $publicationgroup_id) Return the first Task filtered by the publicationgroup_id column
  * @method Task findOneByPublicationId(int $publication_id) Return the first Task filtered by the publication_id column
+ * @method Task findOneByPartnerId(int $partner_id) Return the first Task filtered by the partner_id column
  * @method Task findOneByResponsibleuserId(int $responsibleuser_id) Return the first Task filtered by the responsibleuser_id column
+ * @method Task findOneByCreatedAt(string $created_at) Return the first Task filtered by the created_at column
+ * @method Task findOneByUpdatedAt(string $updated_at) Return the first Task filtered by the updated_at column
  *
  * @method array findById(int $id) Return Task objects filtered by the id column
  * @method array findByTasktypeId(int $tasktype_id) Return Task objects filtered by the tasktype_id column
  * @method array findByDone(boolean $done) Return Task objects filtered by the done column
- * @method array findByStartdate(string $startdate) Return Task objects filtered by the startdate column
- * @method array findByEnddate(string $enddate) Return Task objects filtered by the enddate column
+ * @method array findByStartDate(string $start_date) Return Task objects filtered by the start_date column
+ * @method array findByEndDate(string $end_date) Return Task objects filtered by the end_date column
  * @method array findByComments(string $comments) Return Task objects filtered by the comments column
  * @method array findByPublicationgroupId(int $publicationgroup_id) Return Task objects filtered by the publicationgroup_id column
  * @method array findByPublicationId(int $publication_id) Return Task objects filtered by the publication_id column
+ * @method array findByPartnerId(int $partner_id) Return Task objects filtered by the partner_id column
  * @method array findByResponsibleuserId(int $responsibleuser_id) Return Task objects filtered by the responsibleuser_id column
+ * @method array findByCreatedAt(string $created_at) Return Task objects filtered by the created_at column
+ * @method array findByUpdatedAt(string $updated_at) Return Task objects filtered by the updated_at column
  */
 abstract class BaseTaskQuery extends ModelCriteria
 {
@@ -183,7 +200,7 @@ abstract class BaseTaskQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "tasktype_id", "done", "startdate", "enddate", "comments", "publicationgroup_id", "publication_id", "responsibleuser_id" FROM "task" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "tasktype_id", "done", "start_date", "end_date", "comments", "publicationgroup_id", "publication_id", "partner_id", "responsibleuser_id", "created_at", "updated_at" FROM "task" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -386,16 +403,16 @@ abstract class BaseTaskQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the startdate column
+     * Filter the query on the start_date column
      *
      * Example usage:
      * <code>
-     * $query->filterByStartdate('2011-03-14'); // WHERE startdate = '2011-03-14'
-     * $query->filterByStartdate('now'); // WHERE startdate = '2011-03-14'
-     * $query->filterByStartdate(array('max' => 'yesterday')); // WHERE startdate > '2011-03-13'
+     * $query->filterByStartDate('2011-03-14'); // WHERE start_date = '2011-03-14'
+     * $query->filterByStartDate('now'); // WHERE start_date = '2011-03-14'
+     * $query->filterByStartDate(array('max' => 'yesterday')); // WHERE start_date > '2011-03-13'
      * </code>
      *
-     * @param     mixed $startdate The value to use as filter.
+     * @param     mixed $startDate The value to use as filter.
      *              Values can be integers (unix timestamps), DateTime objects, or strings.
      *              Empty strings are treated as NULL.
      *              Use scalar values for equality.
@@ -405,16 +422,16 @@ abstract class BaseTaskQuery extends ModelCriteria
      *
      * @return TaskQuery The current query, for fluid interface
      */
-    public function filterByStartdate($startdate = null, $comparison = null)
+    public function filterByStartDate($startDate = null, $comparison = null)
     {
-        if (is_array($startdate)) {
+        if (is_array($startDate)) {
             $useMinMax = false;
-            if (isset($startdate['min'])) {
-                $this->addUsingAlias(TaskPeer::STARTDATE, $startdate['min'], Criteria::GREATER_EQUAL);
+            if (isset($startDate['min'])) {
+                $this->addUsingAlias(TaskPeer::START_DATE, $startDate['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($startdate['max'])) {
-                $this->addUsingAlias(TaskPeer::STARTDATE, $startdate['max'], Criteria::LESS_EQUAL);
+            if (isset($startDate['max'])) {
+                $this->addUsingAlias(TaskPeer::START_DATE, $startDate['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -425,20 +442,20 @@ abstract class BaseTaskQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(TaskPeer::STARTDATE, $startdate, $comparison);
+        return $this->addUsingAlias(TaskPeer::START_DATE, $startDate, $comparison);
     }
 
     /**
-     * Filter the query on the enddate column
+     * Filter the query on the end_date column
      *
      * Example usage:
      * <code>
-     * $query->filterByEnddate('2011-03-14'); // WHERE enddate = '2011-03-14'
-     * $query->filterByEnddate('now'); // WHERE enddate = '2011-03-14'
-     * $query->filterByEnddate(array('max' => 'yesterday')); // WHERE enddate > '2011-03-13'
+     * $query->filterByEndDate('2011-03-14'); // WHERE end_date = '2011-03-14'
+     * $query->filterByEndDate('now'); // WHERE end_date = '2011-03-14'
+     * $query->filterByEndDate(array('max' => 'yesterday')); // WHERE end_date > '2011-03-13'
      * </code>
      *
-     * @param     mixed $enddate The value to use as filter.
+     * @param     mixed $endDate The value to use as filter.
      *              Values can be integers (unix timestamps), DateTime objects, or strings.
      *              Empty strings are treated as NULL.
      *              Use scalar values for equality.
@@ -448,16 +465,16 @@ abstract class BaseTaskQuery extends ModelCriteria
      *
      * @return TaskQuery The current query, for fluid interface
      */
-    public function filterByEnddate($enddate = null, $comparison = null)
+    public function filterByEndDate($endDate = null, $comparison = null)
     {
-        if (is_array($enddate)) {
+        if (is_array($endDate)) {
             $useMinMax = false;
-            if (isset($enddate['min'])) {
-                $this->addUsingAlias(TaskPeer::ENDDATE, $enddate['min'], Criteria::GREATER_EQUAL);
+            if (isset($endDate['min'])) {
+                $this->addUsingAlias(TaskPeer::END_DATE, $endDate['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($enddate['max'])) {
-                $this->addUsingAlias(TaskPeer::ENDDATE, $enddate['max'], Criteria::LESS_EQUAL);
+            if (isset($endDate['max'])) {
+                $this->addUsingAlias(TaskPeer::END_DATE, $endDate['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -468,7 +485,7 @@ abstract class BaseTaskQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(TaskPeer::ENDDATE, $enddate, $comparison);
+        return $this->addUsingAlias(TaskPeer::END_DATE, $endDate, $comparison);
     }
 
     /**
@@ -589,6 +606,50 @@ abstract class BaseTaskQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the partner_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPartnerId(1234); // WHERE partner_id = 1234
+     * $query->filterByPartnerId(array(12, 34)); // WHERE partner_id IN (12, 34)
+     * $query->filterByPartnerId(array('min' => 12)); // WHERE partner_id >= 12
+     * $query->filterByPartnerId(array('max' => 12)); // WHERE partner_id <= 12
+     * </code>
+     *
+     * @see       filterByPartner()
+     *
+     * @param     mixed $partnerId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return TaskQuery The current query, for fluid interface
+     */
+    public function filterByPartnerId($partnerId = null, $comparison = null)
+    {
+        if (is_array($partnerId)) {
+            $useMinMax = false;
+            if (isset($partnerId['min'])) {
+                $this->addUsingAlias(TaskPeer::PARTNER_ID, $partnerId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($partnerId['max'])) {
+                $this->addUsingAlias(TaskPeer::PARTNER_ID, $partnerId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(TaskPeer::PARTNER_ID, $partnerId, $comparison);
+    }
+
+    /**
      * Filter the query on the responsibleuser_id column
      *
      * Example usage:
@@ -630,6 +691,92 @@ abstract class BaseTaskQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(TaskPeer::RESPONSIBLEUSER_ID, $responsibleuserId, $comparison);
+    }
+
+    /**
+     * Filter the query on the created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return TaskQuery The current query, for fluid interface
+     */
+    public function filterByCreatedAt($createdAt = null, $comparison = null)
+    {
+        if (is_array($createdAt)) {
+            $useMinMax = false;
+            if (isset($createdAt['min'])) {
+                $this->addUsingAlias(TaskPeer::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($createdAt['max'])) {
+                $this->addUsingAlias(TaskPeer::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(TaskPeer::CREATED_AT, $createdAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the updated_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return TaskQuery The current query, for fluid interface
+     */
+    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+    {
+        if (is_array($updatedAt)) {
+            $useMinMax = false;
+            if (isset($updatedAt['min'])) {
+                $this->addUsingAlias(TaskPeer::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($updatedAt['max'])) {
+                $this->addUsingAlias(TaskPeer::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(TaskPeer::UPDATED_AT, $updatedAt, $comparison);
     }
 
     /**
@@ -861,6 +1008,82 @@ abstract class BaseTaskQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related Partner object
+     *
+     * @param   Partner|PropelObjectCollection $partner The related object(s) to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 TaskQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByPartner($partner, $comparison = null)
+    {
+        if ($partner instanceof Partner) {
+            return $this
+                ->addUsingAlias(TaskPeer::PARTNER_ID, $partner->getId(), $comparison);
+        } elseif ($partner instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(TaskPeer::PARTNER_ID, $partner->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByPartner() only accepts arguments of type Partner or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Partner relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return TaskQuery The current query, for fluid interface
+     */
+    public function joinPartner($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Partner');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Partner');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Partner relation Partner object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\Workflow\PartnerQuery A secondary query class using the current class as primary query
+     */
+    public function usePartnerQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinPartner($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Partner', '\DTA\MetadataBundle\Model\Workflow\PartnerQuery');
+    }
+
+    /**
      * Filter the query by a related DtaUser object
      *
      * @param   DtaUser|PropelObjectCollection $dtaUser The related object(s) to use as filter
@@ -952,4 +1175,69 @@ abstract class BaseTaskQuery extends ModelCriteria
         return $this;
     }
 
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     TaskQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(TaskPeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     TaskQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(TaskPeer::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     TaskQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(TaskPeer::UPDATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     TaskQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(TaskPeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     TaskQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(TaskPeer::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     TaskQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(TaskPeer::CREATED_AT);
+    }
 }

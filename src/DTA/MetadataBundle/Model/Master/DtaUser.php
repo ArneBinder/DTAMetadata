@@ -8,11 +8,10 @@ class DtaUser extends BaseDtaUser implements \Symfony\Component\Security\Core\Us
 
     protected $encoderFactory;
 
-//    public function __construct($encoderFactory = null){
-//        $this->encoderFactory = $encoderFactory;
-//        parent::__construct();
-//    }
-
+    public function __toString(){
+        return $this->getUsername();
+    }
+    
     public function eraseCredentials() {
         
     }

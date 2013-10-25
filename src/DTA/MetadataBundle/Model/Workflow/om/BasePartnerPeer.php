@@ -31,13 +31,13 @@ abstract class BasePartnerPeer
     const TM_CLASS = 'PartnerTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 12;
+    const NUM_COLUMNS = 6;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 12;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /** the column name for the id field */
     const ID = 'partner.id';
@@ -45,32 +45,14 @@ abstract class BasePartnerPeer
     /** the column name for the name field */
     const NAME = 'partner.name';
 
-    /** the column name for the address field */
-    const ADDRESS = 'partner.address';
-
     /** the column name for the person field */
     const PERSON = 'partner.person';
 
-    /** the column name for the mail field */
-    const MAIL = 'partner.mail';
-
-    /** the column name for the web field */
-    const WEB = 'partner.web';
+    /** the column name for the contact_data field */
+    const CONTACT_DATA = 'partner.contact_data';
 
     /** the column name for the comments field */
     const COMMENTS = 'partner.comments';
-
-    /** the column name for the phone1 field */
-    const PHONE1 = 'partner.phone1';
-
-    /** the column name for the phone2 field */
-    const PHONE2 = 'partner.phone2';
-
-    /** the column name for the phone3 field */
-    const PHONE3 = 'partner.phone3';
-
-    /** the column name for the fax field */
-    const FAX = 'partner.fax';
 
     /** the column name for the is_organization field */
     const IS_ORGANIZATION = 'partner.is_organization';
@@ -94,12 +76,12 @@ abstract class BasePartnerPeer
      * e.g. PartnerPeer::$fieldNames[PartnerPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'Address', 'Person', 'Mail', 'Web', 'Comments', 'Phone1', 'Phone2', 'Phone3', 'Fax', 'IsOrganization', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'address', 'person', 'mail', 'web', 'comments', 'phone1', 'phone2', 'phone3', 'fax', 'isOrganization', ),
-        BasePeer::TYPE_COLNAME => array (PartnerPeer::ID, PartnerPeer::NAME, PartnerPeer::ADDRESS, PartnerPeer::PERSON, PartnerPeer::MAIL, PartnerPeer::WEB, PartnerPeer::COMMENTS, PartnerPeer::PHONE1, PartnerPeer::PHONE2, PartnerPeer::PHONE3, PartnerPeer::FAX, PartnerPeer::IS_ORGANIZATION, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'ADDRESS', 'PERSON', 'MAIL', 'WEB', 'COMMENTS', 'PHONE1', 'PHONE2', 'PHONE3', 'FAX', 'IS_ORGANIZATION', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'address', 'person', 'mail', 'web', 'comments', 'phone1', 'phone2', 'phone3', 'fax', 'is_organization', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'Person', 'ContactData', 'Comments', 'IsOrganization', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'person', 'contactData', 'comments', 'isOrganization', ),
+        BasePeer::TYPE_COLNAME => array (PartnerPeer::ID, PartnerPeer::NAME, PartnerPeer::PERSON, PartnerPeer::CONTACT_DATA, PartnerPeer::COMMENTS, PartnerPeer::IS_ORGANIZATION, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'PERSON', 'CONTACT_DATA', 'COMMENTS', 'IS_ORGANIZATION', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'person', 'contact_data', 'comments', 'is_organization', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -109,12 +91,12 @@ abstract class BasePartnerPeer
      * e.g. PartnerPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'Address' => 2, 'Person' => 3, 'Mail' => 4, 'Web' => 5, 'Comments' => 6, 'Phone1' => 7, 'Phone2' => 8, 'Phone3' => 9, 'Fax' => 10, 'IsOrganization' => 11, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'address' => 2, 'person' => 3, 'mail' => 4, 'web' => 5, 'comments' => 6, 'phone1' => 7, 'phone2' => 8, 'phone3' => 9, 'fax' => 10, 'isOrganization' => 11, ),
-        BasePeer::TYPE_COLNAME => array (PartnerPeer::ID => 0, PartnerPeer::NAME => 1, PartnerPeer::ADDRESS => 2, PartnerPeer::PERSON => 3, PartnerPeer::MAIL => 4, PartnerPeer::WEB => 5, PartnerPeer::COMMENTS => 6, PartnerPeer::PHONE1 => 7, PartnerPeer::PHONE2 => 8, PartnerPeer::PHONE3 => 9, PartnerPeer::FAX => 10, PartnerPeer::IS_ORGANIZATION => 11, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'ADDRESS' => 2, 'PERSON' => 3, 'MAIL' => 4, 'WEB' => 5, 'COMMENTS' => 6, 'PHONE1' => 7, 'PHONE2' => 8, 'PHONE3' => 9, 'FAX' => 10, 'IS_ORGANIZATION' => 11, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'address' => 2, 'person' => 3, 'mail' => 4, 'web' => 5, 'comments' => 6, 'phone1' => 7, 'phone2' => 8, 'phone3' => 9, 'fax' => 10, 'is_organization' => 11, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'Person' => 2, 'ContactData' => 3, 'Comments' => 4, 'IsOrganization' => 5, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'person' => 2, 'contactData' => 3, 'comments' => 4, 'isOrganization' => 5, ),
+        BasePeer::TYPE_COLNAME => array (PartnerPeer::ID => 0, PartnerPeer::NAME => 1, PartnerPeer::PERSON => 2, PartnerPeer::CONTACT_DATA => 3, PartnerPeer::COMMENTS => 4, PartnerPeer::IS_ORGANIZATION => 5, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'PERSON' => 2, 'CONTACT_DATA' => 3, 'COMMENTS' => 4, 'IS_ORGANIZATION' => 5, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'person' => 2, 'contact_data' => 3, 'comments' => 4, 'is_organization' => 5, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -190,28 +172,16 @@ abstract class BasePartnerPeer
         if (null === $alias) {
             $criteria->addSelectColumn(PartnerPeer::ID);
             $criteria->addSelectColumn(PartnerPeer::NAME);
-            $criteria->addSelectColumn(PartnerPeer::ADDRESS);
             $criteria->addSelectColumn(PartnerPeer::PERSON);
-            $criteria->addSelectColumn(PartnerPeer::MAIL);
-            $criteria->addSelectColumn(PartnerPeer::WEB);
+            $criteria->addSelectColumn(PartnerPeer::CONTACT_DATA);
             $criteria->addSelectColumn(PartnerPeer::COMMENTS);
-            $criteria->addSelectColumn(PartnerPeer::PHONE1);
-            $criteria->addSelectColumn(PartnerPeer::PHONE2);
-            $criteria->addSelectColumn(PartnerPeer::PHONE3);
-            $criteria->addSelectColumn(PartnerPeer::FAX);
             $criteria->addSelectColumn(PartnerPeer::IS_ORGANIZATION);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.name');
-            $criteria->addSelectColumn($alias . '.address');
             $criteria->addSelectColumn($alias . '.person');
-            $criteria->addSelectColumn($alias . '.mail');
-            $criteria->addSelectColumn($alias . '.web');
+            $criteria->addSelectColumn($alias . '.contact_data');
             $criteria->addSelectColumn($alias . '.comments');
-            $criteria->addSelectColumn($alias . '.phone1');
-            $criteria->addSelectColumn($alias . '.phone2');
-            $criteria->addSelectColumn($alias . '.phone3');
-            $criteria->addSelectColumn($alias . '.fax');
             $criteria->addSelectColumn($alias . '.is_organization');
         }
     }

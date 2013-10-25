@@ -397,11 +397,6 @@ DTA\MetadataBundle\Model\Data\Place:
     Place_7:
         name: 'Monet en la Isle'
         gnd: '2'
-DTA\MetadataBundle\Model\Data\Printrun:
-    Printrun_2: {  }
-    Printrun_1:
-        name: 'Zweite, vollständig überarbeitete Ausgabe'
-        numeric: 2
 DTA\MetadataBundle\Model\Data\Title:
     Title_1: {  }
     Title_2: {  }
@@ -427,14 +422,12 @@ DTA\MetadataBundle\Model\Data\Publication:
         place_id: Place_2
         publicationdate_id: Datespecification_5
         firstpublicationdate_id: Datespecification_6
-        printrun_id: Printrun_2
         publishingcompany_id: Publishingcompany_1
     Publication_1:
         work_id: Work_1
         place_id: Place_1
         publicationdate_id: Datespecification_2
         firstpublicationdate_id: Datespecification_3
-        printrun_id: Printrun_1
         publishingcompany_id: Publishingcompany_4
         font_id: Font_2
 DTA\MetadataBundle\Model\Data\PublicationM:
@@ -467,6 +460,9 @@ DTA\MetadataBundle\Model\Master\CategoryWork:
         category_id: Category_1
         work_id: Work_1
 DTA\MetadataBundle\Model\Master\DtaUser:
+    DtaUser_1:
+        username: Susanne
+        admin: false
     DtaUser_2:
         username: Matthias
         password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
@@ -487,41 +483,6 @@ DTA\MetadataBundle\Model\Master\DtaUser:
         username: Carl
         password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
         admin: true
-    DtaUser_7:
-        username: cc
-        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
-        admin: false
-    DtaUser_8:
-        username: cc
-        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
-        admin: false
-    DtaUser_9:
-        username: cc
-        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
-        admin: false
-    DtaUser_10:
-        username: cc
-        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
-        admin: false
-    DtaUser_11:
-        username: cc
-        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
-        admin: false
-    DtaUser_12:
-        username: cc
-        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
-        admin: false
-    DtaUser_13:
-        username: cc
-        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
-        admin: false
-    DtaUser_14:
-        username: cc
-        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
-        admin: false
-    DtaUser_1:
-        username: Susanne
-        admin: false
 DTA\MetadataBundle\Model\Master\GenreWork:
     GenreWork_2:
         genre_id: Genre_7

@@ -9,7 +9,7 @@
     propel > dbal > connections for connection setup or ./runtime-conf.xml if that doesn't work -->
 <database name="DTAMetadata" namespace="DTA\MetadataBundle\Model\Master" defaultIdMethod="native">
   
-    <behavior name="auto_add_pk" />
+    <behavior name="auto_add_pk"/>
     
     <!-- This parameter set is added to each entity that doesn't implement the table_row_view behavior. 
     It is not added to tables/entities that define the bahavior. -->
@@ -74,12 +74,12 @@
     </table>
 
     <table name="dta_user">
-        <column name="username" type="LONGVARCHAR" required="false"/>
-        <column name="password" type="VARCHAR" size="512" required="false"/>
-        <column name="salt" type="VARCHAR" size="512" required="false"/>
-        <column name="mail" type="LONGVARCHAR" required="false"/>
-        <column name="phone" type="LONGVARCHAR" required="false"/>
-        <column name="admin" type="BOOLEAN" default="false" required="false"/>
+        <column name="username" type="LONGVARCHAR"/>
+        <column name="password" type="VARCHAR" size="512"/>
+        <column name="salt" type="VARCHAR" size="512"/>
+        <column name="mail" type="LONGVARCHAR"/>
+        <column name="phone" type="LONGVARCHAR"/>
+        <column name="admin" type="BOOLEAN" default="false"/>
         
         <behavior name="table_row_view">
             <parameter name="id" value="id"/>

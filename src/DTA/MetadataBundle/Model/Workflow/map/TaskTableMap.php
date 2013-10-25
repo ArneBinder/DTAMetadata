@@ -46,12 +46,15 @@ class TaskTableMap extends TableMap
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('tasktype_id', 'TasktypeId', 'INTEGER', 'tasktype', 'id', true, null, null);
         $this->addColumn('done', 'Done', 'BOOLEAN', false, null, null);
-        $this->addColumn('startdate', 'Startdate', 'DATE', false, null, null);
-        $this->addColumn('enddate', 'Enddate', 'DATE', false, null, null);
+        $this->addColumn('start_date', 'StartDate', 'DATE', false, null, null);
+        $this->addColumn('end_date', 'EndDate', 'DATE', false, null, null);
         $this->addColumn('comments', 'Comments', 'LONGVARCHAR', false, null, null);
         $this->addForeignKey('publicationgroup_id', 'PublicationgroupId', 'INTEGER', 'publicationgroup', 'id', false, null, null);
         $this->addForeignKey('publication_id', 'PublicationId', 'INTEGER', 'publication', 'id', false, null, null);
+        $this->addForeignKey('partner_id', 'PartnerId', 'INTEGER', 'partner', 'id', false, null, null);
         $this->addForeignKey('responsibleuser_id', 'ResponsibleuserId', 'INTEGER', 'dta_user', 'id', false, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -63,6 +66,7 @@ class TaskTableMap extends TableMap
         $this->addRelation('Tasktype', 'DTA\\MetadataBundle\\Model\\Workflow\\Tasktype', RelationMap::MANY_TO_ONE, array('tasktype_id' => 'id', ), null, null);
         $this->addRelation('Publicationgroup', 'DTA\\MetadataBundle\\Model\\Workflow\\Publicationgroup', RelationMap::MANY_TO_ONE, array('publicationgroup_id' => 'id', ), null, null);
         $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::MANY_TO_ONE, array('publication_id' => 'id', ), null, null);
+        $this->addRelation('Partner', 'DTA\\MetadataBundle\\Model\\Workflow\\Partner', RelationMap::MANY_TO_ONE, array('partner_id' => 'id', ), null, null);
         $this->addRelation('DtaUser', 'DTA\\MetadataBundle\\Model\\Master\\DtaUser', RelationMap::MANY_TO_ONE, array('responsibleuser_id' => 'id', ), null, null);
     } // buildRelations()
 
@@ -75,16 +79,18 @@ class TaskTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
+),
             'table_row_view' =>  array (
-  'Id' => 'id',
-  'TasktypeId' => 'tasktype_id',
-  'Done' => 'done',
-  'Startdate' => 'startdate',
-  'Enddate' => 'enddate',
-  'Comments' => 'comments',
-  'PublicationgroupId' => 'publicationgroup_id',
-  'PublicationId' => 'publication_id',
-  'ResponsibleuserId' => 'responsibleuser_id',
+  'embedColumns1' => 'tasktype',
+  'Abgeschlossen' => 'done',
+  'Start' => 'start_date',
+  'Ende' => 'end_date',
+  'Für' => 'accessor:getReferee',
+  'Verantwortlich' => 'accessor:getResponsibleUser',
 ),
         );
     } // getBehaviors()

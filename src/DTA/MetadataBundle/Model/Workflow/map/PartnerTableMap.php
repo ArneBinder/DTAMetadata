@@ -45,15 +45,9 @@ class PartnerTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('name', 'Name', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('address', 'Address', 'LONGVARCHAR', false, null, null);
         $this->addColumn('person', 'Person', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('mail', 'Mail', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('web', 'Web', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('contact_data', 'ContactData', 'LONGVARCHAR', false, null, null);
         $this->addColumn('comments', 'Comments', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('phone1', 'Phone1', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('phone2', 'Phone2', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('phone3', 'Phone3', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('fax', 'Fax', 'LONGVARCHAR', false, null, null);
         $this->addColumn('is_organization', 'IsOrganization', 'BOOLEAN', false, null, false);
         // validators
     } // initialize()
@@ -63,6 +57,7 @@ class PartnerTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('Task', 'DTA\\MetadataBundle\\Model\\Workflow\\Task', RelationMap::ONE_TO_MANY, array('id' => 'partner_id', ), null, null, 'Tasks');
         $this->addRelation('Imagesource', 'DTA\\MetadataBundle\\Model\\Workflow\\Imagesource', RelationMap::ONE_TO_MANY, array('id' => 'partner_id', ), 'SET NULL', null, 'Imagesources');
         $this->addRelation('Textsource', 'DTA\\MetadataBundle\\Model\\Workflow\\Textsource', RelationMap::ONE_TO_MANY, array('id' => 'partner_id', ), 'SET NULL', null, 'Textsources');
     } // buildRelations()
@@ -79,15 +74,9 @@ class PartnerTableMap extends TableMap
             'table_row_view' =>  array (
   'Id' => 'id',
   'Name' => 'name',
-  'Address' => 'address',
   'Person' => 'person',
-  'Mail' => 'mail',
-  'Web' => 'web',
+  'ContactData' => 'contact_data',
   'Comments' => 'comments',
-  'Phone1' => 'phone1',
-  'Phone2' => 'phone2',
-  'Phone3' => 'phone3',
-  'Fax' => 'fax',
   'IsOrganization' => 'is_organization',
 ),
         );

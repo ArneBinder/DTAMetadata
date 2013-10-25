@@ -32,9 +32,9 @@
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
         <!--Ob diese Rolle auf eine Beziehung zwischen Personen und Publikationen angewandt werden darf (z.B. nicht Autor)-->
-        <column name="applicable_to_publication" type="BOOLEAN" required="false" default="false"/>
+        <column name="applicable_to_publication" type="BOOLEAN" default="false"/>
         <!--Ob diese Rolle auf eine Beziehung zwischen Personen und Werken angewandt werden darf (z.B. nicht Drucker)-->
-        <column name="applicable_to_work" type="BOOLEAN" required="false" default="false"/>
+        <column name="applicable_to_work" type="BOOLEAN" default="false"/>
     </table>
   
     <!--Korpora.--> 
@@ -62,7 +62,7 @@
     <table name="genre">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
-        <column name="childof" type="INTEGER" required="false"/>
+        <column name="childof" type="INTEGER"/>
         <foreign-key foreignTable="genre"> <reference local="childof" foreign="id"/> </foreign-key>
         <behavior name="table_row_view">
             <parameter name="name" value="name"/>

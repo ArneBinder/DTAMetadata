@@ -11,6 +11,7 @@ use \PropelException;
 use \PropelPDO;
 use DTA\MetadataBundle\Model\Data\PublicationPeer;
 use DTA\MetadataBundle\Model\Master\DtaUserPeer;
+use DTA\MetadataBundle\Model\Workflow\PartnerPeer;
 use DTA\MetadataBundle\Model\Workflow\PublicationgroupPeer;
 use DTA\MetadataBundle\Model\Workflow\Task;
 use DTA\MetadataBundle\Model\Workflow\TaskPeer;
@@ -33,13 +34,13 @@ abstract class BaseTaskPeer
     const TM_CLASS = 'TaskTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 9;
+    const NUM_COLUMNS = 12;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 9;
+    const NUM_HYDRATE_COLUMNS = 12;
 
     /** the column name for the id field */
     const ID = 'task.id';
@@ -50,11 +51,11 @@ abstract class BaseTaskPeer
     /** the column name for the done field */
     const DONE = 'task.done';
 
-    /** the column name for the startdate field */
-    const STARTDATE = 'task.startdate';
+    /** the column name for the start_date field */
+    const START_DATE = 'task.start_date';
 
-    /** the column name for the enddate field */
-    const ENDDATE = 'task.enddate';
+    /** the column name for the end_date field */
+    const END_DATE = 'task.end_date';
 
     /** the column name for the comments field */
     const COMMENTS = 'task.comments';
@@ -65,8 +66,17 @@ abstract class BaseTaskPeer
     /** the column name for the publication_id field */
     const PUBLICATION_ID = 'task.publication_id';
 
+    /** the column name for the partner_id field */
+    const PARTNER_ID = 'task.partner_id';
+
     /** the column name for the responsibleuser_id field */
     const RESPONSIBLEUSER_ID = 'task.responsibleuser_id';
+
+    /** the column name for the created_at field */
+    const CREATED_AT = 'task.created_at';
+
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'task.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -87,12 +97,12 @@ abstract class BaseTaskPeer
      * e.g. TaskPeer::$fieldNames[TaskPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'TasktypeId', 'Done', 'Startdate', 'Enddate', 'Comments', 'PublicationgroupId', 'PublicationId', 'ResponsibleuserId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'tasktypeId', 'done', 'startdate', 'enddate', 'comments', 'publicationgroupId', 'publicationId', 'responsibleuserId', ),
-        BasePeer::TYPE_COLNAME => array (TaskPeer::ID, TaskPeer::TASKTYPE_ID, TaskPeer::DONE, TaskPeer::STARTDATE, TaskPeer::ENDDATE, TaskPeer::COMMENTS, TaskPeer::PUBLICATIONGROUP_ID, TaskPeer::PUBLICATION_ID, TaskPeer::RESPONSIBLEUSER_ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TASKTYPE_ID', 'DONE', 'STARTDATE', 'ENDDATE', 'COMMENTS', 'PUBLICATIONGROUP_ID', 'PUBLICATION_ID', 'RESPONSIBLEUSER_ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'tasktype_id', 'done', 'startdate', 'enddate', 'comments', 'publicationgroup_id', 'publication_id', 'responsibleuser_id', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'TasktypeId', 'Done', 'StartDate', 'EndDate', 'Comments', 'PublicationgroupId', 'PublicationId', 'PartnerId', 'ResponsibleuserId', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'tasktypeId', 'done', 'startDate', 'endDate', 'comments', 'publicationgroupId', 'publicationId', 'partnerId', 'responsibleuserId', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (TaskPeer::ID, TaskPeer::TASKTYPE_ID, TaskPeer::DONE, TaskPeer::START_DATE, TaskPeer::END_DATE, TaskPeer::COMMENTS, TaskPeer::PUBLICATIONGROUP_ID, TaskPeer::PUBLICATION_ID, TaskPeer::PARTNER_ID, TaskPeer::RESPONSIBLEUSER_ID, TaskPeer::CREATED_AT, TaskPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TASKTYPE_ID', 'DONE', 'START_DATE', 'END_DATE', 'COMMENTS', 'PUBLICATIONGROUP_ID', 'PUBLICATION_ID', 'PARTNER_ID', 'RESPONSIBLEUSER_ID', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'tasktype_id', 'done', 'start_date', 'end_date', 'comments', 'publicationgroup_id', 'publication_id', 'partner_id', 'responsibleuser_id', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
     );
 
     /**
@@ -102,12 +112,12 @@ abstract class BaseTaskPeer
      * e.g. TaskPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'TasktypeId' => 1, 'Done' => 2, 'Startdate' => 3, 'Enddate' => 4, 'Comments' => 5, 'PublicationgroupId' => 6, 'PublicationId' => 7, 'ResponsibleuserId' => 8, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'tasktypeId' => 1, 'done' => 2, 'startdate' => 3, 'enddate' => 4, 'comments' => 5, 'publicationgroupId' => 6, 'publicationId' => 7, 'responsibleuserId' => 8, ),
-        BasePeer::TYPE_COLNAME => array (TaskPeer::ID => 0, TaskPeer::TASKTYPE_ID => 1, TaskPeer::DONE => 2, TaskPeer::STARTDATE => 3, TaskPeer::ENDDATE => 4, TaskPeer::COMMENTS => 5, TaskPeer::PUBLICATIONGROUP_ID => 6, TaskPeer::PUBLICATION_ID => 7, TaskPeer::RESPONSIBLEUSER_ID => 8, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TASKTYPE_ID' => 1, 'DONE' => 2, 'STARTDATE' => 3, 'ENDDATE' => 4, 'COMMENTS' => 5, 'PUBLICATIONGROUP_ID' => 6, 'PUBLICATION_ID' => 7, 'RESPONSIBLEUSER_ID' => 8, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'tasktype_id' => 1, 'done' => 2, 'startdate' => 3, 'enddate' => 4, 'comments' => 5, 'publicationgroup_id' => 6, 'publication_id' => 7, 'responsibleuser_id' => 8, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'TasktypeId' => 1, 'Done' => 2, 'StartDate' => 3, 'EndDate' => 4, 'Comments' => 5, 'PublicationgroupId' => 6, 'PublicationId' => 7, 'PartnerId' => 8, 'ResponsibleuserId' => 9, 'CreatedAt' => 10, 'UpdatedAt' => 11, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'tasktypeId' => 1, 'done' => 2, 'startDate' => 3, 'endDate' => 4, 'comments' => 5, 'publicationgroupId' => 6, 'publicationId' => 7, 'partnerId' => 8, 'responsibleuserId' => 9, 'createdAt' => 10, 'updatedAt' => 11, ),
+        BasePeer::TYPE_COLNAME => array (TaskPeer::ID => 0, TaskPeer::TASKTYPE_ID => 1, TaskPeer::DONE => 2, TaskPeer::START_DATE => 3, TaskPeer::END_DATE => 4, TaskPeer::COMMENTS => 5, TaskPeer::PUBLICATIONGROUP_ID => 6, TaskPeer::PUBLICATION_ID => 7, TaskPeer::PARTNER_ID => 8, TaskPeer::RESPONSIBLEUSER_ID => 9, TaskPeer::CREATED_AT => 10, TaskPeer::UPDATED_AT => 11, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TASKTYPE_ID' => 1, 'DONE' => 2, 'START_DATE' => 3, 'END_DATE' => 4, 'COMMENTS' => 5, 'PUBLICATIONGROUP_ID' => 6, 'PUBLICATION_ID' => 7, 'PARTNER_ID' => 8, 'RESPONSIBLEUSER_ID' => 9, 'CREATED_AT' => 10, 'UPDATED_AT' => 11, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'tasktype_id' => 1, 'done' => 2, 'start_date' => 3, 'end_date' => 4, 'comments' => 5, 'publicationgroup_id' => 6, 'publication_id' => 7, 'partner_id' => 8, 'responsibleuser_id' => 9, 'created_at' => 10, 'updated_at' => 11, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
     );
 
     /**
@@ -184,22 +194,28 @@ abstract class BaseTaskPeer
             $criteria->addSelectColumn(TaskPeer::ID);
             $criteria->addSelectColumn(TaskPeer::TASKTYPE_ID);
             $criteria->addSelectColumn(TaskPeer::DONE);
-            $criteria->addSelectColumn(TaskPeer::STARTDATE);
-            $criteria->addSelectColumn(TaskPeer::ENDDATE);
+            $criteria->addSelectColumn(TaskPeer::START_DATE);
+            $criteria->addSelectColumn(TaskPeer::END_DATE);
             $criteria->addSelectColumn(TaskPeer::COMMENTS);
             $criteria->addSelectColumn(TaskPeer::PUBLICATIONGROUP_ID);
             $criteria->addSelectColumn(TaskPeer::PUBLICATION_ID);
+            $criteria->addSelectColumn(TaskPeer::PARTNER_ID);
             $criteria->addSelectColumn(TaskPeer::RESPONSIBLEUSER_ID);
+            $criteria->addSelectColumn(TaskPeer::CREATED_AT);
+            $criteria->addSelectColumn(TaskPeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.tasktype_id');
             $criteria->addSelectColumn($alias . '.done');
-            $criteria->addSelectColumn($alias . '.startdate');
-            $criteria->addSelectColumn($alias . '.enddate');
+            $criteria->addSelectColumn($alias . '.start_date');
+            $criteria->addSelectColumn($alias . '.end_date');
             $criteria->addSelectColumn($alias . '.comments');
             $criteria->addSelectColumn($alias . '.publicationgroup_id');
             $criteria->addSelectColumn($alias . '.publication_id');
+            $criteria->addSelectColumn($alias . '.partner_id');
             $criteria->addSelectColumn($alias . '.responsibleuser_id');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -657,6 +673,57 @@ abstract class BaseTaskPeer
 
 
     /**
+     * Returns the number of rows matching criteria, joining the related Partner table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinPartner(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(TaskPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            TaskPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(TaskPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(TaskPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(TaskPeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
      * Returns the number of rows matching criteria, joining the related DtaUser table
      *
      * @param      Criteria $criteria
@@ -909,6 +976,73 @@ abstract class BaseTaskPeer
 
 
     /**
+     * Selects a collection of Task objects pre-filled with their Partner objects.
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Task objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinPartner(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(TaskPeer::DATABASE_NAME);
+        }
+
+        TaskPeer::addSelectColumns($criteria);
+        $startcol = TaskPeer::NUM_HYDRATE_COLUMNS;
+        PartnerPeer::addSelectColumns($criteria);
+
+        $criteria->addJoin(TaskPeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = TaskPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = TaskPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+
+                $cls = TaskPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                TaskPeer::addInstanceToPool($obj1, $key1);
+            } // if $obj1 already loaded
+
+            $key2 = PartnerPeer::getPrimaryKeyHashFromRow($row, $startcol);
+            if ($key2 !== null) {
+                $obj2 = PartnerPeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = PartnerPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol);
+                    PartnerPeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 already loaded
+
+                // Add the $obj1 (Task) to $obj2 (Partner)
+                $obj2->addTask($obj1);
+
+            } // if joined row was not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
      * Selects a collection of Task objects pre-filled with their DtaUser objects.
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
@@ -1017,6 +1151,8 @@ abstract class BaseTaskPeer
 
         $criteria->addJoin(TaskPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
 
+        $criteria->addJoin(TaskPeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
+
         $criteria->addJoin(TaskPeer::RESPONSIBLEUSER_ID, DtaUserPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
@@ -1062,14 +1198,19 @@ abstract class BaseTaskPeer
         PublicationPeer::addSelectColumns($criteria);
         $startcol5 = $startcol4 + PublicationPeer::NUM_HYDRATE_COLUMNS;
 
+        PartnerPeer::addSelectColumns($criteria);
+        $startcol6 = $startcol5 + PartnerPeer::NUM_HYDRATE_COLUMNS;
+
         DtaUserPeer::addSelectColumns($criteria);
-        $startcol6 = $startcol5 + DtaUserPeer::NUM_HYDRATE_COLUMNS;
+        $startcol7 = $startcol6 + DtaUserPeer::NUM_HYDRATE_COLUMNS;
 
         $criteria->addJoin(TaskPeer::TASKTYPE_ID, TasktypePeer::ID, $join_behavior);
 
         $criteria->addJoin(TaskPeer::PUBLICATIONGROUP_ID, PublicationgroupPeer::ID, $join_behavior);
 
         $criteria->addJoin(TaskPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
+
+        $criteria->addJoin(TaskPeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
 
         $criteria->addJoin(TaskPeer::RESPONSIBLEUSER_ID, DtaUserPeer::ID, $join_behavior);
 
@@ -1144,22 +1285,40 @@ abstract class BaseTaskPeer
                 $obj4->addTask($obj1);
             } // if joined row not null
 
-            // Add objects for joined DtaUser rows
+            // Add objects for joined Partner rows
 
-            $key5 = DtaUserPeer::getPrimaryKeyHashFromRow($row, $startcol5);
+            $key5 = PartnerPeer::getPrimaryKeyHashFromRow($row, $startcol5);
             if ($key5 !== null) {
-                $obj5 = DtaUserPeer::getInstanceFromPool($key5);
+                $obj5 = PartnerPeer::getInstanceFromPool($key5);
                 if (!$obj5) {
 
-                    $cls = DtaUserPeer::getOMClass();
+                    $cls = PartnerPeer::getOMClass();
 
                     $obj5 = new $cls();
                     $obj5->hydrate($row, $startcol5);
-                    DtaUserPeer::addInstanceToPool($obj5, $key5);
+                    PartnerPeer::addInstanceToPool($obj5, $key5);
                 } // if obj5 loaded
 
-                // Add the $obj1 (Task) to the collection in $obj5 (DtaUser)
+                // Add the $obj1 (Task) to the collection in $obj5 (Partner)
                 $obj5->addTask($obj1);
+            } // if joined row not null
+
+            // Add objects for joined DtaUser rows
+
+            $key6 = DtaUserPeer::getPrimaryKeyHashFromRow($row, $startcol6);
+            if ($key6 !== null) {
+                $obj6 = DtaUserPeer::getInstanceFromPool($key6);
+                if (!$obj6) {
+
+                    $cls = DtaUserPeer::getOMClass();
+
+                    $obj6 = new $cls();
+                    $obj6->hydrate($row, $startcol6);
+                    DtaUserPeer::addInstanceToPool($obj6, $key6);
+                } // if obj6 loaded
+
+                // Add the $obj1 (Task) to the collection in $obj6 (DtaUser)
+                $obj6->addTask($obj1);
             } // if joined row not null
 
             $results[] = $obj1;
@@ -1209,6 +1368,8 @@ abstract class BaseTaskPeer
         $criteria->addJoin(TaskPeer::PUBLICATIONGROUP_ID, PublicationgroupPeer::ID, $join_behavior);
 
         $criteria->addJoin(TaskPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
+
+        $criteria->addJoin(TaskPeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
 
         $criteria->addJoin(TaskPeer::RESPONSIBLEUSER_ID, DtaUserPeer::ID, $join_behavior);
 
@@ -1265,6 +1426,8 @@ abstract class BaseTaskPeer
 
         $criteria->addJoin(TaskPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
 
+        $criteria->addJoin(TaskPeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
+
         $criteria->addJoin(TaskPeer::RESPONSIBLEUSER_ID, DtaUserPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
@@ -1319,6 +1482,65 @@ abstract class BaseTaskPeer
         $criteria->addJoin(TaskPeer::TASKTYPE_ID, TasktypePeer::ID, $join_behavior);
 
         $criteria->addJoin(TaskPeer::PUBLICATIONGROUP_ID, PublicationgroupPeer::ID, $join_behavior);
+
+        $criteria->addJoin(TaskPeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
+
+        $criteria->addJoin(TaskPeer::RESPONSIBLEUSER_ID, DtaUserPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Partner table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAllExceptPartner(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(TaskPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            TaskPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
+
+        // Set the correct dbName
+        $criteria->setDbName(TaskPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(TaskPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(TaskPeer::TASKTYPE_ID, TasktypePeer::ID, $join_behavior);
+
+        $criteria->addJoin(TaskPeer::PUBLICATIONGROUP_ID, PublicationgroupPeer::ID, $join_behavior);
+
+        $criteria->addJoin(TaskPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
 
         $criteria->addJoin(TaskPeer::RESPONSIBLEUSER_ID, DtaUserPeer::ID, $join_behavior);
 
@@ -1377,6 +1599,8 @@ abstract class BaseTaskPeer
 
         $criteria->addJoin(TaskPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
 
+        $criteria->addJoin(TaskPeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
+
         $stmt = BasePeer::doCount($criteria, $con);
 
         if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
@@ -1420,12 +1644,17 @@ abstract class BaseTaskPeer
         PublicationPeer::addSelectColumns($criteria);
         $startcol4 = $startcol3 + PublicationPeer::NUM_HYDRATE_COLUMNS;
 
+        PartnerPeer::addSelectColumns($criteria);
+        $startcol5 = $startcol4 + PartnerPeer::NUM_HYDRATE_COLUMNS;
+
         DtaUserPeer::addSelectColumns($criteria);
-        $startcol5 = $startcol4 + DtaUserPeer::NUM_HYDRATE_COLUMNS;
+        $startcol6 = $startcol5 + DtaUserPeer::NUM_HYDRATE_COLUMNS;
 
         $criteria->addJoin(TaskPeer::PUBLICATIONGROUP_ID, PublicationgroupPeer::ID, $join_behavior);
 
         $criteria->addJoin(TaskPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
+
+        $criteria->addJoin(TaskPeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
 
         $criteria->addJoin(TaskPeer::RESPONSIBLEUSER_ID, DtaUserPeer::ID, $join_behavior);
 
@@ -1485,22 +1714,41 @@ abstract class BaseTaskPeer
 
             } // if joined row is not null
 
-                // Add objects for joined DtaUser rows
+                // Add objects for joined Partner rows
 
-                $key4 = DtaUserPeer::getPrimaryKeyHashFromRow($row, $startcol4);
+                $key4 = PartnerPeer::getPrimaryKeyHashFromRow($row, $startcol4);
                 if ($key4 !== null) {
-                    $obj4 = DtaUserPeer::getInstanceFromPool($key4);
+                    $obj4 = PartnerPeer::getInstanceFromPool($key4);
                     if (!$obj4) {
 
-                        $cls = DtaUserPeer::getOMClass();
+                        $cls = PartnerPeer::getOMClass();
 
                     $obj4 = new $cls();
                     $obj4->hydrate($row, $startcol4);
-                    DtaUserPeer::addInstanceToPool($obj4, $key4);
+                    PartnerPeer::addInstanceToPool($obj4, $key4);
                 } // if $obj4 already loaded
 
-                // Add the $obj1 (Task) to the collection in $obj4 (DtaUser)
+                // Add the $obj1 (Task) to the collection in $obj4 (Partner)
                 $obj4->addTask($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined DtaUser rows
+
+                $key5 = DtaUserPeer::getPrimaryKeyHashFromRow($row, $startcol5);
+                if ($key5 !== null) {
+                    $obj5 = DtaUserPeer::getInstanceFromPool($key5);
+                    if (!$obj5) {
+
+                        $cls = DtaUserPeer::getOMClass();
+
+                    $obj5 = new $cls();
+                    $obj5->hydrate($row, $startcol5);
+                    DtaUserPeer::addInstanceToPool($obj5, $key5);
+                } // if $obj5 already loaded
+
+                // Add the $obj1 (Task) to the collection in $obj5 (DtaUser)
+                $obj5->addTask($obj1);
 
             } // if joined row is not null
 
@@ -1542,12 +1790,17 @@ abstract class BaseTaskPeer
         PublicationPeer::addSelectColumns($criteria);
         $startcol4 = $startcol3 + PublicationPeer::NUM_HYDRATE_COLUMNS;
 
+        PartnerPeer::addSelectColumns($criteria);
+        $startcol5 = $startcol4 + PartnerPeer::NUM_HYDRATE_COLUMNS;
+
         DtaUserPeer::addSelectColumns($criteria);
-        $startcol5 = $startcol4 + DtaUserPeer::NUM_HYDRATE_COLUMNS;
+        $startcol6 = $startcol5 + DtaUserPeer::NUM_HYDRATE_COLUMNS;
 
         $criteria->addJoin(TaskPeer::TASKTYPE_ID, TasktypePeer::ID, $join_behavior);
 
         $criteria->addJoin(TaskPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
+
+        $criteria->addJoin(TaskPeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
 
         $criteria->addJoin(TaskPeer::RESPONSIBLEUSER_ID, DtaUserPeer::ID, $join_behavior);
 
@@ -1607,22 +1860,41 @@ abstract class BaseTaskPeer
 
             } // if joined row is not null
 
-                // Add objects for joined DtaUser rows
+                // Add objects for joined Partner rows
 
-                $key4 = DtaUserPeer::getPrimaryKeyHashFromRow($row, $startcol4);
+                $key4 = PartnerPeer::getPrimaryKeyHashFromRow($row, $startcol4);
                 if ($key4 !== null) {
-                    $obj4 = DtaUserPeer::getInstanceFromPool($key4);
+                    $obj4 = PartnerPeer::getInstanceFromPool($key4);
                     if (!$obj4) {
 
-                        $cls = DtaUserPeer::getOMClass();
+                        $cls = PartnerPeer::getOMClass();
 
                     $obj4 = new $cls();
                     $obj4->hydrate($row, $startcol4);
-                    DtaUserPeer::addInstanceToPool($obj4, $key4);
+                    PartnerPeer::addInstanceToPool($obj4, $key4);
                 } // if $obj4 already loaded
 
-                // Add the $obj1 (Task) to the collection in $obj4 (DtaUser)
+                // Add the $obj1 (Task) to the collection in $obj4 (Partner)
                 $obj4->addTask($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined DtaUser rows
+
+                $key5 = DtaUserPeer::getPrimaryKeyHashFromRow($row, $startcol5);
+                if ($key5 !== null) {
+                    $obj5 = DtaUserPeer::getInstanceFromPool($key5);
+                    if (!$obj5) {
+
+                        $cls = DtaUserPeer::getOMClass();
+
+                    $obj5 = new $cls();
+                    $obj5->hydrate($row, $startcol5);
+                    DtaUserPeer::addInstanceToPool($obj5, $key5);
+                } // if $obj5 already loaded
+
+                // Add the $obj1 (Task) to the collection in $obj5 (DtaUser)
+                $obj5->addTask($obj1);
 
             } // if joined row is not null
 
@@ -1664,12 +1936,17 @@ abstract class BaseTaskPeer
         PublicationgroupPeer::addSelectColumns($criteria);
         $startcol4 = $startcol3 + PublicationgroupPeer::NUM_HYDRATE_COLUMNS;
 
+        PartnerPeer::addSelectColumns($criteria);
+        $startcol5 = $startcol4 + PartnerPeer::NUM_HYDRATE_COLUMNS;
+
         DtaUserPeer::addSelectColumns($criteria);
-        $startcol5 = $startcol4 + DtaUserPeer::NUM_HYDRATE_COLUMNS;
+        $startcol6 = $startcol5 + DtaUserPeer::NUM_HYDRATE_COLUMNS;
 
         $criteria->addJoin(TaskPeer::TASKTYPE_ID, TasktypePeer::ID, $join_behavior);
 
         $criteria->addJoin(TaskPeer::PUBLICATIONGROUP_ID, PublicationgroupPeer::ID, $join_behavior);
+
+        $criteria->addJoin(TaskPeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
 
         $criteria->addJoin(TaskPeer::RESPONSIBLEUSER_ID, DtaUserPeer::ID, $join_behavior);
 
@@ -1729,22 +2006,41 @@ abstract class BaseTaskPeer
 
             } // if joined row is not null
 
-                // Add objects for joined DtaUser rows
+                // Add objects for joined Partner rows
 
-                $key4 = DtaUserPeer::getPrimaryKeyHashFromRow($row, $startcol4);
+                $key4 = PartnerPeer::getPrimaryKeyHashFromRow($row, $startcol4);
                 if ($key4 !== null) {
-                    $obj4 = DtaUserPeer::getInstanceFromPool($key4);
+                    $obj4 = PartnerPeer::getInstanceFromPool($key4);
                     if (!$obj4) {
 
-                        $cls = DtaUserPeer::getOMClass();
+                        $cls = PartnerPeer::getOMClass();
 
                     $obj4 = new $cls();
                     $obj4->hydrate($row, $startcol4);
-                    DtaUserPeer::addInstanceToPool($obj4, $key4);
+                    PartnerPeer::addInstanceToPool($obj4, $key4);
                 } // if $obj4 already loaded
 
-                // Add the $obj1 (Task) to the collection in $obj4 (DtaUser)
+                // Add the $obj1 (Task) to the collection in $obj4 (Partner)
                 $obj4->addTask($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined DtaUser rows
+
+                $key5 = DtaUserPeer::getPrimaryKeyHashFromRow($row, $startcol5);
+                if ($key5 !== null) {
+                    $obj5 = DtaUserPeer::getInstanceFromPool($key5);
+                    if (!$obj5) {
+
+                        $cls = DtaUserPeer::getOMClass();
+
+                    $obj5 = new $cls();
+                    $obj5->hydrate($row, $startcol5);
+                    DtaUserPeer::addInstanceToPool($obj5, $key5);
+                } // if $obj5 already loaded
+
+                // Add the $obj1 (Task) to the collection in $obj5 (DtaUser)
+                $obj5->addTask($obj1);
 
             } // if joined row is not null
 
@@ -1757,7 +2053,7 @@ abstract class BaseTaskPeer
 
 
     /**
-     * Selects a collection of Task objects pre-filled with all related objects except DtaUser.
+     * Selects a collection of Task objects pre-filled with all related objects except Partner.
      *
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
@@ -1766,7 +2062,7 @@ abstract class BaseTaskPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinAllExceptDtaUser(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinAllExceptPartner(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -1789,11 +2085,16 @@ abstract class BaseTaskPeer
         PublicationPeer::addSelectColumns($criteria);
         $startcol5 = $startcol4 + PublicationPeer::NUM_HYDRATE_COLUMNS;
 
+        DtaUserPeer::addSelectColumns($criteria);
+        $startcol6 = $startcol5 + DtaUserPeer::NUM_HYDRATE_COLUMNS;
+
         $criteria->addJoin(TaskPeer::TASKTYPE_ID, TasktypePeer::ID, $join_behavior);
 
         $criteria->addJoin(TaskPeer::PUBLICATIONGROUP_ID, PublicationgroupPeer::ID, $join_behavior);
 
         $criteria->addJoin(TaskPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
+
+        $criteria->addJoin(TaskPeer::RESPONSIBLEUSER_ID, DtaUserPeer::ID, $join_behavior);
 
 
         $stmt = BasePeer::doSelect($criteria, $con);
@@ -1867,6 +2168,171 @@ abstract class BaseTaskPeer
 
                 // Add the $obj1 (Task) to the collection in $obj4 (Publication)
                 $obj4->addTask($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined DtaUser rows
+
+                $key5 = DtaUserPeer::getPrimaryKeyHashFromRow($row, $startcol5);
+                if ($key5 !== null) {
+                    $obj5 = DtaUserPeer::getInstanceFromPool($key5);
+                    if (!$obj5) {
+
+                        $cls = DtaUserPeer::getOMClass();
+
+                    $obj5 = new $cls();
+                    $obj5->hydrate($row, $startcol5);
+                    DtaUserPeer::addInstanceToPool($obj5, $key5);
+                } // if $obj5 already loaded
+
+                // Add the $obj1 (Task) to the collection in $obj5 (DtaUser)
+                $obj5->addTask($obj1);
+
+            } // if joined row is not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Selects a collection of Task objects pre-filled with all related objects except DtaUser.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Task objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAllExceptDtaUser(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        // $criteria->getDbName() will return the same object if not set to another value
+        // so == check is okay and faster
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(TaskPeer::DATABASE_NAME);
+        }
+
+        TaskPeer::addSelectColumns($criteria);
+        $startcol2 = TaskPeer::NUM_HYDRATE_COLUMNS;
+
+        TasktypePeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + TasktypePeer::NUM_HYDRATE_COLUMNS;
+
+        PublicationgroupPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + PublicationgroupPeer::NUM_HYDRATE_COLUMNS;
+
+        PublicationPeer::addSelectColumns($criteria);
+        $startcol5 = $startcol4 + PublicationPeer::NUM_HYDRATE_COLUMNS;
+
+        PartnerPeer::addSelectColumns($criteria);
+        $startcol6 = $startcol5 + PartnerPeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(TaskPeer::TASKTYPE_ID, TasktypePeer::ID, $join_behavior);
+
+        $criteria->addJoin(TaskPeer::PUBLICATIONGROUP_ID, PublicationgroupPeer::ID, $join_behavior);
+
+        $criteria->addJoin(TaskPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
+
+        $criteria->addJoin(TaskPeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
+
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = TaskPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = TaskPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = TaskPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                TaskPeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+                // Add objects for joined Tasktype rows
+
+                $key2 = TasktypePeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                if ($key2 !== null) {
+                    $obj2 = TasktypePeer::getInstanceFromPool($key2);
+                    if (!$obj2) {
+
+                        $cls = TasktypePeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    TasktypePeer::addInstanceToPool($obj2, $key2);
+                } // if $obj2 already loaded
+
+                // Add the $obj1 (Task) to the collection in $obj2 (Tasktype)
+                $obj2->addTask($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Publicationgroup rows
+
+                $key3 = PublicationgroupPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+                if ($key3 !== null) {
+                    $obj3 = PublicationgroupPeer::getInstanceFromPool($key3);
+                    if (!$obj3) {
+
+                        $cls = PublicationgroupPeer::getOMClass();
+
+                    $obj3 = new $cls();
+                    $obj3->hydrate($row, $startcol3);
+                    PublicationgroupPeer::addInstanceToPool($obj3, $key3);
+                } // if $obj3 already loaded
+
+                // Add the $obj1 (Task) to the collection in $obj3 (Publicationgroup)
+                $obj3->addTask($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Publication rows
+
+                $key4 = PublicationPeer::getPrimaryKeyHashFromRow($row, $startcol4);
+                if ($key4 !== null) {
+                    $obj4 = PublicationPeer::getInstanceFromPool($key4);
+                    if (!$obj4) {
+
+                        $cls = PublicationPeer::getOMClass();
+
+                    $obj4 = new $cls();
+                    $obj4->hydrate($row, $startcol4);
+                    PublicationPeer::addInstanceToPool($obj4, $key4);
+                } // if $obj4 already loaded
+
+                // Add the $obj1 (Task) to the collection in $obj4 (Publication)
+                $obj4->addTask($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Partner rows
+
+                $key5 = PartnerPeer::getPrimaryKeyHashFromRow($row, $startcol5);
+                if ($key5 !== null) {
+                    $obj5 = PartnerPeer::getInstanceFromPool($key5);
+                    if (!$obj5) {
+
+                        $cls = PartnerPeer::getOMClass();
+
+                    $obj5 = new $cls();
+                    $obj5->hydrate($row, $startcol5);
+                    PartnerPeer::addInstanceToPool($obj5, $key5);
+                } // if $obj5 already loaded
+
+                // Add the $obj1 (Task) to the collection in $obj5 (Partner)
+                $obj5->addTask($obj1);
 
             } // if joined row is not null
 

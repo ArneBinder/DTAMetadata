@@ -50,9 +50,10 @@ class PublicationType extends BaseAbstractType
             'label' => 'Erscheinungsjahr der Erstausgabe'
         ));
 
-        $builder->add('printrun', new Data\PrintrunType(), array(
-            'label' => 'Auflage'
-        ));
+        
+        $builder->add('volume_alphanumeric', 'text');
+        $builder->add('volume_numeric', 'text');
+        $builder->add('volumes_total', 'text');
         
         $builder->add('editiondescription', 'text', array(
             'required' => false

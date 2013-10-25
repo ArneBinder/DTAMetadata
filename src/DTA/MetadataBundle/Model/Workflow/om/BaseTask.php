@@ -17,6 +17,8 @@ use DTA\MetadataBundle\Model\Data\Publication;
 use DTA\MetadataBundle\Model\Data\PublicationQuery;
 use DTA\MetadataBundle\Model\Master\DtaUser;
 use DTA\MetadataBundle\Model\Master\DtaUserQuery;
+use DTA\MetadataBundle\Model\Workflow\Partner;
+use DTA\MetadataBundle\Model\Workflow\PartnerQuery;
 use DTA\MetadataBundle\Model\Workflow\Publicationgroup;
 use DTA\MetadataBundle\Model\Workflow\PublicationgroupQuery;
 use DTA\MetadataBundle\Model\Workflow\Task;
@@ -65,16 +67,16 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     protected $done;
 
     /**
-     * The value for the startdate field.
+     * The value for the start_date field.
      * @var        string
      */
-    protected $startdate;
+    protected $start_date;
 
     /**
-     * The value for the enddate field.
+     * The value for the end_date field.
      * @var        string
      */
-    protected $enddate;
+    protected $end_date;
 
     /**
      * The value for the comments field.
@@ -95,10 +97,28 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     protected $publication_id;
 
     /**
+     * The value for the partner_id field.
+     * @var        int
+     */
+    protected $partner_id;
+
+    /**
      * The value for the responsibleuser_id field.
      * @var        int
      */
     protected $responsibleuser_id;
+
+    /**
+     * The value for the created_at field.
+     * @var        string
+     */
+    protected $created_at;
+
+    /**
+     * The value for the updated_at field.
+     * @var        string
+     */
+    protected $updated_at;
 
     /**
      * @var        Tasktype
@@ -114,6 +134,11 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
      * @var        Publication
      */
     protected $aPublication;
+
+    /**
+     * @var        Partner
+     */
+    protected $aPartner;
 
     /**
      * @var        DtaUser
@@ -141,7 +166,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Id', 'TasktypeId', 'Done', 'Startdate', 'Enddate', 'Comments', 'PublicationgroupId', 'PublicationId', 'ResponsibleuserId', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'TasktypeId'=>'TasktypeId', 'Done'=>'Done', 'Startdate'=>'Startdate', 'Enddate'=>'Enddate', 'Comments'=>'Comments', 'PublicationgroupId'=>'PublicationgroupId', 'PublicationId'=>'PublicationId', 'ResponsibleuserId'=>'ResponsibleuserId', );
+    public static $tableRowViewCaptions = array('Zuordnung', 'Typ', 'Abgeschlossen', 'Start', 'Ende', 'Für', 'Verantwortlich', );	public   $tableRowViewAccessors = array('Zuordnung'=>'accessor:getEmbeddedColumn1OfTasktype', 'Typ'=>'accessor:getEmbeddedColumn2OfTasktype', 'Abgeschlossen'=>'Done', 'Start'=>'StartDate', 'Ende'=>'EndDate', 'Für'=>'accessor:getReferee', 'Verantwortlich'=>'accessor:getResponsibleUser', );
     /**
      * Get the [id] column value.
      *
@@ -173,7 +198,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     }
 
     /**
-     * Get the [optionally formatted] temporal [startdate] column value.
+     * Get the [optionally formatted] temporal [start_date] column value.
      *
      *
      * @param string $format The date/time format string (either date()-style or strftime()-style).
@@ -181,17 +206,17 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
      * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null
      * @throws PropelException - if unable to parse/validate the date/time value.
      */
-    public function getStartdate($format = null)
+    public function getStartDate($format = null)
     {
-        if ($this->startdate === null) {
+        if ($this->start_date === null) {
             return null;
         }
 
 
         try {
-            $dt = new DateTime($this->startdate);
+            $dt = new DateTime($this->start_date);
         } catch (Exception $x) {
-            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->startdate, true), $x);
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->start_date, true), $x);
         }
 
         if ($format === null) {
@@ -208,7 +233,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     }
 
     /**
-     * Get the [optionally formatted] temporal [enddate] column value.
+     * Get the [optionally formatted] temporal [end_date] column value.
      *
      *
      * @param string $format The date/time format string (either date()-style or strftime()-style).
@@ -216,17 +241,17 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
      * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null
      * @throws PropelException - if unable to parse/validate the date/time value.
      */
-    public function getEnddate($format = null)
+    public function getEndDate($format = null)
     {
-        if ($this->enddate === null) {
+        if ($this->end_date === null) {
             return null;
         }
 
 
         try {
-            $dt = new DateTime($this->enddate);
+            $dt = new DateTime($this->end_date);
         } catch (Exception $x) {
-            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->enddate, true), $x);
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->end_date, true), $x);
         }
 
         if ($format === null) {
@@ -273,6 +298,16 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     }
 
     /**
+     * Get the [partner_id] column value.
+     *
+     * @return int
+     */
+    public function getPartnerId()
+    {
+        return $this->partner_id;
+    }
+
+    /**
      * Get the [responsibleuser_id] column value.
      *
      * @return int
@@ -280,6 +315,76 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     public function getResponsibleuserId()
     {
         return $this->responsibleuser_id;
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [created_at] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getCreatedAt($format = null)
+    {
+        if ($this->created_at === null) {
+            return null;
+        }
+
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [updated_at] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getUpdatedAt($format = null)
+    {
+        if ($this->updated_at === null) {
+            return null;
+        }
+
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -358,50 +463,50 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     } // setDone()
 
     /**
-     * Sets the value of [startdate] column to a normalized version of the date/time value specified.
+     * Sets the value of [start_date] column to a normalized version of the date/time value specified.
      *
      * @param mixed $v string, integer (timestamp), or DateTime value.
      *               Empty strings are treated as null.
      * @return Task The current object (for fluent API support)
      */
-    public function setStartdate($v)
+    public function setStartDate($v)
     {
         $dt = PropelDateTime::newInstance($v, null, 'DateTime');
-        if ($this->startdate !== null || $dt !== null) {
-            $currentDateAsString = ($this->startdate !== null && $tmpDt = new DateTime($this->startdate)) ? $tmpDt->format('Y-m-d') : null;
+        if ($this->start_date !== null || $dt !== null) {
+            $currentDateAsString = ($this->start_date !== null && $tmpDt = new DateTime($this->start_date)) ? $tmpDt->format('Y-m-d') : null;
             $newDateAsString = $dt ? $dt->format('Y-m-d') : null;
             if ($currentDateAsString !== $newDateAsString) {
-                $this->startdate = $newDateAsString;
-                $this->modifiedColumns[] = TaskPeer::STARTDATE;
+                $this->start_date = $newDateAsString;
+                $this->modifiedColumns[] = TaskPeer::START_DATE;
             }
         } // if either are not null
 
 
         return $this;
-    } // setStartdate()
+    } // setStartDate()
 
     /**
-     * Sets the value of [enddate] column to a normalized version of the date/time value specified.
+     * Sets the value of [end_date] column to a normalized version of the date/time value specified.
      *
      * @param mixed $v string, integer (timestamp), or DateTime value.
      *               Empty strings are treated as null.
      * @return Task The current object (for fluent API support)
      */
-    public function setEnddate($v)
+    public function setEndDate($v)
     {
         $dt = PropelDateTime::newInstance($v, null, 'DateTime');
-        if ($this->enddate !== null || $dt !== null) {
-            $currentDateAsString = ($this->enddate !== null && $tmpDt = new DateTime($this->enddate)) ? $tmpDt->format('Y-m-d') : null;
+        if ($this->end_date !== null || $dt !== null) {
+            $currentDateAsString = ($this->end_date !== null && $tmpDt = new DateTime($this->end_date)) ? $tmpDt->format('Y-m-d') : null;
             $newDateAsString = $dt ? $dt->format('Y-m-d') : null;
             if ($currentDateAsString !== $newDateAsString) {
-                $this->enddate = $newDateAsString;
-                $this->modifiedColumns[] = TaskPeer::ENDDATE;
+                $this->end_date = $newDateAsString;
+                $this->modifiedColumns[] = TaskPeer::END_DATE;
             }
         } // if either are not null
 
 
         return $this;
-    } // setEnddate()
+    } // setEndDate()
 
     /**
      * Set the value of [comments] column.
@@ -475,6 +580,31 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     } // setPublicationId()
 
     /**
+     * Set the value of [partner_id] column.
+     *
+     * @param int $v new value
+     * @return Task The current object (for fluent API support)
+     */
+    public function setPartnerId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->partner_id !== $v) {
+            $this->partner_id = $v;
+            $this->modifiedColumns[] = TaskPeer::PARTNER_ID;
+        }
+
+        if ($this->aPartner !== null && $this->aPartner->getId() !== $v) {
+            $this->aPartner = null;
+        }
+
+
+        return $this;
+    } // setPartnerId()
+
+    /**
      * Set the value of [responsibleuser_id] column.
      *
      * @param int $v new value
@@ -498,6 +628,52 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
 
         return $this;
     } // setResponsibleuserId()
+
+    /**
+     * Sets the value of [created_at] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return Task The current object (for fluent API support)
+     */
+    public function setCreatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->created_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->created_at !== null && $tmpDt = new DateTime($this->created_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->created_at = $newDateAsString;
+                $this->modifiedColumns[] = TaskPeer::CREATED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setCreatedAt()
+
+    /**
+     * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return Task The current object (for fluent API support)
+     */
+    public function setUpdatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->updated_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->updated_at !== null && $tmpDt = new DateTime($this->updated_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->updated_at = $newDateAsString;
+                $this->modifiedColumns[] = TaskPeer::UPDATED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setUpdatedAt()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -534,12 +710,15 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->tasktype_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
             $this->done = ($row[$startcol + 2] !== null) ? (boolean) $row[$startcol + 2] : null;
-            $this->startdate = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-            $this->enddate = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+            $this->start_date = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+            $this->end_date = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
             $this->comments = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
             $this->publicationgroup_id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
             $this->publication_id = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-            $this->responsibleuser_id = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+            $this->partner_id = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+            $this->responsibleuser_id = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+            $this->created_at = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+            $this->updated_at = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -548,7 +727,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 9; // 9 = TaskPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 12; // 12 = TaskPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Task object", $e);
@@ -579,6 +758,9 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
         }
         if ($this->aPublication !== null && $this->publication_id !== $this->aPublication->getId()) {
             $this->aPublication = null;
+        }
+        if ($this->aPartner !== null && $this->partner_id !== $this->aPartner->getId()) {
+            $this->aPartner = null;
         }
         if ($this->aDtaUser !== null && $this->responsibleuser_id !== $this->aDtaUser->getId()) {
             $this->aDtaUser = null;
@@ -625,6 +807,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
             $this->aTasktype = null;
             $this->aPublicationgroup = null;
             $this->aPublication = null;
+            $this->aPartner = null;
             $this->aDtaUser = null;
         } // if (deep)
     }
@@ -698,8 +881,19 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+                if (!$this->isColumnModified(TaskPeer::CREATED_AT)) {
+                    $this->setCreatedAt(time());
+                }
+                if (!$this->isColumnModified(TaskPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(TaskPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -765,6 +959,13 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
                 $this->setPublication($this->aPublication);
             }
 
+            if ($this->aPartner !== null) {
+                if ($this->aPartner->isModified() || $this->aPartner->isNew()) {
+                    $affectedRows += $this->aPartner->save($con);
+                }
+                $this->setPartner($this->aPartner);
+            }
+
             if ($this->aDtaUser !== null) {
                 if ($this->aDtaUser->isModified() || $this->aDtaUser->isNew()) {
                     $affectedRows += $this->aDtaUser->save($con);
@@ -828,11 +1029,11 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
         if ($this->isColumnModified(TaskPeer::DONE)) {
             $modifiedColumns[':p' . $index++]  = '"done"';
         }
-        if ($this->isColumnModified(TaskPeer::STARTDATE)) {
-            $modifiedColumns[':p' . $index++]  = '"startdate"';
+        if ($this->isColumnModified(TaskPeer::START_DATE)) {
+            $modifiedColumns[':p' . $index++]  = '"start_date"';
         }
-        if ($this->isColumnModified(TaskPeer::ENDDATE)) {
-            $modifiedColumns[':p' . $index++]  = '"enddate"';
+        if ($this->isColumnModified(TaskPeer::END_DATE)) {
+            $modifiedColumns[':p' . $index++]  = '"end_date"';
         }
         if ($this->isColumnModified(TaskPeer::COMMENTS)) {
             $modifiedColumns[':p' . $index++]  = '"comments"';
@@ -843,8 +1044,17 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
         if ($this->isColumnModified(TaskPeer::PUBLICATION_ID)) {
             $modifiedColumns[':p' . $index++]  = '"publication_id"';
         }
+        if ($this->isColumnModified(TaskPeer::PARTNER_ID)) {
+            $modifiedColumns[':p' . $index++]  = '"partner_id"';
+        }
         if ($this->isColumnModified(TaskPeer::RESPONSIBLEUSER_ID)) {
             $modifiedColumns[':p' . $index++]  = '"responsibleuser_id"';
+        }
+        if ($this->isColumnModified(TaskPeer::CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '"created_at"';
+        }
+        if ($this->isColumnModified(TaskPeer::UPDATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '"updated_at"';
         }
 
         $sql = sprintf(
@@ -866,11 +1076,11 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
                     case '"done"':
                         $stmt->bindValue($identifier, $this->done, PDO::PARAM_BOOL);
                         break;
-                    case '"startdate"':
-                        $stmt->bindValue($identifier, $this->startdate, PDO::PARAM_STR);
+                    case '"start_date"':
+                        $stmt->bindValue($identifier, $this->start_date, PDO::PARAM_STR);
                         break;
-                    case '"enddate"':
-                        $stmt->bindValue($identifier, $this->enddate, PDO::PARAM_STR);
+                    case '"end_date"':
+                        $stmt->bindValue($identifier, $this->end_date, PDO::PARAM_STR);
                         break;
                     case '"comments"':
                         $stmt->bindValue($identifier, $this->comments, PDO::PARAM_STR);
@@ -881,8 +1091,17 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
                     case '"publication_id"':
                         $stmt->bindValue($identifier, $this->publication_id, PDO::PARAM_INT);
                         break;
+                    case '"partner_id"':
+                        $stmt->bindValue($identifier, $this->partner_id, PDO::PARAM_INT);
+                        break;
                     case '"responsibleuser_id"':
                         $stmt->bindValue($identifier, $this->responsibleuser_id, PDO::PARAM_INT);
+                        break;
+                    case '"created_at"':
+                        $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
+                        break;
+                    case '"updated_at"':
+                        $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -994,6 +1213,12 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
                 }
             }
 
+            if ($this->aPartner !== null) {
+                if (!$this->aPartner->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aPartner->getValidationFailures());
+                }
+            }
+
             if ($this->aDtaUser !== null) {
                 if (!$this->aDtaUser->validate($columns)) {
                     $failureMap = array_merge($failureMap, $this->aDtaUser->getValidationFailures());
@@ -1051,10 +1276,10 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
                 return $this->getDone();
                 break;
             case 3:
-                return $this->getStartdate();
+                return $this->getStartDate();
                 break;
             case 4:
-                return $this->getEnddate();
+                return $this->getEndDate();
                 break;
             case 5:
                 return $this->getComments();
@@ -1066,7 +1291,16 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
                 return $this->getPublicationId();
                 break;
             case 8:
+                return $this->getPartnerId();
+                break;
+            case 9:
                 return $this->getResponsibleuserId();
+                break;
+            case 10:
+                return $this->getCreatedAt();
+                break;
+            case 11:
+                return $this->getUpdatedAt();
                 break;
             default:
                 return null;
@@ -1100,12 +1334,15 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
             $keys[0] => $this->getId(),
             $keys[1] => $this->getTasktypeId(),
             $keys[2] => $this->getDone(),
-            $keys[3] => $this->getStartdate(),
-            $keys[4] => $this->getEnddate(),
+            $keys[3] => $this->getStartDate(),
+            $keys[4] => $this->getEndDate(),
             $keys[5] => $this->getComments(),
             $keys[6] => $this->getPublicationgroupId(),
             $keys[7] => $this->getPublicationId(),
-            $keys[8] => $this->getResponsibleuserId(),
+            $keys[8] => $this->getPartnerId(),
+            $keys[9] => $this->getResponsibleuserId(),
+            $keys[10] => $this->getCreatedAt(),
+            $keys[11] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aTasktype) {
@@ -1116,6 +1353,9 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
             }
             if (null !== $this->aPublication) {
                 $result['Publication'] = $this->aPublication->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aPartner) {
+                $result['Partner'] = $this->aPartner->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->aDtaUser) {
                 $result['DtaUser'] = $this->aDtaUser->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
@@ -1164,10 +1404,10 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
                 $this->setDone($value);
                 break;
             case 3:
-                $this->setStartdate($value);
+                $this->setStartDate($value);
                 break;
             case 4:
-                $this->setEnddate($value);
+                $this->setEndDate($value);
                 break;
             case 5:
                 $this->setComments($value);
@@ -1179,7 +1419,16 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
                 $this->setPublicationId($value);
                 break;
             case 8:
+                $this->setPartnerId($value);
+                break;
+            case 9:
                 $this->setResponsibleuserId($value);
+                break;
+            case 10:
+                $this->setCreatedAt($value);
+                break;
+            case 11:
+                $this->setUpdatedAt($value);
                 break;
         } // switch()
     }
@@ -1208,12 +1457,15 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setTasktypeId($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setDone($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setStartdate($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setEnddate($arr[$keys[4]]);
+        if (array_key_exists($keys[3], $arr)) $this->setStartDate($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setEndDate($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setComments($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setPublicationgroupId($arr[$keys[6]]);
         if (array_key_exists($keys[7], $arr)) $this->setPublicationId($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setResponsibleuserId($arr[$keys[8]]);
+        if (array_key_exists($keys[8], $arr)) $this->setPartnerId($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setResponsibleuserId($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setCreatedAt($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setUpdatedAt($arr[$keys[11]]);
     }
 
     /**
@@ -1228,12 +1480,15 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
         if ($this->isColumnModified(TaskPeer::ID)) $criteria->add(TaskPeer::ID, $this->id);
         if ($this->isColumnModified(TaskPeer::TASKTYPE_ID)) $criteria->add(TaskPeer::TASKTYPE_ID, $this->tasktype_id);
         if ($this->isColumnModified(TaskPeer::DONE)) $criteria->add(TaskPeer::DONE, $this->done);
-        if ($this->isColumnModified(TaskPeer::STARTDATE)) $criteria->add(TaskPeer::STARTDATE, $this->startdate);
-        if ($this->isColumnModified(TaskPeer::ENDDATE)) $criteria->add(TaskPeer::ENDDATE, $this->enddate);
+        if ($this->isColumnModified(TaskPeer::START_DATE)) $criteria->add(TaskPeer::START_DATE, $this->start_date);
+        if ($this->isColumnModified(TaskPeer::END_DATE)) $criteria->add(TaskPeer::END_DATE, $this->end_date);
         if ($this->isColumnModified(TaskPeer::COMMENTS)) $criteria->add(TaskPeer::COMMENTS, $this->comments);
         if ($this->isColumnModified(TaskPeer::PUBLICATIONGROUP_ID)) $criteria->add(TaskPeer::PUBLICATIONGROUP_ID, $this->publicationgroup_id);
         if ($this->isColumnModified(TaskPeer::PUBLICATION_ID)) $criteria->add(TaskPeer::PUBLICATION_ID, $this->publication_id);
+        if ($this->isColumnModified(TaskPeer::PARTNER_ID)) $criteria->add(TaskPeer::PARTNER_ID, $this->partner_id);
         if ($this->isColumnModified(TaskPeer::RESPONSIBLEUSER_ID)) $criteria->add(TaskPeer::RESPONSIBLEUSER_ID, $this->responsibleuser_id);
+        if ($this->isColumnModified(TaskPeer::CREATED_AT)) $criteria->add(TaskPeer::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(TaskPeer::UPDATED_AT)) $criteria->add(TaskPeer::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -1299,12 +1554,15 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     {
         $copyObj->setTasktypeId($this->getTasktypeId());
         $copyObj->setDone($this->getDone());
-        $copyObj->setStartdate($this->getStartdate());
-        $copyObj->setEnddate($this->getEnddate());
+        $copyObj->setStartDate($this->getStartDate());
+        $copyObj->setEndDate($this->getEndDate());
         $copyObj->setComments($this->getComments());
         $copyObj->setPublicationgroupId($this->getPublicationgroupId());
         $copyObj->setPublicationId($this->getPublicationId());
+        $copyObj->setPartnerId($this->getPartnerId());
         $copyObj->setResponsibleuserId($this->getResponsibleuserId());
+        $copyObj->setCreatedAt($this->getCreatedAt());
+        $copyObj->setUpdatedAt($this->getUpdatedAt());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1520,6 +1778,58 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     }
 
     /**
+     * Declares an association between this object and a Partner object.
+     *
+     * @param             Partner $v
+     * @return Task The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setPartner(Partner $v = null)
+    {
+        if ($v === null) {
+            $this->setPartnerId(NULL);
+        } else {
+            $this->setPartnerId($v->getId());
+        }
+
+        $this->aPartner = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Partner object, it will not be re-added.
+        if ($v !== null) {
+            $v->addTask($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Partner object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return Partner The associated Partner object.
+     * @throws PropelException
+     */
+    public function getPartner(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aPartner === null && ($this->partner_id !== null) && $doQuery) {
+            $this->aPartner = PartnerQuery::create()->findPk($this->partner_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aPartner->addTasks($this);
+             */
+        }
+
+        return $this->aPartner;
+    }
+
+    /**
      * Declares an association between this object and a DtaUser object.
      *
      * @param             DtaUser $v
@@ -1579,12 +1889,15 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
         $this->id = null;
         $this->tasktype_id = null;
         $this->done = null;
-        $this->startdate = null;
-        $this->enddate = null;
+        $this->start_date = null;
+        $this->end_date = null;
         $this->comments = null;
         $this->publicationgroup_id = null;
         $this->publication_id = null;
+        $this->partner_id = null;
         $this->responsibleuser_id = null;
+        $this->created_at = null;
+        $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
@@ -1616,6 +1929,9 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
             if ($this->aPublication instanceof Persistent) {
               $this->aPublication->clearAllReferences($deep);
             }
+            if ($this->aPartner instanceof Persistent) {
+              $this->aPartner->clearAllReferences($deep);
+            }
             if ($this->aDtaUser instanceof Persistent) {
               $this->aDtaUser->clearAllReferences($deep);
             }
@@ -1626,6 +1942,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
         $this->aTasktype = null;
         $this->aPublicationgroup = null;
         $this->aPublication = null;
+        $this->aPartner = null;
         $this->aDtaUser = null;
     }
 
@@ -1647,6 +1964,20 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     Task The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = TaskPeer::UPDATED_AT;
+
+        return $this;
     }
 
     // table_row_view behavior
@@ -1680,5 +2011,23 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
         }
     }
 
+    /**
+     * Cascades the get to a related entity (possibly recursively)
+     */
 
+    public function getEmbeddedColumn1OfTasktype(){
+
+        $relatedEntity = $this->getTasktype();
+        return $relatedEntity->getAttributeByTableViewColumName("Zuordnung");
+
+    }    /**
+     * Cascades the get to a related entity (possibly recursively)
+     */
+
+    public function getEmbeddedColumn2OfTasktype(){
+
+        $relatedEntity = $this->getTasktype();
+        return $relatedEntity->getAttributeByTableViewColumName("Typ");
+
+    }
 }

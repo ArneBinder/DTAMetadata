@@ -118,7 +118,7 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
 
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('name', 'zugeordnet', );	public   $tableRowViewAccessors = array('name'=>'Name', 'zugeordnet'=>'accessor:getParent', );
+    public static $tableRowViewCaptions = array('Zuordnung', 'Typ', );	public   $tableRowViewAccessors = array('Zuordnung'=>'accessor:getParent', 'Typ'=>'Name', );
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -1327,6 +1327,31 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
     {
         $query = TaskQuery::create(null, $criteria);
         $query->joinWith('Publication', $join_behavior);
+
+        return $this->getTasks($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Tasktype is new, it will return
+     * an empty collection; or if this Tasktype has previously
+     * been saved, it will retrieve related Tasks from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Tasktype.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Task[] List of Task objects
+     */
+    public function getTasksJoinPartner($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = TaskQuery::create(null, $criteria);
+        $query->joinWith('Partner', $join_behavior);
 
         return $this->getTasks($query, $con);
     }

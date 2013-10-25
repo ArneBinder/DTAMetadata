@@ -44,19 +44,24 @@ class PublicationTableMap extends TableMap
         $this->setPrimaryKeyMethodInfo('publication_id_seq');
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addColumn('wwwReady', 'Wwwready', 'INTEGER', false, null, null);
         $this->addForeignKey('work_id', 'WorkId', 'INTEGER', 'work', 'id', true, null, null);
         $this->addForeignKey('place_id', 'PlaceId', 'INTEGER', 'place', 'id', false, null, null);
         $this->addForeignKey('publicationdate_id', 'PublicationdateId', 'INTEGER', 'datespecification', 'id', false, null, null);
         $this->addForeignKey('firstpublicationdate_id', 'FirstpublicationdateId', 'INTEGER', 'datespecification', 'id', false, null, null);
-        $this->addForeignKey('printrun_id', 'PrintrunId', 'INTEGER', 'printrun', 'id', false, null, null);
         $this->addForeignKey('publishingcompany_id', 'PublishingcompanyId', 'INTEGER', 'publishingcompany', 'id', false, null, null);
         $this->addColumn('partner_id', 'PartnerId', 'INTEGER', false, null, null);
         $this->addColumn('editiondescription', 'Editiondescription', 'LONGVARCHAR', false, null, null);
         $this->addColumn('digitaleditioneditor', 'Digitaleditioneditor', 'LONGVARCHAR', false, null, null);
         $this->addColumn('transcriptioncomment', 'Transcriptioncomment', 'LONGVARCHAR', false, null, null);
         $this->addForeignKey('font_id', 'FontId', 'INTEGER', 'font', 'id', false, null, null);
+        $this->addColumn('volume_alphanumeric', 'VolumeAlphanumeric', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('volume_numeric', 'VolumeNumeric', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('volumes_total', 'VolumesTotal', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('numpages', 'Numpages', 'INTEGER', false, null, null);
+        $this->addColumn('numpagesnormed', 'Numpagesnormed', 'INTEGER', false, null, null);
         $this->addColumn('comment', 'Comment', 'LONGVARCHAR', false, null, null);
-        $this->addForeignKey('relatedset_id', 'RelatedsetId', 'INTEGER', 'relatedset', 'id', false, null, null);
+        $this->addColumn('publishingcompany_id_is_reconstructed', 'PublishingcompanyIdIsReconstructed', 'BOOLEAN', false, null, false);
         // validators
     } // initialize()
 
@@ -68,8 +73,6 @@ class PublicationTableMap extends TableMap
         $this->addRelation('Work', 'DTA\\MetadataBundle\\Model\\Data\\Work', RelationMap::MANY_TO_ONE, array('work_id' => 'id', ), null, null);
         $this->addRelation('Publishingcompany', 'DTA\\MetadataBundle\\Model\\Data\\Publishingcompany', RelationMap::MANY_TO_ONE, array('publishingcompany_id' => 'id', ), null, null);
         $this->addRelation('Place', 'DTA\\MetadataBundle\\Model\\Data\\Place', RelationMap::MANY_TO_ONE, array('place_id' => 'id', ), null, null);
-        $this->addRelation('Printrun', 'DTA\\MetadataBundle\\Model\\Data\\Printrun', RelationMap::MANY_TO_ONE, array('printrun_id' => 'id', ), null, null);
-        $this->addRelation('Relatedset', 'DTA\\MetadataBundle\\Model\\Workflow\\Relatedset', RelationMap::MANY_TO_ONE, array('relatedset_id' => 'id', ), null, null);
         $this->addRelation('DatespecificationRelatedByPublicationdateId', 'DTA\\MetadataBundle\\Model\\Data\\Datespecification', RelationMap::MANY_TO_ONE, array('publicationdate_id' => 'id', ), null, null);
         $this->addRelation('DatespecificationRelatedByFirstpublicationdateId', 'DTA\\MetadataBundle\\Model\\Data\\Datespecification', RelationMap::MANY_TO_ONE, array('firstpublicationdate_id' => 'id', ), null, null);
         $this->addRelation('Font', 'DTA\\MetadataBundle\\Model\\Data\\Font', RelationMap::MANY_TO_ONE, array('font_id' => 'id', ), null, null);
@@ -102,6 +105,9 @@ class PublicationTableMap extends TableMap
   'embedColumnsForWork' => 'work',
   'veröffentlicht' => 'accessor:getDatespecificationRelatedByPublicationdateId',
   'embedcolumnstitle' => 'title',
+),
+            'reconstructed_flaggable' =>  array (
+  'column' => 'publishingcompany_id',
 ),
         );
     } // getBehaviors()

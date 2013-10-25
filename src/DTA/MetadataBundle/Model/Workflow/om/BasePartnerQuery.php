@@ -16,38 +16,31 @@ use DTA\MetadataBundle\Model\Workflow\Imagesource;
 use DTA\MetadataBundle\Model\Workflow\Partner;
 use DTA\MetadataBundle\Model\Workflow\PartnerPeer;
 use DTA\MetadataBundle\Model\Workflow\PartnerQuery;
+use DTA\MetadataBundle\Model\Workflow\Task;
 use DTA\MetadataBundle\Model\Workflow\Textsource;
 
 /**
  * @method PartnerQuery orderById($order = Criteria::ASC) Order by the id column
  * @method PartnerQuery orderByName($order = Criteria::ASC) Order by the name column
- * @method PartnerQuery orderByAddress($order = Criteria::ASC) Order by the address column
  * @method PartnerQuery orderByPerson($order = Criteria::ASC) Order by the person column
- * @method PartnerQuery orderByMail($order = Criteria::ASC) Order by the mail column
- * @method PartnerQuery orderByWeb($order = Criteria::ASC) Order by the web column
+ * @method PartnerQuery orderByContactData($order = Criteria::ASC) Order by the contact_data column
  * @method PartnerQuery orderByComments($order = Criteria::ASC) Order by the comments column
- * @method PartnerQuery orderByPhone1($order = Criteria::ASC) Order by the phone1 column
- * @method PartnerQuery orderByPhone2($order = Criteria::ASC) Order by the phone2 column
- * @method PartnerQuery orderByPhone3($order = Criteria::ASC) Order by the phone3 column
- * @method PartnerQuery orderByFax($order = Criteria::ASC) Order by the fax column
  * @method PartnerQuery orderByIsOrganization($order = Criteria::ASC) Order by the is_organization column
  *
  * @method PartnerQuery groupById() Group by the id column
  * @method PartnerQuery groupByName() Group by the name column
- * @method PartnerQuery groupByAddress() Group by the address column
  * @method PartnerQuery groupByPerson() Group by the person column
- * @method PartnerQuery groupByMail() Group by the mail column
- * @method PartnerQuery groupByWeb() Group by the web column
+ * @method PartnerQuery groupByContactData() Group by the contact_data column
  * @method PartnerQuery groupByComments() Group by the comments column
- * @method PartnerQuery groupByPhone1() Group by the phone1 column
- * @method PartnerQuery groupByPhone2() Group by the phone2 column
- * @method PartnerQuery groupByPhone3() Group by the phone3 column
- * @method PartnerQuery groupByFax() Group by the fax column
  * @method PartnerQuery groupByIsOrganization() Group by the is_organization column
  *
  * @method PartnerQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method PartnerQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method PartnerQuery innerJoin($relation) Adds a INNER JOIN clause to the query
+ *
+ * @method PartnerQuery leftJoinTask($relationAlias = null) Adds a LEFT JOIN clause to the query using the Task relation
+ * @method PartnerQuery rightJoinTask($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Task relation
+ * @method PartnerQuery innerJoinTask($relationAlias = null) Adds a INNER JOIN clause to the query using the Task relation
  *
  * @method PartnerQuery leftJoinImagesource($relationAlias = null) Adds a LEFT JOIN clause to the query using the Imagesource relation
  * @method PartnerQuery rightJoinImagesource($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Imagesource relation
@@ -61,28 +54,16 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method Partner findOneOrCreate(PropelPDO $con = null) Return the first Partner matching the query, or a new Partner object populated from the query conditions when no match is found
  *
  * @method Partner findOneByName(string $name) Return the first Partner filtered by the name column
- * @method Partner findOneByAddress(string $address) Return the first Partner filtered by the address column
  * @method Partner findOneByPerson(string $person) Return the first Partner filtered by the person column
- * @method Partner findOneByMail(string $mail) Return the first Partner filtered by the mail column
- * @method Partner findOneByWeb(string $web) Return the first Partner filtered by the web column
+ * @method Partner findOneByContactData(string $contact_data) Return the first Partner filtered by the contact_data column
  * @method Partner findOneByComments(string $comments) Return the first Partner filtered by the comments column
- * @method Partner findOneByPhone1(string $phone1) Return the first Partner filtered by the phone1 column
- * @method Partner findOneByPhone2(string $phone2) Return the first Partner filtered by the phone2 column
- * @method Partner findOneByPhone3(string $phone3) Return the first Partner filtered by the phone3 column
- * @method Partner findOneByFax(string $fax) Return the first Partner filtered by the fax column
  * @method Partner findOneByIsOrganization(boolean $is_organization) Return the first Partner filtered by the is_organization column
  *
  * @method array findById(int $id) Return Partner objects filtered by the id column
  * @method array findByName(string $name) Return Partner objects filtered by the name column
- * @method array findByAddress(string $address) Return Partner objects filtered by the address column
  * @method array findByPerson(string $person) Return Partner objects filtered by the person column
- * @method array findByMail(string $mail) Return Partner objects filtered by the mail column
- * @method array findByWeb(string $web) Return Partner objects filtered by the web column
+ * @method array findByContactData(string $contact_data) Return Partner objects filtered by the contact_data column
  * @method array findByComments(string $comments) Return Partner objects filtered by the comments column
- * @method array findByPhone1(string $phone1) Return Partner objects filtered by the phone1 column
- * @method array findByPhone2(string $phone2) Return Partner objects filtered by the phone2 column
- * @method array findByPhone3(string $phone3) Return Partner objects filtered by the phone3 column
- * @method array findByFax(string $fax) Return Partner objects filtered by the fax column
  * @method array findByIsOrganization(boolean $is_organization) Return Partner objects filtered by the is_organization column
  */
 abstract class BasePartnerQuery extends ModelCriteria
@@ -185,7 +166,7 @@ abstract class BasePartnerQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "name", "address", "person", "mail", "web", "comments", "phone1", "phone2", "phone3", "fax", "is_organization" FROM "partner" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "name", "person", "contact_data", "comments", "is_organization" FROM "partner" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -346,35 +327,6 @@ abstract class BasePartnerQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the address column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByAddress('fooValue');   // WHERE address = 'fooValue'
-     * $query->filterByAddress('%fooValue%'); // WHERE address LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $address The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return PartnerQuery The current query, for fluid interface
-     */
-    public function filterByAddress($address = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($address)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $address)) {
-                $address = str_replace('*', '%', $address);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(PartnerPeer::ADDRESS, $address, $comparison);
-    }
-
-    /**
      * Filter the query on the person column
      *
      * Example usage:
@@ -404,61 +356,32 @@ abstract class BasePartnerQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the mail column
+     * Filter the query on the contact_data column
      *
      * Example usage:
      * <code>
-     * $query->filterByMail('fooValue');   // WHERE mail = 'fooValue'
-     * $query->filterByMail('%fooValue%'); // WHERE mail LIKE '%fooValue%'
+     * $query->filterByContactData('fooValue');   // WHERE contact_data = 'fooValue'
+     * $query->filterByContactData('%fooValue%'); // WHERE contact_data LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $mail The value to use as filter.
+     * @param     string $contactData The value to use as filter.
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return PartnerQuery The current query, for fluid interface
      */
-    public function filterByMail($mail = null, $comparison = null)
+    public function filterByContactData($contactData = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (is_array($mail)) {
+            if (is_array($contactData)) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $mail)) {
-                $mail = str_replace('*', '%', $mail);
+            } elseif (preg_match('/[\%\*]/', $contactData)) {
+                $contactData = str_replace('*', '%', $contactData);
                 $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(PartnerPeer::MAIL, $mail, $comparison);
-    }
-
-    /**
-     * Filter the query on the web column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByWeb('fooValue');   // WHERE web = 'fooValue'
-     * $query->filterByWeb('%fooValue%'); // WHERE web LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $web The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return PartnerQuery The current query, for fluid interface
-     */
-    public function filterByWeb($web = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($web)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $web)) {
-                $web = str_replace('*', '%', $web);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(PartnerPeer::WEB, $web, $comparison);
+        return $this->addUsingAlias(PartnerPeer::CONTACT_DATA, $contactData, $comparison);
     }
 
     /**
@@ -491,122 +414,6 @@ abstract class BasePartnerQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the phone1 column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByPhone1('fooValue');   // WHERE phone1 = 'fooValue'
-     * $query->filterByPhone1('%fooValue%'); // WHERE phone1 LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $phone1 The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return PartnerQuery The current query, for fluid interface
-     */
-    public function filterByPhone1($phone1 = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($phone1)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $phone1)) {
-                $phone1 = str_replace('*', '%', $phone1);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(PartnerPeer::PHONE1, $phone1, $comparison);
-    }
-
-    /**
-     * Filter the query on the phone2 column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByPhone2('fooValue');   // WHERE phone2 = 'fooValue'
-     * $query->filterByPhone2('%fooValue%'); // WHERE phone2 LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $phone2 The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return PartnerQuery The current query, for fluid interface
-     */
-    public function filterByPhone2($phone2 = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($phone2)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $phone2)) {
-                $phone2 = str_replace('*', '%', $phone2);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(PartnerPeer::PHONE2, $phone2, $comparison);
-    }
-
-    /**
-     * Filter the query on the phone3 column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByPhone3('fooValue');   // WHERE phone3 = 'fooValue'
-     * $query->filterByPhone3('%fooValue%'); // WHERE phone3 LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $phone3 The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return PartnerQuery The current query, for fluid interface
-     */
-    public function filterByPhone3($phone3 = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($phone3)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $phone3)) {
-                $phone3 = str_replace('*', '%', $phone3);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(PartnerPeer::PHONE3, $phone3, $comparison);
-    }
-
-    /**
-     * Filter the query on the fax column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByFax('fooValue');   // WHERE fax = 'fooValue'
-     * $query->filterByFax('%fooValue%'); // WHERE fax LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $fax The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return PartnerQuery The current query, for fluid interface
-     */
-    public function filterByFax($fax = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($fax)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $fax)) {
-                $fax = str_replace('*', '%', $fax);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(PartnerPeer::FAX, $fax, $comparison);
-    }
-
-    /**
      * Filter the query on the is_organization column
      *
      * Example usage:
@@ -631,6 +438,80 @@ abstract class BasePartnerQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(PartnerPeer::IS_ORGANIZATION, $isOrganization, $comparison);
+    }
+
+    /**
+     * Filter the query by a related Task object
+     *
+     * @param   Task|PropelObjectCollection $task  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 PartnerQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByTask($task, $comparison = null)
+    {
+        if ($task instanceof Task) {
+            return $this
+                ->addUsingAlias(PartnerPeer::ID, $task->getPartnerId(), $comparison);
+        } elseif ($task instanceof PropelObjectCollection) {
+            return $this
+                ->useTaskQuery()
+                ->filterByPrimaryKeys($task->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByTask() only accepts arguments of type Task or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Task relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return PartnerQuery The current query, for fluid interface
+     */
+    public function joinTask($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Task');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Task');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Task relation Task object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\Workflow\TaskQuery A secondary query class using the current class as primary query
+     */
+    public function useTaskQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinTask($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Task', '\DTA\MetadataBundle\Model\Workflow\TaskQuery');
     }
 
     /**

@@ -18,6 +18,8 @@ use DTA\MetadataBundle\Model\Workflow\ImagesourceQuery;
 use DTA\MetadataBundle\Model\Workflow\Partner;
 use DTA\MetadataBundle\Model\Workflow\PartnerPeer;
 use DTA\MetadataBundle\Model\Workflow\PartnerQuery;
+use DTA\MetadataBundle\Model\Workflow\Task;
+use DTA\MetadataBundle\Model\Workflow\TaskQuery;
 use DTA\MetadataBundle\Model\Workflow\Textsource;
 use DTA\MetadataBundle\Model\Workflow\TextsourceQuery;
 
@@ -55,28 +57,16 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     protected $name;
 
     /**
-     * The value for the address field.
-     * @var        string
-     */
-    protected $address;
-
-    /**
      * The value for the person field.
      * @var        string
      */
     protected $person;
 
     /**
-     * The value for the mail field.
+     * The value for the contact_data field.
      * @var        string
      */
-    protected $mail;
-
-    /**
-     * The value for the web field.
-     * @var        string
-     */
-    protected $web;
+    protected $contact_data;
 
     /**
      * The value for the comments field.
@@ -85,35 +75,17 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     protected $comments;
 
     /**
-     * The value for the phone1 field.
-     * @var        string
-     */
-    protected $phone1;
-
-    /**
-     * The value for the phone2 field.
-     * @var        string
-     */
-    protected $phone2;
-
-    /**
-     * The value for the phone3 field.
-     * @var        string
-     */
-    protected $phone3;
-
-    /**
-     * The value for the fax field.
-     * @var        string
-     */
-    protected $fax;
-
-    /**
      * The value for the is_organization field.
      * Note: this column has a database default value of: false
      * @var        boolean
      */
     protected $is_organization;
+
+    /**
+     * @var        PropelObjectCollection|Task[] Collection to store aggregation of Task objects.
+     */
+    protected $collTasks;
+    protected $collTasksPartial;
 
     /**
      * @var        PropelObjectCollection|Imagesource[] Collection to store aggregation of Imagesource objects.
@@ -148,7 +120,13 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Id', 'Name', 'Address', 'Mail', 'Web', 'Comments', 'Phone1', 'Phone2', 'Phone3', 'Fax', 'IsOrganization', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'Name'=>'Name', 'Address'=>'Address', 'Mail'=>'Mail', 'Web'=>'Web', 'Comments'=>'Comments', 'Phone1'=>'Phone1', 'Phone2'=>'Phone2', 'Phone3'=>'Phone3', 'Fax'=>'Fax', 'IsOrganization'=>'IsOrganization', );
+    public static $tableRowViewCaptions = array('Id', 'Name', 'ContactData', 'Comments', 'IsOrganization', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'Name'=>'Name', 'ContactData'=>'ContactData', 'Comments'=>'Comments', 'IsOrganization'=>'IsOrganization', );
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $tasksScheduledForDeletion = null;
+
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -203,18 +181,8 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     }
 
     /**
-     * Get the [address] column value.
-     *
-     * @return string
-     */
-    public function getAddress()
-    {
-        return $this->address;
-    }
-
-    /**
      * Get the [person] column value.
-     *
+     * Ansprechpartner
      * @return string
      */
     public function getPerson()
@@ -223,23 +191,13 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     }
 
     /**
-     * Get the [mail] column value.
+     * Get the [contact_data] column value.
      *
      * @return string
      */
-    public function getMail()
+    public function getContactData()
     {
-        return $this->mail;
-    }
-
-    /**
-     * Get the [web] column value.
-     *
-     * @return string
-     */
-    public function getWeb()
-    {
-        return $this->web;
+        return $this->contact_data;
     }
 
     /**
@@ -250,46 +208,6 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     public function getComments()
     {
         return $this->comments;
-    }
-
-    /**
-     * Get the [phone1] column value.
-     *
-     * @return string
-     */
-    public function getPhone1()
-    {
-        return $this->phone1;
-    }
-
-    /**
-     * Get the [phone2] column value.
-     *
-     * @return string
-     */
-    public function getPhone2()
-    {
-        return $this->phone2;
-    }
-
-    /**
-     * Get the [phone3] column value.
-     *
-     * @return string
-     */
-    public function getPhone3()
-    {
-        return $this->phone3;
-    }
-
-    /**
-     * Get the [fax] column value.
-     *
-     * @return string
-     */
-    public function getFax()
-    {
-        return $this->fax;
     }
 
     /**
@@ -345,29 +263,8 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     } // setName()
 
     /**
-     * Set the value of [address] column.
-     *
-     * @param string $v new value
-     * @return Partner The current object (for fluent API support)
-     */
-    public function setAddress($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
-        }
-
-        if ($this->address !== $v) {
-            $this->address = $v;
-            $this->modifiedColumns[] = PartnerPeer::ADDRESS;
-        }
-
-
-        return $this;
-    } // setAddress()
-
-    /**
      * Set the value of [person] column.
-     *
+     * Ansprechpartner
      * @param string $v new value
      * @return Partner The current object (for fluent API support)
      */
@@ -387,46 +284,25 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     } // setPerson()
 
     /**
-     * Set the value of [mail] column.
+     * Set the value of [contact_data] column.
      *
      * @param string $v new value
      * @return Partner The current object (for fluent API support)
      */
-    public function setMail($v)
+    public function setContactData($v)
     {
         if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
-        if ($this->mail !== $v) {
-            $this->mail = $v;
-            $this->modifiedColumns[] = PartnerPeer::MAIL;
+        if ($this->contact_data !== $v) {
+            $this->contact_data = $v;
+            $this->modifiedColumns[] = PartnerPeer::CONTACT_DATA;
         }
 
 
         return $this;
-    } // setMail()
-
-    /**
-     * Set the value of [web] column.
-     *
-     * @param string $v new value
-     * @return Partner The current object (for fluent API support)
-     */
-    public function setWeb($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
-        }
-
-        if ($this->web !== $v) {
-            $this->web = $v;
-            $this->modifiedColumns[] = PartnerPeer::WEB;
-        }
-
-
-        return $this;
-    } // setWeb()
+    } // setContactData()
 
     /**
      * Set the value of [comments] column.
@@ -448,90 +324,6 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
 
         return $this;
     } // setComments()
-
-    /**
-     * Set the value of [phone1] column.
-     *
-     * @param string $v new value
-     * @return Partner The current object (for fluent API support)
-     */
-    public function setPhone1($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
-        }
-
-        if ($this->phone1 !== $v) {
-            $this->phone1 = $v;
-            $this->modifiedColumns[] = PartnerPeer::PHONE1;
-        }
-
-
-        return $this;
-    } // setPhone1()
-
-    /**
-     * Set the value of [phone2] column.
-     *
-     * @param string $v new value
-     * @return Partner The current object (for fluent API support)
-     */
-    public function setPhone2($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
-        }
-
-        if ($this->phone2 !== $v) {
-            $this->phone2 = $v;
-            $this->modifiedColumns[] = PartnerPeer::PHONE2;
-        }
-
-
-        return $this;
-    } // setPhone2()
-
-    /**
-     * Set the value of [phone3] column.
-     *
-     * @param string $v new value
-     * @return Partner The current object (for fluent API support)
-     */
-    public function setPhone3($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
-        }
-
-        if ($this->phone3 !== $v) {
-            $this->phone3 = $v;
-            $this->modifiedColumns[] = PartnerPeer::PHONE3;
-        }
-
-
-        return $this;
-    } // setPhone3()
-
-    /**
-     * Set the value of [fax] column.
-     *
-     * @param string $v new value
-     * @return Partner The current object (for fluent API support)
-     */
-    public function setFax($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
-        }
-
-        if ($this->fax !== $v) {
-            $this->fax = $v;
-            $this->modifiedColumns[] = PartnerPeer::FAX;
-        }
-
-
-        return $this;
-    } // setFax()
 
     /**
      * Sets the value of the [is_organization] column.
@@ -600,16 +392,10 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->name = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
-            $this->address = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-            $this->person = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-            $this->mail = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-            $this->web = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-            $this->comments = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-            $this->phone1 = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
-            $this->phone2 = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-            $this->phone3 = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-            $this->fax = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
-            $this->is_organization = ($row[$startcol + 11] !== null) ? (boolean) $row[$startcol + 11] : null;
+            $this->person = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+            $this->contact_data = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+            $this->comments = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+            $this->is_organization = ($row[$startcol + 5] !== null) ? (boolean) $row[$startcol + 5] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -618,7 +404,7 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 12; // 12 = PartnerPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = PartnerPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Partner object", $e);
@@ -679,6 +465,8 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
         $this->hydrate($row, 0, true); // rehydrate
 
         if ($deep) {  // also de-associate any related objects?
+
+            $this->collTasks = null;
 
             $this->collImagesources = null;
 
@@ -808,6 +596,24 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
                 $this->resetModified();
             }
 
+            if ($this->tasksScheduledForDeletion !== null) {
+                if (!$this->tasksScheduledForDeletion->isEmpty()) {
+                    foreach ($this->tasksScheduledForDeletion as $task) {
+                        // need to save related object because we set the relation to null
+                        $task->save($con);
+                    }
+                    $this->tasksScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collTasks !== null) {
+                foreach ($this->collTasks as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             if ($this->imagesourcesScheduledForDeletion !== null) {
                 if (!$this->imagesourcesScheduledForDeletion->isEmpty()) {
                     foreach ($this->imagesourcesScheduledForDeletion as $imagesource) {
@@ -886,32 +692,14 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
         if ($this->isColumnModified(PartnerPeer::NAME)) {
             $modifiedColumns[':p' . $index++]  = '"name"';
         }
-        if ($this->isColumnModified(PartnerPeer::ADDRESS)) {
-            $modifiedColumns[':p' . $index++]  = '"address"';
-        }
         if ($this->isColumnModified(PartnerPeer::PERSON)) {
             $modifiedColumns[':p' . $index++]  = '"person"';
         }
-        if ($this->isColumnModified(PartnerPeer::MAIL)) {
-            $modifiedColumns[':p' . $index++]  = '"mail"';
-        }
-        if ($this->isColumnModified(PartnerPeer::WEB)) {
-            $modifiedColumns[':p' . $index++]  = '"web"';
+        if ($this->isColumnModified(PartnerPeer::CONTACT_DATA)) {
+            $modifiedColumns[':p' . $index++]  = '"contact_data"';
         }
         if ($this->isColumnModified(PartnerPeer::COMMENTS)) {
             $modifiedColumns[':p' . $index++]  = '"comments"';
-        }
-        if ($this->isColumnModified(PartnerPeer::PHONE1)) {
-            $modifiedColumns[':p' . $index++]  = '"phone1"';
-        }
-        if ($this->isColumnModified(PartnerPeer::PHONE2)) {
-            $modifiedColumns[':p' . $index++]  = '"phone2"';
-        }
-        if ($this->isColumnModified(PartnerPeer::PHONE3)) {
-            $modifiedColumns[':p' . $index++]  = '"phone3"';
-        }
-        if ($this->isColumnModified(PartnerPeer::FAX)) {
-            $modifiedColumns[':p' . $index++]  = '"fax"';
         }
         if ($this->isColumnModified(PartnerPeer::IS_ORGANIZATION)) {
             $modifiedColumns[':p' . $index++]  = '"is_organization"';
@@ -933,32 +721,14 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
                     case '"name"':
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
                         break;
-                    case '"address"':
-                        $stmt->bindValue($identifier, $this->address, PDO::PARAM_STR);
-                        break;
                     case '"person"':
                         $stmt->bindValue($identifier, $this->person, PDO::PARAM_STR);
                         break;
-                    case '"mail"':
-                        $stmt->bindValue($identifier, $this->mail, PDO::PARAM_STR);
-                        break;
-                    case '"web"':
-                        $stmt->bindValue($identifier, $this->web, PDO::PARAM_STR);
+                    case '"contact_data"':
+                        $stmt->bindValue($identifier, $this->contact_data, PDO::PARAM_STR);
                         break;
                     case '"comments"':
                         $stmt->bindValue($identifier, $this->comments, PDO::PARAM_STR);
-                        break;
-                    case '"phone1"':
-                        $stmt->bindValue($identifier, $this->phone1, PDO::PARAM_STR);
-                        break;
-                    case '"phone2"':
-                        $stmt->bindValue($identifier, $this->phone2, PDO::PARAM_STR);
-                        break;
-                    case '"phone3"':
-                        $stmt->bindValue($identifier, $this->phone3, PDO::PARAM_STR);
-                        break;
-                    case '"fax"':
-                        $stmt->bindValue($identifier, $this->fax, PDO::PARAM_STR);
                         break;
                     case '"is_organization"':
                         $stmt->bindValue($identifier, $this->is_organization, PDO::PARAM_BOOL);
@@ -1055,6 +825,14 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
             }
 
 
+                if ($this->collTasks !== null) {
+                    foreach ($this->collTasks as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
                 if ($this->collImagesources !== null) {
                     foreach ($this->collImagesources as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -1113,33 +891,15 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
                 return $this->getName();
                 break;
             case 2:
-                return $this->getAddress();
-                break;
-            case 3:
                 return $this->getPerson();
                 break;
+            case 3:
+                return $this->getContactData();
+                break;
             case 4:
-                return $this->getMail();
-                break;
-            case 5:
-                return $this->getWeb();
-                break;
-            case 6:
                 return $this->getComments();
                 break;
-            case 7:
-                return $this->getPhone1();
-                break;
-            case 8:
-                return $this->getPhone2();
-                break;
-            case 9:
-                return $this->getPhone3();
-                break;
-            case 10:
-                return $this->getFax();
-                break;
-            case 11:
+            case 5:
                 return $this->getIsOrganization();
                 break;
             default:
@@ -1173,18 +933,15 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getName(),
-            $keys[2] => $this->getAddress(),
-            $keys[3] => $this->getPerson(),
-            $keys[4] => $this->getMail(),
-            $keys[5] => $this->getWeb(),
-            $keys[6] => $this->getComments(),
-            $keys[7] => $this->getPhone1(),
-            $keys[8] => $this->getPhone2(),
-            $keys[9] => $this->getPhone3(),
-            $keys[10] => $this->getFax(),
-            $keys[11] => $this->getIsOrganization(),
+            $keys[2] => $this->getPerson(),
+            $keys[3] => $this->getContactData(),
+            $keys[4] => $this->getComments(),
+            $keys[5] => $this->getIsOrganization(),
         );
         if ($includeForeignObjects) {
+            if (null !== $this->collTasks) {
+                $result['Tasks'] = $this->collTasks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collImagesources) {
                 $result['Imagesources'] = $this->collImagesources->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1232,33 +989,15 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
                 $this->setName($value);
                 break;
             case 2:
-                $this->setAddress($value);
-                break;
-            case 3:
                 $this->setPerson($value);
                 break;
+            case 3:
+                $this->setContactData($value);
+                break;
             case 4:
-                $this->setMail($value);
-                break;
-            case 5:
-                $this->setWeb($value);
-                break;
-            case 6:
                 $this->setComments($value);
                 break;
-            case 7:
-                $this->setPhone1($value);
-                break;
-            case 8:
-                $this->setPhone2($value);
-                break;
-            case 9:
-                $this->setPhone3($value);
-                break;
-            case 10:
-                $this->setFax($value);
-                break;
-            case 11:
+            case 5:
                 $this->setIsOrganization($value);
                 break;
         } // switch()
@@ -1287,16 +1026,10 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setAddress($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setPerson($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setMail($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setWeb($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setComments($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setPhone1($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setPhone2($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setPhone3($arr[$keys[9]]);
-        if (array_key_exists($keys[10], $arr)) $this->setFax($arr[$keys[10]]);
-        if (array_key_exists($keys[11], $arr)) $this->setIsOrganization($arr[$keys[11]]);
+        if (array_key_exists($keys[2], $arr)) $this->setPerson($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setContactData($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setComments($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setIsOrganization($arr[$keys[5]]);
     }
 
     /**
@@ -1310,15 +1043,9 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
 
         if ($this->isColumnModified(PartnerPeer::ID)) $criteria->add(PartnerPeer::ID, $this->id);
         if ($this->isColumnModified(PartnerPeer::NAME)) $criteria->add(PartnerPeer::NAME, $this->name);
-        if ($this->isColumnModified(PartnerPeer::ADDRESS)) $criteria->add(PartnerPeer::ADDRESS, $this->address);
         if ($this->isColumnModified(PartnerPeer::PERSON)) $criteria->add(PartnerPeer::PERSON, $this->person);
-        if ($this->isColumnModified(PartnerPeer::MAIL)) $criteria->add(PartnerPeer::MAIL, $this->mail);
-        if ($this->isColumnModified(PartnerPeer::WEB)) $criteria->add(PartnerPeer::WEB, $this->web);
+        if ($this->isColumnModified(PartnerPeer::CONTACT_DATA)) $criteria->add(PartnerPeer::CONTACT_DATA, $this->contact_data);
         if ($this->isColumnModified(PartnerPeer::COMMENTS)) $criteria->add(PartnerPeer::COMMENTS, $this->comments);
-        if ($this->isColumnModified(PartnerPeer::PHONE1)) $criteria->add(PartnerPeer::PHONE1, $this->phone1);
-        if ($this->isColumnModified(PartnerPeer::PHONE2)) $criteria->add(PartnerPeer::PHONE2, $this->phone2);
-        if ($this->isColumnModified(PartnerPeer::PHONE3)) $criteria->add(PartnerPeer::PHONE3, $this->phone3);
-        if ($this->isColumnModified(PartnerPeer::FAX)) $criteria->add(PartnerPeer::FAX, $this->fax);
         if ($this->isColumnModified(PartnerPeer::IS_ORGANIZATION)) $criteria->add(PartnerPeer::IS_ORGANIZATION, $this->is_organization);
 
         return $criteria;
@@ -1384,15 +1111,9 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setName($this->getName());
-        $copyObj->setAddress($this->getAddress());
         $copyObj->setPerson($this->getPerson());
-        $copyObj->setMail($this->getMail());
-        $copyObj->setWeb($this->getWeb());
+        $copyObj->setContactData($this->getContactData());
         $copyObj->setComments($this->getComments());
-        $copyObj->setPhone1($this->getPhone1());
-        $copyObj->setPhone2($this->getPhone2());
-        $copyObj->setPhone3($this->getPhone3());
-        $copyObj->setFax($this->getFax());
         $copyObj->setIsOrganization($this->getIsOrganization());
 
         if ($deepCopy && !$this->startCopy) {
@@ -1401,6 +1122,12 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
             $copyObj->setNew(false);
             // store object hash to prevent cycle
             $this->startCopy = true;
+
+            foreach ($this->getTasks() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addTask($relObj->copy($deepCopy));
+                }
+            }
 
             foreach ($this->getImagesources() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
@@ -1475,12 +1202,333 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
      */
     public function initRelation($relationName)
     {
+        if ('Task' == $relationName) {
+            $this->initTasks();
+        }
         if ('Imagesource' == $relationName) {
             $this->initImagesources();
         }
         if ('Textsource' == $relationName) {
             $this->initTextsources();
         }
+    }
+
+    /**
+     * Clears out the collTasks collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Partner The current object (for fluent API support)
+     * @see        addTasks()
+     */
+    public function clearTasks()
+    {
+        $this->collTasks = null; // important to set this to null since that means it is uninitialized
+        $this->collTasksPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collTasks collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialTasks($v = true)
+    {
+        $this->collTasksPartial = $v;
+    }
+
+    /**
+     * Initializes the collTasks collection.
+     *
+     * By default this just sets the collTasks collection to an empty array (like clearcollTasks());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initTasks($overrideExisting = true)
+    {
+        if (null !== $this->collTasks && !$overrideExisting) {
+            return;
+        }
+        $this->collTasks = new PropelObjectCollection();
+        $this->collTasks->setModel('Task');
+    }
+
+    /**
+     * Gets an array of Task objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Partner is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Task[] List of Task objects
+     * @throws PropelException
+     */
+    public function getTasks($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collTasksPartial && !$this->isNew();
+        if (null === $this->collTasks || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collTasks) {
+                // return empty collection
+                $this->initTasks();
+            } else {
+                $collTasks = TaskQuery::create(null, $criteria)
+                    ->filterByPartner($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collTasksPartial && count($collTasks)) {
+                      $this->initTasks(false);
+
+                      foreach($collTasks as $obj) {
+                        if (false == $this->collTasks->contains($obj)) {
+                          $this->collTasks->append($obj);
+                        }
+                      }
+
+                      $this->collTasksPartial = true;
+                    }
+
+                    $collTasks->getInternalIterator()->rewind();
+                    return $collTasks;
+                }
+
+                if($partial && $this->collTasks) {
+                    foreach($this->collTasks as $obj) {
+                        if($obj->isNew()) {
+                            $collTasks[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collTasks = $collTasks;
+                $this->collTasksPartial = false;
+            }
+        }
+
+        return $this->collTasks;
+    }
+
+    /**
+     * Sets a collection of Task objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $tasks A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Partner The current object (for fluent API support)
+     */
+    public function setTasks(PropelCollection $tasks, PropelPDO $con = null)
+    {
+        $tasksToDelete = $this->getTasks(new Criteria(), $con)->diff($tasks);
+
+        $this->tasksScheduledForDeletion = unserialize(serialize($tasksToDelete));
+
+        foreach ($tasksToDelete as $taskRemoved) {
+            $taskRemoved->setPartner(null);
+        }
+
+        $this->collTasks = null;
+        foreach ($tasks as $task) {
+            $this->addTask($task);
+        }
+
+        $this->collTasks = $tasks;
+        $this->collTasksPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Task objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Task objects.
+     * @throws PropelException
+     */
+    public function countTasks(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collTasksPartial && !$this->isNew();
+        if (null === $this->collTasks || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collTasks) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getTasks());
+            }
+            $query = TaskQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPartner($this)
+                ->count($con);
+        }
+
+        return count($this->collTasks);
+    }
+
+    /**
+     * Method called to associate a Task object to this object
+     * through the Task foreign key attribute.
+     *
+     * @param    Task $l Task
+     * @return Partner The current object (for fluent API support)
+     */
+    public function addTask(Task $l)
+    {
+        if ($this->collTasks === null) {
+            $this->initTasks();
+            $this->collTasksPartial = true;
+        }
+        if (!in_array($l, $this->collTasks->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddTask($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Task $task The task object to add.
+     */
+    protected function doAddTask($task)
+    {
+        $this->collTasks[]= $task;
+        $task->setPartner($this);
+    }
+
+    /**
+     * @param	Task $task The task object to remove.
+     * @return Partner The current object (for fluent API support)
+     */
+    public function removeTask($task)
+    {
+        if ($this->getTasks()->contains($task)) {
+            $this->collTasks->remove($this->collTasks->search($task));
+            if (null === $this->tasksScheduledForDeletion) {
+                $this->tasksScheduledForDeletion = clone $this->collTasks;
+                $this->tasksScheduledForDeletion->clear();
+            }
+            $this->tasksScheduledForDeletion[]= $task;
+            $task->setPartner(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Partner is new, it will return
+     * an empty collection; or if this Partner has previously
+     * been saved, it will retrieve related Tasks from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Partner.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Task[] List of Task objects
+     */
+    public function getTasksJoinTasktype($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = TaskQuery::create(null, $criteria);
+        $query->joinWith('Tasktype', $join_behavior);
+
+        return $this->getTasks($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Partner is new, it will return
+     * an empty collection; or if this Partner has previously
+     * been saved, it will retrieve related Tasks from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Partner.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Task[] List of Task objects
+     */
+    public function getTasksJoinPublicationgroup($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = TaskQuery::create(null, $criteria);
+        $query->joinWith('Publicationgroup', $join_behavior);
+
+        return $this->getTasks($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Partner is new, it will return
+     * an empty collection; or if this Partner has previously
+     * been saved, it will retrieve related Tasks from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Partner.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Task[] List of Task objects
+     */
+    public function getTasksJoinPublication($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = TaskQuery::create(null, $criteria);
+        $query->joinWith('Publication', $join_behavior);
+
+        return $this->getTasks($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Partner is new, it will return
+     * an empty collection; or if this Partner has previously
+     * been saved, it will retrieve related Tasks from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Partner.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Task[] List of Task objects
+     */
+    public function getTasksJoinDtaUser($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = TaskQuery::create(null, $criteria);
+        $query->joinWith('DtaUser', $join_behavior);
+
+        return $this->getTasks($query, $con);
     }
 
     /**
@@ -2026,15 +2074,9 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     {
         $this->id = null;
         $this->name = null;
-        $this->address = null;
         $this->person = null;
-        $this->mail = null;
-        $this->web = null;
+        $this->contact_data = null;
         $this->comments = null;
-        $this->phone1 = null;
-        $this->phone2 = null;
-        $this->phone3 = null;
-        $this->fax = null;
         $this->is_organization = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
@@ -2059,6 +2101,11 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->collTasks) {
+                foreach ($this->collTasks as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collImagesources) {
                 foreach ($this->collImagesources as $o) {
                     $o->clearAllReferences($deep);
@@ -2073,6 +2120,10 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
+        if ($this->collTasks instanceof PropelCollection) {
+            $this->collTasks->clearIterator();
+        }
+        $this->collTasks = null;
         if ($this->collImagesources instanceof PropelCollection) {
             $this->collImagesources->clearIterator();
         }

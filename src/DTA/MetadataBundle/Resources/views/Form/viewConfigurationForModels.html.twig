@@ -22,10 +22,6 @@
     {{ form_row(form, {'expanded':true}) }}
 {% endblock %}
 
-{% block printrun_row %}
-    {{ form_row(form, {'inlineChildren':true }) }}
-{% endblock %}
-
 {% block imagesource_row %}
     {% import  'DTAMetadataBundle:form:buildingBlocks.html.twig' as dta %}
     <div>

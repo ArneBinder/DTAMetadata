@@ -21,17 +21,22 @@ class TaskType extends BaseAbstractType
             'class' => '\DTA\MetadataBundle\Model\Workflow\Tasktype',
             'property' => 'name',
         ));
-        $builder->add('done', null, array(
-            'label' => 'erledigt',
-            'attr' => array('expanded'=>true),
-        ));
-        $builder->add('start', null, array('years'=>array('2013'),'widget' => 'choice'));
-        $builder->add('end');
+        $builder->add('start_date', null, array('years'=>array('2013','2014','2015'),'widget' => 'choice'));
+        $builder->add('end_date');
         $builder->add('comments');
-        $builder->add('User', 'model', array(
+        $builder->add('DTAUser', 'model', array(
             'property' => 'username',
-            'class' => 'DTA\MetadataBundle\Model\Workflow\User',
+            'class' => 'DTA\MetadataBundle\Model\Master\DTAUser',
             'label' => 'verantwortlich'
+        ));
+        $builder->add('Partner', 'model', array(
+            'property' => 'name',
+            'class' => 'DTA\MetadataBundle\Model\Workflow\Partner',
+            'label' => 'Partner'
+        ));
+        $builder->add('done', null, array(
+            'label' => 'Abgeschlossen',
+            'attr' => array('expanded'=>true),
         ));
     }
 }

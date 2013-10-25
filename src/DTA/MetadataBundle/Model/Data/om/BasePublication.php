@@ -19,8 +19,6 @@ use DTA\MetadataBundle\Model\Data\Font;
 use DTA\MetadataBundle\Model\Data\FontQuery;
 use DTA\MetadataBundle\Model\Data\Place;
 use DTA\MetadataBundle\Model\Data\PlaceQuery;
-use DTA\MetadataBundle\Model\Data\Printrun;
-use DTA\MetadataBundle\Model\Data\PrintrunQuery;
 use DTA\MetadataBundle\Model\Data\Publication;
 use DTA\MetadataBundle\Model\Data\PublicationDm;
 use DTA\MetadataBundle\Model\Data\PublicationDmQuery;
@@ -52,14 +50,12 @@ use DTA\MetadataBundle\Model\Workflow\Imagesource;
 use DTA\MetadataBundle\Model\Workflow\ImagesourceQuery;
 use DTA\MetadataBundle\Model\Workflow\Publicationgroup;
 use DTA\MetadataBundle\Model\Workflow\PublicationgroupQuery;
-use DTA\MetadataBundle\Model\Workflow\Relatedset;
-use DTA\MetadataBundle\Model\Workflow\RelatedsetQuery;
 use DTA\MetadataBundle\Model\Workflow\Task;
 use DTA\MetadataBundle\Model\Workflow\TaskQuery;
 use DTA\MetadataBundle\Model\Workflow\Textsource;
 use DTA\MetadataBundle\Model\Workflow\TextsourceQuery;
 
-abstract class BasePublication extends BaseObject implements Persistent, \DTA\MetadataBundle\Model\table_row_view\TableRowViewInterface
+abstract class BasePublication extends BaseObject implements Persistent, \DTA\MetadataBundle\Model\reconstructed_flaggable\ReconstructedFlaggableInterface, \DTA\MetadataBundle\Model\table_row_view\TableRowViewInterface
 {
     /**
      * Peer class name
@@ -87,6 +83,12 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     protected $id;
 
     /**
+     * The value for the wwwready field.
+     * @var        int
+     */
+    protected $wwwready;
+
+    /**
      * The value for the work_id field.
      * @var        int
      */
@@ -109,12 +111,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      * @var        int
      */
     protected $firstpublicationdate_id;
-
-    /**
-     * The value for the printrun_id field.
-     * @var        int
-     */
-    protected $printrun_id;
 
     /**
      * The value for the publishingcompany_id field.
@@ -153,16 +149,47 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     protected $font_id;
 
     /**
+     * The value for the volume_alphanumeric field.
+     * @var        string
+     */
+    protected $volume_alphanumeric;
+
+    /**
+     * The value for the volume_numeric field.
+     * @var        string
+     */
+    protected $volume_numeric;
+
+    /**
+     * The value for the volumes_total field.
+     * @var        string
+     */
+    protected $volumes_total;
+
+    /**
+     * The value for the numpages field.
+     * @var        int
+     */
+    protected $numpages;
+
+    /**
+     * The value for the numpagesnormed field.
+     * @var        int
+     */
+    protected $numpagesnormed;
+
+    /**
      * The value for the comment field.
      * @var        string
      */
     protected $comment;
 
     /**
-     * The value for the relatedset_id field.
-     * @var        int
+     * The value for the publishingcompany_id_is_reconstructed field.
+     * Note: this column has a database default value of: false
+     * @var        boolean
      */
-    protected $relatedset_id;
+    protected $publishingcompany_id_is_reconstructed;
 
     /**
      * @var        Work
@@ -178,16 +205,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      * @var        Place
      */
     protected $aPlace;
-
-    /**
-     * @var        Printrun
-     */
-    protected $aPrintrun;
-
-    /**
-     * @var        Relatedset
-     */
-    protected $aRelatedset;
 
     /**
      * @var        Datespecification
@@ -394,6 +411,27 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     protected $textsourcesScheduledForDeletion = null;
 
     /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see        __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->publishingcompany_id_is_reconstructed = false;
+    }
+
+    /**
+     * Initializes internal state of BasePublication object.
+     * @see        applyDefaults()
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->applyDefaultValues();
+    }
+
+    /**
      * Get the [id] column value.
      *
      * @return int
@@ -401,6 +439,16 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * Get the [wwwready] column value.
+     *
+     * @return int
+     */
+    public function getWwwready()
+    {
+        return $this->wwwready;
     }
 
     /**
@@ -441,16 +489,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     public function getFirstpublicationdateId()
     {
         return $this->firstpublicationdate_id;
-    }
-
-    /**
-     * Get the [printrun_id] column value.
-     * Informationen zur Auflage
-     * @return int
-     */
-    public function getPrintrunId()
-    {
-        return $this->printrun_id;
     }
 
     /**
@@ -514,6 +552,56 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     }
 
     /**
+     * Get the [volume_alphanumeric] column value.
+     * Band (alphanumerisch)
+     * @return string
+     */
+    public function getVolumeAlphanumeric()
+    {
+        return $this->volume_alphanumeric;
+    }
+
+    /**
+     * Get the [volume_numeric] column value.
+     * Band (numerisch)
+     * @return string
+     */
+    public function getVolumeNumeric()
+    {
+        return $this->volume_numeric;
+    }
+
+    /**
+     * Get the [volumes_total] column value.
+     * Anzahl Bände
+     * @return string
+     */
+    public function getVolumesTotal()
+    {
+        return $this->volumes_total;
+    }
+
+    /**
+     * Get the [numpages] column value.
+     *
+     * @return int
+     */
+    public function getNumpages()
+    {
+        return $this->numpages;
+    }
+
+    /**
+     * Get the [numpagesnormed] column value.
+     *
+     * @return int
+     */
+    public function getNumpagesnormed()
+    {
+        return $this->numpagesnormed;
+    }
+
+    /**
      * Get the [comment] column value.
      * Anmerkungen
      * @return string
@@ -524,13 +612,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     }
 
     /**
-     * Get the [relatedset_id] column value.
+     * Get the [publishingcompany_id_is_reconstructed] column value.
      *
-     * @return int
+     * @return boolean
      */
-    public function getRelatedsetId()
+    public function getPublishingcompanyIdIsReconstructed()
     {
-        return $this->relatedset_id;
+        return $this->publishingcompany_id_is_reconstructed;
     }
 
     /**
@@ -553,6 +641,27 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
         return $this;
     } // setId()
+
+    /**
+     * Set the value of [wwwready] column.
+     *
+     * @param int $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setWwwready($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->wwwready !== $v) {
+            $this->wwwready = $v;
+            $this->modifiedColumns[] = PublicationPeer::WWWREADY;
+        }
+
+
+        return $this;
+    } // setWwwready()
 
     /**
      * Set the value of [work_id] column.
@@ -653,31 +762,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
         return $this;
     } // setFirstpublicationdateId()
-
-    /**
-     * Set the value of [printrun_id] column.
-     * Informationen zur Auflage
-     * @param int $v new value
-     * @return Publication The current object (for fluent API support)
-     */
-    public function setPrintrunId($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->printrun_id !== $v) {
-            $this->printrun_id = $v;
-            $this->modifiedColumns[] = PublicationPeer::PRINTRUN_ID;
-        }
-
-        if ($this->aPrintrun !== null && $this->aPrintrun->getId() !== $v) {
-            $this->aPrintrun = null;
-        }
-
-
-        return $this;
-    } // setPrintrunId()
 
     /**
      * Set the value of [publishingcompany_id] column.
@@ -814,6 +898,111 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     } // setFontId()
 
     /**
+     * Set the value of [volume_alphanumeric] column.
+     * Band (alphanumerisch)
+     * @param string $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setVolumeAlphanumeric($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->volume_alphanumeric !== $v) {
+            $this->volume_alphanumeric = $v;
+            $this->modifiedColumns[] = PublicationPeer::VOLUME_ALPHANUMERIC;
+        }
+
+
+        return $this;
+    } // setVolumeAlphanumeric()
+
+    /**
+     * Set the value of [volume_numeric] column.
+     * Band (numerisch)
+     * @param string $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setVolumeNumeric($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->volume_numeric !== $v) {
+            $this->volume_numeric = $v;
+            $this->modifiedColumns[] = PublicationPeer::VOLUME_NUMERIC;
+        }
+
+
+        return $this;
+    } // setVolumeNumeric()
+
+    /**
+     * Set the value of [volumes_total] column.
+     * Anzahl Bände
+     * @param string $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setVolumesTotal($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->volumes_total !== $v) {
+            $this->volumes_total = $v;
+            $this->modifiedColumns[] = PublicationPeer::VOLUMES_TOTAL;
+        }
+
+
+        return $this;
+    } // setVolumesTotal()
+
+    /**
+     * Set the value of [numpages] column.
+     *
+     * @param int $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setNumpages($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->numpages !== $v) {
+            $this->numpages = $v;
+            $this->modifiedColumns[] = PublicationPeer::NUMPAGES;
+        }
+
+
+        return $this;
+    } // setNumpages()
+
+    /**
+     * Set the value of [numpagesnormed] column.
+     *
+     * @param int $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setNumpagesnormed($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->numpagesnormed !== $v) {
+            $this->numpagesnormed = $v;
+            $this->modifiedColumns[] = PublicationPeer::NUMPAGESNORMED;
+        }
+
+
+        return $this;
+    } // setNumpagesnormed()
+
+    /**
      * Set the value of [comment] column.
      * Anmerkungen
      * @param string $v new value
@@ -835,29 +1024,33 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     } // setComment()
 
     /**
-     * Set the value of [relatedset_id] column.
+     * Sets the value of the [publishingcompany_id_is_reconstructed] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
      *
-     * @param int $v new value
+     * @param boolean|integer|string $v The new value
      * @return Publication The current object (for fluent API support)
      */
-    public function setRelatedsetId($v)
+    public function setPublishingcompanyIdIsReconstructed($v)
     {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
         }
 
-        if ($this->relatedset_id !== $v) {
-            $this->relatedset_id = $v;
-            $this->modifiedColumns[] = PublicationPeer::RELATEDSET_ID;
-        }
-
-        if ($this->aRelatedset !== null && $this->aRelatedset->getId() !== $v) {
-            $this->aRelatedset = null;
+        if ($this->publishingcompany_id_is_reconstructed !== $v) {
+            $this->publishingcompany_id_is_reconstructed = $v;
+            $this->modifiedColumns[] = PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED;
         }
 
 
         return $this;
-    } // setRelatedsetId()
+    } // setPublishingcompanyIdIsReconstructed()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -869,6 +1062,10 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->publishingcompany_id_is_reconstructed !== false) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return true
         return true;
     } // hasOnlyDefaultValues()
@@ -892,19 +1089,24 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         try {
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-            $this->work_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-            $this->place_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
-            $this->publicationdate_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
-            $this->firstpublicationdate_id = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
-            $this->printrun_id = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+            $this->wwwready = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+            $this->work_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+            $this->place_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+            $this->publicationdate_id = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
+            $this->firstpublicationdate_id = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
             $this->publishingcompany_id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
             $this->partner_id = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
             $this->editiondescription = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
             $this->digitaleditioneditor = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
             $this->transcriptioncomment = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
             $this->font_id = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
-            $this->comment = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
-            $this->relatedset_id = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
+            $this->volume_alphanumeric = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+            $this->volume_numeric = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+            $this->volumes_total = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
+            $this->numpages = ($row[$startcol + 15] !== null) ? (int) $row[$startcol + 15] : null;
+            $this->numpagesnormed = ($row[$startcol + 16] !== null) ? (int) $row[$startcol + 16] : null;
+            $this->comment = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
+            $this->publishingcompany_id_is_reconstructed = ($row[$startcol + 18] !== null) ? (boolean) $row[$startcol + 18] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -913,7 +1115,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 14; // 14 = PublicationPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 19; // 19 = PublicationPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Publication object", $e);
@@ -948,17 +1150,11 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ($this->aDatespecificationRelatedByFirstpublicationdateId !== null && $this->firstpublicationdate_id !== $this->aDatespecificationRelatedByFirstpublicationdateId->getId()) {
             $this->aDatespecificationRelatedByFirstpublicationdateId = null;
         }
-        if ($this->aPrintrun !== null && $this->printrun_id !== $this->aPrintrun->getId()) {
-            $this->aPrintrun = null;
-        }
         if ($this->aPublishingcompany !== null && $this->publishingcompany_id !== $this->aPublishingcompany->getId()) {
             $this->aPublishingcompany = null;
         }
         if ($this->aFont !== null && $this->font_id !== $this->aFont->getId()) {
             $this->aFont = null;
-        }
-        if ($this->aRelatedset !== null && $this->relatedset_id !== $this->aRelatedset->getId()) {
-            $this->aRelatedset = null;
         }
     } // ensureConsistency
 
@@ -1002,8 +1198,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->aWork = null;
             $this->aPublishingcompany = null;
             $this->aPlace = null;
-            $this->aPrintrun = null;
-            $this->aRelatedset = null;
             $this->aDatespecificationRelatedByPublicationdateId = null;
             $this->aDatespecificationRelatedByFirstpublicationdateId = null;
             $this->aFont = null;
@@ -1171,20 +1365,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     $affectedRows += $this->aPlace->save($con);
                 }
                 $this->setPlace($this->aPlace);
-            }
-
-            if ($this->aPrintrun !== null) {
-                if ($this->aPrintrun->isModified() || $this->aPrintrun->isNew()) {
-                    $affectedRows += $this->aPrintrun->save($con);
-                }
-                $this->setPrintrun($this->aPrintrun);
-            }
-
-            if ($this->aRelatedset !== null) {
-                if ($this->aRelatedset->isModified() || $this->aRelatedset->isNew()) {
-                    $affectedRows += $this->aRelatedset->save($con);
-                }
-                $this->setRelatedset($this->aRelatedset);
             }
 
             if ($this->aDatespecificationRelatedByPublicationdateId !== null) {
@@ -1506,6 +1686,9 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ($this->isColumnModified(PublicationPeer::ID)) {
             $modifiedColumns[':p' . $index++]  = '"id"';
         }
+        if ($this->isColumnModified(PublicationPeer::WWWREADY)) {
+            $modifiedColumns[':p' . $index++]  = '"wwwReady"';
+        }
         if ($this->isColumnModified(PublicationPeer::WORK_ID)) {
             $modifiedColumns[':p' . $index++]  = '"work_id"';
         }
@@ -1517,9 +1700,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         }
         if ($this->isColumnModified(PublicationPeer::FIRSTPUBLICATIONDATE_ID)) {
             $modifiedColumns[':p' . $index++]  = '"firstpublicationdate_id"';
-        }
-        if ($this->isColumnModified(PublicationPeer::PRINTRUN_ID)) {
-            $modifiedColumns[':p' . $index++]  = '"printrun_id"';
         }
         if ($this->isColumnModified(PublicationPeer::PUBLISHINGCOMPANY_ID)) {
             $modifiedColumns[':p' . $index++]  = '"publishingcompany_id"';
@@ -1539,11 +1719,26 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ($this->isColumnModified(PublicationPeer::FONT_ID)) {
             $modifiedColumns[':p' . $index++]  = '"font_id"';
         }
+        if ($this->isColumnModified(PublicationPeer::VOLUME_ALPHANUMERIC)) {
+            $modifiedColumns[':p' . $index++]  = '"volume_alphanumeric"';
+        }
+        if ($this->isColumnModified(PublicationPeer::VOLUME_NUMERIC)) {
+            $modifiedColumns[':p' . $index++]  = '"volume_numeric"';
+        }
+        if ($this->isColumnModified(PublicationPeer::VOLUMES_TOTAL)) {
+            $modifiedColumns[':p' . $index++]  = '"volumes_total"';
+        }
+        if ($this->isColumnModified(PublicationPeer::NUMPAGES)) {
+            $modifiedColumns[':p' . $index++]  = '"numpages"';
+        }
+        if ($this->isColumnModified(PublicationPeer::NUMPAGESNORMED)) {
+            $modifiedColumns[':p' . $index++]  = '"numpagesnormed"';
+        }
         if ($this->isColumnModified(PublicationPeer::COMMENT)) {
             $modifiedColumns[':p' . $index++]  = '"comment"';
         }
-        if ($this->isColumnModified(PublicationPeer::RELATEDSET_ID)) {
-            $modifiedColumns[':p' . $index++]  = '"relatedset_id"';
+        if ($this->isColumnModified(PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED)) {
+            $modifiedColumns[':p' . $index++]  = '"publishingcompany_id_is_reconstructed"';
         }
 
         $sql = sprintf(
@@ -1559,6 +1754,9 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     case '"id"':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
+                    case '"wwwReady"':
+                        $stmt->bindValue($identifier, $this->wwwready, PDO::PARAM_INT);
+                        break;
                     case '"work_id"':
                         $stmt->bindValue($identifier, $this->work_id, PDO::PARAM_INT);
                         break;
@@ -1570,9 +1768,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                         break;
                     case '"firstpublicationdate_id"':
                         $stmt->bindValue($identifier, $this->firstpublicationdate_id, PDO::PARAM_INT);
-                        break;
-                    case '"printrun_id"':
-                        $stmt->bindValue($identifier, $this->printrun_id, PDO::PARAM_INT);
                         break;
                     case '"publishingcompany_id"':
                         $stmt->bindValue($identifier, $this->publishingcompany_id, PDO::PARAM_INT);
@@ -1592,11 +1787,26 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     case '"font_id"':
                         $stmt->bindValue($identifier, $this->font_id, PDO::PARAM_INT);
                         break;
+                    case '"volume_alphanumeric"':
+                        $stmt->bindValue($identifier, $this->volume_alphanumeric, PDO::PARAM_STR);
+                        break;
+                    case '"volume_numeric"':
+                        $stmt->bindValue($identifier, $this->volume_numeric, PDO::PARAM_STR);
+                        break;
+                    case '"volumes_total"':
+                        $stmt->bindValue($identifier, $this->volumes_total, PDO::PARAM_STR);
+                        break;
+                    case '"numpages"':
+                        $stmt->bindValue($identifier, $this->numpages, PDO::PARAM_INT);
+                        break;
+                    case '"numpagesnormed"':
+                        $stmt->bindValue($identifier, $this->numpagesnormed, PDO::PARAM_INT);
+                        break;
                     case '"comment"':
                         $stmt->bindValue($identifier, $this->comment, PDO::PARAM_STR);
                         break;
-                    case '"relatedset_id"':
-                        $stmt->bindValue($identifier, $this->relatedset_id, PDO::PARAM_INT);
+                    case '"publishingcompany_id_is_reconstructed"':
+                        $stmt->bindValue($identifier, $this->publishingcompany_id_is_reconstructed, PDO::PARAM_BOOL);
                         break;
                 }
             }
@@ -1705,18 +1915,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             if ($this->aPlace !== null) {
                 if (!$this->aPlace->validate($columns)) {
                     $failureMap = array_merge($failureMap, $this->aPlace->getValidationFailures());
-                }
-            }
-
-            if ($this->aPrintrun !== null) {
-                if (!$this->aPrintrun->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aPrintrun->getValidationFailures());
-                }
-            }
-
-            if ($this->aRelatedset !== null) {
-                if (!$this->aRelatedset->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aRelatedset->getValidationFailures());
                 }
             }
 
@@ -1887,19 +2085,19 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return $this->getId();
                 break;
             case 1:
-                return $this->getWorkId();
+                return $this->getWwwready();
                 break;
             case 2:
-                return $this->getPlaceId();
+                return $this->getWorkId();
                 break;
             case 3:
-                return $this->getPublicationdateId();
+                return $this->getPlaceId();
                 break;
             case 4:
-                return $this->getFirstpublicationdateId();
+                return $this->getPublicationdateId();
                 break;
             case 5:
-                return $this->getPrintrunId();
+                return $this->getFirstpublicationdateId();
                 break;
             case 6:
                 return $this->getPublishingcompanyId();
@@ -1920,10 +2118,25 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return $this->getFontId();
                 break;
             case 12:
-                return $this->getComment();
+                return $this->getVolumeAlphanumeric();
                 break;
             case 13:
-                return $this->getRelatedsetId();
+                return $this->getVolumeNumeric();
+                break;
+            case 14:
+                return $this->getVolumesTotal();
+                break;
+            case 15:
+                return $this->getNumpages();
+                break;
+            case 16:
+                return $this->getNumpagesnormed();
+                break;
+            case 17:
+                return $this->getComment();
+                break;
+            case 18:
+                return $this->getPublishingcompanyIdIsReconstructed();
                 break;
             default:
                 return null;
@@ -1955,19 +2168,24 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         $keys = PublicationPeer::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getWorkId(),
-            $keys[2] => $this->getPlaceId(),
-            $keys[3] => $this->getPublicationdateId(),
-            $keys[4] => $this->getFirstpublicationdateId(),
-            $keys[5] => $this->getPrintrunId(),
+            $keys[1] => $this->getWwwready(),
+            $keys[2] => $this->getWorkId(),
+            $keys[3] => $this->getPlaceId(),
+            $keys[4] => $this->getPublicationdateId(),
+            $keys[5] => $this->getFirstpublicationdateId(),
             $keys[6] => $this->getPublishingcompanyId(),
             $keys[7] => $this->getPartnerId(),
             $keys[8] => $this->getEditiondescription(),
             $keys[9] => $this->getDigitaleditioneditor(),
             $keys[10] => $this->getTranscriptioncomment(),
             $keys[11] => $this->getFontId(),
-            $keys[12] => $this->getComment(),
-            $keys[13] => $this->getRelatedsetId(),
+            $keys[12] => $this->getVolumeAlphanumeric(),
+            $keys[13] => $this->getVolumeNumeric(),
+            $keys[14] => $this->getVolumesTotal(),
+            $keys[15] => $this->getNumpages(),
+            $keys[16] => $this->getNumpagesnormed(),
+            $keys[17] => $this->getComment(),
+            $keys[18] => $this->getPublishingcompanyIdIsReconstructed(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aWork) {
@@ -1978,12 +2196,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             }
             if (null !== $this->aPlace) {
                 $result['Place'] = $this->aPlace->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->aPrintrun) {
-                $result['Printrun'] = $this->aPrintrun->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->aRelatedset) {
-                $result['Relatedset'] = $this->aRelatedset->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->aDatespecificationRelatedByPublicationdateId) {
                 $result['DatespecificationRelatedByPublicationdateId'] = $this->aDatespecificationRelatedByPublicationdateId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
@@ -2071,19 +2283,19 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 $this->setId($value);
                 break;
             case 1:
-                $this->setWorkId($value);
+                $this->setWwwready($value);
                 break;
             case 2:
-                $this->setPlaceId($value);
+                $this->setWorkId($value);
                 break;
             case 3:
-                $this->setPublicationdateId($value);
+                $this->setPlaceId($value);
                 break;
             case 4:
-                $this->setFirstpublicationdateId($value);
+                $this->setPublicationdateId($value);
                 break;
             case 5:
-                $this->setPrintrunId($value);
+                $this->setFirstpublicationdateId($value);
                 break;
             case 6:
                 $this->setPublishingcompanyId($value);
@@ -2104,10 +2316,25 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 $this->setFontId($value);
                 break;
             case 12:
-                $this->setComment($value);
+                $this->setVolumeAlphanumeric($value);
                 break;
             case 13:
-                $this->setRelatedsetId($value);
+                $this->setVolumeNumeric($value);
+                break;
+            case 14:
+                $this->setVolumesTotal($value);
+                break;
+            case 15:
+                $this->setNumpages($value);
+                break;
+            case 16:
+                $this->setNumpagesnormed($value);
+                break;
+            case 17:
+                $this->setComment($value);
+                break;
+            case 18:
+                $this->setPublishingcompanyIdIsReconstructed($value);
                 break;
         } // switch()
     }
@@ -2134,19 +2361,24 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         $keys = PublicationPeer::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setWorkId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setPlaceId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setPublicationdateId($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setFirstpublicationdateId($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setPrintrunId($arr[$keys[5]]);
+        if (array_key_exists($keys[1], $arr)) $this->setWwwready($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setWorkId($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setPlaceId($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setPublicationdateId($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setFirstpublicationdateId($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setPublishingcompanyId($arr[$keys[6]]);
         if (array_key_exists($keys[7], $arr)) $this->setPartnerId($arr[$keys[7]]);
         if (array_key_exists($keys[8], $arr)) $this->setEditiondescription($arr[$keys[8]]);
         if (array_key_exists($keys[9], $arr)) $this->setDigitaleditioneditor($arr[$keys[9]]);
         if (array_key_exists($keys[10], $arr)) $this->setTranscriptioncomment($arr[$keys[10]]);
         if (array_key_exists($keys[11], $arr)) $this->setFontId($arr[$keys[11]]);
-        if (array_key_exists($keys[12], $arr)) $this->setComment($arr[$keys[12]]);
-        if (array_key_exists($keys[13], $arr)) $this->setRelatedsetId($arr[$keys[13]]);
+        if (array_key_exists($keys[12], $arr)) $this->setVolumeAlphanumeric($arr[$keys[12]]);
+        if (array_key_exists($keys[13], $arr)) $this->setVolumeNumeric($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setVolumesTotal($arr[$keys[14]]);
+        if (array_key_exists($keys[15], $arr)) $this->setNumpages($arr[$keys[15]]);
+        if (array_key_exists($keys[16], $arr)) $this->setNumpagesnormed($arr[$keys[16]]);
+        if (array_key_exists($keys[17], $arr)) $this->setComment($arr[$keys[17]]);
+        if (array_key_exists($keys[18], $arr)) $this->setPublishingcompanyIdIsReconstructed($arr[$keys[18]]);
     }
 
     /**
@@ -2159,19 +2391,24 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         $criteria = new Criteria(PublicationPeer::DATABASE_NAME);
 
         if ($this->isColumnModified(PublicationPeer::ID)) $criteria->add(PublicationPeer::ID, $this->id);
+        if ($this->isColumnModified(PublicationPeer::WWWREADY)) $criteria->add(PublicationPeer::WWWREADY, $this->wwwready);
         if ($this->isColumnModified(PublicationPeer::WORK_ID)) $criteria->add(PublicationPeer::WORK_ID, $this->work_id);
         if ($this->isColumnModified(PublicationPeer::PLACE_ID)) $criteria->add(PublicationPeer::PLACE_ID, $this->place_id);
         if ($this->isColumnModified(PublicationPeer::PUBLICATIONDATE_ID)) $criteria->add(PublicationPeer::PUBLICATIONDATE_ID, $this->publicationdate_id);
         if ($this->isColumnModified(PublicationPeer::FIRSTPUBLICATIONDATE_ID)) $criteria->add(PublicationPeer::FIRSTPUBLICATIONDATE_ID, $this->firstpublicationdate_id);
-        if ($this->isColumnModified(PublicationPeer::PRINTRUN_ID)) $criteria->add(PublicationPeer::PRINTRUN_ID, $this->printrun_id);
         if ($this->isColumnModified(PublicationPeer::PUBLISHINGCOMPANY_ID)) $criteria->add(PublicationPeer::PUBLISHINGCOMPANY_ID, $this->publishingcompany_id);
         if ($this->isColumnModified(PublicationPeer::PARTNER_ID)) $criteria->add(PublicationPeer::PARTNER_ID, $this->partner_id);
         if ($this->isColumnModified(PublicationPeer::EDITIONDESCRIPTION)) $criteria->add(PublicationPeer::EDITIONDESCRIPTION, $this->editiondescription);
         if ($this->isColumnModified(PublicationPeer::DIGITALEDITIONEDITOR)) $criteria->add(PublicationPeer::DIGITALEDITIONEDITOR, $this->digitaleditioneditor);
         if ($this->isColumnModified(PublicationPeer::TRANSCRIPTIONCOMMENT)) $criteria->add(PublicationPeer::TRANSCRIPTIONCOMMENT, $this->transcriptioncomment);
         if ($this->isColumnModified(PublicationPeer::FONT_ID)) $criteria->add(PublicationPeer::FONT_ID, $this->font_id);
+        if ($this->isColumnModified(PublicationPeer::VOLUME_ALPHANUMERIC)) $criteria->add(PublicationPeer::VOLUME_ALPHANUMERIC, $this->volume_alphanumeric);
+        if ($this->isColumnModified(PublicationPeer::VOLUME_NUMERIC)) $criteria->add(PublicationPeer::VOLUME_NUMERIC, $this->volume_numeric);
+        if ($this->isColumnModified(PublicationPeer::VOLUMES_TOTAL)) $criteria->add(PublicationPeer::VOLUMES_TOTAL, $this->volumes_total);
+        if ($this->isColumnModified(PublicationPeer::NUMPAGES)) $criteria->add(PublicationPeer::NUMPAGES, $this->numpages);
+        if ($this->isColumnModified(PublicationPeer::NUMPAGESNORMED)) $criteria->add(PublicationPeer::NUMPAGESNORMED, $this->numpagesnormed);
         if ($this->isColumnModified(PublicationPeer::COMMENT)) $criteria->add(PublicationPeer::COMMENT, $this->comment);
-        if ($this->isColumnModified(PublicationPeer::RELATEDSET_ID)) $criteria->add(PublicationPeer::RELATEDSET_ID, $this->relatedset_id);
+        if ($this->isColumnModified(PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED)) $criteria->add(PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED, $this->publishingcompany_id_is_reconstructed);
 
         return $criteria;
     }
@@ -2235,19 +2472,24 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
+        $copyObj->setWwwready($this->getWwwready());
         $copyObj->setWorkId($this->getWorkId());
         $copyObj->setPlaceId($this->getPlaceId());
         $copyObj->setPublicationdateId($this->getPublicationdateId());
         $copyObj->setFirstpublicationdateId($this->getFirstpublicationdateId());
-        $copyObj->setPrintrunId($this->getPrintrunId());
         $copyObj->setPublishingcompanyId($this->getPublishingcompanyId());
         $copyObj->setPartnerId($this->getPartnerId());
         $copyObj->setEditiondescription($this->getEditiondescription());
         $copyObj->setDigitaleditioneditor($this->getDigitaleditioneditor());
         $copyObj->setTranscriptioncomment($this->getTranscriptioncomment());
         $copyObj->setFontId($this->getFontId());
+        $copyObj->setVolumeAlphanumeric($this->getVolumeAlphanumeric());
+        $copyObj->setVolumeNumeric($this->getVolumeNumeric());
+        $copyObj->setVolumesTotal($this->getVolumesTotal());
+        $copyObj->setNumpages($this->getNumpages());
+        $copyObj->setNumpagesnormed($this->getNumpagesnormed());
         $copyObj->setComment($this->getComment());
-        $copyObj->setRelatedsetId($this->getRelatedsetId());
+        $copyObj->setPublishingcompanyIdIsReconstructed($this->getPublishingcompanyIdIsReconstructed());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -2538,110 +2780,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         }
 
         return $this->aPlace;
-    }
-
-    /**
-     * Declares an association between this object and a Printrun object.
-     *
-     * @param             Printrun $v
-     * @return Publication The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setPrintrun(Printrun $v = null)
-    {
-        if ($v === null) {
-            $this->setPrintrunId(NULL);
-        } else {
-            $this->setPrintrunId($v->getId());
-        }
-
-        $this->aPrintrun = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Printrun object, it will not be re-added.
-        if ($v !== null) {
-            $v->addPublication($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated Printrun object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @param $doQuery Executes a query to get the object if required
-     * @return Printrun The associated Printrun object.
-     * @throws PropelException
-     */
-    public function getPrintrun(PropelPDO $con = null, $doQuery = true)
-    {
-        if ($this->aPrintrun === null && ($this->printrun_id !== null) && $doQuery) {
-            $this->aPrintrun = PrintrunQuery::create()->findPk($this->printrun_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aPrintrun->addPublications($this);
-             */
-        }
-
-        return $this->aPrintrun;
-    }
-
-    /**
-     * Declares an association between this object and a Relatedset object.
-     *
-     * @param             Relatedset $v
-     * @return Publication The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setRelatedset(Relatedset $v = null)
-    {
-        if ($v === null) {
-            $this->setRelatedsetId(NULL);
-        } else {
-            $this->setRelatedsetId($v->getId());
-        }
-
-        $this->aRelatedset = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Relatedset object, it will not be re-added.
-        if ($v !== null) {
-            $v->addPublication($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated Relatedset object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @param $doQuery Executes a query to get the object if required
-     * @return Relatedset The associated Relatedset object.
-     * @throws PropelException
-     */
-    public function getRelatedset(PropelPDO $con = null, $doQuery = true)
-    {
-        if ($this->aRelatedset === null && ($this->relatedset_id !== null) && $doQuery) {
-            $this->aRelatedset = RelatedsetQuery::create()->findPk($this->relatedset_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aRelatedset->addPublications($this);
-             */
-        }
-
-        return $this->aRelatedset;
     }
 
     /**
@@ -5567,6 +5705,31 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Task[] List of Task objects
      */
+    public function getTasksJoinPartner($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = TaskQuery::create(null, $criteria);
+        $query->joinWith('Partner', $join_behavior);
+
+        return $this->getTasks($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Publication is new, it will return
+     * an empty collection; or if this Publication has previously
+     * been saved, it will retrieve related Tasks from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Publication.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Task[] List of Task objects
+     */
     public function getTasksJoinDtaUser($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = TaskQuery::create(null, $criteria);
@@ -6294,23 +6457,29 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     public function clear()
     {
         $this->id = null;
+        $this->wwwready = null;
         $this->work_id = null;
         $this->place_id = null;
         $this->publicationdate_id = null;
         $this->firstpublicationdate_id = null;
-        $this->printrun_id = null;
         $this->publishingcompany_id = null;
         $this->partner_id = null;
         $this->editiondescription = null;
         $this->digitaleditioneditor = null;
         $this->transcriptioncomment = null;
         $this->font_id = null;
+        $this->volume_alphanumeric = null;
+        $this->volume_numeric = null;
+        $this->volumes_total = null;
+        $this->numpages = null;
+        $this->numpagesnormed = null;
         $this->comment = null;
-        $this->relatedset_id = null;
+        $this->publishingcompany_id_is_reconstructed = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -6408,12 +6577,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             if ($this->aPlace instanceof Persistent) {
               $this->aPlace->clearAllReferences($deep);
             }
-            if ($this->aPrintrun instanceof Persistent) {
-              $this->aPrintrun->clearAllReferences($deep);
-            }
-            if ($this->aRelatedset instanceof Persistent) {
-              $this->aRelatedset->clearAllReferences($deep);
-            }
             if ($this->aDatespecificationRelatedByPublicationdateId instanceof Persistent) {
               $this->aDatespecificationRelatedByPublicationdateId->clearAllReferences($deep);
             }
@@ -6486,8 +6649,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         $this->aWork = null;
         $this->aPublishingcompany = null;
         $this->aPlace = null;
-        $this->aPrintrun = null;
-        $this->aRelatedset = null;
         $this->aDatespecificationRelatedByPublicationdateId = null;
         $this->aDatespecificationRelatedByFirstpublicationdateId = null;
         $this->aFont = null;
@@ -6595,5 +6756,45 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         $relatedEntity = $this->getWork();
         return $relatedEntity->getAttributeByTableViewColumName("entstanden");
 
+    }
+    // reconstructed_flaggable behavior
+    /**
+    * Returns all columns that can be flagged as reconstructed.
+    */
+    public function getReconstructedFlaggableColumns(){
+        return array('PublishingcompanyId', );
+    }
+
+    /**
+    * Returns whether a column is flagged as reconstructed.
+    * @param $column the PHP name of the column as defined in the schema
+    */
+    public function isReconstructedByName($column){
+        return $this->getByName($column."IsReconstructed");
+    }
+
+    /**
+    * Returns the marked column value, e.g. in brackets to denote that the value is reconstructed.
+    * e.g. getMarkedByName('name') return '[<name>]'.
+    * @param $column the PHP name of the column as defined in the schema
+    */
+    public function getMarkedByName($column){
+        if($this->isReconstructedByName($column))
+            return '[' . $this->getByName($column) . ']';
+        else
+            return $this->getByName($column);
+    }
+
+    /**
+    * Returns all columns that are flagged as reconstructed.
+    */
+    public function getReconstructedFlaggedColumns(){
+        $flaggableColumns = $this->getReconstructedFlaggableColumns();
+        $flaggedColumns = array();
+        foreach($flaggableColumns as $column){
+            if($this->isReconstructedByName($column))
+            $flaggedColumns[] = $column;
+        }
+        return $flaggedColumns;
     }
 }
