@@ -15,8 +15,8 @@ use \PropelPDO;
 use DTA\MetadataBundle\Model\Data\Language;
 use DTA\MetadataBundle\Model\Data\LanguagePeer;
 use DTA\MetadataBundle\Model\Data\LanguageQuery;
-use DTA\MetadataBundle\Model\Data\Work;
-use DTA\MetadataBundle\Model\Master\LanguageWork;
+use DTA\MetadataBundle\Model\Data\Publication;
+use DTA\MetadataBundle\Model\Master\LanguagePublication;
 
 /**
  * @method LanguageQuery orderById($order = Criteria::ASC) Order by the id column
@@ -29,9 +29,9 @@ use DTA\MetadataBundle\Model\Master\LanguageWork;
  * @method LanguageQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method LanguageQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method LanguageQuery leftJoinLanguageWork($relationAlias = null) Adds a LEFT JOIN clause to the query using the LanguageWork relation
- * @method LanguageQuery rightJoinLanguageWork($relationAlias = null) Adds a RIGHT JOIN clause to the query using the LanguageWork relation
- * @method LanguageQuery innerJoinLanguageWork($relationAlias = null) Adds a INNER JOIN clause to the query using the LanguageWork relation
+ * @method LanguageQuery leftJoinLanguagePublication($relationAlias = null) Adds a LEFT JOIN clause to the query using the LanguagePublication relation
+ * @method LanguageQuery rightJoinLanguagePublication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the LanguagePublication relation
+ * @method LanguageQuery innerJoinLanguagePublication($relationAlias = null) Adds a INNER JOIN clause to the query using the LanguagePublication relation
  *
  * @method Language findOne(PropelPDO $con = null) Return the first Language matching the query
  * @method Language findOneOrCreate(PropelPDO $con = null) Return the first Language matching the query, or a new Language object populated from the query conditions when no match is found
@@ -50,7 +50,7 @@ abstract class BaseLanguageQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'DTAMetadata', $modelName = 'DTA\\MetadataBundle\\Model\\Data\\Language', $modelAlias = null)
+    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Data\\Language', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -302,41 +302,41 @@ abstract class BaseLanguageQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related LanguageWork object
+     * Filter the query by a related LanguagePublication object
      *
-     * @param   LanguageWork|PropelObjectCollection $languageWork  the related object to use as filter
+     * @param   LanguagePublication|PropelObjectCollection $languagePublication  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return                 LanguageQuery The current query, for fluid interface
      * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterByLanguageWork($languageWork, $comparison = null)
+    public function filterByLanguagePublication($languagePublication, $comparison = null)
     {
-        if ($languageWork instanceof LanguageWork) {
+        if ($languagePublication instanceof LanguagePublication) {
             return $this
-                ->addUsingAlias(LanguagePeer::ID, $languageWork->getLanguageId(), $comparison);
-        } elseif ($languageWork instanceof PropelObjectCollection) {
+                ->addUsingAlias(LanguagePeer::ID, $languagePublication->getLanguageId(), $comparison);
+        } elseif ($languagePublication instanceof PropelObjectCollection) {
             return $this
-                ->useLanguageWorkQuery()
-                ->filterByPrimaryKeys($languageWork->getPrimaryKeys())
+                ->useLanguagePublicationQuery()
+                ->filterByPrimaryKeys($languagePublication->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByLanguageWork() only accepts arguments of type LanguageWork or PropelCollection');
+            throw new PropelException('filterByLanguagePublication() only accepts arguments of type LanguagePublication or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the LanguageWork relation
+     * Adds a JOIN clause to the query using the LanguagePublication relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return LanguageQuery The current query, for fluid interface
      */
-    public function joinLanguageWork($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinLanguagePublication($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('LanguageWork');
+        $relationMap = $tableMap->getRelation('LanguagePublication');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -351,14 +351,14 @@ abstract class BaseLanguageQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'LanguageWork');
+            $this->addJoinObject($join, 'LanguagePublication');
         }
 
         return $this;
     }
 
     /**
-     * Use the LanguageWork relation LanguageWork object
+     * Use the LanguagePublication relation LanguagePublication object
      *
      * @see       useQuery()
      *
@@ -366,29 +366,29 @@ abstract class BaseLanguageQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \DTA\MetadataBundle\Model\Master\LanguageWorkQuery A secondary query class using the current class as primary query
+     * @return   \DTA\MetadataBundle\Model\Master\LanguagePublicationQuery A secondary query class using the current class as primary query
      */
-    public function useLanguageWorkQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useLanguagePublicationQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinLanguageWork($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'LanguageWork', '\DTA\MetadataBundle\Model\Master\LanguageWorkQuery');
+            ->joinLanguagePublication($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'LanguagePublication', '\DTA\MetadataBundle\Model\Master\LanguagePublicationQuery');
     }
 
     /**
-     * Filter the query by a related Work object
-     * using the language_work table as cross reference
+     * Filter the query by a related Publication object
+     * using the language_publication table as cross reference
      *
-     * @param   Work $work the related object to use as filter
+     * @param   Publication $publication the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   LanguageQuery The current query, for fluid interface
      */
-    public function filterByWork($work, $comparison = Criteria::EQUAL)
+    public function filterByPublication($publication, $comparison = Criteria::EQUAL)
     {
         return $this
-            ->useLanguageWorkQuery()
-            ->filterByWork($work, $comparison)
+            ->useLanguagePublicationQuery()
+            ->filterByPublication($publication, $comparison)
             ->endUse();
     }
 

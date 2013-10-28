@@ -17,18 +17,15 @@ use DTA\MetadataBundle\Model\Data\PublicationMms;
 use DTA\MetadataBundle\Model\Data\PublicationMmsPeer;
 use DTA\MetadataBundle\Model\Data\PublicationMmsQuery;
 use DTA\MetadataBundle\Model\Data\Series;
-use DTA\MetadataBundle\Model\Data\Volume;
 
 /**
  * @method PublicationMmsQuery orderById($order = Criteria::ASC) Order by the id column
  * @method PublicationMmsQuery orderByPublicationId($order = Criteria::ASC) Order by the publication_id column
  * @method PublicationMmsQuery orderBySeriesId($order = Criteria::ASC) Order by the series_id column
- * @method PublicationMmsQuery orderByVolumeId($order = Criteria::ASC) Order by the volume_id column
  *
  * @method PublicationMmsQuery groupById() Group by the id column
  * @method PublicationMmsQuery groupByPublicationId() Group by the publication_id column
  * @method PublicationMmsQuery groupBySeriesId() Group by the series_id column
- * @method PublicationMmsQuery groupByVolumeId() Group by the volume_id column
  *
  * @method PublicationMmsQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method PublicationMmsQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -37,10 +34,6 @@ use DTA\MetadataBundle\Model\Data\Volume;
  * @method PublicationMmsQuery leftJoinPublication($relationAlias = null) Adds a LEFT JOIN clause to the query using the Publication relation
  * @method PublicationMmsQuery rightJoinPublication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Publication relation
  * @method PublicationMmsQuery innerJoinPublication($relationAlias = null) Adds a INNER JOIN clause to the query using the Publication relation
- *
- * @method PublicationMmsQuery leftJoinVolume($relationAlias = null) Adds a LEFT JOIN clause to the query using the Volume relation
- * @method PublicationMmsQuery rightJoinVolume($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Volume relation
- * @method PublicationMmsQuery innerJoinVolume($relationAlias = null) Adds a INNER JOIN clause to the query using the Volume relation
  *
  * @method PublicationMmsQuery leftJoinSeries($relationAlias = null) Adds a LEFT JOIN clause to the query using the Series relation
  * @method PublicationMmsQuery rightJoinSeries($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Series relation
@@ -51,12 +44,10 @@ use DTA\MetadataBundle\Model\Data\Volume;
  *
  * @method PublicationMms findOneByPublicationId(int $publication_id) Return the first PublicationMms filtered by the publication_id column
  * @method PublicationMms findOneBySeriesId(int $series_id) Return the first PublicationMms filtered by the series_id column
- * @method PublicationMms findOneByVolumeId(int $volume_id) Return the first PublicationMms filtered by the volume_id column
  *
  * @method array findById(int $id) Return PublicationMms objects filtered by the id column
  * @method array findByPublicationId(int $publication_id) Return PublicationMms objects filtered by the publication_id column
  * @method array findBySeriesId(int $series_id) Return PublicationMms objects filtered by the series_id column
- * @method array findByVolumeId(int $volume_id) Return PublicationMms objects filtered by the volume_id column
  */
 abstract class BasePublicationMmsQuery extends ModelCriteria
 {
@@ -67,7 +58,7 @@ abstract class BasePublicationMmsQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'DTAMetadata', $modelName = 'DTA\\MetadataBundle\\Model\\Data\\PublicationMms', $modelAlias = null)
+    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Data\\PublicationMms', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -158,7 +149,7 @@ abstract class BasePublicationMmsQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "publication_id", "series_id", "volume_id" FROM "publication_mms" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "publication_id", "series_id" FROM "publication_mms" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -378,50 +369,6 @@ abstract class BasePublicationMmsQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the volume_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByVolumeId(1234); // WHERE volume_id = 1234
-     * $query->filterByVolumeId(array(12, 34)); // WHERE volume_id IN (12, 34)
-     * $query->filterByVolumeId(array('min' => 12)); // WHERE volume_id >= 12
-     * $query->filterByVolumeId(array('max' => 12)); // WHERE volume_id <= 12
-     * </code>
-     *
-     * @see       filterByVolume()
-     *
-     * @param     mixed $volumeId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return PublicationMmsQuery The current query, for fluid interface
-     */
-    public function filterByVolumeId($volumeId = null, $comparison = null)
-    {
-        if (is_array($volumeId)) {
-            $useMinMax = false;
-            if (isset($volumeId['min'])) {
-                $this->addUsingAlias(PublicationMmsPeer::VOLUME_ID, $volumeId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($volumeId['max'])) {
-                $this->addUsingAlias(PublicationMmsPeer::VOLUME_ID, $volumeId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(PublicationMmsPeer::VOLUME_ID, $volumeId, $comparison);
-    }
-
-    /**
      * Filter the query by a related Publication object
      *
      * @param   Publication|PropelObjectCollection $publication The related object(s) to use as filter
@@ -495,82 +442,6 @@ abstract class BasePublicationMmsQuery extends ModelCriteria
         return $this
             ->joinPublication($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Publication', '\DTA\MetadataBundle\Model\Data\PublicationQuery');
-    }
-
-    /**
-     * Filter the query by a related Volume object
-     *
-     * @param   Volume|PropelObjectCollection $volume The related object(s) to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 PublicationMmsQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByVolume($volume, $comparison = null)
-    {
-        if ($volume instanceof Volume) {
-            return $this
-                ->addUsingAlias(PublicationMmsPeer::VOLUME_ID, $volume->getId(), $comparison);
-        } elseif ($volume instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(PublicationMmsPeer::VOLUME_ID, $volume->toKeyValue('PrimaryKey', 'Id'), $comparison);
-        } else {
-            throw new PropelException('filterByVolume() only accepts arguments of type Volume or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Volume relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return PublicationMmsQuery The current query, for fluid interface
-     */
-    public function joinVolume($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Volume');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Volume');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Volume relation Volume object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\Data\VolumeQuery A secondary query class using the current class as primary query
-     */
-    public function useVolumeQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinVolume($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Volume', '\DTA\MetadataBundle\Model\Data\VolumeQuery');
     }
 
     /**

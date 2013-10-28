@@ -16,7 +16,6 @@ use DTA\MetadataBundle\Model\Data\Datespecification;
 use DTA\MetadataBundle\Model\Data\DatespecificationPeer;
 use DTA\MetadataBundle\Model\Data\DatespecificationQuery;
 use DTA\MetadataBundle\Model\Data\Publication;
-use DTA\MetadataBundle\Model\Data\Work;
 
 /**
  * @method DatespecificationQuery orderById($order = Criteria::ASC) Order by the id column
@@ -37,13 +36,9 @@ use DTA\MetadataBundle\Model\Data\Work;
  * @method DatespecificationQuery rightJoinPublicationRelatedByPublicationdateId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the PublicationRelatedByPublicationdateId relation
  * @method DatespecificationQuery innerJoinPublicationRelatedByPublicationdateId($relationAlias = null) Adds a INNER JOIN clause to the query using the PublicationRelatedByPublicationdateId relation
  *
- * @method DatespecificationQuery leftJoinPublicationRelatedByFirstpublicationdateId($relationAlias = null) Adds a LEFT JOIN clause to the query using the PublicationRelatedByFirstpublicationdateId relation
- * @method DatespecificationQuery rightJoinPublicationRelatedByFirstpublicationdateId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the PublicationRelatedByFirstpublicationdateId relation
- * @method DatespecificationQuery innerJoinPublicationRelatedByFirstpublicationdateId($relationAlias = null) Adds a INNER JOIN clause to the query using the PublicationRelatedByFirstpublicationdateId relation
- *
- * @method DatespecificationQuery leftJoinWork($relationAlias = null) Adds a LEFT JOIN clause to the query using the Work relation
- * @method DatespecificationQuery rightJoinWork($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Work relation
- * @method DatespecificationQuery innerJoinWork($relationAlias = null) Adds a INNER JOIN clause to the query using the Work relation
+ * @method DatespecificationQuery leftJoinPublicationRelatedByCreationdateId($relationAlias = null) Adds a LEFT JOIN clause to the query using the PublicationRelatedByCreationdateId relation
+ * @method DatespecificationQuery rightJoinPublicationRelatedByCreationdateId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the PublicationRelatedByCreationdateId relation
+ * @method DatespecificationQuery innerJoinPublicationRelatedByCreationdateId($relationAlias = null) Adds a INNER JOIN clause to the query using the PublicationRelatedByCreationdateId relation
  *
  * @method Datespecification findOne(PropelPDO $con = null) Return the first Datespecification matching the query
  * @method Datespecification findOneOrCreate(PropelPDO $con = null) Return the first Datespecification matching the query, or a new Datespecification object populated from the query conditions when no match is found
@@ -66,7 +61,7 @@ abstract class BaseDatespecificationQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'DTAMetadata', $modelName = 'DTA\\MetadataBundle\\Model\\Data\\Datespecification', $modelAlias = null)
+    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Data\\Datespecification', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -469,33 +464,33 @@ abstract class BaseDatespecificationQuery extends ModelCriteria
      * @return                 DatespecificationQuery The current query, for fluid interface
      * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterByPublicationRelatedByFirstpublicationdateId($publication, $comparison = null)
+    public function filterByPublicationRelatedByCreationdateId($publication, $comparison = null)
     {
         if ($publication instanceof Publication) {
             return $this
-                ->addUsingAlias(DatespecificationPeer::ID, $publication->getFirstpublicationdateId(), $comparison);
+                ->addUsingAlias(DatespecificationPeer::ID, $publication->getCreationdateId(), $comparison);
         } elseif ($publication instanceof PropelObjectCollection) {
             return $this
-                ->usePublicationRelatedByFirstpublicationdateIdQuery()
+                ->usePublicationRelatedByCreationdateIdQuery()
                 ->filterByPrimaryKeys($publication->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByPublicationRelatedByFirstpublicationdateId() only accepts arguments of type Publication or PropelCollection');
+            throw new PropelException('filterByPublicationRelatedByCreationdateId() only accepts arguments of type Publication or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the PublicationRelatedByFirstpublicationdateId relation
+     * Adds a JOIN clause to the query using the PublicationRelatedByCreationdateId relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return DatespecificationQuery The current query, for fluid interface
      */
-    public function joinPublicationRelatedByFirstpublicationdateId($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinPublicationRelatedByCreationdateId($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('PublicationRelatedByFirstpublicationdateId');
+        $relationMap = $tableMap->getRelation('PublicationRelatedByCreationdateId');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -510,14 +505,14 @@ abstract class BaseDatespecificationQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'PublicationRelatedByFirstpublicationdateId');
+            $this->addJoinObject($join, 'PublicationRelatedByCreationdateId');
         }
 
         return $this;
     }
 
     /**
-     * Use the PublicationRelatedByFirstpublicationdateId relation Publication object
+     * Use the PublicationRelatedByCreationdateId relation Publication object
      *
      * @see       useQuery()
      *
@@ -527,85 +522,11 @@ abstract class BaseDatespecificationQuery extends ModelCriteria
      *
      * @return   \DTA\MetadataBundle\Model\Data\PublicationQuery A secondary query class using the current class as primary query
      */
-    public function usePublicationRelatedByFirstpublicationdateIdQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function usePublicationRelatedByCreationdateIdQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
-            ->joinPublicationRelatedByFirstpublicationdateId($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'PublicationRelatedByFirstpublicationdateId', '\DTA\MetadataBundle\Model\Data\PublicationQuery');
-    }
-
-    /**
-     * Filter the query by a related Work object
-     *
-     * @param   Work|PropelObjectCollection $work  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 DatespecificationQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByWork($work, $comparison = null)
-    {
-        if ($work instanceof Work) {
-            return $this
-                ->addUsingAlias(DatespecificationPeer::ID, $work->getDatespecificationId(), $comparison);
-        } elseif ($work instanceof PropelObjectCollection) {
-            return $this
-                ->useWorkQuery()
-                ->filterByPrimaryKeys($work->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByWork() only accepts arguments of type Work or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Work relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return DatespecificationQuery The current query, for fluid interface
-     */
-    public function joinWork($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Work');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Work');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Work relation Work object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\Data\WorkQuery A secondary query class using the current class as primary query
-     */
-    public function useWorkQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinWork($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Work', '\DTA\MetadataBundle\Model\Data\WorkQuery');
+            ->joinPublicationRelatedByCreationdateId($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'PublicationRelatedByCreationdateId', '\DTA\MetadataBundle\Model\Data\PublicationQuery');
     }
 
     /**

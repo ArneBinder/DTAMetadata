@@ -45,7 +45,6 @@ class GenreTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('name', 'Name', 'LONGVARCHAR', true, null, null);
-        $this->addForeignKey('childof', 'Childof', 'INTEGER', 'genre', 'id', false, null, null);
         // validators
     } // initialize()
 
@@ -54,10 +53,8 @@ class GenreTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('GenreRelatedByChildof', 'DTA\\MetadataBundle\\Model\\Classification\\Genre', RelationMap::MANY_TO_ONE, array('childof' => 'id', ), null, null);
-        $this->addRelation('GenreRelatedById', 'DTA\\MetadataBundle\\Model\\Classification\\Genre', RelationMap::ONE_TO_MANY, array('id' => 'childof', ), null, null, 'GenresRelatedById');
-        $this->addRelation('GenreWork', 'DTA\\MetadataBundle\\Model\\Master\\GenreWork', RelationMap::ONE_TO_MANY, array('id' => 'genre_id', ), null, null, 'GenreWorks');
-        $this->addRelation('Work', 'DTA\\MetadataBundle\\Model\\Data\\Work', RelationMap::MANY_TO_MANY, array(), null, null, 'Works');
+        $this->addRelation('GenrePublication', 'DTA\\MetadataBundle\\Model\\Master\\GenrePublication', RelationMap::ONE_TO_MANY, array('id' => 'genre_id', ), null, null, 'GenrePublications');
+        $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::MANY_TO_MANY, array(), null, null, 'Publications');
     } // buildRelations()
 
     /**
@@ -71,7 +68,6 @@ class GenreTableMap extends TableMap
         return array(
             'table_row_view' =>  array (
   'name' => 'name',
-  'zugeordnet' => 'accessor:getParent',
 ),
         );
     } // getBehaviors()

@@ -22,9 +22,11 @@ use DTA\MetadataBundle\Model\Workflow\Task;
 /**
  * @method PublicationgroupQuery orderById($order = Criteria::ASC) Order by the id column
  * @method PublicationgroupQuery orderByName($order = Criteria::ASC) Order by the name column
+ * @method PublicationgroupQuery orderByLegacyGroupId($order = Criteria::ASC) Order by the legacy_group_id column
  *
  * @method PublicationgroupQuery groupById() Group by the id column
  * @method PublicationgroupQuery groupByName() Group by the name column
+ * @method PublicationgroupQuery groupByLegacyGroupId() Group by the legacy_group_id column
  *
  * @method PublicationgroupQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method PublicationgroupQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -42,9 +44,11 @@ use DTA\MetadataBundle\Model\Workflow\Task;
  * @method Publicationgroup findOneOrCreate(PropelPDO $con = null) Return the first Publicationgroup matching the query, or a new Publicationgroup object populated from the query conditions when no match is found
  *
  * @method Publicationgroup findOneByName(string $name) Return the first Publicationgroup filtered by the name column
+ * @method Publicationgroup findOneByLegacyGroupId(int $legacy_group_id) Return the first Publicationgroup filtered by the legacy_group_id column
  *
  * @method array findById(int $id) Return Publicationgroup objects filtered by the id column
  * @method array findByName(string $name) Return Publicationgroup objects filtered by the name column
+ * @method array findByLegacyGroupId(int $legacy_group_id) Return Publicationgroup objects filtered by the legacy_group_id column
  */
 abstract class BasePublicationgroupQuery extends ModelCriteria
 {
@@ -55,7 +59,7 @@ abstract class BasePublicationgroupQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'DTAMetadata', $modelName = 'DTA\\MetadataBundle\\Model\\Workflow\\Publicationgroup', $modelAlias = null)
+    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Workflow\\Publicationgroup', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -146,7 +150,7 @@ abstract class BasePublicationgroupQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "name" FROM "publicationgroup" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "name", "legacy_group_id" FROM "publicationgroup" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -304,6 +308,48 @@ abstract class BasePublicationgroupQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(PublicationgroupPeer::NAME, $name, $comparison);
+    }
+
+    /**
+     * Filter the query on the legacy_group_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByLegacyGroupId(1234); // WHERE legacy_group_id = 1234
+     * $query->filterByLegacyGroupId(array(12, 34)); // WHERE legacy_group_id IN (12, 34)
+     * $query->filterByLegacyGroupId(array('min' => 12)); // WHERE legacy_group_id >= 12
+     * $query->filterByLegacyGroupId(array('max' => 12)); // WHERE legacy_group_id <= 12
+     * </code>
+     *
+     * @param     mixed $legacyGroupId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return PublicationgroupQuery The current query, for fluid interface
+     */
+    public function filterByLegacyGroupId($legacyGroupId = null, $comparison = null)
+    {
+        if (is_array($legacyGroupId)) {
+            $useMinMax = false;
+            if (isset($legacyGroupId['min'])) {
+                $this->addUsingAlias(PublicationgroupPeer::LEGACY_GROUP_ID, $legacyGroupId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($legacyGroupId['max'])) {
+                $this->addUsingAlias(PublicationgroupPeer::LEGACY_GROUP_ID, $legacyGroupId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(PublicationgroupPeer::LEGACY_GROUP_ID, $legacyGroupId, $comparison);
     }
 
     /**

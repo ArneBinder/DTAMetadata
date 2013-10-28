@@ -19,7 +19,7 @@ abstract class BasePartnerPeer
 {
 
     /** the default database name for this class */
-    const DATABASE_NAME = 'DTAMetadata';
+    const DATABASE_NAME = 'dtametadata';
 
     /** the table name for this class */
     const TABLE_NAME = 'partner';
@@ -31,13 +31,13 @@ abstract class BasePartnerPeer
     const TM_CLASS = 'PartnerTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 9;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 9;
 
     /** the column name for the id field */
     const ID = 'partner.id';
@@ -45,17 +45,26 @@ abstract class BasePartnerPeer
     /** the column name for the name field */
     const NAME = 'partner.name';
 
-    /** the column name for the person field */
-    const PERSON = 'partner.person';
+    /** the column name for the mail field */
+    const MAIL = 'partner.mail';
 
-    /** the column name for the contact_data field */
-    const CONTACT_DATA = 'partner.contact_data';
+    /** the column name for the web field */
+    const WEB = 'partner.web';
+
+    /** the column name for the contactperson field */
+    const CONTACTPERSON = 'partner.contactperson';
+
+    /** the column name for the contactdata field */
+    const CONTACTDATA = 'partner.contactdata';
 
     /** the column name for the comments field */
     const COMMENTS = 'partner.comments';
 
     /** the column name for the is_organization field */
     const IS_ORGANIZATION = 'partner.is_organization';
+
+    /** the column name for the legacy_partner_id field */
+    const LEGACY_PARTNER_ID = 'partner.legacy_partner_id';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -76,12 +85,12 @@ abstract class BasePartnerPeer
      * e.g. PartnerPeer::$fieldNames[PartnerPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'Person', 'ContactData', 'Comments', 'IsOrganization', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'person', 'contactData', 'comments', 'isOrganization', ),
-        BasePeer::TYPE_COLNAME => array (PartnerPeer::ID, PartnerPeer::NAME, PartnerPeer::PERSON, PartnerPeer::CONTACT_DATA, PartnerPeer::COMMENTS, PartnerPeer::IS_ORGANIZATION, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'PERSON', 'CONTACT_DATA', 'COMMENTS', 'IS_ORGANIZATION', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'person', 'contact_data', 'comments', 'is_organization', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'Mail', 'Web', 'Contactperson', 'Contactdata', 'Comments', 'IsOrganization', 'LegacyPartnerId', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'mail', 'web', 'contactperson', 'contactdata', 'comments', 'isOrganization', 'legacyPartnerId', ),
+        BasePeer::TYPE_COLNAME => array (PartnerPeer::ID, PartnerPeer::NAME, PartnerPeer::MAIL, PartnerPeer::WEB, PartnerPeer::CONTACTPERSON, PartnerPeer::CONTACTDATA, PartnerPeer::COMMENTS, PartnerPeer::IS_ORGANIZATION, PartnerPeer::LEGACY_PARTNER_ID, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'MAIL', 'WEB', 'CONTACTPERSON', 'CONTACTDATA', 'COMMENTS', 'IS_ORGANIZATION', 'LEGACY_PARTNER_ID', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'mail', 'web', 'contactperson', 'contactdata', 'comments', 'is_organization', 'legacy_partner_id', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
     );
 
     /**
@@ -91,12 +100,12 @@ abstract class BasePartnerPeer
      * e.g. PartnerPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'Person' => 2, 'ContactData' => 3, 'Comments' => 4, 'IsOrganization' => 5, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'person' => 2, 'contactData' => 3, 'comments' => 4, 'isOrganization' => 5, ),
-        BasePeer::TYPE_COLNAME => array (PartnerPeer::ID => 0, PartnerPeer::NAME => 1, PartnerPeer::PERSON => 2, PartnerPeer::CONTACT_DATA => 3, PartnerPeer::COMMENTS => 4, PartnerPeer::IS_ORGANIZATION => 5, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'PERSON' => 2, 'CONTACT_DATA' => 3, 'COMMENTS' => 4, 'IS_ORGANIZATION' => 5, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'person' => 2, 'contact_data' => 3, 'comments' => 4, 'is_organization' => 5, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'Mail' => 2, 'Web' => 3, 'Contactperson' => 4, 'Contactdata' => 5, 'Comments' => 6, 'IsOrganization' => 7, 'LegacyPartnerId' => 8, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'mail' => 2, 'web' => 3, 'contactperson' => 4, 'contactdata' => 5, 'comments' => 6, 'isOrganization' => 7, 'legacyPartnerId' => 8, ),
+        BasePeer::TYPE_COLNAME => array (PartnerPeer::ID => 0, PartnerPeer::NAME => 1, PartnerPeer::MAIL => 2, PartnerPeer::WEB => 3, PartnerPeer::CONTACTPERSON => 4, PartnerPeer::CONTACTDATA => 5, PartnerPeer::COMMENTS => 6, PartnerPeer::IS_ORGANIZATION => 7, PartnerPeer::LEGACY_PARTNER_ID => 8, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'MAIL' => 2, 'WEB' => 3, 'CONTACTPERSON' => 4, 'CONTACTDATA' => 5, 'COMMENTS' => 6, 'IS_ORGANIZATION' => 7, 'LEGACY_PARTNER_ID' => 8, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'mail' => 2, 'web' => 3, 'contactperson' => 4, 'contactdata' => 5, 'comments' => 6, 'is_organization' => 7, 'legacy_partner_id' => 8, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
     );
 
     /**
@@ -172,17 +181,23 @@ abstract class BasePartnerPeer
         if (null === $alias) {
             $criteria->addSelectColumn(PartnerPeer::ID);
             $criteria->addSelectColumn(PartnerPeer::NAME);
-            $criteria->addSelectColumn(PartnerPeer::PERSON);
-            $criteria->addSelectColumn(PartnerPeer::CONTACT_DATA);
+            $criteria->addSelectColumn(PartnerPeer::MAIL);
+            $criteria->addSelectColumn(PartnerPeer::WEB);
+            $criteria->addSelectColumn(PartnerPeer::CONTACTPERSON);
+            $criteria->addSelectColumn(PartnerPeer::CONTACTDATA);
             $criteria->addSelectColumn(PartnerPeer::COMMENTS);
             $criteria->addSelectColumn(PartnerPeer::IS_ORGANIZATION);
+            $criteria->addSelectColumn(PartnerPeer::LEGACY_PARTNER_ID);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.name');
-            $criteria->addSelectColumn($alias . '.person');
-            $criteria->addSelectColumn($alias . '.contact_data');
+            $criteria->addSelectColumn($alias . '.mail');
+            $criteria->addSelectColumn($alias . '.web');
+            $criteria->addSelectColumn($alias . '.contactperson');
+            $criteria->addSelectColumn($alias . '.contactdata');
             $criteria->addSelectColumn($alias . '.comments');
             $criteria->addSelectColumn($alias . '.is_organization');
+            $criteria->addSelectColumn($alias . '.legacy_partner_id');
         }
     }
 

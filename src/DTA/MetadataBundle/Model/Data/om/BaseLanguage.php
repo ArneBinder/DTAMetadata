@@ -16,10 +16,10 @@ use \PropelPDO;
 use DTA\MetadataBundle\Model\Data\Language;
 use DTA\MetadataBundle\Model\Data\LanguagePeer;
 use DTA\MetadataBundle\Model\Data\LanguageQuery;
-use DTA\MetadataBundle\Model\Data\Work;
-use DTA\MetadataBundle\Model\Data\WorkQuery;
-use DTA\MetadataBundle\Model\Master\LanguageWork;
-use DTA\MetadataBundle\Model\Master\LanguageWorkQuery;
+use DTA\MetadataBundle\Model\Data\Publication;
+use DTA\MetadataBundle\Model\Data\PublicationQuery;
+use DTA\MetadataBundle\Model\Master\LanguagePublication;
+use DTA\MetadataBundle\Model\Master\LanguagePublicationQuery;
 
 abstract class BaseLanguage extends BaseObject implements Persistent, \DTA\MetadataBundle\Model\table_row_view\TableRowViewInterface
 {
@@ -55,15 +55,15 @@ abstract class BaseLanguage extends BaseObject implements Persistent, \DTA\Metad
     protected $name;
 
     /**
-     * @var        PropelObjectCollection|LanguageWork[] Collection to store aggregation of LanguageWork objects.
+     * @var        PropelObjectCollection|LanguagePublication[] Collection to store aggregation of LanguagePublication objects.
      */
-    protected $collLanguageWorks;
-    protected $collLanguageWorksPartial;
+    protected $collLanguagePublications;
+    protected $collLanguagePublicationsPartial;
 
     /**
-     * @var        PropelObjectCollection|Work[] Collection to store aggregation of Work objects.
+     * @var        PropelObjectCollection|Publication[] Collection to store aggregation of Publication objects.
      */
-    protected $collWorks;
+    protected $collPublications;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -91,13 +91,13 @@ abstract class BaseLanguage extends BaseObject implements Persistent, \DTA\Metad
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $worksScheduledForDeletion = null;
+    protected $publicationsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $languageWorksScheduledForDeletion = null;
+    protected $languagePublicationsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -265,9 +265,9 @@ abstract class BaseLanguage extends BaseObject implements Persistent, \DTA\Metad
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collLanguageWorks = null;
+            $this->collLanguagePublications = null;
 
-            $this->collWorks = null;
+            $this->collPublications = null;
         } // if (deep)
     }
 
@@ -392,43 +392,43 @@ abstract class BaseLanguage extends BaseObject implements Persistent, \DTA\Metad
                 $this->resetModified();
             }
 
-            if ($this->worksScheduledForDeletion !== null) {
-                if (!$this->worksScheduledForDeletion->isEmpty()) {
+            if ($this->publicationsScheduledForDeletion !== null) {
+                if (!$this->publicationsScheduledForDeletion->isEmpty()) {
                     $pks = array();
                     $pk = $this->getPrimaryKey();
-                    foreach ($this->worksScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                    foreach ($this->publicationsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
                         $pks[] = array($pk, $remotePk);
                     }
-                    LanguageWorkQuery::create()
+                    LanguagePublicationQuery::create()
                         ->filterByPrimaryKeys($pks)
                         ->delete($con);
-                    $this->worksScheduledForDeletion = null;
+                    $this->publicationsScheduledForDeletion = null;
                 }
 
-                foreach ($this->getWorks() as $work) {
-                    if ($work->isModified()) {
-                        $work->save($con);
+                foreach ($this->getPublications() as $publication) {
+                    if ($publication->isModified()) {
+                        $publication->save($con);
                     }
                 }
-            } elseif ($this->collWorks) {
-                foreach ($this->collWorks as $work) {
-                    if ($work->isModified()) {
-                        $work->save($con);
+            } elseif ($this->collPublications) {
+                foreach ($this->collPublications as $publication) {
+                    if ($publication->isModified()) {
+                        $publication->save($con);
                     }
                 }
             }
 
-            if ($this->languageWorksScheduledForDeletion !== null) {
-                if (!$this->languageWorksScheduledForDeletion->isEmpty()) {
-                    LanguageWorkQuery::create()
-                        ->filterByPrimaryKeys($this->languageWorksScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->languagePublicationsScheduledForDeletion !== null) {
+                if (!$this->languagePublicationsScheduledForDeletion->isEmpty()) {
+                    LanguagePublicationQuery::create()
+                        ->filterByPrimaryKeys($this->languagePublicationsScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->languageWorksScheduledForDeletion = null;
+                    $this->languagePublicationsScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collLanguageWorks !== null) {
-                foreach ($this->collLanguageWorks as $referrerFK) {
+            if ($this->collLanguagePublications !== null) {
+                foreach ($this->collLanguagePublications as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -586,8 +586,8 @@ abstract class BaseLanguage extends BaseObject implements Persistent, \DTA\Metad
             }
 
 
-                if ($this->collLanguageWorks !== null) {
-                    foreach ($this->collLanguageWorks as $referrerFK) {
+                if ($this->collLanguagePublications !== null) {
+                    foreach ($this->collLanguagePublications as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -668,8 +668,8 @@ abstract class BaseLanguage extends BaseObject implements Persistent, \DTA\Metad
             $keys[1] => $this->getName(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->collLanguageWorks) {
-                $result['LanguageWorks'] = $this->collLanguageWorks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collLanguagePublications) {
+                $result['LanguagePublications'] = $this->collLanguagePublications->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -822,9 +822,9 @@ abstract class BaseLanguage extends BaseObject implements Persistent, \DTA\Metad
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getLanguageWorks() as $relObj) {
+            foreach ($this->getLanguagePublications() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addLanguageWork($relObj->copy($deepCopy));
+                    $copyObj->addLanguagePublication($relObj->copy($deepCopy));
                 }
             }
 
@@ -889,42 +889,42 @@ abstract class BaseLanguage extends BaseObject implements Persistent, \DTA\Metad
      */
     public function initRelation($relationName)
     {
-        if ('LanguageWork' == $relationName) {
-            $this->initLanguageWorks();
+        if ('LanguagePublication' == $relationName) {
+            $this->initLanguagePublications();
         }
     }
 
     /**
-     * Clears out the collLanguageWorks collection
+     * Clears out the collLanguagePublications collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return Language The current object (for fluent API support)
-     * @see        addLanguageWorks()
+     * @see        addLanguagePublications()
      */
-    public function clearLanguageWorks()
+    public function clearLanguagePublications()
     {
-        $this->collLanguageWorks = null; // important to set this to null since that means it is uninitialized
-        $this->collLanguageWorksPartial = null;
+        $this->collLanguagePublications = null; // important to set this to null since that means it is uninitialized
+        $this->collLanguagePublicationsPartial = null;
 
         return $this;
     }
 
     /**
-     * reset is the collLanguageWorks collection loaded partially
+     * reset is the collLanguagePublications collection loaded partially
      *
      * @return void
      */
-    public function resetPartialLanguageWorks($v = true)
+    public function resetPartialLanguagePublications($v = true)
     {
-        $this->collLanguageWorksPartial = $v;
+        $this->collLanguagePublicationsPartial = $v;
     }
 
     /**
-     * Initializes the collLanguageWorks collection.
+     * Initializes the collLanguagePublications collection.
      *
-     * By default this just sets the collLanguageWorks collection to an empty array (like clearcollLanguageWorks());
+     * By default this just sets the collLanguagePublications collection to an empty array (like clearcollLanguagePublications());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -933,17 +933,17 @@ abstract class BaseLanguage extends BaseObject implements Persistent, \DTA\Metad
      *
      * @return void
      */
-    public function initLanguageWorks($overrideExisting = true)
+    public function initLanguagePublications($overrideExisting = true)
     {
-        if (null !== $this->collLanguageWorks && !$overrideExisting) {
+        if (null !== $this->collLanguagePublications && !$overrideExisting) {
             return;
         }
-        $this->collLanguageWorks = new PropelObjectCollection();
-        $this->collLanguageWorks->setModel('LanguageWork');
+        $this->collLanguagePublications = new PropelObjectCollection();
+        $this->collLanguagePublications->setModel('LanguagePublication');
     }
 
     /**
-     * Gets an array of LanguageWork objects which contain a foreign key that references this object.
+     * Gets an array of LanguagePublication objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -953,105 +953,105 @@ abstract class BaseLanguage extends BaseObject implements Persistent, \DTA\Metad
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|LanguageWork[] List of LanguageWork objects
+     * @return PropelObjectCollection|LanguagePublication[] List of LanguagePublication objects
      * @throws PropelException
      */
-    public function getLanguageWorks($criteria = null, PropelPDO $con = null)
+    public function getLanguagePublications($criteria = null, PropelPDO $con = null)
     {
-        $partial = $this->collLanguageWorksPartial && !$this->isNew();
-        if (null === $this->collLanguageWorks || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collLanguageWorks) {
+        $partial = $this->collLanguagePublicationsPartial && !$this->isNew();
+        if (null === $this->collLanguagePublications || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collLanguagePublications) {
                 // return empty collection
-                $this->initLanguageWorks();
+                $this->initLanguagePublications();
             } else {
-                $collLanguageWorks = LanguageWorkQuery::create(null, $criteria)
+                $collLanguagePublications = LanguagePublicationQuery::create(null, $criteria)
                     ->filterByLanguage($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    if (false !== $this->collLanguageWorksPartial && count($collLanguageWorks)) {
-                      $this->initLanguageWorks(false);
+                    if (false !== $this->collLanguagePublicationsPartial && count($collLanguagePublications)) {
+                      $this->initLanguagePublications(false);
 
-                      foreach($collLanguageWorks as $obj) {
-                        if (false == $this->collLanguageWorks->contains($obj)) {
-                          $this->collLanguageWorks->append($obj);
+                      foreach($collLanguagePublications as $obj) {
+                        if (false == $this->collLanguagePublications->contains($obj)) {
+                          $this->collLanguagePublications->append($obj);
                         }
                       }
 
-                      $this->collLanguageWorksPartial = true;
+                      $this->collLanguagePublicationsPartial = true;
                     }
 
-                    $collLanguageWorks->getInternalIterator()->rewind();
-                    return $collLanguageWorks;
+                    $collLanguagePublications->getInternalIterator()->rewind();
+                    return $collLanguagePublications;
                 }
 
-                if($partial && $this->collLanguageWorks) {
-                    foreach($this->collLanguageWorks as $obj) {
+                if($partial && $this->collLanguagePublications) {
+                    foreach($this->collLanguagePublications as $obj) {
                         if($obj->isNew()) {
-                            $collLanguageWorks[] = $obj;
+                            $collLanguagePublications[] = $obj;
                         }
                     }
                 }
 
-                $this->collLanguageWorks = $collLanguageWorks;
-                $this->collLanguageWorksPartial = false;
+                $this->collLanguagePublications = $collLanguagePublications;
+                $this->collLanguagePublicationsPartial = false;
             }
         }
 
-        return $this->collLanguageWorks;
+        return $this->collLanguagePublications;
     }
 
     /**
-     * Sets a collection of LanguageWork objects related by a one-to-many relationship
+     * Sets a collection of LanguagePublication objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $languageWorks A Propel collection.
+     * @param PropelCollection $languagePublications A Propel collection.
      * @param PropelPDO $con Optional connection object
      * @return Language The current object (for fluent API support)
      */
-    public function setLanguageWorks(PropelCollection $languageWorks, PropelPDO $con = null)
+    public function setLanguagePublications(PropelCollection $languagePublications, PropelPDO $con = null)
     {
-        $languageWorksToDelete = $this->getLanguageWorks(new Criteria(), $con)->diff($languageWorks);
+        $languagePublicationsToDelete = $this->getLanguagePublications(new Criteria(), $con)->diff($languagePublications);
 
-        $this->languageWorksScheduledForDeletion = unserialize(serialize($languageWorksToDelete));
+        $this->languagePublicationsScheduledForDeletion = unserialize(serialize($languagePublicationsToDelete));
 
-        foreach ($languageWorksToDelete as $languageWorkRemoved) {
-            $languageWorkRemoved->setLanguage(null);
+        foreach ($languagePublicationsToDelete as $languagePublicationRemoved) {
+            $languagePublicationRemoved->setLanguage(null);
         }
 
-        $this->collLanguageWorks = null;
-        foreach ($languageWorks as $languageWork) {
-            $this->addLanguageWork($languageWork);
+        $this->collLanguagePublications = null;
+        foreach ($languagePublications as $languagePublication) {
+            $this->addLanguagePublication($languagePublication);
         }
 
-        $this->collLanguageWorks = $languageWorks;
-        $this->collLanguageWorksPartial = false;
+        $this->collLanguagePublications = $languagePublications;
+        $this->collLanguagePublicationsPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related LanguageWork objects.
+     * Returns the number of related LanguagePublication objects.
      *
      * @param Criteria $criteria
      * @param boolean $distinct
      * @param PropelPDO $con
-     * @return int             Count of related LanguageWork objects.
+     * @return int             Count of related LanguagePublication objects.
      * @throws PropelException
      */
-    public function countLanguageWorks(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countLanguagePublications(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $partial = $this->collLanguageWorksPartial && !$this->isNew();
-        if (null === $this->collLanguageWorks || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collLanguageWorks) {
+        $partial = $this->collLanguagePublicationsPartial && !$this->isNew();
+        if (null === $this->collLanguagePublications || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collLanguagePublications) {
                 return 0;
             }
 
             if($partial && !$criteria) {
-                return count($this->getLanguageWorks());
+                return count($this->getLanguagePublications());
             }
-            $query = LanguageWorkQuery::create(null, $criteria);
+            $query = LanguagePublicationQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
@@ -1061,52 +1061,52 @@ abstract class BaseLanguage extends BaseObject implements Persistent, \DTA\Metad
                 ->count($con);
         }
 
-        return count($this->collLanguageWorks);
+        return count($this->collLanguagePublications);
     }
 
     /**
-     * Method called to associate a LanguageWork object to this object
-     * through the LanguageWork foreign key attribute.
+     * Method called to associate a LanguagePublication object to this object
+     * through the LanguagePublication foreign key attribute.
      *
-     * @param    LanguageWork $l LanguageWork
+     * @param    LanguagePublication $l LanguagePublication
      * @return Language The current object (for fluent API support)
      */
-    public function addLanguageWork(LanguageWork $l)
+    public function addLanguagePublication(LanguagePublication $l)
     {
-        if ($this->collLanguageWorks === null) {
-            $this->initLanguageWorks();
-            $this->collLanguageWorksPartial = true;
+        if ($this->collLanguagePublications === null) {
+            $this->initLanguagePublications();
+            $this->collLanguagePublicationsPartial = true;
         }
-        if (!in_array($l, $this->collLanguageWorks->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddLanguageWork($l);
+        if (!in_array($l, $this->collLanguagePublications->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddLanguagePublication($l);
         }
 
         return $this;
     }
 
     /**
-     * @param	LanguageWork $languageWork The languageWork object to add.
+     * @param	LanguagePublication $languagePublication The languagePublication object to add.
      */
-    protected function doAddLanguageWork($languageWork)
+    protected function doAddLanguagePublication($languagePublication)
     {
-        $this->collLanguageWorks[]= $languageWork;
-        $languageWork->setLanguage($this);
+        $this->collLanguagePublications[]= $languagePublication;
+        $languagePublication->setLanguage($this);
     }
 
     /**
-     * @param	LanguageWork $languageWork The languageWork object to remove.
+     * @param	LanguagePublication $languagePublication The languagePublication object to remove.
      * @return Language The current object (for fluent API support)
      */
-    public function removeLanguageWork($languageWork)
+    public function removeLanguagePublication($languagePublication)
     {
-        if ($this->getLanguageWorks()->contains($languageWork)) {
-            $this->collLanguageWorks->remove($this->collLanguageWorks->search($languageWork));
-            if (null === $this->languageWorksScheduledForDeletion) {
-                $this->languageWorksScheduledForDeletion = clone $this->collLanguageWorks;
-                $this->languageWorksScheduledForDeletion->clear();
+        if ($this->getLanguagePublications()->contains($languagePublication)) {
+            $this->collLanguagePublications->remove($this->collLanguagePublications->search($languagePublication));
+            if (null === $this->languagePublicationsScheduledForDeletion) {
+                $this->languagePublicationsScheduledForDeletion = clone $this->collLanguagePublications;
+                $this->languagePublicationsScheduledForDeletion->clear();
             }
-            $this->languageWorksScheduledForDeletion[]= clone $languageWork;
-            $languageWork->setLanguage(null);
+            $this->languagePublicationsScheduledForDeletion[]= clone $languagePublication;
+            $languagePublication->setLanguage(null);
         }
 
         return $this;
@@ -1118,7 +1118,7 @@ abstract class BaseLanguage extends BaseObject implements Persistent, \DTA\Metad
      * an identical criteria, it returns the collection.
      * Otherwise if this Language is new, it will return
      * an empty collection; or if this Language has previously
-     * been saved, it will retrieve related LanguageWorks from storage.
+     * been saved, it will retrieve related LanguagePublications from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1127,51 +1127,51 @@ abstract class BaseLanguage extends BaseObject implements Persistent, \DTA\Metad
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|LanguageWork[] List of LanguageWork objects
+     * @return PropelObjectCollection|LanguagePublication[] List of LanguagePublication objects
      */
-    public function getLanguageWorksJoinWork($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getLanguagePublicationsJoinPublication($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
-        $query = LanguageWorkQuery::create(null, $criteria);
-        $query->joinWith('Work', $join_behavior);
+        $query = LanguagePublicationQuery::create(null, $criteria);
+        $query->joinWith('Publication', $join_behavior);
 
-        return $this->getLanguageWorks($query, $con);
+        return $this->getLanguagePublications($query, $con);
     }
 
     /**
-     * Clears out the collWorks collection
+     * Clears out the collPublications collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return Language The current object (for fluent API support)
-     * @see        addWorks()
+     * @see        addPublications()
      */
-    public function clearWorks()
+    public function clearPublications()
     {
-        $this->collWorks = null; // important to set this to null since that means it is uninitialized
-        $this->collWorksPartial = null;
+        $this->collPublications = null; // important to set this to null since that means it is uninitialized
+        $this->collPublicationsPartial = null;
 
         return $this;
     }
 
     /**
-     * Initializes the collWorks collection.
+     * Initializes the collPublications collection.
      *
-     * By default this just sets the collWorks collection to an empty collection (like clearWorks());
+     * By default this just sets the collPublications collection to an empty collection (like clearPublications());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
      * @return void
      */
-    public function initWorks()
+    public function initPublications()
     {
-        $this->collWorks = new PropelObjectCollection();
-        $this->collWorks->setModel('Work');
+        $this->collPublications = new PropelObjectCollection();
+        $this->collPublications->setModel('Publication');
     }
 
     /**
-     * Gets a collection of Work objects related by a many-to-many relationship
-     * to the current object by way of the language_work cross-reference table.
+     * Gets a collection of Publication objects related by a many-to-many relationship
+     * to the current object by way of the language_publication cross-reference table.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1182,73 +1182,73 @@ abstract class BaseLanguage extends BaseObject implements Persistent, \DTA\Metad
      * @param Criteria $criteria Optional query object to filter the query
      * @param PropelPDO $con Optional connection object
      *
-     * @return PropelObjectCollection|Work[] List of Work objects
+     * @return PropelObjectCollection|Publication[] List of Publication objects
      */
-    public function getWorks($criteria = null, PropelPDO $con = null)
+    public function getPublications($criteria = null, PropelPDO $con = null)
     {
-        if (null === $this->collWorks || null !== $criteria) {
-            if ($this->isNew() && null === $this->collWorks) {
+        if (null === $this->collPublications || null !== $criteria) {
+            if ($this->isNew() && null === $this->collPublications) {
                 // return empty collection
-                $this->initWorks();
+                $this->initPublications();
             } else {
-                $collWorks = WorkQuery::create(null, $criteria)
+                $collPublications = PublicationQuery::create(null, $criteria)
                     ->filterByLanguage($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    return $collWorks;
+                    return $collPublications;
                 }
-                $this->collWorks = $collWorks;
+                $this->collPublications = $collPublications;
             }
         }
 
-        return $this->collWorks;
+        return $this->collPublications;
     }
 
     /**
-     * Sets a collection of Work objects related by a many-to-many relationship
-     * to the current object by way of the language_work cross-reference table.
+     * Sets a collection of Publication objects related by a many-to-many relationship
+     * to the current object by way of the language_publication cross-reference table.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $works A Propel collection.
+     * @param PropelCollection $publications A Propel collection.
      * @param PropelPDO $con Optional connection object
      * @return Language The current object (for fluent API support)
      */
-    public function setWorks(PropelCollection $works, PropelPDO $con = null)
+    public function setPublications(PropelCollection $publications, PropelPDO $con = null)
     {
-        $this->clearWorks();
-        $currentWorks = $this->getWorks();
+        $this->clearPublications();
+        $currentPublications = $this->getPublications();
 
-        $this->worksScheduledForDeletion = $currentWorks->diff($works);
+        $this->publicationsScheduledForDeletion = $currentPublications->diff($publications);
 
-        foreach ($works as $work) {
-            if (!$currentWorks->contains($work)) {
-                $this->doAddWork($work);
+        foreach ($publications as $publication) {
+            if (!$currentPublications->contains($publication)) {
+                $this->doAddPublication($publication);
             }
         }
 
-        $this->collWorks = $works;
+        $this->collPublications = $publications;
 
         return $this;
     }
 
     /**
-     * Gets the number of Work objects related by a many-to-many relationship
-     * to the current object by way of the language_work cross-reference table.
+     * Gets the number of Publication objects related by a many-to-many relationship
+     * to the current object by way of the language_publication cross-reference table.
      *
      * @param Criteria $criteria Optional query object to filter the query
      * @param boolean $distinct Set to true to force count distinct
      * @param PropelPDO $con Optional connection object
      *
-     * @return int the number of related Work objects
+     * @return int the number of related Publication objects
      */
-    public function countWorks($criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countPublications($criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        if (null === $this->collWorks || null !== $criteria) {
-            if ($this->isNew() && null === $this->collWorks) {
+        if (null === $this->collPublications || null !== $criteria) {
+            if ($this->isNew() && null === $this->collPublications) {
                 return 0;
             } else {
-                $query = WorkQuery::create(null, $criteria);
+                $query = PublicationQuery::create(null, $criteria);
                 if ($distinct) {
                     $query->distinct();
                 }
@@ -1258,57 +1258,57 @@ abstract class BaseLanguage extends BaseObject implements Persistent, \DTA\Metad
                     ->count($con);
             }
         } else {
-            return count($this->collWorks);
+            return count($this->collPublications);
         }
     }
 
     /**
-     * Associate a Work object to this object
-     * through the language_work cross reference table.
+     * Associate a Publication object to this object
+     * through the language_publication cross reference table.
      *
-     * @param  Work $work The LanguageWork object to relate
+     * @param  Publication $publication The LanguagePublication object to relate
      * @return Language The current object (for fluent API support)
      */
-    public function addWork(Work $work)
+    public function addPublication(Publication $publication)
     {
-        if ($this->collWorks === null) {
-            $this->initWorks();
+        if ($this->collPublications === null) {
+            $this->initPublications();
         }
-        if (!$this->collWorks->contains($work)) { // only add it if the **same** object is not already associated
-            $this->doAddWork($work);
+        if (!$this->collPublications->contains($publication)) { // only add it if the **same** object is not already associated
+            $this->doAddPublication($publication);
 
-            $this->collWorks[]= $work;
+            $this->collPublications[]= $publication;
         }
 
         return $this;
     }
 
     /**
-     * @param	Work $work The work object to add.
+     * @param	Publication $publication The publication object to add.
      */
-    protected function doAddWork($work)
+    protected function doAddPublication($publication)
     {
-        $languageWork = new LanguageWork();
-        $languageWork->setWork($work);
-        $this->addLanguageWork($languageWork);
+        $languagePublication = new LanguagePublication();
+        $languagePublication->setPublication($publication);
+        $this->addLanguagePublication($languagePublication);
     }
 
     /**
-     * Remove a Work object to this object
-     * through the language_work cross reference table.
+     * Remove a Publication object to this object
+     * through the language_publication cross reference table.
      *
-     * @param Work $work The LanguageWork object to relate
+     * @param Publication $publication The LanguagePublication object to relate
      * @return Language The current object (for fluent API support)
      */
-    public function removeWork(Work $work)
+    public function removePublication(Publication $publication)
     {
-        if ($this->getWorks()->contains($work)) {
-            $this->collWorks->remove($this->collWorks->search($work));
-            if (null === $this->worksScheduledForDeletion) {
-                $this->worksScheduledForDeletion = clone $this->collWorks;
-                $this->worksScheduledForDeletion->clear();
+        if ($this->getPublications()->contains($publication)) {
+            $this->collPublications->remove($this->collPublications->search($publication));
+            if (null === $this->publicationsScheduledForDeletion) {
+                $this->publicationsScheduledForDeletion = clone $this->collPublications;
+                $this->publicationsScheduledForDeletion->clear();
             }
-            $this->worksScheduledForDeletion[]= $work;
+            $this->publicationsScheduledForDeletion[]= $publication;
         }
 
         return $this;
@@ -1343,13 +1343,13 @@ abstract class BaseLanguage extends BaseObject implements Persistent, \DTA\Metad
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
-            if ($this->collLanguageWorks) {
-                foreach ($this->collLanguageWorks as $o) {
+            if ($this->collLanguagePublications) {
+                foreach ($this->collLanguagePublications as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collWorks) {
-                foreach ($this->collWorks as $o) {
+            if ($this->collPublications) {
+                foreach ($this->collPublications as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -1357,14 +1357,14 @@ abstract class BaseLanguage extends BaseObject implements Persistent, \DTA\Metad
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
-        if ($this->collLanguageWorks instanceof PropelCollection) {
-            $this->collLanguageWorks->clearIterator();
+        if ($this->collLanguagePublications instanceof PropelCollection) {
+            $this->collLanguagePublications->clearIterator();
         }
-        $this->collLanguageWorks = null;
-        if ($this->collWorks instanceof PropelCollection) {
-            $this->collWorks->clearIterator();
+        $this->collLanguagePublications = null;
+        if ($this->collPublications instanceof PropelCollection) {
+            $this->collPublications->clearIterator();
         }
-        $this->collWorks = null;
+        $this->collPublications = null;
     }
 
     /**

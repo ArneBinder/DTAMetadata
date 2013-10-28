@@ -17,24 +17,11 @@ class HomeController extends DTADomainController {
 
     /** @inheritdoc */
     public $domainMenu = array(
-        array("caption" => "Zuletzt Angelegt", 'route' => 'home'),
-        array("caption" => "Zuletzt Bearbeitet", 'route' => 'home'),
-        array("caption" => "Zuletzt Angesehen", 'route' => 'home'),
+//        array("caption" => "Meine letzten Bearbeitungen", 'route' => 'home'),
+//        array("caption" => "Von mir und anderen zuletzt bearbeitet", 'route' => 'home'),
+//        array("caption" => "Zuletzt Angesehen", 'route' => 'home'),
     );
     
-    private function retrieveSubtree($root){
-        
-        $children = $root->getChildren();
-        $result = array();
-        
-        if(count($children) > 0){
-            foreach ($children as $child) {
-                $result[$child->getName()] = $this->retrieveSubtree($child);
-            }
-        }
-        return $result;
-    }
-
     public function indexAction(Request $request) {
 //        $p = new Model\Publication();
 //        $p->setNumpages(101);

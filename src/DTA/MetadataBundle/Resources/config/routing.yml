@@ -190,6 +190,12 @@ workflowDomain:
   path: /Workflow/
   defaults: { _controller: DTAMetadataBundle:WorkflowDomain:index }
   
+Workflow_tasktypeViewAll:
+  path: /Workflow/showAll/Tasktype
+  defaults: 
+    _controller: DTAMetadataBundle:WorkflowDomain:tasktypeViewAll
+    package: Workflow
+    
 reporting:
   path: /Workflow/Statistics 
   defaults: { _controller: DTAMetadataBundle:WorkflowDomain:reporting }

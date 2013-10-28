@@ -75,7 +75,7 @@ abstract class BaseTextsourceQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'DTAMetadata', $modelName = 'DTA\\MetadataBundle\\Model\\Workflow\\Textsource', $modelAlias = null)
+    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Workflow\\Textsource', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }

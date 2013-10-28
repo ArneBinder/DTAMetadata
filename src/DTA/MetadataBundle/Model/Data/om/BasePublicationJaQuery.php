@@ -16,17 +16,14 @@ use DTA\MetadataBundle\Model\Data\Publication;
 use DTA\MetadataBundle\Model\Data\PublicationJa;
 use DTA\MetadataBundle\Model\Data\PublicationJaPeer;
 use DTA\MetadataBundle\Model\Data\PublicationJaQuery;
-use DTA\MetadataBundle\Model\Data\Volume;
 
 /**
  * @method PublicationJaQuery orderById($order = Criteria::ASC) Order by the id column
  * @method PublicationJaQuery orderByPublicationId($order = Criteria::ASC) Order by the publication_id column
- * @method PublicationJaQuery orderByVolumeId($order = Criteria::ASC) Order by the volume_id column
  * @method PublicationJaQuery orderByParent($order = Criteria::ASC) Order by the parent column
  *
  * @method PublicationJaQuery groupById() Group by the id column
  * @method PublicationJaQuery groupByPublicationId() Group by the publication_id column
- * @method PublicationJaQuery groupByVolumeId() Group by the volume_id column
  * @method PublicationJaQuery groupByParent() Group by the parent column
  *
  * @method PublicationJaQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
@@ -37,20 +34,14 @@ use DTA\MetadataBundle\Model\Data\Volume;
  * @method PublicationJaQuery rightJoinPublication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Publication relation
  * @method PublicationJaQuery innerJoinPublication($relationAlias = null) Adds a INNER JOIN clause to the query using the Publication relation
  *
- * @method PublicationJaQuery leftJoinVolume($relationAlias = null) Adds a LEFT JOIN clause to the query using the Volume relation
- * @method PublicationJaQuery rightJoinVolume($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Volume relation
- * @method PublicationJaQuery innerJoinVolume($relationAlias = null) Adds a INNER JOIN clause to the query using the Volume relation
- *
  * @method PublicationJa findOne(PropelPDO $con = null) Return the first PublicationJa matching the query
  * @method PublicationJa findOneOrCreate(PropelPDO $con = null) Return the first PublicationJa matching the query, or a new PublicationJa object populated from the query conditions when no match is found
  *
  * @method PublicationJa findOneByPublicationId(int $publication_id) Return the first PublicationJa filtered by the publication_id column
- * @method PublicationJa findOneByVolumeId(int $volume_id) Return the first PublicationJa filtered by the volume_id column
  * @method PublicationJa findOneByParent(int $parent) Return the first PublicationJa filtered by the parent column
  *
  * @method array findById(int $id) Return PublicationJa objects filtered by the id column
  * @method array findByPublicationId(int $publication_id) Return PublicationJa objects filtered by the publication_id column
- * @method array findByVolumeId(int $volume_id) Return PublicationJa objects filtered by the volume_id column
  * @method array findByParent(int $parent) Return PublicationJa objects filtered by the parent column
  */
 abstract class BasePublicationJaQuery extends ModelCriteria
@@ -62,7 +53,7 @@ abstract class BasePublicationJaQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'DTAMetadata', $modelName = 'DTA\\MetadataBundle\\Model\\Data\\PublicationJa', $modelAlias = null)
+    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Data\\PublicationJa', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -153,7 +144,7 @@ abstract class BasePublicationJaQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "publication_id", "volume_id", "parent" FROM "publication_ja" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "publication_id", "parent" FROM "publication_ja" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -329,50 +320,6 @@ abstract class BasePublicationJaQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the volume_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByVolumeId(1234); // WHERE volume_id = 1234
-     * $query->filterByVolumeId(array(12, 34)); // WHERE volume_id IN (12, 34)
-     * $query->filterByVolumeId(array('min' => 12)); // WHERE volume_id >= 12
-     * $query->filterByVolumeId(array('max' => 12)); // WHERE volume_id <= 12
-     * </code>
-     *
-     * @see       filterByVolume()
-     *
-     * @param     mixed $volumeId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return PublicationJaQuery The current query, for fluid interface
-     */
-    public function filterByVolumeId($volumeId = null, $comparison = null)
-    {
-        if (is_array($volumeId)) {
-            $useMinMax = false;
-            if (isset($volumeId['min'])) {
-                $this->addUsingAlias(PublicationJaPeer::VOLUME_ID, $volumeId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($volumeId['max'])) {
-                $this->addUsingAlias(PublicationJaPeer::VOLUME_ID, $volumeId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(PublicationJaPeer::VOLUME_ID, $volumeId, $comparison);
-    }
-
-    /**
      * Filter the query on the parent column
      *
      * Example usage:
@@ -488,82 +435,6 @@ abstract class BasePublicationJaQuery extends ModelCriteria
         return $this
             ->joinPublication($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Publication', '\DTA\MetadataBundle\Model\Data\PublicationQuery');
-    }
-
-    /**
-     * Filter the query by a related Volume object
-     *
-     * @param   Volume|PropelObjectCollection $volume The related object(s) to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 PublicationJaQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByVolume($volume, $comparison = null)
-    {
-        if ($volume instanceof Volume) {
-            return $this
-                ->addUsingAlias(PublicationJaPeer::VOLUME_ID, $volume->getId(), $comparison);
-        } elseif ($volume instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(PublicationJaPeer::VOLUME_ID, $volume->toKeyValue('PrimaryKey', 'Id'), $comparison);
-        } else {
-            throw new PropelException('filterByVolume() only accepts arguments of type Volume or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Volume relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return PublicationJaQuery The current query, for fluid interface
-     */
-    public function joinVolume($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Volume');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Volume');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Volume relation Volume object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\Data\VolumeQuery A secondary query class using the current class as primary query
-     */
-    public function useVolumeQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinVolume($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Volume', '\DTA\MetadataBundle\Model\Data\VolumeQuery');
     }
 
     /**

@@ -65,12 +65,6 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     protected $mail;
 
     /**
-     * The value for the phone field.
-     * @var        string
-     */
-    protected $phone;
-
-    /**
      * The value for the admin field.
      * Note: this column has a database default value of: false
      * @var        boolean
@@ -110,7 +104,7 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('id', 'benutzername', 'mail', 'telefon', 'administratorrechte', );	public   $tableRowViewAccessors = array('id'=>'Id', 'benutzername'=>'Username', 'mail'=>'Mail', 'telefon'=>'Phone', 'administratorrechte'=>'accessor:adminToString', );
+    public static $tableRowViewCaptions = array('id', 'benutzername', 'mail', 'administratorrechte', );	public   $tableRowViewAccessors = array('id'=>'Id', 'benutzername'=>'Username', 'mail'=>'Mail', 'administratorrechte'=>'accessor:adminToString', );
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -176,16 +170,6 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     public function getMail()
     {
         return $this->mail;
-    }
-
-    /**
-     * Get the [phone] column value.
-     *
-     * @return string
-     */
-    public function getPhone()
-    {
-        return $this->phone;
     }
 
     /**
@@ -293,27 +277,6 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     } // setMail()
 
     /**
-     * Set the value of [phone] column.
-     *
-     * @param string $v new value
-     * @return DtaUser The current object (for fluent API support)
-     */
-    public function setPhone($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
-        }
-
-        if ($this->phone !== $v) {
-            $this->phone = $v;
-            $this->modifiedColumns[] = DtaUserPeer::PHONE;
-        }
-
-
-        return $this;
-    } // setPhone()
-
-    /**
      * Sets the value of the [admin] column.
      * Non-boolean arguments are converted using the following rules:
      *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
@@ -403,9 +366,8 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
             $this->password = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
             $this->salt = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
             $this->mail = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-            $this->phone = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-            $this->admin = ($row[$startcol + 5] !== null) ? (boolean) $row[$startcol + 5] : null;
-            $this->id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
+            $this->admin = ($row[$startcol + 4] !== null) ? (boolean) $row[$startcol + 4] : null;
+            $this->id = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -414,7 +376,7 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 7; // 7 = DtaUserPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = DtaUserPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating DtaUser object", $e);
@@ -668,9 +630,6 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
         if ($this->isColumnModified(DtaUserPeer::MAIL)) {
             $modifiedColumns[':p' . $index++]  = '"mail"';
         }
-        if ($this->isColumnModified(DtaUserPeer::PHONE)) {
-            $modifiedColumns[':p' . $index++]  = '"phone"';
-        }
         if ($this->isColumnModified(DtaUserPeer::ADMIN)) {
             $modifiedColumns[':p' . $index++]  = '"admin"';
         }
@@ -699,9 +658,6 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
                         break;
                     case '"mail"':
                         $stmt->bindValue($identifier, $this->mail, PDO::PARAM_STR);
-                        break;
-                    case '"phone"':
-                        $stmt->bindValue($identifier, $this->phone, PDO::PARAM_STR);
                         break;
                     case '"admin"':
                         $stmt->bindValue($identifier, $this->admin, PDO::PARAM_BOOL);
@@ -857,12 +813,9 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
                 return $this->getMail();
                 break;
             case 4:
-                return $this->getPhone();
-                break;
-            case 5:
                 return $this->getAdmin();
                 break;
-            case 6:
+            case 5:
                 return $this->getId();
                 break;
             default:
@@ -898,9 +851,8 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
             $keys[1] => $this->getPassword(),
             $keys[2] => $this->getSalt(),
             $keys[3] => $this->getMail(),
-            $keys[4] => $this->getPhone(),
-            $keys[5] => $this->getAdmin(),
-            $keys[6] => $this->getId(),
+            $keys[4] => $this->getAdmin(),
+            $keys[5] => $this->getId(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->collTasks) {
@@ -953,12 +905,9 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
                 $this->setMail($value);
                 break;
             case 4:
-                $this->setPhone($value);
-                break;
-            case 5:
                 $this->setAdmin($value);
                 break;
-            case 6:
+            case 5:
                 $this->setId($value);
                 break;
         } // switch()
@@ -989,9 +938,8 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
         if (array_key_exists($keys[1], $arr)) $this->setPassword($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setSalt($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setMail($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setPhone($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setAdmin($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setId($arr[$keys[6]]);
+        if (array_key_exists($keys[4], $arr)) $this->setAdmin($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setId($arr[$keys[5]]);
     }
 
     /**
@@ -1007,7 +955,6 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
         if ($this->isColumnModified(DtaUserPeer::PASSWORD)) $criteria->add(DtaUserPeer::PASSWORD, $this->password);
         if ($this->isColumnModified(DtaUserPeer::SALT)) $criteria->add(DtaUserPeer::SALT, $this->salt);
         if ($this->isColumnModified(DtaUserPeer::MAIL)) $criteria->add(DtaUserPeer::MAIL, $this->mail);
-        if ($this->isColumnModified(DtaUserPeer::PHONE)) $criteria->add(DtaUserPeer::PHONE, $this->phone);
         if ($this->isColumnModified(DtaUserPeer::ADMIN)) $criteria->add(DtaUserPeer::ADMIN, $this->admin);
         if ($this->isColumnModified(DtaUserPeer::ID)) $criteria->add(DtaUserPeer::ID, $this->id);
 
@@ -1077,7 +1024,6 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
         $copyObj->setPassword($this->getPassword());
         $copyObj->setSalt($this->getSalt());
         $copyObj->setMail($this->getMail());
-        $copyObj->setPhone($this->getPhone());
         $copyObj->setAdmin($this->getAdmin());
 
         if ($deepCopy && !$this->startCopy) {
@@ -1486,7 +1432,6 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
         $this->password = null;
         $this->salt = null;
         $this->mail = null;
-        $this->phone = null;
         $this->admin = null;
         $this->id = null;
         $this->alreadyInSave = false;

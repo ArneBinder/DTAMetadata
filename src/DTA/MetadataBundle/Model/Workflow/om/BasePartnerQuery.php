@@ -22,17 +22,23 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
 /**
  * @method PartnerQuery orderById($order = Criteria::ASC) Order by the id column
  * @method PartnerQuery orderByName($order = Criteria::ASC) Order by the name column
- * @method PartnerQuery orderByPerson($order = Criteria::ASC) Order by the person column
- * @method PartnerQuery orderByContactData($order = Criteria::ASC) Order by the contact_data column
+ * @method PartnerQuery orderByMail($order = Criteria::ASC) Order by the mail column
+ * @method PartnerQuery orderByWeb($order = Criteria::ASC) Order by the web column
+ * @method PartnerQuery orderByContactperson($order = Criteria::ASC) Order by the contactperson column
+ * @method PartnerQuery orderByContactdata($order = Criteria::ASC) Order by the contactdata column
  * @method PartnerQuery orderByComments($order = Criteria::ASC) Order by the comments column
  * @method PartnerQuery orderByIsOrganization($order = Criteria::ASC) Order by the is_organization column
+ * @method PartnerQuery orderByLegacyPartnerId($order = Criteria::ASC) Order by the legacy_partner_id column
  *
  * @method PartnerQuery groupById() Group by the id column
  * @method PartnerQuery groupByName() Group by the name column
- * @method PartnerQuery groupByPerson() Group by the person column
- * @method PartnerQuery groupByContactData() Group by the contact_data column
+ * @method PartnerQuery groupByMail() Group by the mail column
+ * @method PartnerQuery groupByWeb() Group by the web column
+ * @method PartnerQuery groupByContactperson() Group by the contactperson column
+ * @method PartnerQuery groupByContactdata() Group by the contactdata column
  * @method PartnerQuery groupByComments() Group by the comments column
  * @method PartnerQuery groupByIsOrganization() Group by the is_organization column
+ * @method PartnerQuery groupByLegacyPartnerId() Group by the legacy_partner_id column
  *
  * @method PartnerQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method PartnerQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -54,17 +60,23 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method Partner findOneOrCreate(PropelPDO $con = null) Return the first Partner matching the query, or a new Partner object populated from the query conditions when no match is found
  *
  * @method Partner findOneByName(string $name) Return the first Partner filtered by the name column
- * @method Partner findOneByPerson(string $person) Return the first Partner filtered by the person column
- * @method Partner findOneByContactData(string $contact_data) Return the first Partner filtered by the contact_data column
+ * @method Partner findOneByMail(string $mail) Return the first Partner filtered by the mail column
+ * @method Partner findOneByWeb(string $web) Return the first Partner filtered by the web column
+ * @method Partner findOneByContactperson(string $contactperson) Return the first Partner filtered by the contactperson column
+ * @method Partner findOneByContactdata(string $contactdata) Return the first Partner filtered by the contactdata column
  * @method Partner findOneByComments(string $comments) Return the first Partner filtered by the comments column
  * @method Partner findOneByIsOrganization(boolean $is_organization) Return the first Partner filtered by the is_organization column
+ * @method Partner findOneByLegacyPartnerId(int $legacy_partner_id) Return the first Partner filtered by the legacy_partner_id column
  *
  * @method array findById(int $id) Return Partner objects filtered by the id column
  * @method array findByName(string $name) Return Partner objects filtered by the name column
- * @method array findByPerson(string $person) Return Partner objects filtered by the person column
- * @method array findByContactData(string $contact_data) Return Partner objects filtered by the contact_data column
+ * @method array findByMail(string $mail) Return Partner objects filtered by the mail column
+ * @method array findByWeb(string $web) Return Partner objects filtered by the web column
+ * @method array findByContactperson(string $contactperson) Return Partner objects filtered by the contactperson column
+ * @method array findByContactdata(string $contactdata) Return Partner objects filtered by the contactdata column
  * @method array findByComments(string $comments) Return Partner objects filtered by the comments column
  * @method array findByIsOrganization(boolean $is_organization) Return Partner objects filtered by the is_organization column
+ * @method array findByLegacyPartnerId(int $legacy_partner_id) Return Partner objects filtered by the legacy_partner_id column
  */
 abstract class BasePartnerQuery extends ModelCriteria
 {
@@ -75,7 +87,7 @@ abstract class BasePartnerQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'DTAMetadata', $modelName = 'DTA\\MetadataBundle\\Model\\Workflow\\Partner', $modelAlias = null)
+    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Workflow\\Partner', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -166,7 +178,7 @@ abstract class BasePartnerQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "name", "person", "contact_data", "comments", "is_organization" FROM "partner" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "name", "mail", "web", "contactperson", "contactdata", "comments", "is_organization", "legacy_partner_id" FROM "partner" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -327,61 +339,119 @@ abstract class BasePartnerQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the person column
+     * Filter the query on the mail column
      *
      * Example usage:
      * <code>
-     * $query->filterByPerson('fooValue');   // WHERE person = 'fooValue'
-     * $query->filterByPerson('%fooValue%'); // WHERE person LIKE '%fooValue%'
+     * $query->filterByMail('fooValue');   // WHERE mail = 'fooValue'
+     * $query->filterByMail('%fooValue%'); // WHERE mail LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $person The value to use as filter.
+     * @param     string $mail The value to use as filter.
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return PartnerQuery The current query, for fluid interface
      */
-    public function filterByPerson($person = null, $comparison = null)
+    public function filterByMail($mail = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (is_array($person)) {
+            if (is_array($mail)) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $person)) {
-                $person = str_replace('*', '%', $person);
+            } elseif (preg_match('/[\%\*]/', $mail)) {
+                $mail = str_replace('*', '%', $mail);
                 $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(PartnerPeer::PERSON, $person, $comparison);
+        return $this->addUsingAlias(PartnerPeer::MAIL, $mail, $comparison);
     }
 
     /**
-     * Filter the query on the contact_data column
+     * Filter the query on the web column
      *
      * Example usage:
      * <code>
-     * $query->filterByContactData('fooValue');   // WHERE contact_data = 'fooValue'
-     * $query->filterByContactData('%fooValue%'); // WHERE contact_data LIKE '%fooValue%'
+     * $query->filterByWeb('fooValue');   // WHERE web = 'fooValue'
+     * $query->filterByWeb('%fooValue%'); // WHERE web LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $contactData The value to use as filter.
+     * @param     string $web The value to use as filter.
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return PartnerQuery The current query, for fluid interface
      */
-    public function filterByContactData($contactData = null, $comparison = null)
+    public function filterByWeb($web = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (is_array($contactData)) {
+            if (is_array($web)) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $contactData)) {
-                $contactData = str_replace('*', '%', $contactData);
+            } elseif (preg_match('/[\%\*]/', $web)) {
+                $web = str_replace('*', '%', $web);
                 $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(PartnerPeer::CONTACT_DATA, $contactData, $comparison);
+        return $this->addUsingAlias(PartnerPeer::WEB, $web, $comparison);
+    }
+
+    /**
+     * Filter the query on the contactperson column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByContactperson('fooValue');   // WHERE contactperson = 'fooValue'
+     * $query->filterByContactperson('%fooValue%'); // WHERE contactperson LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $contactperson The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return PartnerQuery The current query, for fluid interface
+     */
+    public function filterByContactperson($contactperson = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($contactperson)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $contactperson)) {
+                $contactperson = str_replace('*', '%', $contactperson);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(PartnerPeer::CONTACTPERSON, $contactperson, $comparison);
+    }
+
+    /**
+     * Filter the query on the contactdata column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByContactdata('fooValue');   // WHERE contactdata = 'fooValue'
+     * $query->filterByContactdata('%fooValue%'); // WHERE contactdata LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $contactdata The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return PartnerQuery The current query, for fluid interface
+     */
+    public function filterByContactdata($contactdata = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($contactdata)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $contactdata)) {
+                $contactdata = str_replace('*', '%', $contactdata);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(PartnerPeer::CONTACTDATA, $contactdata, $comparison);
     }
 
     /**
@@ -438,6 +508,48 @@ abstract class BasePartnerQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(PartnerPeer::IS_ORGANIZATION, $isOrganization, $comparison);
+    }
+
+    /**
+     * Filter the query on the legacy_partner_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByLegacyPartnerId(1234); // WHERE legacy_partner_id = 1234
+     * $query->filterByLegacyPartnerId(array(12, 34)); // WHERE legacy_partner_id IN (12, 34)
+     * $query->filterByLegacyPartnerId(array('min' => 12)); // WHERE legacy_partner_id >= 12
+     * $query->filterByLegacyPartnerId(array('max' => 12)); // WHERE legacy_partner_id <= 12
+     * </code>
+     *
+     * @param     mixed $legacyPartnerId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return PartnerQuery The current query, for fluid interface
+     */
+    public function filterByLegacyPartnerId($legacyPartnerId = null, $comparison = null)
+    {
+        if (is_array($legacyPartnerId)) {
+            $useMinMax = false;
+            if (isset($legacyPartnerId['min'])) {
+                $this->addUsingAlias(PartnerPeer::LEGACY_PARTNER_ID, $legacyPartnerId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($legacyPartnerId['max'])) {
+                $this->addUsingAlias(PartnerPeer::LEGACY_PARTNER_ID, $legacyPartnerId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(PartnerPeer::LEGACY_PARTNER_ID, $legacyPartnerId, $comparison);
     }
 
     /**

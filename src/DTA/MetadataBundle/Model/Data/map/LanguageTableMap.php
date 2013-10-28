@@ -53,8 +53,8 @@ class LanguageTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('LanguageWork', 'DTA\\MetadataBundle\\Model\\Master\\LanguageWork', RelationMap::ONE_TO_MANY, array('id' => 'language_id', ), null, null, 'LanguageWorks');
-        $this->addRelation('Work', 'DTA\\MetadataBundle\\Model\\Data\\Work', RelationMap::MANY_TO_MANY, array(), null, null, 'Works');
+        $this->addRelation('LanguagePublication', 'DTA\\MetadataBundle\\Model\\Master\\LanguagePublication', RelationMap::ONE_TO_MANY, array('id' => 'language_id', ), null, null, 'LanguagePublications');
+        $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::MANY_TO_MANY, array(), null, null, 'Publications');
     } // buildRelations()
 
     /**

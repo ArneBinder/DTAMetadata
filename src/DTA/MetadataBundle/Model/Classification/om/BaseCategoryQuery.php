@@ -15,31 +15,44 @@ use \PropelPDO;
 use DTA\MetadataBundle\Model\Classification\Category;
 use DTA\MetadataBundle\Model\Classification\CategoryPeer;
 use DTA\MetadataBundle\Model\Classification\CategoryQuery;
-use DTA\MetadataBundle\Model\Data\Work;
-use DTA\MetadataBundle\Model\Master\CategoryWork;
+use DTA\MetadataBundle\Model\Classification\Categorytype;
+use DTA\MetadataBundle\Model\Data\Publication;
+use DTA\MetadataBundle\Model\Master\CategoryPublication;
 
 /**
  * @method CategoryQuery orderById($order = Criteria::ASC) Order by the id column
  * @method CategoryQuery orderByName($order = Criteria::ASC) Order by the name column
+ * @method CategoryQuery orderByDescription($order = Criteria::ASC) Order by the description column
+ * @method CategoryQuery orderByCategorytypeId($order = Criteria::ASC) Order by the categorytype_id column
  *
  * @method CategoryQuery groupById() Group by the id column
  * @method CategoryQuery groupByName() Group by the name column
+ * @method CategoryQuery groupByDescription() Group by the description column
+ * @method CategoryQuery groupByCategorytypeId() Group by the categorytype_id column
  *
  * @method CategoryQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method CategoryQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method CategoryQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method CategoryQuery leftJoinCategoryWork($relationAlias = null) Adds a LEFT JOIN clause to the query using the CategoryWork relation
- * @method CategoryQuery rightJoinCategoryWork($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CategoryWork relation
- * @method CategoryQuery innerJoinCategoryWork($relationAlias = null) Adds a INNER JOIN clause to the query using the CategoryWork relation
+ * @method CategoryQuery leftJoinCategorytype($relationAlias = null) Adds a LEFT JOIN clause to the query using the Categorytype relation
+ * @method CategoryQuery rightJoinCategorytype($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Categorytype relation
+ * @method CategoryQuery innerJoinCategorytype($relationAlias = null) Adds a INNER JOIN clause to the query using the Categorytype relation
+ *
+ * @method CategoryQuery leftJoinCategoryPublication($relationAlias = null) Adds a LEFT JOIN clause to the query using the CategoryPublication relation
+ * @method CategoryQuery rightJoinCategoryPublication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CategoryPublication relation
+ * @method CategoryQuery innerJoinCategoryPublication($relationAlias = null) Adds a INNER JOIN clause to the query using the CategoryPublication relation
  *
  * @method Category findOne(PropelPDO $con = null) Return the first Category matching the query
  * @method Category findOneOrCreate(PropelPDO $con = null) Return the first Category matching the query, or a new Category object populated from the query conditions when no match is found
  *
  * @method Category findOneByName(string $name) Return the first Category filtered by the name column
+ * @method Category findOneByDescription(string $description) Return the first Category filtered by the description column
+ * @method Category findOneByCategorytypeId(int $categorytype_id) Return the first Category filtered by the categorytype_id column
  *
  * @method array findById(int $id) Return Category objects filtered by the id column
  * @method array findByName(string $name) Return Category objects filtered by the name column
+ * @method array findByDescription(string $description) Return Category objects filtered by the description column
+ * @method array findByCategorytypeId(int $categorytype_id) Return Category objects filtered by the categorytype_id column
  */
 abstract class BaseCategoryQuery extends ModelCriteria
 {
@@ -50,7 +63,7 @@ abstract class BaseCategoryQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'DTAMetadata', $modelName = 'DTA\\MetadataBundle\\Model\\Classification\\Category', $modelAlias = null)
+    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Classification\\Category', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -141,7 +154,7 @@ abstract class BaseCategoryQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "name" FROM "category" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "name", "description", "categorytype_id" FROM "category" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -302,41 +315,116 @@ abstract class BaseCategoryQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related CategoryWork object
+     * Filter the query on the description column
      *
-     * @param   CategoryWork|PropelObjectCollection $categoryWork  the related object to use as filter
+     * Example usage:
+     * <code>
+     * $query->filterByDescription('fooValue');   // WHERE description = 'fooValue'
+     * $query->filterByDescription('%fooValue%'); // WHERE description LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $description The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return CategoryQuery The current query, for fluid interface
+     */
+    public function filterByDescription($description = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($description)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $description)) {
+                $description = str_replace('*', '%', $description);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(CategoryPeer::DESCRIPTION, $description, $comparison);
+    }
+
+    /**
+     * Filter the query on the categorytype_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCategorytypeId(1234); // WHERE categorytype_id = 1234
+     * $query->filterByCategorytypeId(array(12, 34)); // WHERE categorytype_id IN (12, 34)
+     * $query->filterByCategorytypeId(array('min' => 12)); // WHERE categorytype_id >= 12
+     * $query->filterByCategorytypeId(array('max' => 12)); // WHERE categorytype_id <= 12
+     * </code>
+     *
+     * @see       filterByCategorytype()
+     *
+     * @param     mixed $categorytypeId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return CategoryQuery The current query, for fluid interface
+     */
+    public function filterByCategorytypeId($categorytypeId = null, $comparison = null)
+    {
+        if (is_array($categorytypeId)) {
+            $useMinMax = false;
+            if (isset($categorytypeId['min'])) {
+                $this->addUsingAlias(CategoryPeer::CATEGORYTYPE_ID, $categorytypeId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($categorytypeId['max'])) {
+                $this->addUsingAlias(CategoryPeer::CATEGORYTYPE_ID, $categorytypeId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CategoryPeer::CATEGORYTYPE_ID, $categorytypeId, $comparison);
+    }
+
+    /**
+     * Filter the query by a related Categorytype object
+     *
+     * @param   Categorytype|PropelObjectCollection $categorytype The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return                 CategoryQuery The current query, for fluid interface
      * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterByCategoryWork($categoryWork, $comparison = null)
+    public function filterByCategorytype($categorytype, $comparison = null)
     {
-        if ($categoryWork instanceof CategoryWork) {
+        if ($categorytype instanceof Categorytype) {
             return $this
-                ->addUsingAlias(CategoryPeer::ID, $categoryWork->getCategoryId(), $comparison);
-        } elseif ($categoryWork instanceof PropelObjectCollection) {
+                ->addUsingAlias(CategoryPeer::CATEGORYTYPE_ID, $categorytype->getId(), $comparison);
+        } elseif ($categorytype instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useCategoryWorkQuery()
-                ->filterByPrimaryKeys($categoryWork->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(CategoryPeer::CATEGORYTYPE_ID, $categorytype->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByCategoryWork() only accepts arguments of type CategoryWork or PropelCollection');
+            throw new PropelException('filterByCategorytype() only accepts arguments of type Categorytype or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the CategoryWork relation
+     * Adds a JOIN clause to the query using the Categorytype relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return CategoryQuery The current query, for fluid interface
      */
-    public function joinCategoryWork($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinCategorytype($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('CategoryWork');
+        $relationMap = $tableMap->getRelation('Categorytype');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -351,14 +439,14 @@ abstract class BaseCategoryQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'CategoryWork');
+            $this->addJoinObject($join, 'Categorytype');
         }
 
         return $this;
     }
 
     /**
-     * Use the CategoryWork relation CategoryWork object
+     * Use the Categorytype relation Categorytype object
      *
      * @see       useQuery()
      *
@@ -366,29 +454,103 @@ abstract class BaseCategoryQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \DTA\MetadataBundle\Model\Master\CategoryWorkQuery A secondary query class using the current class as primary query
+     * @return   \DTA\MetadataBundle\Model\Classification\CategorytypeQuery A secondary query class using the current class as primary query
      */
-    public function useCategoryWorkQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useCategorytypeQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinCategoryWork($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'CategoryWork', '\DTA\MetadataBundle\Model\Master\CategoryWorkQuery');
+            ->joinCategorytype($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Categorytype', '\DTA\MetadataBundle\Model\Classification\CategorytypeQuery');
     }
 
     /**
-     * Filter the query by a related Work object
-     * using the category_work table as cross reference
+     * Filter the query by a related CategoryPublication object
      *
-     * @param   Work $work the related object to use as filter
+     * @param   CategoryPublication|PropelObjectCollection $categoryPublication  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 CategoryQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByCategoryPublication($categoryPublication, $comparison = null)
+    {
+        if ($categoryPublication instanceof CategoryPublication) {
+            return $this
+                ->addUsingAlias(CategoryPeer::ID, $categoryPublication->getCategoryId(), $comparison);
+        } elseif ($categoryPublication instanceof PropelObjectCollection) {
+            return $this
+                ->useCategoryPublicationQuery()
+                ->filterByPrimaryKeys($categoryPublication->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCategoryPublication() only accepts arguments of type CategoryPublication or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CategoryPublication relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return CategoryQuery The current query, for fluid interface
+     */
+    public function joinCategoryPublication($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CategoryPublication');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CategoryPublication');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CategoryPublication relation CategoryPublication object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\Master\CategoryPublicationQuery A secondary query class using the current class as primary query
+     */
+    public function useCategoryPublicationQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinCategoryPublication($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CategoryPublication', '\DTA\MetadataBundle\Model\Master\CategoryPublicationQuery');
+    }
+
+    /**
+     * Filter the query by a related Publication object
+     * using the category_publication table as cross reference
+     *
+     * @param   Publication $publication the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   CategoryQuery The current query, for fluid interface
      */
-    public function filterByWork($work, $comparison = Criteria::EQUAL)
+    public function filterByPublication($publication, $comparison = Criteria::EQUAL)
     {
         return $this
-            ->useCategoryWorkQuery()
-            ->filterByWork($work, $comparison)
+            ->useCategoryPublicationQuery()
+            ->filterByPublication($publication, $comparison)
             ->endUse();
     }
 

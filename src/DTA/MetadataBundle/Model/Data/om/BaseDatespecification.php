@@ -18,8 +18,6 @@ use DTA\MetadataBundle\Model\Data\DatespecificationPeer;
 use DTA\MetadataBundle\Model\Data\DatespecificationQuery;
 use DTA\MetadataBundle\Model\Data\Publication;
 use DTA\MetadataBundle\Model\Data\PublicationQuery;
-use DTA\MetadataBundle\Model\Data\Work;
-use DTA\MetadataBundle\Model\Data\WorkQuery;
 
 abstract class BaseDatespecification extends BaseObject implements Persistent, \DTA\MetadataBundle\Model\table_row_view\TableRowViewInterface, \DTA\MetadataBundle\Model\reconstructed_flaggable\ReconstructedFlaggableInterface
 {
@@ -76,14 +74,8 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
     /**
      * @var        PropelObjectCollection|Publication[] Collection to store aggregation of Publication objects.
      */
-    protected $collPublicationsRelatedByFirstpublicationdateId;
-    protected $collPublicationsRelatedByFirstpublicationdateIdPartial;
-
-    /**
-     * @var        PropelObjectCollection|Work[] Collection to store aggregation of Work objects.
-     */
-    protected $collWorks;
-    protected $collWorksPartial;
+    protected $collPublicationsRelatedByCreationdateId;
+    protected $collPublicationsRelatedByCreationdateIdPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -117,13 +109,7 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $publicationsRelatedByFirstpublicationdateIdScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $worksScheduledForDeletion = null;
+    protected $publicationsRelatedByCreationdateIdScheduledForDeletion = null;
 
     /**
      * Applies default values to this object.
@@ -390,9 +376,7 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
 
             $this->collPublicationsRelatedByPublicationdateId = null;
 
-            $this->collPublicationsRelatedByFirstpublicationdateId = null;
-
-            $this->collWorks = null;
+            $this->collPublicationsRelatedByCreationdateId = null;
 
         } // if (deep)
     }
@@ -536,36 +520,18 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
                 }
             }
 
-            if ($this->publicationsRelatedByFirstpublicationdateIdScheduledForDeletion !== null) {
-                if (!$this->publicationsRelatedByFirstpublicationdateIdScheduledForDeletion->isEmpty()) {
-                    foreach ($this->publicationsRelatedByFirstpublicationdateIdScheduledForDeletion as $publicationRelatedByFirstpublicationdateId) {
+            if ($this->publicationsRelatedByCreationdateIdScheduledForDeletion !== null) {
+                if (!$this->publicationsRelatedByCreationdateIdScheduledForDeletion->isEmpty()) {
+                    foreach ($this->publicationsRelatedByCreationdateIdScheduledForDeletion as $publicationRelatedByCreationdateId) {
                         // need to save related object because we set the relation to null
-                        $publicationRelatedByFirstpublicationdateId->save($con);
+                        $publicationRelatedByCreationdateId->save($con);
                     }
-                    $this->publicationsRelatedByFirstpublicationdateIdScheduledForDeletion = null;
+                    $this->publicationsRelatedByCreationdateIdScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collPublicationsRelatedByFirstpublicationdateId !== null) {
-                foreach ($this->collPublicationsRelatedByFirstpublicationdateId as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
-            if ($this->worksScheduledForDeletion !== null) {
-                if (!$this->worksScheduledForDeletion->isEmpty()) {
-                    foreach ($this->worksScheduledForDeletion as $work) {
-                        // need to save related object because we set the relation to null
-                        $work->save($con);
-                    }
-                    $this->worksScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collWorks !== null) {
-                foreach ($this->collWorks as $referrerFK) {
+            if ($this->collPublicationsRelatedByCreationdateId !== null) {
+                foreach ($this->collPublicationsRelatedByCreationdateId as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -743,16 +709,8 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
                     }
                 }
 
-                if ($this->collPublicationsRelatedByFirstpublicationdateId !== null) {
-                    foreach ($this->collPublicationsRelatedByFirstpublicationdateId as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
-                if ($this->collWorks !== null) {
-                    foreach ($this->collWorks as $referrerFK) {
+                if ($this->collPublicationsRelatedByCreationdateId !== null) {
+                    foreach ($this->collPublicationsRelatedByCreationdateId as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -844,11 +802,8 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
             if (null !== $this->collPublicationsRelatedByPublicationdateId) {
                 $result['PublicationsRelatedByPublicationdateId'] = $this->collPublicationsRelatedByPublicationdateId->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collPublicationsRelatedByFirstpublicationdateId) {
-                $result['PublicationsRelatedByFirstpublicationdateId'] = $this->collPublicationsRelatedByFirstpublicationdateId->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
-            if (null !== $this->collWorks) {
-                $result['Works'] = $this->collWorks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collPublicationsRelatedByCreationdateId) {
+                $result['PublicationsRelatedByCreationdateId'] = $this->collPublicationsRelatedByCreationdateId->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1019,15 +974,9 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
                 }
             }
 
-            foreach ($this->getPublicationsRelatedByFirstpublicationdateId() as $relObj) {
+            foreach ($this->getPublicationsRelatedByCreationdateId() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addPublicationRelatedByFirstpublicationdateId($relObj->copy($deepCopy));
-                }
-            }
-
-            foreach ($this->getWorks() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addWork($relObj->copy($deepCopy));
+                    $copyObj->addPublicationRelatedByCreationdateId($relObj->copy($deepCopy));
                 }
             }
 
@@ -1095,11 +1044,8 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
         if ('PublicationRelatedByPublicationdateId' == $relationName) {
             $this->initPublicationsRelatedByPublicationdateId();
         }
-        if ('PublicationRelatedByFirstpublicationdateId' == $relationName) {
-            $this->initPublicationsRelatedByFirstpublicationdateId();
-        }
-        if ('Work' == $relationName) {
-            $this->initWorks();
+        if ('PublicationRelatedByCreationdateId' == $relationName) {
+            $this->initPublicationsRelatedByCreationdateId();
         }
     }
 
@@ -1338,10 +1284,10 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Publication[] List of Publication objects
      */
-    public function getPublicationsRelatedByPublicationdateIdJoinWork($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getPublicationsRelatedByPublicationdateIdJoinTitle($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = PublicationQuery::create(null, $criteria);
-        $query->joinWith('Work', $join_behavior);
+        $query->joinWith('Title', $join_behavior);
 
         return $this->getPublicationsRelatedByPublicationdateId($query, $con);
     }
@@ -1396,62 +1342,37 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
         return $this->getPublicationsRelatedByPublicationdateId($query, $con);
     }
 
-
     /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Datespecification is new, it will return
-     * an empty collection; or if this Datespecification has previously
-     * been saved, it will retrieve related PublicationsRelatedByPublicationdateId from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Datespecification.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Publication[] List of Publication objects
-     */
-    public function getPublicationsRelatedByPublicationdateIdJoinFont($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = PublicationQuery::create(null, $criteria);
-        $query->joinWith('Font', $join_behavior);
-
-        return $this->getPublicationsRelatedByPublicationdateId($query, $con);
-    }
-
-    /**
-     * Clears out the collPublicationsRelatedByFirstpublicationdateId collection
+     * Clears out the collPublicationsRelatedByCreationdateId collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return Datespecification The current object (for fluent API support)
-     * @see        addPublicationsRelatedByFirstpublicationdateId()
+     * @see        addPublicationsRelatedByCreationdateId()
      */
-    public function clearPublicationsRelatedByFirstpublicationdateId()
+    public function clearPublicationsRelatedByCreationdateId()
     {
-        $this->collPublicationsRelatedByFirstpublicationdateId = null; // important to set this to null since that means it is uninitialized
-        $this->collPublicationsRelatedByFirstpublicationdateIdPartial = null;
+        $this->collPublicationsRelatedByCreationdateId = null; // important to set this to null since that means it is uninitialized
+        $this->collPublicationsRelatedByCreationdateIdPartial = null;
 
         return $this;
     }
 
     /**
-     * reset is the collPublicationsRelatedByFirstpublicationdateId collection loaded partially
+     * reset is the collPublicationsRelatedByCreationdateId collection loaded partially
      *
      * @return void
      */
-    public function resetPartialPublicationsRelatedByFirstpublicationdateId($v = true)
+    public function resetPartialPublicationsRelatedByCreationdateId($v = true)
     {
-        $this->collPublicationsRelatedByFirstpublicationdateIdPartial = $v;
+        $this->collPublicationsRelatedByCreationdateIdPartial = $v;
     }
 
     /**
-     * Initializes the collPublicationsRelatedByFirstpublicationdateId collection.
+     * Initializes the collPublicationsRelatedByCreationdateId collection.
      *
-     * By default this just sets the collPublicationsRelatedByFirstpublicationdateId collection to an empty array (like clearcollPublicationsRelatedByFirstpublicationdateId());
+     * By default this just sets the collPublicationsRelatedByCreationdateId collection to an empty array (like clearcollPublicationsRelatedByCreationdateId());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1460,13 +1381,13 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
      *
      * @return void
      */
-    public function initPublicationsRelatedByFirstpublicationdateId($overrideExisting = true)
+    public function initPublicationsRelatedByCreationdateId($overrideExisting = true)
     {
-        if (null !== $this->collPublicationsRelatedByFirstpublicationdateId && !$overrideExisting) {
+        if (null !== $this->collPublicationsRelatedByCreationdateId && !$overrideExisting) {
             return;
         }
-        $this->collPublicationsRelatedByFirstpublicationdateId = new PropelObjectCollection();
-        $this->collPublicationsRelatedByFirstpublicationdateId->setModel('Publication');
+        $this->collPublicationsRelatedByCreationdateId = new PropelObjectCollection();
+        $this->collPublicationsRelatedByCreationdateId->setModel('Publication');
     }
 
     /**
@@ -1483,77 +1404,77 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
      * @return PropelObjectCollection|Publication[] List of Publication objects
      * @throws PropelException
      */
-    public function getPublicationsRelatedByFirstpublicationdateId($criteria = null, PropelPDO $con = null)
+    public function getPublicationsRelatedByCreationdateId($criteria = null, PropelPDO $con = null)
     {
-        $partial = $this->collPublicationsRelatedByFirstpublicationdateIdPartial && !$this->isNew();
-        if (null === $this->collPublicationsRelatedByFirstpublicationdateId || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collPublicationsRelatedByFirstpublicationdateId) {
+        $partial = $this->collPublicationsRelatedByCreationdateIdPartial && !$this->isNew();
+        if (null === $this->collPublicationsRelatedByCreationdateId || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collPublicationsRelatedByCreationdateId) {
                 // return empty collection
-                $this->initPublicationsRelatedByFirstpublicationdateId();
+                $this->initPublicationsRelatedByCreationdateId();
             } else {
-                $collPublicationsRelatedByFirstpublicationdateId = PublicationQuery::create(null, $criteria)
-                    ->filterByDatespecificationRelatedByFirstpublicationdateId($this)
+                $collPublicationsRelatedByCreationdateId = PublicationQuery::create(null, $criteria)
+                    ->filterByDatespecificationRelatedByCreationdateId($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    if (false !== $this->collPublicationsRelatedByFirstpublicationdateIdPartial && count($collPublicationsRelatedByFirstpublicationdateId)) {
-                      $this->initPublicationsRelatedByFirstpublicationdateId(false);
+                    if (false !== $this->collPublicationsRelatedByCreationdateIdPartial && count($collPublicationsRelatedByCreationdateId)) {
+                      $this->initPublicationsRelatedByCreationdateId(false);
 
-                      foreach($collPublicationsRelatedByFirstpublicationdateId as $obj) {
-                        if (false == $this->collPublicationsRelatedByFirstpublicationdateId->contains($obj)) {
-                          $this->collPublicationsRelatedByFirstpublicationdateId->append($obj);
+                      foreach($collPublicationsRelatedByCreationdateId as $obj) {
+                        if (false == $this->collPublicationsRelatedByCreationdateId->contains($obj)) {
+                          $this->collPublicationsRelatedByCreationdateId->append($obj);
                         }
                       }
 
-                      $this->collPublicationsRelatedByFirstpublicationdateIdPartial = true;
+                      $this->collPublicationsRelatedByCreationdateIdPartial = true;
                     }
 
-                    $collPublicationsRelatedByFirstpublicationdateId->getInternalIterator()->rewind();
-                    return $collPublicationsRelatedByFirstpublicationdateId;
+                    $collPublicationsRelatedByCreationdateId->getInternalIterator()->rewind();
+                    return $collPublicationsRelatedByCreationdateId;
                 }
 
-                if($partial && $this->collPublicationsRelatedByFirstpublicationdateId) {
-                    foreach($this->collPublicationsRelatedByFirstpublicationdateId as $obj) {
+                if($partial && $this->collPublicationsRelatedByCreationdateId) {
+                    foreach($this->collPublicationsRelatedByCreationdateId as $obj) {
                         if($obj->isNew()) {
-                            $collPublicationsRelatedByFirstpublicationdateId[] = $obj;
+                            $collPublicationsRelatedByCreationdateId[] = $obj;
                         }
                     }
                 }
 
-                $this->collPublicationsRelatedByFirstpublicationdateId = $collPublicationsRelatedByFirstpublicationdateId;
-                $this->collPublicationsRelatedByFirstpublicationdateIdPartial = false;
+                $this->collPublicationsRelatedByCreationdateId = $collPublicationsRelatedByCreationdateId;
+                $this->collPublicationsRelatedByCreationdateIdPartial = false;
             }
         }
 
-        return $this->collPublicationsRelatedByFirstpublicationdateId;
+        return $this->collPublicationsRelatedByCreationdateId;
     }
 
     /**
-     * Sets a collection of PublicationRelatedByFirstpublicationdateId objects related by a one-to-many relationship
+     * Sets a collection of PublicationRelatedByCreationdateId objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $publicationsRelatedByFirstpublicationdateId A Propel collection.
+     * @param PropelCollection $publicationsRelatedByCreationdateId A Propel collection.
      * @param PropelPDO $con Optional connection object
      * @return Datespecification The current object (for fluent API support)
      */
-    public function setPublicationsRelatedByFirstpublicationdateId(PropelCollection $publicationsRelatedByFirstpublicationdateId, PropelPDO $con = null)
+    public function setPublicationsRelatedByCreationdateId(PropelCollection $publicationsRelatedByCreationdateId, PropelPDO $con = null)
     {
-        $publicationsRelatedByFirstpublicationdateIdToDelete = $this->getPublicationsRelatedByFirstpublicationdateId(new Criteria(), $con)->diff($publicationsRelatedByFirstpublicationdateId);
+        $publicationsRelatedByCreationdateIdToDelete = $this->getPublicationsRelatedByCreationdateId(new Criteria(), $con)->diff($publicationsRelatedByCreationdateId);
 
-        $this->publicationsRelatedByFirstpublicationdateIdScheduledForDeletion = unserialize(serialize($publicationsRelatedByFirstpublicationdateIdToDelete));
+        $this->publicationsRelatedByCreationdateIdScheduledForDeletion = unserialize(serialize($publicationsRelatedByCreationdateIdToDelete));
 
-        foreach ($publicationsRelatedByFirstpublicationdateIdToDelete as $publicationRelatedByFirstpublicationdateIdRemoved) {
-            $publicationRelatedByFirstpublicationdateIdRemoved->setDatespecificationRelatedByFirstpublicationdateId(null);
+        foreach ($publicationsRelatedByCreationdateIdToDelete as $publicationRelatedByCreationdateIdRemoved) {
+            $publicationRelatedByCreationdateIdRemoved->setDatespecificationRelatedByCreationdateId(null);
         }
 
-        $this->collPublicationsRelatedByFirstpublicationdateId = null;
-        foreach ($publicationsRelatedByFirstpublicationdateId as $publicationRelatedByFirstpublicationdateId) {
-            $this->addPublicationRelatedByFirstpublicationdateId($publicationRelatedByFirstpublicationdateId);
+        $this->collPublicationsRelatedByCreationdateId = null;
+        foreach ($publicationsRelatedByCreationdateId as $publicationRelatedByCreationdateId) {
+            $this->addPublicationRelatedByCreationdateId($publicationRelatedByCreationdateId);
         }
 
-        $this->collPublicationsRelatedByFirstpublicationdateId = $publicationsRelatedByFirstpublicationdateId;
-        $this->collPublicationsRelatedByFirstpublicationdateIdPartial = false;
+        $this->collPublicationsRelatedByCreationdateId = $publicationsRelatedByCreationdateId;
+        $this->collPublicationsRelatedByCreationdateIdPartial = false;
 
         return $this;
     }
@@ -1567,16 +1488,16 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
      * @return int             Count of related Publication objects.
      * @throws PropelException
      */
-    public function countPublicationsRelatedByFirstpublicationdateId(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countPublicationsRelatedByCreationdateId(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $partial = $this->collPublicationsRelatedByFirstpublicationdateIdPartial && !$this->isNew();
-        if (null === $this->collPublicationsRelatedByFirstpublicationdateId || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collPublicationsRelatedByFirstpublicationdateId) {
+        $partial = $this->collPublicationsRelatedByCreationdateIdPartial && !$this->isNew();
+        if (null === $this->collPublicationsRelatedByCreationdateId || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collPublicationsRelatedByCreationdateId) {
                 return 0;
             }
 
             if($partial && !$criteria) {
-                return count($this->getPublicationsRelatedByFirstpublicationdateId());
+                return count($this->getPublicationsRelatedByCreationdateId());
             }
             $query = PublicationQuery::create(null, $criteria);
             if ($distinct) {
@@ -1584,11 +1505,11 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
             }
 
             return $query
-                ->filterByDatespecificationRelatedByFirstpublicationdateId($this)
+                ->filterByDatespecificationRelatedByCreationdateId($this)
                 ->count($con);
         }
 
-        return count($this->collPublicationsRelatedByFirstpublicationdateId);
+        return count($this->collPublicationsRelatedByCreationdateId);
     }
 
     /**
@@ -1598,42 +1519,42 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
      * @param    Publication $l Publication
      * @return Datespecification The current object (for fluent API support)
      */
-    public function addPublicationRelatedByFirstpublicationdateId(Publication $l)
+    public function addPublicationRelatedByCreationdateId(Publication $l)
     {
-        if ($this->collPublicationsRelatedByFirstpublicationdateId === null) {
-            $this->initPublicationsRelatedByFirstpublicationdateId();
-            $this->collPublicationsRelatedByFirstpublicationdateIdPartial = true;
+        if ($this->collPublicationsRelatedByCreationdateId === null) {
+            $this->initPublicationsRelatedByCreationdateId();
+            $this->collPublicationsRelatedByCreationdateIdPartial = true;
         }
-        if (!in_array($l, $this->collPublicationsRelatedByFirstpublicationdateId->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddPublicationRelatedByFirstpublicationdateId($l);
+        if (!in_array($l, $this->collPublicationsRelatedByCreationdateId->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddPublicationRelatedByCreationdateId($l);
         }
 
         return $this;
     }
 
     /**
-     * @param	PublicationRelatedByFirstpublicationdateId $publicationRelatedByFirstpublicationdateId The publicationRelatedByFirstpublicationdateId object to add.
+     * @param	PublicationRelatedByCreationdateId $publicationRelatedByCreationdateId The publicationRelatedByCreationdateId object to add.
      */
-    protected function doAddPublicationRelatedByFirstpublicationdateId($publicationRelatedByFirstpublicationdateId)
+    protected function doAddPublicationRelatedByCreationdateId($publicationRelatedByCreationdateId)
     {
-        $this->collPublicationsRelatedByFirstpublicationdateId[]= $publicationRelatedByFirstpublicationdateId;
-        $publicationRelatedByFirstpublicationdateId->setDatespecificationRelatedByFirstpublicationdateId($this);
+        $this->collPublicationsRelatedByCreationdateId[]= $publicationRelatedByCreationdateId;
+        $publicationRelatedByCreationdateId->setDatespecificationRelatedByCreationdateId($this);
     }
 
     /**
-     * @param	PublicationRelatedByFirstpublicationdateId $publicationRelatedByFirstpublicationdateId The publicationRelatedByFirstpublicationdateId object to remove.
+     * @param	PublicationRelatedByCreationdateId $publicationRelatedByCreationdateId The publicationRelatedByCreationdateId object to remove.
      * @return Datespecification The current object (for fluent API support)
      */
-    public function removePublicationRelatedByFirstpublicationdateId($publicationRelatedByFirstpublicationdateId)
+    public function removePublicationRelatedByCreationdateId($publicationRelatedByCreationdateId)
     {
-        if ($this->getPublicationsRelatedByFirstpublicationdateId()->contains($publicationRelatedByFirstpublicationdateId)) {
-            $this->collPublicationsRelatedByFirstpublicationdateId->remove($this->collPublicationsRelatedByFirstpublicationdateId->search($publicationRelatedByFirstpublicationdateId));
-            if (null === $this->publicationsRelatedByFirstpublicationdateIdScheduledForDeletion) {
-                $this->publicationsRelatedByFirstpublicationdateIdScheduledForDeletion = clone $this->collPublicationsRelatedByFirstpublicationdateId;
-                $this->publicationsRelatedByFirstpublicationdateIdScheduledForDeletion->clear();
+        if ($this->getPublicationsRelatedByCreationdateId()->contains($publicationRelatedByCreationdateId)) {
+            $this->collPublicationsRelatedByCreationdateId->remove($this->collPublicationsRelatedByCreationdateId->search($publicationRelatedByCreationdateId));
+            if (null === $this->publicationsRelatedByCreationdateIdScheduledForDeletion) {
+                $this->publicationsRelatedByCreationdateIdScheduledForDeletion = clone $this->collPublicationsRelatedByCreationdateId;
+                $this->publicationsRelatedByCreationdateIdScheduledForDeletion->clear();
             }
-            $this->publicationsRelatedByFirstpublicationdateIdScheduledForDeletion[]= $publicationRelatedByFirstpublicationdateId;
-            $publicationRelatedByFirstpublicationdateId->setDatespecificationRelatedByFirstpublicationdateId(null);
+            $this->publicationsRelatedByCreationdateIdScheduledForDeletion[]= $publicationRelatedByCreationdateId;
+            $publicationRelatedByCreationdateId->setDatespecificationRelatedByCreationdateId(null);
         }
 
         return $this;
@@ -1645,7 +1566,7 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
      * an identical criteria, it returns the collection.
      * Otherwise if this Datespecification is new, it will return
      * an empty collection; or if this Datespecification has previously
-     * been saved, it will retrieve related PublicationsRelatedByFirstpublicationdateId from storage.
+     * been saved, it will retrieve related PublicationsRelatedByCreationdateId from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1656,12 +1577,12 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Publication[] List of Publication objects
      */
-    public function getPublicationsRelatedByFirstpublicationdateIdJoinWork($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getPublicationsRelatedByCreationdateIdJoinTitle($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = PublicationQuery::create(null, $criteria);
-        $query->joinWith('Work', $join_behavior);
+        $query->joinWith('Title', $join_behavior);
 
-        return $this->getPublicationsRelatedByFirstpublicationdateId($query, $con);
+        return $this->getPublicationsRelatedByCreationdateId($query, $con);
     }
 
 
@@ -1670,7 +1591,7 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
      * an identical criteria, it returns the collection.
      * Otherwise if this Datespecification is new, it will return
      * an empty collection; or if this Datespecification has previously
-     * been saved, it will retrieve related PublicationsRelatedByFirstpublicationdateId from storage.
+     * been saved, it will retrieve related PublicationsRelatedByCreationdateId from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1681,12 +1602,12 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Publication[] List of Publication objects
      */
-    public function getPublicationsRelatedByFirstpublicationdateIdJoinPublishingcompany($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getPublicationsRelatedByCreationdateIdJoinPublishingcompany($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = PublicationQuery::create(null, $criteria);
         $query->joinWith('Publishingcompany', $join_behavior);
 
-        return $this->getPublicationsRelatedByFirstpublicationdateId($query, $con);
+        return $this->getPublicationsRelatedByCreationdateId($query, $con);
     }
 
 
@@ -1695,7 +1616,7 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
      * an identical criteria, it returns the collection.
      * Otherwise if this Datespecification is new, it will return
      * an empty collection; or if this Datespecification has previously
-     * been saved, it will retrieve related PublicationsRelatedByFirstpublicationdateId from storage.
+     * been saved, it will retrieve related PublicationsRelatedByCreationdateId from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1706,280 +1627,12 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Publication[] List of Publication objects
      */
-    public function getPublicationsRelatedByFirstpublicationdateIdJoinPlace($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getPublicationsRelatedByCreationdateIdJoinPlace($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = PublicationQuery::create(null, $criteria);
         $query->joinWith('Place', $join_behavior);
 
-        return $this->getPublicationsRelatedByFirstpublicationdateId($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Datespecification is new, it will return
-     * an empty collection; or if this Datespecification has previously
-     * been saved, it will retrieve related PublicationsRelatedByFirstpublicationdateId from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Datespecification.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Publication[] List of Publication objects
-     */
-    public function getPublicationsRelatedByFirstpublicationdateIdJoinFont($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = PublicationQuery::create(null, $criteria);
-        $query->joinWith('Font', $join_behavior);
-
-        return $this->getPublicationsRelatedByFirstpublicationdateId($query, $con);
-    }
-
-    /**
-     * Clears out the collWorks collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return Datespecification The current object (for fluent API support)
-     * @see        addWorks()
-     */
-    public function clearWorks()
-    {
-        $this->collWorks = null; // important to set this to null since that means it is uninitialized
-        $this->collWorksPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * reset is the collWorks collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialWorks($v = true)
-    {
-        $this->collWorksPartial = $v;
-    }
-
-    /**
-     * Initializes the collWorks collection.
-     *
-     * By default this just sets the collWorks collection to an empty array (like clearcollWorks());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initWorks($overrideExisting = true)
-    {
-        if (null !== $this->collWorks && !$overrideExisting) {
-            return;
-        }
-        $this->collWorks = new PropelObjectCollection();
-        $this->collWorks->setModel('Work');
-    }
-
-    /**
-     * Gets an array of Work objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Datespecification is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|Work[] List of Work objects
-     * @throws PropelException
-     */
-    public function getWorks($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collWorksPartial && !$this->isNew();
-        if (null === $this->collWorks || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collWorks) {
-                // return empty collection
-                $this->initWorks();
-            } else {
-                $collWorks = WorkQuery::create(null, $criteria)
-                    ->filterByDatespecification($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collWorksPartial && count($collWorks)) {
-                      $this->initWorks(false);
-
-                      foreach($collWorks as $obj) {
-                        if (false == $this->collWorks->contains($obj)) {
-                          $this->collWorks->append($obj);
-                        }
-                      }
-
-                      $this->collWorksPartial = true;
-                    }
-
-                    $collWorks->getInternalIterator()->rewind();
-                    return $collWorks;
-                }
-
-                if($partial && $this->collWorks) {
-                    foreach($this->collWorks as $obj) {
-                        if($obj->isNew()) {
-                            $collWorks[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collWorks = $collWorks;
-                $this->collWorksPartial = false;
-            }
-        }
-
-        return $this->collWorks;
-    }
-
-    /**
-     * Sets a collection of Work objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $works A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     * @return Datespecification The current object (for fluent API support)
-     */
-    public function setWorks(PropelCollection $works, PropelPDO $con = null)
-    {
-        $worksToDelete = $this->getWorks(new Criteria(), $con)->diff($works);
-
-        $this->worksScheduledForDeletion = unserialize(serialize($worksToDelete));
-
-        foreach ($worksToDelete as $workRemoved) {
-            $workRemoved->setDatespecification(null);
-        }
-
-        $this->collWorks = null;
-        foreach ($works as $work) {
-            $this->addWork($work);
-        }
-
-        $this->collWorks = $works;
-        $this->collWorksPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related Work objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related Work objects.
-     * @throws PropelException
-     */
-    public function countWorks(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collWorksPartial && !$this->isNew();
-        if (null === $this->collWorks || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collWorks) {
-                return 0;
-            }
-
-            if($partial && !$criteria) {
-                return count($this->getWorks());
-            }
-            $query = WorkQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByDatespecification($this)
-                ->count($con);
-        }
-
-        return count($this->collWorks);
-    }
-
-    /**
-     * Method called to associate a Work object to this object
-     * through the Work foreign key attribute.
-     *
-     * @param    Work $l Work
-     * @return Datespecification The current object (for fluent API support)
-     */
-    public function addWork(Work $l)
-    {
-        if ($this->collWorks === null) {
-            $this->initWorks();
-            $this->collWorksPartial = true;
-        }
-        if (!in_array($l, $this->collWorks->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddWork($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	Work $work The work object to add.
-     */
-    protected function doAddWork($work)
-    {
-        $this->collWorks[]= $work;
-        $work->setDatespecification($this);
-    }
-
-    /**
-     * @param	Work $work The work object to remove.
-     * @return Datespecification The current object (for fluent API support)
-     */
-    public function removeWork($work)
-    {
-        if ($this->getWorks()->contains($work)) {
-            $this->collWorks->remove($this->collWorks->search($work));
-            if (null === $this->worksScheduledForDeletion) {
-                $this->worksScheduledForDeletion = clone $this->collWorks;
-                $this->worksScheduledForDeletion->clear();
-            }
-            $this->worksScheduledForDeletion[]= $work;
-            $work->setDatespecification(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Datespecification is new, it will return
-     * an empty collection; or if this Datespecification has previously
-     * been saved, it will retrieve related Works from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Datespecification.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Work[] List of Work objects
-     */
-    public function getWorksJoinTitle($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = WorkQuery::create(null, $criteria);
-        $query->joinWith('Title', $join_behavior);
-
-        return $this->getWorks($query, $con);
+        return $this->getPublicationsRelatedByCreationdateId($query, $con);
     }
 
     /**
@@ -2019,13 +1672,8 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collPublicationsRelatedByFirstpublicationdateId) {
-                foreach ($this->collPublicationsRelatedByFirstpublicationdateId as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
-            if ($this->collWorks) {
-                foreach ($this->collWorks as $o) {
+            if ($this->collPublicationsRelatedByCreationdateId) {
+                foreach ($this->collPublicationsRelatedByCreationdateId as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -2037,14 +1685,10 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
             $this->collPublicationsRelatedByPublicationdateId->clearIterator();
         }
         $this->collPublicationsRelatedByPublicationdateId = null;
-        if ($this->collPublicationsRelatedByFirstpublicationdateId instanceof PropelCollection) {
-            $this->collPublicationsRelatedByFirstpublicationdateId->clearIterator();
+        if ($this->collPublicationsRelatedByCreationdateId instanceof PropelCollection) {
+            $this->collPublicationsRelatedByCreationdateId->clearIterator();
         }
-        $this->collPublicationsRelatedByFirstpublicationdateId = null;
-        if ($this->collWorks instanceof PropelCollection) {
-            $this->collWorks->clearIterator();
-        }
-        $this->collWorks = null;
+        $this->collPublicationsRelatedByCreationdateId = null;
     }
 
     /**

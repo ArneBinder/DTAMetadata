@@ -44,23 +44,24 @@ class PublicationTableMap extends TableMap
         $this->setPrimaryKeyMethodInfo('publication_id_seq');
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('wwwReady', 'Wwwready', 'INTEGER', false, null, null);
-        $this->addForeignKey('work_id', 'WorkId', 'INTEGER', 'work', 'id', true, null, null);
+        $this->addForeignKey('title_id', 'TitleId', 'INTEGER', 'title', 'id', true, null, null);
+        $this->addColumn('firsteditionpublication_id', 'FirsteditionpublicationId', 'INTEGER', false, null, null);
         $this->addForeignKey('place_id', 'PlaceId', 'INTEGER', 'place', 'id', false, null, null);
         $this->addForeignKey('publicationdate_id', 'PublicationdateId', 'INTEGER', 'datespecification', 'id', false, null, null);
-        $this->addForeignKey('firstpublicationdate_id', 'FirstpublicationdateId', 'INTEGER', 'datespecification', 'id', false, null, null);
+        $this->addForeignKey('creationdate_id', 'CreationdateId', 'INTEGER', 'datespecification', 'id', false, null, null);
         $this->addForeignKey('publishingcompany_id', 'PublishingcompanyId', 'INTEGER', 'publishingcompany', 'id', false, null, null);
         $this->addColumn('partner_id', 'PartnerId', 'INTEGER', false, null, null);
         $this->addColumn('editiondescription', 'Editiondescription', 'LONGVARCHAR', false, null, null);
         $this->addColumn('digitaleditioneditor', 'Digitaleditioneditor', 'LONGVARCHAR', false, null, null);
         $this->addColumn('transcriptioncomment', 'Transcriptioncomment', 'LONGVARCHAR', false, null, null);
-        $this->addForeignKey('font_id', 'FontId', 'INTEGER', 'font', 'id', false, null, null);
-        $this->addColumn('volume_alphanumeric', 'VolumeAlphanumeric', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('volume_numeric', 'VolumeNumeric', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('volumes_total', 'VolumesTotal', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('numpages', 'Numpages', 'INTEGER', false, null, null);
-        $this->addColumn('numpagesnormed', 'Numpagesnormed', 'INTEGER', false, null, null);
+        $this->addColumn('numpages', 'Numpages', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('numpagesnumeric', 'Numpagesnumeric', 'INTEGER', false, null, null);
         $this->addColumn('comment', 'Comment', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('doi', 'Doi', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('format', 'Format', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('directoryname', 'Directoryname', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('wwwready', 'Wwwready', 'INTEGER', false, null, null);
+        $this->addColumn('legacy_book_id', 'LegacyBookId', 'INTEGER', false, null, null);
         $this->addColumn('publishingcompany_id_is_reconstructed', 'PublishingcompanyIdIsReconstructed', 'BOOLEAN', false, null, false);
         // validators
     } // initialize()
@@ -70,25 +71,35 @@ class PublicationTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Work', 'DTA\\MetadataBundle\\Model\\Data\\Work', RelationMap::MANY_TO_ONE, array('work_id' => 'id', ), null, null);
+        $this->addRelation('Title', 'DTA\\MetadataBundle\\Model\\Data\\Title', RelationMap::MANY_TO_ONE, array('title_id' => 'id', ), null, null);
         $this->addRelation('Publishingcompany', 'DTA\\MetadataBundle\\Model\\Data\\Publishingcompany', RelationMap::MANY_TO_ONE, array('publishingcompany_id' => 'id', ), null, null);
         $this->addRelation('Place', 'DTA\\MetadataBundle\\Model\\Data\\Place', RelationMap::MANY_TO_ONE, array('place_id' => 'id', ), null, null);
         $this->addRelation('DatespecificationRelatedByPublicationdateId', 'DTA\\MetadataBundle\\Model\\Data\\Datespecification', RelationMap::MANY_TO_ONE, array('publicationdate_id' => 'id', ), null, null);
-        $this->addRelation('DatespecificationRelatedByFirstpublicationdateId', 'DTA\\MetadataBundle\\Model\\Data\\Datespecification', RelationMap::MANY_TO_ONE, array('firstpublicationdate_id' => 'id', ), null, null);
-        $this->addRelation('Font', 'DTA\\MetadataBundle\\Model\\Data\\Font', RelationMap::MANY_TO_ONE, array('font_id' => 'id', ), null, null);
+        $this->addRelation('DatespecificationRelatedByCreationdateId', 'DTA\\MetadataBundle\\Model\\Data\\Datespecification', RelationMap::MANY_TO_ONE, array('creationdate_id' => 'id', ), null, null);
         $this->addRelation('PublicationM', 'DTA\\MetadataBundle\\Model\\Data\\PublicationM', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationMs');
         $this->addRelation('PublicationDm', 'DTA\\MetadataBundle\\Model\\Data\\PublicationDm', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationDms');
-        $this->addRelation('PublicationMm', 'DTA\\MetadataBundle\\Model\\Data\\PublicationMm', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationMms');
         $this->addRelation('PublicationDs', 'DTA\\MetadataBundle\\Model\\Data\\PublicationDs', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationDss');
         $this->addRelation('PublicationMs', 'DTA\\MetadataBundle\\Model\\Data\\PublicationMs', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationMss');
         $this->addRelation('PublicationJa', 'DTA\\MetadataBundle\\Model\\Data\\PublicationJa', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationJas');
         $this->addRelation('PublicationMms', 'DTA\\MetadataBundle\\Model\\Data\\PublicationMms', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationMmss');
         $this->addRelation('PublicationJ', 'DTA\\MetadataBundle\\Model\\Data\\PublicationJ', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationJs');
+        $this->addRelation('VolumeRelatedByPublicationId', 'DTA\\MetadataBundle\\Model\\Data\\Volume', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'VolumesRelatedByPublicationId');
+        $this->addRelation('VolumeRelatedByParentpublicationId', 'DTA\\MetadataBundle\\Model\\Data\\Volume', RelationMap::ONE_TO_MANY, array('id' => 'parentpublication_id', ), null, null, 'VolumesRelatedByParentpublicationId');
+        $this->addRelation('LanguagePublication', 'DTA\\MetadataBundle\\Model\\Master\\LanguagePublication', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'LanguagePublications');
+        $this->addRelation('GenrePublication', 'DTA\\MetadataBundle\\Model\\Master\\GenrePublication', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'GenrePublications');
+        $this->addRelation('PublicationTag', 'DTA\\MetadataBundle\\Model\\Master\\PublicationTag', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationTags');
+        $this->addRelation('CategoryPublication', 'DTA\\MetadataBundle\\Model\\Master\\CategoryPublication', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'CategoryPublications');
+        $this->addRelation('FontPublication', 'DTA\\MetadataBundle\\Model\\Master\\FontPublication', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'FontPublications');
         $this->addRelation('PublicationPublicationgroup', 'DTA\\MetadataBundle\\Model\\Master\\PublicationPublicationgroup', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationPublicationgroups');
         $this->addRelation('PersonPublication', 'DTA\\MetadataBundle\\Model\\Master\\PersonPublication', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PersonPublications');
         $this->addRelation('Task', 'DTA\\MetadataBundle\\Model\\Workflow\\Task', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Tasks');
         $this->addRelation('Imagesource', 'DTA\\MetadataBundle\\Model\\Workflow\\Imagesource', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Imagesources');
         $this->addRelation('Textsource', 'DTA\\MetadataBundle\\Model\\Workflow\\Textsource', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Textsources');
+        $this->addRelation('Language', 'DTA\\MetadataBundle\\Model\\Data\\Language', RelationMap::MANY_TO_MANY, array(), null, null, 'Languages');
+        $this->addRelation('Genre', 'DTA\\MetadataBundle\\Model\\Classification\\Genre', RelationMap::MANY_TO_MANY, array(), null, null, 'Genres');
+        $this->addRelation('Tag', 'DTA\\MetadataBundle\\Model\\Classification\\Tag', RelationMap::MANY_TO_MANY, array(), null, null, 'Tags');
+        $this->addRelation('Category', 'DTA\\MetadataBundle\\Model\\Classification\\Category', RelationMap::MANY_TO_MANY, array(), null, null, 'Categories');
+        $this->addRelation('Font', 'DTA\\MetadataBundle\\Model\\Data\\Font', RelationMap::MANY_TO_MANY, array(), null, null, 'Fonts');
         $this->addRelation('Publicationgroup', 'DTA\\MetadataBundle\\Model\\Workflow\\Publicationgroup', RelationMap::MANY_TO_MANY, array(), null, null, 'Publicationgroups');
     } // buildRelations()
 
@@ -102,7 +113,9 @@ class PublicationTableMap extends TableMap
     {
         return array(
             'table_row_view' =>  array (
-  'embedColumnsForWork' => 'work',
+  'Titel' => 'accessor:getTitle',
+  'erster Autor' => 'accessor:getFirstAuthor',
+  'entstanden' => 'accessor:getDatespecification',
   'veröffentlicht' => 'accessor:getDatespecificationRelatedByPublicationdateId',
   'embedcolumnstitle' => 'title',
 ),

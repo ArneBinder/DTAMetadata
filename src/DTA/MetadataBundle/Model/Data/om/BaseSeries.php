@@ -1297,31 +1297,6 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
         return $this->getPublicationDss($query, $con);
     }
 
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Series is new, it will return
-     * an empty collection; or if this Series has previously
-     * been saved, it will retrieve related PublicationDss from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Series.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|PublicationDs[] List of PublicationDs objects
-     */
-    public function getPublicationDssJoinVolume($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = PublicationDsQuery::create(null, $criteria);
-        $query->joinWith('Volume', $join_behavior);
-
-        return $this->getPublicationDss($query, $con);
-    }
-
     /**
      * Clears out the collPublicationMss collection
      *
@@ -1804,31 +1779,6 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
     {
         $query = PublicationMmsQuery::create(null, $criteria);
         $query->joinWith('Publication', $join_behavior);
-
-        return $this->getPublicationMmss($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Series is new, it will return
-     * an empty collection; or if this Series has previously
-     * been saved, it will retrieve related PublicationMmss from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Series.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|PublicationMms[] List of PublicationMms objects
-     */
-    public function getPublicationMmssJoinVolume($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = PublicationMmsQuery::create(null, $criteria);
-        $query->joinWith('Volume', $join_behavior);
 
         return $this->getPublicationMmss($query, $con);
     }

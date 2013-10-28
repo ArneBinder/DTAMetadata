@@ -17,7 +17,6 @@ use DTA\MetadataBundle\Model\Data\PersonPeer;
 use DTA\MetadataBundle\Model\Data\PersonQuery;
 use DTA\MetadataBundle\Model\Data\Personalname;
 use DTA\MetadataBundle\Model\Master\PersonPublication;
-use DTA\MetadataBundle\Model\Master\PersonWork;
 
 /**
  * @method PersonQuery orderById($order = Criteria::ASC) Order by the id column
@@ -38,10 +37,6 @@ use DTA\MetadataBundle\Model\Master\PersonWork;
  * @method PersonQuery rightJoinPersonPublication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the PersonPublication relation
  * @method PersonQuery innerJoinPersonPublication($relationAlias = null) Adds a INNER JOIN clause to the query using the PersonPublication relation
  *
- * @method PersonQuery leftJoinPersonWork($relationAlias = null) Adds a LEFT JOIN clause to the query using the PersonWork relation
- * @method PersonQuery rightJoinPersonWork($relationAlias = null) Adds a RIGHT JOIN clause to the query using the PersonWork relation
- * @method PersonQuery innerJoinPersonWork($relationAlias = null) Adds a INNER JOIN clause to the query using the PersonWork relation
- *
  * @method Person findOne(PropelPDO $con = null) Return the first Person matching the query
  * @method Person findOneOrCreate(PropelPDO $con = null) Return the first Person matching the query, or a new Person object populated from the query conditions when no match is found
  *
@@ -59,7 +54,7 @@ abstract class BasePersonQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'DTAMetadata', $modelName = 'DTA\\MetadataBundle\\Model\\Data\\Person', $modelAlias = null)
+    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Data\\Person', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -456,80 +451,6 @@ abstract class BasePersonQuery extends ModelCriteria
         return $this
             ->joinPersonPublication($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'PersonPublication', '\DTA\MetadataBundle\Model\Master\PersonPublicationQuery');
-    }
-
-    /**
-     * Filter the query by a related PersonWork object
-     *
-     * @param   PersonWork|PropelObjectCollection $personWork  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 PersonQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByPersonWork($personWork, $comparison = null)
-    {
-        if ($personWork instanceof PersonWork) {
-            return $this
-                ->addUsingAlias(PersonPeer::ID, $personWork->getPersonId(), $comparison);
-        } elseif ($personWork instanceof PropelObjectCollection) {
-            return $this
-                ->usePersonWorkQuery()
-                ->filterByPrimaryKeys($personWork->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByPersonWork() only accepts arguments of type PersonWork or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the PersonWork relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return PersonQuery The current query, for fluid interface
-     */
-    public function joinPersonWork($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('PersonWork');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'PersonWork');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the PersonWork relation PersonWork object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\Master\PersonWorkQuery A secondary query class using the current class as primary query
-     */
-    public function usePersonWorkQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinPersonWork($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'PersonWork', '\DTA\MetadataBundle\Model\Master\PersonWorkQuery');
     }
 
     /**

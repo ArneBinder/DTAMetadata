@@ -18,8 +18,6 @@ use DTA\MetadataBundle\Model\Data\PublicationDsQuery;
 use DTA\MetadataBundle\Model\Data\PublicationQuery;
 use DTA\MetadataBundle\Model\Data\Series;
 use DTA\MetadataBundle\Model\Data\SeriesQuery;
-use DTA\MetadataBundle\Model\Data\Volume;
-use DTA\MetadataBundle\Model\Data\VolumeQuery;
 
 abstract class BasePublicationDs extends BaseObject implements Persistent, \DTA\MetadataBundle\Model\table_row_view\TableRowViewInterface
 {
@@ -61,12 +59,6 @@ abstract class BasePublicationDs extends BaseObject implements Persistent, \DTA\
     protected $series_id;
 
     /**
-     * The value for the volume_id field.
-     * @var        int
-     */
-    protected $volume_id;
-
-    /**
      * The value for the pages field.
      * @var        string
      */
@@ -76,11 +68,6 @@ abstract class BasePublicationDs extends BaseObject implements Persistent, \DTA\
      * @var        Publication
      */
     protected $aPublication;
-
-    /**
-     * @var        Volume
-     */
-    protected $aVolume;
 
     /**
      * @var        Series
@@ -137,16 +124,6 @@ abstract class BasePublicationDs extends BaseObject implements Persistent, \DTA\
     public function getSeriesId()
     {
         return $this->series_id;
-    }
-
-    /**
-     * Get the [volume_id] column value.
-     *
-     * @return int
-     */
-    public function getVolumeId()
-    {
-        return $this->volume_id;
     }
 
     /**
@@ -231,31 +208,6 @@ abstract class BasePublicationDs extends BaseObject implements Persistent, \DTA\
     } // setSeriesId()
 
     /**
-     * Set the value of [volume_id] column.
-     *
-     * @param int $v new value
-     * @return PublicationDs The current object (for fluent API support)
-     */
-    public function setVolumeId($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->volume_id !== $v) {
-            $this->volume_id = $v;
-            $this->modifiedColumns[] = PublicationDsPeer::VOLUME_ID;
-        }
-
-        if ($this->aVolume !== null && $this->aVolume->getId() !== $v) {
-            $this->aVolume = null;
-        }
-
-
-        return $this;
-    } // setVolumeId()
-
-    /**
      * Set the value of [pages] column.
      * Seitenangabe
      * @param string $v new value
@@ -311,8 +263,7 @@ abstract class BasePublicationDs extends BaseObject implements Persistent, \DTA\
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->publication_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
             $this->series_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
-            $this->volume_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
-            $this->pages = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+            $this->pages = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -321,7 +272,7 @@ abstract class BasePublicationDs extends BaseObject implements Persistent, \DTA\
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 5; // 5 = PublicationDsPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 4; // 4 = PublicationDsPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating PublicationDs object", $e);
@@ -349,9 +300,6 @@ abstract class BasePublicationDs extends BaseObject implements Persistent, \DTA\
         }
         if ($this->aSeries !== null && $this->series_id !== $this->aSeries->getId()) {
             $this->aSeries = null;
-        }
-        if ($this->aVolume !== null && $this->volume_id !== $this->aVolume->getId()) {
-            $this->aVolume = null;
         }
     } // ensureConsistency
 
@@ -393,7 +341,6 @@ abstract class BasePublicationDs extends BaseObject implements Persistent, \DTA\
         if ($deep) {  // also de-associate any related objects?
 
             $this->aPublication = null;
-            $this->aVolume = null;
             $this->aSeries = null;
         } // if (deep)
     }
@@ -520,13 +467,6 @@ abstract class BasePublicationDs extends BaseObject implements Persistent, \DTA\
                 $this->setPublication($this->aPublication);
             }
 
-            if ($this->aVolume !== null) {
-                if ($this->aVolume->isModified() || $this->aVolume->isNew()) {
-                    $affectedRows += $this->aVolume->save($con);
-                }
-                $this->setVolume($this->aVolume);
-            }
-
             if ($this->aSeries !== null) {
                 if ($this->aSeries->isModified() || $this->aSeries->isNew()) {
                     $affectedRows += $this->aSeries->save($con);
@@ -590,9 +530,6 @@ abstract class BasePublicationDs extends BaseObject implements Persistent, \DTA\
         if ($this->isColumnModified(PublicationDsPeer::SERIES_ID)) {
             $modifiedColumns[':p' . $index++]  = '"series_id"';
         }
-        if ($this->isColumnModified(PublicationDsPeer::VOLUME_ID)) {
-            $modifiedColumns[':p' . $index++]  = '"volume_id"';
-        }
         if ($this->isColumnModified(PublicationDsPeer::PAGES)) {
             $modifiedColumns[':p' . $index++]  = '"pages"';
         }
@@ -615,9 +552,6 @@ abstract class BasePublicationDs extends BaseObject implements Persistent, \DTA\
                         break;
                     case '"series_id"':
                         $stmt->bindValue($identifier, $this->series_id, PDO::PARAM_INT);
-                        break;
-                    case '"volume_id"':
-                        $stmt->bindValue($identifier, $this->volume_id, PDO::PARAM_INT);
                         break;
                     case '"pages"':
                         $stmt->bindValue($identifier, $this->pages, PDO::PARAM_STR);
@@ -720,12 +654,6 @@ abstract class BasePublicationDs extends BaseObject implements Persistent, \DTA\
                 }
             }
 
-            if ($this->aVolume !== null) {
-                if (!$this->aVolume->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aVolume->getValidationFailures());
-                }
-            }
-
             if ($this->aSeries !== null) {
                 if (!$this->aSeries->validate($columns)) {
                     $failureMap = array_merge($failureMap, $this->aSeries->getValidationFailures());
@@ -783,9 +711,6 @@ abstract class BasePublicationDs extends BaseObject implements Persistent, \DTA\
                 return $this->getSeriesId();
                 break;
             case 3:
-                return $this->getVolumeId();
-                break;
-            case 4:
                 return $this->getPages();
                 break;
             default:
@@ -820,15 +745,11 @@ abstract class BasePublicationDs extends BaseObject implements Persistent, \DTA\
             $keys[0] => $this->getId(),
             $keys[1] => $this->getPublicationId(),
             $keys[2] => $this->getSeriesId(),
-            $keys[3] => $this->getVolumeId(),
-            $keys[4] => $this->getPages(),
+            $keys[3] => $this->getPages(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aPublication) {
                 $result['Publication'] = $this->aPublication->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->aVolume) {
-                $result['Volume'] = $this->aVolume->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->aSeries) {
                 $result['Series'] = $this->aSeries->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
@@ -877,9 +798,6 @@ abstract class BasePublicationDs extends BaseObject implements Persistent, \DTA\
                 $this->setSeriesId($value);
                 break;
             case 3:
-                $this->setVolumeId($value);
-                break;
-            case 4:
                 $this->setPages($value);
                 break;
         } // switch()
@@ -909,8 +827,7 @@ abstract class BasePublicationDs extends BaseObject implements Persistent, \DTA\
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setPublicationId($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setSeriesId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setVolumeId($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setPages($arr[$keys[4]]);
+        if (array_key_exists($keys[3], $arr)) $this->setPages($arr[$keys[3]]);
     }
 
     /**
@@ -925,7 +842,6 @@ abstract class BasePublicationDs extends BaseObject implements Persistent, \DTA\
         if ($this->isColumnModified(PublicationDsPeer::ID)) $criteria->add(PublicationDsPeer::ID, $this->id);
         if ($this->isColumnModified(PublicationDsPeer::PUBLICATION_ID)) $criteria->add(PublicationDsPeer::PUBLICATION_ID, $this->publication_id);
         if ($this->isColumnModified(PublicationDsPeer::SERIES_ID)) $criteria->add(PublicationDsPeer::SERIES_ID, $this->series_id);
-        if ($this->isColumnModified(PublicationDsPeer::VOLUME_ID)) $criteria->add(PublicationDsPeer::VOLUME_ID, $this->volume_id);
         if ($this->isColumnModified(PublicationDsPeer::PAGES)) $criteria->add(PublicationDsPeer::PAGES, $this->pages);
 
         return $criteria;
@@ -992,7 +908,6 @@ abstract class BasePublicationDs extends BaseObject implements Persistent, \DTA\
     {
         $copyObj->setPublicationId($this->getPublicationId());
         $copyObj->setSeriesId($this->getSeriesId());
-        $copyObj->setVolumeId($this->getVolumeId());
         $copyObj->setPages($this->getPages());
 
         if ($deepCopy && !$this->startCopy) {
@@ -1105,58 +1020,6 @@ abstract class BasePublicationDs extends BaseObject implements Persistent, \DTA\
     }
 
     /**
-     * Declares an association between this object and a Volume object.
-     *
-     * @param             Volume $v
-     * @return PublicationDs The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setVolume(Volume $v = null)
-    {
-        if ($v === null) {
-            $this->setVolumeId(NULL);
-        } else {
-            $this->setVolumeId($v->getId());
-        }
-
-        $this->aVolume = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Volume object, it will not be re-added.
-        if ($v !== null) {
-            $v->addPublicationDs($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated Volume object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @param $doQuery Executes a query to get the object if required
-     * @return Volume The associated Volume object.
-     * @throws PropelException
-     */
-    public function getVolume(PropelPDO $con = null, $doQuery = true)
-    {
-        if ($this->aVolume === null && ($this->volume_id !== null) && $doQuery) {
-            $this->aVolume = VolumeQuery::create()->findPk($this->volume_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aVolume->addPublicationDss($this);
-             */
-        }
-
-        return $this->aVolume;
-    }
-
-    /**
      * Declares an association between this object and a Series object.
      *
      * @param             Series $v
@@ -1216,7 +1079,6 @@ abstract class BasePublicationDs extends BaseObject implements Persistent, \DTA\
         $this->id = null;
         $this->publication_id = null;
         $this->series_id = null;
-        $this->volume_id = null;
         $this->pages = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
@@ -1243,9 +1105,6 @@ abstract class BasePublicationDs extends BaseObject implements Persistent, \DTA\
             if ($this->aPublication instanceof Persistent) {
               $this->aPublication->clearAllReferences($deep);
             }
-            if ($this->aVolume instanceof Persistent) {
-              $this->aVolume->clearAllReferences($deep);
-            }
             if ($this->aSeries instanceof Persistent) {
               $this->aSeries->clearAllReferences($deep);
             }
@@ -1254,7 +1113,6 @@ abstract class BasePublicationDs extends BaseObject implements Persistent, \DTA\
         } // if ($deep)
 
         $this->aPublication = null;
-        $this->aVolume = null;
         $this->aSeries = null;
     }
 

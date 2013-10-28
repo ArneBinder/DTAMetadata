@@ -45,8 +45,6 @@ class PersonroleTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('name', 'Name', 'LONGVARCHAR', true, null, null);
-        $this->addColumn('applicable_to_publication', 'ApplicableToPublication', 'BOOLEAN', false, null, false);
-        $this->addColumn('applicable_to_work', 'ApplicableToWork', 'BOOLEAN', false, null, false);
         // validators
     } // initialize()
 
@@ -56,7 +54,6 @@ class PersonroleTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('PersonPublication', 'DTA\\MetadataBundle\\Model\\Master\\PersonPublication', RelationMap::ONE_TO_MANY, array('id' => 'personrole_id', ), null, null, 'PersonPublications');
-        $this->addRelation('PersonWork', 'DTA\\MetadataBundle\\Model\\Master\\PersonWork', RelationMap::ONE_TO_MANY, array('id' => 'personrole_id', ), null, null, 'PersonWorks');
     } // buildRelations()
 
     /**
@@ -71,8 +68,6 @@ class PersonroleTableMap extends TableMap
             'table_row_view' =>  array (
   'Id' => 'id',
   'Name' => 'name',
-  'ApplicableToPublication' => 'applicable_to_publication',
-  'ApplicableToWork' => 'applicable_to_work',
 ),
         );
     } // getBehaviors()

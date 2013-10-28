@@ -53,7 +53,8 @@ class FontTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::ONE_TO_MANY, array('id' => 'font_id', ), null, null, 'Publications');
+        $this->addRelation('FontPublication', 'DTA\\MetadataBundle\\Model\\Master\\FontPublication', RelationMap::ONE_TO_MANY, array('id' => 'font_id', ), null, null, 'FontPublications');
+        $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::MANY_TO_MANY, array(), null, null, 'Publications');
     } // buildRelations()
 
     /**

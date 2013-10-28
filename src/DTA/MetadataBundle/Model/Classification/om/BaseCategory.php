@@ -16,10 +16,12 @@ use \PropelPDO;
 use DTA\MetadataBundle\Model\Classification\Category;
 use DTA\MetadataBundle\Model\Classification\CategoryPeer;
 use DTA\MetadataBundle\Model\Classification\CategoryQuery;
-use DTA\MetadataBundle\Model\Data\Work;
-use DTA\MetadataBundle\Model\Data\WorkQuery;
-use DTA\MetadataBundle\Model\Master\CategoryWork;
-use DTA\MetadataBundle\Model\Master\CategoryWorkQuery;
+use DTA\MetadataBundle\Model\Classification\Categorytype;
+use DTA\MetadataBundle\Model\Classification\CategorytypeQuery;
+use DTA\MetadataBundle\Model\Data\Publication;
+use DTA\MetadataBundle\Model\Data\PublicationQuery;
+use DTA\MetadataBundle\Model\Master\CategoryPublication;
+use DTA\MetadataBundle\Model\Master\CategoryPublicationQuery;
 
 abstract class BaseCategory extends BaseObject implements Persistent, \DTA\MetadataBundle\Model\table_row_view\TableRowViewInterface
 {
@@ -55,15 +57,32 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
     protected $name;
 
     /**
-     * @var        PropelObjectCollection|CategoryWork[] Collection to store aggregation of CategoryWork objects.
+     * The value for the description field.
+     * @var        string
      */
-    protected $collCategoryWorks;
-    protected $collCategoryWorksPartial;
+    protected $description;
 
     /**
-     * @var        PropelObjectCollection|Work[] Collection to store aggregation of Work objects.
+     * The value for the categorytype_id field.
+     * @var        int
      */
-    protected $collWorks;
+    protected $categorytype_id;
+
+    /**
+     * @var        Categorytype
+     */
+    protected $aCategorytype;
+
+    /**
+     * @var        PropelObjectCollection|CategoryPublication[] Collection to store aggregation of CategoryPublication objects.
+     */
+    protected $collCategoryPublications;
+    protected $collCategoryPublicationsPartial;
+
+    /**
+     * @var        PropelObjectCollection|Publication[] Collection to store aggregation of Publication objects.
+     */
+    protected $collPublications;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -86,18 +105,18 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Id', 'Name', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'Name'=>'Name', );
+    public static $tableRowViewCaptions = array('Id', 'Name', 'Description', 'CategorytypeId', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'Name'=>'Name', 'Description'=>'Description', 'CategorytypeId'=>'CategorytypeId', );
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $worksScheduledForDeletion = null;
+    protected $publicationsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $categoryWorksScheduledForDeletion = null;
+    protected $categoryPublicationsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -117,6 +136,26 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Get the [description] column value.
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * Get the [categorytype_id] column value.
+     *
+     * @return int
+     */
+    public function getCategorytypeId()
+    {
+        return $this->categorytype_id;
     }
 
     /**
@@ -162,6 +201,52 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
     } // setName()
 
     /**
+     * Set the value of [description] column.
+     *
+     * @param string $v new value
+     * @return Category The current object (for fluent API support)
+     */
+    public function setDescription($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->description !== $v) {
+            $this->description = $v;
+            $this->modifiedColumns[] = CategoryPeer::DESCRIPTION;
+        }
+
+
+        return $this;
+    } // setDescription()
+
+    /**
+     * Set the value of [categorytype_id] column.
+     *
+     * @param int $v new value
+     * @return Category The current object (for fluent API support)
+     */
+    public function setCategorytypeId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->categorytype_id !== $v) {
+            $this->categorytype_id = $v;
+            $this->modifiedColumns[] = CategoryPeer::CATEGORYTYPE_ID;
+        }
+
+        if ($this->aCategorytype !== null && $this->aCategorytype->getId() !== $v) {
+            $this->aCategorytype = null;
+        }
+
+
+        return $this;
+    } // setCategorytypeId()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -195,6 +280,8 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->name = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
+            $this->description = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+            $this->categorytype_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -203,7 +290,7 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 2; // 2 = CategoryPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 4; // 4 = CategoryPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Category object", $e);
@@ -226,6 +313,9 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
     public function ensureConsistency()
     {
 
+        if ($this->aCategorytype !== null && $this->categorytype_id !== $this->aCategorytype->getId()) {
+            $this->aCategorytype = null;
+        }
     } // ensureConsistency
 
     /**
@@ -265,9 +355,10 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collCategoryWorks = null;
+            $this->aCategorytype = null;
+            $this->collCategoryPublications = null;
 
-            $this->collWorks = null;
+            $this->collPublications = null;
         } // if (deep)
     }
 
@@ -381,6 +472,18 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aCategorytype !== null) {
+                if ($this->aCategorytype->isModified() || $this->aCategorytype->isNew()) {
+                    $affectedRows += $this->aCategorytype->save($con);
+                }
+                $this->setCategorytype($this->aCategorytype);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -392,43 +495,43 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
                 $this->resetModified();
             }
 
-            if ($this->worksScheduledForDeletion !== null) {
-                if (!$this->worksScheduledForDeletion->isEmpty()) {
+            if ($this->publicationsScheduledForDeletion !== null) {
+                if (!$this->publicationsScheduledForDeletion->isEmpty()) {
                     $pks = array();
                     $pk = $this->getPrimaryKey();
-                    foreach ($this->worksScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                    foreach ($this->publicationsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
                         $pks[] = array($pk, $remotePk);
                     }
-                    CategoryWorkQuery::create()
+                    CategoryPublicationQuery::create()
                         ->filterByPrimaryKeys($pks)
                         ->delete($con);
-                    $this->worksScheduledForDeletion = null;
+                    $this->publicationsScheduledForDeletion = null;
                 }
 
-                foreach ($this->getWorks() as $work) {
-                    if ($work->isModified()) {
-                        $work->save($con);
+                foreach ($this->getPublications() as $publication) {
+                    if ($publication->isModified()) {
+                        $publication->save($con);
                     }
                 }
-            } elseif ($this->collWorks) {
-                foreach ($this->collWorks as $work) {
-                    if ($work->isModified()) {
-                        $work->save($con);
+            } elseif ($this->collPublications) {
+                foreach ($this->collPublications as $publication) {
+                    if ($publication->isModified()) {
+                        $publication->save($con);
                     }
                 }
             }
 
-            if ($this->categoryWorksScheduledForDeletion !== null) {
-                if (!$this->categoryWorksScheduledForDeletion->isEmpty()) {
-                    CategoryWorkQuery::create()
-                        ->filterByPrimaryKeys($this->categoryWorksScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->categoryPublicationsScheduledForDeletion !== null) {
+                if (!$this->categoryPublicationsScheduledForDeletion->isEmpty()) {
+                    CategoryPublicationQuery::create()
+                        ->filterByPrimaryKeys($this->categoryPublicationsScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->categoryWorksScheduledForDeletion = null;
+                    $this->categoryPublicationsScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collCategoryWorks !== null) {
-                foreach ($this->collCategoryWorks as $referrerFK) {
+            if ($this->collCategoryPublications !== null) {
+                foreach ($this->collCategoryPublications as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -477,6 +580,12 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
         if ($this->isColumnModified(CategoryPeer::NAME)) {
             $modifiedColumns[':p' . $index++]  = '"name"';
         }
+        if ($this->isColumnModified(CategoryPeer::DESCRIPTION)) {
+            $modifiedColumns[':p' . $index++]  = '"description"';
+        }
+        if ($this->isColumnModified(CategoryPeer::CATEGORYTYPE_ID)) {
+            $modifiedColumns[':p' . $index++]  = '"categorytype_id"';
+        }
 
         $sql = sprintf(
             'INSERT INTO "category" (%s) VALUES (%s)',
@@ -493,6 +602,12 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
                         break;
                     case '"name"':
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
+                        break;
+                    case '"description"':
+                        $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
+                        break;
+                    case '"categorytype_id"':
+                        $stmt->bindValue($identifier, $this->categorytype_id, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -581,13 +696,25 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aCategorytype !== null) {
+                if (!$this->aCategorytype->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aCategorytype->getValidationFailures());
+                }
+            }
+
+
             if (($retval = CategoryPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
 
-                if ($this->collCategoryWorks !== null) {
-                    foreach ($this->collCategoryWorks as $referrerFK) {
+                if ($this->collCategoryPublications !== null) {
+                    foreach ($this->collCategoryPublications as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -635,6 +762,12 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
             case 1:
                 return $this->getName();
                 break;
+            case 2:
+                return $this->getDescription();
+                break;
+            case 3:
+                return $this->getCategorytypeId();
+                break;
             default:
                 return null;
                 break;
@@ -666,10 +799,15 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getName(),
+            $keys[2] => $this->getDescription(),
+            $keys[3] => $this->getCategorytypeId(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->collCategoryWorks) {
-                $result['CategoryWorks'] = $this->collCategoryWorks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->aCategorytype) {
+                $result['Categorytype'] = $this->aCategorytype->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->collCategoryPublications) {
+                $result['CategoryPublications'] = $this->collCategoryPublications->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -711,6 +849,12 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
             case 1:
                 $this->setName($value);
                 break;
+            case 2:
+                $this->setDescription($value);
+                break;
+            case 3:
+                $this->setCategorytypeId($value);
+                break;
         } // switch()
     }
 
@@ -737,6 +881,8 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setDescription($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setCategorytypeId($arr[$keys[3]]);
     }
 
     /**
@@ -750,6 +896,8 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
 
         if ($this->isColumnModified(CategoryPeer::ID)) $criteria->add(CategoryPeer::ID, $this->id);
         if ($this->isColumnModified(CategoryPeer::NAME)) $criteria->add(CategoryPeer::NAME, $this->name);
+        if ($this->isColumnModified(CategoryPeer::DESCRIPTION)) $criteria->add(CategoryPeer::DESCRIPTION, $this->description);
+        if ($this->isColumnModified(CategoryPeer::CATEGORYTYPE_ID)) $criteria->add(CategoryPeer::CATEGORYTYPE_ID, $this->categorytype_id);
 
         return $criteria;
     }
@@ -814,6 +962,8 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setName($this->getName());
+        $copyObj->setDescription($this->getDescription());
+        $copyObj->setCategorytypeId($this->getCategorytypeId());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -822,9 +972,9 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getCategoryWorks() as $relObj) {
+            foreach ($this->getCategoryPublications() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addCategoryWork($relObj->copy($deepCopy));
+                    $copyObj->addCategoryPublication($relObj->copy($deepCopy));
                 }
             }
 
@@ -878,6 +1028,58 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
         return self::$peer;
     }
 
+    /**
+     * Declares an association between this object and a Categorytype object.
+     *
+     * @param             Categorytype $v
+     * @return Category The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setCategorytype(Categorytype $v = null)
+    {
+        if ($v === null) {
+            $this->setCategorytypeId(NULL);
+        } else {
+            $this->setCategorytypeId($v->getId());
+        }
+
+        $this->aCategorytype = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Categorytype object, it will not be re-added.
+        if ($v !== null) {
+            $v->addCategory($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Categorytype object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return Categorytype The associated Categorytype object.
+     * @throws PropelException
+     */
+    public function getCategorytype(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aCategorytype === null && ($this->categorytype_id !== null) && $doQuery) {
+            $this->aCategorytype = CategorytypeQuery::create()->findPk($this->categorytype_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCategorytype->addCategories($this);
+             */
+        }
+
+        return $this->aCategorytype;
+    }
+
 
     /**
      * Initializes a collection based on the name of a relation.
@@ -889,42 +1091,42 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
      */
     public function initRelation($relationName)
     {
-        if ('CategoryWork' == $relationName) {
-            $this->initCategoryWorks();
+        if ('CategoryPublication' == $relationName) {
+            $this->initCategoryPublications();
         }
     }
 
     /**
-     * Clears out the collCategoryWorks collection
+     * Clears out the collCategoryPublications collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return Category The current object (for fluent API support)
-     * @see        addCategoryWorks()
+     * @see        addCategoryPublications()
      */
-    public function clearCategoryWorks()
+    public function clearCategoryPublications()
     {
-        $this->collCategoryWorks = null; // important to set this to null since that means it is uninitialized
-        $this->collCategoryWorksPartial = null;
+        $this->collCategoryPublications = null; // important to set this to null since that means it is uninitialized
+        $this->collCategoryPublicationsPartial = null;
 
         return $this;
     }
 
     /**
-     * reset is the collCategoryWorks collection loaded partially
+     * reset is the collCategoryPublications collection loaded partially
      *
      * @return void
      */
-    public function resetPartialCategoryWorks($v = true)
+    public function resetPartialCategoryPublications($v = true)
     {
-        $this->collCategoryWorksPartial = $v;
+        $this->collCategoryPublicationsPartial = $v;
     }
 
     /**
-     * Initializes the collCategoryWorks collection.
+     * Initializes the collCategoryPublications collection.
      *
-     * By default this just sets the collCategoryWorks collection to an empty array (like clearcollCategoryWorks());
+     * By default this just sets the collCategoryPublications collection to an empty array (like clearcollCategoryPublications());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -933,17 +1135,17 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
      *
      * @return void
      */
-    public function initCategoryWorks($overrideExisting = true)
+    public function initCategoryPublications($overrideExisting = true)
     {
-        if (null !== $this->collCategoryWorks && !$overrideExisting) {
+        if (null !== $this->collCategoryPublications && !$overrideExisting) {
             return;
         }
-        $this->collCategoryWorks = new PropelObjectCollection();
-        $this->collCategoryWorks->setModel('CategoryWork');
+        $this->collCategoryPublications = new PropelObjectCollection();
+        $this->collCategoryPublications->setModel('CategoryPublication');
     }
 
     /**
-     * Gets an array of CategoryWork objects which contain a foreign key that references this object.
+     * Gets an array of CategoryPublication objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -953,105 +1155,105 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|CategoryWork[] List of CategoryWork objects
+     * @return PropelObjectCollection|CategoryPublication[] List of CategoryPublication objects
      * @throws PropelException
      */
-    public function getCategoryWorks($criteria = null, PropelPDO $con = null)
+    public function getCategoryPublications($criteria = null, PropelPDO $con = null)
     {
-        $partial = $this->collCategoryWorksPartial && !$this->isNew();
-        if (null === $this->collCategoryWorks || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collCategoryWorks) {
+        $partial = $this->collCategoryPublicationsPartial && !$this->isNew();
+        if (null === $this->collCategoryPublications || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCategoryPublications) {
                 // return empty collection
-                $this->initCategoryWorks();
+                $this->initCategoryPublications();
             } else {
-                $collCategoryWorks = CategoryWorkQuery::create(null, $criteria)
+                $collCategoryPublications = CategoryPublicationQuery::create(null, $criteria)
                     ->filterByCategory($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    if (false !== $this->collCategoryWorksPartial && count($collCategoryWorks)) {
-                      $this->initCategoryWorks(false);
+                    if (false !== $this->collCategoryPublicationsPartial && count($collCategoryPublications)) {
+                      $this->initCategoryPublications(false);
 
-                      foreach($collCategoryWorks as $obj) {
-                        if (false == $this->collCategoryWorks->contains($obj)) {
-                          $this->collCategoryWorks->append($obj);
+                      foreach($collCategoryPublications as $obj) {
+                        if (false == $this->collCategoryPublications->contains($obj)) {
+                          $this->collCategoryPublications->append($obj);
                         }
                       }
 
-                      $this->collCategoryWorksPartial = true;
+                      $this->collCategoryPublicationsPartial = true;
                     }
 
-                    $collCategoryWorks->getInternalIterator()->rewind();
-                    return $collCategoryWorks;
+                    $collCategoryPublications->getInternalIterator()->rewind();
+                    return $collCategoryPublications;
                 }
 
-                if($partial && $this->collCategoryWorks) {
-                    foreach($this->collCategoryWorks as $obj) {
+                if($partial && $this->collCategoryPublications) {
+                    foreach($this->collCategoryPublications as $obj) {
                         if($obj->isNew()) {
-                            $collCategoryWorks[] = $obj;
+                            $collCategoryPublications[] = $obj;
                         }
                     }
                 }
 
-                $this->collCategoryWorks = $collCategoryWorks;
-                $this->collCategoryWorksPartial = false;
+                $this->collCategoryPublications = $collCategoryPublications;
+                $this->collCategoryPublicationsPartial = false;
             }
         }
 
-        return $this->collCategoryWorks;
+        return $this->collCategoryPublications;
     }
 
     /**
-     * Sets a collection of CategoryWork objects related by a one-to-many relationship
+     * Sets a collection of CategoryPublication objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $categoryWorks A Propel collection.
+     * @param PropelCollection $categoryPublications A Propel collection.
      * @param PropelPDO $con Optional connection object
      * @return Category The current object (for fluent API support)
      */
-    public function setCategoryWorks(PropelCollection $categoryWorks, PropelPDO $con = null)
+    public function setCategoryPublications(PropelCollection $categoryPublications, PropelPDO $con = null)
     {
-        $categoryWorksToDelete = $this->getCategoryWorks(new Criteria(), $con)->diff($categoryWorks);
+        $categoryPublicationsToDelete = $this->getCategoryPublications(new Criteria(), $con)->diff($categoryPublications);
 
-        $this->categoryWorksScheduledForDeletion = unserialize(serialize($categoryWorksToDelete));
+        $this->categoryPublicationsScheduledForDeletion = unserialize(serialize($categoryPublicationsToDelete));
 
-        foreach ($categoryWorksToDelete as $categoryWorkRemoved) {
-            $categoryWorkRemoved->setCategory(null);
+        foreach ($categoryPublicationsToDelete as $categoryPublicationRemoved) {
+            $categoryPublicationRemoved->setCategory(null);
         }
 
-        $this->collCategoryWorks = null;
-        foreach ($categoryWorks as $categoryWork) {
-            $this->addCategoryWork($categoryWork);
+        $this->collCategoryPublications = null;
+        foreach ($categoryPublications as $categoryPublication) {
+            $this->addCategoryPublication($categoryPublication);
         }
 
-        $this->collCategoryWorks = $categoryWorks;
-        $this->collCategoryWorksPartial = false;
+        $this->collCategoryPublications = $categoryPublications;
+        $this->collCategoryPublicationsPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related CategoryWork objects.
+     * Returns the number of related CategoryPublication objects.
      *
      * @param Criteria $criteria
      * @param boolean $distinct
      * @param PropelPDO $con
-     * @return int             Count of related CategoryWork objects.
+     * @return int             Count of related CategoryPublication objects.
      * @throws PropelException
      */
-    public function countCategoryWorks(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countCategoryPublications(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $partial = $this->collCategoryWorksPartial && !$this->isNew();
-        if (null === $this->collCategoryWorks || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collCategoryWorks) {
+        $partial = $this->collCategoryPublicationsPartial && !$this->isNew();
+        if (null === $this->collCategoryPublications || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCategoryPublications) {
                 return 0;
             }
 
             if($partial && !$criteria) {
-                return count($this->getCategoryWorks());
+                return count($this->getCategoryPublications());
             }
-            $query = CategoryWorkQuery::create(null, $criteria);
+            $query = CategoryPublicationQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
@@ -1061,52 +1263,52 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
                 ->count($con);
         }
 
-        return count($this->collCategoryWorks);
+        return count($this->collCategoryPublications);
     }
 
     /**
-     * Method called to associate a CategoryWork object to this object
-     * through the CategoryWork foreign key attribute.
+     * Method called to associate a CategoryPublication object to this object
+     * through the CategoryPublication foreign key attribute.
      *
-     * @param    CategoryWork $l CategoryWork
+     * @param    CategoryPublication $l CategoryPublication
      * @return Category The current object (for fluent API support)
      */
-    public function addCategoryWork(CategoryWork $l)
+    public function addCategoryPublication(CategoryPublication $l)
     {
-        if ($this->collCategoryWorks === null) {
-            $this->initCategoryWorks();
-            $this->collCategoryWorksPartial = true;
+        if ($this->collCategoryPublications === null) {
+            $this->initCategoryPublications();
+            $this->collCategoryPublicationsPartial = true;
         }
-        if (!in_array($l, $this->collCategoryWorks->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddCategoryWork($l);
+        if (!in_array($l, $this->collCategoryPublications->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddCategoryPublication($l);
         }
 
         return $this;
     }
 
     /**
-     * @param	CategoryWork $categoryWork The categoryWork object to add.
+     * @param	CategoryPublication $categoryPublication The categoryPublication object to add.
      */
-    protected function doAddCategoryWork($categoryWork)
+    protected function doAddCategoryPublication($categoryPublication)
     {
-        $this->collCategoryWorks[]= $categoryWork;
-        $categoryWork->setCategory($this);
+        $this->collCategoryPublications[]= $categoryPublication;
+        $categoryPublication->setCategory($this);
     }
 
     /**
-     * @param	CategoryWork $categoryWork The categoryWork object to remove.
+     * @param	CategoryPublication $categoryPublication The categoryPublication object to remove.
      * @return Category The current object (for fluent API support)
      */
-    public function removeCategoryWork($categoryWork)
+    public function removeCategoryPublication($categoryPublication)
     {
-        if ($this->getCategoryWorks()->contains($categoryWork)) {
-            $this->collCategoryWorks->remove($this->collCategoryWorks->search($categoryWork));
-            if (null === $this->categoryWorksScheduledForDeletion) {
-                $this->categoryWorksScheduledForDeletion = clone $this->collCategoryWorks;
-                $this->categoryWorksScheduledForDeletion->clear();
+        if ($this->getCategoryPublications()->contains($categoryPublication)) {
+            $this->collCategoryPublications->remove($this->collCategoryPublications->search($categoryPublication));
+            if (null === $this->categoryPublicationsScheduledForDeletion) {
+                $this->categoryPublicationsScheduledForDeletion = clone $this->collCategoryPublications;
+                $this->categoryPublicationsScheduledForDeletion->clear();
             }
-            $this->categoryWorksScheduledForDeletion[]= clone $categoryWork;
-            $categoryWork->setCategory(null);
+            $this->categoryPublicationsScheduledForDeletion[]= clone $categoryPublication;
+            $categoryPublication->setCategory(null);
         }
 
         return $this;
@@ -1118,7 +1320,7 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
      * an identical criteria, it returns the collection.
      * Otherwise if this Category is new, it will return
      * an empty collection; or if this Category has previously
-     * been saved, it will retrieve related CategoryWorks from storage.
+     * been saved, it will retrieve related CategoryPublications from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1127,51 +1329,51 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|CategoryWork[] List of CategoryWork objects
+     * @return PropelObjectCollection|CategoryPublication[] List of CategoryPublication objects
      */
-    public function getCategoryWorksJoinWork($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getCategoryPublicationsJoinPublication($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
-        $query = CategoryWorkQuery::create(null, $criteria);
-        $query->joinWith('Work', $join_behavior);
+        $query = CategoryPublicationQuery::create(null, $criteria);
+        $query->joinWith('Publication', $join_behavior);
 
-        return $this->getCategoryWorks($query, $con);
+        return $this->getCategoryPublications($query, $con);
     }
 
     /**
-     * Clears out the collWorks collection
+     * Clears out the collPublications collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return Category The current object (for fluent API support)
-     * @see        addWorks()
+     * @see        addPublications()
      */
-    public function clearWorks()
+    public function clearPublications()
     {
-        $this->collWorks = null; // important to set this to null since that means it is uninitialized
-        $this->collWorksPartial = null;
+        $this->collPublications = null; // important to set this to null since that means it is uninitialized
+        $this->collPublicationsPartial = null;
 
         return $this;
     }
 
     /**
-     * Initializes the collWorks collection.
+     * Initializes the collPublications collection.
      *
-     * By default this just sets the collWorks collection to an empty collection (like clearWorks());
+     * By default this just sets the collPublications collection to an empty collection (like clearPublications());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
      * @return void
      */
-    public function initWorks()
+    public function initPublications()
     {
-        $this->collWorks = new PropelObjectCollection();
-        $this->collWorks->setModel('Work');
+        $this->collPublications = new PropelObjectCollection();
+        $this->collPublications->setModel('Publication');
     }
 
     /**
-     * Gets a collection of Work objects related by a many-to-many relationship
-     * to the current object by way of the category_work cross-reference table.
+     * Gets a collection of Publication objects related by a many-to-many relationship
+     * to the current object by way of the category_publication cross-reference table.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1182,73 +1384,73 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
      * @param Criteria $criteria Optional query object to filter the query
      * @param PropelPDO $con Optional connection object
      *
-     * @return PropelObjectCollection|Work[] List of Work objects
+     * @return PropelObjectCollection|Publication[] List of Publication objects
      */
-    public function getWorks($criteria = null, PropelPDO $con = null)
+    public function getPublications($criteria = null, PropelPDO $con = null)
     {
-        if (null === $this->collWorks || null !== $criteria) {
-            if ($this->isNew() && null === $this->collWorks) {
+        if (null === $this->collPublications || null !== $criteria) {
+            if ($this->isNew() && null === $this->collPublications) {
                 // return empty collection
-                $this->initWorks();
+                $this->initPublications();
             } else {
-                $collWorks = WorkQuery::create(null, $criteria)
+                $collPublications = PublicationQuery::create(null, $criteria)
                     ->filterByCategory($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    return $collWorks;
+                    return $collPublications;
                 }
-                $this->collWorks = $collWorks;
+                $this->collPublications = $collPublications;
             }
         }
 
-        return $this->collWorks;
+        return $this->collPublications;
     }
 
     /**
-     * Sets a collection of Work objects related by a many-to-many relationship
-     * to the current object by way of the category_work cross-reference table.
+     * Sets a collection of Publication objects related by a many-to-many relationship
+     * to the current object by way of the category_publication cross-reference table.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $works A Propel collection.
+     * @param PropelCollection $publications A Propel collection.
      * @param PropelPDO $con Optional connection object
      * @return Category The current object (for fluent API support)
      */
-    public function setWorks(PropelCollection $works, PropelPDO $con = null)
+    public function setPublications(PropelCollection $publications, PropelPDO $con = null)
     {
-        $this->clearWorks();
-        $currentWorks = $this->getWorks();
+        $this->clearPublications();
+        $currentPublications = $this->getPublications();
 
-        $this->worksScheduledForDeletion = $currentWorks->diff($works);
+        $this->publicationsScheduledForDeletion = $currentPublications->diff($publications);
 
-        foreach ($works as $work) {
-            if (!$currentWorks->contains($work)) {
-                $this->doAddWork($work);
+        foreach ($publications as $publication) {
+            if (!$currentPublications->contains($publication)) {
+                $this->doAddPublication($publication);
             }
         }
 
-        $this->collWorks = $works;
+        $this->collPublications = $publications;
 
         return $this;
     }
 
     /**
-     * Gets the number of Work objects related by a many-to-many relationship
-     * to the current object by way of the category_work cross-reference table.
+     * Gets the number of Publication objects related by a many-to-many relationship
+     * to the current object by way of the category_publication cross-reference table.
      *
      * @param Criteria $criteria Optional query object to filter the query
      * @param boolean $distinct Set to true to force count distinct
      * @param PropelPDO $con Optional connection object
      *
-     * @return int the number of related Work objects
+     * @return int the number of related Publication objects
      */
-    public function countWorks($criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countPublications($criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        if (null === $this->collWorks || null !== $criteria) {
-            if ($this->isNew() && null === $this->collWorks) {
+        if (null === $this->collPublications || null !== $criteria) {
+            if ($this->isNew() && null === $this->collPublications) {
                 return 0;
             } else {
-                $query = WorkQuery::create(null, $criteria);
+                $query = PublicationQuery::create(null, $criteria);
                 if ($distinct) {
                     $query->distinct();
                 }
@@ -1258,57 +1460,57 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
                     ->count($con);
             }
         } else {
-            return count($this->collWorks);
+            return count($this->collPublications);
         }
     }
 
     /**
-     * Associate a Work object to this object
-     * through the category_work cross reference table.
+     * Associate a Publication object to this object
+     * through the category_publication cross reference table.
      *
-     * @param  Work $work The CategoryWork object to relate
+     * @param  Publication $publication The CategoryPublication object to relate
      * @return Category The current object (for fluent API support)
      */
-    public function addWork(Work $work)
+    public function addPublication(Publication $publication)
     {
-        if ($this->collWorks === null) {
-            $this->initWorks();
+        if ($this->collPublications === null) {
+            $this->initPublications();
         }
-        if (!$this->collWorks->contains($work)) { // only add it if the **same** object is not already associated
-            $this->doAddWork($work);
+        if (!$this->collPublications->contains($publication)) { // only add it if the **same** object is not already associated
+            $this->doAddPublication($publication);
 
-            $this->collWorks[]= $work;
+            $this->collPublications[]= $publication;
         }
 
         return $this;
     }
 
     /**
-     * @param	Work $work The work object to add.
+     * @param	Publication $publication The publication object to add.
      */
-    protected function doAddWork($work)
+    protected function doAddPublication($publication)
     {
-        $categoryWork = new CategoryWork();
-        $categoryWork->setWork($work);
-        $this->addCategoryWork($categoryWork);
+        $categoryPublication = new CategoryPublication();
+        $categoryPublication->setPublication($publication);
+        $this->addCategoryPublication($categoryPublication);
     }
 
     /**
-     * Remove a Work object to this object
-     * through the category_work cross reference table.
+     * Remove a Publication object to this object
+     * through the category_publication cross reference table.
      *
-     * @param Work $work The CategoryWork object to relate
+     * @param Publication $publication The CategoryPublication object to relate
      * @return Category The current object (for fluent API support)
      */
-    public function removeWork(Work $work)
+    public function removePublication(Publication $publication)
     {
-        if ($this->getWorks()->contains($work)) {
-            $this->collWorks->remove($this->collWorks->search($work));
-            if (null === $this->worksScheduledForDeletion) {
-                $this->worksScheduledForDeletion = clone $this->collWorks;
-                $this->worksScheduledForDeletion->clear();
+        if ($this->getPublications()->contains($publication)) {
+            $this->collPublications->remove($this->collPublications->search($publication));
+            if (null === $this->publicationsScheduledForDeletion) {
+                $this->publicationsScheduledForDeletion = clone $this->collPublications;
+                $this->publicationsScheduledForDeletion->clear();
             }
-            $this->worksScheduledForDeletion[]= $work;
+            $this->publicationsScheduledForDeletion[]= $publication;
         }
 
         return $this;
@@ -1321,6 +1523,8 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
     {
         $this->id = null;
         $this->name = null;
+        $this->description = null;
+        $this->categorytype_id = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
@@ -1343,28 +1547,32 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
-            if ($this->collCategoryWorks) {
-                foreach ($this->collCategoryWorks as $o) {
+            if ($this->collCategoryPublications) {
+                foreach ($this->collCategoryPublications as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collWorks) {
-                foreach ($this->collWorks as $o) {
+            if ($this->collPublications) {
+                foreach ($this->collPublications as $o) {
                     $o->clearAllReferences($deep);
                 }
+            }
+            if ($this->aCategorytype instanceof Persistent) {
+              $this->aCategorytype->clearAllReferences($deep);
             }
 
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
-        if ($this->collCategoryWorks instanceof PropelCollection) {
-            $this->collCategoryWorks->clearIterator();
+        if ($this->collCategoryPublications instanceof PropelCollection) {
+            $this->collCategoryPublications->clearIterator();
         }
-        $this->collCategoryWorks = null;
-        if ($this->collWorks instanceof PropelCollection) {
-            $this->collWorks->clearIterator();
+        $this->collCategoryPublications = null;
+        if ($this->collPublications instanceof PropelCollection) {
+            $this->collPublications->clearIterator();
         }
-        $this->collWorks = null;
+        $this->collPublications = null;
+        $this->aCategorytype = null;
     }
 
     /**

@@ -15,7 +15,7 @@ class WorkflowDomainController extends ORMController {
         array("caption" => "Tasks", 'modelClass' => 'Task'),
         array("caption" => "Publikationsgruppen", 'modelClass' => 'Publicationgroup'),
         array("caption" => "Nachweise", 'modelClass' => 'Imagesource'),
-        array("caption" => "Arbeitsschritte", 'modelClass' => 'Tasktype'),
+        array("caption" => "Workflows", 'modelClass' => 'Tasktype'),
         array("caption" => "Partner", 'modelClass' => 'Partner'),
         array("caption" => "Reporting", 'route' => 'reporting'),
     );
@@ -23,6 +23,31 @@ class WorkflowDomainController extends ORMController {
     public function indexAction() {
 
         return $this->renderWithDomainData('DTAMetadataBundle:Package_Workflow:index.html.twig', array(
+                ));
+    }
+    
+    public function tasktypeViewAllAction($package, $updatedObjectId = 0) {
+        
+        $className="Tasktype";
+        $classNames = $this->relatedClassNames($package, $className);
+
+        // for retrieving the entities
+        $query = \DTA\MetadataBundle\Model\Workflow\TasktypeQuery::create();
+        
+        // for retrieving the column names
+        $modelClass = new $classNames["model"];
+        
+        $records = $query
+                ->filterByTreeLevel(array('min'=>1))
+                ->orderByTreeLeft()
+                ->find();
+        
+        return $this->renderWithDomainData("DTAMetadataBundle:Package_Workflow:tasktypeViewAll.html.twig", array(
+                    'title' => 'Arbeitsschritte der verschiedenen Workflows',
+                    'className' => $className,
+                    'columns' => $modelClass::getTableViewColumnNames(),
+                    'data' => $records,
+                    'updatedObjectId' => $updatedObjectId,
                 ));
     }
 

@@ -12,7 +12,7 @@
         </style>
     </head>
     
-    <body style="min-width: 900px; padding-top: 60px">
+    <body style="min-width: 900px; padding-top: 0px">
 
         
         {#
@@ -22,7 +22,6 @@
 
         {% if error %}
         <div class="alert alert-danger">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
             Anmeldung fehlgeschlagen.
         </div>
         <br/>
@@ -35,7 +34,7 @@
 
             <div class="form-group">
                 <label for="username" class="control-label col-lg-{{labelCols}}"></label>
-                <a class="navbar-brand" href="{{ path('home') }}">
+                <a class="navbar-brand" href="#">
                     DTA Projektdatenbank
                 </a>
             </div>

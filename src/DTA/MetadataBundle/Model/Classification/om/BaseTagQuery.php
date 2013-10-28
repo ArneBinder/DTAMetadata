@@ -15,8 +15,8 @@ use \PropelPDO;
 use DTA\MetadataBundle\Model\Classification\Tag;
 use DTA\MetadataBundle\Model\Classification\TagPeer;
 use DTA\MetadataBundle\Model\Classification\TagQuery;
-use DTA\MetadataBundle\Model\Data\Work;
-use DTA\MetadataBundle\Model\Master\WorkTag;
+use DTA\MetadataBundle\Model\Data\Publication;
+use DTA\MetadataBundle\Model\Master\PublicationTag;
 
 /**
  * @method TagQuery orderById($order = Criteria::ASC) Order by the id column
@@ -29,9 +29,9 @@ use DTA\MetadataBundle\Model\Master\WorkTag;
  * @method TagQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method TagQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method TagQuery leftJoinWorkTag($relationAlias = null) Adds a LEFT JOIN clause to the query using the WorkTag relation
- * @method TagQuery rightJoinWorkTag($relationAlias = null) Adds a RIGHT JOIN clause to the query using the WorkTag relation
- * @method TagQuery innerJoinWorkTag($relationAlias = null) Adds a INNER JOIN clause to the query using the WorkTag relation
+ * @method TagQuery leftJoinPublicationTag($relationAlias = null) Adds a LEFT JOIN clause to the query using the PublicationTag relation
+ * @method TagQuery rightJoinPublicationTag($relationAlias = null) Adds a RIGHT JOIN clause to the query using the PublicationTag relation
+ * @method TagQuery innerJoinPublicationTag($relationAlias = null) Adds a INNER JOIN clause to the query using the PublicationTag relation
  *
  * @method Tag findOne(PropelPDO $con = null) Return the first Tag matching the query
  * @method Tag findOneOrCreate(PropelPDO $con = null) Return the first Tag matching the query, or a new Tag object populated from the query conditions when no match is found
@@ -50,7 +50,7 @@ abstract class BaseTagQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'DTAMetadata', $modelName = 'DTA\\MetadataBundle\\Model\\Classification\\Tag', $modelAlias = null)
+    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Classification\\Tag', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -302,41 +302,41 @@ abstract class BaseTagQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related WorkTag object
+     * Filter the query by a related PublicationTag object
      *
-     * @param   WorkTag|PropelObjectCollection $workTag  the related object to use as filter
+     * @param   PublicationTag|PropelObjectCollection $publicationTag  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return                 TagQuery The current query, for fluid interface
      * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterByWorkTag($workTag, $comparison = null)
+    public function filterByPublicationTag($publicationTag, $comparison = null)
     {
-        if ($workTag instanceof WorkTag) {
+        if ($publicationTag instanceof PublicationTag) {
             return $this
-                ->addUsingAlias(TagPeer::ID, $workTag->getTagId(), $comparison);
-        } elseif ($workTag instanceof PropelObjectCollection) {
+                ->addUsingAlias(TagPeer::ID, $publicationTag->getTagId(), $comparison);
+        } elseif ($publicationTag instanceof PropelObjectCollection) {
             return $this
-                ->useWorkTagQuery()
-                ->filterByPrimaryKeys($workTag->getPrimaryKeys())
+                ->usePublicationTagQuery()
+                ->filterByPrimaryKeys($publicationTag->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByWorkTag() only accepts arguments of type WorkTag or PropelCollection');
+            throw new PropelException('filterByPublicationTag() only accepts arguments of type PublicationTag or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the WorkTag relation
+     * Adds a JOIN clause to the query using the PublicationTag relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return TagQuery The current query, for fluid interface
      */
-    public function joinWorkTag($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinPublicationTag($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('WorkTag');
+        $relationMap = $tableMap->getRelation('PublicationTag');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -351,14 +351,14 @@ abstract class BaseTagQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'WorkTag');
+            $this->addJoinObject($join, 'PublicationTag');
         }
 
         return $this;
     }
 
     /**
-     * Use the WorkTag relation WorkTag object
+     * Use the PublicationTag relation PublicationTag object
      *
      * @see       useQuery()
      *
@@ -366,29 +366,29 @@ abstract class BaseTagQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \DTA\MetadataBundle\Model\Master\WorkTagQuery A secondary query class using the current class as primary query
+     * @return   \DTA\MetadataBundle\Model\Master\PublicationTagQuery A secondary query class using the current class as primary query
      */
-    public function useWorkTagQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function usePublicationTagQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinWorkTag($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'WorkTag', '\DTA\MetadataBundle\Model\Master\WorkTagQuery');
+            ->joinPublicationTag($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'PublicationTag', '\DTA\MetadataBundle\Model\Master\PublicationTagQuery');
     }
 
     /**
-     * Filter the query by a related Work object
-     * using the work_tag table as cross reference
+     * Filter the query by a related Publication object
+     * using the publication_tag table as cross reference
      *
-     * @param   Work $work the related object to use as filter
+     * @param   Publication $publication the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   TagQuery The current query, for fluid interface
      */
-    public function filterByWork($work, $comparison = Criteria::EQUAL)
+    public function filterByPublication($publication, $comparison = Criteria::EQUAL)
     {
         return $this
-            ->useWorkTagQuery()
-            ->filterByWork($work, $comparison)
+            ->usePublicationTagQuery()
+            ->filterByPublication($publication, $comparison)
             ->endUse();
     }
 

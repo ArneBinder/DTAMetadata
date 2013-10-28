@@ -47,7 +47,6 @@ class DtaUserTableMap extends TableMap
         $this->addColumn('password', 'Password', 'VARCHAR', false, 512, null);
         $this->addColumn('salt', 'Salt', 'VARCHAR', false, 512, null);
         $this->addColumn('mail', 'Mail', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('phone', 'Phone', 'LONGVARCHAR', false, null, null);
         $this->addColumn('admin', 'Admin', 'BOOLEAN', false, null, false);
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         // validators
@@ -74,7 +73,6 @@ class DtaUserTableMap extends TableMap
   'id' => 'id',
   'benutzername' => 'username',
   'mail' => 'mail',
-  'telefon' => 'phone',
   'administratorrechte' => 'accessor:adminToString',
 ),
             'auto_add_pk' =>  array (

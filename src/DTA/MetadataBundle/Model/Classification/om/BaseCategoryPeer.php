@@ -11,13 +11,14 @@ use \PropelException;
 use \PropelPDO;
 use DTA\MetadataBundle\Model\Classification\Category;
 use DTA\MetadataBundle\Model\Classification\CategoryPeer;
+use DTA\MetadataBundle\Model\Classification\CategorytypePeer;
 use DTA\MetadataBundle\Model\Classification\map\CategoryTableMap;
 
 abstract class BaseCategoryPeer
 {
 
     /** the default database name for this class */
-    const DATABASE_NAME = 'DTAMetadata';
+    const DATABASE_NAME = 'dtametadata';
 
     /** the table name for this class */
     const TABLE_NAME = 'category';
@@ -29,19 +30,25 @@ abstract class BaseCategoryPeer
     const TM_CLASS = 'CategoryTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 2;
+    const NUM_COLUMNS = 4;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 2;
+    const NUM_HYDRATE_COLUMNS = 4;
 
     /** the column name for the id field */
     const ID = 'category.id';
 
     /** the column name for the name field */
     const NAME = 'category.name';
+
+    /** the column name for the description field */
+    const DESCRIPTION = 'category.description';
+
+    /** the column name for the categorytype_id field */
+    const CATEGORYTYPE_ID = 'category.categorytype_id';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -62,12 +69,12 @@ abstract class BaseCategoryPeer
      * e.g. CategoryPeer::$fieldNames[CategoryPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', ),
-        BasePeer::TYPE_COLNAME => array (CategoryPeer::ID, CategoryPeer::NAME, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'name', ),
-        BasePeer::TYPE_NUM => array (0, 1, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'Description', 'CategorytypeId', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'description', 'categorytypeId', ),
+        BasePeer::TYPE_COLNAME => array (CategoryPeer::ID, CategoryPeer::NAME, CategoryPeer::DESCRIPTION, CategoryPeer::CATEGORYTYPE_ID, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'DESCRIPTION', 'CATEGORYTYPE_ID', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'description', 'categorytype_id', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
     /**
@@ -77,12 +84,12 @@ abstract class BaseCategoryPeer
      * e.g. CategoryPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, ),
-        BasePeer::TYPE_COLNAME => array (CategoryPeer::ID => 0, CategoryPeer::NAME => 1, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, ),
-        BasePeer::TYPE_NUM => array (0, 1, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'Description' => 2, 'CategorytypeId' => 3, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'description' => 2, 'categorytypeId' => 3, ),
+        BasePeer::TYPE_COLNAME => array (CategoryPeer::ID => 0, CategoryPeer::NAME => 1, CategoryPeer::DESCRIPTION => 2, CategoryPeer::CATEGORYTYPE_ID => 3, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'DESCRIPTION' => 2, 'CATEGORYTYPE_ID' => 3, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'description' => 2, 'categorytype_id' => 3, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
     /**
@@ -158,9 +165,13 @@ abstract class BaseCategoryPeer
         if (null === $alias) {
             $criteria->addSelectColumn(CategoryPeer::ID);
             $criteria->addSelectColumn(CategoryPeer::NAME);
+            $criteria->addSelectColumn(CategoryPeer::DESCRIPTION);
+            $criteria->addSelectColumn(CategoryPeer::CATEGORYTYPE_ID);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.name');
+            $criteria->addSelectColumn($alias . '.description');
+            $criteria->addSelectColumn($alias . '.categorytype_id');
         }
     }
 
@@ -461,6 +472,244 @@ abstract class BaseCategoryPeer
         }
 
         return array($obj, $col);
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Categorytype table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinCategorytype(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(CategoryPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            CategoryPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(CategoryPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(CategoryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(CategoryPeer::CATEGORYTYPE_ID, CategorytypePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Selects a collection of Category objects pre-filled with their Categorytype objects.
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Category objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinCategorytype(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(CategoryPeer::DATABASE_NAME);
+        }
+
+        CategoryPeer::addSelectColumns($criteria);
+        $startcol = CategoryPeer::NUM_HYDRATE_COLUMNS;
+        CategorytypePeer::addSelectColumns($criteria);
+
+        $criteria->addJoin(CategoryPeer::CATEGORYTYPE_ID, CategorytypePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = CategoryPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = CategoryPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+
+                $cls = CategoryPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                CategoryPeer::addInstanceToPool($obj1, $key1);
+            } // if $obj1 already loaded
+
+            $key2 = CategorytypePeer::getPrimaryKeyHashFromRow($row, $startcol);
+            if ($key2 !== null) {
+                $obj2 = CategorytypePeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = CategorytypePeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol);
+                    CategorytypePeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 already loaded
+
+                // Add the $obj1 (Category) to $obj2 (Categorytype)
+                $obj2->addCategory($obj1);
+
+            } // if joined row was not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining all related tables
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAll(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(CategoryPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            CategoryPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(CategoryPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(CategoryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(CategoryPeer::CATEGORYTYPE_ID, CategorytypePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+    /**
+     * Selects a collection of Category objects pre-filled with all related objects.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Category objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAll(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(CategoryPeer::DATABASE_NAME);
+        }
+
+        CategoryPeer::addSelectColumns($criteria);
+        $startcol2 = CategoryPeer::NUM_HYDRATE_COLUMNS;
+
+        CategorytypePeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + CategorytypePeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(CategoryPeer::CATEGORYTYPE_ID, CategorytypePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = CategoryPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = CategoryPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = CategoryPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                CategoryPeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+            // Add objects for joined Categorytype rows
+
+            $key2 = CategorytypePeer::getPrimaryKeyHashFromRow($row, $startcol2);
+            if ($key2 !== null) {
+                $obj2 = CategorytypePeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = CategorytypePeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    CategorytypePeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 loaded
+
+                // Add the $obj1 (Category) to the collection in $obj2 (Categorytype)
+                $obj2->addCategory($obj1);
+            } // if joined row not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
     }
 
     /**

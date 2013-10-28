@@ -77,8 +77,8 @@ class TasktypeTableMap extends TableMap
   'method_proxies' => 'false',
 ),
             'table_row_view' =>  array (
-  'Zuordnung' => 'accessor:getParent',
   'Typ' => 'name',
+  'Zuordnung' => 'accessor:getParent',
 ),
         );
     } // getBehaviors()

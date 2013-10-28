@@ -12,52 +12,53 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
-use DTA\MetadataBundle\Model\Data\PublicationDs;
-use DTA\MetadataBundle\Model\Data\PublicationJa;
-use DTA\MetadataBundle\Model\Data\PublicationMm;
-use DTA\MetadataBundle\Model\Data\PublicationMms;
+use DTA\MetadataBundle\Model\Data\Publication;
 use DTA\MetadataBundle\Model\Data\Volume;
 use DTA\MetadataBundle\Model\Data\VolumePeer;
 use DTA\MetadataBundle\Model\Data\VolumeQuery;
 
 /**
  * @method VolumeQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method VolumeQuery orderByPublicationId($order = Criteria::ASC) Order by the publication_id column
+ * @method VolumeQuery orderByParentpublicationId($order = Criteria::ASC) Order by the parentpublication_id column
  * @method VolumeQuery orderByVolumedescription($order = Criteria::ASC) Order by the volumedescription column
  * @method VolumeQuery orderByVolumenumeric($order = Criteria::ASC) Order by the volumenumeric column
+ * @method VolumeQuery orderByVolumestotal($order = Criteria::ASC) Order by the volumestotal column
  *
  * @method VolumeQuery groupById() Group by the id column
+ * @method VolumeQuery groupByPublicationId() Group by the publication_id column
+ * @method VolumeQuery groupByParentpublicationId() Group by the parentpublication_id column
  * @method VolumeQuery groupByVolumedescription() Group by the volumedescription column
  * @method VolumeQuery groupByVolumenumeric() Group by the volumenumeric column
+ * @method VolumeQuery groupByVolumestotal() Group by the volumestotal column
  *
  * @method VolumeQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method VolumeQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method VolumeQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method VolumeQuery leftJoinPublicationMm($relationAlias = null) Adds a LEFT JOIN clause to the query using the PublicationMm relation
- * @method VolumeQuery rightJoinPublicationMm($relationAlias = null) Adds a RIGHT JOIN clause to the query using the PublicationMm relation
- * @method VolumeQuery innerJoinPublicationMm($relationAlias = null) Adds a INNER JOIN clause to the query using the PublicationMm relation
+ * @method VolumeQuery leftJoinPublicationRelatedByPublicationId($relationAlias = null) Adds a LEFT JOIN clause to the query using the PublicationRelatedByPublicationId relation
+ * @method VolumeQuery rightJoinPublicationRelatedByPublicationId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the PublicationRelatedByPublicationId relation
+ * @method VolumeQuery innerJoinPublicationRelatedByPublicationId($relationAlias = null) Adds a INNER JOIN clause to the query using the PublicationRelatedByPublicationId relation
  *
- * @method VolumeQuery leftJoinPublicationDs($relationAlias = null) Adds a LEFT JOIN clause to the query using the PublicationDs relation
- * @method VolumeQuery rightJoinPublicationDs($relationAlias = null) Adds a RIGHT JOIN clause to the query using the PublicationDs relation
- * @method VolumeQuery innerJoinPublicationDs($relationAlias = null) Adds a INNER JOIN clause to the query using the PublicationDs relation
- *
- * @method VolumeQuery leftJoinPublicationJa($relationAlias = null) Adds a LEFT JOIN clause to the query using the PublicationJa relation
- * @method VolumeQuery rightJoinPublicationJa($relationAlias = null) Adds a RIGHT JOIN clause to the query using the PublicationJa relation
- * @method VolumeQuery innerJoinPublicationJa($relationAlias = null) Adds a INNER JOIN clause to the query using the PublicationJa relation
- *
- * @method VolumeQuery leftJoinPublicationMms($relationAlias = null) Adds a LEFT JOIN clause to the query using the PublicationMms relation
- * @method VolumeQuery rightJoinPublicationMms($relationAlias = null) Adds a RIGHT JOIN clause to the query using the PublicationMms relation
- * @method VolumeQuery innerJoinPublicationMms($relationAlias = null) Adds a INNER JOIN clause to the query using the PublicationMms relation
+ * @method VolumeQuery leftJoinPublicationRelatedByParentpublicationId($relationAlias = null) Adds a LEFT JOIN clause to the query using the PublicationRelatedByParentpublicationId relation
+ * @method VolumeQuery rightJoinPublicationRelatedByParentpublicationId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the PublicationRelatedByParentpublicationId relation
+ * @method VolumeQuery innerJoinPublicationRelatedByParentpublicationId($relationAlias = null) Adds a INNER JOIN clause to the query using the PublicationRelatedByParentpublicationId relation
  *
  * @method Volume findOne(PropelPDO $con = null) Return the first Volume matching the query
  * @method Volume findOneOrCreate(PropelPDO $con = null) Return the first Volume matching the query, or a new Volume object populated from the query conditions when no match is found
  *
+ * @method Volume findOneByPublicationId(int $publication_id) Return the first Volume filtered by the publication_id column
+ * @method Volume findOneByParentpublicationId(int $parentpublication_id) Return the first Volume filtered by the parentpublication_id column
  * @method Volume findOneByVolumedescription(int $volumedescription) Return the first Volume filtered by the volumedescription column
- * @method Volume findOneByVolumenumeric(string $volumenumeric) Return the first Volume filtered by the volumenumeric column
+ * @method Volume findOneByVolumenumeric(int $volumenumeric) Return the first Volume filtered by the volumenumeric column
+ * @method Volume findOneByVolumestotal(int $volumestotal) Return the first Volume filtered by the volumestotal column
  *
  * @method array findById(int $id) Return Volume objects filtered by the id column
+ * @method array findByPublicationId(int $publication_id) Return Volume objects filtered by the publication_id column
+ * @method array findByParentpublicationId(int $parentpublication_id) Return Volume objects filtered by the parentpublication_id column
  * @method array findByVolumedescription(int $volumedescription) Return Volume objects filtered by the volumedescription column
- * @method array findByVolumenumeric(string $volumenumeric) Return Volume objects filtered by the volumenumeric column
+ * @method array findByVolumenumeric(int $volumenumeric) Return Volume objects filtered by the volumenumeric column
+ * @method array findByVolumestotal(int $volumestotal) Return Volume objects filtered by the volumestotal column
  */
 abstract class BaseVolumeQuery extends ModelCriteria
 {
@@ -68,7 +69,7 @@ abstract class BaseVolumeQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'DTAMetadata', $modelName = 'DTA\\MetadataBundle\\Model\\Data\\Volume', $modelAlias = null)
+    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Data\\Volume', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -159,7 +160,7 @@ abstract class BaseVolumeQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "volumedescription", "volumenumeric" FROM "volume" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "publication_id", "parentpublication_id", "volumedescription", "volumenumeric", "volumestotal" FROM "volume" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -291,6 +292,94 @@ abstract class BaseVolumeQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the publication_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPublicationId(1234); // WHERE publication_id = 1234
+     * $query->filterByPublicationId(array(12, 34)); // WHERE publication_id IN (12, 34)
+     * $query->filterByPublicationId(array('min' => 12)); // WHERE publication_id >= 12
+     * $query->filterByPublicationId(array('max' => 12)); // WHERE publication_id <= 12
+     * </code>
+     *
+     * @see       filterByPublicationRelatedByPublicationId()
+     *
+     * @param     mixed $publicationId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return VolumeQuery The current query, for fluid interface
+     */
+    public function filterByPublicationId($publicationId = null, $comparison = null)
+    {
+        if (is_array($publicationId)) {
+            $useMinMax = false;
+            if (isset($publicationId['min'])) {
+                $this->addUsingAlias(VolumePeer::PUBLICATION_ID, $publicationId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($publicationId['max'])) {
+                $this->addUsingAlias(VolumePeer::PUBLICATION_ID, $publicationId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(VolumePeer::PUBLICATION_ID, $publicationId, $comparison);
+    }
+
+    /**
+     * Filter the query on the parentpublication_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByParentpublicationId(1234); // WHERE parentpublication_id = 1234
+     * $query->filterByParentpublicationId(array(12, 34)); // WHERE parentpublication_id IN (12, 34)
+     * $query->filterByParentpublicationId(array('min' => 12)); // WHERE parentpublication_id >= 12
+     * $query->filterByParentpublicationId(array('max' => 12)); // WHERE parentpublication_id <= 12
+     * </code>
+     *
+     * @see       filterByPublicationRelatedByParentpublicationId()
+     *
+     * @param     mixed $parentpublicationId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return VolumeQuery The current query, for fluid interface
+     */
+    public function filterByParentpublicationId($parentpublicationId = null, $comparison = null)
+    {
+        if (is_array($parentpublicationId)) {
+            $useMinMax = false;
+            if (isset($parentpublicationId['min'])) {
+                $this->addUsingAlias(VolumePeer::PARENTPUBLICATION_ID, $parentpublicationId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($parentpublicationId['max'])) {
+                $this->addUsingAlias(VolumePeer::PARENTPUBLICATION_ID, $parentpublicationId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(VolumePeer::PARENTPUBLICATION_ID, $parentpublicationId, $comparison);
+    }
+
+    /**
      * Filter the query on the volumedescription column
      *
      * Example usage:
@@ -337,24 +426,37 @@ abstract class BaseVolumeQuery extends ModelCriteria
      *
      * Example usage:
      * <code>
-     * $query->filterByVolumenumeric('fooValue');   // WHERE volumenumeric = 'fooValue'
-     * $query->filterByVolumenumeric('%fooValue%'); // WHERE volumenumeric LIKE '%fooValue%'
+     * $query->filterByVolumenumeric(1234); // WHERE volumenumeric = 1234
+     * $query->filterByVolumenumeric(array(12, 34)); // WHERE volumenumeric IN (12, 34)
+     * $query->filterByVolumenumeric(array('min' => 12)); // WHERE volumenumeric >= 12
+     * $query->filterByVolumenumeric(array('max' => 12)); // WHERE volumenumeric <= 12
      * </code>
      *
-     * @param     string $volumenumeric The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     mixed $volumenumeric The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return VolumeQuery The current query, for fluid interface
      */
     public function filterByVolumenumeric($volumenumeric = null, $comparison = null)
     {
-        if (null === $comparison) {
-            if (is_array($volumenumeric)) {
+        if (is_array($volumenumeric)) {
+            $useMinMax = false;
+            if (isset($volumenumeric['min'])) {
+                $this->addUsingAlias(VolumePeer::VOLUMENUMERIC, $volumenumeric['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($volumenumeric['max'])) {
+                $this->addUsingAlias(VolumePeer::VOLUMENUMERIC, $volumenumeric['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $volumenumeric)) {
-                $volumenumeric = str_replace('*', '%', $volumenumeric);
-                $comparison = Criteria::LIKE;
             }
         }
 
@@ -362,41 +464,85 @@ abstract class BaseVolumeQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related PublicationMm object
+     * Filter the query on the volumestotal column
      *
-     * @param   PublicationMm|PropelObjectCollection $publicationMm  the related object to use as filter
+     * Example usage:
+     * <code>
+     * $query->filterByVolumestotal(1234); // WHERE volumestotal = 1234
+     * $query->filterByVolumestotal(array(12, 34)); // WHERE volumestotal IN (12, 34)
+     * $query->filterByVolumestotal(array('min' => 12)); // WHERE volumestotal >= 12
+     * $query->filterByVolumestotal(array('max' => 12)); // WHERE volumestotal <= 12
+     * </code>
+     *
+     * @param     mixed $volumestotal The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return VolumeQuery The current query, for fluid interface
+     */
+    public function filterByVolumestotal($volumestotal = null, $comparison = null)
+    {
+        if (is_array($volumestotal)) {
+            $useMinMax = false;
+            if (isset($volumestotal['min'])) {
+                $this->addUsingAlias(VolumePeer::VOLUMESTOTAL, $volumestotal['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($volumestotal['max'])) {
+                $this->addUsingAlias(VolumePeer::VOLUMESTOTAL, $volumestotal['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(VolumePeer::VOLUMESTOTAL, $volumestotal, $comparison);
+    }
+
+    /**
+     * Filter the query by a related Publication object
+     *
+     * @param   Publication|PropelObjectCollection $publication The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return                 VolumeQuery The current query, for fluid interface
      * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterByPublicationMm($publicationMm, $comparison = null)
+    public function filterByPublicationRelatedByPublicationId($publication, $comparison = null)
     {
-        if ($publicationMm instanceof PublicationMm) {
+        if ($publication instanceof Publication) {
             return $this
-                ->addUsingAlias(VolumePeer::ID, $publicationMm->getVolumeId(), $comparison);
-        } elseif ($publicationMm instanceof PropelObjectCollection) {
+                ->addUsingAlias(VolumePeer::PUBLICATION_ID, $publication->getId(), $comparison);
+        } elseif ($publication instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->usePublicationMmQuery()
-                ->filterByPrimaryKeys($publicationMm->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(VolumePeer::PUBLICATION_ID, $publication->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByPublicationMm() only accepts arguments of type PublicationMm or PropelCollection');
+            throw new PropelException('filterByPublicationRelatedByPublicationId() only accepts arguments of type Publication or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the PublicationMm relation
+     * Adds a JOIN clause to the query using the PublicationRelatedByPublicationId relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return VolumeQuery The current query, for fluid interface
      */
-    public function joinPublicationMm($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinPublicationRelatedByPublicationId($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('PublicationMm');
+        $relationMap = $tableMap->getRelation('PublicationRelatedByPublicationId');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -411,14 +557,14 @@ abstract class BaseVolumeQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'PublicationMm');
+            $this->addJoinObject($join, 'PublicationRelatedByPublicationId');
         }
 
         return $this;
     }
 
     /**
-     * Use the PublicationMm relation PublicationMm object
+     * Use the PublicationRelatedByPublicationId relation Publication object
      *
      * @see       useQuery()
      *
@@ -426,51 +572,53 @@ abstract class BaseVolumeQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \DTA\MetadataBundle\Model\Data\PublicationMmQuery A secondary query class using the current class as primary query
+     * @return   \DTA\MetadataBundle\Model\Data\PublicationQuery A secondary query class using the current class as primary query
      */
-    public function usePublicationMmQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function usePublicationRelatedByPublicationIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinPublicationMm($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'PublicationMm', '\DTA\MetadataBundle\Model\Data\PublicationMmQuery');
+            ->joinPublicationRelatedByPublicationId($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'PublicationRelatedByPublicationId', '\DTA\MetadataBundle\Model\Data\PublicationQuery');
     }
 
     /**
-     * Filter the query by a related PublicationDs object
+     * Filter the query by a related Publication object
      *
-     * @param   PublicationDs|PropelObjectCollection $publicationDs  the related object to use as filter
+     * @param   Publication|PropelObjectCollection $publication The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return                 VolumeQuery The current query, for fluid interface
      * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterByPublicationDs($publicationDs, $comparison = null)
+    public function filterByPublicationRelatedByParentpublicationId($publication, $comparison = null)
     {
-        if ($publicationDs instanceof PublicationDs) {
+        if ($publication instanceof Publication) {
             return $this
-                ->addUsingAlias(VolumePeer::ID, $publicationDs->getVolumeId(), $comparison);
-        } elseif ($publicationDs instanceof PropelObjectCollection) {
+                ->addUsingAlias(VolumePeer::PARENTPUBLICATION_ID, $publication->getId(), $comparison);
+        } elseif ($publication instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->usePublicationDsQuery()
-                ->filterByPrimaryKeys($publicationDs->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(VolumePeer::PARENTPUBLICATION_ID, $publication->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByPublicationDs() only accepts arguments of type PublicationDs or PropelCollection');
+            throw new PropelException('filterByPublicationRelatedByParentpublicationId() only accepts arguments of type Publication or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the PublicationDs relation
+     * Adds a JOIN clause to the query using the PublicationRelatedByParentpublicationId relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return VolumeQuery The current query, for fluid interface
      */
-    public function joinPublicationDs($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinPublicationRelatedByParentpublicationId($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('PublicationDs');
+        $relationMap = $tableMap->getRelation('PublicationRelatedByParentpublicationId');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -485,14 +633,14 @@ abstract class BaseVolumeQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'PublicationDs');
+            $this->addJoinObject($join, 'PublicationRelatedByParentpublicationId');
         }
 
         return $this;
     }
 
     /**
-     * Use the PublicationDs relation PublicationDs object
+     * Use the PublicationRelatedByParentpublicationId relation Publication object
      *
      * @see       useQuery()
      *
@@ -500,161 +648,13 @@ abstract class BaseVolumeQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \DTA\MetadataBundle\Model\Data\PublicationDsQuery A secondary query class using the current class as primary query
+     * @return   \DTA\MetadataBundle\Model\Data\PublicationQuery A secondary query class using the current class as primary query
      */
-    public function usePublicationDsQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function usePublicationRelatedByParentpublicationIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinPublicationDs($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'PublicationDs', '\DTA\MetadataBundle\Model\Data\PublicationDsQuery');
-    }
-
-    /**
-     * Filter the query by a related PublicationJa object
-     *
-     * @param   PublicationJa|PropelObjectCollection $publicationJa  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 VolumeQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByPublicationJa($publicationJa, $comparison = null)
-    {
-        if ($publicationJa instanceof PublicationJa) {
-            return $this
-                ->addUsingAlias(VolumePeer::ID, $publicationJa->getVolumeId(), $comparison);
-        } elseif ($publicationJa instanceof PropelObjectCollection) {
-            return $this
-                ->usePublicationJaQuery()
-                ->filterByPrimaryKeys($publicationJa->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByPublicationJa() only accepts arguments of type PublicationJa or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the PublicationJa relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return VolumeQuery The current query, for fluid interface
-     */
-    public function joinPublicationJa($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('PublicationJa');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'PublicationJa');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the PublicationJa relation PublicationJa object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\Data\PublicationJaQuery A secondary query class using the current class as primary query
-     */
-    public function usePublicationJaQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinPublicationJa($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'PublicationJa', '\DTA\MetadataBundle\Model\Data\PublicationJaQuery');
-    }
-
-    /**
-     * Filter the query by a related PublicationMms object
-     *
-     * @param   PublicationMms|PropelObjectCollection $publicationMms  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 VolumeQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByPublicationMms($publicationMms, $comparison = null)
-    {
-        if ($publicationMms instanceof PublicationMms) {
-            return $this
-                ->addUsingAlias(VolumePeer::ID, $publicationMms->getVolumeId(), $comparison);
-        } elseif ($publicationMms instanceof PropelObjectCollection) {
-            return $this
-                ->usePublicationMmsQuery()
-                ->filterByPrimaryKeys($publicationMms->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByPublicationMms() only accepts arguments of type PublicationMms or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the PublicationMms relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return VolumeQuery The current query, for fluid interface
-     */
-    public function joinPublicationMms($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('PublicationMms');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'PublicationMms');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the PublicationMms relation PublicationMms object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\Data\PublicationMmsQuery A secondary query class using the current class as primary query
-     */
-    public function usePublicationMmsQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinPublicationMms($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'PublicationMms', '\DTA\MetadataBundle\Model\Data\PublicationMmsQuery');
+            ->joinPublicationRelatedByParentpublicationId($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'PublicationRelatedByParentpublicationId', '\DTA\MetadataBundle\Model\Data\PublicationQuery');
     }
 
     /**

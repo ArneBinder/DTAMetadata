@@ -18,7 +18,7 @@ abstract class BasePublicationJPeer
 {
 
     /** the default database name for this class */
-    const DATABASE_NAME = 'DTAMetadata';
+    const DATABASE_NAME = 'dtametadata';
 
     /** the table name for this class */
     const TABLE_NAME = 'publication_j';

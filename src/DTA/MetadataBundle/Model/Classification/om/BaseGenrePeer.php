@@ -17,7 +17,7 @@ abstract class BaseGenrePeer
 {
 
     /** the default database name for this class */
-    const DATABASE_NAME = 'DTAMetadata';
+    const DATABASE_NAME = 'dtametadata';
 
     /** the table name for this class */
     const TABLE_NAME = 'genre';
@@ -29,22 +29,19 @@ abstract class BaseGenrePeer
     const TM_CLASS = 'GenreTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 2;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 3;
+    const NUM_HYDRATE_COLUMNS = 2;
 
     /** the column name for the id field */
     const ID = 'genre.id';
 
     /** the column name for the name field */
     const NAME = 'genre.name';
-
-    /** the column name for the childof field */
-    const CHILDOF = 'genre.childof';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -65,12 +62,12 @@ abstract class BaseGenrePeer
      * e.g. GenrePeer::$fieldNames[GenrePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'Childof', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'childof', ),
-        BasePeer::TYPE_COLNAME => array (GenrePeer::ID, GenrePeer::NAME, GenrePeer::CHILDOF, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'CHILDOF', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'childof', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', ),
+        BasePeer::TYPE_COLNAME => array (GenrePeer::ID, GenrePeer::NAME, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'name', ),
+        BasePeer::TYPE_NUM => array (0, 1, )
     );
 
     /**
@@ -80,12 +77,12 @@ abstract class BaseGenrePeer
      * e.g. GenrePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'Childof' => 2, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'childof' => 2, ),
-        BasePeer::TYPE_COLNAME => array (GenrePeer::ID => 0, GenrePeer::NAME => 1, GenrePeer::CHILDOF => 2, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'CHILDOF' => 2, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'childof' => 2, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, ),
+        BasePeer::TYPE_COLNAME => array (GenrePeer::ID => 0, GenrePeer::NAME => 1, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, ),
+        BasePeer::TYPE_NUM => array (0, 1, )
     );
 
     /**
@@ -161,11 +158,9 @@ abstract class BaseGenrePeer
         if (null === $alias) {
             $criteria->addSelectColumn(GenrePeer::ID);
             $criteria->addSelectColumn(GenrePeer::NAME);
-            $criteria->addSelectColumn(GenrePeer::CHILDOF);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.name');
-            $criteria->addSelectColumn($alias . '.childof');
         }
     }
 
@@ -466,101 +461,6 @@ abstract class BaseGenrePeer
         }
 
         return array($obj, $col);
-    }
-
-
-    /**
-     * Returns the number of rows matching criteria, joining all related tables
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return int Number of matching rows.
-     */
-    public static function doCountJoinAll(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        // we're going to modify criteria, so copy it first
-        $criteria = clone $criteria;
-
-        // We need to set the primary table name, since in the case that there are no WHERE columns
-        // it will be impossible for the BasePeer::createSelectSql() method to determine which
-        // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(GenrePeer::TABLE_NAME);
-
-        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-            $criteria->setDistinct();
-        }
-
-        if (!$criteria->hasSelectClause()) {
-            GenrePeer::addSelectColumns($criteria);
-        }
-
-        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
-
-        // Set the correct dbName
-        $criteria->setDbName(GenrePeer::DATABASE_NAME);
-
-        if ($con === null) {
-            $con = Propel::getConnection(GenrePeer::DATABASE_NAME, Propel::CONNECTION_READ);
-        }
-
-        $stmt = BasePeer::doCount($criteria, $con);
-
-        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $count = (int) $row[0];
-        } else {
-            $count = 0; // no rows returned; we infer that means 0 matches.
-        }
-        $stmt->closeCursor();
-
-        return $count;
-    }
-
-    /**
-     * Selects a collection of Genre objects pre-filled with all related objects.
-     *
-     * @param      Criteria  $criteria
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of Genre objects.
-     * @throws PropelException Any exceptions caught during processing will be
-     *		 rethrown wrapped into a PropelException.
-     */
-    public static function doSelectJoinAll(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $criteria = clone $criteria;
-
-        // Set the correct dbName if it has not been overridden
-        if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(GenrePeer::DATABASE_NAME);
-        }
-
-        GenrePeer::addSelectColumns($criteria);
-        $startcol2 = GenrePeer::NUM_HYDRATE_COLUMNS;
-
-        $stmt = BasePeer::doSelect($criteria, $con);
-        $results = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = GenrePeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = GenrePeer::getInstanceFromPool($key1))) {
-                // We no longer rehydrate the object, since this can cause data loss.
-                // See http://www.propelorm.org/ticket/509
-                // $obj1->hydrate($row, 0, true); // rehydrate
-            } else {
-                $cls = GenrePeer::getOMClass();
-
-                $obj1 = new $cls();
-                $obj1->hydrate($row);
-                GenrePeer::addInstanceToPool($obj1, $key1);
-            } // if obj1 already loaded
-
-            $results[] = $obj1;
-        }
-        $stmt->closeCursor();
-
-        return $results;
     }
 
     /**

@@ -45,6 +45,7 @@ class PublicationgroupTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('name', 'Name', 'LONGVARCHAR', true, null, null);
+        $this->addColumn('legacy_group_id', 'LegacyGroupId', 'INTEGER', false, null, null);
         // validators
     } // initialize()
 
@@ -70,6 +71,7 @@ class PublicationgroupTableMap extends TableMap
             'table_row_view' =>  array (
   'Id' => 'id',
   'Name' => 'name',
+  'LegacyGroupId' => 'legacy_group_id',
 ),
         );
     } // getBehaviors()

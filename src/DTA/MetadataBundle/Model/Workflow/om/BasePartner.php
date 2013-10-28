@@ -57,16 +57,28 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     protected $name;
 
     /**
-     * The value for the person field.
+     * The value for the mail field.
      * @var        string
      */
-    protected $person;
+    protected $mail;
 
     /**
-     * The value for the contact_data field.
+     * The value for the web field.
      * @var        string
      */
-    protected $contact_data;
+    protected $web;
+
+    /**
+     * The value for the contactperson field.
+     * @var        string
+     */
+    protected $contactperson;
+
+    /**
+     * The value for the contactdata field.
+     * @var        string
+     */
+    protected $contactdata;
 
     /**
      * The value for the comments field.
@@ -80,6 +92,12 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
      * @var        boolean
      */
     protected $is_organization;
+
+    /**
+     * The value for the legacy_partner_id field.
+     * @var        int
+     */
+    protected $legacy_partner_id;
 
     /**
      * @var        PropelObjectCollection|Task[] Collection to store aggregation of Task objects.
@@ -120,7 +138,7 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Id', 'Name', 'ContactData', 'Comments', 'IsOrganization', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'Name'=>'Name', 'ContactData'=>'ContactData', 'Comments'=>'Comments', 'IsOrganization'=>'IsOrganization', );
+    public static $tableRowViewCaptions = array('Id', 'Name', 'Mail', 'Web', 'Contactperson', 'Contactdata', 'Comments', 'IsOrganization', 'LegacyPartnerId', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'Name'=>'Name', 'Mail'=>'Mail', 'Web'=>'Web', 'Contactperson'=>'Contactperson', 'Contactdata'=>'Contactdata', 'Comments'=>'Comments', 'IsOrganization'=>'IsOrganization', 'LegacyPartnerId'=>'LegacyPartnerId', );
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -181,23 +199,43 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     }
 
     /**
-     * Get the [person] column value.
-     * Ansprechpartner
-     * @return string
-     */
-    public function getPerson()
-    {
-        return $this->person;
-    }
-
-    /**
-     * Get the [contact_data] column value.
+     * Get the [mail] column value.
      *
      * @return string
      */
-    public function getContactData()
+    public function getMail()
     {
-        return $this->contact_data;
+        return $this->mail;
+    }
+
+    /**
+     * Get the [web] column value.
+     *
+     * @return string
+     */
+    public function getWeb()
+    {
+        return $this->web;
+    }
+
+    /**
+     * Get the [contactperson] column value.
+     * Ansprechpartner
+     * @return string
+     */
+    public function getContactperson()
+    {
+        return $this->contactperson;
+    }
+
+    /**
+     * Get the [contactdata] column value.
+     *
+     * @return string
+     */
+    public function getContactdata()
+    {
+        return $this->contactdata;
     }
 
     /**
@@ -218,6 +256,16 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     public function getIsOrganization()
     {
         return $this->is_organization;
+    }
+
+    /**
+     * Get the [legacy_partner_id] column value.
+     * id_book_location (=Partner/Bibliothek) des Datensatzes aus der alten Datenbank, der dem neuen Datensatz zugrundeliegt.
+     * @return int
+     */
+    public function getLegacyPartnerId()
+    {
+        return $this->legacy_partner_id;
     }
 
     /**
@@ -263,46 +311,88 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     } // setName()
 
     /**
-     * Set the value of [person] column.
-     * Ansprechpartner
-     * @param string $v new value
-     * @return Partner The current object (for fluent API support)
-     */
-    public function setPerson($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
-        }
-
-        if ($this->person !== $v) {
-            $this->person = $v;
-            $this->modifiedColumns[] = PartnerPeer::PERSON;
-        }
-
-
-        return $this;
-    } // setPerson()
-
-    /**
-     * Set the value of [contact_data] column.
+     * Set the value of [mail] column.
      *
      * @param string $v new value
      * @return Partner The current object (for fluent API support)
      */
-    public function setContactData($v)
+    public function setMail($v)
     {
         if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
-        if ($this->contact_data !== $v) {
-            $this->contact_data = $v;
-            $this->modifiedColumns[] = PartnerPeer::CONTACT_DATA;
+        if ($this->mail !== $v) {
+            $this->mail = $v;
+            $this->modifiedColumns[] = PartnerPeer::MAIL;
         }
 
 
         return $this;
-    } // setContactData()
+    } // setMail()
+
+    /**
+     * Set the value of [web] column.
+     *
+     * @param string $v new value
+     * @return Partner The current object (for fluent API support)
+     */
+    public function setWeb($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->web !== $v) {
+            $this->web = $v;
+            $this->modifiedColumns[] = PartnerPeer::WEB;
+        }
+
+
+        return $this;
+    } // setWeb()
+
+    /**
+     * Set the value of [contactperson] column.
+     * Ansprechpartner
+     * @param string $v new value
+     * @return Partner The current object (for fluent API support)
+     */
+    public function setContactperson($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->contactperson !== $v) {
+            $this->contactperson = $v;
+            $this->modifiedColumns[] = PartnerPeer::CONTACTPERSON;
+        }
+
+
+        return $this;
+    } // setContactperson()
+
+    /**
+     * Set the value of [contactdata] column.
+     *
+     * @param string $v new value
+     * @return Partner The current object (for fluent API support)
+     */
+    public function setContactdata($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->contactdata !== $v) {
+            $this->contactdata = $v;
+            $this->modifiedColumns[] = PartnerPeer::CONTACTDATA;
+        }
+
+
+        return $this;
+    } // setContactdata()
 
     /**
      * Set the value of [comments] column.
@@ -355,6 +445,27 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     } // setIsOrganization()
 
     /**
+     * Set the value of [legacy_partner_id] column.
+     * id_book_location (=Partner/Bibliothek) des Datensatzes aus der alten Datenbank, der dem neuen Datensatz zugrundeliegt.
+     * @param int $v new value
+     * @return Partner The current object (for fluent API support)
+     */
+    public function setLegacyPartnerId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->legacy_partner_id !== $v) {
+            $this->legacy_partner_id = $v;
+            $this->modifiedColumns[] = PartnerPeer::LEGACY_PARTNER_ID;
+        }
+
+
+        return $this;
+    } // setLegacyPartnerId()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -392,10 +503,13 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->name = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
-            $this->person = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-            $this->contact_data = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-            $this->comments = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-            $this->is_organization = ($row[$startcol + 5] !== null) ? (boolean) $row[$startcol + 5] : null;
+            $this->mail = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+            $this->web = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+            $this->contactperson = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+            $this->contactdata = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+            $this->comments = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+            $this->is_organization = ($row[$startcol + 7] !== null) ? (boolean) $row[$startcol + 7] : null;
+            $this->legacy_partner_id = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -404,7 +518,7 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 6; // 6 = PartnerPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 9; // 9 = PartnerPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Partner object", $e);
@@ -692,17 +806,26 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
         if ($this->isColumnModified(PartnerPeer::NAME)) {
             $modifiedColumns[':p' . $index++]  = '"name"';
         }
-        if ($this->isColumnModified(PartnerPeer::PERSON)) {
-            $modifiedColumns[':p' . $index++]  = '"person"';
+        if ($this->isColumnModified(PartnerPeer::MAIL)) {
+            $modifiedColumns[':p' . $index++]  = '"mail"';
         }
-        if ($this->isColumnModified(PartnerPeer::CONTACT_DATA)) {
-            $modifiedColumns[':p' . $index++]  = '"contact_data"';
+        if ($this->isColumnModified(PartnerPeer::WEB)) {
+            $modifiedColumns[':p' . $index++]  = '"web"';
+        }
+        if ($this->isColumnModified(PartnerPeer::CONTACTPERSON)) {
+            $modifiedColumns[':p' . $index++]  = '"contactperson"';
+        }
+        if ($this->isColumnModified(PartnerPeer::CONTACTDATA)) {
+            $modifiedColumns[':p' . $index++]  = '"contactdata"';
         }
         if ($this->isColumnModified(PartnerPeer::COMMENTS)) {
             $modifiedColumns[':p' . $index++]  = '"comments"';
         }
         if ($this->isColumnModified(PartnerPeer::IS_ORGANIZATION)) {
             $modifiedColumns[':p' . $index++]  = '"is_organization"';
+        }
+        if ($this->isColumnModified(PartnerPeer::LEGACY_PARTNER_ID)) {
+            $modifiedColumns[':p' . $index++]  = '"legacy_partner_id"';
         }
 
         $sql = sprintf(
@@ -721,17 +844,26 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
                     case '"name"':
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
                         break;
-                    case '"person"':
-                        $stmt->bindValue($identifier, $this->person, PDO::PARAM_STR);
+                    case '"mail"':
+                        $stmt->bindValue($identifier, $this->mail, PDO::PARAM_STR);
                         break;
-                    case '"contact_data"':
-                        $stmt->bindValue($identifier, $this->contact_data, PDO::PARAM_STR);
+                    case '"web"':
+                        $stmt->bindValue($identifier, $this->web, PDO::PARAM_STR);
+                        break;
+                    case '"contactperson"':
+                        $stmt->bindValue($identifier, $this->contactperson, PDO::PARAM_STR);
+                        break;
+                    case '"contactdata"':
+                        $stmt->bindValue($identifier, $this->contactdata, PDO::PARAM_STR);
                         break;
                     case '"comments"':
                         $stmt->bindValue($identifier, $this->comments, PDO::PARAM_STR);
                         break;
                     case '"is_organization"':
                         $stmt->bindValue($identifier, $this->is_organization, PDO::PARAM_BOOL);
+                        break;
+                    case '"legacy_partner_id"':
+                        $stmt->bindValue($identifier, $this->legacy_partner_id, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -891,16 +1023,25 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
                 return $this->getName();
                 break;
             case 2:
-                return $this->getPerson();
+                return $this->getMail();
                 break;
             case 3:
-                return $this->getContactData();
+                return $this->getWeb();
                 break;
             case 4:
-                return $this->getComments();
+                return $this->getContactperson();
                 break;
             case 5:
+                return $this->getContactdata();
+                break;
+            case 6:
+                return $this->getComments();
+                break;
+            case 7:
                 return $this->getIsOrganization();
+                break;
+            case 8:
+                return $this->getLegacyPartnerId();
                 break;
             default:
                 return null;
@@ -933,10 +1074,13 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getName(),
-            $keys[2] => $this->getPerson(),
-            $keys[3] => $this->getContactData(),
-            $keys[4] => $this->getComments(),
-            $keys[5] => $this->getIsOrganization(),
+            $keys[2] => $this->getMail(),
+            $keys[3] => $this->getWeb(),
+            $keys[4] => $this->getContactperson(),
+            $keys[5] => $this->getContactdata(),
+            $keys[6] => $this->getComments(),
+            $keys[7] => $this->getIsOrganization(),
+            $keys[8] => $this->getLegacyPartnerId(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->collTasks) {
@@ -989,16 +1133,25 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
                 $this->setName($value);
                 break;
             case 2:
-                $this->setPerson($value);
+                $this->setMail($value);
                 break;
             case 3:
-                $this->setContactData($value);
+                $this->setWeb($value);
                 break;
             case 4:
-                $this->setComments($value);
+                $this->setContactperson($value);
                 break;
             case 5:
+                $this->setContactdata($value);
+                break;
+            case 6:
+                $this->setComments($value);
+                break;
+            case 7:
                 $this->setIsOrganization($value);
+                break;
+            case 8:
+                $this->setLegacyPartnerId($value);
                 break;
         } // switch()
     }
@@ -1026,10 +1179,13 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setPerson($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setContactData($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setComments($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setIsOrganization($arr[$keys[5]]);
+        if (array_key_exists($keys[2], $arr)) $this->setMail($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setWeb($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setContactperson($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setContactdata($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setComments($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setIsOrganization($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setLegacyPartnerId($arr[$keys[8]]);
     }
 
     /**
@@ -1043,10 +1199,13 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
 
         if ($this->isColumnModified(PartnerPeer::ID)) $criteria->add(PartnerPeer::ID, $this->id);
         if ($this->isColumnModified(PartnerPeer::NAME)) $criteria->add(PartnerPeer::NAME, $this->name);
-        if ($this->isColumnModified(PartnerPeer::PERSON)) $criteria->add(PartnerPeer::PERSON, $this->person);
-        if ($this->isColumnModified(PartnerPeer::CONTACT_DATA)) $criteria->add(PartnerPeer::CONTACT_DATA, $this->contact_data);
+        if ($this->isColumnModified(PartnerPeer::MAIL)) $criteria->add(PartnerPeer::MAIL, $this->mail);
+        if ($this->isColumnModified(PartnerPeer::WEB)) $criteria->add(PartnerPeer::WEB, $this->web);
+        if ($this->isColumnModified(PartnerPeer::CONTACTPERSON)) $criteria->add(PartnerPeer::CONTACTPERSON, $this->contactperson);
+        if ($this->isColumnModified(PartnerPeer::CONTACTDATA)) $criteria->add(PartnerPeer::CONTACTDATA, $this->contactdata);
         if ($this->isColumnModified(PartnerPeer::COMMENTS)) $criteria->add(PartnerPeer::COMMENTS, $this->comments);
         if ($this->isColumnModified(PartnerPeer::IS_ORGANIZATION)) $criteria->add(PartnerPeer::IS_ORGANIZATION, $this->is_organization);
+        if ($this->isColumnModified(PartnerPeer::LEGACY_PARTNER_ID)) $criteria->add(PartnerPeer::LEGACY_PARTNER_ID, $this->legacy_partner_id);
 
         return $criteria;
     }
@@ -1111,10 +1270,13 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setName($this->getName());
-        $copyObj->setPerson($this->getPerson());
-        $copyObj->setContactData($this->getContactData());
+        $copyObj->setMail($this->getMail());
+        $copyObj->setWeb($this->getWeb());
+        $copyObj->setContactperson($this->getContactperson());
+        $copyObj->setContactdata($this->getContactdata());
         $copyObj->setComments($this->getComments());
         $copyObj->setIsOrganization($this->getIsOrganization());
+        $copyObj->setLegacyPartnerId($this->getLegacyPartnerId());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -2074,10 +2236,13 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     {
         $this->id = null;
         $this->name = null;
-        $this->person = null;
-        $this->contact_data = null;
+        $this->mail = null;
+        $this->web = null;
+        $this->contactperson = null;
+        $this->contactdata = null;
         $this->comments = null;
         $this->is_organization = null;
+        $this->legacy_partner_id = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
@@ -2185,29 +2350,5 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
         }
     }
 
-    /**
-     * Selects one of many related entities
-     */
 
-    public function getRepresentativePerson(){
-
-        if ($this->countPeople() > 0) {
-
-            $pn = $this->getPeople();
-
-            // sort by rank if available
-            $rc = new \ReflectionClass(new Person());
-            if ( $rc->hasMethod('getSortableRank')) {
-                $pn->uasort(function($a, $b) {
-                            return $a->getSortableRank() - $b->getSortableRank();
-                        });
-            }
-
-            $pn = $pn->toKeyValue();
-            return array_shift($pn);
-
-        } else {
-            return "-";
-        }
-    }
 }

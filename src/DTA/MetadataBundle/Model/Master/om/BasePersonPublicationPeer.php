@@ -20,7 +20,7 @@ abstract class BasePersonPublicationPeer
 {
 
     /** the default database name for this class */
-    const DATABASE_NAME = 'DTAMetadata';
+    const DATABASE_NAME = 'dtametadata';
 
     /** the table name for this class */
     const TABLE_NAME = 'person_publication';
@@ -40,11 +40,11 @@ abstract class BasePersonPublicationPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 4;
 
-    /** the column name for the personrole_id field */
-    const PERSONROLE_ID = 'person_publication.personrole_id';
-
     /** the column name for the person_id field */
     const PERSON_ID = 'person_publication.person_id';
+
+    /** the column name for the personrole_id field */
+    const PERSONROLE_ID = 'person_publication.personrole_id';
 
     /** the column name for the publication_id field */
     const PUBLICATION_ID = 'person_publication.publication_id';
@@ -71,11 +71,11 @@ abstract class BasePersonPublicationPeer
      * e.g. PersonPublicationPeer::$fieldNames[PersonPublicationPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('PersonroleId', 'PersonId', 'PublicationId', 'Id', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('personroleId', 'personId', 'publicationId', 'id', ),
-        BasePeer::TYPE_COLNAME => array (PersonPublicationPeer::PERSONROLE_ID, PersonPublicationPeer::PERSON_ID, PersonPublicationPeer::PUBLICATION_ID, PersonPublicationPeer::ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('PERSONROLE_ID', 'PERSON_ID', 'PUBLICATION_ID', 'ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('personrole_id', 'person_id', 'publication_id', 'id', ),
+        BasePeer::TYPE_PHPNAME => array ('PersonId', 'PersonroleId', 'PublicationId', 'Id', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('personId', 'personroleId', 'publicationId', 'id', ),
+        BasePeer::TYPE_COLNAME => array (PersonPublicationPeer::PERSON_ID, PersonPublicationPeer::PERSONROLE_ID, PersonPublicationPeer::PUBLICATION_ID, PersonPublicationPeer::ID, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('PERSON_ID', 'PERSONROLE_ID', 'PUBLICATION_ID', 'ID', ),
+        BasePeer::TYPE_FIELDNAME => array ('person_id', 'personrole_id', 'publication_id', 'id', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
@@ -86,11 +86,11 @@ abstract class BasePersonPublicationPeer
      * e.g. PersonPublicationPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('PersonroleId' => 0, 'PersonId' => 1, 'PublicationId' => 2, 'Id' => 3, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('personroleId' => 0, 'personId' => 1, 'publicationId' => 2, 'id' => 3, ),
-        BasePeer::TYPE_COLNAME => array (PersonPublicationPeer::PERSONROLE_ID => 0, PersonPublicationPeer::PERSON_ID => 1, PersonPublicationPeer::PUBLICATION_ID => 2, PersonPublicationPeer::ID => 3, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('PERSONROLE_ID' => 0, 'PERSON_ID' => 1, 'PUBLICATION_ID' => 2, 'ID' => 3, ),
-        BasePeer::TYPE_FIELDNAME => array ('personrole_id' => 0, 'person_id' => 1, 'publication_id' => 2, 'id' => 3, ),
+        BasePeer::TYPE_PHPNAME => array ('PersonId' => 0, 'PersonroleId' => 1, 'PublicationId' => 2, 'Id' => 3, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('personId' => 0, 'personroleId' => 1, 'publicationId' => 2, 'id' => 3, ),
+        BasePeer::TYPE_COLNAME => array (PersonPublicationPeer::PERSON_ID => 0, PersonPublicationPeer::PERSONROLE_ID => 1, PersonPublicationPeer::PUBLICATION_ID => 2, PersonPublicationPeer::ID => 3, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('PERSON_ID' => 0, 'PERSONROLE_ID' => 1, 'PUBLICATION_ID' => 2, 'ID' => 3, ),
+        BasePeer::TYPE_FIELDNAME => array ('person_id' => 0, 'personrole_id' => 1, 'publication_id' => 2, 'id' => 3, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
@@ -165,13 +165,13 @@ abstract class BasePersonPublicationPeer
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(PersonPublicationPeer::PERSONROLE_ID);
             $criteria->addSelectColumn(PersonPublicationPeer::PERSON_ID);
+            $criteria->addSelectColumn(PersonPublicationPeer::PERSONROLE_ID);
             $criteria->addSelectColumn(PersonPublicationPeer::PUBLICATION_ID);
             $criteria->addSelectColumn(PersonPublicationPeer::ID);
         } else {
-            $criteria->addSelectColumn($alias . '.personrole_id');
             $criteria->addSelectColumn($alias . '.person_id');
+            $criteria->addSelectColumn($alias . '.personrole_id');
             $criteria->addSelectColumn($alias . '.publication_id');
             $criteria->addSelectColumn($alias . '.id');
         }
@@ -478,57 +478,6 @@ abstract class BasePersonPublicationPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related Personrole table
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return int Number of matching rows.
-     */
-    public static function doCountJoinPersonrole(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        // we're going to modify criteria, so copy it first
-        $criteria = clone $criteria;
-
-        // We need to set the primary table name, since in the case that there are no WHERE columns
-        // it will be impossible for the BasePeer::createSelectSql() method to determine which
-        // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(PersonPublicationPeer::TABLE_NAME);
-
-        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-            $criteria->setDistinct();
-        }
-
-        if (!$criteria->hasSelectClause()) {
-            PersonPublicationPeer::addSelectColumns($criteria);
-        }
-
-        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
-
-        // Set the correct dbName
-        $criteria->setDbName(PersonPublicationPeer::DATABASE_NAME);
-
-        if ($con === null) {
-            $con = Propel::getConnection(PersonPublicationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
-        }
-
-        $criteria->addJoin(PersonPublicationPeer::PERSONROLE_ID, PersonrolePeer::ID, $join_behavior);
-
-        $stmt = BasePeer::doCount($criteria, $con);
-
-        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $count = (int) $row[0];
-        } else {
-            $count = 0; // no rows returned; we infer that means 0 matches.
-        }
-        $stmt->closeCursor();
-
-        return $count;
-    }
-
-
-    /**
      * Returns the number of rows matching criteria, joining the related Person table
      *
      * @param      Criteria $criteria
@@ -565,6 +514,57 @@ abstract class BasePersonPublicationPeer
         }
 
         $criteria->addJoin(PersonPublicationPeer::PERSON_ID, PersonPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Personrole table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinPersonrole(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(PersonPublicationPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            PersonPublicationPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(PersonPublicationPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(PersonPublicationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(PersonPublicationPeer::PERSONROLE_ID, PersonrolePeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -631,73 +631,6 @@ abstract class BasePersonPublicationPeer
 
 
     /**
-     * Selects a collection of PersonPublication objects pre-filled with their Personrole objects.
-     * @param      Criteria  $criteria
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of PersonPublication objects.
-     * @throws PropelException Any exceptions caught during processing will be
-     *		 rethrown wrapped into a PropelException.
-     */
-    public static function doSelectJoinPersonrole(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $criteria = clone $criteria;
-
-        // Set the correct dbName if it has not been overridden
-        if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(PersonPublicationPeer::DATABASE_NAME);
-        }
-
-        PersonPublicationPeer::addSelectColumns($criteria);
-        $startcol = PersonPublicationPeer::NUM_HYDRATE_COLUMNS;
-        PersonrolePeer::addSelectColumns($criteria);
-
-        $criteria->addJoin(PersonPublicationPeer::PERSONROLE_ID, PersonrolePeer::ID, $join_behavior);
-
-        $stmt = BasePeer::doSelect($criteria, $con);
-        $results = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = PersonPublicationPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = PersonPublicationPeer::getInstanceFromPool($key1))) {
-                // We no longer rehydrate the object, since this can cause data loss.
-                // See http://www.propelorm.org/ticket/509
-                // $obj1->hydrate($row, 0, true); // rehydrate
-            } else {
-
-                $cls = PersonPublicationPeer::getOMClass();
-
-                $obj1 = new $cls();
-                $obj1->hydrate($row);
-                PersonPublicationPeer::addInstanceToPool($obj1, $key1);
-            } // if $obj1 already loaded
-
-            $key2 = PersonrolePeer::getPrimaryKeyHashFromRow($row, $startcol);
-            if ($key2 !== null) {
-                $obj2 = PersonrolePeer::getInstanceFromPool($key2);
-                if (!$obj2) {
-
-                    $cls = PersonrolePeer::getOMClass();
-
-                    $obj2 = new $cls();
-                    $obj2->hydrate($row, $startcol);
-                    PersonrolePeer::addInstanceToPool($obj2, $key2);
-                } // if obj2 already loaded
-
-                // Add the $obj1 (PersonPublication) to $obj2 (Personrole)
-                $obj2->addPersonPublication($obj1);
-
-            } // if joined row was not null
-
-            $results[] = $obj1;
-        }
-        $stmt->closeCursor();
-
-        return $results;
-    }
-
-
-    /**
      * Selects a collection of PersonPublication objects pre-filled with their Person objects.
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
@@ -752,6 +685,73 @@ abstract class BasePersonPublicationPeer
                 } // if obj2 already loaded
 
                 // Add the $obj1 (PersonPublication) to $obj2 (Person)
+                $obj2->addPersonPublication($obj1);
+
+            } // if joined row was not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Selects a collection of PersonPublication objects pre-filled with their Personrole objects.
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of PersonPublication objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinPersonrole(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(PersonPublicationPeer::DATABASE_NAME);
+        }
+
+        PersonPublicationPeer::addSelectColumns($criteria);
+        $startcol = PersonPublicationPeer::NUM_HYDRATE_COLUMNS;
+        PersonrolePeer::addSelectColumns($criteria);
+
+        $criteria->addJoin(PersonPublicationPeer::PERSONROLE_ID, PersonrolePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = PersonPublicationPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = PersonPublicationPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+
+                $cls = PersonPublicationPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                PersonPublicationPeer::addInstanceToPool($obj1, $key1);
+            } // if $obj1 already loaded
+
+            $key2 = PersonrolePeer::getPrimaryKeyHashFromRow($row, $startcol);
+            if ($key2 !== null) {
+                $obj2 = PersonrolePeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = PersonrolePeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol);
+                    PersonrolePeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 already loaded
+
+                // Add the $obj1 (PersonPublication) to $obj2 (Personrole)
                 $obj2->addPersonPublication($obj1);
 
             } // if joined row was not null
@@ -867,9 +867,9 @@ abstract class BasePersonPublicationPeer
             $con = Propel::getConnection(PersonPublicationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(PersonPublicationPeer::PERSONROLE_ID, PersonrolePeer::ID, $join_behavior);
-
         $criteria->addJoin(PersonPublicationPeer::PERSON_ID, PersonPeer::ID, $join_behavior);
+
+        $criteria->addJoin(PersonPublicationPeer::PERSONROLE_ID, PersonrolePeer::ID, $join_behavior);
 
         $criteria->addJoin(PersonPublicationPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
 
@@ -907,18 +907,18 @@ abstract class BasePersonPublicationPeer
         PersonPublicationPeer::addSelectColumns($criteria);
         $startcol2 = PersonPublicationPeer::NUM_HYDRATE_COLUMNS;
 
-        PersonrolePeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + PersonrolePeer::NUM_HYDRATE_COLUMNS;
-
         PersonPeer::addSelectColumns($criteria);
-        $startcol4 = $startcol3 + PersonPeer::NUM_HYDRATE_COLUMNS;
+        $startcol3 = $startcol2 + PersonPeer::NUM_HYDRATE_COLUMNS;
+
+        PersonrolePeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + PersonrolePeer::NUM_HYDRATE_COLUMNS;
 
         PublicationPeer::addSelectColumns($criteria);
         $startcol5 = $startcol4 + PublicationPeer::NUM_HYDRATE_COLUMNS;
 
-        $criteria->addJoin(PersonPublicationPeer::PERSONROLE_ID, PersonrolePeer::ID, $join_behavior);
-
         $criteria->addJoin(PersonPublicationPeer::PERSON_ID, PersonPeer::ID, $join_behavior);
+
+        $criteria->addJoin(PersonPublicationPeer::PERSONROLE_ID, PersonrolePeer::ID, $join_behavior);
 
         $criteria->addJoin(PersonPublicationPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
 
@@ -939,39 +939,39 @@ abstract class BasePersonPublicationPeer
                 PersonPublicationPeer::addInstanceToPool($obj1, $key1);
             } // if obj1 already loaded
 
-            // Add objects for joined Personrole rows
-
-            $key2 = PersonrolePeer::getPrimaryKeyHashFromRow($row, $startcol2);
-            if ($key2 !== null) {
-                $obj2 = PersonrolePeer::getInstanceFromPool($key2);
-                if (!$obj2) {
-
-                    $cls = PersonrolePeer::getOMClass();
-
-                    $obj2 = new $cls();
-                    $obj2->hydrate($row, $startcol2);
-                    PersonrolePeer::addInstanceToPool($obj2, $key2);
-                } // if obj2 loaded
-
-                // Add the $obj1 (PersonPublication) to the collection in $obj2 (Personrole)
-                $obj2->addPersonPublication($obj1);
-            } // if joined row not null
-
             // Add objects for joined Person rows
 
-            $key3 = PersonPeer::getPrimaryKeyHashFromRow($row, $startcol3);
-            if ($key3 !== null) {
-                $obj3 = PersonPeer::getInstanceFromPool($key3);
-                if (!$obj3) {
+            $key2 = PersonPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+            if ($key2 !== null) {
+                $obj2 = PersonPeer::getInstanceFromPool($key2);
+                if (!$obj2) {
 
                     $cls = PersonPeer::getOMClass();
 
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    PersonPeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 loaded
+
+                // Add the $obj1 (PersonPublication) to the collection in $obj2 (Person)
+                $obj2->addPersonPublication($obj1);
+            } // if joined row not null
+
+            // Add objects for joined Personrole rows
+
+            $key3 = PersonrolePeer::getPrimaryKeyHashFromRow($row, $startcol3);
+            if ($key3 !== null) {
+                $obj3 = PersonrolePeer::getInstanceFromPool($key3);
+                if (!$obj3) {
+
+                    $cls = PersonrolePeer::getOMClass();
+
                     $obj3 = new $cls();
                     $obj3->hydrate($row, $startcol3);
-                    PersonPeer::addInstanceToPool($obj3, $key3);
+                    PersonrolePeer::addInstanceToPool($obj3, $key3);
                 } // if obj3 loaded
 
-                // Add the $obj1 (PersonPublication) to the collection in $obj3 (Person)
+                // Add the $obj1 (PersonPublication) to the collection in $obj3 (Personrole)
                 $obj3->addPersonPublication($obj1);
             } // if joined row not null
 
@@ -998,59 +998,6 @@ abstract class BasePersonPublicationPeer
         $stmt->closeCursor();
 
         return $results;
-    }
-
-
-    /**
-     * Returns the number of rows matching criteria, joining the related Personrole table
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return int Number of matching rows.
-     */
-    public static function doCountJoinAllExceptPersonrole(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        // we're going to modify criteria, so copy it first
-        $criteria = clone $criteria;
-
-        // We need to set the primary table name, since in the case that there are no WHERE columns
-        // it will be impossible for the BasePeer::createSelectSql() method to determine which
-        // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(PersonPublicationPeer::TABLE_NAME);
-
-        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-            $criteria->setDistinct();
-        }
-
-        if (!$criteria->hasSelectClause()) {
-            PersonPublicationPeer::addSelectColumns($criteria);
-        }
-
-        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
-
-        // Set the correct dbName
-        $criteria->setDbName(PersonPublicationPeer::DATABASE_NAME);
-
-        if ($con === null) {
-            $con = Propel::getConnection(PersonPublicationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
-        }
-
-        $criteria->addJoin(PersonPublicationPeer::PERSON_ID, PersonPeer::ID, $join_behavior);
-
-        $criteria->addJoin(PersonPublicationPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
-
-        $stmt = BasePeer::doCount($criteria, $con);
-
-        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $count = (int) $row[0];
-        } else {
-            $count = 0; // no rows returned; we infer that means 0 matches.
-        }
-        $stmt->closeCursor();
-
-        return $count;
     }
 
 
@@ -1108,6 +1055,59 @@ abstract class BasePersonPublicationPeer
 
 
     /**
+     * Returns the number of rows matching criteria, joining the related Personrole table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAllExceptPersonrole(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(PersonPublicationPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            PersonPublicationPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
+
+        // Set the correct dbName
+        $criteria->setDbName(PersonPublicationPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(PersonPublicationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(PersonPublicationPeer::PERSON_ID, PersonPeer::ID, $join_behavior);
+
+        $criteria->addJoin(PersonPublicationPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
      * Returns the number of rows matching criteria, joining the related Publication table
      *
      * @param      Criteria $criteria
@@ -1143,9 +1143,9 @@ abstract class BasePersonPublicationPeer
             $con = Propel::getConnection(PersonPublicationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(PersonPublicationPeer::PERSONROLE_ID, PersonrolePeer::ID, $join_behavior);
-
         $criteria->addJoin(PersonPublicationPeer::PERSON_ID, PersonPeer::ID, $join_behavior);
+
+        $criteria->addJoin(PersonPublicationPeer::PERSONROLE_ID, PersonrolePeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -1157,104 +1157,6 @@ abstract class BasePersonPublicationPeer
         $stmt->closeCursor();
 
         return $count;
-    }
-
-
-    /**
-     * Selects a collection of PersonPublication objects pre-filled with all related objects except Personrole.
-     *
-     * @param      Criteria  $criteria
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of PersonPublication objects.
-     * @throws PropelException Any exceptions caught during processing will be
-     *		 rethrown wrapped into a PropelException.
-     */
-    public static function doSelectJoinAllExceptPersonrole(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $criteria = clone $criteria;
-
-        // Set the correct dbName if it has not been overridden
-        // $criteria->getDbName() will return the same object if not set to another value
-        // so == check is okay and faster
-        if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(PersonPublicationPeer::DATABASE_NAME);
-        }
-
-        PersonPublicationPeer::addSelectColumns($criteria);
-        $startcol2 = PersonPublicationPeer::NUM_HYDRATE_COLUMNS;
-
-        PersonPeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + PersonPeer::NUM_HYDRATE_COLUMNS;
-
-        PublicationPeer::addSelectColumns($criteria);
-        $startcol4 = $startcol3 + PublicationPeer::NUM_HYDRATE_COLUMNS;
-
-        $criteria->addJoin(PersonPublicationPeer::PERSON_ID, PersonPeer::ID, $join_behavior);
-
-        $criteria->addJoin(PersonPublicationPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
-
-
-        $stmt = BasePeer::doSelect($criteria, $con);
-        $results = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = PersonPublicationPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = PersonPublicationPeer::getInstanceFromPool($key1))) {
-                // We no longer rehydrate the object, since this can cause data loss.
-                // See http://www.propelorm.org/ticket/509
-                // $obj1->hydrate($row, 0, true); // rehydrate
-            } else {
-                $cls = PersonPublicationPeer::getOMClass();
-
-                $obj1 = new $cls();
-                $obj1->hydrate($row);
-                PersonPublicationPeer::addInstanceToPool($obj1, $key1);
-            } // if obj1 already loaded
-
-                // Add objects for joined Person rows
-
-                $key2 = PersonPeer::getPrimaryKeyHashFromRow($row, $startcol2);
-                if ($key2 !== null) {
-                    $obj2 = PersonPeer::getInstanceFromPool($key2);
-                    if (!$obj2) {
-
-                        $cls = PersonPeer::getOMClass();
-
-                    $obj2 = new $cls();
-                    $obj2->hydrate($row, $startcol2);
-                    PersonPeer::addInstanceToPool($obj2, $key2);
-                } // if $obj2 already loaded
-
-                // Add the $obj1 (PersonPublication) to the collection in $obj2 (Person)
-                $obj2->addPersonPublication($obj1);
-
-            } // if joined row is not null
-
-                // Add objects for joined Publication rows
-
-                $key3 = PublicationPeer::getPrimaryKeyHashFromRow($row, $startcol3);
-                if ($key3 !== null) {
-                    $obj3 = PublicationPeer::getInstanceFromPool($key3);
-                    if (!$obj3) {
-
-                        $cls = PublicationPeer::getOMClass();
-
-                    $obj3 = new $cls();
-                    $obj3->hydrate($row, $startcol3);
-                    PublicationPeer::addInstanceToPool($obj3, $key3);
-                } // if $obj3 already loaded
-
-                // Add the $obj1 (PersonPublication) to the collection in $obj3 (Publication)
-                $obj3->addPersonPublication($obj1);
-
-            } // if joined row is not null
-
-            $results[] = $obj1;
-        }
-        $stmt->closeCursor();
-
-        return $results;
     }
 
 
@@ -1357,6 +1259,104 @@ abstract class BasePersonPublicationPeer
 
 
     /**
+     * Selects a collection of PersonPublication objects pre-filled with all related objects except Personrole.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of PersonPublication objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAllExceptPersonrole(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        // $criteria->getDbName() will return the same object if not set to another value
+        // so == check is okay and faster
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(PersonPublicationPeer::DATABASE_NAME);
+        }
+
+        PersonPublicationPeer::addSelectColumns($criteria);
+        $startcol2 = PersonPublicationPeer::NUM_HYDRATE_COLUMNS;
+
+        PersonPeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + PersonPeer::NUM_HYDRATE_COLUMNS;
+
+        PublicationPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + PublicationPeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(PersonPublicationPeer::PERSON_ID, PersonPeer::ID, $join_behavior);
+
+        $criteria->addJoin(PersonPublicationPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
+
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = PersonPublicationPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = PersonPublicationPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = PersonPublicationPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                PersonPublicationPeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+                // Add objects for joined Person rows
+
+                $key2 = PersonPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                if ($key2 !== null) {
+                    $obj2 = PersonPeer::getInstanceFromPool($key2);
+                    if (!$obj2) {
+
+                        $cls = PersonPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    PersonPeer::addInstanceToPool($obj2, $key2);
+                } // if $obj2 already loaded
+
+                // Add the $obj1 (PersonPublication) to the collection in $obj2 (Person)
+                $obj2->addPersonPublication($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Publication rows
+
+                $key3 = PublicationPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+                if ($key3 !== null) {
+                    $obj3 = PublicationPeer::getInstanceFromPool($key3);
+                    if (!$obj3) {
+
+                        $cls = PublicationPeer::getOMClass();
+
+                    $obj3 = new $cls();
+                    $obj3->hydrate($row, $startcol3);
+                    PublicationPeer::addInstanceToPool($obj3, $key3);
+                } // if $obj3 already loaded
+
+                // Add the $obj1 (PersonPublication) to the collection in $obj3 (Publication)
+                $obj3->addPersonPublication($obj1);
+
+            } // if joined row is not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
      * Selects a collection of PersonPublication objects pre-filled with all related objects except Publication.
      *
      * @param      Criteria  $criteria
@@ -1380,15 +1380,15 @@ abstract class BasePersonPublicationPeer
         PersonPublicationPeer::addSelectColumns($criteria);
         $startcol2 = PersonPublicationPeer::NUM_HYDRATE_COLUMNS;
 
-        PersonrolePeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + PersonrolePeer::NUM_HYDRATE_COLUMNS;
-
         PersonPeer::addSelectColumns($criteria);
-        $startcol4 = $startcol3 + PersonPeer::NUM_HYDRATE_COLUMNS;
+        $startcol3 = $startcol2 + PersonPeer::NUM_HYDRATE_COLUMNS;
 
-        $criteria->addJoin(PersonPublicationPeer::PERSONROLE_ID, PersonrolePeer::ID, $join_behavior);
+        PersonrolePeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + PersonrolePeer::NUM_HYDRATE_COLUMNS;
 
         $criteria->addJoin(PersonPublicationPeer::PERSON_ID, PersonPeer::ID, $join_behavior);
+
+        $criteria->addJoin(PersonPublicationPeer::PERSONROLE_ID, PersonrolePeer::ID, $join_behavior);
 
 
         $stmt = BasePeer::doSelect($criteria, $con);
@@ -1408,40 +1408,40 @@ abstract class BasePersonPublicationPeer
                 PersonPublicationPeer::addInstanceToPool($obj1, $key1);
             } // if obj1 already loaded
 
-                // Add objects for joined Personrole rows
+                // Add objects for joined Person rows
 
-                $key2 = PersonrolePeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                $key2 = PersonPeer::getPrimaryKeyHashFromRow($row, $startcol2);
                 if ($key2 !== null) {
-                    $obj2 = PersonrolePeer::getInstanceFromPool($key2);
+                    $obj2 = PersonPeer::getInstanceFromPool($key2);
                     if (!$obj2) {
 
-                        $cls = PersonrolePeer::getOMClass();
+                        $cls = PersonPeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol2);
-                    PersonrolePeer::addInstanceToPool($obj2, $key2);
+                    PersonPeer::addInstanceToPool($obj2, $key2);
                 } // if $obj2 already loaded
 
-                // Add the $obj1 (PersonPublication) to the collection in $obj2 (Personrole)
+                // Add the $obj1 (PersonPublication) to the collection in $obj2 (Person)
                 $obj2->addPersonPublication($obj1);
 
             } // if joined row is not null
 
-                // Add objects for joined Person rows
+                // Add objects for joined Personrole rows
 
-                $key3 = PersonPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+                $key3 = PersonrolePeer::getPrimaryKeyHashFromRow($row, $startcol3);
                 if ($key3 !== null) {
-                    $obj3 = PersonPeer::getInstanceFromPool($key3);
+                    $obj3 = PersonrolePeer::getInstanceFromPool($key3);
                     if (!$obj3) {
 
-                        $cls = PersonPeer::getOMClass();
+                        $cls = PersonrolePeer::getOMClass();
 
                     $obj3 = new $cls();
                     $obj3->hydrate($row, $startcol3);
-                    PersonPeer::addInstanceToPool($obj3, $key3);
+                    PersonrolePeer::addInstanceToPool($obj3, $key3);
                 } // if $obj3 already loaded
 
-                // Add the $obj1 (PersonPublication) to the collection in $obj3 (Person)
+                // Add the $obj1 (PersonPublication) to the collection in $obj3 (Personrole)
                 $obj3->addPersonPublication($obj1);
 
             } // if joined row is not null

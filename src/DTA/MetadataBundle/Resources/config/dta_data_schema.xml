@@ -6,7 +6,7 @@
 
 <!--The name attribute refers to the connection to use. See app/config/config.yml under
     propel > dbal > connections for connection setup. -->
-<database name="DTAMetadata" namespace="DTA\MetadataBundle\Model\Data" defaultIdMethod="native">
+<database name="dtametadata" namespace="DTA\MetadataBundle\Model\Data" defaultIdMethod="native">
   
     <!-- This parameter set is added to each entity that doesn't implement the table_row_view behavior. 
     It is not added to tables/entities that define the bahavior. -->
@@ -17,52 +17,51 @@
     <!-- The base class for all publications. -->
     <table name="publication">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="wwwReady" type="INTEGER"/>
-        
-        <!--Werk das der Publikation zugrunde liegt-->
-        <column name="work_id" type="INTEGER" required="true"/>
-        
-        <!--Titelinformationen ergeben sich aus dem publizierten Werk-->
-        <!--<column name="title_id" type="INTEGER" required="true"/>-->
+        <column name="title_id" type="INTEGER" required="true"/>
         
         <!--Personalia werden ueber Fremdschluessel von der Personenseite dargestellt.-->
         
-        <!--Angaben zur Publikation der Vorlage-->
-        <column description="Druckort" name="place_id" type="INTEGER"/>
-        <column description="Erscheinungsjahr" name="publicationdate_id" type="INTEGER"/>
-        <column description="Erscheinungsjahr der Erstausgabe" name="firstpublicationdate_id" type="INTEGER"/>
-        <column description="Verlag" name="publishingcompany_id" type="INTEGER"/>
+        <column name="firsteditionpublication_id" description="Publikation, die die Informationen zur Erstauflage enthält" type="INTEGER"/>
+        
+        <column name="place_id" description="Druckort" type="INTEGER"/>
+        <column name="publicationdate_id" description="Erscheinungsjahr" type="INTEGER"/>
+        <column name="creationdate_id" description="Erscheinungsjahr der Erstausgabe" type="INTEGER"/>
+        <column name="publishingcompany_id" description="Verlag" type="INTEGER"/>
         
         <!-- Bild- und Textquellen über die imageSource Tabelle dargestellt, da publication:imageSource eine 1:n Beziehung ist -->
 
-        <column description="akquiriert über" name="partner_id" type="INTEGER"/>
+        <column name="partner_id" description="akquiriert über" type="INTEGER"/>
 
         <!--Editorisches-->        
-        <column description="Art der Ausgabe" name="editiondescription" type="LONGVARCHAR"/>
-        <column description="Bearbeiter der digitalen Edition" name="digitaleditioneditor" type="LONGVARCHAR"/>
-        <column description="Bemerkungen zu den Transkriptionsrichtlinien" name="transcriptioncomment" type="LONGVARCHAR"/>
+        <column name="editiondescription" description="Art der Ausgabe" type="LONGVARCHAR"/>
+        <column name="digitaleditioneditor" description="Bearbeiter der digitalen Edition" type="LONGVARCHAR"/>
+        <column name="transcriptioncomment" description="Bemerkungen zu den Transkriptionsrichtlinien" type="LONGVARCHAR"/>
         
         <!--Klassifikation und Einordnung-->
-        <column description="Vorherrschende Schriftart" name="font_id" type="INTEGER"/>
         <!--vorherrschende Sprache, Kategorien, Schlagworte und Genres sind durch das Werk festgelegt.-->
     
-        <!--Angaben zur Auflage-->
-        <column name="volume_alphanumeric" type="LONGVARCHAR"  description="Band (alphanumerisch)"/>
-        <column name="volume_numeric" type="LONGVARCHAR"  description="Band (numerisch)"/>
-        <column name="volumes_total" type="LONGVARCHAR"  description="Anzahl Bände"/>
-        
-        <column name="numpages" type="INTEGER"/>
-        <column name="numpagesnormed" type="INTEGER"/>
+        <column name="numpages" description="Anzahl Seiten (Umfang)" type="LONGVARCHAR"/>
+        <column name="numpagesnumeric" description="Umfang (normiert)" type="INTEGER"/>
     
-        <column description="Anmerkungen" name="comment" type="LONGVARCHAR"/>
+        <column name="comment" description="Anmerkungen" type="LONGVARCHAR"/>
+        
+        <column name="doi" type="LONGVARCHAR"/>
+        <column name="format" type="LONGVARCHAR"/>
+        <column name="directoryname" type="LONGVARCHAR"/>
+        <column name="wwwready" type="INTEGER"/>
+        
+        
+        
+        
+        <column name="legacy_book_id" description="id_book des Datensatzes aus der alten Datenbank, der dem neuen Datensatz zugrundeliegt." type="INTEGER"/>
         
         <!--Workflow-Aspekte -->        
         <!--<column name="status_id" type="INTEGER" required="true"/>-->
 
         <behavior name="table_row_view">
-            <!--<parameter name="id" value="id"/>-->
-            <!--<parameter name="geschrieben" value="accessor:getDateSpecificationRelatedByOrigindateId"/>-->
-            <parameter name="embedColumnsForWork" value="work"/>
+            <parameter name="Titel" value="accessor:getTitle"/>
+            <parameter name="erster Autor" value="accessor:getFirstAuthor"/>
+            <parameter name="entstanden" value="accessor:getDatespecification"/>
             <!--<parameter name="Verlag" value="accessor:getPublishingCompany"/>-->
             <parameter name="veröffentlicht" value="accessor:getDatespecificationRelatedByPublicationdateId"/>
             <!--<parameter name="embedcolumnsstatus" value="status"/>-->
@@ -73,40 +72,15 @@
             <parameter name="column" value="publishingcompany_id"/>
         </behavior>
         
-        <foreign-key foreignTable="work"> <reference local="work_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="title"> <reference local="title_id" foreign="id"/> </foreign-key>
         <!--<foreign-key foreignTable="title"> <reference local="title_id" foreign="id"/> </foreign-key>-->
         <foreign-key foreignTable="publishingcompany"> <reference local="publishingcompany_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="place"> <reference local="place_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="datespecification"> <reference local="publicationdate_id" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="datespecification"> <reference local="firstpublicationdate_id" foreign="id"/> </foreign-key>
-        <!--<foreign-key foreignTable="status"> <reference local="status_id" foreign="id"/> </foreign-key>-->
-        <foreign-key foreignTable="font"> <reference local="font_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="datespecification"> <reference local="creationdate_id" foreign="id"/> </foreign-key>
     </table>
-    
-    <!-- The core class representing an authors work. 
-         This is independent of the actual written form of the work which is represented by the Publication class. -->
-    <table name="work">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="title_id" type="INTEGER" required="true"/>
-        <column name="datespecification_id" type="INTEGER"/>
-        <column name="doi" type="LONGVARCHAR"/>
-        <column name="comments" type="LONGVARCHAR"/>
-        <column name="format" type="LONGVARCHAR"/>
-        <column name="directoryname" type="LONGVARCHAR"/>
-        
-        <!--vorherrschende sprache, kategorien, schlagworte und genres sind durch n:n beziehungen gegeben. 
-            die entsprechenden cross-ref tabellen sind im master schema definiert. -->
-        
-        <foreign-key foreignTable="title"> <reference local="title_id" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="datespecification"> <reference local="datespecification_id" foreign="id"/> </foreign-key>
-        
-        <behavior name="table_row_view">
-            <parameter name="Titel" value="accessor:getTitle"/>
-            <parameter name="erster Autor" value="accessor:getFirstAuthor"/>
-            <parameter name="entstanden" value="accessor:getDatespecification"/>
-        </behavior>
-    </table>
-    
+
+                
     <!-- Publication types. -->
 
     <!--                          -->
@@ -127,26 +101,13 @@
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="publication_id" type="INTEGER" required="true"/>
         
-        <column description="Titel des übergeordneten Werkes" name="title_id" type="INTEGER" required="true"/>
-        <column description="Seitenangabe" name="pages" type="LONGVARCHAR"/>
+        <column name="title_id" description="Titel des übergeordneten Werkes" type="INTEGER" required="true"/>
+        <column name="pages" description="Seitenangabe" type="LONGVARCHAR"/>
         
         <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>
         
         <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
     </table>   
-    
-    <!--MM: Teil einer mehrbändigen Monographie.-->
-    <table name="publication_mm">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="publication_id" type="INTEGER" required="true"/>
-        
-        <column name="volume_id" type="INTEGER" required="true"/>
-        
-        <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>
-        
-        <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="volume"> <reference local="volume_id" foreign="id"/> </foreign-key>
-    </table> 
     
     <!--DS: Unselbständige Schrift in einem Band, der Teil einer Reihe ist.-->
     <table name="publication_ds">
@@ -154,13 +115,13 @@
         <column name="publication_id" type="INTEGER" required="true"/>
         
         <column name="series_id" type="INTEGER" required="true"/>
-        <column name="volume_id" type="INTEGER" required="true"/>
-        <column description="Seitenangabe" name="pages" type="LONGVARCHAR"/>
+        <!--<column name="volume_id" type="INTEGER" required="true"/>-->
+        <column name="pages" description="Seitenangabe" type="LONGVARCHAR"/>
         
         <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>
         
         <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="volume"> <reference local="volume_id" foreign="id"/> </foreign-key>
+        <!--<foreign-key foreignTable="volume"> <reference local="volume_id" foreign="id"/> </foreign-key>-->
         <foreign-key foreignTable="series"> <reference local="series_id" foreign="id"/> </foreign-key>
     </table> 
     
@@ -170,7 +131,7 @@
         <column name="publication_id" type="INTEGER" required="true"/>
         
         <column name="series_id" type="INTEGER" required="true"/>
-        <column description="Nummer des Bandes innerhalb der Reihe" name="volumenumberinseries" type="LONGVARCHAR"/>
+        <column name="volumenumberinseries" description="Nummer des Bandes innerhalb der Reihe" type="LONGVARCHAR"/>
         
         <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>
         
@@ -183,13 +144,13 @@
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="publication_id" type="INTEGER" required="true"/>
         
-        <column description="Teil (bei einer mehrteiligen Publikation)" name="volume_id" type="INTEGER" required="true"/>
-        <column description="Zeitschrift, in der erschienen" name="parent" type="INTEGER" required="true"/>
+        <!--<column name="volume_id" description="Teil (bei einer mehrteiligen Publikation)" type="INTEGER" required="true"/>-->
+        <column name="parent" description="Zeitschrift, in der erschienen" type="INTEGER" required="true"/>
         
         <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>
         
         <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="volume"> <reference local="volume_id" foreign="id"/> </foreign-key>
+        <!--<foreign-key foreignTable="volume"> <reference local="volume_id" foreign="id"/> </foreign-key>-->
     </table> 
     
     <!--MMS: Teil einer mehrbändigen Monographie, die ihrerseits Teil einer Reihe ist.-->
@@ -198,12 +159,12 @@
         <column name="publication_id" type="INTEGER" required="true"/>
         
         <column name="series_id" type="INTEGER" required="true"/>
-        <column name="volume_id" type="INTEGER" required="true"/>
+        <!--<column name="volume_id" type="INTEGER" required="true"/>-->
         
         <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>
         
         <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="volume"> <reference local="volume_id" foreign="id"/> </foreign-key>
+        <!--<foreign-key foreignTable="volume"> <reference local="volume_id" foreign="id"/> </foreign-key>-->
         <foreign-key foreignTable="series"> <reference local="series_id" foreign="id"/> </foreign-key>
     </table> 
     
@@ -212,7 +173,7 @@
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="publication_id" type="INTEGER" required="true"/>
         
-        <column description="Ausgabe" name="edition" type="LONGVARCHAR"/>
+        <column name="edition" description="Ausgabe" type="LONGVARCHAR"/>
         
         <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>
         
@@ -222,9 +183,20 @@
     <!--Ein Band einer mehrbaendigen etwas.-->
     <table name="volume">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <!--Inheritance-->
+        <column name="publication_id" type="INTEGER" required="true"/>
         
-        <column description="Bezeichnung des Bandes" name="volumedescription" type="INTEGER"/>
-        <column description="Numerische Bezeichnung des Bandes" name="volumenumeric" type="LONGVARCHAR"/>
+        <!--Parent publication-->
+        <column name="parentpublication_id" type="INTEGER" required="true"/>
+        
+        <column name="volumedescription" description="Bezeichnung des Bandes (alphanumerisch)" type="INTEGER"/>
+        <column name="volumenumeric" description="Bezeichnung des Bandes (numerisch)" type="INTEGER"/>
+        <column name="volumestotal" description="Anzahl Bände (gesamt)" type="INTEGER"/>
+        
+        <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="publication"> <reference local="parentpublication_id" foreign="id"/> </foreign-key>
+        
+        <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>
     </table>
     
     <!--Eine Reihe.-->

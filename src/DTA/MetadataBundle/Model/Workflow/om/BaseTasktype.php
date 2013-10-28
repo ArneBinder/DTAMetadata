@@ -118,7 +118,7 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
 
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Zuordnung', 'Typ', );	public   $tableRowViewAccessors = array('Zuordnung'=>'accessor:getParent', 'Typ'=>'Name', );
+    public static $tableRowViewCaptions = array('Typ', 'Zuordnung', );	public   $tableRowViewAccessors = array('Typ'=>'Name', 'Zuordnung'=>'accessor:getParent', );
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection

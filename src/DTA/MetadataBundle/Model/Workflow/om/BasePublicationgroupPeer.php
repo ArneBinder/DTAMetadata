@@ -17,7 +17,7 @@ abstract class BasePublicationgroupPeer
 {
 
     /** the default database name for this class */
-    const DATABASE_NAME = 'DTAMetadata';
+    const DATABASE_NAME = 'dtametadata';
 
     /** the table name for this class */
     const TABLE_NAME = 'publicationgroup';
@@ -29,19 +29,22 @@ abstract class BasePublicationgroupPeer
     const TM_CLASS = 'PublicationgroupTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 2;
+    const NUM_COLUMNS = 3;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 2;
+    const NUM_HYDRATE_COLUMNS = 3;
 
     /** the column name for the id field */
     const ID = 'publicationgroup.id';
 
     /** the column name for the name field */
     const NAME = 'publicationgroup.name';
+
+    /** the column name for the legacy_group_id field */
+    const LEGACY_GROUP_ID = 'publicationgroup.legacy_group_id';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -62,12 +65,12 @@ abstract class BasePublicationgroupPeer
      * e.g. PublicationgroupPeer::$fieldNames[PublicationgroupPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', ),
-        BasePeer::TYPE_COLNAME => array (PublicationgroupPeer::ID, PublicationgroupPeer::NAME, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'name', ),
-        BasePeer::TYPE_NUM => array (0, 1, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'LegacyGroupId', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'legacyGroupId', ),
+        BasePeer::TYPE_COLNAME => array (PublicationgroupPeer::ID, PublicationgroupPeer::NAME, PublicationgroupPeer::LEGACY_GROUP_ID, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'LEGACY_GROUP_ID', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'legacy_group_id', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
     /**
@@ -77,12 +80,12 @@ abstract class BasePublicationgroupPeer
      * e.g. PublicationgroupPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, ),
-        BasePeer::TYPE_COLNAME => array (PublicationgroupPeer::ID => 0, PublicationgroupPeer::NAME => 1, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, ),
-        BasePeer::TYPE_NUM => array (0, 1, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'LegacyGroupId' => 2, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'legacyGroupId' => 2, ),
+        BasePeer::TYPE_COLNAME => array (PublicationgroupPeer::ID => 0, PublicationgroupPeer::NAME => 1, PublicationgroupPeer::LEGACY_GROUP_ID => 2, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'LEGACY_GROUP_ID' => 2, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'legacy_group_id' => 2, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
     /**
@@ -158,9 +161,11 @@ abstract class BasePublicationgroupPeer
         if (null === $alias) {
             $criteria->addSelectColumn(PublicationgroupPeer::ID);
             $criteria->addSelectColumn(PublicationgroupPeer::NAME);
+            $criteria->addSelectColumn(PublicationgroupPeer::LEGACY_GROUP_ID);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.name');
+            $criteria->addSelectColumn($alias . '.legacy_group_id');
         }
     }
 

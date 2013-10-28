@@ -166,7 +166,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Zuordnung', 'Typ', 'Abgeschlossen', 'Start', 'Ende', 'Für', 'Verantwortlich', );	public   $tableRowViewAccessors = array('Zuordnung'=>'accessor:getEmbeddedColumn1OfTasktype', 'Typ'=>'accessor:getEmbeddedColumn2OfTasktype', 'Abgeschlossen'=>'Done', 'Start'=>'StartDate', 'Ende'=>'EndDate', 'Für'=>'accessor:getReferee', 'Verantwortlich'=>'accessor:getResponsibleUser', );
+    public static $tableRowViewCaptions = array('Typ', 'Zuordnung', 'Abgeschlossen', 'Start', 'Ende', 'Für', 'Verantwortlich', );	public   $tableRowViewAccessors = array('Typ'=>'accessor:getEmbeddedColumn1OfTasktype', 'Zuordnung'=>'accessor:getEmbeddedColumn2OfTasktype', 'Abgeschlossen'=>'Done', 'Start'=>'StartDate', 'Ende'=>'EndDate', 'Für'=>'accessor:getReferee', 'Verantwortlich'=>'accessor:getResponsibleUser', );
     /**
      * Get the [id] column value.
      *
@@ -2018,7 +2018,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     public function getEmbeddedColumn1OfTasktype(){
 
         $relatedEntity = $this->getTasktype();
-        return $relatedEntity->getAttributeByTableViewColumName("Zuordnung");
+        return $relatedEntity->getAttributeByTableViewColumName("Typ");
 
     }    /**
      * Cascades the get to a related entity (possibly recursively)
@@ -2027,7 +2027,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     public function getEmbeddedColumn2OfTasktype(){
 
         $relatedEntity = $this->getTasktype();
-        return $relatedEntity->getAttributeByTableViewColumName("Typ");
+        return $relatedEntity->getAttributeByTableViewColumName("Zuordnung");
 
     }
 }

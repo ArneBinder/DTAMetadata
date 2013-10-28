@@ -17,7 +17,7 @@ abstract class BasePersonrolePeer
 {
 
     /** the default database name for this class */
-    const DATABASE_NAME = 'DTAMetadata';
+    const DATABASE_NAME = 'dtametadata';
 
     /** the table name for this class */
     const TABLE_NAME = 'personrole';
@@ -29,25 +29,19 @@ abstract class BasePersonrolePeer
     const TM_CLASS = 'PersonroleTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 2;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 2;
 
     /** the column name for the id field */
     const ID = 'personrole.id';
 
     /** the column name for the name field */
     const NAME = 'personrole.name';
-
-    /** the column name for the applicable_to_publication field */
-    const APPLICABLE_TO_PUBLICATION = 'personrole.applicable_to_publication';
-
-    /** the column name for the applicable_to_work field */
-    const APPLICABLE_TO_WORK = 'personrole.applicable_to_work';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -68,12 +62,12 @@ abstract class BasePersonrolePeer
      * e.g. PersonrolePeer::$fieldNames[PersonrolePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'ApplicableToPublication', 'ApplicableToWork', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'applicableToPublication', 'applicableToWork', ),
-        BasePeer::TYPE_COLNAME => array (PersonrolePeer::ID, PersonrolePeer::NAME, PersonrolePeer::APPLICABLE_TO_PUBLICATION, PersonrolePeer::APPLICABLE_TO_WORK, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'APPLICABLE_TO_PUBLICATION', 'APPLICABLE_TO_WORK', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'applicable_to_publication', 'applicable_to_work', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', ),
+        BasePeer::TYPE_COLNAME => array (PersonrolePeer::ID, PersonrolePeer::NAME, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'name', ),
+        BasePeer::TYPE_NUM => array (0, 1, )
     );
 
     /**
@@ -83,12 +77,12 @@ abstract class BasePersonrolePeer
      * e.g. PersonrolePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'ApplicableToPublication' => 2, 'ApplicableToWork' => 3, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'applicableToPublication' => 2, 'applicableToWork' => 3, ),
-        BasePeer::TYPE_COLNAME => array (PersonrolePeer::ID => 0, PersonrolePeer::NAME => 1, PersonrolePeer::APPLICABLE_TO_PUBLICATION => 2, PersonrolePeer::APPLICABLE_TO_WORK => 3, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'APPLICABLE_TO_PUBLICATION' => 2, 'APPLICABLE_TO_WORK' => 3, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'applicable_to_publication' => 2, 'applicable_to_work' => 3, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, ),
+        BasePeer::TYPE_COLNAME => array (PersonrolePeer::ID => 0, PersonrolePeer::NAME => 1, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, ),
+        BasePeer::TYPE_NUM => array (0, 1, )
     );
 
     /**
@@ -164,13 +158,9 @@ abstract class BasePersonrolePeer
         if (null === $alias) {
             $criteria->addSelectColumn(PersonrolePeer::ID);
             $criteria->addSelectColumn(PersonrolePeer::NAME);
-            $criteria->addSelectColumn(PersonrolePeer::APPLICABLE_TO_PUBLICATION);
-            $criteria->addSelectColumn(PersonrolePeer::APPLICABLE_TO_WORK);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.name');
-            $criteria->addSelectColumn($alias . '.applicable_to_publication');
-            $criteria->addSelectColumn($alias . '.applicable_to_work');
         }
     }
 

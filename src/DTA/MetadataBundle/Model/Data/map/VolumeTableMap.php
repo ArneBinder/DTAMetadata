@@ -44,8 +44,11 @@ class VolumeTableMap extends TableMap
         $this->setPrimaryKeyMethodInfo('volume_id_seq');
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addForeignKey('publication_id', 'PublicationId', 'INTEGER', 'publication', 'id', true, null, null);
+        $this->addForeignKey('parentpublication_id', 'ParentpublicationId', 'INTEGER', 'publication', 'id', true, null, null);
         $this->addColumn('volumedescription', 'Volumedescription', 'INTEGER', false, null, null);
-        $this->addColumn('volumenumeric', 'Volumenumeric', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('volumenumeric', 'Volumenumeric', 'INTEGER', false, null, null);
+        $this->addColumn('volumestotal', 'Volumestotal', 'INTEGER', false, null, null);
         // validators
     } // initialize()
 
@@ -54,10 +57,8 @@ class VolumeTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('PublicationMm', 'DTA\\MetadataBundle\\Model\\Data\\PublicationMm', RelationMap::ONE_TO_MANY, array('id' => 'volume_id', ), null, null, 'PublicationMms');
-        $this->addRelation('PublicationDs', 'DTA\\MetadataBundle\\Model\\Data\\PublicationDs', RelationMap::ONE_TO_MANY, array('id' => 'volume_id', ), null, null, 'PublicationDss');
-        $this->addRelation('PublicationJa', 'DTA\\MetadataBundle\\Model\\Data\\PublicationJa', RelationMap::ONE_TO_MANY, array('id' => 'volume_id', ), null, null, 'PublicationJas');
-        $this->addRelation('PublicationMms', 'DTA\\MetadataBundle\\Model\\Data\\PublicationMms', RelationMap::ONE_TO_MANY, array('id' => 'volume_id', ), null, null, 'PublicationMmss');
+        $this->addRelation('PublicationRelatedByPublicationId', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::MANY_TO_ONE, array('publication_id' => 'id', ), null, null);
+        $this->addRelation('PublicationRelatedByParentpublicationId', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::MANY_TO_ONE, array('parentpublication_id' => 'id', ), null, null);
     } // buildRelations()
 
     /**
@@ -70,9 +71,7 @@ class VolumeTableMap extends TableMap
     {
         return array(
             'table_row_view' =>  array (
-  'Id' => 'id',
-  'Volumedescription' => 'volumedescription',
-  'Volumenumeric' => 'volumenumeric',
+  'embedcolumnspublication' => 'publication',
 ),
         );
     } // getBehaviors()

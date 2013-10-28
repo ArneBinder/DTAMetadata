@@ -43,8 +43,8 @@ class PersonPublicationTableMap extends TableMap
         $this->setUseIdGenerator(true);
         $this->setPrimaryKeyMethodInfo('person_publication_id_seq');
         // columns
-        $this->addForeignKey('personrole_id', 'PersonroleId', 'INTEGER', 'personrole', 'id', true, null, null);
         $this->addForeignKey('person_id', 'PersonId', 'INTEGER', 'person', 'id', true, null, null);
+        $this->addForeignKey('personrole_id', 'PersonroleId', 'INTEGER', 'personrole', 'id', true, null, null);
         $this->addForeignKey('publication_id', 'PublicationId', 'INTEGER', 'publication', 'id', true, null, null);
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         // validators
@@ -55,8 +55,8 @@ class PersonPublicationTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Personrole', 'DTA\\MetadataBundle\\Model\\Classification\\Personrole', RelationMap::MANY_TO_ONE, array('personrole_id' => 'id', ), null, null);
         $this->addRelation('Person', 'DTA\\MetadataBundle\\Model\\Data\\Person', RelationMap::MANY_TO_ONE, array('person_id' => 'id', ), null, null);
+        $this->addRelation('Personrole', 'DTA\\MetadataBundle\\Model\\Classification\\Personrole', RelationMap::MANY_TO_ONE, array('personrole_id' => 'id', ), null, null);
         $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::MANY_TO_ONE, array('publication_id' => 'id', ), null, null);
     } // buildRelations()
 
@@ -70,8 +70,8 @@ class PersonPublicationTableMap extends TableMap
     {
         return array(
             'table_row_view' =>  array (
-  'PersonroleId' => 'personrole_id',
   'PersonId' => 'person_id',
+  'PersonroleId' => 'personrole_id',
   'PublicationId' => 'publication_id',
   'Id' => 'id',
 ),

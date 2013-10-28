@@ -18,6 +18,8 @@ use DTA\MetadataBundle\Model\Data\FontPeer;
 use DTA\MetadataBundle\Model\Data\FontQuery;
 use DTA\MetadataBundle\Model\Data\Publication;
 use DTA\MetadataBundle\Model\Data\PublicationQuery;
+use DTA\MetadataBundle\Model\Master\FontPublication;
+use DTA\MetadataBundle\Model\Master\FontPublicationQuery;
 
 abstract class BaseFont extends BaseObject implements Persistent, \DTA\MetadataBundle\Model\table_row_view\TableRowViewInterface
 {
@@ -53,10 +55,15 @@ abstract class BaseFont extends BaseObject implements Persistent, \DTA\MetadataB
     protected $name;
 
     /**
+     * @var        PropelObjectCollection|FontPublication[] Collection to store aggregation of FontPublication objects.
+     */
+    protected $collFontPublications;
+    protected $collFontPublicationsPartial;
+
+    /**
      * @var        PropelObjectCollection|Publication[] Collection to store aggregation of Publication objects.
      */
     protected $collPublications;
-    protected $collPublicationsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -85,6 +92,12 @@ abstract class BaseFont extends BaseObject implements Persistent, \DTA\MetadataB
      * @var		PropelObjectCollection
      */
     protected $publicationsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $fontPublicationsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -252,8 +265,9 @@ abstract class BaseFont extends BaseObject implements Persistent, \DTA\MetadataB
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collPublications = null;
+            $this->collFontPublications = null;
 
+            $this->collPublications = null;
         } // if (deep)
     }
 
@@ -380,16 +394,41 @@ abstract class BaseFont extends BaseObject implements Persistent, \DTA\MetadataB
 
             if ($this->publicationsScheduledForDeletion !== null) {
                 if (!$this->publicationsScheduledForDeletion->isEmpty()) {
-                    foreach ($this->publicationsScheduledForDeletion as $publication) {
-                        // need to save related object because we set the relation to null
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->publicationsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($pk, $remotePk);
+                    }
+                    FontPublicationQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->publicationsScheduledForDeletion = null;
+                }
+
+                foreach ($this->getPublications() as $publication) {
+                    if ($publication->isModified()) {
                         $publication->save($con);
                     }
-                    $this->publicationsScheduledForDeletion = null;
+                }
+            } elseif ($this->collPublications) {
+                foreach ($this->collPublications as $publication) {
+                    if ($publication->isModified()) {
+                        $publication->save($con);
+                    }
                 }
             }
 
-            if ($this->collPublications !== null) {
-                foreach ($this->collPublications as $referrerFK) {
+            if ($this->fontPublicationsScheduledForDeletion !== null) {
+                if (!$this->fontPublicationsScheduledForDeletion->isEmpty()) {
+                    FontPublicationQuery::create()
+                        ->filterByPrimaryKeys($this->fontPublicationsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->fontPublicationsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collFontPublications !== null) {
+                foreach ($this->collFontPublications as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -547,8 +586,8 @@ abstract class BaseFont extends BaseObject implements Persistent, \DTA\MetadataB
             }
 
 
-                if ($this->collPublications !== null) {
-                    foreach ($this->collPublications as $referrerFK) {
+                if ($this->collFontPublications !== null) {
+                    foreach ($this->collFontPublications as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -629,8 +668,8 @@ abstract class BaseFont extends BaseObject implements Persistent, \DTA\MetadataB
             $keys[1] => $this->getName(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->collPublications) {
-                $result['Publications'] = $this->collPublications->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collFontPublications) {
+                $result['FontPublications'] = $this->collFontPublications->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -783,9 +822,9 @@ abstract class BaseFont extends BaseObject implements Persistent, \DTA\MetadataB
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getPublications() as $relObj) {
+            foreach ($this->getFontPublications() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addPublication($relObj->copy($deepCopy));
+                    $copyObj->addFontPublication($relObj->copy($deepCopy));
                 }
             }
 
@@ -850,9 +889,252 @@ abstract class BaseFont extends BaseObject implements Persistent, \DTA\MetadataB
      */
     public function initRelation($relationName)
     {
-        if ('Publication' == $relationName) {
-            $this->initPublications();
+        if ('FontPublication' == $relationName) {
+            $this->initFontPublications();
         }
+    }
+
+    /**
+     * Clears out the collFontPublications collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Font The current object (for fluent API support)
+     * @see        addFontPublications()
+     */
+    public function clearFontPublications()
+    {
+        $this->collFontPublications = null; // important to set this to null since that means it is uninitialized
+        $this->collFontPublicationsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collFontPublications collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialFontPublications($v = true)
+    {
+        $this->collFontPublicationsPartial = $v;
+    }
+
+    /**
+     * Initializes the collFontPublications collection.
+     *
+     * By default this just sets the collFontPublications collection to an empty array (like clearcollFontPublications());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initFontPublications($overrideExisting = true)
+    {
+        if (null !== $this->collFontPublications && !$overrideExisting) {
+            return;
+        }
+        $this->collFontPublications = new PropelObjectCollection();
+        $this->collFontPublications->setModel('FontPublication');
+    }
+
+    /**
+     * Gets an array of FontPublication objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Font is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|FontPublication[] List of FontPublication objects
+     * @throws PropelException
+     */
+    public function getFontPublications($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collFontPublicationsPartial && !$this->isNew();
+        if (null === $this->collFontPublications || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collFontPublications) {
+                // return empty collection
+                $this->initFontPublications();
+            } else {
+                $collFontPublications = FontPublicationQuery::create(null, $criteria)
+                    ->filterByFont($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collFontPublicationsPartial && count($collFontPublications)) {
+                      $this->initFontPublications(false);
+
+                      foreach($collFontPublications as $obj) {
+                        if (false == $this->collFontPublications->contains($obj)) {
+                          $this->collFontPublications->append($obj);
+                        }
+                      }
+
+                      $this->collFontPublicationsPartial = true;
+                    }
+
+                    $collFontPublications->getInternalIterator()->rewind();
+                    return $collFontPublications;
+                }
+
+                if($partial && $this->collFontPublications) {
+                    foreach($this->collFontPublications as $obj) {
+                        if($obj->isNew()) {
+                            $collFontPublications[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collFontPublications = $collFontPublications;
+                $this->collFontPublicationsPartial = false;
+            }
+        }
+
+        return $this->collFontPublications;
+    }
+
+    /**
+     * Sets a collection of FontPublication objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $fontPublications A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Font The current object (for fluent API support)
+     */
+    public function setFontPublications(PropelCollection $fontPublications, PropelPDO $con = null)
+    {
+        $fontPublicationsToDelete = $this->getFontPublications(new Criteria(), $con)->diff($fontPublications);
+
+        $this->fontPublicationsScheduledForDeletion = unserialize(serialize($fontPublicationsToDelete));
+
+        foreach ($fontPublicationsToDelete as $fontPublicationRemoved) {
+            $fontPublicationRemoved->setFont(null);
+        }
+
+        $this->collFontPublications = null;
+        foreach ($fontPublications as $fontPublication) {
+            $this->addFontPublication($fontPublication);
+        }
+
+        $this->collFontPublications = $fontPublications;
+        $this->collFontPublicationsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related FontPublication objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related FontPublication objects.
+     * @throws PropelException
+     */
+    public function countFontPublications(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collFontPublicationsPartial && !$this->isNew();
+        if (null === $this->collFontPublications || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collFontPublications) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getFontPublications());
+            }
+            $query = FontPublicationQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByFont($this)
+                ->count($con);
+        }
+
+        return count($this->collFontPublications);
+    }
+
+    /**
+     * Method called to associate a FontPublication object to this object
+     * through the FontPublication foreign key attribute.
+     *
+     * @param    FontPublication $l FontPublication
+     * @return Font The current object (for fluent API support)
+     */
+    public function addFontPublication(FontPublication $l)
+    {
+        if ($this->collFontPublications === null) {
+            $this->initFontPublications();
+            $this->collFontPublicationsPartial = true;
+        }
+        if (!in_array($l, $this->collFontPublications->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddFontPublication($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	FontPublication $fontPublication The fontPublication object to add.
+     */
+    protected function doAddFontPublication($fontPublication)
+    {
+        $this->collFontPublications[]= $fontPublication;
+        $fontPublication->setFont($this);
+    }
+
+    /**
+     * @param	FontPublication $fontPublication The fontPublication object to remove.
+     * @return Font The current object (for fluent API support)
+     */
+    public function removeFontPublication($fontPublication)
+    {
+        if ($this->getFontPublications()->contains($fontPublication)) {
+            $this->collFontPublications->remove($this->collFontPublications->search($fontPublication));
+            if (null === $this->fontPublicationsScheduledForDeletion) {
+                $this->fontPublicationsScheduledForDeletion = clone $this->collFontPublications;
+                $this->fontPublicationsScheduledForDeletion->clear();
+            }
+            $this->fontPublicationsScheduledForDeletion[]= clone $fontPublication;
+            $fontPublication->setFont(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Font is new, it will return
+     * an empty collection; or if this Font has previously
+     * been saved, it will retrieve related FontPublications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Font.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|FontPublication[] List of FontPublication objects
+     */
+    public function getFontPublicationsJoinPublication($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = FontPublicationQuery::create(null, $criteria);
+        $query->joinWith('Publication', $join_behavior);
+
+        return $this->getFontPublications($query, $con);
     }
 
     /**
@@ -873,38 +1155,23 @@ abstract class BaseFont extends BaseObject implements Persistent, \DTA\MetadataB
     }
 
     /**
-     * reset is the collPublications collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialPublications($v = true)
-    {
-        $this->collPublicationsPartial = $v;
-    }
-
-    /**
      * Initializes the collPublications collection.
      *
-     * By default this just sets the collPublications collection to an empty array (like clearcollPublications());
+     * By default this just sets the collPublications collection to an empty collection (like clearPublications());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
      * @return void
      */
-    public function initPublications($overrideExisting = true)
+    public function initPublications()
     {
-        if (null !== $this->collPublications && !$overrideExisting) {
-            return;
-        }
         $this->collPublications = new PropelObjectCollection();
         $this->collPublications->setModel('Publication');
     }
 
     /**
-     * Gets an array of Publication objects which contain a foreign key that references this object.
+     * Gets a collection of Publication objects related by a many-to-many relationship
+     * to the current object by way of the font_publication cross-reference table.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -912,15 +1179,14 @@ abstract class BaseFont extends BaseObject implements Persistent, \DTA\MetadataB
      * If this Font is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
      * @return PropelObjectCollection|Publication[] List of Publication objects
-     * @throws PropelException
      */
     public function getPublications($criteria = null, PropelPDO $con = null)
     {
-        $partial = $this->collPublicationsPartial && !$this->isNew();
-        if (null === $this->collPublications || null !== $criteria  || $partial) {
+        if (null === $this->collPublications || null !== $criteria) {
             if ($this->isNew() && null === $this->collPublications) {
                 // return empty collection
                 $this->initPublications();
@@ -929,32 +1195,9 @@ abstract class BaseFont extends BaseObject implements Persistent, \DTA\MetadataB
                     ->filterByFont($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    if (false !== $this->collPublicationsPartial && count($collPublications)) {
-                      $this->initPublications(false);
-
-                      foreach($collPublications as $obj) {
-                        if (false == $this->collPublications->contains($obj)) {
-                          $this->collPublications->append($obj);
-                        }
-                      }
-
-                      $this->collPublicationsPartial = true;
-                    }
-
-                    $collPublications->getInternalIterator()->rewind();
                     return $collPublications;
                 }
-
-                if($partial && $this->collPublications) {
-                    foreach($this->collPublications as $obj) {
-                        if($obj->isNew()) {
-                            $collPublications[] = $obj;
-                        }
-                    }
-                }
-
                 $this->collPublications = $collPublications;
-                $this->collPublicationsPartial = false;
             }
         }
 
@@ -962,8 +1205,8 @@ abstract class BaseFont extends BaseObject implements Persistent, \DTA\MetadataB
     }
 
     /**
-     * Sets a collection of Publication objects related by a one-to-many relationship
-     * to the current object.
+     * Sets a collection of Publication objects related by a many-to-many relationship
+     * to the current object by way of the font_publication cross-reference table.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
@@ -973,73 +1216,68 @@ abstract class BaseFont extends BaseObject implements Persistent, \DTA\MetadataB
      */
     public function setPublications(PropelCollection $publications, PropelPDO $con = null)
     {
-        $publicationsToDelete = $this->getPublications(new Criteria(), $con)->diff($publications);
+        $this->clearPublications();
+        $currentPublications = $this->getPublications();
 
-        $this->publicationsScheduledForDeletion = unserialize(serialize($publicationsToDelete));
+        $this->publicationsScheduledForDeletion = $currentPublications->diff($publications);
 
-        foreach ($publicationsToDelete as $publicationRemoved) {
-            $publicationRemoved->setFont(null);
-        }
-
-        $this->collPublications = null;
         foreach ($publications as $publication) {
-            $this->addPublication($publication);
+            if (!$currentPublications->contains($publication)) {
+                $this->doAddPublication($publication);
+            }
         }
 
         $this->collPublications = $publications;
-        $this->collPublicationsPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related Publication objects.
+     * Gets the number of Publication objects related by a many-to-many relationship
+     * to the current object by way of the font_publication cross-reference table.
      *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related Publication objects.
-     * @throws PropelException
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related Publication objects
      */
-    public function countPublications(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countPublications($criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $partial = $this->collPublicationsPartial && !$this->isNew();
-        if (null === $this->collPublications || null !== $criteria || $partial) {
+        if (null === $this->collPublications || null !== $criteria) {
             if ($this->isNew() && null === $this->collPublications) {
                 return 0;
-            }
+            } else {
+                $query = PublicationQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
 
-            if($partial && !$criteria) {
-                return count($this->getPublications());
+                return $query
+                    ->filterByFont($this)
+                    ->count($con);
             }
-            $query = PublicationQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByFont($this)
-                ->count($con);
+        } else {
+            return count($this->collPublications);
         }
-
-        return count($this->collPublications);
     }
 
     /**
-     * Method called to associate a Publication object to this object
-     * through the Publication foreign key attribute.
+     * Associate a Publication object to this object
+     * through the font_publication cross reference table.
      *
-     * @param    Publication $l Publication
+     * @param  Publication $publication The FontPublication object to relate
      * @return Font The current object (for fluent API support)
      */
-    public function addPublication(Publication $l)
+    public function addPublication(Publication $publication)
     {
         if ($this->collPublications === null) {
             $this->initPublications();
-            $this->collPublicationsPartial = true;
         }
-        if (!in_array($l, $this->collPublications->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddPublication($l);
+        if (!$this->collPublications->contains($publication)) { // only add it if the **same** object is not already associated
+            $this->doAddPublication($publication);
+
+            $this->collPublications[]= $publication;
         }
 
         return $this;
@@ -1050,15 +1288,19 @@ abstract class BaseFont extends BaseObject implements Persistent, \DTA\MetadataB
      */
     protected function doAddPublication($publication)
     {
-        $this->collPublications[]= $publication;
-        $publication->setFont($this);
+        $fontPublication = new FontPublication();
+        $fontPublication->setPublication($publication);
+        $this->addFontPublication($fontPublication);
     }
 
     /**
-     * @param	Publication $publication The publication object to remove.
+     * Remove a Publication object to this object
+     * through the font_publication cross reference table.
+     *
+     * @param Publication $publication The FontPublication object to relate
      * @return Font The current object (for fluent API support)
      */
-    public function removePublication($publication)
+    public function removePublication(Publication $publication)
     {
         if ($this->getPublications()->contains($publication)) {
             $this->collPublications->remove($this->collPublications->search($publication));
@@ -1067,135 +1309,9 @@ abstract class BaseFont extends BaseObject implements Persistent, \DTA\MetadataB
                 $this->publicationsScheduledForDeletion->clear();
             }
             $this->publicationsScheduledForDeletion[]= $publication;
-            $publication->setFont(null);
         }
 
         return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Font is new, it will return
-     * an empty collection; or if this Font has previously
-     * been saved, it will retrieve related Publications from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Font.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Publication[] List of Publication objects
-     */
-    public function getPublicationsJoinWork($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = PublicationQuery::create(null, $criteria);
-        $query->joinWith('Work', $join_behavior);
-
-        return $this->getPublications($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Font is new, it will return
-     * an empty collection; or if this Font has previously
-     * been saved, it will retrieve related Publications from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Font.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Publication[] List of Publication objects
-     */
-    public function getPublicationsJoinPublishingcompany($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = PublicationQuery::create(null, $criteria);
-        $query->joinWith('Publishingcompany', $join_behavior);
-
-        return $this->getPublications($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Font is new, it will return
-     * an empty collection; or if this Font has previously
-     * been saved, it will retrieve related Publications from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Font.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Publication[] List of Publication objects
-     */
-    public function getPublicationsJoinPlace($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = PublicationQuery::create(null, $criteria);
-        $query->joinWith('Place', $join_behavior);
-
-        return $this->getPublications($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Font is new, it will return
-     * an empty collection; or if this Font has previously
-     * been saved, it will retrieve related Publications from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Font.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Publication[] List of Publication objects
-     */
-    public function getPublicationsJoinDatespecificationRelatedByPublicationdateId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = PublicationQuery::create(null, $criteria);
-        $query->joinWith('DatespecificationRelatedByPublicationdateId', $join_behavior);
-
-        return $this->getPublications($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Font is new, it will return
-     * an empty collection; or if this Font has previously
-     * been saved, it will retrieve related Publications from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Font.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Publication[] List of Publication objects
-     */
-    public function getPublicationsJoinDatespecificationRelatedByFirstpublicationdateId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = PublicationQuery::create(null, $criteria);
-        $query->joinWith('DatespecificationRelatedByFirstpublicationdateId', $join_behavior);
-
-        return $this->getPublications($query, $con);
     }
 
     /**
@@ -1227,6 +1343,11 @@ abstract class BaseFont extends BaseObject implements Persistent, \DTA\MetadataB
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->collFontPublications) {
+                foreach ($this->collFontPublications as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collPublications) {
                 foreach ($this->collPublications as $o) {
                     $o->clearAllReferences($deep);
@@ -1236,6 +1357,10 @@ abstract class BaseFont extends BaseObject implements Persistent, \DTA\MetadataB
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
+        if ($this->collFontPublications instanceof PropelCollection) {
+            $this->collFontPublications->clearIterator();
+        }
+        $this->collFontPublications = null;
         if ($this->collPublications instanceof PropelCollection) {
             $this->collPublications->clearIterator();
         }

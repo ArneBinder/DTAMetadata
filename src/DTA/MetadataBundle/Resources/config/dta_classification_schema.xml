@@ -7,7 +7,7 @@
 
 <!--The name attribute refers to the connection to use. See app/config/config.yml under
     propel > dbal > connections for connection setup. -->
-<database name="DTAMetadata" namespace="DTA\MetadataBundle\Model\Classification" defaultIdMethod="native">
+<database name="dtametadata" namespace="DTA\MetadataBundle\Model\Classification" defaultIdMethod="native">
   
     <!-- This parameter set is added to each entity that doesn't implement the table_row_view behavior. 
     It is not added to tables/entities that define the bahavior. -->
@@ -31,23 +31,24 @@
     <table name="personrole" idMethod="native">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
-        <!--Ob diese Rolle auf eine Beziehung zwischen Personen und Publikationen angewandt werden darf (z.B. nicht Autor)-->
-        <column name="applicable_to_publication" type="BOOLEAN" default="false"/>
-        <!--Ob diese Rolle auf eine Beziehung zwischen Personen und Werken angewandt werden darf (z.B. nicht Drucker)-->
-        <column name="applicable_to_work" type="BOOLEAN" default="false"/>
     </table>
   
     <!--Korpora.--> 
-    <table name="corpus">
+<!--    <table name="corpus">
         <column name="id" type="INTEGER" size="10" sqlType="int(10) unsigned" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
-        <!--        <unique name="korpusname_einzigartig">
-            <unique-column name="corpusnamehash"/>
-        </unique>-->
-    </table>
+    </table>-->
     
     <!--Kategorien. Zum Beispiel Ratgeber, Zeitschrift, etc. -->
     <table name="category">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" type="LONGVARCHAR" required="true"/>
+        <column name="description" type="LONGVARCHAR" required="true"/>
+        <column name="categorytype_id" type="INTEGER" required="true"/>
+        <foreign-key foreignTable="categorytype"> <reference local="categorytype_id" foreign="id"/> </foreign-key>
+    </table>
+    <!--Kategorientypen/Bereiche: Wissensbereich, Textsorte, Präsentationsform, Sitz im Leben-->
+    <table name="categorytype">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
     </table>
@@ -58,15 +59,15 @@
         <column name="name" type="LONGVARCHAR" required="true"/>
     </table>
     
-    <!--Genres (Baumstruktur) Zum Beispiel Sachliteratur (Fachliteratur, Gebrauchsliteratur, etc.), Belletristik, etc. -->
+    <!--Genres: Belletristik: Epik, Lyrik, Dramatik. Gebrauchsliteratur: Sach- und Fachliteratur. -->
     <table name="genre">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
-        <column name="childof" type="INTEGER"/>
-        <foreign-key foreignTable="genre"> <reference local="childof" foreign="id"/> </foreign-key>
+<!--        <column name="childof" type="INTEGER"/>
+        <foreign-key foreignTable="genre"> <reference local="childof" foreign="id"/> </foreign-key>-->
         <behavior name="table_row_view">
             <parameter name="name" value="name"/>
-            <parameter name="zugeordnet" value="accessor:getParent"/>
+            <!--<parameter name="zugeordnet" value="accessor:getParent"/>-->
         </behavior>
 
     </table>

@@ -45,10 +45,13 @@ class PartnerTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('name', 'Name', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('person', 'Person', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('contact_data', 'ContactData', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('mail', 'Mail', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('web', 'Web', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('contactperson', 'Contactperson', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('contactdata', 'Contactdata', 'LONGVARCHAR', false, null, null);
         $this->addColumn('comments', 'Comments', 'LONGVARCHAR', false, null, null);
         $this->addColumn('is_organization', 'IsOrganization', 'BOOLEAN', false, null, false);
+        $this->addColumn('legacy_partner_id', 'LegacyPartnerId', 'INTEGER', false, null, null);
         // validators
     } // initialize()
 
@@ -74,10 +77,13 @@ class PartnerTableMap extends TableMap
             'table_row_view' =>  array (
   'Id' => 'id',
   'Name' => 'name',
-  'Person' => 'person',
-  'ContactData' => 'contact_data',
+  'Mail' => 'mail',
+  'Web' => 'web',
+  'Contactperson' => 'contactperson',
+  'Contactdata' => 'contactdata',
   'Comments' => 'comments',
   'IsOrganization' => 'is_organization',
+  'LegacyPartnerId' => 'legacy_partner_id',
 ),
         );
     } // getBehaviors()

@@ -43,16 +43,16 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
     protected $startCopy = false;
 
     /**
-     * The value for the personrole_id field.
-     * @var        int
-     */
-    protected $personrole_id;
-
-    /**
      * The value for the person_id field.
      * @var        int
      */
     protected $person_id;
+
+    /**
+     * The value for the personrole_id field.
+     * @var        int
+     */
+    protected $personrole_id;
 
     /**
      * The value for the publication_id field.
@@ -67,14 +67,14 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
     protected $id;
 
     /**
-     * @var        Personrole
-     */
-    protected $aPersonrole;
-
-    /**
      * @var        Person
      */
     protected $aPerson;
+
+    /**
+     * @var        Personrole
+     */
+    protected $aPersonrole;
 
     /**
      * @var        Publication
@@ -102,17 +102,7 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('PersonroleId', 'PersonId', 'PublicationId', 'Id', );	public   $tableRowViewAccessors = array('PersonroleId'=>'PersonroleId', 'PersonId'=>'PersonId', 'PublicationId'=>'PublicationId', 'Id'=>'Id', );
-    /**
-     * Get the [personrole_id] column value.
-     *
-     * @return int
-     */
-    public function getPersonroleId()
-    {
-        return $this->personrole_id;
-    }
-
+    public static $tableRowViewCaptions = array('PersonId', 'PersonroleId', 'PublicationId', 'Id', );	public   $tableRowViewAccessors = array('PersonId'=>'PersonId', 'PersonroleId'=>'PersonroleId', 'PublicationId'=>'PublicationId', 'Id'=>'Id', );
     /**
      * Get the [person_id] column value.
      *
@@ -121,6 +111,16 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
     public function getPersonId()
     {
         return $this->person_id;
+    }
+
+    /**
+     * Get the [personrole_id] column value.
+     *
+     * @return int
+     */
+    public function getPersonroleId()
+    {
+        return $this->personrole_id;
     }
 
     /**
@@ -142,31 +142,6 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
     {
         return $this->id;
     }
-
-    /**
-     * Set the value of [personrole_id] column.
-     *
-     * @param int $v new value
-     * @return PersonPublication The current object (for fluent API support)
-     */
-    public function setPersonroleId($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->personrole_id !== $v) {
-            $this->personrole_id = $v;
-            $this->modifiedColumns[] = PersonPublicationPeer::PERSONROLE_ID;
-        }
-
-        if ($this->aPersonrole !== null && $this->aPersonrole->getId() !== $v) {
-            $this->aPersonrole = null;
-        }
-
-
-        return $this;
-    } // setPersonroleId()
 
     /**
      * Set the value of [person_id] column.
@@ -192,6 +167,31 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
 
         return $this;
     } // setPersonId()
+
+    /**
+     * Set the value of [personrole_id] column.
+     *
+     * @param int $v new value
+     * @return PersonPublication The current object (for fluent API support)
+     */
+    public function setPersonroleId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->personrole_id !== $v) {
+            $this->personrole_id = $v;
+            $this->modifiedColumns[] = PersonPublicationPeer::PERSONROLE_ID;
+        }
+
+        if ($this->aPersonrole !== null && $this->aPersonrole->getId() !== $v) {
+            $this->aPersonrole = null;
+        }
+
+
+        return $this;
+    } // setPersonroleId()
 
     /**
      * Set the value of [publication_id] column.
@@ -271,8 +271,8 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
     {
         try {
 
-            $this->personrole_id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-            $this->person_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+            $this->person_id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
+            $this->personrole_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
             $this->publication_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
             $this->id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
             $this->resetModified();
@@ -306,11 +306,11 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
     public function ensureConsistency()
     {
 
-        if ($this->aPersonrole !== null && $this->personrole_id !== $this->aPersonrole->getId()) {
-            $this->aPersonrole = null;
-        }
         if ($this->aPerson !== null && $this->person_id !== $this->aPerson->getId()) {
             $this->aPerson = null;
+        }
+        if ($this->aPersonrole !== null && $this->personrole_id !== $this->aPersonrole->getId()) {
+            $this->aPersonrole = null;
         }
         if ($this->aPublication !== null && $this->publication_id !== $this->aPublication->getId()) {
             $this->aPublication = null;
@@ -354,8 +354,8 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aPersonrole = null;
             $this->aPerson = null;
+            $this->aPersonrole = null;
             $this->aPublication = null;
         } // if (deep)
     }
@@ -475,18 +475,18 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aPersonrole !== null) {
-                if ($this->aPersonrole->isModified() || $this->aPersonrole->isNew()) {
-                    $affectedRows += $this->aPersonrole->save($con);
-                }
-                $this->setPersonrole($this->aPersonrole);
-            }
-
             if ($this->aPerson !== null) {
                 if ($this->aPerson->isModified() || $this->aPerson->isNew()) {
                     $affectedRows += $this->aPerson->save($con);
                 }
                 $this->setPerson($this->aPerson);
+            }
+
+            if ($this->aPersonrole !== null) {
+                if ($this->aPersonrole->isModified() || $this->aPersonrole->isNew()) {
+                    $affectedRows += $this->aPersonrole->save($con);
+                }
+                $this->setPersonrole($this->aPersonrole);
             }
 
             if ($this->aPublication !== null) {
@@ -543,11 +543,11 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
 
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(PersonPublicationPeer::PERSONROLE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '"personrole_id"';
-        }
         if ($this->isColumnModified(PersonPublicationPeer::PERSON_ID)) {
             $modifiedColumns[':p' . $index++]  = '"person_id"';
+        }
+        if ($this->isColumnModified(PersonPublicationPeer::PERSONROLE_ID)) {
+            $modifiedColumns[':p' . $index++]  = '"personrole_id"';
         }
         if ($this->isColumnModified(PersonPublicationPeer::PUBLICATION_ID)) {
             $modifiedColumns[':p' . $index++]  = '"publication_id"';
@@ -566,11 +566,11 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '"personrole_id"':
-                        $stmt->bindValue($identifier, $this->personrole_id, PDO::PARAM_INT);
-                        break;
                     case '"person_id"':
                         $stmt->bindValue($identifier, $this->person_id, PDO::PARAM_INT);
+                        break;
+                    case '"personrole_id"':
+                        $stmt->bindValue($identifier, $this->personrole_id, PDO::PARAM_INT);
                         break;
                     case '"publication_id"':
                         $stmt->bindValue($identifier, $this->publication_id, PDO::PARAM_INT);
@@ -670,15 +670,15 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aPersonrole !== null) {
-                if (!$this->aPersonrole->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aPersonrole->getValidationFailures());
-                }
-            }
-
             if ($this->aPerson !== null) {
                 if (!$this->aPerson->validate($columns)) {
                     $failureMap = array_merge($failureMap, $this->aPerson->getValidationFailures());
+                }
+            }
+
+            if ($this->aPersonrole !== null) {
+                if (!$this->aPersonrole->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aPersonrole->getValidationFailures());
                 }
             }
 
@@ -730,10 +730,10 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
     {
         switch ($pos) {
             case 0:
-                return $this->getPersonroleId();
+                return $this->getPersonId();
                 break;
             case 1:
-                return $this->getPersonId();
+                return $this->getPersonroleId();
                 break;
             case 2:
                 return $this->getPublicationId();
@@ -770,17 +770,17 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
         $alreadyDumpedObjects['PersonPublication'][$this->getPrimaryKey()] = true;
         $keys = PersonPublicationPeer::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getPersonroleId(),
-            $keys[1] => $this->getPersonId(),
+            $keys[0] => $this->getPersonId(),
+            $keys[1] => $this->getPersonroleId(),
             $keys[2] => $this->getPublicationId(),
             $keys[3] => $this->getId(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aPersonrole) {
-                $result['Personrole'] = $this->aPersonrole->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
             if (null !== $this->aPerson) {
                 $result['Person'] = $this->aPerson->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aPersonrole) {
+                $result['Personrole'] = $this->aPersonrole->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->aPublication) {
                 $result['Publication'] = $this->aPublication->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
@@ -820,10 +820,10 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
     {
         switch ($pos) {
             case 0:
-                $this->setPersonroleId($value);
+                $this->setPersonId($value);
                 break;
             case 1:
-                $this->setPersonId($value);
+                $this->setPersonroleId($value);
                 break;
             case 2:
                 $this->setPublicationId($value);
@@ -855,8 +855,8 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
     {
         $keys = PersonPublicationPeer::getFieldNames($keyType);
 
-        if (array_key_exists($keys[0], $arr)) $this->setPersonroleId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setPersonId($arr[$keys[1]]);
+        if (array_key_exists($keys[0], $arr)) $this->setPersonId($arr[$keys[0]]);
+        if (array_key_exists($keys[1], $arr)) $this->setPersonroleId($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setPublicationId($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setId($arr[$keys[3]]);
     }
@@ -870,8 +870,8 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
     {
         $criteria = new Criteria(PersonPublicationPeer::DATABASE_NAME);
 
-        if ($this->isColumnModified(PersonPublicationPeer::PERSONROLE_ID)) $criteria->add(PersonPublicationPeer::PERSONROLE_ID, $this->personrole_id);
         if ($this->isColumnModified(PersonPublicationPeer::PERSON_ID)) $criteria->add(PersonPublicationPeer::PERSON_ID, $this->person_id);
+        if ($this->isColumnModified(PersonPublicationPeer::PERSONROLE_ID)) $criteria->add(PersonPublicationPeer::PERSONROLE_ID, $this->personrole_id);
         if ($this->isColumnModified(PersonPublicationPeer::PUBLICATION_ID)) $criteria->add(PersonPublicationPeer::PUBLICATION_ID, $this->publication_id);
         if ($this->isColumnModified(PersonPublicationPeer::ID)) $criteria->add(PersonPublicationPeer::ID, $this->id);
 
@@ -937,8 +937,8 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setPersonroleId($this->getPersonroleId());
         $copyObj->setPersonId($this->getPersonId());
+        $copyObj->setPersonroleId($this->getPersonroleId());
         $copyObj->setPublicationId($this->getPublicationId());
 
         if ($deepCopy && !$this->startCopy) {
@@ -999,58 +999,6 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
     }
 
     /**
-     * Declares an association between this object and a Personrole object.
-     *
-     * @param             Personrole $v
-     * @return PersonPublication The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setPersonrole(Personrole $v = null)
-    {
-        if ($v === null) {
-            $this->setPersonroleId(NULL);
-        } else {
-            $this->setPersonroleId($v->getId());
-        }
-
-        $this->aPersonrole = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Personrole object, it will not be re-added.
-        if ($v !== null) {
-            $v->addPersonPublication($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated Personrole object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @param $doQuery Executes a query to get the object if required
-     * @return Personrole The associated Personrole object.
-     * @throws PropelException
-     */
-    public function getPersonrole(PropelPDO $con = null, $doQuery = true)
-    {
-        if ($this->aPersonrole === null && ($this->personrole_id !== null) && $doQuery) {
-            $this->aPersonrole = PersonroleQuery::create()->findPk($this->personrole_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aPersonrole->addPersonPublications($this);
-             */
-        }
-
-        return $this->aPersonrole;
-    }
-
-    /**
      * Declares an association between this object and a Person object.
      *
      * @param             Person $v
@@ -1100,6 +1048,58 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
         }
 
         return $this->aPerson;
+    }
+
+    /**
+     * Declares an association between this object and a Personrole object.
+     *
+     * @param             Personrole $v
+     * @return PersonPublication The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setPersonrole(Personrole $v = null)
+    {
+        if ($v === null) {
+            $this->setPersonroleId(NULL);
+        } else {
+            $this->setPersonroleId($v->getId());
+        }
+
+        $this->aPersonrole = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Personrole object, it will not be re-added.
+        if ($v !== null) {
+            $v->addPersonPublication($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Personrole object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return Personrole The associated Personrole object.
+     * @throws PropelException
+     */
+    public function getPersonrole(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aPersonrole === null && ($this->personrole_id !== null) && $doQuery) {
+            $this->aPersonrole = PersonroleQuery::create()->findPk($this->personrole_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aPersonrole->addPersonPublications($this);
+             */
+        }
+
+        return $this->aPersonrole;
     }
 
     /**
@@ -1159,8 +1159,8 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
      */
     public function clear()
     {
-        $this->personrole_id = null;
         $this->person_id = null;
+        $this->personrole_id = null;
         $this->publication_id = null;
         $this->id = null;
         $this->alreadyInSave = false;
@@ -1185,11 +1185,11 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
-            if ($this->aPersonrole instanceof Persistent) {
-              $this->aPersonrole->clearAllReferences($deep);
-            }
             if ($this->aPerson instanceof Persistent) {
               $this->aPerson->clearAllReferences($deep);
+            }
+            if ($this->aPersonrole instanceof Persistent) {
+              $this->aPersonrole->clearAllReferences($deep);
             }
             if ($this->aPublication instanceof Persistent) {
               $this->aPublication->clearAllReferences($deep);
@@ -1198,8 +1198,8 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
-        $this->aPersonrole = null;
         $this->aPerson = null;
+        $this->aPersonrole = null;
         $this->aPublication = null;
     }
 

@@ -13,6 +13,8 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use DTA\MetadataBundle\Model\Data\Publication;
+use DTA\MetadataBundle\Model\Data\PublicationQuery;
 use DTA\MetadataBundle\Model\Data\Series;
 use DTA\MetadataBundle\Model\Data\SeriesQuery;
 use DTA\MetadataBundle\Model\Data\Title;
@@ -20,8 +22,6 @@ use DTA\MetadataBundle\Model\Data\TitlePeer;
 use DTA\MetadataBundle\Model\Data\TitleQuery;
 use DTA\MetadataBundle\Model\Data\Titlefragment;
 use DTA\MetadataBundle\Model\Data\TitlefragmentQuery;
-use DTA\MetadataBundle\Model\Data\Work;
-use DTA\MetadataBundle\Model\Data\WorkQuery;
 
 abstract class BaseTitle extends BaseObject implements Persistent, \DTA\MetadataBundle\Model\table_row_view\TableRowViewInterface
 {
@@ -51,10 +51,10 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
     protected $id;
 
     /**
-     * @var        PropelObjectCollection|Work[] Collection to store aggregation of Work objects.
+     * @var        PropelObjectCollection|Publication[] Collection to store aggregation of Publication objects.
      */
-    protected $collWorks;
-    protected $collWorksPartial;
+    protected $collPublications;
+    protected $collPublicationsPartial;
 
     /**
      * @var        PropelObjectCollection|Series[] Collection to store aggregation of Series objects.
@@ -94,7 +94,7 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $worksScheduledForDeletion = null;
+    protected $publicationsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -242,7 +242,7 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collWorks = null;
+            $this->collPublications = null;
 
             $this->collSeries = null;
 
@@ -372,17 +372,17 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
                 $this->resetModified();
             }
 
-            if ($this->worksScheduledForDeletion !== null) {
-                if (!$this->worksScheduledForDeletion->isEmpty()) {
-                    WorkQuery::create()
-                        ->filterByPrimaryKeys($this->worksScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->publicationsScheduledForDeletion !== null) {
+                if (!$this->publicationsScheduledForDeletion->isEmpty()) {
+                    PublicationQuery::create()
+                        ->filterByPrimaryKeys($this->publicationsScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->worksScheduledForDeletion = null;
+                    $this->publicationsScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collWorks !== null) {
-                foreach ($this->collWorks as $referrerFK) {
+            if ($this->collPublications !== null) {
+                foreach ($this->collPublications as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -568,8 +568,8 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
             }
 
 
-                if ($this->collWorks !== null) {
-                    foreach ($this->collWorks as $referrerFK) {
+                if ($this->collPublications !== null) {
+                    foreach ($this->collPublications as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -662,8 +662,8 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
             $keys[0] => $this->getId(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->collWorks) {
-                $result['Works'] = $this->collWorks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collPublications) {
+                $result['Publications'] = $this->collPublications->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collSeries) {
                 $result['Series'] = $this->collSeries->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -816,9 +816,9 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getWorks() as $relObj) {
+            foreach ($this->getPublications() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addWork($relObj->copy($deepCopy));
+                    $copyObj->addPublication($relObj->copy($deepCopy));
                 }
             }
 
@@ -895,8 +895,8 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
      */
     public function initRelation($relationName)
     {
-        if ('Work' == $relationName) {
-            $this->initWorks();
+        if ('Publication' == $relationName) {
+            $this->initPublications();
         }
         if ('Series' == $relationName) {
             $this->initSeries();
@@ -907,36 +907,36 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
     }
 
     /**
-     * Clears out the collWorks collection
+     * Clears out the collPublications collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return Title The current object (for fluent API support)
-     * @see        addWorks()
+     * @see        addPublications()
      */
-    public function clearWorks()
+    public function clearPublications()
     {
-        $this->collWorks = null; // important to set this to null since that means it is uninitialized
-        $this->collWorksPartial = null;
+        $this->collPublications = null; // important to set this to null since that means it is uninitialized
+        $this->collPublicationsPartial = null;
 
         return $this;
     }
 
     /**
-     * reset is the collWorks collection loaded partially
+     * reset is the collPublications collection loaded partially
      *
      * @return void
      */
-    public function resetPartialWorks($v = true)
+    public function resetPartialPublications($v = true)
     {
-        $this->collWorksPartial = $v;
+        $this->collPublicationsPartial = $v;
     }
 
     /**
-     * Initializes the collWorks collection.
+     * Initializes the collPublications collection.
      *
-     * By default this just sets the collWorks collection to an empty array (like clearcollWorks());
+     * By default this just sets the collPublications collection to an empty array (like clearcollPublications());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -945,17 +945,17 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
      *
      * @return void
      */
-    public function initWorks($overrideExisting = true)
+    public function initPublications($overrideExisting = true)
     {
-        if (null !== $this->collWorks && !$overrideExisting) {
+        if (null !== $this->collPublications && !$overrideExisting) {
             return;
         }
-        $this->collWorks = new PropelObjectCollection();
-        $this->collWorks->setModel('Work');
+        $this->collPublications = new PropelObjectCollection();
+        $this->collPublications->setModel('Publication');
     }
 
     /**
-     * Gets an array of Work objects which contain a foreign key that references this object.
+     * Gets an array of Publication objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -965,105 +965,105 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|Work[] List of Work objects
+     * @return PropelObjectCollection|Publication[] List of Publication objects
      * @throws PropelException
      */
-    public function getWorks($criteria = null, PropelPDO $con = null)
+    public function getPublications($criteria = null, PropelPDO $con = null)
     {
-        $partial = $this->collWorksPartial && !$this->isNew();
-        if (null === $this->collWorks || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collWorks) {
+        $partial = $this->collPublicationsPartial && !$this->isNew();
+        if (null === $this->collPublications || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collPublications) {
                 // return empty collection
-                $this->initWorks();
+                $this->initPublications();
             } else {
-                $collWorks = WorkQuery::create(null, $criteria)
+                $collPublications = PublicationQuery::create(null, $criteria)
                     ->filterByTitle($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    if (false !== $this->collWorksPartial && count($collWorks)) {
-                      $this->initWorks(false);
+                    if (false !== $this->collPublicationsPartial && count($collPublications)) {
+                      $this->initPublications(false);
 
-                      foreach($collWorks as $obj) {
-                        if (false == $this->collWorks->contains($obj)) {
-                          $this->collWorks->append($obj);
+                      foreach($collPublications as $obj) {
+                        if (false == $this->collPublications->contains($obj)) {
+                          $this->collPublications->append($obj);
                         }
                       }
 
-                      $this->collWorksPartial = true;
+                      $this->collPublicationsPartial = true;
                     }
 
-                    $collWorks->getInternalIterator()->rewind();
-                    return $collWorks;
+                    $collPublications->getInternalIterator()->rewind();
+                    return $collPublications;
                 }
 
-                if($partial && $this->collWorks) {
-                    foreach($this->collWorks as $obj) {
+                if($partial && $this->collPublications) {
+                    foreach($this->collPublications as $obj) {
                         if($obj->isNew()) {
-                            $collWorks[] = $obj;
+                            $collPublications[] = $obj;
                         }
                     }
                 }
 
-                $this->collWorks = $collWorks;
-                $this->collWorksPartial = false;
+                $this->collPublications = $collPublications;
+                $this->collPublicationsPartial = false;
             }
         }
 
-        return $this->collWorks;
+        return $this->collPublications;
     }
 
     /**
-     * Sets a collection of Work objects related by a one-to-many relationship
+     * Sets a collection of Publication objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $works A Propel collection.
+     * @param PropelCollection $publications A Propel collection.
      * @param PropelPDO $con Optional connection object
      * @return Title The current object (for fluent API support)
      */
-    public function setWorks(PropelCollection $works, PropelPDO $con = null)
+    public function setPublications(PropelCollection $publications, PropelPDO $con = null)
     {
-        $worksToDelete = $this->getWorks(new Criteria(), $con)->diff($works);
+        $publicationsToDelete = $this->getPublications(new Criteria(), $con)->diff($publications);
 
-        $this->worksScheduledForDeletion = unserialize(serialize($worksToDelete));
+        $this->publicationsScheduledForDeletion = unserialize(serialize($publicationsToDelete));
 
-        foreach ($worksToDelete as $workRemoved) {
-            $workRemoved->setTitle(null);
+        foreach ($publicationsToDelete as $publicationRemoved) {
+            $publicationRemoved->setTitle(null);
         }
 
-        $this->collWorks = null;
-        foreach ($works as $work) {
-            $this->addWork($work);
+        $this->collPublications = null;
+        foreach ($publications as $publication) {
+            $this->addPublication($publication);
         }
 
-        $this->collWorks = $works;
-        $this->collWorksPartial = false;
+        $this->collPublications = $publications;
+        $this->collPublicationsPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related Work objects.
+     * Returns the number of related Publication objects.
      *
      * @param Criteria $criteria
      * @param boolean $distinct
      * @param PropelPDO $con
-     * @return int             Count of related Work objects.
+     * @return int             Count of related Publication objects.
      * @throws PropelException
      */
-    public function countWorks(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countPublications(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $partial = $this->collWorksPartial && !$this->isNew();
-        if (null === $this->collWorks || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collWorks) {
+        $partial = $this->collPublicationsPartial && !$this->isNew();
+        if (null === $this->collPublications || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collPublications) {
                 return 0;
             }
 
             if($partial && !$criteria) {
-                return count($this->getWorks());
+                return count($this->getPublications());
             }
-            $query = WorkQuery::create(null, $criteria);
+            $query = PublicationQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
@@ -1073,52 +1073,52 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
                 ->count($con);
         }
 
-        return count($this->collWorks);
+        return count($this->collPublications);
     }
 
     /**
-     * Method called to associate a Work object to this object
-     * through the Work foreign key attribute.
+     * Method called to associate a Publication object to this object
+     * through the Publication foreign key attribute.
      *
-     * @param    Work $l Work
+     * @param    Publication $l Publication
      * @return Title The current object (for fluent API support)
      */
-    public function addWork(Work $l)
+    public function addPublication(Publication $l)
     {
-        if ($this->collWorks === null) {
-            $this->initWorks();
-            $this->collWorksPartial = true;
+        if ($this->collPublications === null) {
+            $this->initPublications();
+            $this->collPublicationsPartial = true;
         }
-        if (!in_array($l, $this->collWorks->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddWork($l);
+        if (!in_array($l, $this->collPublications->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddPublication($l);
         }
 
         return $this;
     }
 
     /**
-     * @param	Work $work The work object to add.
+     * @param	Publication $publication The publication object to add.
      */
-    protected function doAddWork($work)
+    protected function doAddPublication($publication)
     {
-        $this->collWorks[]= $work;
-        $work->setTitle($this);
+        $this->collPublications[]= $publication;
+        $publication->setTitle($this);
     }
 
     /**
-     * @param	Work $work The work object to remove.
+     * @param	Publication $publication The publication object to remove.
      * @return Title The current object (for fluent API support)
      */
-    public function removeWork($work)
+    public function removePublication($publication)
     {
-        if ($this->getWorks()->contains($work)) {
-            $this->collWorks->remove($this->collWorks->search($work));
-            if (null === $this->worksScheduledForDeletion) {
-                $this->worksScheduledForDeletion = clone $this->collWorks;
-                $this->worksScheduledForDeletion->clear();
+        if ($this->getPublications()->contains($publication)) {
+            $this->collPublications->remove($this->collPublications->search($publication));
+            if (null === $this->publicationsScheduledForDeletion) {
+                $this->publicationsScheduledForDeletion = clone $this->collPublications;
+                $this->publicationsScheduledForDeletion->clear();
             }
-            $this->worksScheduledForDeletion[]= clone $work;
-            $work->setTitle(null);
+            $this->publicationsScheduledForDeletion[]= clone $publication;
+            $publication->setTitle(null);
         }
 
         return $this;
@@ -1130,7 +1130,7 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
      * an identical criteria, it returns the collection.
      * Otherwise if this Title is new, it will return
      * an empty collection; or if this Title has previously
-     * been saved, it will retrieve related Works from storage.
+     * been saved, it will retrieve related Publications from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1139,14 +1139,89 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Work[] List of Work objects
+     * @return PropelObjectCollection|Publication[] List of Publication objects
      */
-    public function getWorksJoinDatespecification($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getPublicationsJoinPublishingcompany($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
-        $query = WorkQuery::create(null, $criteria);
-        $query->joinWith('Datespecification', $join_behavior);
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Publishingcompany', $join_behavior);
 
-        return $this->getWorks($query, $con);
+        return $this->getPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinPlace($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Place', $join_behavior);
+
+        return $this->getPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinDatespecificationRelatedByPublicationdateId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('DatespecificationRelatedByPublicationdateId', $join_behavior);
+
+        return $this->getPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinDatespecificationRelatedByCreationdateId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('DatespecificationRelatedByCreationdateId', $join_behavior);
+
+        return $this->getPublications($query, $con);
     }
 
     /**
@@ -1638,8 +1713,8 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
-            if ($this->collWorks) {
-                foreach ($this->collWorks as $o) {
+            if ($this->collPublications) {
+                foreach ($this->collPublications as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -1657,10 +1732,10 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
-        if ($this->collWorks instanceof PropelCollection) {
-            $this->collWorks->clearIterator();
+        if ($this->collPublications instanceof PropelCollection) {
+            $this->collPublications->clearIterator();
         }
-        $this->collWorks = null;
+        $this->collPublications = null;
         if ($this->collSeries instanceof PropelCollection) {
             $this->collSeries->clearIterator();
         }

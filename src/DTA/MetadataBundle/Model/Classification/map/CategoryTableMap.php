@@ -45,6 +45,8 @@ class CategoryTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('name', 'Name', 'LONGVARCHAR', true, null, null);
+        $this->addColumn('description', 'Description', 'LONGVARCHAR', true, null, null);
+        $this->addForeignKey('categorytype_id', 'CategorytypeId', 'INTEGER', 'categorytype', 'id', true, null, null);
         // validators
     } // initialize()
 
@@ -53,8 +55,9 @@ class CategoryTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('CategoryWork', 'DTA\\MetadataBundle\\Model\\Master\\CategoryWork', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), null, null, 'CategoryWorks');
-        $this->addRelation('Work', 'DTA\\MetadataBundle\\Model\\Data\\Work', RelationMap::MANY_TO_MANY, array(), null, null, 'Works');
+        $this->addRelation('Categorytype', 'DTA\\MetadataBundle\\Model\\Classification\\Categorytype', RelationMap::MANY_TO_ONE, array('categorytype_id' => 'id', ), null, null);
+        $this->addRelation('CategoryPublication', 'DTA\\MetadataBundle\\Model\\Master\\CategoryPublication', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), null, null, 'CategoryPublications');
+        $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::MANY_TO_MANY, array(), null, null, 'Publications');
     } // buildRelations()
 
     /**
@@ -69,6 +72,8 @@ class CategoryTableMap extends TableMap
             'table_row_view' =>  array (
   'Id' => 'id',
   'Name' => 'name',
+  'Description' => 'description',
+  'CategorytypeId' => 'categorytype_id',
 ),
         );
     } // getBehaviors()

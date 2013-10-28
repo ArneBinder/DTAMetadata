@@ -20,8 +20,6 @@ use DTA\MetadataBundle\Model\Data\Personalname;
 use DTA\MetadataBundle\Model\Data\PersonalnameQuery;
 use DTA\MetadataBundle\Model\Master\PersonPublication;
 use DTA\MetadataBundle\Model\Master\PersonPublicationQuery;
-use DTA\MetadataBundle\Model\Master\PersonWork;
-use DTA\MetadataBundle\Model\Master\PersonWorkQuery;
 
 abstract class BasePerson extends BaseObject implements Persistent, \DTA\MetadataBundle\Model\table_row_view\TableRowViewInterface
 {
@@ -69,12 +67,6 @@ abstract class BasePerson extends BaseObject implements Persistent, \DTA\Metadat
     protected $collPersonPublicationsPartial;
 
     /**
-     * @var        PropelObjectCollection|PersonWork[] Collection to store aggregation of PersonWork objects.
-     */
-    protected $collPersonWorks;
-    protected $collPersonWorksPartial;
-
-    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      * @var        boolean
@@ -107,12 +99,6 @@ abstract class BasePerson extends BaseObject implements Persistent, \DTA\Metadat
      * @var		PropelObjectCollection
      */
     protected $personPublicationsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $personWorksScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -284,8 +270,6 @@ abstract class BasePerson extends BaseObject implements Persistent, \DTA\Metadat
 
             $this->collPersonPublications = null;
 
-            $this->collPersonWorks = null;
-
         } // if (deep)
     }
 
@@ -438,23 +422,6 @@ abstract class BasePerson extends BaseObject implements Persistent, \DTA\Metadat
 
             if ($this->collPersonPublications !== null) {
                 foreach ($this->collPersonPublications as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
-            if ($this->personWorksScheduledForDeletion !== null) {
-                if (!$this->personWorksScheduledForDeletion->isEmpty()) {
-                    PersonWorkQuery::create()
-                        ->filterByPrimaryKeys($this->personWorksScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->personWorksScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collPersonWorks !== null) {
-                foreach ($this->collPersonWorks as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -628,14 +595,6 @@ abstract class BasePerson extends BaseObject implements Persistent, \DTA\Metadat
                     }
                 }
 
-                if ($this->collPersonWorks !== null) {
-                    foreach ($this->collPersonWorks as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
 
             $this->alreadyInValidation = false;
         }
@@ -715,9 +674,6 @@ abstract class BasePerson extends BaseObject implements Persistent, \DTA\Metadat
             }
             if (null !== $this->collPersonPublications) {
                 $result['PersonPublications'] = $this->collPersonPublications->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
-            if (null !== $this->collPersonWorks) {
-                $result['PersonWorks'] = $this->collPersonWorks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -882,12 +838,6 @@ abstract class BasePerson extends BaseObject implements Persistent, \DTA\Metadat
                 }
             }
 
-            foreach ($this->getPersonWorks() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addPersonWork($relObj->copy($deepCopy));
-                }
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -954,9 +904,6 @@ abstract class BasePerson extends BaseObject implements Persistent, \DTA\Metadat
         }
         if ('PersonPublication' == $relationName) {
             $this->initPersonPublications();
-        }
-        if ('PersonWork' == $relationName) {
-            $this->initPersonWorks();
         }
     }
 
@@ -1447,274 +1394,6 @@ abstract class BasePerson extends BaseObject implements Persistent, \DTA\Metadat
     }
 
     /**
-     * Clears out the collPersonWorks collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return Person The current object (for fluent API support)
-     * @see        addPersonWorks()
-     */
-    public function clearPersonWorks()
-    {
-        $this->collPersonWorks = null; // important to set this to null since that means it is uninitialized
-        $this->collPersonWorksPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * reset is the collPersonWorks collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialPersonWorks($v = true)
-    {
-        $this->collPersonWorksPartial = $v;
-    }
-
-    /**
-     * Initializes the collPersonWorks collection.
-     *
-     * By default this just sets the collPersonWorks collection to an empty array (like clearcollPersonWorks());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initPersonWorks($overrideExisting = true)
-    {
-        if (null !== $this->collPersonWorks && !$overrideExisting) {
-            return;
-        }
-        $this->collPersonWorks = new PropelObjectCollection();
-        $this->collPersonWorks->setModel('PersonWork');
-    }
-
-    /**
-     * Gets an array of PersonWork objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Person is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|PersonWork[] List of PersonWork objects
-     * @throws PropelException
-     */
-    public function getPersonWorks($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collPersonWorksPartial && !$this->isNew();
-        if (null === $this->collPersonWorks || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collPersonWorks) {
-                // return empty collection
-                $this->initPersonWorks();
-            } else {
-                $collPersonWorks = PersonWorkQuery::create(null, $criteria)
-                    ->filterByPerson($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collPersonWorksPartial && count($collPersonWorks)) {
-                      $this->initPersonWorks(false);
-
-                      foreach($collPersonWorks as $obj) {
-                        if (false == $this->collPersonWorks->contains($obj)) {
-                          $this->collPersonWorks->append($obj);
-                        }
-                      }
-
-                      $this->collPersonWorksPartial = true;
-                    }
-
-                    $collPersonWorks->getInternalIterator()->rewind();
-                    return $collPersonWorks;
-                }
-
-                if($partial && $this->collPersonWorks) {
-                    foreach($this->collPersonWorks as $obj) {
-                        if($obj->isNew()) {
-                            $collPersonWorks[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collPersonWorks = $collPersonWorks;
-                $this->collPersonWorksPartial = false;
-            }
-        }
-
-        return $this->collPersonWorks;
-    }
-
-    /**
-     * Sets a collection of PersonWork objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $personWorks A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     * @return Person The current object (for fluent API support)
-     */
-    public function setPersonWorks(PropelCollection $personWorks, PropelPDO $con = null)
-    {
-        $personWorksToDelete = $this->getPersonWorks(new Criteria(), $con)->diff($personWorks);
-
-        $this->personWorksScheduledForDeletion = unserialize(serialize($personWorksToDelete));
-
-        foreach ($personWorksToDelete as $personWorkRemoved) {
-            $personWorkRemoved->setPerson(null);
-        }
-
-        $this->collPersonWorks = null;
-        foreach ($personWorks as $personWork) {
-            $this->addPersonWork($personWork);
-        }
-
-        $this->collPersonWorks = $personWorks;
-        $this->collPersonWorksPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related PersonWork objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related PersonWork objects.
-     * @throws PropelException
-     */
-    public function countPersonWorks(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collPersonWorksPartial && !$this->isNew();
-        if (null === $this->collPersonWorks || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collPersonWorks) {
-                return 0;
-            }
-
-            if($partial && !$criteria) {
-                return count($this->getPersonWorks());
-            }
-            $query = PersonWorkQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByPerson($this)
-                ->count($con);
-        }
-
-        return count($this->collPersonWorks);
-    }
-
-    /**
-     * Method called to associate a PersonWork object to this object
-     * through the PersonWork foreign key attribute.
-     *
-     * @param    PersonWork $l PersonWork
-     * @return Person The current object (for fluent API support)
-     */
-    public function addPersonWork(PersonWork $l)
-    {
-        if ($this->collPersonWorks === null) {
-            $this->initPersonWorks();
-            $this->collPersonWorksPartial = true;
-        }
-        if (!in_array($l, $this->collPersonWorks->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddPersonWork($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	PersonWork $personWork The personWork object to add.
-     */
-    protected function doAddPersonWork($personWork)
-    {
-        $this->collPersonWorks[]= $personWork;
-        $personWork->setPerson($this);
-    }
-
-    /**
-     * @param	PersonWork $personWork The personWork object to remove.
-     * @return Person The current object (for fluent API support)
-     */
-    public function removePersonWork($personWork)
-    {
-        if ($this->getPersonWorks()->contains($personWork)) {
-            $this->collPersonWorks->remove($this->collPersonWorks->search($personWork));
-            if (null === $this->personWorksScheduledForDeletion) {
-                $this->personWorksScheduledForDeletion = clone $this->collPersonWorks;
-                $this->personWorksScheduledForDeletion->clear();
-            }
-            $this->personWorksScheduledForDeletion[]= clone $personWork;
-            $personWork->setPerson(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Person is new, it will return
-     * an empty collection; or if this Person has previously
-     * been saved, it will retrieve related PersonWorks from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Person.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|PersonWork[] List of PersonWork objects
-     */
-    public function getPersonWorksJoinPersonrole($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = PersonWorkQuery::create(null, $criteria);
-        $query->joinWith('Personrole', $join_behavior);
-
-        return $this->getPersonWorks($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Person is new, it will return
-     * an empty collection; or if this Person has previously
-     * been saved, it will retrieve related PersonWorks from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Person.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|PersonWork[] List of PersonWork objects
-     */
-    public function getPersonWorksJoinWork($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = PersonWorkQuery::create(null, $criteria);
-        $query->joinWith('Work', $join_behavior);
-
-        return $this->getPersonWorks($query, $con);
-    }
-
-    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -1753,11 +1432,6 @@ abstract class BasePerson extends BaseObject implements Persistent, \DTA\Metadat
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collPersonWorks) {
-                foreach ($this->collPersonWorks as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
 
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
@@ -1770,10 +1444,6 @@ abstract class BasePerson extends BaseObject implements Persistent, \DTA\Metadat
             $this->collPersonPublications->clearIterator();
         }
         $this->collPersonPublications = null;
-        if ($this->collPersonWorks instanceof PropelCollection) {
-            $this->collPersonWorks->clearIterator();
-        }
-        $this->collPersonWorks = null;
     }
 
     /**

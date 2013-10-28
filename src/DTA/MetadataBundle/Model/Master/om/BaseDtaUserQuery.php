@@ -22,7 +22,6 @@ use DTA\MetadataBundle\Model\Workflow\Task;
  * @method DtaUserQuery orderByPassword($order = Criteria::ASC) Order by the password column
  * @method DtaUserQuery orderBySalt($order = Criteria::ASC) Order by the salt column
  * @method DtaUserQuery orderByMail($order = Criteria::ASC) Order by the mail column
- * @method DtaUserQuery orderByPhone($order = Criteria::ASC) Order by the phone column
  * @method DtaUserQuery orderByAdmin($order = Criteria::ASC) Order by the admin column
  * @method DtaUserQuery orderById($order = Criteria::ASC) Order by the id column
  *
@@ -30,7 +29,6 @@ use DTA\MetadataBundle\Model\Workflow\Task;
  * @method DtaUserQuery groupByPassword() Group by the password column
  * @method DtaUserQuery groupBySalt() Group by the salt column
  * @method DtaUserQuery groupByMail() Group by the mail column
- * @method DtaUserQuery groupByPhone() Group by the phone column
  * @method DtaUserQuery groupByAdmin() Group by the admin column
  * @method DtaUserQuery groupById() Group by the id column
  *
@@ -49,14 +47,12 @@ use DTA\MetadataBundle\Model\Workflow\Task;
  * @method DtaUser findOneByPassword(string $password) Return the first DtaUser filtered by the password column
  * @method DtaUser findOneBySalt(string $salt) Return the first DtaUser filtered by the salt column
  * @method DtaUser findOneByMail(string $mail) Return the first DtaUser filtered by the mail column
- * @method DtaUser findOneByPhone(string $phone) Return the first DtaUser filtered by the phone column
  * @method DtaUser findOneByAdmin(boolean $admin) Return the first DtaUser filtered by the admin column
  *
  * @method array findByUsername(string $username) Return DtaUser objects filtered by the username column
  * @method array findByPassword(string $password) Return DtaUser objects filtered by the password column
  * @method array findBySalt(string $salt) Return DtaUser objects filtered by the salt column
  * @method array findByMail(string $mail) Return DtaUser objects filtered by the mail column
- * @method array findByPhone(string $phone) Return DtaUser objects filtered by the phone column
  * @method array findByAdmin(boolean $admin) Return DtaUser objects filtered by the admin column
  * @method array findById(int $id) Return DtaUser objects filtered by the id column
  */
@@ -69,7 +65,7 @@ abstract class BaseDtaUserQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'DTAMetadata', $modelName = 'DTA\\MetadataBundle\\Model\\Master\\DtaUser', $modelAlias = null)
+    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Master\\DtaUser', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -160,7 +156,7 @@ abstract class BaseDtaUserQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "username", "password", "salt", "mail", "phone", "admin", "id" FROM "dta_user" WHERE "id" = :p0';
+        $sql = 'SELECT "username", "password", "salt", "mail", "admin", "id" FROM "dta_user" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -363,35 +359,6 @@ abstract class BaseDtaUserQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(DtaUserPeer::MAIL, $mail, $comparison);
-    }
-
-    /**
-     * Filter the query on the phone column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByPhone('fooValue');   // WHERE phone = 'fooValue'
-     * $query->filterByPhone('%fooValue%'); // WHERE phone LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $phone The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return DtaUserQuery The current query, for fluid interface
-     */
-    public function filterByPhone($phone = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($phone)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $phone)) {
-                $phone = str_replace('*', '%', $phone);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(DtaUserPeer::PHONE, $phone, $comparison);
     }
 
     /**

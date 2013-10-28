@@ -5,7 +5,7 @@
     Tasks, tasktypes, related publications, sources, license types, etc.
 -->
 
-<database name="DTAMetadata" namespace="DTA\MetadataBundle\Model\Workflow" defaultIdMethod="native">
+<database name="dtametadata" namespace="DTA\MetadataBundle\Model\Workflow" defaultIdMethod="native">
   
     <!-- This parameter set is added to each entity that doesn't implement the table_row_view behavior. 
     It is not added to tables/entities that define the bahavior. -->
@@ -60,18 +60,23 @@
         <behavior name="nested_set"/>
         <behavior name="table_row_view">
 <!--            <parameter name="id" value="id"/>-->
-            <parameter name="Zuordnung" value="accessor:getParent"/>
             <parameter name="Typ" value="name"/>
+            <parameter name="Zuordnung" value="accessor:getParent"/>
         </behavior>
     </table>
     
     <table name="partner">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR"/>
-        <column description="Ansprechpartner" name="person" type="LONGVARCHAR"/>
-        <column name="contact_data" type="LONGVARCHAR"/>
+        <column name="mail" type="LONGVARCHAR"/>
+        <column name="web" type="LONGVARCHAR"/>
+        <column name="contactperson" description="Ansprechpartner" type="LONGVARCHAR"/>
+        <column name="contactdata" type="LONGVARCHAR"/>
         <column name="comments" type="LONGVARCHAR"/>
         <column name="is_organization" type="BOOLEAN" default="false"/>
+        
+        <column name="legacy_partner_id" description="id_book_location (=Partner/Bibliothek) des Datensatzes aus der alten Datenbank, der dem neuen Datensatz zugrundeliegt." type="INTEGER"/>
+        
     </table>
 
     <!--Quellenangabe fuer Bilddigitalisate-->
@@ -133,6 +138,9 @@
     <table name="publicationgroup">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
+        
+        <column name="legacy_group_id" description="id_group der alten Datenbank, die dem Datensatz zugrundeliegt." type="INTEGER"/>
+        
     </table>
     
 </database>

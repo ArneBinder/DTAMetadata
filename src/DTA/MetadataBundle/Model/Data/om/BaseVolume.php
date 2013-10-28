@@ -9,18 +9,10 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
-use DTA\MetadataBundle\Model\Data\PublicationDs;
-use DTA\MetadataBundle\Model\Data\PublicationDsQuery;
-use DTA\MetadataBundle\Model\Data\PublicationJa;
-use DTA\MetadataBundle\Model\Data\PublicationJaQuery;
-use DTA\MetadataBundle\Model\Data\PublicationMm;
-use DTA\MetadataBundle\Model\Data\PublicationMmQuery;
-use DTA\MetadataBundle\Model\Data\PublicationMms;
-use DTA\MetadataBundle\Model\Data\PublicationMmsQuery;
+use DTA\MetadataBundle\Model\Data\Publication;
+use DTA\MetadataBundle\Model\Data\PublicationQuery;
 use DTA\MetadataBundle\Model\Data\Volume;
 use DTA\MetadataBundle\Model\Data\VolumePeer;
 use DTA\MetadataBundle\Model\Data\VolumeQuery;
@@ -53,6 +45,18 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
     protected $id;
 
     /**
+     * The value for the publication_id field.
+     * @var        int
+     */
+    protected $publication_id;
+
+    /**
+     * The value for the parentpublication_id field.
+     * @var        int
+     */
+    protected $parentpublication_id;
+
+    /**
      * The value for the volumedescription field.
      * @var        int
      */
@@ -60,33 +64,25 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
 
     /**
      * The value for the volumenumeric field.
-     * @var        string
+     * @var        int
      */
     protected $volumenumeric;
 
     /**
-     * @var        PropelObjectCollection|PublicationMm[] Collection to store aggregation of PublicationMm objects.
+     * The value for the volumestotal field.
+     * @var        int
      */
-    protected $collPublicationMms;
-    protected $collPublicationMmsPartial;
+    protected $volumestotal;
 
     /**
-     * @var        PropelObjectCollection|PublicationDs[] Collection to store aggregation of PublicationDs objects.
+     * @var        Publication
      */
-    protected $collPublicationDss;
-    protected $collPublicationDssPartial;
+    protected $aPublicationRelatedByPublicationId;
 
     /**
-     * @var        PropelObjectCollection|PublicationJa[] Collection to store aggregation of PublicationJa objects.
+     * @var        Publication
      */
-    protected $collPublicationJas;
-    protected $collPublicationJasPartial;
-
-    /**
-     * @var        PropelObjectCollection|PublicationMms[] Collection to store aggregation of PublicationMms objects.
-     */
-    protected $collPublicationMmss;
-    protected $collPublicationMmssPartial;
+    protected $aPublicationRelatedByParentpublicationId;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -109,31 +105,7 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Id', 'Volumedescription', 'Volumenumeric', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'Volumedescription'=>'Volumedescription', 'Volumenumeric'=>'Volumenumeric', );
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $publicationMmsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $publicationDssScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $publicationJasScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $publicationMmssScheduledForDeletion = null;
-
+    public static $tableRowViewCaptions = array();	public   $tableRowViewAccessors = array();
     /**
      * Get the [id] column value.
      *
@@ -145,8 +117,28 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
     }
 
     /**
+     * Get the [publication_id] column value.
+     *
+     * @return int
+     */
+    public function getPublicationId()
+    {
+        return $this->publication_id;
+    }
+
+    /**
+     * Get the [parentpublication_id] column value.
+     *
+     * @return int
+     */
+    public function getParentpublicationId()
+    {
+        return $this->parentpublication_id;
+    }
+
+    /**
      * Get the [volumedescription] column value.
-     * Bezeichnung des Bandes
+     * Bezeichnung des Bandes (alphanumerisch)
      * @return int
      */
     public function getVolumedescription()
@@ -156,12 +148,22 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
 
     /**
      * Get the [volumenumeric] column value.
-     * Numerische Bezeichnung des Bandes
-     * @return string
+     * Bezeichnung des Bandes (numerisch)
+     * @return int
      */
     public function getVolumenumeric()
     {
         return $this->volumenumeric;
+    }
+
+    /**
+     * Get the [volumestotal] column value.
+     * Anzahl Bände (gesamt)
+     * @return int
+     */
+    public function getVolumestotal()
+    {
+        return $this->volumestotal;
     }
 
     /**
@@ -186,8 +188,58 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
     } // setId()
 
     /**
+     * Set the value of [publication_id] column.
+     *
+     * @param int $v new value
+     * @return Volume The current object (for fluent API support)
+     */
+    public function setPublicationId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->publication_id !== $v) {
+            $this->publication_id = $v;
+            $this->modifiedColumns[] = VolumePeer::PUBLICATION_ID;
+        }
+
+        if ($this->aPublicationRelatedByPublicationId !== null && $this->aPublicationRelatedByPublicationId->getId() !== $v) {
+            $this->aPublicationRelatedByPublicationId = null;
+        }
+
+
+        return $this;
+    } // setPublicationId()
+
+    /**
+     * Set the value of [parentpublication_id] column.
+     *
+     * @param int $v new value
+     * @return Volume The current object (for fluent API support)
+     */
+    public function setParentpublicationId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->parentpublication_id !== $v) {
+            $this->parentpublication_id = $v;
+            $this->modifiedColumns[] = VolumePeer::PARENTPUBLICATION_ID;
+        }
+
+        if ($this->aPublicationRelatedByParentpublicationId !== null && $this->aPublicationRelatedByParentpublicationId->getId() !== $v) {
+            $this->aPublicationRelatedByParentpublicationId = null;
+        }
+
+
+        return $this;
+    } // setParentpublicationId()
+
+    /**
      * Set the value of [volumedescription] column.
-     * Bezeichnung des Bandes
+     * Bezeichnung des Bandes (alphanumerisch)
      * @param int $v new value
      * @return Volume The current object (for fluent API support)
      */
@@ -208,14 +260,14 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
 
     /**
      * Set the value of [volumenumeric] column.
-     * Numerische Bezeichnung des Bandes
-     * @param string $v new value
+     * Bezeichnung des Bandes (numerisch)
+     * @param int $v new value
      * @return Volume The current object (for fluent API support)
      */
     public function setVolumenumeric($v)
     {
         if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
+            $v = (int) $v;
         }
 
         if ($this->volumenumeric !== $v) {
@@ -226,6 +278,27 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
 
         return $this;
     } // setVolumenumeric()
+
+    /**
+     * Set the value of [volumestotal] column.
+     * Anzahl Bände (gesamt)
+     * @param int $v new value
+     * @return Volume The current object (for fluent API support)
+     */
+    public function setVolumestotal($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->volumestotal !== $v) {
+            $this->volumestotal = $v;
+            $this->modifiedColumns[] = VolumePeer::VOLUMESTOTAL;
+        }
+
+
+        return $this;
+    } // setVolumestotal()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -260,8 +333,11 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
         try {
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-            $this->volumedescription = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-            $this->volumenumeric = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+            $this->publication_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+            $this->parentpublication_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+            $this->volumedescription = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+            $this->volumenumeric = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
+            $this->volumestotal = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -270,7 +346,7 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 3; // 3 = VolumePeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = VolumePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Volume object", $e);
@@ -293,6 +369,12 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
     public function ensureConsistency()
     {
 
+        if ($this->aPublicationRelatedByPublicationId !== null && $this->publication_id !== $this->aPublicationRelatedByPublicationId->getId()) {
+            $this->aPublicationRelatedByPublicationId = null;
+        }
+        if ($this->aPublicationRelatedByParentpublicationId !== null && $this->parentpublication_id !== $this->aPublicationRelatedByParentpublicationId->getId()) {
+            $this->aPublicationRelatedByParentpublicationId = null;
+        }
     } // ensureConsistency
 
     /**
@@ -332,14 +414,8 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collPublicationMms = null;
-
-            $this->collPublicationDss = null;
-
-            $this->collPublicationJas = null;
-
-            $this->collPublicationMmss = null;
-
+            $this->aPublicationRelatedByPublicationId = null;
+            $this->aPublicationRelatedByParentpublicationId = null;
         } // if (deep)
     }
 
@@ -453,6 +529,25 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aPublicationRelatedByPublicationId !== null) {
+                if ($this->aPublicationRelatedByPublicationId->isModified() || $this->aPublicationRelatedByPublicationId->isNew()) {
+                    $affectedRows += $this->aPublicationRelatedByPublicationId->save($con);
+                }
+                $this->setPublicationRelatedByPublicationId($this->aPublicationRelatedByPublicationId);
+            }
+
+            if ($this->aPublicationRelatedByParentpublicationId !== null) {
+                if ($this->aPublicationRelatedByParentpublicationId->isModified() || $this->aPublicationRelatedByParentpublicationId->isNew()) {
+                    $affectedRows += $this->aPublicationRelatedByParentpublicationId->save($con);
+                }
+                $this->setPublicationRelatedByParentpublicationId($this->aPublicationRelatedByParentpublicationId);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -462,74 +557,6 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->publicationMmsScheduledForDeletion !== null) {
-                if (!$this->publicationMmsScheduledForDeletion->isEmpty()) {
-                    PublicationMmQuery::create()
-                        ->filterByPrimaryKeys($this->publicationMmsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->publicationMmsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collPublicationMms !== null) {
-                foreach ($this->collPublicationMms as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
-            if ($this->publicationDssScheduledForDeletion !== null) {
-                if (!$this->publicationDssScheduledForDeletion->isEmpty()) {
-                    PublicationDsQuery::create()
-                        ->filterByPrimaryKeys($this->publicationDssScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->publicationDssScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collPublicationDss !== null) {
-                foreach ($this->collPublicationDss as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
-            if ($this->publicationJasScheduledForDeletion !== null) {
-                if (!$this->publicationJasScheduledForDeletion->isEmpty()) {
-                    PublicationJaQuery::create()
-                        ->filterByPrimaryKeys($this->publicationJasScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->publicationJasScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collPublicationJas !== null) {
-                foreach ($this->collPublicationJas as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
-            if ($this->publicationMmssScheduledForDeletion !== null) {
-                if (!$this->publicationMmssScheduledForDeletion->isEmpty()) {
-                    PublicationMmsQuery::create()
-                        ->filterByPrimaryKeys($this->publicationMmssScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->publicationMmssScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collPublicationMmss !== null) {
-                foreach ($this->collPublicationMmss as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
             }
 
             $this->alreadyInSave = false;
@@ -571,11 +598,20 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
         if ($this->isColumnModified(VolumePeer::ID)) {
             $modifiedColumns[':p' . $index++]  = '"id"';
         }
+        if ($this->isColumnModified(VolumePeer::PUBLICATION_ID)) {
+            $modifiedColumns[':p' . $index++]  = '"publication_id"';
+        }
+        if ($this->isColumnModified(VolumePeer::PARENTPUBLICATION_ID)) {
+            $modifiedColumns[':p' . $index++]  = '"parentpublication_id"';
+        }
         if ($this->isColumnModified(VolumePeer::VOLUMEDESCRIPTION)) {
             $modifiedColumns[':p' . $index++]  = '"volumedescription"';
         }
         if ($this->isColumnModified(VolumePeer::VOLUMENUMERIC)) {
             $modifiedColumns[':p' . $index++]  = '"volumenumeric"';
+        }
+        if ($this->isColumnModified(VolumePeer::VOLUMESTOTAL)) {
+            $modifiedColumns[':p' . $index++]  = '"volumestotal"';
         }
 
         $sql = sprintf(
@@ -591,11 +627,20 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
                     case '"id"':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
+                    case '"publication_id"':
+                        $stmt->bindValue($identifier, $this->publication_id, PDO::PARAM_INT);
+                        break;
+                    case '"parentpublication_id"':
+                        $stmt->bindValue($identifier, $this->parentpublication_id, PDO::PARAM_INT);
+                        break;
                     case '"volumedescription"':
                         $stmt->bindValue($identifier, $this->volumedescription, PDO::PARAM_INT);
                         break;
                     case '"volumenumeric"':
-                        $stmt->bindValue($identifier, $this->volumenumeric, PDO::PARAM_STR);
+                        $stmt->bindValue($identifier, $this->volumenumeric, PDO::PARAM_INT);
+                        break;
+                    case '"volumestotal"':
+                        $stmt->bindValue($identifier, $this->volumestotal, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -684,42 +729,28 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aPublicationRelatedByPublicationId !== null) {
+                if (!$this->aPublicationRelatedByPublicationId->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aPublicationRelatedByPublicationId->getValidationFailures());
+                }
+            }
+
+            if ($this->aPublicationRelatedByParentpublicationId !== null) {
+                if (!$this->aPublicationRelatedByParentpublicationId->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aPublicationRelatedByParentpublicationId->getValidationFailures());
+                }
+            }
+
+
             if (($retval = VolumePeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->collPublicationMms !== null) {
-                    foreach ($this->collPublicationMms as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
-                if ($this->collPublicationDss !== null) {
-                    foreach ($this->collPublicationDss as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
-                if ($this->collPublicationJas !== null) {
-                    foreach ($this->collPublicationJas as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
-                if ($this->collPublicationMmss !== null) {
-                    foreach ($this->collPublicationMmss as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -760,10 +791,19 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
                 return $this->getId();
                 break;
             case 1:
-                return $this->getVolumedescription();
+                return $this->getPublicationId();
                 break;
             case 2:
+                return $this->getParentpublicationId();
+                break;
+            case 3:
+                return $this->getVolumedescription();
+                break;
+            case 4:
                 return $this->getVolumenumeric();
+                break;
+            case 5:
+                return $this->getVolumestotal();
                 break;
             default:
                 return null;
@@ -795,21 +835,18 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
         $keys = VolumePeer::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getVolumedescription(),
-            $keys[2] => $this->getVolumenumeric(),
+            $keys[1] => $this->getPublicationId(),
+            $keys[2] => $this->getParentpublicationId(),
+            $keys[3] => $this->getVolumedescription(),
+            $keys[4] => $this->getVolumenumeric(),
+            $keys[5] => $this->getVolumestotal(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->collPublicationMms) {
-                $result['PublicationMms'] = $this->collPublicationMms->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->aPublicationRelatedByPublicationId) {
+                $result['PublicationRelatedByPublicationId'] = $this->aPublicationRelatedByPublicationId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->collPublicationDss) {
-                $result['PublicationDss'] = $this->collPublicationDss->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
-            if (null !== $this->collPublicationJas) {
-                $result['PublicationJas'] = $this->collPublicationJas->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
-            if (null !== $this->collPublicationMmss) {
-                $result['PublicationMmss'] = $this->collPublicationMmss->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->aPublicationRelatedByParentpublicationId) {
+                $result['PublicationRelatedByParentpublicationId'] = $this->aPublicationRelatedByParentpublicationId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -849,10 +886,19 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
                 $this->setId($value);
                 break;
             case 1:
-                $this->setVolumedescription($value);
+                $this->setPublicationId($value);
                 break;
             case 2:
+                $this->setParentpublicationId($value);
+                break;
+            case 3:
+                $this->setVolumedescription($value);
+                break;
+            case 4:
                 $this->setVolumenumeric($value);
+                break;
+            case 5:
+                $this->setVolumestotal($value);
                 break;
         } // switch()
     }
@@ -879,8 +925,11 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
         $keys = VolumePeer::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setVolumedescription($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setVolumenumeric($arr[$keys[2]]);
+        if (array_key_exists($keys[1], $arr)) $this->setPublicationId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setParentpublicationId($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setVolumedescription($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setVolumenumeric($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setVolumestotal($arr[$keys[5]]);
     }
 
     /**
@@ -893,8 +942,11 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
         $criteria = new Criteria(VolumePeer::DATABASE_NAME);
 
         if ($this->isColumnModified(VolumePeer::ID)) $criteria->add(VolumePeer::ID, $this->id);
+        if ($this->isColumnModified(VolumePeer::PUBLICATION_ID)) $criteria->add(VolumePeer::PUBLICATION_ID, $this->publication_id);
+        if ($this->isColumnModified(VolumePeer::PARENTPUBLICATION_ID)) $criteria->add(VolumePeer::PARENTPUBLICATION_ID, $this->parentpublication_id);
         if ($this->isColumnModified(VolumePeer::VOLUMEDESCRIPTION)) $criteria->add(VolumePeer::VOLUMEDESCRIPTION, $this->volumedescription);
         if ($this->isColumnModified(VolumePeer::VOLUMENUMERIC)) $criteria->add(VolumePeer::VOLUMENUMERIC, $this->volumenumeric);
+        if ($this->isColumnModified(VolumePeer::VOLUMESTOTAL)) $criteria->add(VolumePeer::VOLUMESTOTAL, $this->volumestotal);
 
         return $criteria;
     }
@@ -958,8 +1010,11 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
+        $copyObj->setPublicationId($this->getPublicationId());
+        $copyObj->setParentpublicationId($this->getParentpublicationId());
         $copyObj->setVolumedescription($this->getVolumedescription());
         $copyObj->setVolumenumeric($this->getVolumenumeric());
+        $copyObj->setVolumestotal($this->getVolumestotal());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -967,30 +1022,6 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
             $copyObj->setNew(false);
             // store object hash to prevent cycle
             $this->startCopy = true;
-
-            foreach ($this->getPublicationMms() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addPublicationMm($relObj->copy($deepCopy));
-                }
-            }
-
-            foreach ($this->getPublicationDss() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addPublicationDs($relObj->copy($deepCopy));
-                }
-            }
-
-            foreach ($this->getPublicationJas() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addPublicationJa($relObj->copy($deepCopy));
-                }
-            }
-
-            foreach ($this->getPublicationMmss() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addPublicationMms($relObj->copy($deepCopy));
-                }
-            }
 
             //unflag object copy
             $this->startCopy = false;
@@ -1042,1051 +1073,108 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Publication object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-        if ('PublicationMm' == $relationName) {
-            $this->initPublicationMms();
-        }
-        if ('PublicationDs' == $relationName) {
-            $this->initPublicationDss();
-        }
-        if ('PublicationJa' == $relationName) {
-            $this->initPublicationJas();
-        }
-        if ('PublicationMms' == $relationName) {
-            $this->initPublicationMmss();
-        }
-    }
-
-    /**
-     * Clears out the collPublicationMms collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
+     * @param             Publication $v
      * @return Volume The current object (for fluent API support)
-     * @see        addPublicationMms()
-     */
-    public function clearPublicationMms()
-    {
-        $this->collPublicationMms = null; // important to set this to null since that means it is uninitialized
-        $this->collPublicationMmsPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * reset is the collPublicationMms collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialPublicationMms($v = true)
-    {
-        $this->collPublicationMmsPartial = $v;
-    }
-
-    /**
-     * Initializes the collPublicationMms collection.
-     *
-     * By default this just sets the collPublicationMms collection to an empty array (like clearcollPublicationMms());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initPublicationMms($overrideExisting = true)
-    {
-        if (null !== $this->collPublicationMms && !$overrideExisting) {
-            return;
-        }
-        $this->collPublicationMms = new PropelObjectCollection();
-        $this->collPublicationMms->setModel('PublicationMm');
-    }
-
-    /**
-     * Gets an array of PublicationMm objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Volume is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|PublicationMm[] List of PublicationMm objects
      * @throws PropelException
      */
-    public function getPublicationMms($criteria = null, PropelPDO $con = null)
+    public function setPublicationRelatedByPublicationId(Publication $v = null)
     {
-        $partial = $this->collPublicationMmsPartial && !$this->isNew();
-        if (null === $this->collPublicationMms || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collPublicationMms) {
-                // return empty collection
-                $this->initPublicationMms();
-            } else {
-                $collPublicationMms = PublicationMmQuery::create(null, $criteria)
-                    ->filterByVolume($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collPublicationMmsPartial && count($collPublicationMms)) {
-                      $this->initPublicationMms(false);
-
-                      foreach($collPublicationMms as $obj) {
-                        if (false == $this->collPublicationMms->contains($obj)) {
-                          $this->collPublicationMms->append($obj);
-                        }
-                      }
-
-                      $this->collPublicationMmsPartial = true;
-                    }
-
-                    $collPublicationMms->getInternalIterator()->rewind();
-                    return $collPublicationMms;
-                }
-
-                if($partial && $this->collPublicationMms) {
-                    foreach($this->collPublicationMms as $obj) {
-                        if($obj->isNew()) {
-                            $collPublicationMms[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collPublicationMms = $collPublicationMms;
-                $this->collPublicationMmsPartial = false;
-            }
+        if ($v === null) {
+            $this->setPublicationId(NULL);
+        } else {
+            $this->setPublicationId($v->getId());
         }
 
-        return $this->collPublicationMms;
-    }
+        $this->aPublicationRelatedByPublicationId = $v;
 
-    /**
-     * Sets a collection of PublicationMm objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $publicationMms A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     * @return Volume The current object (for fluent API support)
-     */
-    public function setPublicationMms(PropelCollection $publicationMms, PropelPDO $con = null)
-    {
-        $publicationMmsToDelete = $this->getPublicationMms(new Criteria(), $con)->diff($publicationMms);
-
-        $this->publicationMmsScheduledForDeletion = unserialize(serialize($publicationMmsToDelete));
-
-        foreach ($publicationMmsToDelete as $publicationMmRemoved) {
-            $publicationMmRemoved->setVolume(null);
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Publication object, it will not be re-added.
+        if ($v !== null) {
+            $v->addVolumeRelatedByPublicationId($this);
         }
 
-        $this->collPublicationMms = null;
-        foreach ($publicationMms as $publicationMm) {
-            $this->addPublicationMm($publicationMm);
-        }
-
-        $this->collPublicationMms = $publicationMms;
-        $this->collPublicationMmsPartial = false;
 
         return $this;
     }
 
+
     /**
-     * Returns the number of related PublicationMm objects.
+     * Get the associated Publication object
      *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related PublicationMm objects.
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return Publication The associated Publication object.
      * @throws PropelException
      */
-    public function countPublicationMms(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function getPublicationRelatedByPublicationId(PropelPDO $con = null, $doQuery = true)
     {
-        $partial = $this->collPublicationMmsPartial && !$this->isNew();
-        if (null === $this->collPublicationMms || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collPublicationMms) {
-                return 0;
-            }
-
-            if($partial && !$criteria) {
-                return count($this->getPublicationMms());
-            }
-            $query = PublicationMmQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByVolume($this)
-                ->count($con);
+        if ($this->aPublicationRelatedByPublicationId === null && ($this->publication_id !== null) && $doQuery) {
+            $this->aPublicationRelatedByPublicationId = PublicationQuery::create()->findPk($this->publication_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aPublicationRelatedByPublicationId->addVolumesRelatedByPublicationId($this);
+             */
         }
 
-        return count($this->collPublicationMms);
+        return $this->aPublicationRelatedByPublicationId;
     }
 
     /**
-     * Method called to associate a PublicationMm object to this object
-     * through the PublicationMm foreign key attribute.
+     * Declares an association between this object and a Publication object.
      *
-     * @param    PublicationMm $l PublicationMm
+     * @param             Publication $v
      * @return Volume The current object (for fluent API support)
-     */
-    public function addPublicationMm(PublicationMm $l)
-    {
-        if ($this->collPublicationMms === null) {
-            $this->initPublicationMms();
-            $this->collPublicationMmsPartial = true;
-        }
-        if (!in_array($l, $this->collPublicationMms->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddPublicationMm($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	PublicationMm $publicationMm The publicationMm object to add.
-     */
-    protected function doAddPublicationMm($publicationMm)
-    {
-        $this->collPublicationMms[]= $publicationMm;
-        $publicationMm->setVolume($this);
-    }
-
-    /**
-     * @param	PublicationMm $publicationMm The publicationMm object to remove.
-     * @return Volume The current object (for fluent API support)
-     */
-    public function removePublicationMm($publicationMm)
-    {
-        if ($this->getPublicationMms()->contains($publicationMm)) {
-            $this->collPublicationMms->remove($this->collPublicationMms->search($publicationMm));
-            if (null === $this->publicationMmsScheduledForDeletion) {
-                $this->publicationMmsScheduledForDeletion = clone $this->collPublicationMms;
-                $this->publicationMmsScheduledForDeletion->clear();
-            }
-            $this->publicationMmsScheduledForDeletion[]= clone $publicationMm;
-            $publicationMm->setVolume(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Volume is new, it will return
-     * an empty collection; or if this Volume has previously
-     * been saved, it will retrieve related PublicationMms from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Volume.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|PublicationMm[] List of PublicationMm objects
-     */
-    public function getPublicationMmsJoinPublication($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = PublicationMmQuery::create(null, $criteria);
-        $query->joinWith('Publication', $join_behavior);
-
-        return $this->getPublicationMms($query, $con);
-    }
-
-    /**
-     * Clears out the collPublicationDss collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return Volume The current object (for fluent API support)
-     * @see        addPublicationDss()
-     */
-    public function clearPublicationDss()
-    {
-        $this->collPublicationDss = null; // important to set this to null since that means it is uninitialized
-        $this->collPublicationDssPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * reset is the collPublicationDss collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialPublicationDss($v = true)
-    {
-        $this->collPublicationDssPartial = $v;
-    }
-
-    /**
-     * Initializes the collPublicationDss collection.
-     *
-     * By default this just sets the collPublicationDss collection to an empty array (like clearcollPublicationDss());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initPublicationDss($overrideExisting = true)
-    {
-        if (null !== $this->collPublicationDss && !$overrideExisting) {
-            return;
-        }
-        $this->collPublicationDss = new PropelObjectCollection();
-        $this->collPublicationDss->setModel('PublicationDs');
-    }
-
-    /**
-     * Gets an array of PublicationDs objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Volume is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|PublicationDs[] List of PublicationDs objects
      * @throws PropelException
      */
-    public function getPublicationDss($criteria = null, PropelPDO $con = null)
+    public function setPublicationRelatedByParentpublicationId(Publication $v = null)
     {
-        $partial = $this->collPublicationDssPartial && !$this->isNew();
-        if (null === $this->collPublicationDss || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collPublicationDss) {
-                // return empty collection
-                $this->initPublicationDss();
-            } else {
-                $collPublicationDss = PublicationDsQuery::create(null, $criteria)
-                    ->filterByVolume($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collPublicationDssPartial && count($collPublicationDss)) {
-                      $this->initPublicationDss(false);
-
-                      foreach($collPublicationDss as $obj) {
-                        if (false == $this->collPublicationDss->contains($obj)) {
-                          $this->collPublicationDss->append($obj);
-                        }
-                      }
-
-                      $this->collPublicationDssPartial = true;
-                    }
-
-                    $collPublicationDss->getInternalIterator()->rewind();
-                    return $collPublicationDss;
-                }
-
-                if($partial && $this->collPublicationDss) {
-                    foreach($this->collPublicationDss as $obj) {
-                        if($obj->isNew()) {
-                            $collPublicationDss[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collPublicationDss = $collPublicationDss;
-                $this->collPublicationDssPartial = false;
-            }
+        if ($v === null) {
+            $this->setParentpublicationId(NULL);
+        } else {
+            $this->setParentpublicationId($v->getId());
         }
 
-        return $this->collPublicationDss;
-    }
+        $this->aPublicationRelatedByParentpublicationId = $v;
 
-    /**
-     * Sets a collection of PublicationDs objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $publicationDss A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     * @return Volume The current object (for fluent API support)
-     */
-    public function setPublicationDss(PropelCollection $publicationDss, PropelPDO $con = null)
-    {
-        $publicationDssToDelete = $this->getPublicationDss(new Criteria(), $con)->diff($publicationDss);
-
-        $this->publicationDssScheduledForDeletion = unserialize(serialize($publicationDssToDelete));
-
-        foreach ($publicationDssToDelete as $publicationDsRemoved) {
-            $publicationDsRemoved->setVolume(null);
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Publication object, it will not be re-added.
+        if ($v !== null) {
+            $v->addVolumeRelatedByParentpublicationId($this);
         }
 
-        $this->collPublicationDss = null;
-        foreach ($publicationDss as $publicationDs) {
-            $this->addPublicationDs($publicationDs);
-        }
-
-        $this->collPublicationDss = $publicationDss;
-        $this->collPublicationDssPartial = false;
 
         return $this;
     }
 
+
     /**
-     * Returns the number of related PublicationDs objects.
+     * Get the associated Publication object
      *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related PublicationDs objects.
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return Publication The associated Publication object.
      * @throws PropelException
      */
-    public function countPublicationDss(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function getPublicationRelatedByParentpublicationId(PropelPDO $con = null, $doQuery = true)
     {
-        $partial = $this->collPublicationDssPartial && !$this->isNew();
-        if (null === $this->collPublicationDss || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collPublicationDss) {
-                return 0;
-            }
-
-            if($partial && !$criteria) {
-                return count($this->getPublicationDss());
-            }
-            $query = PublicationDsQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByVolume($this)
-                ->count($con);
+        if ($this->aPublicationRelatedByParentpublicationId === null && ($this->parentpublication_id !== null) && $doQuery) {
+            $this->aPublicationRelatedByParentpublicationId = PublicationQuery::create()->findPk($this->parentpublication_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aPublicationRelatedByParentpublicationId->addVolumesRelatedByParentpublicationId($this);
+             */
         }
 
-        return count($this->collPublicationDss);
-    }
-
-    /**
-     * Method called to associate a PublicationDs object to this object
-     * through the PublicationDs foreign key attribute.
-     *
-     * @param    PublicationDs $l PublicationDs
-     * @return Volume The current object (for fluent API support)
-     */
-    public function addPublicationDs(PublicationDs $l)
-    {
-        if ($this->collPublicationDss === null) {
-            $this->initPublicationDss();
-            $this->collPublicationDssPartial = true;
-        }
-        if (!in_array($l, $this->collPublicationDss->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddPublicationDs($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	PublicationDs $publicationDs The publicationDs object to add.
-     */
-    protected function doAddPublicationDs($publicationDs)
-    {
-        $this->collPublicationDss[]= $publicationDs;
-        $publicationDs->setVolume($this);
-    }
-
-    /**
-     * @param	PublicationDs $publicationDs The publicationDs object to remove.
-     * @return Volume The current object (for fluent API support)
-     */
-    public function removePublicationDs($publicationDs)
-    {
-        if ($this->getPublicationDss()->contains($publicationDs)) {
-            $this->collPublicationDss->remove($this->collPublicationDss->search($publicationDs));
-            if (null === $this->publicationDssScheduledForDeletion) {
-                $this->publicationDssScheduledForDeletion = clone $this->collPublicationDss;
-                $this->publicationDssScheduledForDeletion->clear();
-            }
-            $this->publicationDssScheduledForDeletion[]= clone $publicationDs;
-            $publicationDs->setVolume(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Volume is new, it will return
-     * an empty collection; or if this Volume has previously
-     * been saved, it will retrieve related PublicationDss from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Volume.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|PublicationDs[] List of PublicationDs objects
-     */
-    public function getPublicationDssJoinPublication($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = PublicationDsQuery::create(null, $criteria);
-        $query->joinWith('Publication', $join_behavior);
-
-        return $this->getPublicationDss($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Volume is new, it will return
-     * an empty collection; or if this Volume has previously
-     * been saved, it will retrieve related PublicationDss from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Volume.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|PublicationDs[] List of PublicationDs objects
-     */
-    public function getPublicationDssJoinSeries($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = PublicationDsQuery::create(null, $criteria);
-        $query->joinWith('Series', $join_behavior);
-
-        return $this->getPublicationDss($query, $con);
-    }
-
-    /**
-     * Clears out the collPublicationJas collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return Volume The current object (for fluent API support)
-     * @see        addPublicationJas()
-     */
-    public function clearPublicationJas()
-    {
-        $this->collPublicationJas = null; // important to set this to null since that means it is uninitialized
-        $this->collPublicationJasPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * reset is the collPublicationJas collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialPublicationJas($v = true)
-    {
-        $this->collPublicationJasPartial = $v;
-    }
-
-    /**
-     * Initializes the collPublicationJas collection.
-     *
-     * By default this just sets the collPublicationJas collection to an empty array (like clearcollPublicationJas());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initPublicationJas($overrideExisting = true)
-    {
-        if (null !== $this->collPublicationJas && !$overrideExisting) {
-            return;
-        }
-        $this->collPublicationJas = new PropelObjectCollection();
-        $this->collPublicationJas->setModel('PublicationJa');
-    }
-
-    /**
-     * Gets an array of PublicationJa objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Volume is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|PublicationJa[] List of PublicationJa objects
-     * @throws PropelException
-     */
-    public function getPublicationJas($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collPublicationJasPartial && !$this->isNew();
-        if (null === $this->collPublicationJas || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collPublicationJas) {
-                // return empty collection
-                $this->initPublicationJas();
-            } else {
-                $collPublicationJas = PublicationJaQuery::create(null, $criteria)
-                    ->filterByVolume($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collPublicationJasPartial && count($collPublicationJas)) {
-                      $this->initPublicationJas(false);
-
-                      foreach($collPublicationJas as $obj) {
-                        if (false == $this->collPublicationJas->contains($obj)) {
-                          $this->collPublicationJas->append($obj);
-                        }
-                      }
-
-                      $this->collPublicationJasPartial = true;
-                    }
-
-                    $collPublicationJas->getInternalIterator()->rewind();
-                    return $collPublicationJas;
-                }
-
-                if($partial && $this->collPublicationJas) {
-                    foreach($this->collPublicationJas as $obj) {
-                        if($obj->isNew()) {
-                            $collPublicationJas[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collPublicationJas = $collPublicationJas;
-                $this->collPublicationJasPartial = false;
-            }
-        }
-
-        return $this->collPublicationJas;
-    }
-
-    /**
-     * Sets a collection of PublicationJa objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $publicationJas A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     * @return Volume The current object (for fluent API support)
-     */
-    public function setPublicationJas(PropelCollection $publicationJas, PropelPDO $con = null)
-    {
-        $publicationJasToDelete = $this->getPublicationJas(new Criteria(), $con)->diff($publicationJas);
-
-        $this->publicationJasScheduledForDeletion = unserialize(serialize($publicationJasToDelete));
-
-        foreach ($publicationJasToDelete as $publicationJaRemoved) {
-            $publicationJaRemoved->setVolume(null);
-        }
-
-        $this->collPublicationJas = null;
-        foreach ($publicationJas as $publicationJa) {
-            $this->addPublicationJa($publicationJa);
-        }
-
-        $this->collPublicationJas = $publicationJas;
-        $this->collPublicationJasPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related PublicationJa objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related PublicationJa objects.
-     * @throws PropelException
-     */
-    public function countPublicationJas(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collPublicationJasPartial && !$this->isNew();
-        if (null === $this->collPublicationJas || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collPublicationJas) {
-                return 0;
-            }
-
-            if($partial && !$criteria) {
-                return count($this->getPublicationJas());
-            }
-            $query = PublicationJaQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByVolume($this)
-                ->count($con);
-        }
-
-        return count($this->collPublicationJas);
-    }
-
-    /**
-     * Method called to associate a PublicationJa object to this object
-     * through the PublicationJa foreign key attribute.
-     *
-     * @param    PublicationJa $l PublicationJa
-     * @return Volume The current object (for fluent API support)
-     */
-    public function addPublicationJa(PublicationJa $l)
-    {
-        if ($this->collPublicationJas === null) {
-            $this->initPublicationJas();
-            $this->collPublicationJasPartial = true;
-        }
-        if (!in_array($l, $this->collPublicationJas->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddPublicationJa($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	PublicationJa $publicationJa The publicationJa object to add.
-     */
-    protected function doAddPublicationJa($publicationJa)
-    {
-        $this->collPublicationJas[]= $publicationJa;
-        $publicationJa->setVolume($this);
-    }
-
-    /**
-     * @param	PublicationJa $publicationJa The publicationJa object to remove.
-     * @return Volume The current object (for fluent API support)
-     */
-    public function removePublicationJa($publicationJa)
-    {
-        if ($this->getPublicationJas()->contains($publicationJa)) {
-            $this->collPublicationJas->remove($this->collPublicationJas->search($publicationJa));
-            if (null === $this->publicationJasScheduledForDeletion) {
-                $this->publicationJasScheduledForDeletion = clone $this->collPublicationJas;
-                $this->publicationJasScheduledForDeletion->clear();
-            }
-            $this->publicationJasScheduledForDeletion[]= clone $publicationJa;
-            $publicationJa->setVolume(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Volume is new, it will return
-     * an empty collection; or if this Volume has previously
-     * been saved, it will retrieve related PublicationJas from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Volume.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|PublicationJa[] List of PublicationJa objects
-     */
-    public function getPublicationJasJoinPublication($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = PublicationJaQuery::create(null, $criteria);
-        $query->joinWith('Publication', $join_behavior);
-
-        return $this->getPublicationJas($query, $con);
-    }
-
-    /**
-     * Clears out the collPublicationMmss collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return Volume The current object (for fluent API support)
-     * @see        addPublicationMmss()
-     */
-    public function clearPublicationMmss()
-    {
-        $this->collPublicationMmss = null; // important to set this to null since that means it is uninitialized
-        $this->collPublicationMmssPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * reset is the collPublicationMmss collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialPublicationMmss($v = true)
-    {
-        $this->collPublicationMmssPartial = $v;
-    }
-
-    /**
-     * Initializes the collPublicationMmss collection.
-     *
-     * By default this just sets the collPublicationMmss collection to an empty array (like clearcollPublicationMmss());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initPublicationMmss($overrideExisting = true)
-    {
-        if (null !== $this->collPublicationMmss && !$overrideExisting) {
-            return;
-        }
-        $this->collPublicationMmss = new PropelObjectCollection();
-        $this->collPublicationMmss->setModel('PublicationMms');
-    }
-
-    /**
-     * Gets an array of PublicationMms objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Volume is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|PublicationMms[] List of PublicationMms objects
-     * @throws PropelException
-     */
-    public function getPublicationMmss($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collPublicationMmssPartial && !$this->isNew();
-        if (null === $this->collPublicationMmss || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collPublicationMmss) {
-                // return empty collection
-                $this->initPublicationMmss();
-            } else {
-                $collPublicationMmss = PublicationMmsQuery::create(null, $criteria)
-                    ->filterByVolume($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collPublicationMmssPartial && count($collPublicationMmss)) {
-                      $this->initPublicationMmss(false);
-
-                      foreach($collPublicationMmss as $obj) {
-                        if (false == $this->collPublicationMmss->contains($obj)) {
-                          $this->collPublicationMmss->append($obj);
-                        }
-                      }
-
-                      $this->collPublicationMmssPartial = true;
-                    }
-
-                    $collPublicationMmss->getInternalIterator()->rewind();
-                    return $collPublicationMmss;
-                }
-
-                if($partial && $this->collPublicationMmss) {
-                    foreach($this->collPublicationMmss as $obj) {
-                        if($obj->isNew()) {
-                            $collPublicationMmss[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collPublicationMmss = $collPublicationMmss;
-                $this->collPublicationMmssPartial = false;
-            }
-        }
-
-        return $this->collPublicationMmss;
-    }
-
-    /**
-     * Sets a collection of PublicationMms objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $publicationMmss A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     * @return Volume The current object (for fluent API support)
-     */
-    public function setPublicationMmss(PropelCollection $publicationMmss, PropelPDO $con = null)
-    {
-        $publicationMmssToDelete = $this->getPublicationMmss(new Criteria(), $con)->diff($publicationMmss);
-
-        $this->publicationMmssScheduledForDeletion = unserialize(serialize($publicationMmssToDelete));
-
-        foreach ($publicationMmssToDelete as $publicationMmsRemoved) {
-            $publicationMmsRemoved->setVolume(null);
-        }
-
-        $this->collPublicationMmss = null;
-        foreach ($publicationMmss as $publicationMms) {
-            $this->addPublicationMms($publicationMms);
-        }
-
-        $this->collPublicationMmss = $publicationMmss;
-        $this->collPublicationMmssPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related PublicationMms objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related PublicationMms objects.
-     * @throws PropelException
-     */
-    public function countPublicationMmss(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collPublicationMmssPartial && !$this->isNew();
-        if (null === $this->collPublicationMmss || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collPublicationMmss) {
-                return 0;
-            }
-
-            if($partial && !$criteria) {
-                return count($this->getPublicationMmss());
-            }
-            $query = PublicationMmsQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByVolume($this)
-                ->count($con);
-        }
-
-        return count($this->collPublicationMmss);
-    }
-
-    /**
-     * Method called to associate a PublicationMms object to this object
-     * through the PublicationMms foreign key attribute.
-     *
-     * @param    PublicationMms $l PublicationMms
-     * @return Volume The current object (for fluent API support)
-     */
-    public function addPublicationMms(PublicationMms $l)
-    {
-        if ($this->collPublicationMmss === null) {
-            $this->initPublicationMmss();
-            $this->collPublicationMmssPartial = true;
-        }
-        if (!in_array($l, $this->collPublicationMmss->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddPublicationMms($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	PublicationMms $publicationMms The publicationMms object to add.
-     */
-    protected function doAddPublicationMms($publicationMms)
-    {
-        $this->collPublicationMmss[]= $publicationMms;
-        $publicationMms->setVolume($this);
-    }
-
-    /**
-     * @param	PublicationMms $publicationMms The publicationMms object to remove.
-     * @return Volume The current object (for fluent API support)
-     */
-    public function removePublicationMms($publicationMms)
-    {
-        if ($this->getPublicationMmss()->contains($publicationMms)) {
-            $this->collPublicationMmss->remove($this->collPublicationMmss->search($publicationMms));
-            if (null === $this->publicationMmssScheduledForDeletion) {
-                $this->publicationMmssScheduledForDeletion = clone $this->collPublicationMmss;
-                $this->publicationMmssScheduledForDeletion->clear();
-            }
-            $this->publicationMmssScheduledForDeletion[]= clone $publicationMms;
-            $publicationMms->setVolume(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Volume is new, it will return
-     * an empty collection; or if this Volume has previously
-     * been saved, it will retrieve related PublicationMmss from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Volume.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|PublicationMms[] List of PublicationMms objects
-     */
-    public function getPublicationMmssJoinPublication($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = PublicationMmsQuery::create(null, $criteria);
-        $query->joinWith('Publication', $join_behavior);
-
-        return $this->getPublicationMmss($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Volume is new, it will return
-     * an empty collection; or if this Volume has previously
-     * been saved, it will retrieve related PublicationMmss from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Volume.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|PublicationMms[] List of PublicationMms objects
-     */
-    public function getPublicationMmssJoinSeries($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = PublicationMmsQuery::create(null, $criteria);
-        $query->joinWith('Series', $join_behavior);
-
-        return $this->getPublicationMmss($query, $con);
+        return $this->aPublicationRelatedByParentpublicationId;
     }
 
     /**
@@ -2095,8 +1183,11 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
     public function clear()
     {
         $this->id = null;
+        $this->publication_id = null;
+        $this->parentpublication_id = null;
         $this->volumedescription = null;
         $this->volumenumeric = null;
+        $this->volumestotal = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
@@ -2119,46 +1210,18 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
-            if ($this->collPublicationMms) {
-                foreach ($this->collPublicationMms as $o) {
-                    $o->clearAllReferences($deep);
-                }
+            if ($this->aPublicationRelatedByPublicationId instanceof Persistent) {
+              $this->aPublicationRelatedByPublicationId->clearAllReferences($deep);
             }
-            if ($this->collPublicationDss) {
-                foreach ($this->collPublicationDss as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
-            if ($this->collPublicationJas) {
-                foreach ($this->collPublicationJas as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
-            if ($this->collPublicationMmss) {
-                foreach ($this->collPublicationMmss as $o) {
-                    $o->clearAllReferences($deep);
-                }
+            if ($this->aPublicationRelatedByParentpublicationId instanceof Persistent) {
+              $this->aPublicationRelatedByParentpublicationId->clearAllReferences($deep);
             }
 
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
-        if ($this->collPublicationMms instanceof PropelCollection) {
-            $this->collPublicationMms->clearIterator();
-        }
-        $this->collPublicationMms = null;
-        if ($this->collPublicationDss instanceof PropelCollection) {
-            $this->collPublicationDss->clearIterator();
-        }
-        $this->collPublicationDss = null;
-        if ($this->collPublicationJas instanceof PropelCollection) {
-            $this->collPublicationJas->clearIterator();
-        }
-        $this->collPublicationJas = null;
-        if ($this->collPublicationMmss instanceof PropelCollection) {
-            $this->collPublicationMmss->clearIterator();
-        }
-        $this->collPublicationMmss = null;
+        $this->aPublicationRelatedByPublicationId = null;
+        $this->aPublicationRelatedByParentpublicationId = null;
     }
 
     /**
@@ -2212,5 +1275,29 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
         }
     }
 
+    /**
+     * Selects one of many related entities
+     */
 
+    public function getRepresentativePublication(){
+
+        if ($this->countPublications() > 0) {
+
+            $pn = $this->getPublications();
+
+            // sort by rank if available
+            $rc = new \ReflectionClass(new Publication());
+            if ( $rc->hasMethod('getSortableRank')) {
+                $pn->uasort(function($a, $b) {
+                            return $a->getSortableRank() - $b->getSortableRank();
+                        });
+            }
+
+            $pn = $pn->toKeyValue();
+            return array_shift($pn);
+
+        } else {
+            return "-";
+        }
+    }
 }

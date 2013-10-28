@@ -1,28 +1,34 @@
-DTA\MetadataBundle\Model\Classification\Category:
-    Category_1:
-        name: Sachbuch
-    Category_2:
-        name: Ratgeber
+
+# ------------------------------------------------------------------------------
+# basic categories and types
+# ------------------------------------------------------------------------------
+
+DTA\MetadataBundle\Model\Classification\Categorytype:
+    Categorytype_1:
+        name: Wissensgebiet
+    Categorytype_2:
+        name: "Präsentationsform"
+    Categorytype_3:
+        name: "Textsorte"
+    Categorytype_4:
+        name: "Sitz im Leben"
+    Categorytype_5:
+        name: "Nicht verwenden"
 DTA\MetadataBundle\Model\Classification\Genre:
     Genre_1:
-        name: Belletristik
+        name: "Belletristik: allgemeine"
     Genre_2:
-        name: Sachliteratur
+        name: "Belletristik: Lyrik"
     Genre_3:
-        name: Lyrik
-        childof: Genre_1
+        name: "Belletristik: Epik"
     Genre_4:
-        name: Epik
-        childof: Genre_1
+        name: "Belletristik: Dramatik"
     Genre_5:
-        name: Dramatik
-        childof: Genre_1
+        name: "Sachliteratur: allgemeine"
     Genre_6:
-        name: Gebrauchsliteratur
-        childof: Genre_2
+        name: "Sachliteratur: Fachliteratur"
     Genre_7:
-        name: Fachliteratur
-        childof: Genre_2
+        name: "Sachliteratur: Gebrauchsliteratur"
 DTA\MetadataBundle\Model\Classification\Namefragmenttype:
     Namefragmenttype_1:
         name: Vorname
@@ -34,28 +40,22 @@ DTA\MetadataBundle\Model\Classification\Namefragmenttype:
         name: Generation
     Namefragmenttype_5:
         name: Pseudonym
+    Namefragmenttype_6:
+        name: Alternative Schreibweise
 DTA\MetadataBundle\Model\Classification\Personrole:
     Personrole_1:
         name: Autor
-        applicable_to_publication: false
-        applicable_to_work: true
     Personrole_2:
         name: Verleger
-        applicable_to_publication: true
-        applicable_to_work: false
     Personrole_3:
         name: Übersetzer
-        applicable_to_publication: true
-        applicable_to_work: false
     Personrole_4:
         name: Drucker
-        applicable_to_publication: true
-        applicable_to_work: false
 DTA\MetadataBundle\Model\Classification\Tag:
     Tag_1:
-        name: 'Kant''sche Philosophie'
+        name: "Kant'sche Philosophie"
     Tag_2:
-        name: 'Französischer Surrealismus'
+        name: "Französischer Surrealismus"
     Tag_3:
         name: 'Cute Kittens'
 DTA\MetadataBundle\Model\Classification\Titlefragmenttype:
@@ -63,25 +63,6 @@ DTA\MetadataBundle\Model\Classification\Titlefragmenttype:
         name: Haupttitel
     Titlefragmenttype_2:
         name: Untertitel
-    Titlefragmenttype_3:
-        name: Kurztitel
-DTA\MetadataBundle\Model\Data\Datespecification:
-    Datespecification_4:
-        year_is_reconstructed: false
-    Datespecification_5:
-        year_is_reconstructed: false
-    Datespecification_6:
-        year_is_reconstructed: false
-    Datespecification_3:
-        comments: yweit
-        year_is_reconstructed: true
-    Datespecification_2:
-        comments: 'ein Kommentar'
-        year_is_reconstructed: false
-    Datespecification_1:
-        year: 1721
-        comments: "eins zwei drei,\r\ndie katze auf dem heißen Blechdach"
-        year_is_reconstructed: false
 DTA\MetadataBundle\Model\Data\Font:
     Font_1:
         name: Textur
@@ -124,6 +105,142 @@ DTA\MetadataBundle\Model\Data\Language:
         name: Niederdeutsch
     Language_14:
         name: Latein
+DTA\MetadataBundle\Model\Workflow\License:
+    License_1:
+        name: 'gemeinfrei (CC0)'
+        applicable_to_image: false
+        applicable_to_text: true
+    License_2:
+        name: 'CC-by-SA 2.0 (de)'
+        applicable_to_image: false
+        applicable_to_text: false
+DTA\MetadataBundle\Model\Workflow\Tasktype:
+    Tasktype_35:
+        name: GrobiZoning
+        tree_left: 15
+        tree_right: 16
+        tree_level: 2
+    Tasktype_37:
+        name: Convert2TEIP5
+        tree_left: 11
+        tree_right: 12
+        tree_level: 2
+    Tasktype_29:
+        name: 'Gruppe A: Double Keying'
+        tree_left: 2
+        tree_right: 13
+        tree_level: 1
+    Tasktype_38:
+        name: OCR2
+        tree_left: 17
+        tree_right: 18
+        tree_level: 2
+    Tasktype_34:
+        name: 'Gruppe B'
+        tree_left: 14
+        tree_right: 19
+        tree_level: 1
+    Tasktype_40:
+        name: 'Scannen (fakultativ)'
+        tree_left: 21
+        tree_right: 22
+        tree_level: 2
+    Tasktype_39:
+        name: 'Gruppe C'
+        tree_left: 20
+        tree_right: 23
+        tree_level: 1
+    Tasktype_42:
+        name: OCR
+        tree_left: 25
+        tree_right: 26
+        tree_level: 2
+    Tasktype_43:
+        name: DON
+        tree_left: 27
+        tree_right: 28
+        tree_level: 2
+    Tasktype_44:
+        name: Compare
+        tree_left: 29
+        tree_right: 30
+        tree_level: 2
+    Tasktype_45:
+        name: DON2XML
+        tree_left: 31
+        tree_right: 32
+        tree_level: 2
+    Tasktype_46:
+        name: CoordinateMerge_Don
+        tree_left: 33
+        tree_right: 34
+        tree_level: 2
+    Tasktype_33:
+        name: Workflows
+        tree_left: 1
+        tree_right: 38
+        tree_level: 0
+    Tasktype_47:
+        name: Nachkorrektur
+        tree_left: 35
+        tree_right: 36
+        tree_level: 2
+    Tasktype_41:
+        name: 'Gruppe D (OCR-Workflow, nach Zoning)'
+        tree_left: 24
+        tree_right: 37
+        tree_level: 1
+    Tasktype_30:
+        name: Textbeschaffung
+        tree_left: 3
+        tree_right: 4
+        tree_level: 2
+    Tasktype_31:
+        name: Vorkorrektur
+        tree_left: 5
+        tree_right: 6
+        tree_level: 2
+    Tasktype_32:
+        name: Zoning
+        tree_left: 7
+        tree_right: 8
+        tree_level: 2
+    Tasktype_36:
+        name: Abtippen
+        tree_left: 9
+        tree_right: 10
+        tree_level: 2
+        
+# ------------------------------------------------------------------------------        
+# Test data
+# ------------------------------------------------------------------------------
+
+DTA\MetadataBundle\Model\Master\DtaUser:
+    DtaUser_1:
+        username: Susanne
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: false
+    DtaUser_2:
+        username: Matthias
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: false
+    DtaUser_3:
+        username: Christian
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: false
+    DtaUser_4:
+        username: Alexander
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: false
+    DtaUser_5:
+        username: Frank
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: true
+    DtaUser_6:
+        username: Carl
+        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
+        admin: true
+        
 DTA\MetadataBundle\Model\Data\Person:
     Person_1: {  }
     Person_2:
@@ -397,16 +514,6 @@ DTA\MetadataBundle\Model\Data\Place:
     Place_7:
         name: 'Monet en la Isle'
         gnd: '2'
-DTA\MetadataBundle\Model\Data\Title:
-    Title_1: {  }
-    Title_2: {  }
-DTA\MetadataBundle\Model\Data\Work:
-    Work_1:
-        title_id: Title_1
-        datespecification_id: Datespecification_1
-    Work_2:
-        title_id: Title_2
-        datespecification_id: Datespecification_4
 DTA\MetadataBundle\Model\Data\Publishingcompany:
     Publishingcompany_1:
         name: Inselverlag
@@ -416,174 +523,7 @@ DTA\MetadataBundle\Model\Data\Publishingcompany:
         name: Verbrecherverlag
     Publishingcompany_4:
         name: Suhrkamp
-DTA\MetadataBundle\Model\Data\Publication:
-    Publication_2:
-        work_id: Work_2
-        place_id: Place_2
-        publicationdate_id: Datespecification_5
-        firstpublicationdate_id: Datespecification_6
-        publishingcompany_id: Publishingcompany_1
-    Publication_1:
-        work_id: Work_1
-        place_id: Place_1
-        publicationdate_id: Datespecification_2
-        firstpublicationdate_id: Datespecification_3
-        publishingcompany_id: Publishingcompany_4
-        font_id: Font_2
-DTA\MetadataBundle\Model\Data\PublicationM:
-    PublicationM_1:
-        publication_id: Publication_1
-DTA\MetadataBundle\Model\Data\Titlefragment:
-    Titlefragment_3:
-        name: 'Leipziger einerlei'
-        title_id: Title_2
-        titlefragmenttype_id: Titlefragmenttype_1
-        sortable_rank: 1
-        name_is_reconstructed: false
-    Titlefragment_1:
-        name: 'Don Quijote'
-        title_id: Title_1
-        titlefragmenttype_id: Titlefragmenttype_1
-        sortable_rank: 0
-        name_is_reconstructed: false
-    Titlefragment_2:
-        name: 'Gegen die Windmühlen'
-        title_id: Title_1
-        titlefragmenttype_id: Titlefragmenttype_2
-        sortable_rank: 1
-        name_is_reconstructed: false
-DTA\MetadataBundle\Model\Master\CategoryWork:
-    CategoryWork_1:
-        category_id: Category_1
-        work_id: Work_1
-    CategoryWork_2:
-        category_id: Category_1
-        work_id: Work_1
-DTA\MetadataBundle\Model\Master\DtaUser:
-    DtaUser_1:
-        username: Susanne
-        admin: false
-    DtaUser_2:
-        username: Matthias
-        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
-        admin: false
-    DtaUser_3:
-        username: Christian
-        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
-        admin: false
-    DtaUser_4:
-        username: Alexander
-        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
-        admin: false
-    DtaUser_5:
-        username: Frank
-        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
-        admin: true
-    DtaUser_6:
-        username: Carl
-        password: x7jWpL/iAAkY/4U8MeIjMyE9X3Jd9eNbEAK3LbeVmIAU+39Fp0oEB8krmF4kk167iTXx6VbxLIk5KxsECEGzrw==
-        admin: true
-DTA\MetadataBundle\Model\Master\GenreWork:
-    GenreWork_2:
-        genre_id: Genre_7
-        work_id: Work_1
-DTA\MetadataBundle\Model\Master\LanguageWork:
-    LanguageWork_1:
-        language_id: Language_2
-        work_id: Work_1
-    LanguageWork_2:
-        language_id: Language_3
-        work_id: Work_1
-    LanguageWork_3:
-        language_id: Language_4
-        work_id: Work_1
-DTA\MetadataBundle\Model\Master\PersonPublication:
-    PersonPublication_1:
-        personrole_id: Personrole_2
-        person_id: Person_7
-        publication_id: Publication_1
-    PersonPublication_2:
-        personrole_id: Personrole_4
-        person_id: Person_11
-        publication_id: Publication_1
-    PersonPublication_3:
-        personrole_id: Personrole_3
-        person_id: Person_12
-        publication_id: Publication_1
-DTA\MetadataBundle\Model\Master\PersonWork:
-    PersonWork_4:
-        person_id: Person_8
-        personrole_id: Personrole_1
-        work_id: Work_1
-DTA\MetadataBundle\Model\Master\WorkTag:
-    WorkTag_1:
-        tag_id: Tag_1
-        work_id: Work_1
-    WorkTag_2:
-        tag_id: Tag_2
-        work_id: Work_1
-    WorkTag_3:
-        tag_id: Tag_3
-        work_id: Work_1
 DTA\MetadataBundle\Model\Workflow\Partner:
-    Partner_2:
+    Partner_1:
         name: 'Bibliothek der Berlin-Brandenburgischen Akademie der Wissenschaften'
-        is_organization: false
-DTA\MetadataBundle\Model\Workflow\License:
-    License_1:
-        name: 'gemeinfrei (CC0)'
-        applicable_to_image: false
-        applicable_to_text: false
-    License_2:
-        name: 'CC-by-SA 2.0 (de)'
-        applicable_to_image: false
-        applicable_to_text: false
-DTA\MetadataBundle\Model\Workflow\Imagesource:
-    Imagesource_1:
-        publication_id: Publication_1
-        partner_id: Partner_2
-        faksimilerefrange: 1-10
-        originalrefrange: 2-11
-        license_id: License_2
-    Imagesource_2:
-        publication_id: Publication_1
-        partner_id: Partner_2
-        faksimilerefrange: 3-100
-        originalrefrange: 4-101
-        license_id: License_1
-DTA\MetadataBundle\Model\Workflow\Tasktype:
-    Tasktype_1:
-        name: 'Gruppe A: Double Keying'
-        tree_left: 2
-        tree_right: 9
-        tree_level: 1
-    Tasktype_2:
-        name: Textbeschaffung
-        tree_left: 3
-        tree_right: 8
-        tree_level: 2
-    Tasktype_3:
-        name: Vorkorrektur
-        tree_left: 4
-        tree_right: 7
-        tree_level: 3
-    Tasktype_4:
-        name: Zoning
-        tree_left: 5
-        tree_right: 6
-        tree_level: 4
-    Tasktype_5:
-        name: Aufgabentypen
-        tree_left: 1
-        tree_right: 14
-        tree_level: 0
-    Tasktype_6:
-        name: 'Gruppe B'
-        tree_left: 10
-        tree_right: 13
-        tree_level: 1
-    Tasktype_7:
-        name: GrobiZoning
-        tree_left: 11
-        tree_right: 12
-        tree_level: 2
+        is_organization: true

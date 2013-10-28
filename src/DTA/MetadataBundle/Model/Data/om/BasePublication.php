@@ -13,10 +13,18 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use DTA\MetadataBundle\Model\Classification\Category;
+use DTA\MetadataBundle\Model\Classification\CategoryQuery;
+use DTA\MetadataBundle\Model\Classification\Genre;
+use DTA\MetadataBundle\Model\Classification\GenreQuery;
+use DTA\MetadataBundle\Model\Classification\Tag;
+use DTA\MetadataBundle\Model\Classification\TagQuery;
 use DTA\MetadataBundle\Model\Data\Datespecification;
 use DTA\MetadataBundle\Model\Data\DatespecificationQuery;
 use DTA\MetadataBundle\Model\Data\Font;
 use DTA\MetadataBundle\Model\Data\FontQuery;
+use DTA\MetadataBundle\Model\Data\Language;
+use DTA\MetadataBundle\Model\Data\LanguageQuery;
 use DTA\MetadataBundle\Model\Data\Place;
 use DTA\MetadataBundle\Model\Data\PlaceQuery;
 use DTA\MetadataBundle\Model\Data\Publication;
@@ -30,8 +38,6 @@ use DTA\MetadataBundle\Model\Data\PublicationJa;
 use DTA\MetadataBundle\Model\Data\PublicationJaQuery;
 use DTA\MetadataBundle\Model\Data\PublicationM;
 use DTA\MetadataBundle\Model\Data\PublicationMQuery;
-use DTA\MetadataBundle\Model\Data\PublicationMm;
-use DTA\MetadataBundle\Model\Data\PublicationMmQuery;
 use DTA\MetadataBundle\Model\Data\PublicationMms;
 use DTA\MetadataBundle\Model\Data\PublicationMmsQuery;
 use DTA\MetadataBundle\Model\Data\PublicationMs;
@@ -40,12 +46,24 @@ use DTA\MetadataBundle\Model\Data\PublicationPeer;
 use DTA\MetadataBundle\Model\Data\PublicationQuery;
 use DTA\MetadataBundle\Model\Data\Publishingcompany;
 use DTA\MetadataBundle\Model\Data\PublishingcompanyQuery;
-use DTA\MetadataBundle\Model\Data\Work;
-use DTA\MetadataBundle\Model\Data\WorkQuery;
+use DTA\MetadataBundle\Model\Data\Title;
+use DTA\MetadataBundle\Model\Data\TitleQuery;
+use DTA\MetadataBundle\Model\Data\Volume;
+use DTA\MetadataBundle\Model\Data\VolumeQuery;
+use DTA\MetadataBundle\Model\Master\CategoryPublication;
+use DTA\MetadataBundle\Model\Master\CategoryPublicationQuery;
+use DTA\MetadataBundle\Model\Master\FontPublication;
+use DTA\MetadataBundle\Model\Master\FontPublicationQuery;
+use DTA\MetadataBundle\Model\Master\GenrePublication;
+use DTA\MetadataBundle\Model\Master\GenrePublicationQuery;
+use DTA\MetadataBundle\Model\Master\LanguagePublication;
+use DTA\MetadataBundle\Model\Master\LanguagePublicationQuery;
 use DTA\MetadataBundle\Model\Master\PersonPublication;
 use DTA\MetadataBundle\Model\Master\PersonPublicationQuery;
 use DTA\MetadataBundle\Model\Master\PublicationPublicationgroup;
 use DTA\MetadataBundle\Model\Master\PublicationPublicationgroupQuery;
+use DTA\MetadataBundle\Model\Master\PublicationTag;
+use DTA\MetadataBundle\Model\Master\PublicationTagQuery;
 use DTA\MetadataBundle\Model\Workflow\Imagesource;
 use DTA\MetadataBundle\Model\Workflow\ImagesourceQuery;
 use DTA\MetadataBundle\Model\Workflow\Publicationgroup;
@@ -83,16 +101,16 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     protected $id;
 
     /**
-     * The value for the wwwready field.
+     * The value for the title_id field.
      * @var        int
      */
-    protected $wwwready;
+    protected $title_id;
 
     /**
-     * The value for the work_id field.
+     * The value for the firsteditionpublication_id field.
      * @var        int
      */
-    protected $work_id;
+    protected $firsteditionpublication_id;
 
     /**
      * The value for the place_id field.
@@ -107,10 +125,10 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     protected $publicationdate_id;
 
     /**
-     * The value for the firstpublicationdate_id field.
+     * The value for the creationdate_id field.
      * @var        int
      */
-    protected $firstpublicationdate_id;
+    protected $creationdate_id;
 
     /**
      * The value for the publishingcompany_id field.
@@ -143,46 +161,52 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     protected $transcriptioncomment;
 
     /**
-     * The value for the font_id field.
-     * @var        int
-     */
-    protected $font_id;
-
-    /**
-     * The value for the volume_alphanumeric field.
-     * @var        string
-     */
-    protected $volume_alphanumeric;
-
-    /**
-     * The value for the volume_numeric field.
-     * @var        string
-     */
-    protected $volume_numeric;
-
-    /**
-     * The value for the volumes_total field.
-     * @var        string
-     */
-    protected $volumes_total;
-
-    /**
      * The value for the numpages field.
-     * @var        int
+     * @var        string
      */
     protected $numpages;
 
     /**
-     * The value for the numpagesnormed field.
+     * The value for the numpagesnumeric field.
      * @var        int
      */
-    protected $numpagesnormed;
+    protected $numpagesnumeric;
 
     /**
      * The value for the comment field.
      * @var        string
      */
     protected $comment;
+
+    /**
+     * The value for the doi field.
+     * @var        string
+     */
+    protected $doi;
+
+    /**
+     * The value for the format field.
+     * @var        string
+     */
+    protected $format;
+
+    /**
+     * The value for the directoryname field.
+     * @var        string
+     */
+    protected $directoryname;
+
+    /**
+     * The value for the wwwready field.
+     * @var        int
+     */
+    protected $wwwready;
+
+    /**
+     * The value for the legacy_book_id field.
+     * @var        int
+     */
+    protected $legacy_book_id;
 
     /**
      * The value for the publishingcompany_id_is_reconstructed field.
@@ -192,9 +216,9 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     protected $publishingcompany_id_is_reconstructed;
 
     /**
-     * @var        Work
+     * @var        Title
      */
-    protected $aWork;
+    protected $aTitle;
 
     /**
      * @var        Publishingcompany
@@ -214,12 +238,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * @var        Datespecification
      */
-    protected $aDatespecificationRelatedByFirstpublicationdateId;
-
-    /**
-     * @var        Font
-     */
-    protected $aFont;
+    protected $aDatespecificationRelatedByCreationdateId;
 
     /**
      * @var        PropelObjectCollection|PublicationM[] Collection to store aggregation of PublicationM objects.
@@ -232,12 +251,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     protected $collPublicationDms;
     protected $collPublicationDmsPartial;
-
-    /**
-     * @var        PropelObjectCollection|PublicationMm[] Collection to store aggregation of PublicationMm objects.
-     */
-    protected $collPublicationMms;
-    protected $collPublicationMmsPartial;
 
     /**
      * @var        PropelObjectCollection|PublicationDs[] Collection to store aggregation of PublicationDs objects.
@@ -270,6 +283,48 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     protected $collPublicationJsPartial;
 
     /**
+     * @var        PropelObjectCollection|Volume[] Collection to store aggregation of Volume objects.
+     */
+    protected $collVolumesRelatedByPublicationId;
+    protected $collVolumesRelatedByPublicationIdPartial;
+
+    /**
+     * @var        PropelObjectCollection|Volume[] Collection to store aggregation of Volume objects.
+     */
+    protected $collVolumesRelatedByParentpublicationId;
+    protected $collVolumesRelatedByParentpublicationIdPartial;
+
+    /**
+     * @var        PropelObjectCollection|LanguagePublication[] Collection to store aggregation of LanguagePublication objects.
+     */
+    protected $collLanguagePublications;
+    protected $collLanguagePublicationsPartial;
+
+    /**
+     * @var        PropelObjectCollection|GenrePublication[] Collection to store aggregation of GenrePublication objects.
+     */
+    protected $collGenrePublications;
+    protected $collGenrePublicationsPartial;
+
+    /**
+     * @var        PropelObjectCollection|PublicationTag[] Collection to store aggregation of PublicationTag objects.
+     */
+    protected $collPublicationTags;
+    protected $collPublicationTagsPartial;
+
+    /**
+     * @var        PropelObjectCollection|CategoryPublication[] Collection to store aggregation of CategoryPublication objects.
+     */
+    protected $collCategoryPublications;
+    protected $collCategoryPublicationsPartial;
+
+    /**
+     * @var        PropelObjectCollection|FontPublication[] Collection to store aggregation of FontPublication objects.
+     */
+    protected $collFontPublications;
+    protected $collFontPublicationsPartial;
+
+    /**
      * @var        PropelObjectCollection|PublicationPublicationgroup[] Collection to store aggregation of PublicationPublicationgroup objects.
      */
     protected $collPublicationPublicationgroups;
@@ -300,6 +355,31 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     protected $collTextsourcesPartial;
 
     /**
+     * @var        PropelObjectCollection|Language[] Collection to store aggregation of Language objects.
+     */
+    protected $collLanguages;
+
+    /**
+     * @var        PropelObjectCollection|Genre[] Collection to store aggregation of Genre objects.
+     */
+    protected $collGenres;
+
+    /**
+     * @var        PropelObjectCollection|Tag[] Collection to store aggregation of Tag objects.
+     */
+    protected $collTags;
+
+    /**
+     * @var        PropelObjectCollection|Category[] Collection to store aggregation of Category objects.
+     */
+    protected $collCategories;
+
+    /**
+     * @var        PropelObjectCollection|Font[] Collection to store aggregation of Font objects.
+     */
+    protected $collFonts;
+
+    /**
      * @var        PropelObjectCollection|Publicationgroup[] Collection to store aggregation of Publicationgroup objects.
      */
     protected $collPublicationgroups;
@@ -325,7 +405,37 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Titel', 'erster Autor', 'entstanden', 'veröffentlicht', );	public   $tableRowViewAccessors = array('Titel'=>'accessor:getEmbeddedColumn1OfWork', 'erster Autor'=>'accessor:getEmbeddedColumn2OfWork', 'entstanden'=>'accessor:getEmbeddedColumn3OfWork', 'veröffentlicht'=>'accessor:getDatespecificationRelatedByPublicationdateId', );
+    public static $tableRowViewCaptions = array('Titel', 'erster Autor', 'entstanden', 'veröffentlicht', );	public   $tableRowViewAccessors = array('Titel'=>'accessor:getTitle', 'erster Autor'=>'accessor:getFirstAuthor', 'entstanden'=>'accessor:getDatespecification', 'veröffentlicht'=>'accessor:getDatespecificationRelatedByPublicationdateId', );
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $languagesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $genresScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $tagsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $categoriesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $fontsScheduledForDeletion = null;
+
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -343,12 +453,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      * @var		PropelObjectCollection
      */
     protected $publicationDmsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $publicationMmsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -379,6 +483,48 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      * @var		PropelObjectCollection
      */
     protected $publicationJsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $volumesRelatedByPublicationIdScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $volumesRelatedByParentpublicationIdScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $languagePublicationsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $genrePublicationsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $publicationTagsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $categoryPublicationsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $fontPublicationsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -442,23 +588,23 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     }
 
     /**
-     * Get the [wwwready] column value.
+     * Get the [title_id] column value.
      *
      * @return int
      */
-    public function getWwwready()
+    public function getTitleId()
     {
-        return $this->wwwready;
+        return $this->title_id;
     }
 
     /**
-     * Get the [work_id] column value.
-     *
+     * Get the [firsteditionpublication_id] column value.
+     * Publikation, die die Informationen zur Erstauflage enthält
      * @return int
      */
-    public function getWorkId()
+    public function getFirsteditionpublicationId()
     {
-        return $this->work_id;
+        return $this->firsteditionpublication_id;
     }
 
     /**
@@ -482,13 +628,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     }
 
     /**
-     * Get the [firstpublicationdate_id] column value.
+     * Get the [creationdate_id] column value.
      * Erscheinungsjahr der Erstausgabe
      * @return int
      */
-    public function getFirstpublicationdateId()
+    public function getCreationdateId()
     {
-        return $this->firstpublicationdate_id;
+        return $this->creationdate_id;
     }
 
     /**
@@ -542,49 +688,9 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     }
 
     /**
-     * Get the [font_id] column value.
-     * Vorherrschende Schriftart
-     * @return int
-     */
-    public function getFontId()
-    {
-        return $this->font_id;
-    }
-
-    /**
-     * Get the [volume_alphanumeric] column value.
-     * Band (alphanumerisch)
-     * @return string
-     */
-    public function getVolumeAlphanumeric()
-    {
-        return $this->volume_alphanumeric;
-    }
-
-    /**
-     * Get the [volume_numeric] column value.
-     * Band (numerisch)
-     * @return string
-     */
-    public function getVolumeNumeric()
-    {
-        return $this->volume_numeric;
-    }
-
-    /**
-     * Get the [volumes_total] column value.
-     * Anzahl Bände
-     * @return string
-     */
-    public function getVolumesTotal()
-    {
-        return $this->volumes_total;
-    }
-
-    /**
      * Get the [numpages] column value.
-     *
-     * @return int
+     * Anzahl Seiten (Umfang)
+     * @return string
      */
     public function getNumpages()
     {
@@ -592,13 +698,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     }
 
     /**
-     * Get the [numpagesnormed] column value.
-     *
+     * Get the [numpagesnumeric] column value.
+     * Umfang (normiert)
      * @return int
      */
-    public function getNumpagesnormed()
+    public function getNumpagesnumeric()
     {
-        return $this->numpagesnormed;
+        return $this->numpagesnumeric;
     }
 
     /**
@@ -609,6 +715,56 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     public function getComment()
     {
         return $this->comment;
+    }
+
+    /**
+     * Get the [doi] column value.
+     *
+     * @return string
+     */
+    public function getDoi()
+    {
+        return $this->doi;
+    }
+
+    /**
+     * Get the [format] column value.
+     *
+     * @return string
+     */
+    public function getFormat()
+    {
+        return $this->format;
+    }
+
+    /**
+     * Get the [directoryname] column value.
+     *
+     * @return string
+     */
+    public function getDirectoryname()
+    {
+        return $this->directoryname;
+    }
+
+    /**
+     * Get the [wwwready] column value.
+     *
+     * @return int
+     */
+    public function getWwwready()
+    {
+        return $this->wwwready;
+    }
+
+    /**
+     * Get the [legacy_book_id] column value.
+     * id_book des Datensatzes aus der alten Datenbank, der dem neuen Datensatz zugrundeliegt.
+     * @return int
+     */
+    public function getLegacyBookId()
+    {
+        return $this->legacy_book_id;
     }
 
     /**
@@ -643,50 +799,50 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     } // setId()
 
     /**
-     * Set the value of [wwwready] column.
+     * Set the value of [title_id] column.
      *
      * @param int $v new value
      * @return Publication The current object (for fluent API support)
      */
-    public function setWwwready($v)
+    public function setTitleId($v)
     {
         if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
-        if ($this->wwwready !== $v) {
-            $this->wwwready = $v;
-            $this->modifiedColumns[] = PublicationPeer::WWWREADY;
+        if ($this->title_id !== $v) {
+            $this->title_id = $v;
+            $this->modifiedColumns[] = PublicationPeer::TITLE_ID;
+        }
+
+        if ($this->aTitle !== null && $this->aTitle->getId() !== $v) {
+            $this->aTitle = null;
         }
 
 
         return $this;
-    } // setWwwready()
+    } // setTitleId()
 
     /**
-     * Set the value of [work_id] column.
-     *
+     * Set the value of [firsteditionpublication_id] column.
+     * Publikation, die die Informationen zur Erstauflage enthält
      * @param int $v new value
      * @return Publication The current object (for fluent API support)
      */
-    public function setWorkId($v)
+    public function setFirsteditionpublicationId($v)
     {
         if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
-        if ($this->work_id !== $v) {
-            $this->work_id = $v;
-            $this->modifiedColumns[] = PublicationPeer::WORK_ID;
-        }
-
-        if ($this->aWork !== null && $this->aWork->getId() !== $v) {
-            $this->aWork = null;
+        if ($this->firsteditionpublication_id !== $v) {
+            $this->firsteditionpublication_id = $v;
+            $this->modifiedColumns[] = PublicationPeer::FIRSTEDITIONPUBLICATION_ID;
         }
 
 
         return $this;
-    } // setWorkId()
+    } // setFirsteditionpublicationId()
 
     /**
      * Set the value of [place_id] column.
@@ -739,29 +895,29 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     } // setPublicationdateId()
 
     /**
-     * Set the value of [firstpublicationdate_id] column.
+     * Set the value of [creationdate_id] column.
      * Erscheinungsjahr der Erstausgabe
      * @param int $v new value
      * @return Publication The current object (for fluent API support)
      */
-    public function setFirstpublicationdateId($v)
+    public function setCreationdateId($v)
     {
         if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
-        if ($this->firstpublicationdate_id !== $v) {
-            $this->firstpublicationdate_id = $v;
-            $this->modifiedColumns[] = PublicationPeer::FIRSTPUBLICATIONDATE_ID;
+        if ($this->creationdate_id !== $v) {
+            $this->creationdate_id = $v;
+            $this->modifiedColumns[] = PublicationPeer::CREATIONDATE_ID;
         }
 
-        if ($this->aDatespecificationRelatedByFirstpublicationdateId !== null && $this->aDatespecificationRelatedByFirstpublicationdateId->getId() !== $v) {
-            $this->aDatespecificationRelatedByFirstpublicationdateId = null;
+        if ($this->aDatespecificationRelatedByCreationdateId !== null && $this->aDatespecificationRelatedByCreationdateId->getId() !== $v) {
+            $this->aDatespecificationRelatedByCreationdateId = null;
         }
 
 
         return $this;
-    } // setFirstpublicationdateId()
+    } // setCreationdateId()
 
     /**
      * Set the value of [publishingcompany_id] column.
@@ -873,103 +1029,15 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     } // setTranscriptioncomment()
 
     /**
-     * Set the value of [font_id] column.
-     * Vorherrschende Schriftart
-     * @param int $v new value
-     * @return Publication The current object (for fluent API support)
-     */
-    public function setFontId($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->font_id !== $v) {
-            $this->font_id = $v;
-            $this->modifiedColumns[] = PublicationPeer::FONT_ID;
-        }
-
-        if ($this->aFont !== null && $this->aFont->getId() !== $v) {
-            $this->aFont = null;
-        }
-
-
-        return $this;
-    } // setFontId()
-
-    /**
-     * Set the value of [volume_alphanumeric] column.
-     * Band (alphanumerisch)
-     * @param string $v new value
-     * @return Publication The current object (for fluent API support)
-     */
-    public function setVolumeAlphanumeric($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
-        }
-
-        if ($this->volume_alphanumeric !== $v) {
-            $this->volume_alphanumeric = $v;
-            $this->modifiedColumns[] = PublicationPeer::VOLUME_ALPHANUMERIC;
-        }
-
-
-        return $this;
-    } // setVolumeAlphanumeric()
-
-    /**
-     * Set the value of [volume_numeric] column.
-     * Band (numerisch)
-     * @param string $v new value
-     * @return Publication The current object (for fluent API support)
-     */
-    public function setVolumeNumeric($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
-        }
-
-        if ($this->volume_numeric !== $v) {
-            $this->volume_numeric = $v;
-            $this->modifiedColumns[] = PublicationPeer::VOLUME_NUMERIC;
-        }
-
-
-        return $this;
-    } // setVolumeNumeric()
-
-    /**
-     * Set the value of [volumes_total] column.
-     * Anzahl Bände
-     * @param string $v new value
-     * @return Publication The current object (for fluent API support)
-     */
-    public function setVolumesTotal($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
-        }
-
-        if ($this->volumes_total !== $v) {
-            $this->volumes_total = $v;
-            $this->modifiedColumns[] = PublicationPeer::VOLUMES_TOTAL;
-        }
-
-
-        return $this;
-    } // setVolumesTotal()
-
-    /**
      * Set the value of [numpages] column.
-     *
-     * @param int $v new value
+     * Anzahl Seiten (Umfang)
+     * @param string $v new value
      * @return Publication The current object (for fluent API support)
      */
     public function setNumpages($v)
     {
         if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
+            $v = (string) $v;
         }
 
         if ($this->numpages !== $v) {
@@ -982,25 +1050,25 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     } // setNumpages()
 
     /**
-     * Set the value of [numpagesnormed] column.
-     *
+     * Set the value of [numpagesnumeric] column.
+     * Umfang (normiert)
      * @param int $v new value
      * @return Publication The current object (for fluent API support)
      */
-    public function setNumpagesnormed($v)
+    public function setNumpagesnumeric($v)
     {
         if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
-        if ($this->numpagesnormed !== $v) {
-            $this->numpagesnormed = $v;
-            $this->modifiedColumns[] = PublicationPeer::NUMPAGESNORMED;
+        if ($this->numpagesnumeric !== $v) {
+            $this->numpagesnumeric = $v;
+            $this->modifiedColumns[] = PublicationPeer::NUMPAGESNUMERIC;
         }
 
 
         return $this;
-    } // setNumpagesnormed()
+    } // setNumpagesnumeric()
 
     /**
      * Set the value of [comment] column.
@@ -1022,6 +1090,111 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
         return $this;
     } // setComment()
+
+    /**
+     * Set the value of [doi] column.
+     *
+     * @param string $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setDoi($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->doi !== $v) {
+            $this->doi = $v;
+            $this->modifiedColumns[] = PublicationPeer::DOI;
+        }
+
+
+        return $this;
+    } // setDoi()
+
+    /**
+     * Set the value of [format] column.
+     *
+     * @param string $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setFormat($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->format !== $v) {
+            $this->format = $v;
+            $this->modifiedColumns[] = PublicationPeer::FORMAT;
+        }
+
+
+        return $this;
+    } // setFormat()
+
+    /**
+     * Set the value of [directoryname] column.
+     *
+     * @param string $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setDirectoryname($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->directoryname !== $v) {
+            $this->directoryname = $v;
+            $this->modifiedColumns[] = PublicationPeer::DIRECTORYNAME;
+        }
+
+
+        return $this;
+    } // setDirectoryname()
+
+    /**
+     * Set the value of [wwwready] column.
+     *
+     * @param int $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setWwwready($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->wwwready !== $v) {
+            $this->wwwready = $v;
+            $this->modifiedColumns[] = PublicationPeer::WWWREADY;
+        }
+
+
+        return $this;
+    } // setWwwready()
+
+    /**
+     * Set the value of [legacy_book_id] column.
+     * id_book des Datensatzes aus der alten Datenbank, der dem neuen Datensatz zugrundeliegt.
+     * @param int $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setLegacyBookId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->legacy_book_id !== $v) {
+            $this->legacy_book_id = $v;
+            $this->modifiedColumns[] = PublicationPeer::LEGACY_BOOK_ID;
+        }
+
+
+        return $this;
+    } // setLegacyBookId()
 
     /**
      * Sets the value of the [publishingcompany_id_is_reconstructed] column.
@@ -1089,24 +1262,25 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         try {
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-            $this->wwwready = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-            $this->work_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+            $this->title_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+            $this->firsteditionpublication_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
             $this->place_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
             $this->publicationdate_id = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
-            $this->firstpublicationdate_id = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+            $this->creationdate_id = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
             $this->publishingcompany_id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
             $this->partner_id = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
             $this->editiondescription = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
             $this->digitaleditioneditor = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
             $this->transcriptioncomment = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
-            $this->font_id = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
-            $this->volume_alphanumeric = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
-            $this->volume_numeric = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
-            $this->volumes_total = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
-            $this->numpages = ($row[$startcol + 15] !== null) ? (int) $row[$startcol + 15] : null;
-            $this->numpagesnormed = ($row[$startcol + 16] !== null) ? (int) $row[$startcol + 16] : null;
-            $this->comment = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
-            $this->publishingcompany_id_is_reconstructed = ($row[$startcol + 18] !== null) ? (boolean) $row[$startcol + 18] : null;
+            $this->numpages = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+            $this->numpagesnumeric = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
+            $this->comment = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+            $this->doi = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
+            $this->format = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+            $this->directoryname = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
+            $this->wwwready = ($row[$startcol + 17] !== null) ? (int) $row[$startcol + 17] : null;
+            $this->legacy_book_id = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
+            $this->publishingcompany_id_is_reconstructed = ($row[$startcol + 19] !== null) ? (boolean) $row[$startcol + 19] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -1115,7 +1289,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 19; // 19 = PublicationPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 20; // 20 = PublicationPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Publication object", $e);
@@ -1138,8 +1312,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     public function ensureConsistency()
     {
 
-        if ($this->aWork !== null && $this->work_id !== $this->aWork->getId()) {
-            $this->aWork = null;
+        if ($this->aTitle !== null && $this->title_id !== $this->aTitle->getId()) {
+            $this->aTitle = null;
         }
         if ($this->aPlace !== null && $this->place_id !== $this->aPlace->getId()) {
             $this->aPlace = null;
@@ -1147,14 +1321,11 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ($this->aDatespecificationRelatedByPublicationdateId !== null && $this->publicationdate_id !== $this->aDatespecificationRelatedByPublicationdateId->getId()) {
             $this->aDatespecificationRelatedByPublicationdateId = null;
         }
-        if ($this->aDatespecificationRelatedByFirstpublicationdateId !== null && $this->firstpublicationdate_id !== $this->aDatespecificationRelatedByFirstpublicationdateId->getId()) {
-            $this->aDatespecificationRelatedByFirstpublicationdateId = null;
+        if ($this->aDatespecificationRelatedByCreationdateId !== null && $this->creationdate_id !== $this->aDatespecificationRelatedByCreationdateId->getId()) {
+            $this->aDatespecificationRelatedByCreationdateId = null;
         }
         if ($this->aPublishingcompany !== null && $this->publishingcompany_id !== $this->aPublishingcompany->getId()) {
             $this->aPublishingcompany = null;
-        }
-        if ($this->aFont !== null && $this->font_id !== $this->aFont->getId()) {
-            $this->aFont = null;
         }
     } // ensureConsistency
 
@@ -1195,17 +1366,14 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aWork = null;
+            $this->aTitle = null;
             $this->aPublishingcompany = null;
             $this->aPlace = null;
             $this->aDatespecificationRelatedByPublicationdateId = null;
-            $this->aDatespecificationRelatedByFirstpublicationdateId = null;
-            $this->aFont = null;
+            $this->aDatespecificationRelatedByCreationdateId = null;
             $this->collPublicationMs = null;
 
             $this->collPublicationDms = null;
-
-            $this->collPublicationMms = null;
 
             $this->collPublicationDss = null;
 
@@ -1217,6 +1385,20 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
             $this->collPublicationJs = null;
 
+            $this->collVolumesRelatedByPublicationId = null;
+
+            $this->collVolumesRelatedByParentpublicationId = null;
+
+            $this->collLanguagePublications = null;
+
+            $this->collGenrePublications = null;
+
+            $this->collPublicationTags = null;
+
+            $this->collCategoryPublications = null;
+
+            $this->collFontPublications = null;
+
             $this->collPublicationPublicationgroups = null;
 
             $this->collPersonPublications = null;
@@ -1227,6 +1409,11 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
             $this->collTextsources = null;
 
+            $this->collLanguages = null;
+            $this->collGenres = null;
+            $this->collTags = null;
+            $this->collCategories = null;
+            $this->collFonts = null;
             $this->collPublicationgroups = null;
         } // if (deep)
     }
@@ -1346,11 +1533,11 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aWork !== null) {
-                if ($this->aWork->isModified() || $this->aWork->isNew()) {
-                    $affectedRows += $this->aWork->save($con);
+            if ($this->aTitle !== null) {
+                if ($this->aTitle->isModified() || $this->aTitle->isNew()) {
+                    $affectedRows += $this->aTitle->save($con);
                 }
-                $this->setWork($this->aWork);
+                $this->setTitle($this->aTitle);
             }
 
             if ($this->aPublishingcompany !== null) {
@@ -1374,18 +1561,11 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 $this->setDatespecificationRelatedByPublicationdateId($this->aDatespecificationRelatedByPublicationdateId);
             }
 
-            if ($this->aDatespecificationRelatedByFirstpublicationdateId !== null) {
-                if ($this->aDatespecificationRelatedByFirstpublicationdateId->isModified() || $this->aDatespecificationRelatedByFirstpublicationdateId->isNew()) {
-                    $affectedRows += $this->aDatespecificationRelatedByFirstpublicationdateId->save($con);
+            if ($this->aDatespecificationRelatedByCreationdateId !== null) {
+                if ($this->aDatespecificationRelatedByCreationdateId->isModified() || $this->aDatespecificationRelatedByCreationdateId->isNew()) {
+                    $affectedRows += $this->aDatespecificationRelatedByCreationdateId->save($con);
                 }
-                $this->setDatespecificationRelatedByFirstpublicationdateId($this->aDatespecificationRelatedByFirstpublicationdateId);
-            }
-
-            if ($this->aFont !== null) {
-                if ($this->aFont->isModified() || $this->aFont->isNew()) {
-                    $affectedRows += $this->aFont->save($con);
-                }
-                $this->setFont($this->aFont);
+                $this->setDatespecificationRelatedByCreationdateId($this->aDatespecificationRelatedByCreationdateId);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -1397,6 +1577,136 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->languagesScheduledForDeletion !== null) {
+                if (!$this->languagesScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->languagesScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($remotePk, $pk);
+                    }
+                    LanguagePublicationQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->languagesScheduledForDeletion = null;
+                }
+
+                foreach ($this->getLanguages() as $language) {
+                    if ($language->isModified()) {
+                        $language->save($con);
+                    }
+                }
+            } elseif ($this->collLanguages) {
+                foreach ($this->collLanguages as $language) {
+                    if ($language->isModified()) {
+                        $language->save($con);
+                    }
+                }
+            }
+
+            if ($this->genresScheduledForDeletion !== null) {
+                if (!$this->genresScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->genresScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($remotePk, $pk);
+                    }
+                    GenrePublicationQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->genresScheduledForDeletion = null;
+                }
+
+                foreach ($this->getGenres() as $genre) {
+                    if ($genre->isModified()) {
+                        $genre->save($con);
+                    }
+                }
+            } elseif ($this->collGenres) {
+                foreach ($this->collGenres as $genre) {
+                    if ($genre->isModified()) {
+                        $genre->save($con);
+                    }
+                }
+            }
+
+            if ($this->tagsScheduledForDeletion !== null) {
+                if (!$this->tagsScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->tagsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($remotePk, $pk);
+                    }
+                    PublicationTagQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->tagsScheduledForDeletion = null;
+                }
+
+                foreach ($this->getTags() as $tag) {
+                    if ($tag->isModified()) {
+                        $tag->save($con);
+                    }
+                }
+            } elseif ($this->collTags) {
+                foreach ($this->collTags as $tag) {
+                    if ($tag->isModified()) {
+                        $tag->save($con);
+                    }
+                }
+            }
+
+            if ($this->categoriesScheduledForDeletion !== null) {
+                if (!$this->categoriesScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->categoriesScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($remotePk, $pk);
+                    }
+                    CategoryPublicationQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->categoriesScheduledForDeletion = null;
+                }
+
+                foreach ($this->getCategories() as $category) {
+                    if ($category->isModified()) {
+                        $category->save($con);
+                    }
+                }
+            } elseif ($this->collCategories) {
+                foreach ($this->collCategories as $category) {
+                    if ($category->isModified()) {
+                        $category->save($con);
+                    }
+                }
+            }
+
+            if ($this->fontsScheduledForDeletion !== null) {
+                if (!$this->fontsScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->fontsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($remotePk, $pk);
+                    }
+                    FontPublicationQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->fontsScheduledForDeletion = null;
+                }
+
+                foreach ($this->getFonts() as $font) {
+                    if ($font->isModified()) {
+                        $font->save($con);
+                    }
+                }
+            } elseif ($this->collFonts) {
+                foreach ($this->collFonts as $font) {
+                    if ($font->isModified()) {
+                        $font->save($con);
+                    }
+                }
             }
 
             if ($this->publicationgroupsScheduledForDeletion !== null) {
@@ -1453,23 +1763,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
             if ($this->collPublicationDms !== null) {
                 foreach ($this->collPublicationDms as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
-            if ($this->publicationMmsScheduledForDeletion !== null) {
-                if (!$this->publicationMmsScheduledForDeletion->isEmpty()) {
-                    PublicationMmQuery::create()
-                        ->filterByPrimaryKeys($this->publicationMmsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->publicationMmsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collPublicationMms !== null) {
-                foreach ($this->collPublicationMms as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1555,6 +1848,125 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
             if ($this->collPublicationJs !== null) {
                 foreach ($this->collPublicationJs as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->volumesRelatedByPublicationIdScheduledForDeletion !== null) {
+                if (!$this->volumesRelatedByPublicationIdScheduledForDeletion->isEmpty()) {
+                    VolumeQuery::create()
+                        ->filterByPrimaryKeys($this->volumesRelatedByPublicationIdScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->volumesRelatedByPublicationIdScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collVolumesRelatedByPublicationId !== null) {
+                foreach ($this->collVolumesRelatedByPublicationId as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->volumesRelatedByParentpublicationIdScheduledForDeletion !== null) {
+                if (!$this->volumesRelatedByParentpublicationIdScheduledForDeletion->isEmpty()) {
+                    VolumeQuery::create()
+                        ->filterByPrimaryKeys($this->volumesRelatedByParentpublicationIdScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->volumesRelatedByParentpublicationIdScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collVolumesRelatedByParentpublicationId !== null) {
+                foreach ($this->collVolumesRelatedByParentpublicationId as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->languagePublicationsScheduledForDeletion !== null) {
+                if (!$this->languagePublicationsScheduledForDeletion->isEmpty()) {
+                    LanguagePublicationQuery::create()
+                        ->filterByPrimaryKeys($this->languagePublicationsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->languagePublicationsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collLanguagePublications !== null) {
+                foreach ($this->collLanguagePublications as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->genrePublicationsScheduledForDeletion !== null) {
+                if (!$this->genrePublicationsScheduledForDeletion->isEmpty()) {
+                    GenrePublicationQuery::create()
+                        ->filterByPrimaryKeys($this->genrePublicationsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->genrePublicationsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collGenrePublications !== null) {
+                foreach ($this->collGenrePublications as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->publicationTagsScheduledForDeletion !== null) {
+                if (!$this->publicationTagsScheduledForDeletion->isEmpty()) {
+                    PublicationTagQuery::create()
+                        ->filterByPrimaryKeys($this->publicationTagsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->publicationTagsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collPublicationTags !== null) {
+                foreach ($this->collPublicationTags as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->categoryPublicationsScheduledForDeletion !== null) {
+                if (!$this->categoryPublicationsScheduledForDeletion->isEmpty()) {
+                    CategoryPublicationQuery::create()
+                        ->filterByPrimaryKeys($this->categoryPublicationsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->categoryPublicationsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collCategoryPublications !== null) {
+                foreach ($this->collCategoryPublications as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->fontPublicationsScheduledForDeletion !== null) {
+                if (!$this->fontPublicationsScheduledForDeletion->isEmpty()) {
+                    FontPublicationQuery::create()
+                        ->filterByPrimaryKeys($this->fontPublicationsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->fontPublicationsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collFontPublications !== null) {
+                foreach ($this->collFontPublications as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1686,11 +2098,11 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ($this->isColumnModified(PublicationPeer::ID)) {
             $modifiedColumns[':p' . $index++]  = '"id"';
         }
-        if ($this->isColumnModified(PublicationPeer::WWWREADY)) {
-            $modifiedColumns[':p' . $index++]  = '"wwwReady"';
+        if ($this->isColumnModified(PublicationPeer::TITLE_ID)) {
+            $modifiedColumns[':p' . $index++]  = '"title_id"';
         }
-        if ($this->isColumnModified(PublicationPeer::WORK_ID)) {
-            $modifiedColumns[':p' . $index++]  = '"work_id"';
+        if ($this->isColumnModified(PublicationPeer::FIRSTEDITIONPUBLICATION_ID)) {
+            $modifiedColumns[':p' . $index++]  = '"firsteditionpublication_id"';
         }
         if ($this->isColumnModified(PublicationPeer::PLACE_ID)) {
             $modifiedColumns[':p' . $index++]  = '"place_id"';
@@ -1698,8 +2110,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ($this->isColumnModified(PublicationPeer::PUBLICATIONDATE_ID)) {
             $modifiedColumns[':p' . $index++]  = '"publicationdate_id"';
         }
-        if ($this->isColumnModified(PublicationPeer::FIRSTPUBLICATIONDATE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '"firstpublicationdate_id"';
+        if ($this->isColumnModified(PublicationPeer::CREATIONDATE_ID)) {
+            $modifiedColumns[':p' . $index++]  = '"creationdate_id"';
         }
         if ($this->isColumnModified(PublicationPeer::PUBLISHINGCOMPANY_ID)) {
             $modifiedColumns[':p' . $index++]  = '"publishingcompany_id"';
@@ -1716,26 +2128,29 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ($this->isColumnModified(PublicationPeer::TRANSCRIPTIONCOMMENT)) {
             $modifiedColumns[':p' . $index++]  = '"transcriptioncomment"';
         }
-        if ($this->isColumnModified(PublicationPeer::FONT_ID)) {
-            $modifiedColumns[':p' . $index++]  = '"font_id"';
-        }
-        if ($this->isColumnModified(PublicationPeer::VOLUME_ALPHANUMERIC)) {
-            $modifiedColumns[':p' . $index++]  = '"volume_alphanumeric"';
-        }
-        if ($this->isColumnModified(PublicationPeer::VOLUME_NUMERIC)) {
-            $modifiedColumns[':p' . $index++]  = '"volume_numeric"';
-        }
-        if ($this->isColumnModified(PublicationPeer::VOLUMES_TOTAL)) {
-            $modifiedColumns[':p' . $index++]  = '"volumes_total"';
-        }
         if ($this->isColumnModified(PublicationPeer::NUMPAGES)) {
             $modifiedColumns[':p' . $index++]  = '"numpages"';
         }
-        if ($this->isColumnModified(PublicationPeer::NUMPAGESNORMED)) {
-            $modifiedColumns[':p' . $index++]  = '"numpagesnormed"';
+        if ($this->isColumnModified(PublicationPeer::NUMPAGESNUMERIC)) {
+            $modifiedColumns[':p' . $index++]  = '"numpagesnumeric"';
         }
         if ($this->isColumnModified(PublicationPeer::COMMENT)) {
             $modifiedColumns[':p' . $index++]  = '"comment"';
+        }
+        if ($this->isColumnModified(PublicationPeer::DOI)) {
+            $modifiedColumns[':p' . $index++]  = '"doi"';
+        }
+        if ($this->isColumnModified(PublicationPeer::FORMAT)) {
+            $modifiedColumns[':p' . $index++]  = '"format"';
+        }
+        if ($this->isColumnModified(PublicationPeer::DIRECTORYNAME)) {
+            $modifiedColumns[':p' . $index++]  = '"directoryname"';
+        }
+        if ($this->isColumnModified(PublicationPeer::WWWREADY)) {
+            $modifiedColumns[':p' . $index++]  = '"wwwready"';
+        }
+        if ($this->isColumnModified(PublicationPeer::LEGACY_BOOK_ID)) {
+            $modifiedColumns[':p' . $index++]  = '"legacy_book_id"';
         }
         if ($this->isColumnModified(PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED)) {
             $modifiedColumns[':p' . $index++]  = '"publishingcompany_id_is_reconstructed"';
@@ -1754,11 +2169,11 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     case '"id"':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '"wwwReady"':
-                        $stmt->bindValue($identifier, $this->wwwready, PDO::PARAM_INT);
+                    case '"title_id"':
+                        $stmt->bindValue($identifier, $this->title_id, PDO::PARAM_INT);
                         break;
-                    case '"work_id"':
-                        $stmt->bindValue($identifier, $this->work_id, PDO::PARAM_INT);
+                    case '"firsteditionpublication_id"':
+                        $stmt->bindValue($identifier, $this->firsteditionpublication_id, PDO::PARAM_INT);
                         break;
                     case '"place_id"':
                         $stmt->bindValue($identifier, $this->place_id, PDO::PARAM_INT);
@@ -1766,8 +2181,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     case '"publicationdate_id"':
                         $stmt->bindValue($identifier, $this->publicationdate_id, PDO::PARAM_INT);
                         break;
-                    case '"firstpublicationdate_id"':
-                        $stmt->bindValue($identifier, $this->firstpublicationdate_id, PDO::PARAM_INT);
+                    case '"creationdate_id"':
+                        $stmt->bindValue($identifier, $this->creationdate_id, PDO::PARAM_INT);
                         break;
                     case '"publishingcompany_id"':
                         $stmt->bindValue($identifier, $this->publishingcompany_id, PDO::PARAM_INT);
@@ -1784,26 +2199,29 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     case '"transcriptioncomment"':
                         $stmt->bindValue($identifier, $this->transcriptioncomment, PDO::PARAM_STR);
                         break;
-                    case '"font_id"':
-                        $stmt->bindValue($identifier, $this->font_id, PDO::PARAM_INT);
-                        break;
-                    case '"volume_alphanumeric"':
-                        $stmt->bindValue($identifier, $this->volume_alphanumeric, PDO::PARAM_STR);
-                        break;
-                    case '"volume_numeric"':
-                        $stmt->bindValue($identifier, $this->volume_numeric, PDO::PARAM_STR);
-                        break;
-                    case '"volumes_total"':
-                        $stmt->bindValue($identifier, $this->volumes_total, PDO::PARAM_STR);
-                        break;
                     case '"numpages"':
-                        $stmt->bindValue($identifier, $this->numpages, PDO::PARAM_INT);
+                        $stmt->bindValue($identifier, $this->numpages, PDO::PARAM_STR);
                         break;
-                    case '"numpagesnormed"':
-                        $stmt->bindValue($identifier, $this->numpagesnormed, PDO::PARAM_INT);
+                    case '"numpagesnumeric"':
+                        $stmt->bindValue($identifier, $this->numpagesnumeric, PDO::PARAM_INT);
                         break;
                     case '"comment"':
                         $stmt->bindValue($identifier, $this->comment, PDO::PARAM_STR);
+                        break;
+                    case '"doi"':
+                        $stmt->bindValue($identifier, $this->doi, PDO::PARAM_STR);
+                        break;
+                    case '"format"':
+                        $stmt->bindValue($identifier, $this->format, PDO::PARAM_STR);
+                        break;
+                    case '"directoryname"':
+                        $stmt->bindValue($identifier, $this->directoryname, PDO::PARAM_STR);
+                        break;
+                    case '"wwwready"':
+                        $stmt->bindValue($identifier, $this->wwwready, PDO::PARAM_INT);
+                        break;
+                    case '"legacy_book_id"':
+                        $stmt->bindValue($identifier, $this->legacy_book_id, PDO::PARAM_INT);
                         break;
                     case '"publishingcompany_id_is_reconstructed"':
                         $stmt->bindValue($identifier, $this->publishingcompany_id_is_reconstructed, PDO::PARAM_BOOL);
@@ -1900,9 +2318,9 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aWork !== null) {
-                if (!$this->aWork->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aWork->getValidationFailures());
+            if ($this->aTitle !== null) {
+                if (!$this->aTitle->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aTitle->getValidationFailures());
                 }
             }
 
@@ -1924,15 +2342,9 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 }
             }
 
-            if ($this->aDatespecificationRelatedByFirstpublicationdateId !== null) {
-                if (!$this->aDatespecificationRelatedByFirstpublicationdateId->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aDatespecificationRelatedByFirstpublicationdateId->getValidationFailures());
-                }
-            }
-
-            if ($this->aFont !== null) {
-                if (!$this->aFont->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aFont->getValidationFailures());
+            if ($this->aDatespecificationRelatedByCreationdateId !== null) {
+                if (!$this->aDatespecificationRelatedByCreationdateId->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aDatespecificationRelatedByCreationdateId->getValidationFailures());
                 }
             }
 
@@ -1952,14 +2364,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
                 if ($this->collPublicationDms !== null) {
                     foreach ($this->collPublicationDms as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
-                if ($this->collPublicationMms !== null) {
-                    foreach ($this->collPublicationMms as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -2000,6 +2404,62 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
                 if ($this->collPublicationJs !== null) {
                     foreach ($this->collPublicationJs as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collVolumesRelatedByPublicationId !== null) {
+                    foreach ($this->collVolumesRelatedByPublicationId as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collVolumesRelatedByParentpublicationId !== null) {
+                    foreach ($this->collVolumesRelatedByParentpublicationId as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collLanguagePublications !== null) {
+                    foreach ($this->collLanguagePublications as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collGenrePublications !== null) {
+                    foreach ($this->collGenrePublications as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collPublicationTags !== null) {
+                    foreach ($this->collPublicationTags as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collCategoryPublications !== null) {
+                    foreach ($this->collCategoryPublications as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collFontPublications !== null) {
+                    foreach ($this->collFontPublications as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -2085,10 +2545,10 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return $this->getId();
                 break;
             case 1:
-                return $this->getWwwready();
+                return $this->getTitleId();
                 break;
             case 2:
-                return $this->getWorkId();
+                return $this->getFirsteditionpublicationId();
                 break;
             case 3:
                 return $this->getPlaceId();
@@ -2097,7 +2557,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return $this->getPublicationdateId();
                 break;
             case 5:
-                return $this->getFirstpublicationdateId();
+                return $this->getCreationdateId();
                 break;
             case 6:
                 return $this->getPublishingcompanyId();
@@ -2115,27 +2575,30 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return $this->getTranscriptioncomment();
                 break;
             case 11:
-                return $this->getFontId();
-                break;
-            case 12:
-                return $this->getVolumeAlphanumeric();
-                break;
-            case 13:
-                return $this->getVolumeNumeric();
-                break;
-            case 14:
-                return $this->getVolumesTotal();
-                break;
-            case 15:
                 return $this->getNumpages();
                 break;
-            case 16:
-                return $this->getNumpagesnormed();
+            case 12:
+                return $this->getNumpagesnumeric();
                 break;
-            case 17:
+            case 13:
                 return $this->getComment();
                 break;
+            case 14:
+                return $this->getDoi();
+                break;
+            case 15:
+                return $this->getFormat();
+                break;
+            case 16:
+                return $this->getDirectoryname();
+                break;
+            case 17:
+                return $this->getWwwready();
+                break;
             case 18:
+                return $this->getLegacyBookId();
+                break;
+            case 19:
                 return $this->getPublishingcompanyIdIsReconstructed();
                 break;
             default:
@@ -2168,28 +2631,29 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         $keys = PublicationPeer::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getWwwready(),
-            $keys[2] => $this->getWorkId(),
+            $keys[1] => $this->getTitleId(),
+            $keys[2] => $this->getFirsteditionpublicationId(),
             $keys[3] => $this->getPlaceId(),
             $keys[4] => $this->getPublicationdateId(),
-            $keys[5] => $this->getFirstpublicationdateId(),
+            $keys[5] => $this->getCreationdateId(),
             $keys[6] => $this->getPublishingcompanyId(),
             $keys[7] => $this->getPartnerId(),
             $keys[8] => $this->getEditiondescription(),
             $keys[9] => $this->getDigitaleditioneditor(),
             $keys[10] => $this->getTranscriptioncomment(),
-            $keys[11] => $this->getFontId(),
-            $keys[12] => $this->getVolumeAlphanumeric(),
-            $keys[13] => $this->getVolumeNumeric(),
-            $keys[14] => $this->getVolumesTotal(),
-            $keys[15] => $this->getNumpages(),
-            $keys[16] => $this->getNumpagesnormed(),
-            $keys[17] => $this->getComment(),
-            $keys[18] => $this->getPublishingcompanyIdIsReconstructed(),
+            $keys[11] => $this->getNumpages(),
+            $keys[12] => $this->getNumpagesnumeric(),
+            $keys[13] => $this->getComment(),
+            $keys[14] => $this->getDoi(),
+            $keys[15] => $this->getFormat(),
+            $keys[16] => $this->getDirectoryname(),
+            $keys[17] => $this->getWwwready(),
+            $keys[18] => $this->getLegacyBookId(),
+            $keys[19] => $this->getPublishingcompanyIdIsReconstructed(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aWork) {
-                $result['Work'] = $this->aWork->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aTitle) {
+                $result['Title'] = $this->aTitle->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->aPublishingcompany) {
                 $result['Publishingcompany'] = $this->aPublishingcompany->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
@@ -2200,20 +2664,14 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             if (null !== $this->aDatespecificationRelatedByPublicationdateId) {
                 $result['DatespecificationRelatedByPublicationdateId'] = $this->aDatespecificationRelatedByPublicationdateId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aDatespecificationRelatedByFirstpublicationdateId) {
-                $result['DatespecificationRelatedByFirstpublicationdateId'] = $this->aDatespecificationRelatedByFirstpublicationdateId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->aFont) {
-                $result['Font'] = $this->aFont->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aDatespecificationRelatedByCreationdateId) {
+                $result['DatespecificationRelatedByCreationdateId'] = $this->aDatespecificationRelatedByCreationdateId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->collPublicationMs) {
                 $result['PublicationMs'] = $this->collPublicationMs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collPublicationDms) {
                 $result['PublicationDms'] = $this->collPublicationDms->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
-            if (null !== $this->collPublicationMms) {
-                $result['PublicationMms'] = $this->collPublicationMms->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collPublicationDss) {
                 $result['PublicationDss'] = $this->collPublicationDss->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -2229,6 +2687,27 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             }
             if (null !== $this->collPublicationJs) {
                 $result['PublicationJs'] = $this->collPublicationJs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collVolumesRelatedByPublicationId) {
+                $result['VolumesRelatedByPublicationId'] = $this->collVolumesRelatedByPublicationId->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collVolumesRelatedByParentpublicationId) {
+                $result['VolumesRelatedByParentpublicationId'] = $this->collVolumesRelatedByParentpublicationId->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collLanguagePublications) {
+                $result['LanguagePublications'] = $this->collLanguagePublications->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collGenrePublications) {
+                $result['GenrePublications'] = $this->collGenrePublications->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collPublicationTags) {
+                $result['PublicationTags'] = $this->collPublicationTags->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collCategoryPublications) {
+                $result['CategoryPublications'] = $this->collCategoryPublications->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collFontPublications) {
+                $result['FontPublications'] = $this->collFontPublications->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collPublicationPublicationgroups) {
                 $result['PublicationPublicationgroups'] = $this->collPublicationPublicationgroups->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -2283,10 +2762,10 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 $this->setId($value);
                 break;
             case 1:
-                $this->setWwwready($value);
+                $this->setTitleId($value);
                 break;
             case 2:
-                $this->setWorkId($value);
+                $this->setFirsteditionpublicationId($value);
                 break;
             case 3:
                 $this->setPlaceId($value);
@@ -2295,7 +2774,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 $this->setPublicationdateId($value);
                 break;
             case 5:
-                $this->setFirstpublicationdateId($value);
+                $this->setCreationdateId($value);
                 break;
             case 6:
                 $this->setPublishingcompanyId($value);
@@ -2313,27 +2792,30 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 $this->setTranscriptioncomment($value);
                 break;
             case 11:
-                $this->setFontId($value);
-                break;
-            case 12:
-                $this->setVolumeAlphanumeric($value);
-                break;
-            case 13:
-                $this->setVolumeNumeric($value);
-                break;
-            case 14:
-                $this->setVolumesTotal($value);
-                break;
-            case 15:
                 $this->setNumpages($value);
                 break;
-            case 16:
-                $this->setNumpagesnormed($value);
+            case 12:
+                $this->setNumpagesnumeric($value);
                 break;
-            case 17:
+            case 13:
                 $this->setComment($value);
                 break;
+            case 14:
+                $this->setDoi($value);
+                break;
+            case 15:
+                $this->setFormat($value);
+                break;
+            case 16:
+                $this->setDirectoryname($value);
+                break;
+            case 17:
+                $this->setWwwready($value);
+                break;
             case 18:
+                $this->setLegacyBookId($value);
+                break;
+            case 19:
                 $this->setPublishingcompanyIdIsReconstructed($value);
                 break;
         } // switch()
@@ -2361,24 +2843,25 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         $keys = PublicationPeer::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setWwwready($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setWorkId($arr[$keys[2]]);
+        if (array_key_exists($keys[1], $arr)) $this->setTitleId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setFirsteditionpublicationId($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setPlaceId($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setPublicationdateId($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setFirstpublicationdateId($arr[$keys[5]]);
+        if (array_key_exists($keys[5], $arr)) $this->setCreationdateId($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setPublishingcompanyId($arr[$keys[6]]);
         if (array_key_exists($keys[7], $arr)) $this->setPartnerId($arr[$keys[7]]);
         if (array_key_exists($keys[8], $arr)) $this->setEditiondescription($arr[$keys[8]]);
         if (array_key_exists($keys[9], $arr)) $this->setDigitaleditioneditor($arr[$keys[9]]);
         if (array_key_exists($keys[10], $arr)) $this->setTranscriptioncomment($arr[$keys[10]]);
-        if (array_key_exists($keys[11], $arr)) $this->setFontId($arr[$keys[11]]);
-        if (array_key_exists($keys[12], $arr)) $this->setVolumeAlphanumeric($arr[$keys[12]]);
-        if (array_key_exists($keys[13], $arr)) $this->setVolumeNumeric($arr[$keys[13]]);
-        if (array_key_exists($keys[14], $arr)) $this->setVolumesTotal($arr[$keys[14]]);
-        if (array_key_exists($keys[15], $arr)) $this->setNumpages($arr[$keys[15]]);
-        if (array_key_exists($keys[16], $arr)) $this->setNumpagesnormed($arr[$keys[16]]);
-        if (array_key_exists($keys[17], $arr)) $this->setComment($arr[$keys[17]]);
-        if (array_key_exists($keys[18], $arr)) $this->setPublishingcompanyIdIsReconstructed($arr[$keys[18]]);
+        if (array_key_exists($keys[11], $arr)) $this->setNumpages($arr[$keys[11]]);
+        if (array_key_exists($keys[12], $arr)) $this->setNumpagesnumeric($arr[$keys[12]]);
+        if (array_key_exists($keys[13], $arr)) $this->setComment($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setDoi($arr[$keys[14]]);
+        if (array_key_exists($keys[15], $arr)) $this->setFormat($arr[$keys[15]]);
+        if (array_key_exists($keys[16], $arr)) $this->setDirectoryname($arr[$keys[16]]);
+        if (array_key_exists($keys[17], $arr)) $this->setWwwready($arr[$keys[17]]);
+        if (array_key_exists($keys[18], $arr)) $this->setLegacyBookId($arr[$keys[18]]);
+        if (array_key_exists($keys[19], $arr)) $this->setPublishingcompanyIdIsReconstructed($arr[$keys[19]]);
     }
 
     /**
@@ -2391,23 +2874,24 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         $criteria = new Criteria(PublicationPeer::DATABASE_NAME);
 
         if ($this->isColumnModified(PublicationPeer::ID)) $criteria->add(PublicationPeer::ID, $this->id);
-        if ($this->isColumnModified(PublicationPeer::WWWREADY)) $criteria->add(PublicationPeer::WWWREADY, $this->wwwready);
-        if ($this->isColumnModified(PublicationPeer::WORK_ID)) $criteria->add(PublicationPeer::WORK_ID, $this->work_id);
+        if ($this->isColumnModified(PublicationPeer::TITLE_ID)) $criteria->add(PublicationPeer::TITLE_ID, $this->title_id);
+        if ($this->isColumnModified(PublicationPeer::FIRSTEDITIONPUBLICATION_ID)) $criteria->add(PublicationPeer::FIRSTEDITIONPUBLICATION_ID, $this->firsteditionpublication_id);
         if ($this->isColumnModified(PublicationPeer::PLACE_ID)) $criteria->add(PublicationPeer::PLACE_ID, $this->place_id);
         if ($this->isColumnModified(PublicationPeer::PUBLICATIONDATE_ID)) $criteria->add(PublicationPeer::PUBLICATIONDATE_ID, $this->publicationdate_id);
-        if ($this->isColumnModified(PublicationPeer::FIRSTPUBLICATIONDATE_ID)) $criteria->add(PublicationPeer::FIRSTPUBLICATIONDATE_ID, $this->firstpublicationdate_id);
+        if ($this->isColumnModified(PublicationPeer::CREATIONDATE_ID)) $criteria->add(PublicationPeer::CREATIONDATE_ID, $this->creationdate_id);
         if ($this->isColumnModified(PublicationPeer::PUBLISHINGCOMPANY_ID)) $criteria->add(PublicationPeer::PUBLISHINGCOMPANY_ID, $this->publishingcompany_id);
         if ($this->isColumnModified(PublicationPeer::PARTNER_ID)) $criteria->add(PublicationPeer::PARTNER_ID, $this->partner_id);
         if ($this->isColumnModified(PublicationPeer::EDITIONDESCRIPTION)) $criteria->add(PublicationPeer::EDITIONDESCRIPTION, $this->editiondescription);
         if ($this->isColumnModified(PublicationPeer::DIGITALEDITIONEDITOR)) $criteria->add(PublicationPeer::DIGITALEDITIONEDITOR, $this->digitaleditioneditor);
         if ($this->isColumnModified(PublicationPeer::TRANSCRIPTIONCOMMENT)) $criteria->add(PublicationPeer::TRANSCRIPTIONCOMMENT, $this->transcriptioncomment);
-        if ($this->isColumnModified(PublicationPeer::FONT_ID)) $criteria->add(PublicationPeer::FONT_ID, $this->font_id);
-        if ($this->isColumnModified(PublicationPeer::VOLUME_ALPHANUMERIC)) $criteria->add(PublicationPeer::VOLUME_ALPHANUMERIC, $this->volume_alphanumeric);
-        if ($this->isColumnModified(PublicationPeer::VOLUME_NUMERIC)) $criteria->add(PublicationPeer::VOLUME_NUMERIC, $this->volume_numeric);
-        if ($this->isColumnModified(PublicationPeer::VOLUMES_TOTAL)) $criteria->add(PublicationPeer::VOLUMES_TOTAL, $this->volumes_total);
         if ($this->isColumnModified(PublicationPeer::NUMPAGES)) $criteria->add(PublicationPeer::NUMPAGES, $this->numpages);
-        if ($this->isColumnModified(PublicationPeer::NUMPAGESNORMED)) $criteria->add(PublicationPeer::NUMPAGESNORMED, $this->numpagesnormed);
+        if ($this->isColumnModified(PublicationPeer::NUMPAGESNUMERIC)) $criteria->add(PublicationPeer::NUMPAGESNUMERIC, $this->numpagesnumeric);
         if ($this->isColumnModified(PublicationPeer::COMMENT)) $criteria->add(PublicationPeer::COMMENT, $this->comment);
+        if ($this->isColumnModified(PublicationPeer::DOI)) $criteria->add(PublicationPeer::DOI, $this->doi);
+        if ($this->isColumnModified(PublicationPeer::FORMAT)) $criteria->add(PublicationPeer::FORMAT, $this->format);
+        if ($this->isColumnModified(PublicationPeer::DIRECTORYNAME)) $criteria->add(PublicationPeer::DIRECTORYNAME, $this->directoryname);
+        if ($this->isColumnModified(PublicationPeer::WWWREADY)) $criteria->add(PublicationPeer::WWWREADY, $this->wwwready);
+        if ($this->isColumnModified(PublicationPeer::LEGACY_BOOK_ID)) $criteria->add(PublicationPeer::LEGACY_BOOK_ID, $this->legacy_book_id);
         if ($this->isColumnModified(PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED)) $criteria->add(PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED, $this->publishingcompany_id_is_reconstructed);
 
         return $criteria;
@@ -2472,23 +2956,24 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setWwwready($this->getWwwready());
-        $copyObj->setWorkId($this->getWorkId());
+        $copyObj->setTitleId($this->getTitleId());
+        $copyObj->setFirsteditionpublicationId($this->getFirsteditionpublicationId());
         $copyObj->setPlaceId($this->getPlaceId());
         $copyObj->setPublicationdateId($this->getPublicationdateId());
-        $copyObj->setFirstpublicationdateId($this->getFirstpublicationdateId());
+        $copyObj->setCreationdateId($this->getCreationdateId());
         $copyObj->setPublishingcompanyId($this->getPublishingcompanyId());
         $copyObj->setPartnerId($this->getPartnerId());
         $copyObj->setEditiondescription($this->getEditiondescription());
         $copyObj->setDigitaleditioneditor($this->getDigitaleditioneditor());
         $copyObj->setTranscriptioncomment($this->getTranscriptioncomment());
-        $copyObj->setFontId($this->getFontId());
-        $copyObj->setVolumeAlphanumeric($this->getVolumeAlphanumeric());
-        $copyObj->setVolumeNumeric($this->getVolumeNumeric());
-        $copyObj->setVolumesTotal($this->getVolumesTotal());
         $copyObj->setNumpages($this->getNumpages());
-        $copyObj->setNumpagesnormed($this->getNumpagesnormed());
+        $copyObj->setNumpagesnumeric($this->getNumpagesnumeric());
         $copyObj->setComment($this->getComment());
+        $copyObj->setDoi($this->getDoi());
+        $copyObj->setFormat($this->getFormat());
+        $copyObj->setDirectoryname($this->getDirectoryname());
+        $copyObj->setWwwready($this->getWwwready());
+        $copyObj->setLegacyBookId($this->getLegacyBookId());
         $copyObj->setPublishingcompanyIdIsReconstructed($this->getPublishingcompanyIdIsReconstructed());
 
         if ($deepCopy && !$this->startCopy) {
@@ -2507,12 +2992,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             foreach ($this->getPublicationDms() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addPublicationDm($relObj->copy($deepCopy));
-                }
-            }
-
-            foreach ($this->getPublicationMms() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addPublicationMm($relObj->copy($deepCopy));
                 }
             }
 
@@ -2543,6 +3022,48 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             foreach ($this->getPublicationJs() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addPublicationJ($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getVolumesRelatedByPublicationId() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addVolumeRelatedByPublicationId($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getVolumesRelatedByParentpublicationId() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addVolumeRelatedByParentpublicationId($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getLanguagePublications() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addLanguagePublication($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getGenrePublications() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addGenrePublication($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getPublicationTags() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addPublicationTag($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getCategoryPublications() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCategoryPublication($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getFontPublications() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addFontPublication($relObj->copy($deepCopy));
                 }
             }
 
@@ -2627,24 +3148,24 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     }
 
     /**
-     * Declares an association between this object and a Work object.
+     * Declares an association between this object and a Title object.
      *
-     * @param             Work $v
+     * @param             Title $v
      * @return Publication The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setWork(Work $v = null)
+    public function setTitle(Title $v = null)
     {
         if ($v === null) {
-            $this->setWorkId(NULL);
+            $this->setTitleId(NULL);
         } else {
-            $this->setWorkId($v->getId());
+            $this->setTitleId($v->getId());
         }
 
-        $this->aWork = $v;
+        $this->aTitle = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Work object, it will not be re-added.
+        // If this object has already been added to the Title object, it will not be re-added.
         if ($v !== null) {
             $v->addPublication($this);
         }
@@ -2655,27 +3176,27 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
 
     /**
-     * Get the associated Work object
+     * Get the associated Title object
      *
      * @param PropelPDO $con Optional Connection object.
      * @param $doQuery Executes a query to get the object if required
-     * @return Work The associated Work object.
+     * @return Title The associated Title object.
      * @throws PropelException
      */
-    public function getWork(PropelPDO $con = null, $doQuery = true)
+    public function getTitle(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aWork === null && ($this->work_id !== null) && $doQuery) {
-            $this->aWork = WorkQuery::create()->findPk($this->work_id, $con);
+        if ($this->aTitle === null && ($this->title_id !== null) && $doQuery) {
+            $this->aTitle = TitleQuery::create()->findPk($this->title_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aWork->addPublications($this);
+                $this->aTitle->addPublications($this);
              */
         }
 
-        return $this->aWork;
+        return $this->aTitle;
     }
 
     /**
@@ -2841,20 +3362,20 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      * @return Publication The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setDatespecificationRelatedByFirstpublicationdateId(Datespecification $v = null)
+    public function setDatespecificationRelatedByCreationdateId(Datespecification $v = null)
     {
         if ($v === null) {
-            $this->setFirstpublicationdateId(NULL);
+            $this->setCreationdateId(NULL);
         } else {
-            $this->setFirstpublicationdateId($v->getId());
+            $this->setCreationdateId($v->getId());
         }
 
-        $this->aDatespecificationRelatedByFirstpublicationdateId = $v;
+        $this->aDatespecificationRelatedByCreationdateId = $v;
 
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the Datespecification object, it will not be re-added.
         if ($v !== null) {
-            $v->addPublicationRelatedByFirstpublicationdateId($this);
+            $v->addPublicationRelatedByCreationdateId($this);
         }
 
 
@@ -2870,72 +3391,20 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      * @return Datespecification The associated Datespecification object.
      * @throws PropelException
      */
-    public function getDatespecificationRelatedByFirstpublicationdateId(PropelPDO $con = null, $doQuery = true)
+    public function getDatespecificationRelatedByCreationdateId(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aDatespecificationRelatedByFirstpublicationdateId === null && ($this->firstpublicationdate_id !== null) && $doQuery) {
-            $this->aDatespecificationRelatedByFirstpublicationdateId = DatespecificationQuery::create()->findPk($this->firstpublicationdate_id, $con);
+        if ($this->aDatespecificationRelatedByCreationdateId === null && ($this->creationdate_id !== null) && $doQuery) {
+            $this->aDatespecificationRelatedByCreationdateId = DatespecificationQuery::create()->findPk($this->creationdate_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aDatespecificationRelatedByFirstpublicationdateId->addPublicationsRelatedByFirstpublicationdateId($this);
+                $this->aDatespecificationRelatedByCreationdateId->addPublicationsRelatedByCreationdateId($this);
              */
         }
 
-        return $this->aDatespecificationRelatedByFirstpublicationdateId;
-    }
-
-    /**
-     * Declares an association between this object and a Font object.
-     *
-     * @param             Font $v
-     * @return Publication The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setFont(Font $v = null)
-    {
-        if ($v === null) {
-            $this->setFontId(NULL);
-        } else {
-            $this->setFontId($v->getId());
-        }
-
-        $this->aFont = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Font object, it will not be re-added.
-        if ($v !== null) {
-            $v->addPublication($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated Font object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @param $doQuery Executes a query to get the object if required
-     * @return Font The associated Font object.
-     * @throws PropelException
-     */
-    public function getFont(PropelPDO $con = null, $doQuery = true)
-    {
-        if ($this->aFont === null && ($this->font_id !== null) && $doQuery) {
-            $this->aFont = FontQuery::create()->findPk($this->font_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aFont->addPublications($this);
-             */
-        }
-
-        return $this->aFont;
+        return $this->aDatespecificationRelatedByCreationdateId;
     }
 
 
@@ -2955,9 +3424,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ('PublicationDm' == $relationName) {
             $this->initPublicationDms();
         }
-        if ('PublicationMm' == $relationName) {
-            $this->initPublicationMms();
-        }
         if ('PublicationDs' == $relationName) {
             $this->initPublicationDss();
         }
@@ -2972,6 +3438,27 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         }
         if ('PublicationJ' == $relationName) {
             $this->initPublicationJs();
+        }
+        if ('VolumeRelatedByPublicationId' == $relationName) {
+            $this->initVolumesRelatedByPublicationId();
+        }
+        if ('VolumeRelatedByParentpublicationId' == $relationName) {
+            $this->initVolumesRelatedByParentpublicationId();
+        }
+        if ('LanguagePublication' == $relationName) {
+            $this->initLanguagePublications();
+        }
+        if ('GenrePublication' == $relationName) {
+            $this->initGenrePublications();
+        }
+        if ('PublicationTag' == $relationName) {
+            $this->initPublicationTags();
+        }
+        if ('CategoryPublication' == $relationName) {
+            $this->initCategoryPublications();
+        }
+        if ('FontPublication' == $relationName) {
+            $this->initFontPublications();
         }
         if ('PublicationPublicationgroup' == $relationName) {
             $this->initPublicationPublicationgroups();
@@ -3427,249 +3914,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     }
 
     /**
-     * Clears out the collPublicationMms collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return Publication The current object (for fluent API support)
-     * @see        addPublicationMms()
-     */
-    public function clearPublicationMms()
-    {
-        $this->collPublicationMms = null; // important to set this to null since that means it is uninitialized
-        $this->collPublicationMmsPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * reset is the collPublicationMms collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialPublicationMms($v = true)
-    {
-        $this->collPublicationMmsPartial = $v;
-    }
-
-    /**
-     * Initializes the collPublicationMms collection.
-     *
-     * By default this just sets the collPublicationMms collection to an empty array (like clearcollPublicationMms());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initPublicationMms($overrideExisting = true)
-    {
-        if (null !== $this->collPublicationMms && !$overrideExisting) {
-            return;
-        }
-        $this->collPublicationMms = new PropelObjectCollection();
-        $this->collPublicationMms->setModel('PublicationMm');
-    }
-
-    /**
-     * Gets an array of PublicationMm objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Publication is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|PublicationMm[] List of PublicationMm objects
-     * @throws PropelException
-     */
-    public function getPublicationMms($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collPublicationMmsPartial && !$this->isNew();
-        if (null === $this->collPublicationMms || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collPublicationMms) {
-                // return empty collection
-                $this->initPublicationMms();
-            } else {
-                $collPublicationMms = PublicationMmQuery::create(null, $criteria)
-                    ->filterByPublication($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collPublicationMmsPartial && count($collPublicationMms)) {
-                      $this->initPublicationMms(false);
-
-                      foreach($collPublicationMms as $obj) {
-                        if (false == $this->collPublicationMms->contains($obj)) {
-                          $this->collPublicationMms->append($obj);
-                        }
-                      }
-
-                      $this->collPublicationMmsPartial = true;
-                    }
-
-                    $collPublicationMms->getInternalIterator()->rewind();
-                    return $collPublicationMms;
-                }
-
-                if($partial && $this->collPublicationMms) {
-                    foreach($this->collPublicationMms as $obj) {
-                        if($obj->isNew()) {
-                            $collPublicationMms[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collPublicationMms = $collPublicationMms;
-                $this->collPublicationMmsPartial = false;
-            }
-        }
-
-        return $this->collPublicationMms;
-    }
-
-    /**
-     * Sets a collection of PublicationMm objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $publicationMms A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     * @return Publication The current object (for fluent API support)
-     */
-    public function setPublicationMms(PropelCollection $publicationMms, PropelPDO $con = null)
-    {
-        $publicationMmsToDelete = $this->getPublicationMms(new Criteria(), $con)->diff($publicationMms);
-
-        $this->publicationMmsScheduledForDeletion = unserialize(serialize($publicationMmsToDelete));
-
-        foreach ($publicationMmsToDelete as $publicationMmRemoved) {
-            $publicationMmRemoved->setPublication(null);
-        }
-
-        $this->collPublicationMms = null;
-        foreach ($publicationMms as $publicationMm) {
-            $this->addPublicationMm($publicationMm);
-        }
-
-        $this->collPublicationMms = $publicationMms;
-        $this->collPublicationMmsPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related PublicationMm objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related PublicationMm objects.
-     * @throws PropelException
-     */
-    public function countPublicationMms(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collPublicationMmsPartial && !$this->isNew();
-        if (null === $this->collPublicationMms || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collPublicationMms) {
-                return 0;
-            }
-
-            if($partial && !$criteria) {
-                return count($this->getPublicationMms());
-            }
-            $query = PublicationMmQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByPublication($this)
-                ->count($con);
-        }
-
-        return count($this->collPublicationMms);
-    }
-
-    /**
-     * Method called to associate a PublicationMm object to this object
-     * through the PublicationMm foreign key attribute.
-     *
-     * @param    PublicationMm $l PublicationMm
-     * @return Publication The current object (for fluent API support)
-     */
-    public function addPublicationMm(PublicationMm $l)
-    {
-        if ($this->collPublicationMms === null) {
-            $this->initPublicationMms();
-            $this->collPublicationMmsPartial = true;
-        }
-        if (!in_array($l, $this->collPublicationMms->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddPublicationMm($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	PublicationMm $publicationMm The publicationMm object to add.
-     */
-    protected function doAddPublicationMm($publicationMm)
-    {
-        $this->collPublicationMms[]= $publicationMm;
-        $publicationMm->setPublication($this);
-    }
-
-    /**
-     * @param	PublicationMm $publicationMm The publicationMm object to remove.
-     * @return Publication The current object (for fluent API support)
-     */
-    public function removePublicationMm($publicationMm)
-    {
-        if ($this->getPublicationMms()->contains($publicationMm)) {
-            $this->collPublicationMms->remove($this->collPublicationMms->search($publicationMm));
-            if (null === $this->publicationMmsScheduledForDeletion) {
-                $this->publicationMmsScheduledForDeletion = clone $this->collPublicationMms;
-                $this->publicationMmsScheduledForDeletion->clear();
-            }
-            $this->publicationMmsScheduledForDeletion[]= clone $publicationMm;
-            $publicationMm->setPublication(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Publication is new, it will return
-     * an empty collection; or if this Publication has previously
-     * been saved, it will retrieve related PublicationMms from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Publication.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|PublicationMm[] List of PublicationMm objects
-     */
-    public function getPublicationMmsJoinVolume($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = PublicationMmQuery::create(null, $criteria);
-        $query->joinWith('Volume', $join_behavior);
-
-        return $this->getPublicationMms($query, $con);
-    }
-
-    /**
      * Clears out the collPublicationDss collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -3885,31 +4129,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         }
 
         return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Publication is new, it will return
-     * an empty collection; or if this Publication has previously
-     * been saved, it will retrieve related PublicationDss from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Publication.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|PublicationDs[] List of PublicationDs objects
-     */
-    public function getPublicationDssJoinVolume($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = PublicationDsQuery::create(null, $criteria);
-        $query->joinWith('Volume', $join_behavior);
-
-        return $this->getPublicationDss($query, $con);
     }
 
 
@@ -4398,31 +4617,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         return $this;
     }
 
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Publication is new, it will return
-     * an empty collection; or if this Publication has previously
-     * been saved, it will retrieve related PublicationJas from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Publication.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|PublicationJa[] List of PublicationJa objects
-     */
-    public function getPublicationJasJoinVolume($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = PublicationJaQuery::create(null, $criteria);
-        $query->joinWith('Volume', $join_behavior);
-
-        return $this->getPublicationJas($query, $con);
-    }
-
     /**
      * Clears out the collPublicationMmss collection
      *
@@ -4639,31 +4833,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         }
 
         return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Publication is new, it will return
-     * an empty collection; or if this Publication has previously
-     * been saved, it will retrieve related PublicationMmss from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Publication.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|PublicationMms[] List of PublicationMms objects
-     */
-    public function getPublicationMmssJoinVolume($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = PublicationMmsQuery::create(null, $criteria);
-        $query->joinWith('Volume', $join_behavior);
-
-        return $this->getPublicationMmss($query, $con);
     }
 
 
@@ -4907,6 +5076,1657 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         }
 
         return $this;
+    }
+
+    /**
+     * Clears out the collVolumesRelatedByPublicationId collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Publication The current object (for fluent API support)
+     * @see        addVolumesRelatedByPublicationId()
+     */
+    public function clearVolumesRelatedByPublicationId()
+    {
+        $this->collVolumesRelatedByPublicationId = null; // important to set this to null since that means it is uninitialized
+        $this->collVolumesRelatedByPublicationIdPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collVolumesRelatedByPublicationId collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialVolumesRelatedByPublicationId($v = true)
+    {
+        $this->collVolumesRelatedByPublicationIdPartial = $v;
+    }
+
+    /**
+     * Initializes the collVolumesRelatedByPublicationId collection.
+     *
+     * By default this just sets the collVolumesRelatedByPublicationId collection to an empty array (like clearcollVolumesRelatedByPublicationId());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initVolumesRelatedByPublicationId($overrideExisting = true)
+    {
+        if (null !== $this->collVolumesRelatedByPublicationId && !$overrideExisting) {
+            return;
+        }
+        $this->collVolumesRelatedByPublicationId = new PropelObjectCollection();
+        $this->collVolumesRelatedByPublicationId->setModel('Volume');
+    }
+
+    /**
+     * Gets an array of Volume objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Publication is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Volume[] List of Volume objects
+     * @throws PropelException
+     */
+    public function getVolumesRelatedByPublicationId($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collVolumesRelatedByPublicationIdPartial && !$this->isNew();
+        if (null === $this->collVolumesRelatedByPublicationId || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collVolumesRelatedByPublicationId) {
+                // return empty collection
+                $this->initVolumesRelatedByPublicationId();
+            } else {
+                $collVolumesRelatedByPublicationId = VolumeQuery::create(null, $criteria)
+                    ->filterByPublicationRelatedByPublicationId($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collVolumesRelatedByPublicationIdPartial && count($collVolumesRelatedByPublicationId)) {
+                      $this->initVolumesRelatedByPublicationId(false);
+
+                      foreach($collVolumesRelatedByPublicationId as $obj) {
+                        if (false == $this->collVolumesRelatedByPublicationId->contains($obj)) {
+                          $this->collVolumesRelatedByPublicationId->append($obj);
+                        }
+                      }
+
+                      $this->collVolumesRelatedByPublicationIdPartial = true;
+                    }
+
+                    $collVolumesRelatedByPublicationId->getInternalIterator()->rewind();
+                    return $collVolumesRelatedByPublicationId;
+                }
+
+                if($partial && $this->collVolumesRelatedByPublicationId) {
+                    foreach($this->collVolumesRelatedByPublicationId as $obj) {
+                        if($obj->isNew()) {
+                            $collVolumesRelatedByPublicationId[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collVolumesRelatedByPublicationId = $collVolumesRelatedByPublicationId;
+                $this->collVolumesRelatedByPublicationIdPartial = false;
+            }
+        }
+
+        return $this->collVolumesRelatedByPublicationId;
+    }
+
+    /**
+     * Sets a collection of VolumeRelatedByPublicationId objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $volumesRelatedByPublicationId A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setVolumesRelatedByPublicationId(PropelCollection $volumesRelatedByPublicationId, PropelPDO $con = null)
+    {
+        $volumesRelatedByPublicationIdToDelete = $this->getVolumesRelatedByPublicationId(new Criteria(), $con)->diff($volumesRelatedByPublicationId);
+
+        $this->volumesRelatedByPublicationIdScheduledForDeletion = unserialize(serialize($volumesRelatedByPublicationIdToDelete));
+
+        foreach ($volumesRelatedByPublicationIdToDelete as $volumeRelatedByPublicationIdRemoved) {
+            $volumeRelatedByPublicationIdRemoved->setPublicationRelatedByPublicationId(null);
+        }
+
+        $this->collVolumesRelatedByPublicationId = null;
+        foreach ($volumesRelatedByPublicationId as $volumeRelatedByPublicationId) {
+            $this->addVolumeRelatedByPublicationId($volumeRelatedByPublicationId);
+        }
+
+        $this->collVolumesRelatedByPublicationId = $volumesRelatedByPublicationId;
+        $this->collVolumesRelatedByPublicationIdPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Volume objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Volume objects.
+     * @throws PropelException
+     */
+    public function countVolumesRelatedByPublicationId(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collVolumesRelatedByPublicationIdPartial && !$this->isNew();
+        if (null === $this->collVolumesRelatedByPublicationId || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collVolumesRelatedByPublicationId) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getVolumesRelatedByPublicationId());
+            }
+            $query = VolumeQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPublicationRelatedByPublicationId($this)
+                ->count($con);
+        }
+
+        return count($this->collVolumesRelatedByPublicationId);
+    }
+
+    /**
+     * Method called to associate a Volume object to this object
+     * through the Volume foreign key attribute.
+     *
+     * @param    Volume $l Volume
+     * @return Publication The current object (for fluent API support)
+     */
+    public function addVolumeRelatedByPublicationId(Volume $l)
+    {
+        if ($this->collVolumesRelatedByPublicationId === null) {
+            $this->initVolumesRelatedByPublicationId();
+            $this->collVolumesRelatedByPublicationIdPartial = true;
+        }
+        if (!in_array($l, $this->collVolumesRelatedByPublicationId->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddVolumeRelatedByPublicationId($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	VolumeRelatedByPublicationId $volumeRelatedByPublicationId The volumeRelatedByPublicationId object to add.
+     */
+    protected function doAddVolumeRelatedByPublicationId($volumeRelatedByPublicationId)
+    {
+        $this->collVolumesRelatedByPublicationId[]= $volumeRelatedByPublicationId;
+        $volumeRelatedByPublicationId->setPublicationRelatedByPublicationId($this);
+    }
+
+    /**
+     * @param	VolumeRelatedByPublicationId $volumeRelatedByPublicationId The volumeRelatedByPublicationId object to remove.
+     * @return Publication The current object (for fluent API support)
+     */
+    public function removeVolumeRelatedByPublicationId($volumeRelatedByPublicationId)
+    {
+        if ($this->getVolumesRelatedByPublicationId()->contains($volumeRelatedByPublicationId)) {
+            $this->collVolumesRelatedByPublicationId->remove($this->collVolumesRelatedByPublicationId->search($volumeRelatedByPublicationId));
+            if (null === $this->volumesRelatedByPublicationIdScheduledForDeletion) {
+                $this->volumesRelatedByPublicationIdScheduledForDeletion = clone $this->collVolumesRelatedByPublicationId;
+                $this->volumesRelatedByPublicationIdScheduledForDeletion->clear();
+            }
+            $this->volumesRelatedByPublicationIdScheduledForDeletion[]= clone $volumeRelatedByPublicationId;
+            $volumeRelatedByPublicationId->setPublicationRelatedByPublicationId(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Clears out the collVolumesRelatedByParentpublicationId collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Publication The current object (for fluent API support)
+     * @see        addVolumesRelatedByParentpublicationId()
+     */
+    public function clearVolumesRelatedByParentpublicationId()
+    {
+        $this->collVolumesRelatedByParentpublicationId = null; // important to set this to null since that means it is uninitialized
+        $this->collVolumesRelatedByParentpublicationIdPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collVolumesRelatedByParentpublicationId collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialVolumesRelatedByParentpublicationId($v = true)
+    {
+        $this->collVolumesRelatedByParentpublicationIdPartial = $v;
+    }
+
+    /**
+     * Initializes the collVolumesRelatedByParentpublicationId collection.
+     *
+     * By default this just sets the collVolumesRelatedByParentpublicationId collection to an empty array (like clearcollVolumesRelatedByParentpublicationId());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initVolumesRelatedByParentpublicationId($overrideExisting = true)
+    {
+        if (null !== $this->collVolumesRelatedByParentpublicationId && !$overrideExisting) {
+            return;
+        }
+        $this->collVolumesRelatedByParentpublicationId = new PropelObjectCollection();
+        $this->collVolumesRelatedByParentpublicationId->setModel('Volume');
+    }
+
+    /**
+     * Gets an array of Volume objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Publication is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Volume[] List of Volume objects
+     * @throws PropelException
+     */
+    public function getVolumesRelatedByParentpublicationId($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collVolumesRelatedByParentpublicationIdPartial && !$this->isNew();
+        if (null === $this->collVolumesRelatedByParentpublicationId || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collVolumesRelatedByParentpublicationId) {
+                // return empty collection
+                $this->initVolumesRelatedByParentpublicationId();
+            } else {
+                $collVolumesRelatedByParentpublicationId = VolumeQuery::create(null, $criteria)
+                    ->filterByPublicationRelatedByParentpublicationId($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collVolumesRelatedByParentpublicationIdPartial && count($collVolumesRelatedByParentpublicationId)) {
+                      $this->initVolumesRelatedByParentpublicationId(false);
+
+                      foreach($collVolumesRelatedByParentpublicationId as $obj) {
+                        if (false == $this->collVolumesRelatedByParentpublicationId->contains($obj)) {
+                          $this->collVolumesRelatedByParentpublicationId->append($obj);
+                        }
+                      }
+
+                      $this->collVolumesRelatedByParentpublicationIdPartial = true;
+                    }
+
+                    $collVolumesRelatedByParentpublicationId->getInternalIterator()->rewind();
+                    return $collVolumesRelatedByParentpublicationId;
+                }
+
+                if($partial && $this->collVolumesRelatedByParentpublicationId) {
+                    foreach($this->collVolumesRelatedByParentpublicationId as $obj) {
+                        if($obj->isNew()) {
+                            $collVolumesRelatedByParentpublicationId[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collVolumesRelatedByParentpublicationId = $collVolumesRelatedByParentpublicationId;
+                $this->collVolumesRelatedByParentpublicationIdPartial = false;
+            }
+        }
+
+        return $this->collVolumesRelatedByParentpublicationId;
+    }
+
+    /**
+     * Sets a collection of VolumeRelatedByParentpublicationId objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $volumesRelatedByParentpublicationId A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setVolumesRelatedByParentpublicationId(PropelCollection $volumesRelatedByParentpublicationId, PropelPDO $con = null)
+    {
+        $volumesRelatedByParentpublicationIdToDelete = $this->getVolumesRelatedByParentpublicationId(new Criteria(), $con)->diff($volumesRelatedByParentpublicationId);
+
+        $this->volumesRelatedByParentpublicationIdScheduledForDeletion = unserialize(serialize($volumesRelatedByParentpublicationIdToDelete));
+
+        foreach ($volumesRelatedByParentpublicationIdToDelete as $volumeRelatedByParentpublicationIdRemoved) {
+            $volumeRelatedByParentpublicationIdRemoved->setPublicationRelatedByParentpublicationId(null);
+        }
+
+        $this->collVolumesRelatedByParentpublicationId = null;
+        foreach ($volumesRelatedByParentpublicationId as $volumeRelatedByParentpublicationId) {
+            $this->addVolumeRelatedByParentpublicationId($volumeRelatedByParentpublicationId);
+        }
+
+        $this->collVolumesRelatedByParentpublicationId = $volumesRelatedByParentpublicationId;
+        $this->collVolumesRelatedByParentpublicationIdPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Volume objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Volume objects.
+     * @throws PropelException
+     */
+    public function countVolumesRelatedByParentpublicationId(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collVolumesRelatedByParentpublicationIdPartial && !$this->isNew();
+        if (null === $this->collVolumesRelatedByParentpublicationId || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collVolumesRelatedByParentpublicationId) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getVolumesRelatedByParentpublicationId());
+            }
+            $query = VolumeQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPublicationRelatedByParentpublicationId($this)
+                ->count($con);
+        }
+
+        return count($this->collVolumesRelatedByParentpublicationId);
+    }
+
+    /**
+     * Method called to associate a Volume object to this object
+     * through the Volume foreign key attribute.
+     *
+     * @param    Volume $l Volume
+     * @return Publication The current object (for fluent API support)
+     */
+    public function addVolumeRelatedByParentpublicationId(Volume $l)
+    {
+        if ($this->collVolumesRelatedByParentpublicationId === null) {
+            $this->initVolumesRelatedByParentpublicationId();
+            $this->collVolumesRelatedByParentpublicationIdPartial = true;
+        }
+        if (!in_array($l, $this->collVolumesRelatedByParentpublicationId->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddVolumeRelatedByParentpublicationId($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	VolumeRelatedByParentpublicationId $volumeRelatedByParentpublicationId The volumeRelatedByParentpublicationId object to add.
+     */
+    protected function doAddVolumeRelatedByParentpublicationId($volumeRelatedByParentpublicationId)
+    {
+        $this->collVolumesRelatedByParentpublicationId[]= $volumeRelatedByParentpublicationId;
+        $volumeRelatedByParentpublicationId->setPublicationRelatedByParentpublicationId($this);
+    }
+
+    /**
+     * @param	VolumeRelatedByParentpublicationId $volumeRelatedByParentpublicationId The volumeRelatedByParentpublicationId object to remove.
+     * @return Publication The current object (for fluent API support)
+     */
+    public function removeVolumeRelatedByParentpublicationId($volumeRelatedByParentpublicationId)
+    {
+        if ($this->getVolumesRelatedByParentpublicationId()->contains($volumeRelatedByParentpublicationId)) {
+            $this->collVolumesRelatedByParentpublicationId->remove($this->collVolumesRelatedByParentpublicationId->search($volumeRelatedByParentpublicationId));
+            if (null === $this->volumesRelatedByParentpublicationIdScheduledForDeletion) {
+                $this->volumesRelatedByParentpublicationIdScheduledForDeletion = clone $this->collVolumesRelatedByParentpublicationId;
+                $this->volumesRelatedByParentpublicationIdScheduledForDeletion->clear();
+            }
+            $this->volumesRelatedByParentpublicationIdScheduledForDeletion[]= clone $volumeRelatedByParentpublicationId;
+            $volumeRelatedByParentpublicationId->setPublicationRelatedByParentpublicationId(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Clears out the collLanguagePublications collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Publication The current object (for fluent API support)
+     * @see        addLanguagePublications()
+     */
+    public function clearLanguagePublications()
+    {
+        $this->collLanguagePublications = null; // important to set this to null since that means it is uninitialized
+        $this->collLanguagePublicationsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collLanguagePublications collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialLanguagePublications($v = true)
+    {
+        $this->collLanguagePublicationsPartial = $v;
+    }
+
+    /**
+     * Initializes the collLanguagePublications collection.
+     *
+     * By default this just sets the collLanguagePublications collection to an empty array (like clearcollLanguagePublications());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initLanguagePublications($overrideExisting = true)
+    {
+        if (null !== $this->collLanguagePublications && !$overrideExisting) {
+            return;
+        }
+        $this->collLanguagePublications = new PropelObjectCollection();
+        $this->collLanguagePublications->setModel('LanguagePublication');
+    }
+
+    /**
+     * Gets an array of LanguagePublication objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Publication is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|LanguagePublication[] List of LanguagePublication objects
+     * @throws PropelException
+     */
+    public function getLanguagePublications($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collLanguagePublicationsPartial && !$this->isNew();
+        if (null === $this->collLanguagePublications || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collLanguagePublications) {
+                // return empty collection
+                $this->initLanguagePublications();
+            } else {
+                $collLanguagePublications = LanguagePublicationQuery::create(null, $criteria)
+                    ->filterByPublication($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collLanguagePublicationsPartial && count($collLanguagePublications)) {
+                      $this->initLanguagePublications(false);
+
+                      foreach($collLanguagePublications as $obj) {
+                        if (false == $this->collLanguagePublications->contains($obj)) {
+                          $this->collLanguagePublications->append($obj);
+                        }
+                      }
+
+                      $this->collLanguagePublicationsPartial = true;
+                    }
+
+                    $collLanguagePublications->getInternalIterator()->rewind();
+                    return $collLanguagePublications;
+                }
+
+                if($partial && $this->collLanguagePublications) {
+                    foreach($this->collLanguagePublications as $obj) {
+                        if($obj->isNew()) {
+                            $collLanguagePublications[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collLanguagePublications = $collLanguagePublications;
+                $this->collLanguagePublicationsPartial = false;
+            }
+        }
+
+        return $this->collLanguagePublications;
+    }
+
+    /**
+     * Sets a collection of LanguagePublication objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $languagePublications A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setLanguagePublications(PropelCollection $languagePublications, PropelPDO $con = null)
+    {
+        $languagePublicationsToDelete = $this->getLanguagePublications(new Criteria(), $con)->diff($languagePublications);
+
+        $this->languagePublicationsScheduledForDeletion = unserialize(serialize($languagePublicationsToDelete));
+
+        foreach ($languagePublicationsToDelete as $languagePublicationRemoved) {
+            $languagePublicationRemoved->setPublication(null);
+        }
+
+        $this->collLanguagePublications = null;
+        foreach ($languagePublications as $languagePublication) {
+            $this->addLanguagePublication($languagePublication);
+        }
+
+        $this->collLanguagePublications = $languagePublications;
+        $this->collLanguagePublicationsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related LanguagePublication objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related LanguagePublication objects.
+     * @throws PropelException
+     */
+    public function countLanguagePublications(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collLanguagePublicationsPartial && !$this->isNew();
+        if (null === $this->collLanguagePublications || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collLanguagePublications) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getLanguagePublications());
+            }
+            $query = LanguagePublicationQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPublication($this)
+                ->count($con);
+        }
+
+        return count($this->collLanguagePublications);
+    }
+
+    /**
+     * Method called to associate a LanguagePublication object to this object
+     * through the LanguagePublication foreign key attribute.
+     *
+     * @param    LanguagePublication $l LanguagePublication
+     * @return Publication The current object (for fluent API support)
+     */
+    public function addLanguagePublication(LanguagePublication $l)
+    {
+        if ($this->collLanguagePublications === null) {
+            $this->initLanguagePublications();
+            $this->collLanguagePublicationsPartial = true;
+        }
+        if (!in_array($l, $this->collLanguagePublications->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddLanguagePublication($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	LanguagePublication $languagePublication The languagePublication object to add.
+     */
+    protected function doAddLanguagePublication($languagePublication)
+    {
+        $this->collLanguagePublications[]= $languagePublication;
+        $languagePublication->setPublication($this);
+    }
+
+    /**
+     * @param	LanguagePublication $languagePublication The languagePublication object to remove.
+     * @return Publication The current object (for fluent API support)
+     */
+    public function removeLanguagePublication($languagePublication)
+    {
+        if ($this->getLanguagePublications()->contains($languagePublication)) {
+            $this->collLanguagePublications->remove($this->collLanguagePublications->search($languagePublication));
+            if (null === $this->languagePublicationsScheduledForDeletion) {
+                $this->languagePublicationsScheduledForDeletion = clone $this->collLanguagePublications;
+                $this->languagePublicationsScheduledForDeletion->clear();
+            }
+            $this->languagePublicationsScheduledForDeletion[]= clone $languagePublication;
+            $languagePublication->setPublication(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Publication is new, it will return
+     * an empty collection; or if this Publication has previously
+     * been saved, it will retrieve related LanguagePublications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Publication.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|LanguagePublication[] List of LanguagePublication objects
+     */
+    public function getLanguagePublicationsJoinLanguage($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = LanguagePublicationQuery::create(null, $criteria);
+        $query->joinWith('Language', $join_behavior);
+
+        return $this->getLanguagePublications($query, $con);
+    }
+
+    /**
+     * Clears out the collGenrePublications collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Publication The current object (for fluent API support)
+     * @see        addGenrePublications()
+     */
+    public function clearGenrePublications()
+    {
+        $this->collGenrePublications = null; // important to set this to null since that means it is uninitialized
+        $this->collGenrePublicationsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collGenrePublications collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialGenrePublications($v = true)
+    {
+        $this->collGenrePublicationsPartial = $v;
+    }
+
+    /**
+     * Initializes the collGenrePublications collection.
+     *
+     * By default this just sets the collGenrePublications collection to an empty array (like clearcollGenrePublications());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initGenrePublications($overrideExisting = true)
+    {
+        if (null !== $this->collGenrePublications && !$overrideExisting) {
+            return;
+        }
+        $this->collGenrePublications = new PropelObjectCollection();
+        $this->collGenrePublications->setModel('GenrePublication');
+    }
+
+    /**
+     * Gets an array of GenrePublication objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Publication is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|GenrePublication[] List of GenrePublication objects
+     * @throws PropelException
+     */
+    public function getGenrePublications($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collGenrePublicationsPartial && !$this->isNew();
+        if (null === $this->collGenrePublications || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collGenrePublications) {
+                // return empty collection
+                $this->initGenrePublications();
+            } else {
+                $collGenrePublications = GenrePublicationQuery::create(null, $criteria)
+                    ->filterByPublication($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collGenrePublicationsPartial && count($collGenrePublications)) {
+                      $this->initGenrePublications(false);
+
+                      foreach($collGenrePublications as $obj) {
+                        if (false == $this->collGenrePublications->contains($obj)) {
+                          $this->collGenrePublications->append($obj);
+                        }
+                      }
+
+                      $this->collGenrePublicationsPartial = true;
+                    }
+
+                    $collGenrePublications->getInternalIterator()->rewind();
+                    return $collGenrePublications;
+                }
+
+                if($partial && $this->collGenrePublications) {
+                    foreach($this->collGenrePublications as $obj) {
+                        if($obj->isNew()) {
+                            $collGenrePublications[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collGenrePublications = $collGenrePublications;
+                $this->collGenrePublicationsPartial = false;
+            }
+        }
+
+        return $this->collGenrePublications;
+    }
+
+    /**
+     * Sets a collection of GenrePublication objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $genrePublications A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setGenrePublications(PropelCollection $genrePublications, PropelPDO $con = null)
+    {
+        $genrePublicationsToDelete = $this->getGenrePublications(new Criteria(), $con)->diff($genrePublications);
+
+        $this->genrePublicationsScheduledForDeletion = unserialize(serialize($genrePublicationsToDelete));
+
+        foreach ($genrePublicationsToDelete as $genrePublicationRemoved) {
+            $genrePublicationRemoved->setPublication(null);
+        }
+
+        $this->collGenrePublications = null;
+        foreach ($genrePublications as $genrePublication) {
+            $this->addGenrePublication($genrePublication);
+        }
+
+        $this->collGenrePublications = $genrePublications;
+        $this->collGenrePublicationsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related GenrePublication objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related GenrePublication objects.
+     * @throws PropelException
+     */
+    public function countGenrePublications(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collGenrePublicationsPartial && !$this->isNew();
+        if (null === $this->collGenrePublications || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collGenrePublications) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getGenrePublications());
+            }
+            $query = GenrePublicationQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPublication($this)
+                ->count($con);
+        }
+
+        return count($this->collGenrePublications);
+    }
+
+    /**
+     * Method called to associate a GenrePublication object to this object
+     * through the GenrePublication foreign key attribute.
+     *
+     * @param    GenrePublication $l GenrePublication
+     * @return Publication The current object (for fluent API support)
+     */
+    public function addGenrePublication(GenrePublication $l)
+    {
+        if ($this->collGenrePublications === null) {
+            $this->initGenrePublications();
+            $this->collGenrePublicationsPartial = true;
+        }
+        if (!in_array($l, $this->collGenrePublications->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddGenrePublication($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	GenrePublication $genrePublication The genrePublication object to add.
+     */
+    protected function doAddGenrePublication($genrePublication)
+    {
+        $this->collGenrePublications[]= $genrePublication;
+        $genrePublication->setPublication($this);
+    }
+
+    /**
+     * @param	GenrePublication $genrePublication The genrePublication object to remove.
+     * @return Publication The current object (for fluent API support)
+     */
+    public function removeGenrePublication($genrePublication)
+    {
+        if ($this->getGenrePublications()->contains($genrePublication)) {
+            $this->collGenrePublications->remove($this->collGenrePublications->search($genrePublication));
+            if (null === $this->genrePublicationsScheduledForDeletion) {
+                $this->genrePublicationsScheduledForDeletion = clone $this->collGenrePublications;
+                $this->genrePublicationsScheduledForDeletion->clear();
+            }
+            $this->genrePublicationsScheduledForDeletion[]= clone $genrePublication;
+            $genrePublication->setPublication(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Publication is new, it will return
+     * an empty collection; or if this Publication has previously
+     * been saved, it will retrieve related GenrePublications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Publication.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|GenrePublication[] List of GenrePublication objects
+     */
+    public function getGenrePublicationsJoinGenre($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = GenrePublicationQuery::create(null, $criteria);
+        $query->joinWith('Genre', $join_behavior);
+
+        return $this->getGenrePublications($query, $con);
+    }
+
+    /**
+     * Clears out the collPublicationTags collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Publication The current object (for fluent API support)
+     * @see        addPublicationTags()
+     */
+    public function clearPublicationTags()
+    {
+        $this->collPublicationTags = null; // important to set this to null since that means it is uninitialized
+        $this->collPublicationTagsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collPublicationTags collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialPublicationTags($v = true)
+    {
+        $this->collPublicationTagsPartial = $v;
+    }
+
+    /**
+     * Initializes the collPublicationTags collection.
+     *
+     * By default this just sets the collPublicationTags collection to an empty array (like clearcollPublicationTags());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initPublicationTags($overrideExisting = true)
+    {
+        if (null !== $this->collPublicationTags && !$overrideExisting) {
+            return;
+        }
+        $this->collPublicationTags = new PropelObjectCollection();
+        $this->collPublicationTags->setModel('PublicationTag');
+    }
+
+    /**
+     * Gets an array of PublicationTag objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Publication is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|PublicationTag[] List of PublicationTag objects
+     * @throws PropelException
+     */
+    public function getPublicationTags($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collPublicationTagsPartial && !$this->isNew();
+        if (null === $this->collPublicationTags || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collPublicationTags) {
+                // return empty collection
+                $this->initPublicationTags();
+            } else {
+                $collPublicationTags = PublicationTagQuery::create(null, $criteria)
+                    ->filterByPublication($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collPublicationTagsPartial && count($collPublicationTags)) {
+                      $this->initPublicationTags(false);
+
+                      foreach($collPublicationTags as $obj) {
+                        if (false == $this->collPublicationTags->contains($obj)) {
+                          $this->collPublicationTags->append($obj);
+                        }
+                      }
+
+                      $this->collPublicationTagsPartial = true;
+                    }
+
+                    $collPublicationTags->getInternalIterator()->rewind();
+                    return $collPublicationTags;
+                }
+
+                if($partial && $this->collPublicationTags) {
+                    foreach($this->collPublicationTags as $obj) {
+                        if($obj->isNew()) {
+                            $collPublicationTags[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collPublicationTags = $collPublicationTags;
+                $this->collPublicationTagsPartial = false;
+            }
+        }
+
+        return $this->collPublicationTags;
+    }
+
+    /**
+     * Sets a collection of PublicationTag objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $publicationTags A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setPublicationTags(PropelCollection $publicationTags, PropelPDO $con = null)
+    {
+        $publicationTagsToDelete = $this->getPublicationTags(new Criteria(), $con)->diff($publicationTags);
+
+        $this->publicationTagsScheduledForDeletion = unserialize(serialize($publicationTagsToDelete));
+
+        foreach ($publicationTagsToDelete as $publicationTagRemoved) {
+            $publicationTagRemoved->setPublication(null);
+        }
+
+        $this->collPublicationTags = null;
+        foreach ($publicationTags as $publicationTag) {
+            $this->addPublicationTag($publicationTag);
+        }
+
+        $this->collPublicationTags = $publicationTags;
+        $this->collPublicationTagsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related PublicationTag objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related PublicationTag objects.
+     * @throws PropelException
+     */
+    public function countPublicationTags(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collPublicationTagsPartial && !$this->isNew();
+        if (null === $this->collPublicationTags || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collPublicationTags) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getPublicationTags());
+            }
+            $query = PublicationTagQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPublication($this)
+                ->count($con);
+        }
+
+        return count($this->collPublicationTags);
+    }
+
+    /**
+     * Method called to associate a PublicationTag object to this object
+     * through the PublicationTag foreign key attribute.
+     *
+     * @param    PublicationTag $l PublicationTag
+     * @return Publication The current object (for fluent API support)
+     */
+    public function addPublicationTag(PublicationTag $l)
+    {
+        if ($this->collPublicationTags === null) {
+            $this->initPublicationTags();
+            $this->collPublicationTagsPartial = true;
+        }
+        if (!in_array($l, $this->collPublicationTags->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddPublicationTag($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	PublicationTag $publicationTag The publicationTag object to add.
+     */
+    protected function doAddPublicationTag($publicationTag)
+    {
+        $this->collPublicationTags[]= $publicationTag;
+        $publicationTag->setPublication($this);
+    }
+
+    /**
+     * @param	PublicationTag $publicationTag The publicationTag object to remove.
+     * @return Publication The current object (for fluent API support)
+     */
+    public function removePublicationTag($publicationTag)
+    {
+        if ($this->getPublicationTags()->contains($publicationTag)) {
+            $this->collPublicationTags->remove($this->collPublicationTags->search($publicationTag));
+            if (null === $this->publicationTagsScheduledForDeletion) {
+                $this->publicationTagsScheduledForDeletion = clone $this->collPublicationTags;
+                $this->publicationTagsScheduledForDeletion->clear();
+            }
+            $this->publicationTagsScheduledForDeletion[]= clone $publicationTag;
+            $publicationTag->setPublication(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Publication is new, it will return
+     * an empty collection; or if this Publication has previously
+     * been saved, it will retrieve related PublicationTags from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Publication.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|PublicationTag[] List of PublicationTag objects
+     */
+    public function getPublicationTagsJoinTag($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationTagQuery::create(null, $criteria);
+        $query->joinWith('Tag', $join_behavior);
+
+        return $this->getPublicationTags($query, $con);
+    }
+
+    /**
+     * Clears out the collCategoryPublications collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Publication The current object (for fluent API support)
+     * @see        addCategoryPublications()
+     */
+    public function clearCategoryPublications()
+    {
+        $this->collCategoryPublications = null; // important to set this to null since that means it is uninitialized
+        $this->collCategoryPublicationsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collCategoryPublications collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialCategoryPublications($v = true)
+    {
+        $this->collCategoryPublicationsPartial = $v;
+    }
+
+    /**
+     * Initializes the collCategoryPublications collection.
+     *
+     * By default this just sets the collCategoryPublications collection to an empty array (like clearcollCategoryPublications());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCategoryPublications($overrideExisting = true)
+    {
+        if (null !== $this->collCategoryPublications && !$overrideExisting) {
+            return;
+        }
+        $this->collCategoryPublications = new PropelObjectCollection();
+        $this->collCategoryPublications->setModel('CategoryPublication');
+    }
+
+    /**
+     * Gets an array of CategoryPublication objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Publication is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|CategoryPublication[] List of CategoryPublication objects
+     * @throws PropelException
+     */
+    public function getCategoryPublications($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collCategoryPublicationsPartial && !$this->isNew();
+        if (null === $this->collCategoryPublications || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCategoryPublications) {
+                // return empty collection
+                $this->initCategoryPublications();
+            } else {
+                $collCategoryPublications = CategoryPublicationQuery::create(null, $criteria)
+                    ->filterByPublication($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collCategoryPublicationsPartial && count($collCategoryPublications)) {
+                      $this->initCategoryPublications(false);
+
+                      foreach($collCategoryPublications as $obj) {
+                        if (false == $this->collCategoryPublications->contains($obj)) {
+                          $this->collCategoryPublications->append($obj);
+                        }
+                      }
+
+                      $this->collCategoryPublicationsPartial = true;
+                    }
+
+                    $collCategoryPublications->getInternalIterator()->rewind();
+                    return $collCategoryPublications;
+                }
+
+                if($partial && $this->collCategoryPublications) {
+                    foreach($this->collCategoryPublications as $obj) {
+                        if($obj->isNew()) {
+                            $collCategoryPublications[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCategoryPublications = $collCategoryPublications;
+                $this->collCategoryPublicationsPartial = false;
+            }
+        }
+
+        return $this->collCategoryPublications;
+    }
+
+    /**
+     * Sets a collection of CategoryPublication objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $categoryPublications A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setCategoryPublications(PropelCollection $categoryPublications, PropelPDO $con = null)
+    {
+        $categoryPublicationsToDelete = $this->getCategoryPublications(new Criteria(), $con)->diff($categoryPublications);
+
+        $this->categoryPublicationsScheduledForDeletion = unserialize(serialize($categoryPublicationsToDelete));
+
+        foreach ($categoryPublicationsToDelete as $categoryPublicationRemoved) {
+            $categoryPublicationRemoved->setPublication(null);
+        }
+
+        $this->collCategoryPublications = null;
+        foreach ($categoryPublications as $categoryPublication) {
+            $this->addCategoryPublication($categoryPublication);
+        }
+
+        $this->collCategoryPublications = $categoryPublications;
+        $this->collCategoryPublicationsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related CategoryPublication objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related CategoryPublication objects.
+     * @throws PropelException
+     */
+    public function countCategoryPublications(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collCategoryPublicationsPartial && !$this->isNew();
+        if (null === $this->collCategoryPublications || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCategoryPublications) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getCategoryPublications());
+            }
+            $query = CategoryPublicationQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPublication($this)
+                ->count($con);
+        }
+
+        return count($this->collCategoryPublications);
+    }
+
+    /**
+     * Method called to associate a CategoryPublication object to this object
+     * through the CategoryPublication foreign key attribute.
+     *
+     * @param    CategoryPublication $l CategoryPublication
+     * @return Publication The current object (for fluent API support)
+     */
+    public function addCategoryPublication(CategoryPublication $l)
+    {
+        if ($this->collCategoryPublications === null) {
+            $this->initCategoryPublications();
+            $this->collCategoryPublicationsPartial = true;
+        }
+        if (!in_array($l, $this->collCategoryPublications->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddCategoryPublication($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	CategoryPublication $categoryPublication The categoryPublication object to add.
+     */
+    protected function doAddCategoryPublication($categoryPublication)
+    {
+        $this->collCategoryPublications[]= $categoryPublication;
+        $categoryPublication->setPublication($this);
+    }
+
+    /**
+     * @param	CategoryPublication $categoryPublication The categoryPublication object to remove.
+     * @return Publication The current object (for fluent API support)
+     */
+    public function removeCategoryPublication($categoryPublication)
+    {
+        if ($this->getCategoryPublications()->contains($categoryPublication)) {
+            $this->collCategoryPublications->remove($this->collCategoryPublications->search($categoryPublication));
+            if (null === $this->categoryPublicationsScheduledForDeletion) {
+                $this->categoryPublicationsScheduledForDeletion = clone $this->collCategoryPublications;
+                $this->categoryPublicationsScheduledForDeletion->clear();
+            }
+            $this->categoryPublicationsScheduledForDeletion[]= clone $categoryPublication;
+            $categoryPublication->setPublication(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Publication is new, it will return
+     * an empty collection; or if this Publication has previously
+     * been saved, it will retrieve related CategoryPublications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Publication.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|CategoryPublication[] List of CategoryPublication objects
+     */
+    public function getCategoryPublicationsJoinCategory($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = CategoryPublicationQuery::create(null, $criteria);
+        $query->joinWith('Category', $join_behavior);
+
+        return $this->getCategoryPublications($query, $con);
+    }
+
+    /**
+     * Clears out the collFontPublications collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Publication The current object (for fluent API support)
+     * @see        addFontPublications()
+     */
+    public function clearFontPublications()
+    {
+        $this->collFontPublications = null; // important to set this to null since that means it is uninitialized
+        $this->collFontPublicationsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collFontPublications collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialFontPublications($v = true)
+    {
+        $this->collFontPublicationsPartial = $v;
+    }
+
+    /**
+     * Initializes the collFontPublications collection.
+     *
+     * By default this just sets the collFontPublications collection to an empty array (like clearcollFontPublications());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initFontPublications($overrideExisting = true)
+    {
+        if (null !== $this->collFontPublications && !$overrideExisting) {
+            return;
+        }
+        $this->collFontPublications = new PropelObjectCollection();
+        $this->collFontPublications->setModel('FontPublication');
+    }
+
+    /**
+     * Gets an array of FontPublication objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Publication is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|FontPublication[] List of FontPublication objects
+     * @throws PropelException
+     */
+    public function getFontPublications($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collFontPublicationsPartial && !$this->isNew();
+        if (null === $this->collFontPublications || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collFontPublications) {
+                // return empty collection
+                $this->initFontPublications();
+            } else {
+                $collFontPublications = FontPublicationQuery::create(null, $criteria)
+                    ->filterByPublication($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collFontPublicationsPartial && count($collFontPublications)) {
+                      $this->initFontPublications(false);
+
+                      foreach($collFontPublications as $obj) {
+                        if (false == $this->collFontPublications->contains($obj)) {
+                          $this->collFontPublications->append($obj);
+                        }
+                      }
+
+                      $this->collFontPublicationsPartial = true;
+                    }
+
+                    $collFontPublications->getInternalIterator()->rewind();
+                    return $collFontPublications;
+                }
+
+                if($partial && $this->collFontPublications) {
+                    foreach($this->collFontPublications as $obj) {
+                        if($obj->isNew()) {
+                            $collFontPublications[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collFontPublications = $collFontPublications;
+                $this->collFontPublicationsPartial = false;
+            }
+        }
+
+        return $this->collFontPublications;
+    }
+
+    /**
+     * Sets a collection of FontPublication objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $fontPublications A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setFontPublications(PropelCollection $fontPublications, PropelPDO $con = null)
+    {
+        $fontPublicationsToDelete = $this->getFontPublications(new Criteria(), $con)->diff($fontPublications);
+
+        $this->fontPublicationsScheduledForDeletion = unserialize(serialize($fontPublicationsToDelete));
+
+        foreach ($fontPublicationsToDelete as $fontPublicationRemoved) {
+            $fontPublicationRemoved->setPublication(null);
+        }
+
+        $this->collFontPublications = null;
+        foreach ($fontPublications as $fontPublication) {
+            $this->addFontPublication($fontPublication);
+        }
+
+        $this->collFontPublications = $fontPublications;
+        $this->collFontPublicationsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related FontPublication objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related FontPublication objects.
+     * @throws PropelException
+     */
+    public function countFontPublications(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collFontPublicationsPartial && !$this->isNew();
+        if (null === $this->collFontPublications || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collFontPublications) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getFontPublications());
+            }
+            $query = FontPublicationQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPublication($this)
+                ->count($con);
+        }
+
+        return count($this->collFontPublications);
+    }
+
+    /**
+     * Method called to associate a FontPublication object to this object
+     * through the FontPublication foreign key attribute.
+     *
+     * @param    FontPublication $l FontPublication
+     * @return Publication The current object (for fluent API support)
+     */
+    public function addFontPublication(FontPublication $l)
+    {
+        if ($this->collFontPublications === null) {
+            $this->initFontPublications();
+            $this->collFontPublicationsPartial = true;
+        }
+        if (!in_array($l, $this->collFontPublications->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddFontPublication($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	FontPublication $fontPublication The fontPublication object to add.
+     */
+    protected function doAddFontPublication($fontPublication)
+    {
+        $this->collFontPublications[]= $fontPublication;
+        $fontPublication->setPublication($this);
+    }
+
+    /**
+     * @param	FontPublication $fontPublication The fontPublication object to remove.
+     * @return Publication The current object (for fluent API support)
+     */
+    public function removeFontPublication($fontPublication)
+    {
+        if ($this->getFontPublications()->contains($fontPublication)) {
+            $this->collFontPublications->remove($this->collFontPublications->search($fontPublication));
+            if (null === $this->fontPublicationsScheduledForDeletion) {
+                $this->fontPublicationsScheduledForDeletion = clone $this->collFontPublications;
+                $this->fontPublicationsScheduledForDeletion->clear();
+            }
+            $this->fontPublicationsScheduledForDeletion[]= clone $fontPublication;
+            $fontPublication->setPublication(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Publication is new, it will return
+     * an empty collection; or if this Publication has previously
+     * been saved, it will retrieve related FontPublications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Publication.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|FontPublication[] List of FontPublication objects
+     */
+    public function getFontPublicationsJoinFont($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = FontPublicationQuery::create(null, $criteria);
+        $query->joinWith('Font', $join_behavior);
+
+        return $this->getFontPublications($query, $con);
     }
 
     /**
@@ -5387,10 +7207,10 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|PersonPublication[] List of PersonPublication objects
      */
-    public function getPersonPublicationsJoinPersonrole($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getPersonPublicationsJoinPerson($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = PersonPublicationQuery::create(null, $criteria);
-        $query->joinWith('Personrole', $join_behavior);
+        $query->joinWith('Person', $join_behavior);
 
         return $this->getPersonPublications($query, $con);
     }
@@ -5412,10 +7232,10 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|PersonPublication[] List of PersonPublication objects
      */
-    public function getPersonPublicationsJoinPerson($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getPersonPublicationsJoinPersonrole($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = PersonPublicationQuery::create(null, $criteria);
-        $query->joinWith('Person', $join_behavior);
+        $query->joinWith('Personrole', $join_behavior);
 
         return $this->getPersonPublications($query, $con);
     }
@@ -6275,6 +8095,891 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     }
 
     /**
+     * Clears out the collLanguages collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Publication The current object (for fluent API support)
+     * @see        addLanguages()
+     */
+    public function clearLanguages()
+    {
+        $this->collLanguages = null; // important to set this to null since that means it is uninitialized
+        $this->collLanguagesPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * Initializes the collLanguages collection.
+     *
+     * By default this just sets the collLanguages collection to an empty collection (like clearLanguages());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initLanguages()
+    {
+        $this->collLanguages = new PropelObjectCollection();
+        $this->collLanguages->setModel('Language');
+    }
+
+    /**
+     * Gets a collection of Language objects related by a many-to-many relationship
+     * to the current object by way of the language_publication cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Publication is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return PropelObjectCollection|Language[] List of Language objects
+     */
+    public function getLanguages($criteria = null, PropelPDO $con = null)
+    {
+        if (null === $this->collLanguages || null !== $criteria) {
+            if ($this->isNew() && null === $this->collLanguages) {
+                // return empty collection
+                $this->initLanguages();
+            } else {
+                $collLanguages = LanguageQuery::create(null, $criteria)
+                    ->filterByPublication($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collLanguages;
+                }
+                $this->collLanguages = $collLanguages;
+            }
+        }
+
+        return $this->collLanguages;
+    }
+
+    /**
+     * Sets a collection of Language objects related by a many-to-many relationship
+     * to the current object by way of the language_publication cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $languages A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setLanguages(PropelCollection $languages, PropelPDO $con = null)
+    {
+        $this->clearLanguages();
+        $currentLanguages = $this->getLanguages();
+
+        $this->languagesScheduledForDeletion = $currentLanguages->diff($languages);
+
+        foreach ($languages as $language) {
+            if (!$currentLanguages->contains($language)) {
+                $this->doAddLanguage($language);
+            }
+        }
+
+        $this->collLanguages = $languages;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Language objects related by a many-to-many relationship
+     * to the current object by way of the language_publication cross-reference table.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related Language objects
+     */
+    public function countLanguages($criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        if (null === $this->collLanguages || null !== $criteria) {
+            if ($this->isNew() && null === $this->collLanguages) {
+                return 0;
+            } else {
+                $query = LanguageQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByPublication($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collLanguages);
+        }
+    }
+
+    /**
+     * Associate a Language object to this object
+     * through the language_publication cross reference table.
+     *
+     * @param  Language $language The LanguagePublication object to relate
+     * @return Publication The current object (for fluent API support)
+     */
+    public function addLanguage(Language $language)
+    {
+        if ($this->collLanguages === null) {
+            $this->initLanguages();
+        }
+        if (!$this->collLanguages->contains($language)) { // only add it if the **same** object is not already associated
+            $this->doAddLanguage($language);
+
+            $this->collLanguages[]= $language;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Language $language The language object to add.
+     */
+    protected function doAddLanguage($language)
+    {
+        $languagePublication = new LanguagePublication();
+        $languagePublication->setLanguage($language);
+        $this->addLanguagePublication($languagePublication);
+    }
+
+    /**
+     * Remove a Language object to this object
+     * through the language_publication cross reference table.
+     *
+     * @param Language $language The LanguagePublication object to relate
+     * @return Publication The current object (for fluent API support)
+     */
+    public function removeLanguage(Language $language)
+    {
+        if ($this->getLanguages()->contains($language)) {
+            $this->collLanguages->remove($this->collLanguages->search($language));
+            if (null === $this->languagesScheduledForDeletion) {
+                $this->languagesScheduledForDeletion = clone $this->collLanguages;
+                $this->languagesScheduledForDeletion->clear();
+            }
+            $this->languagesScheduledForDeletion[]= $language;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Clears out the collGenres collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Publication The current object (for fluent API support)
+     * @see        addGenres()
+     */
+    public function clearGenres()
+    {
+        $this->collGenres = null; // important to set this to null since that means it is uninitialized
+        $this->collGenresPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * Initializes the collGenres collection.
+     *
+     * By default this just sets the collGenres collection to an empty collection (like clearGenres());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initGenres()
+    {
+        $this->collGenres = new PropelObjectCollection();
+        $this->collGenres->setModel('Genre');
+    }
+
+    /**
+     * Gets a collection of Genre objects related by a many-to-many relationship
+     * to the current object by way of the genre_publication cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Publication is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return PropelObjectCollection|Genre[] List of Genre objects
+     */
+    public function getGenres($criteria = null, PropelPDO $con = null)
+    {
+        if (null === $this->collGenres || null !== $criteria) {
+            if ($this->isNew() && null === $this->collGenres) {
+                // return empty collection
+                $this->initGenres();
+            } else {
+                $collGenres = GenreQuery::create(null, $criteria)
+                    ->filterByPublication($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collGenres;
+                }
+                $this->collGenres = $collGenres;
+            }
+        }
+
+        return $this->collGenres;
+    }
+
+    /**
+     * Sets a collection of Genre objects related by a many-to-many relationship
+     * to the current object by way of the genre_publication cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $genres A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setGenres(PropelCollection $genres, PropelPDO $con = null)
+    {
+        $this->clearGenres();
+        $currentGenres = $this->getGenres();
+
+        $this->genresScheduledForDeletion = $currentGenres->diff($genres);
+
+        foreach ($genres as $genre) {
+            if (!$currentGenres->contains($genre)) {
+                $this->doAddGenre($genre);
+            }
+        }
+
+        $this->collGenres = $genres;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Genre objects related by a many-to-many relationship
+     * to the current object by way of the genre_publication cross-reference table.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related Genre objects
+     */
+    public function countGenres($criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        if (null === $this->collGenres || null !== $criteria) {
+            if ($this->isNew() && null === $this->collGenres) {
+                return 0;
+            } else {
+                $query = GenreQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByPublication($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collGenres);
+        }
+    }
+
+    /**
+     * Associate a Genre object to this object
+     * through the genre_publication cross reference table.
+     *
+     * @param  Genre $genre The GenrePublication object to relate
+     * @return Publication The current object (for fluent API support)
+     */
+    public function addGenre(Genre $genre)
+    {
+        if ($this->collGenres === null) {
+            $this->initGenres();
+        }
+        if (!$this->collGenres->contains($genre)) { // only add it if the **same** object is not already associated
+            $this->doAddGenre($genre);
+
+            $this->collGenres[]= $genre;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Genre $genre The genre object to add.
+     */
+    protected function doAddGenre($genre)
+    {
+        $genrePublication = new GenrePublication();
+        $genrePublication->setGenre($genre);
+        $this->addGenrePublication($genrePublication);
+    }
+
+    /**
+     * Remove a Genre object to this object
+     * through the genre_publication cross reference table.
+     *
+     * @param Genre $genre The GenrePublication object to relate
+     * @return Publication The current object (for fluent API support)
+     */
+    public function removeGenre(Genre $genre)
+    {
+        if ($this->getGenres()->contains($genre)) {
+            $this->collGenres->remove($this->collGenres->search($genre));
+            if (null === $this->genresScheduledForDeletion) {
+                $this->genresScheduledForDeletion = clone $this->collGenres;
+                $this->genresScheduledForDeletion->clear();
+            }
+            $this->genresScheduledForDeletion[]= $genre;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Clears out the collTags collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Publication The current object (for fluent API support)
+     * @see        addTags()
+     */
+    public function clearTags()
+    {
+        $this->collTags = null; // important to set this to null since that means it is uninitialized
+        $this->collTagsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * Initializes the collTags collection.
+     *
+     * By default this just sets the collTags collection to an empty collection (like clearTags());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initTags()
+    {
+        $this->collTags = new PropelObjectCollection();
+        $this->collTags->setModel('Tag');
+    }
+
+    /**
+     * Gets a collection of Tag objects related by a many-to-many relationship
+     * to the current object by way of the publication_tag cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Publication is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return PropelObjectCollection|Tag[] List of Tag objects
+     */
+    public function getTags($criteria = null, PropelPDO $con = null)
+    {
+        if (null === $this->collTags || null !== $criteria) {
+            if ($this->isNew() && null === $this->collTags) {
+                // return empty collection
+                $this->initTags();
+            } else {
+                $collTags = TagQuery::create(null, $criteria)
+                    ->filterByPublication($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collTags;
+                }
+                $this->collTags = $collTags;
+            }
+        }
+
+        return $this->collTags;
+    }
+
+    /**
+     * Sets a collection of Tag objects related by a many-to-many relationship
+     * to the current object by way of the publication_tag cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $tags A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setTags(PropelCollection $tags, PropelPDO $con = null)
+    {
+        $this->clearTags();
+        $currentTags = $this->getTags();
+
+        $this->tagsScheduledForDeletion = $currentTags->diff($tags);
+
+        foreach ($tags as $tag) {
+            if (!$currentTags->contains($tag)) {
+                $this->doAddTag($tag);
+            }
+        }
+
+        $this->collTags = $tags;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Tag objects related by a many-to-many relationship
+     * to the current object by way of the publication_tag cross-reference table.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related Tag objects
+     */
+    public function countTags($criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        if (null === $this->collTags || null !== $criteria) {
+            if ($this->isNew() && null === $this->collTags) {
+                return 0;
+            } else {
+                $query = TagQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByPublication($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collTags);
+        }
+    }
+
+    /**
+     * Associate a Tag object to this object
+     * through the publication_tag cross reference table.
+     *
+     * @param  Tag $tag The PublicationTag object to relate
+     * @return Publication The current object (for fluent API support)
+     */
+    public function addTag(Tag $tag)
+    {
+        if ($this->collTags === null) {
+            $this->initTags();
+        }
+        if (!$this->collTags->contains($tag)) { // only add it if the **same** object is not already associated
+            $this->doAddTag($tag);
+
+            $this->collTags[]= $tag;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Tag $tag The tag object to add.
+     */
+    protected function doAddTag($tag)
+    {
+        $publicationTag = new PublicationTag();
+        $publicationTag->setTag($tag);
+        $this->addPublicationTag($publicationTag);
+    }
+
+    /**
+     * Remove a Tag object to this object
+     * through the publication_tag cross reference table.
+     *
+     * @param Tag $tag The PublicationTag object to relate
+     * @return Publication The current object (for fluent API support)
+     */
+    public function removeTag(Tag $tag)
+    {
+        if ($this->getTags()->contains($tag)) {
+            $this->collTags->remove($this->collTags->search($tag));
+            if (null === $this->tagsScheduledForDeletion) {
+                $this->tagsScheduledForDeletion = clone $this->collTags;
+                $this->tagsScheduledForDeletion->clear();
+            }
+            $this->tagsScheduledForDeletion[]= $tag;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Clears out the collCategories collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Publication The current object (for fluent API support)
+     * @see        addCategories()
+     */
+    public function clearCategories()
+    {
+        $this->collCategories = null; // important to set this to null since that means it is uninitialized
+        $this->collCategoriesPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * Initializes the collCategories collection.
+     *
+     * By default this just sets the collCategories collection to an empty collection (like clearCategories());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initCategories()
+    {
+        $this->collCategories = new PropelObjectCollection();
+        $this->collCategories->setModel('Category');
+    }
+
+    /**
+     * Gets a collection of Category objects related by a many-to-many relationship
+     * to the current object by way of the category_publication cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Publication is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return PropelObjectCollection|Category[] List of Category objects
+     */
+    public function getCategories($criteria = null, PropelPDO $con = null)
+    {
+        if (null === $this->collCategories || null !== $criteria) {
+            if ($this->isNew() && null === $this->collCategories) {
+                // return empty collection
+                $this->initCategories();
+            } else {
+                $collCategories = CategoryQuery::create(null, $criteria)
+                    ->filterByPublication($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collCategories;
+                }
+                $this->collCategories = $collCategories;
+            }
+        }
+
+        return $this->collCategories;
+    }
+
+    /**
+     * Sets a collection of Category objects related by a many-to-many relationship
+     * to the current object by way of the category_publication cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $categories A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setCategories(PropelCollection $categories, PropelPDO $con = null)
+    {
+        $this->clearCategories();
+        $currentCategories = $this->getCategories();
+
+        $this->categoriesScheduledForDeletion = $currentCategories->diff($categories);
+
+        foreach ($categories as $category) {
+            if (!$currentCategories->contains($category)) {
+                $this->doAddCategory($category);
+            }
+        }
+
+        $this->collCategories = $categories;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Category objects related by a many-to-many relationship
+     * to the current object by way of the category_publication cross-reference table.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related Category objects
+     */
+    public function countCategories($criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        if (null === $this->collCategories || null !== $criteria) {
+            if ($this->isNew() && null === $this->collCategories) {
+                return 0;
+            } else {
+                $query = CategoryQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByPublication($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collCategories);
+        }
+    }
+
+    /**
+     * Associate a Category object to this object
+     * through the category_publication cross reference table.
+     *
+     * @param  Category $category The CategoryPublication object to relate
+     * @return Publication The current object (for fluent API support)
+     */
+    public function addCategory(Category $category)
+    {
+        if ($this->collCategories === null) {
+            $this->initCategories();
+        }
+        if (!$this->collCategories->contains($category)) { // only add it if the **same** object is not already associated
+            $this->doAddCategory($category);
+
+            $this->collCategories[]= $category;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Category $category The category object to add.
+     */
+    protected function doAddCategory($category)
+    {
+        $categoryPublication = new CategoryPublication();
+        $categoryPublication->setCategory($category);
+        $this->addCategoryPublication($categoryPublication);
+    }
+
+    /**
+     * Remove a Category object to this object
+     * through the category_publication cross reference table.
+     *
+     * @param Category $category The CategoryPublication object to relate
+     * @return Publication The current object (for fluent API support)
+     */
+    public function removeCategory(Category $category)
+    {
+        if ($this->getCategories()->contains($category)) {
+            $this->collCategories->remove($this->collCategories->search($category));
+            if (null === $this->categoriesScheduledForDeletion) {
+                $this->categoriesScheduledForDeletion = clone $this->collCategories;
+                $this->categoriesScheduledForDeletion->clear();
+            }
+            $this->categoriesScheduledForDeletion[]= $category;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Clears out the collFonts collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Publication The current object (for fluent API support)
+     * @see        addFonts()
+     */
+    public function clearFonts()
+    {
+        $this->collFonts = null; // important to set this to null since that means it is uninitialized
+        $this->collFontsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * Initializes the collFonts collection.
+     *
+     * By default this just sets the collFonts collection to an empty collection (like clearFonts());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initFonts()
+    {
+        $this->collFonts = new PropelObjectCollection();
+        $this->collFonts->setModel('Font');
+    }
+
+    /**
+     * Gets a collection of Font objects related by a many-to-many relationship
+     * to the current object by way of the font_publication cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Publication is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return PropelObjectCollection|Font[] List of Font objects
+     */
+    public function getFonts($criteria = null, PropelPDO $con = null)
+    {
+        if (null === $this->collFonts || null !== $criteria) {
+            if ($this->isNew() && null === $this->collFonts) {
+                // return empty collection
+                $this->initFonts();
+            } else {
+                $collFonts = FontQuery::create(null, $criteria)
+                    ->filterByPublication($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collFonts;
+                }
+                $this->collFonts = $collFonts;
+            }
+        }
+
+        return $this->collFonts;
+    }
+
+    /**
+     * Sets a collection of Font objects related by a many-to-many relationship
+     * to the current object by way of the font_publication cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $fonts A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setFonts(PropelCollection $fonts, PropelPDO $con = null)
+    {
+        $this->clearFonts();
+        $currentFonts = $this->getFonts();
+
+        $this->fontsScheduledForDeletion = $currentFonts->diff($fonts);
+
+        foreach ($fonts as $font) {
+            if (!$currentFonts->contains($font)) {
+                $this->doAddFont($font);
+            }
+        }
+
+        $this->collFonts = $fonts;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Font objects related by a many-to-many relationship
+     * to the current object by way of the font_publication cross-reference table.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related Font objects
+     */
+    public function countFonts($criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        if (null === $this->collFonts || null !== $criteria) {
+            if ($this->isNew() && null === $this->collFonts) {
+                return 0;
+            } else {
+                $query = FontQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByPublication($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collFonts);
+        }
+    }
+
+    /**
+     * Associate a Font object to this object
+     * through the font_publication cross reference table.
+     *
+     * @param  Font $font The FontPublication object to relate
+     * @return Publication The current object (for fluent API support)
+     */
+    public function addFont(Font $font)
+    {
+        if ($this->collFonts === null) {
+            $this->initFonts();
+        }
+        if (!$this->collFonts->contains($font)) { // only add it if the **same** object is not already associated
+            $this->doAddFont($font);
+
+            $this->collFonts[]= $font;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Font $font The font object to add.
+     */
+    protected function doAddFont($font)
+    {
+        $fontPublication = new FontPublication();
+        $fontPublication->setFont($font);
+        $this->addFontPublication($fontPublication);
+    }
+
+    /**
+     * Remove a Font object to this object
+     * through the font_publication cross reference table.
+     *
+     * @param Font $font The FontPublication object to relate
+     * @return Publication The current object (for fluent API support)
+     */
+    public function removeFont(Font $font)
+    {
+        if ($this->getFonts()->contains($font)) {
+            $this->collFonts->remove($this->collFonts->search($font));
+            if (null === $this->fontsScheduledForDeletion) {
+                $this->fontsScheduledForDeletion = clone $this->collFonts;
+                $this->fontsScheduledForDeletion->clear();
+            }
+            $this->fontsScheduledForDeletion[]= $font;
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears out the collPublicationgroups collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -6457,23 +9162,24 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     public function clear()
     {
         $this->id = null;
-        $this->wwwready = null;
-        $this->work_id = null;
+        $this->title_id = null;
+        $this->firsteditionpublication_id = null;
         $this->place_id = null;
         $this->publicationdate_id = null;
-        $this->firstpublicationdate_id = null;
+        $this->creationdate_id = null;
         $this->publishingcompany_id = null;
         $this->partner_id = null;
         $this->editiondescription = null;
         $this->digitaleditioneditor = null;
         $this->transcriptioncomment = null;
-        $this->font_id = null;
-        $this->volume_alphanumeric = null;
-        $this->volume_numeric = null;
-        $this->volumes_total = null;
         $this->numpages = null;
-        $this->numpagesnormed = null;
+        $this->numpagesnumeric = null;
         $this->comment = null;
+        $this->doi = null;
+        $this->format = null;
+        $this->directoryname = null;
+        $this->wwwready = null;
+        $this->legacy_book_id = null;
         $this->publishingcompany_id_is_reconstructed = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
@@ -6508,11 +9214,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collPublicationMms) {
-                foreach ($this->collPublicationMms as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collPublicationDss) {
                 foreach ($this->collPublicationDss as $o) {
                     $o->clearAllReferences($deep);
@@ -6535,6 +9236,41 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             }
             if ($this->collPublicationJs) {
                 foreach ($this->collPublicationJs as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collVolumesRelatedByPublicationId) {
+                foreach ($this->collVolumesRelatedByPublicationId as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collVolumesRelatedByParentpublicationId) {
+                foreach ($this->collVolumesRelatedByParentpublicationId as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collLanguagePublications) {
+                foreach ($this->collLanguagePublications as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collGenrePublications) {
+                foreach ($this->collGenrePublications as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collPublicationTags) {
+                foreach ($this->collPublicationTags as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collCategoryPublications) {
+                foreach ($this->collCategoryPublications as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collFontPublications) {
+                foreach ($this->collFontPublications as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -6563,13 +9299,38 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collLanguages) {
+                foreach ($this->collLanguages as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collGenres) {
+                foreach ($this->collGenres as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collTags) {
+                foreach ($this->collTags as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collCategories) {
+                foreach ($this->collCategories as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collFonts) {
+                foreach ($this->collFonts as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collPublicationgroups) {
                 foreach ($this->collPublicationgroups as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->aWork instanceof Persistent) {
-              $this->aWork->clearAllReferences($deep);
+            if ($this->aTitle instanceof Persistent) {
+              $this->aTitle->clearAllReferences($deep);
             }
             if ($this->aPublishingcompany instanceof Persistent) {
               $this->aPublishingcompany->clearAllReferences($deep);
@@ -6580,11 +9341,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             if ($this->aDatespecificationRelatedByPublicationdateId instanceof Persistent) {
               $this->aDatespecificationRelatedByPublicationdateId->clearAllReferences($deep);
             }
-            if ($this->aDatespecificationRelatedByFirstpublicationdateId instanceof Persistent) {
-              $this->aDatespecificationRelatedByFirstpublicationdateId->clearAllReferences($deep);
-            }
-            if ($this->aFont instanceof Persistent) {
-              $this->aFont->clearAllReferences($deep);
+            if ($this->aDatespecificationRelatedByCreationdateId instanceof Persistent) {
+              $this->aDatespecificationRelatedByCreationdateId->clearAllReferences($deep);
             }
 
             $this->alreadyInClearAllReferencesDeep = false;
@@ -6598,10 +9356,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->collPublicationDms->clearIterator();
         }
         $this->collPublicationDms = null;
-        if ($this->collPublicationMms instanceof PropelCollection) {
-            $this->collPublicationMms->clearIterator();
-        }
-        $this->collPublicationMms = null;
         if ($this->collPublicationDss instanceof PropelCollection) {
             $this->collPublicationDss->clearIterator();
         }
@@ -6622,6 +9376,34 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->collPublicationJs->clearIterator();
         }
         $this->collPublicationJs = null;
+        if ($this->collVolumesRelatedByPublicationId instanceof PropelCollection) {
+            $this->collVolumesRelatedByPublicationId->clearIterator();
+        }
+        $this->collVolumesRelatedByPublicationId = null;
+        if ($this->collVolumesRelatedByParentpublicationId instanceof PropelCollection) {
+            $this->collVolumesRelatedByParentpublicationId->clearIterator();
+        }
+        $this->collVolumesRelatedByParentpublicationId = null;
+        if ($this->collLanguagePublications instanceof PropelCollection) {
+            $this->collLanguagePublications->clearIterator();
+        }
+        $this->collLanguagePublications = null;
+        if ($this->collGenrePublications instanceof PropelCollection) {
+            $this->collGenrePublications->clearIterator();
+        }
+        $this->collGenrePublications = null;
+        if ($this->collPublicationTags instanceof PropelCollection) {
+            $this->collPublicationTags->clearIterator();
+        }
+        $this->collPublicationTags = null;
+        if ($this->collCategoryPublications instanceof PropelCollection) {
+            $this->collCategoryPublications->clearIterator();
+        }
+        $this->collCategoryPublications = null;
+        if ($this->collFontPublications instanceof PropelCollection) {
+            $this->collFontPublications->clearIterator();
+        }
+        $this->collFontPublications = null;
         if ($this->collPublicationPublicationgroups instanceof PropelCollection) {
             $this->collPublicationPublicationgroups->clearIterator();
         }
@@ -6642,16 +9424,35 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->collTextsources->clearIterator();
         }
         $this->collTextsources = null;
+        if ($this->collLanguages instanceof PropelCollection) {
+            $this->collLanguages->clearIterator();
+        }
+        $this->collLanguages = null;
+        if ($this->collGenres instanceof PropelCollection) {
+            $this->collGenres->clearIterator();
+        }
+        $this->collGenres = null;
+        if ($this->collTags instanceof PropelCollection) {
+            $this->collTags->clearIterator();
+        }
+        $this->collTags = null;
+        if ($this->collCategories instanceof PropelCollection) {
+            $this->collCategories->clearIterator();
+        }
+        $this->collCategories = null;
+        if ($this->collFonts instanceof PropelCollection) {
+            $this->collFonts->clearIterator();
+        }
+        $this->collFonts = null;
         if ($this->collPublicationgroups instanceof PropelCollection) {
             $this->collPublicationgroups->clearIterator();
         }
         $this->collPublicationgroups = null;
-        $this->aWork = null;
+        $this->aTitle = null;
         $this->aPublishingcompany = null;
         $this->aPlace = null;
         $this->aDatespecificationRelatedByPublicationdateId = null;
-        $this->aDatespecificationRelatedByFirstpublicationdateId = null;
-        $this->aFont = null;
+        $this->aDatespecificationRelatedByCreationdateId = null;
     }
 
     /**
@@ -6729,33 +9530,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         } else {
             return "-";
         }
-    }    /**
-     * Cascades the get to a related entity (possibly recursively)
-     */
-
-    public function getEmbeddedColumn1OfWork(){
-
-        $relatedEntity = $this->getWork();
-        return $relatedEntity->getAttributeByTableViewColumName("Titel");
-
-    }    /**
-     * Cascades the get to a related entity (possibly recursively)
-     */
-
-    public function getEmbeddedColumn2OfWork(){
-
-        $relatedEntity = $this->getWork();
-        return $relatedEntity->getAttributeByTableViewColumName("erster Autor");
-
-    }    /**
-     * Cascades the get to a related entity (possibly recursively)
-     */
-
-    public function getEmbeddedColumn3OfWork(){
-
-        $relatedEntity = $this->getWork();
-        return $relatedEntity->getAttributeByTableViewColumName("entstanden");
-
     }
     // reconstructed_flaggable behavior
     /**

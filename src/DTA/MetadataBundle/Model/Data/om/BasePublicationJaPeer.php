@@ -12,14 +12,13 @@ use \PropelPDO;
 use DTA\MetadataBundle\Model\Data\PublicationJa;
 use DTA\MetadataBundle\Model\Data\PublicationJaPeer;
 use DTA\MetadataBundle\Model\Data\PublicationPeer;
-use DTA\MetadataBundle\Model\Data\VolumePeer;
 use DTA\MetadataBundle\Model\Data\map\PublicationJaTableMap;
 
 abstract class BasePublicationJaPeer
 {
 
     /** the default database name for this class */
-    const DATABASE_NAME = 'DTAMetadata';
+    const DATABASE_NAME = 'dtametadata';
 
     /** the table name for this class */
     const TABLE_NAME = 'publication_ja';
@@ -31,22 +30,19 @@ abstract class BasePublicationJaPeer
     const TM_CLASS = 'PublicationJaTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 3;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 3;
 
     /** the column name for the id field */
     const ID = 'publication_ja.id';
 
     /** the column name for the publication_id field */
     const PUBLICATION_ID = 'publication_ja.publication_id';
-
-    /** the column name for the volume_id field */
-    const VOLUME_ID = 'publication_ja.volume_id';
 
     /** the column name for the parent field */
     const PARENT = 'publication_ja.parent';
@@ -70,12 +66,12 @@ abstract class BasePublicationJaPeer
      * e.g. PublicationJaPeer::$fieldNames[PublicationJaPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'VolumeId', 'Parent', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'volumeId', 'parent', ),
-        BasePeer::TYPE_COLNAME => array (PublicationJaPeer::ID, PublicationJaPeer::PUBLICATION_ID, PublicationJaPeer::VOLUME_ID, PublicationJaPeer::PARENT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'VOLUME_ID', 'PARENT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'volume_id', 'parent', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'Parent', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'parent', ),
+        BasePeer::TYPE_COLNAME => array (PublicationJaPeer::ID, PublicationJaPeer::PUBLICATION_ID, PublicationJaPeer::PARENT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'PARENT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'parent', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
     /**
@@ -85,12 +81,12 @@ abstract class BasePublicationJaPeer
      * e.g. PublicationJaPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'VolumeId' => 2, 'Parent' => 3, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'volumeId' => 2, 'parent' => 3, ),
-        BasePeer::TYPE_COLNAME => array (PublicationJaPeer::ID => 0, PublicationJaPeer::PUBLICATION_ID => 1, PublicationJaPeer::VOLUME_ID => 2, PublicationJaPeer::PARENT => 3, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'VOLUME_ID' => 2, 'PARENT' => 3, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'volume_id' => 2, 'parent' => 3, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'Parent' => 2, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'parent' => 2, ),
+        BasePeer::TYPE_COLNAME => array (PublicationJaPeer::ID => 0, PublicationJaPeer::PUBLICATION_ID => 1, PublicationJaPeer::PARENT => 2, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'PARENT' => 2, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'parent' => 2, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
     /**
@@ -166,12 +162,10 @@ abstract class BasePublicationJaPeer
         if (null === $alias) {
             $criteria->addSelectColumn(PublicationJaPeer::ID);
             $criteria->addSelectColumn(PublicationJaPeer::PUBLICATION_ID);
-            $criteria->addSelectColumn(PublicationJaPeer::VOLUME_ID);
             $criteria->addSelectColumn(PublicationJaPeer::PARENT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.publication_id');
-            $criteria->addSelectColumn($alias . '.volume_id');
             $criteria->addSelectColumn($alias . '.parent');
         }
     }
@@ -528,57 +522,6 @@ abstract class BasePublicationJaPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related Volume table
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return int Number of matching rows.
-     */
-    public static function doCountJoinVolume(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        // we're going to modify criteria, so copy it first
-        $criteria = clone $criteria;
-
-        // We need to set the primary table name, since in the case that there are no WHERE columns
-        // it will be impossible for the BasePeer::createSelectSql() method to determine which
-        // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(PublicationJaPeer::TABLE_NAME);
-
-        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-            $criteria->setDistinct();
-        }
-
-        if (!$criteria->hasSelectClause()) {
-            PublicationJaPeer::addSelectColumns($criteria);
-        }
-
-        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
-
-        // Set the correct dbName
-        $criteria->setDbName(PublicationJaPeer::DATABASE_NAME);
-
-        if ($con === null) {
-            $con = Propel::getConnection(PublicationJaPeer::DATABASE_NAME, Propel::CONNECTION_READ);
-        }
-
-        $criteria->addJoin(PublicationJaPeer::VOLUME_ID, VolumePeer::ID, $join_behavior);
-
-        $stmt = BasePeer::doCount($criteria, $con);
-
-        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $count = (int) $row[0];
-        } else {
-            $count = 0; // no rows returned; we infer that means 0 matches.
-        }
-        $stmt->closeCursor();
-
-        return $count;
-    }
-
-
-    /**
      * Selects a collection of PublicationJa objects pre-filled with their Publication objects.
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
@@ -646,73 +589,6 @@ abstract class BasePublicationJaPeer
 
 
     /**
-     * Selects a collection of PublicationJa objects pre-filled with their Volume objects.
-     * @param      Criteria  $criteria
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of PublicationJa objects.
-     * @throws PropelException Any exceptions caught during processing will be
-     *		 rethrown wrapped into a PropelException.
-     */
-    public static function doSelectJoinVolume(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $criteria = clone $criteria;
-
-        // Set the correct dbName if it has not been overridden
-        if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(PublicationJaPeer::DATABASE_NAME);
-        }
-
-        PublicationJaPeer::addSelectColumns($criteria);
-        $startcol = PublicationJaPeer::NUM_HYDRATE_COLUMNS;
-        VolumePeer::addSelectColumns($criteria);
-
-        $criteria->addJoin(PublicationJaPeer::VOLUME_ID, VolumePeer::ID, $join_behavior);
-
-        $stmt = BasePeer::doSelect($criteria, $con);
-        $results = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = PublicationJaPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = PublicationJaPeer::getInstanceFromPool($key1))) {
-                // We no longer rehydrate the object, since this can cause data loss.
-                // See http://www.propelorm.org/ticket/509
-                // $obj1->hydrate($row, 0, true); // rehydrate
-            } else {
-
-                $cls = PublicationJaPeer::getOMClass();
-
-                $obj1 = new $cls();
-                $obj1->hydrate($row);
-                PublicationJaPeer::addInstanceToPool($obj1, $key1);
-            } // if $obj1 already loaded
-
-            $key2 = VolumePeer::getPrimaryKeyHashFromRow($row, $startcol);
-            if ($key2 !== null) {
-                $obj2 = VolumePeer::getInstanceFromPool($key2);
-                if (!$obj2) {
-
-                    $cls = VolumePeer::getOMClass();
-
-                    $obj2 = new $cls();
-                    $obj2->hydrate($row, $startcol);
-                    VolumePeer::addInstanceToPool($obj2, $key2);
-                } // if obj2 already loaded
-
-                // Add the $obj1 (PublicationJa) to $obj2 (Volume)
-                $obj2->addPublicationJa($obj1);
-
-            } // if joined row was not null
-
-            $results[] = $obj1;
-        }
-        $stmt->closeCursor();
-
-        return $results;
-    }
-
-
-    /**
      * Returns the number of rows matching criteria, joining all related tables
      *
      * @param      Criteria $criteria
@@ -749,8 +625,6 @@ abstract class BasePublicationJaPeer
         }
 
         $criteria->addJoin(PublicationJaPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
-
-        $criteria->addJoin(PublicationJaPeer::VOLUME_ID, VolumePeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -789,12 +663,7 @@ abstract class BasePublicationJaPeer
         PublicationPeer::addSelectColumns($criteria);
         $startcol3 = $startcol2 + PublicationPeer::NUM_HYDRATE_COLUMNS;
 
-        VolumePeer::addSelectColumns($criteria);
-        $startcol4 = $startcol3 + VolumePeer::NUM_HYDRATE_COLUMNS;
-
         $criteria->addJoin(PublicationJaPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
-
-        $criteria->addJoin(PublicationJaPeer::VOLUME_ID, VolumePeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
@@ -830,274 +699,6 @@ abstract class BasePublicationJaPeer
                 // Add the $obj1 (PublicationJa) to the collection in $obj2 (Publication)
                 $obj2->addPublicationJa($obj1);
             } // if joined row not null
-
-            // Add objects for joined Volume rows
-
-            $key3 = VolumePeer::getPrimaryKeyHashFromRow($row, $startcol3);
-            if ($key3 !== null) {
-                $obj3 = VolumePeer::getInstanceFromPool($key3);
-                if (!$obj3) {
-
-                    $cls = VolumePeer::getOMClass();
-
-                    $obj3 = new $cls();
-                    $obj3->hydrate($row, $startcol3);
-                    VolumePeer::addInstanceToPool($obj3, $key3);
-                } // if obj3 loaded
-
-                // Add the $obj1 (PublicationJa) to the collection in $obj3 (Volume)
-                $obj3->addPublicationJa($obj1);
-            } // if joined row not null
-
-            $results[] = $obj1;
-        }
-        $stmt->closeCursor();
-
-        return $results;
-    }
-
-
-    /**
-     * Returns the number of rows matching criteria, joining the related Publication table
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return int Number of matching rows.
-     */
-    public static function doCountJoinAllExceptPublication(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        // we're going to modify criteria, so copy it first
-        $criteria = clone $criteria;
-
-        // We need to set the primary table name, since in the case that there are no WHERE columns
-        // it will be impossible for the BasePeer::createSelectSql() method to determine which
-        // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(PublicationJaPeer::TABLE_NAME);
-
-        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-            $criteria->setDistinct();
-        }
-
-        if (!$criteria->hasSelectClause()) {
-            PublicationJaPeer::addSelectColumns($criteria);
-        }
-
-        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
-
-        // Set the correct dbName
-        $criteria->setDbName(PublicationJaPeer::DATABASE_NAME);
-
-        if ($con === null) {
-            $con = Propel::getConnection(PublicationJaPeer::DATABASE_NAME, Propel::CONNECTION_READ);
-        }
-
-        $criteria->addJoin(PublicationJaPeer::VOLUME_ID, VolumePeer::ID, $join_behavior);
-
-        $stmt = BasePeer::doCount($criteria, $con);
-
-        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $count = (int) $row[0];
-        } else {
-            $count = 0; // no rows returned; we infer that means 0 matches.
-        }
-        $stmt->closeCursor();
-
-        return $count;
-    }
-
-
-    /**
-     * Returns the number of rows matching criteria, joining the related Volume table
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return int Number of matching rows.
-     */
-    public static function doCountJoinAllExceptVolume(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        // we're going to modify criteria, so copy it first
-        $criteria = clone $criteria;
-
-        // We need to set the primary table name, since in the case that there are no WHERE columns
-        // it will be impossible for the BasePeer::createSelectSql() method to determine which
-        // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(PublicationJaPeer::TABLE_NAME);
-
-        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-            $criteria->setDistinct();
-        }
-
-        if (!$criteria->hasSelectClause()) {
-            PublicationJaPeer::addSelectColumns($criteria);
-        }
-
-        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
-
-        // Set the correct dbName
-        $criteria->setDbName(PublicationJaPeer::DATABASE_NAME);
-
-        if ($con === null) {
-            $con = Propel::getConnection(PublicationJaPeer::DATABASE_NAME, Propel::CONNECTION_READ);
-        }
-
-        $criteria->addJoin(PublicationJaPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
-
-        $stmt = BasePeer::doCount($criteria, $con);
-
-        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $count = (int) $row[0];
-        } else {
-            $count = 0; // no rows returned; we infer that means 0 matches.
-        }
-        $stmt->closeCursor();
-
-        return $count;
-    }
-
-
-    /**
-     * Selects a collection of PublicationJa objects pre-filled with all related objects except Publication.
-     *
-     * @param      Criteria  $criteria
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of PublicationJa objects.
-     * @throws PropelException Any exceptions caught during processing will be
-     *		 rethrown wrapped into a PropelException.
-     */
-    public static function doSelectJoinAllExceptPublication(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $criteria = clone $criteria;
-
-        // Set the correct dbName if it has not been overridden
-        // $criteria->getDbName() will return the same object if not set to another value
-        // so == check is okay and faster
-        if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(PublicationJaPeer::DATABASE_NAME);
-        }
-
-        PublicationJaPeer::addSelectColumns($criteria);
-        $startcol2 = PublicationJaPeer::NUM_HYDRATE_COLUMNS;
-
-        VolumePeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + VolumePeer::NUM_HYDRATE_COLUMNS;
-
-        $criteria->addJoin(PublicationJaPeer::VOLUME_ID, VolumePeer::ID, $join_behavior);
-
-
-        $stmt = BasePeer::doSelect($criteria, $con);
-        $results = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = PublicationJaPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = PublicationJaPeer::getInstanceFromPool($key1))) {
-                // We no longer rehydrate the object, since this can cause data loss.
-                // See http://www.propelorm.org/ticket/509
-                // $obj1->hydrate($row, 0, true); // rehydrate
-            } else {
-                $cls = PublicationJaPeer::getOMClass();
-
-                $obj1 = new $cls();
-                $obj1->hydrate($row);
-                PublicationJaPeer::addInstanceToPool($obj1, $key1);
-            } // if obj1 already loaded
-
-                // Add objects for joined Volume rows
-
-                $key2 = VolumePeer::getPrimaryKeyHashFromRow($row, $startcol2);
-                if ($key2 !== null) {
-                    $obj2 = VolumePeer::getInstanceFromPool($key2);
-                    if (!$obj2) {
-
-                        $cls = VolumePeer::getOMClass();
-
-                    $obj2 = new $cls();
-                    $obj2->hydrate($row, $startcol2);
-                    VolumePeer::addInstanceToPool($obj2, $key2);
-                } // if $obj2 already loaded
-
-                // Add the $obj1 (PublicationJa) to the collection in $obj2 (Volume)
-                $obj2->addPublicationJa($obj1);
-
-            } // if joined row is not null
-
-            $results[] = $obj1;
-        }
-        $stmt->closeCursor();
-
-        return $results;
-    }
-
-
-    /**
-     * Selects a collection of PublicationJa objects pre-filled with all related objects except Volume.
-     *
-     * @param      Criteria  $criteria
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of PublicationJa objects.
-     * @throws PropelException Any exceptions caught during processing will be
-     *		 rethrown wrapped into a PropelException.
-     */
-    public static function doSelectJoinAllExceptVolume(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $criteria = clone $criteria;
-
-        // Set the correct dbName if it has not been overridden
-        // $criteria->getDbName() will return the same object if not set to another value
-        // so == check is okay and faster
-        if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(PublicationJaPeer::DATABASE_NAME);
-        }
-
-        PublicationJaPeer::addSelectColumns($criteria);
-        $startcol2 = PublicationJaPeer::NUM_HYDRATE_COLUMNS;
-
-        PublicationPeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + PublicationPeer::NUM_HYDRATE_COLUMNS;
-
-        $criteria->addJoin(PublicationJaPeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
-
-
-        $stmt = BasePeer::doSelect($criteria, $con);
-        $results = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = PublicationJaPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = PublicationJaPeer::getInstanceFromPool($key1))) {
-                // We no longer rehydrate the object, since this can cause data loss.
-                // See http://www.propelorm.org/ticket/509
-                // $obj1->hydrate($row, 0, true); // rehydrate
-            } else {
-                $cls = PublicationJaPeer::getOMClass();
-
-                $obj1 = new $cls();
-                $obj1->hydrate($row);
-                PublicationJaPeer::addInstanceToPool($obj1, $key1);
-            } // if obj1 already loaded
-
-                // Add objects for joined Publication rows
-
-                $key2 = PublicationPeer::getPrimaryKeyHashFromRow($row, $startcol2);
-                if ($key2 !== null) {
-                    $obj2 = PublicationPeer::getInstanceFromPool($key2);
-                    if (!$obj2) {
-
-                        $cls = PublicationPeer::getOMClass();
-
-                    $obj2 = new $cls();
-                    $obj2->hydrate($row, $startcol2);
-                    PublicationPeer::addInstanceToPool($obj2, $key2);
-                } // if $obj2 already loaded
-
-                // Add the $obj1 (PublicationJa) to the collection in $obj2 (Publication)
-                $obj2->addPublicationJa($obj1);
-
-            } // if joined row is not null
 
             $results[] = $obj1;
         }

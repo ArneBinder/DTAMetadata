@@ -53,8 +53,8 @@ class TagTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('WorkTag', 'DTA\\MetadataBundle\\Model\\Master\\WorkTag', RelationMap::ONE_TO_MANY, array('id' => 'tag_id', ), null, null, 'WorkTags');
-        $this->addRelation('Work', 'DTA\\MetadataBundle\\Model\\Data\\Work', RelationMap::MANY_TO_MANY, array(), null, null, 'Works');
+        $this->addRelation('PublicationTag', 'DTA\\MetadataBundle\\Model\\Master\\PublicationTag', RelationMap::ONE_TO_MANY, array('id' => 'tag_id', ), null, null, 'PublicationTags');
+        $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::MANY_TO_MANY, array(), null, null, 'Publications');
     } // buildRelations()
 
     /**

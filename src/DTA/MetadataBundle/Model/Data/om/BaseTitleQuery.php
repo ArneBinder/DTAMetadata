@@ -12,12 +12,12 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use DTA\MetadataBundle\Model\Data\Publication;
 use DTA\MetadataBundle\Model\Data\Series;
 use DTA\MetadataBundle\Model\Data\Title;
 use DTA\MetadataBundle\Model\Data\TitlePeer;
 use DTA\MetadataBundle\Model\Data\TitleQuery;
 use DTA\MetadataBundle\Model\Data\Titlefragment;
-use DTA\MetadataBundle\Model\Data\Work;
 
 /**
  * @method TitleQuery orderById($order = Criteria::ASC) Order by the id column
@@ -28,9 +28,9 @@ use DTA\MetadataBundle\Model\Data\Work;
  * @method TitleQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method TitleQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method TitleQuery leftJoinWork($relationAlias = null) Adds a LEFT JOIN clause to the query using the Work relation
- * @method TitleQuery rightJoinWork($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Work relation
- * @method TitleQuery innerJoinWork($relationAlias = null) Adds a INNER JOIN clause to the query using the Work relation
+ * @method TitleQuery leftJoinPublication($relationAlias = null) Adds a LEFT JOIN clause to the query using the Publication relation
+ * @method TitleQuery rightJoinPublication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Publication relation
+ * @method TitleQuery innerJoinPublication($relationAlias = null) Adds a INNER JOIN clause to the query using the Publication relation
  *
  * @method TitleQuery leftJoinSeries($relationAlias = null) Adds a LEFT JOIN clause to the query using the Series relation
  * @method TitleQuery rightJoinSeries($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Series relation
@@ -55,7 +55,7 @@ abstract class BaseTitleQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'DTAMetadata', $modelName = 'DTA\\MetadataBundle\\Model\\Data\\Title', $modelAlias = null)
+    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Data\\Title', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -278,41 +278,41 @@ abstract class BaseTitleQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Work object
+     * Filter the query by a related Publication object
      *
-     * @param   Work|PropelObjectCollection $work  the related object to use as filter
+     * @param   Publication|PropelObjectCollection $publication  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return                 TitleQuery The current query, for fluid interface
      * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterByWork($work, $comparison = null)
+    public function filterByPublication($publication, $comparison = null)
     {
-        if ($work instanceof Work) {
+        if ($publication instanceof Publication) {
             return $this
-                ->addUsingAlias(TitlePeer::ID, $work->getTitleId(), $comparison);
-        } elseif ($work instanceof PropelObjectCollection) {
+                ->addUsingAlias(TitlePeer::ID, $publication->getTitleId(), $comparison);
+        } elseif ($publication instanceof PropelObjectCollection) {
             return $this
-                ->useWorkQuery()
-                ->filterByPrimaryKeys($work->getPrimaryKeys())
+                ->usePublicationQuery()
+                ->filterByPrimaryKeys($publication->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByWork() only accepts arguments of type Work or PropelCollection');
+            throw new PropelException('filterByPublication() only accepts arguments of type Publication or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Work relation
+     * Adds a JOIN clause to the query using the Publication relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return TitleQuery The current query, for fluid interface
      */
-    public function joinWork($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinPublication($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Work');
+        $relationMap = $tableMap->getRelation('Publication');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -327,14 +327,14 @@ abstract class BaseTitleQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Work');
+            $this->addJoinObject($join, 'Publication');
         }
 
         return $this;
     }
 
     /**
-     * Use the Work relation Work object
+     * Use the Publication relation Publication object
      *
      * @see       useQuery()
      *
@@ -342,13 +342,13 @@ abstract class BaseTitleQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \DTA\MetadataBundle\Model\Data\WorkQuery A secondary query class using the current class as primary query
+     * @return   \DTA\MetadataBundle\Model\Data\PublicationQuery A secondary query class using the current class as primary query
      */
-    public function useWorkQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function usePublicationQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinWork($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Work', '\DTA\MetadataBundle\Model\Data\WorkQuery');
+            ->joinPublication($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Publication', '\DTA\MetadataBundle\Model\Data\PublicationQuery');
     }
 
     /**

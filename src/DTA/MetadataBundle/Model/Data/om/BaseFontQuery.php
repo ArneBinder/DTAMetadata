@@ -16,6 +16,7 @@ use DTA\MetadataBundle\Model\Data\Font;
 use DTA\MetadataBundle\Model\Data\FontPeer;
 use DTA\MetadataBundle\Model\Data\FontQuery;
 use DTA\MetadataBundle\Model\Data\Publication;
+use DTA\MetadataBundle\Model\Master\FontPublication;
 
 /**
  * @method FontQuery orderById($order = Criteria::ASC) Order by the id column
@@ -28,9 +29,9 @@ use DTA\MetadataBundle\Model\Data\Publication;
  * @method FontQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method FontQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method FontQuery leftJoinPublication($relationAlias = null) Adds a LEFT JOIN clause to the query using the Publication relation
- * @method FontQuery rightJoinPublication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Publication relation
- * @method FontQuery innerJoinPublication($relationAlias = null) Adds a INNER JOIN clause to the query using the Publication relation
+ * @method FontQuery leftJoinFontPublication($relationAlias = null) Adds a LEFT JOIN clause to the query using the FontPublication relation
+ * @method FontQuery rightJoinFontPublication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FontPublication relation
+ * @method FontQuery innerJoinFontPublication($relationAlias = null) Adds a INNER JOIN clause to the query using the FontPublication relation
  *
  * @method Font findOne(PropelPDO $con = null) Return the first Font matching the query
  * @method Font findOneOrCreate(PropelPDO $con = null) Return the first Font matching the query, or a new Font object populated from the query conditions when no match is found
@@ -49,7 +50,7 @@ abstract class BaseFontQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'DTAMetadata', $modelName = 'DTA\\MetadataBundle\\Model\\Data\\Font', $modelAlias = null)
+    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Data\\Font', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -301,41 +302,41 @@ abstract class BaseFontQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Publication object
+     * Filter the query by a related FontPublication object
      *
-     * @param   Publication|PropelObjectCollection $publication  the related object to use as filter
+     * @param   FontPublication|PropelObjectCollection $fontPublication  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return                 FontQuery The current query, for fluid interface
      * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterByPublication($publication, $comparison = null)
+    public function filterByFontPublication($fontPublication, $comparison = null)
     {
-        if ($publication instanceof Publication) {
+        if ($fontPublication instanceof FontPublication) {
             return $this
-                ->addUsingAlias(FontPeer::ID, $publication->getFontId(), $comparison);
-        } elseif ($publication instanceof PropelObjectCollection) {
+                ->addUsingAlias(FontPeer::ID, $fontPublication->getFontId(), $comparison);
+        } elseif ($fontPublication instanceof PropelObjectCollection) {
             return $this
-                ->usePublicationQuery()
-                ->filterByPrimaryKeys($publication->getPrimaryKeys())
+                ->useFontPublicationQuery()
+                ->filterByPrimaryKeys($fontPublication->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByPublication() only accepts arguments of type Publication or PropelCollection');
+            throw new PropelException('filterByFontPublication() only accepts arguments of type FontPublication or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Publication relation
+     * Adds a JOIN clause to the query using the FontPublication relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return FontQuery The current query, for fluid interface
      */
-    public function joinPublication($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinFontPublication($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Publication');
+        $relationMap = $tableMap->getRelation('FontPublication');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -350,14 +351,14 @@ abstract class BaseFontQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Publication');
+            $this->addJoinObject($join, 'FontPublication');
         }
 
         return $this;
     }
 
     /**
-     * Use the Publication relation Publication object
+     * Use the FontPublication relation FontPublication object
      *
      * @see       useQuery()
      *
@@ -365,13 +366,30 @@ abstract class BaseFontQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \DTA\MetadataBundle\Model\Data\PublicationQuery A secondary query class using the current class as primary query
+     * @return   \DTA\MetadataBundle\Model\Master\FontPublicationQuery A secondary query class using the current class as primary query
      */
-    public function usePublicationQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useFontPublicationQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinPublication($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Publication', '\DTA\MetadataBundle\Model\Data\PublicationQuery');
+            ->joinFontPublication($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'FontPublication', '\DTA\MetadataBundle\Model\Master\FontPublicationQuery');
+    }
+
+    /**
+     * Filter the query by a related Publication object
+     * using the font_publication table as cross reference
+     *
+     * @param   Publication $publication the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   FontQuery The current query, for fluid interface
+     */
+    public function filterByPublication($publication, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useFontPublicationQuery()
+            ->filterByPublication($publication, $comparison)
+            ->endUse();
     }
 
     /**

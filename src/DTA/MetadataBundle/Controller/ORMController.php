@@ -27,7 +27,7 @@ class ORMController extends DTADomainController {
      * @param String $package   The namespace/package name of the class (Data/Workflow/Classification/Master)
      * @param String $className The basic name of the class, all lower-case except the first letter (Work, Personalname, Namefragmenttype)
      */
-    private function relatedClassNames($package, $className) {
+    protected function relatedClassNames($package, $className) {
         return array(
             "model"     => "DTA\\MetadataBundle\\Model\\$package\\" . $className,             // the actual propel active record
             "query"     => "DTA\\MetadataBundle\\Model\\$package\\" . $className . "Query",   // utility class for generating queries
@@ -146,10 +146,6 @@ class ORMController extends DTADomainController {
      * @param string $className    model class
      */
     public function genericViewAllAction($package, $className, $updatedObjectId = 0) {
-        
-//        if($this->package === null){ // called through a HTTP request, not from another controller
-//            return $this->useSpecializedImplementation($package, __METHOD__, array('package'=>$package, 'className'=>$className, 'updatedObjectId' => $updatedObjectId));
-//        }
         
         $classNames = $this->relatedClassNames($package, $className);
 

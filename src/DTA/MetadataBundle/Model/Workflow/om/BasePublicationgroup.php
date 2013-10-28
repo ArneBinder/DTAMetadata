@@ -57,6 +57,12 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
     protected $name;
 
     /**
+     * The value for the legacy_group_id field.
+     * @var        int
+     */
+    protected $legacy_group_id;
+
+    /**
      * @var        PropelObjectCollection|PublicationPublicationgroup[] Collection to store aggregation of PublicationPublicationgroup objects.
      */
     protected $collPublicationPublicationgroups;
@@ -94,7 +100,7 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Id', 'Name', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'Name'=>'Name', );
+    public static $tableRowViewCaptions = array('Id', 'Name', 'LegacyGroupId', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'Name'=>'Name', 'LegacyGroupId'=>'LegacyGroupId', );
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -131,6 +137,16 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Get the [legacy_group_id] column value.
+     * id_group der alten Datenbank, die dem Datensatz zugrundeliegt.
+     * @return int
+     */
+    public function getLegacyGroupId()
+    {
+        return $this->legacy_group_id;
     }
 
     /**
@@ -176,6 +192,27 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
     } // setName()
 
     /**
+     * Set the value of [legacy_group_id] column.
+     * id_group der alten Datenbank, die dem Datensatz zugrundeliegt.
+     * @param int $v new value
+     * @return Publicationgroup The current object (for fluent API support)
+     */
+    public function setLegacyGroupId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->legacy_group_id !== $v) {
+            $this->legacy_group_id = $v;
+            $this->modifiedColumns[] = PublicationgroupPeer::LEGACY_GROUP_ID;
+        }
+
+
+        return $this;
+    } // setLegacyGroupId()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -209,6 +246,7 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->name = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
+            $this->legacy_group_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -217,7 +255,7 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 2; // 2 = PublicationgroupPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 3; // 3 = PublicationgroupPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Publicationgroup object", $e);
@@ -511,6 +549,9 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
         if ($this->isColumnModified(PublicationgroupPeer::NAME)) {
             $modifiedColumns[':p' . $index++]  = '"name"';
         }
+        if ($this->isColumnModified(PublicationgroupPeer::LEGACY_GROUP_ID)) {
+            $modifiedColumns[':p' . $index++]  = '"legacy_group_id"';
+        }
 
         $sql = sprintf(
             'INSERT INTO "publicationgroup" (%s) VALUES (%s)',
@@ -527,6 +568,9 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
                         break;
                     case '"name"':
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
+                        break;
+                    case '"legacy_group_id"':
+                        $stmt->bindValue($identifier, $this->legacy_group_id, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -677,6 +721,9 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
             case 1:
                 return $this->getName();
                 break;
+            case 2:
+                return $this->getLegacyGroupId();
+                break;
             default:
                 return null;
                 break;
@@ -708,6 +755,7 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getName(),
+            $keys[2] => $this->getLegacyGroupId(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->collPublicationPublicationgroups) {
@@ -756,6 +804,9 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
             case 1:
                 $this->setName($value);
                 break;
+            case 2:
+                $this->setLegacyGroupId($value);
+                break;
         } // switch()
     }
 
@@ -782,6 +833,7 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setLegacyGroupId($arr[$keys[2]]);
     }
 
     /**
@@ -795,6 +847,7 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
 
         if ($this->isColumnModified(PublicationgroupPeer::ID)) $criteria->add(PublicationgroupPeer::ID, $this->id);
         if ($this->isColumnModified(PublicationgroupPeer::NAME)) $criteria->add(PublicationgroupPeer::NAME, $this->name);
+        if ($this->isColumnModified(PublicationgroupPeer::LEGACY_GROUP_ID)) $criteria->add(PublicationgroupPeer::LEGACY_GROUP_ID, $this->legacy_group_id);
 
         return $criteria;
     }
@@ -859,6 +912,7 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setName($this->getName());
+        $copyObj->setLegacyGroupId($this->getLegacyGroupId());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1693,6 +1747,7 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
     {
         $this->id = null;
         $this->name = null;
+        $this->legacy_group_id = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;

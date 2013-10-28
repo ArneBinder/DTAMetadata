@@ -16,10 +16,10 @@ use \PropelPDO;
 use DTA\MetadataBundle\Model\Classification\Genre;
 use DTA\MetadataBundle\Model\Classification\GenrePeer;
 use DTA\MetadataBundle\Model\Classification\GenreQuery;
-use DTA\MetadataBundle\Model\Data\Work;
-use DTA\MetadataBundle\Model\Data\WorkQuery;
-use DTA\MetadataBundle\Model\Master\GenreWork;
-use DTA\MetadataBundle\Model\Master\GenreWorkQuery;
+use DTA\MetadataBundle\Model\Data\Publication;
+use DTA\MetadataBundle\Model\Data\PublicationQuery;
+use DTA\MetadataBundle\Model\Master\GenrePublication;
+use DTA\MetadataBundle\Model\Master\GenrePublicationQuery;
 
 abstract class BaseGenre extends BaseObject implements Persistent, \DTA\MetadataBundle\Model\table_row_view\TableRowViewInterface
 {
@@ -55,32 +55,15 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
     protected $name;
 
     /**
-     * The value for the childof field.
-     * @var        int
+     * @var        PropelObjectCollection|GenrePublication[] Collection to store aggregation of GenrePublication objects.
      */
-    protected $childof;
+    protected $collGenrePublications;
+    protected $collGenrePublicationsPartial;
 
     /**
-     * @var        Genre
+     * @var        PropelObjectCollection|Publication[] Collection to store aggregation of Publication objects.
      */
-    protected $aGenreRelatedByChildof;
-
-    /**
-     * @var        PropelObjectCollection|Genre[] Collection to store aggregation of Genre objects.
-     */
-    protected $collGenresRelatedById;
-    protected $collGenresRelatedByIdPartial;
-
-    /**
-     * @var        PropelObjectCollection|GenreWork[] Collection to store aggregation of GenreWork objects.
-     */
-    protected $collGenreWorks;
-    protected $collGenreWorksPartial;
-
-    /**
-     * @var        PropelObjectCollection|Work[] Collection to store aggregation of Work objects.
-     */
-    protected $collWorks;
+    protected $collPublications;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -103,24 +86,18 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('name', 'zugeordnet', );	public   $tableRowViewAccessors = array('name'=>'Name', 'zugeordnet'=>'accessor:getParent', );
+    public static $tableRowViewCaptions = array('name', );	public   $tableRowViewAccessors = array('name'=>'Name', );
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $worksScheduledForDeletion = null;
+    protected $publicationsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $genresRelatedByIdScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $genreWorksScheduledForDeletion = null;
+    protected $genrePublicationsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -140,16 +117,6 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * Get the [childof] column value.
-     *
-     * @return int
-     */
-    public function getChildof()
-    {
-        return $this->childof;
     }
 
     /**
@@ -195,31 +162,6 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
     } // setName()
 
     /**
-     * Set the value of [childof] column.
-     *
-     * @param int $v new value
-     * @return Genre The current object (for fluent API support)
-     */
-    public function setChildof($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->childof !== $v) {
-            $this->childof = $v;
-            $this->modifiedColumns[] = GenrePeer::CHILDOF;
-        }
-
-        if ($this->aGenreRelatedByChildof !== null && $this->aGenreRelatedByChildof->getId() !== $v) {
-            $this->aGenreRelatedByChildof = null;
-        }
-
-
-        return $this;
-    } // setChildof()
-
-    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -253,7 +195,6 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->name = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
-            $this->childof = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -262,7 +203,7 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 3; // 3 = GenrePeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 2; // 2 = GenrePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Genre object", $e);
@@ -285,9 +226,6 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
     public function ensureConsistency()
     {
 
-        if ($this->aGenreRelatedByChildof !== null && $this->childof !== $this->aGenreRelatedByChildof->getId()) {
-            $this->aGenreRelatedByChildof = null;
-        }
     } // ensureConsistency
 
     /**
@@ -327,12 +265,9 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aGenreRelatedByChildof = null;
-            $this->collGenresRelatedById = null;
+            $this->collGenrePublications = null;
 
-            $this->collGenreWorks = null;
-
-            $this->collWorks = null;
+            $this->collPublications = null;
         } // if (deep)
     }
 
@@ -446,18 +381,6 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
-            // We call the save method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aGenreRelatedByChildof !== null) {
-                if ($this->aGenreRelatedByChildof->isModified() || $this->aGenreRelatedByChildof->isNew()) {
-                    $affectedRows += $this->aGenreRelatedByChildof->save($con);
-                }
-                $this->setGenreRelatedByChildof($this->aGenreRelatedByChildof);
-            }
-
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -469,61 +392,43 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
                 $this->resetModified();
             }
 
-            if ($this->worksScheduledForDeletion !== null) {
-                if (!$this->worksScheduledForDeletion->isEmpty()) {
+            if ($this->publicationsScheduledForDeletion !== null) {
+                if (!$this->publicationsScheduledForDeletion->isEmpty()) {
                     $pks = array();
                     $pk = $this->getPrimaryKey();
-                    foreach ($this->worksScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                    foreach ($this->publicationsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
                         $pks[] = array($pk, $remotePk);
                     }
-                    GenreWorkQuery::create()
+                    GenrePublicationQuery::create()
                         ->filterByPrimaryKeys($pks)
                         ->delete($con);
-                    $this->worksScheduledForDeletion = null;
+                    $this->publicationsScheduledForDeletion = null;
                 }
 
-                foreach ($this->getWorks() as $work) {
-                    if ($work->isModified()) {
-                        $work->save($con);
+                foreach ($this->getPublications() as $publication) {
+                    if ($publication->isModified()) {
+                        $publication->save($con);
                     }
                 }
-            } elseif ($this->collWorks) {
-                foreach ($this->collWorks as $work) {
-                    if ($work->isModified()) {
-                        $work->save($con);
-                    }
-                }
-            }
-
-            if ($this->genresRelatedByIdScheduledForDeletion !== null) {
-                if (!$this->genresRelatedByIdScheduledForDeletion->isEmpty()) {
-                    foreach ($this->genresRelatedByIdScheduledForDeletion as $genreRelatedById) {
-                        // need to save related object because we set the relation to null
-                        $genreRelatedById->save($con);
-                    }
-                    $this->genresRelatedByIdScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collGenresRelatedById !== null) {
-                foreach ($this->collGenresRelatedById as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
+            } elseif ($this->collPublications) {
+                foreach ($this->collPublications as $publication) {
+                    if ($publication->isModified()) {
+                        $publication->save($con);
                     }
                 }
             }
 
-            if ($this->genreWorksScheduledForDeletion !== null) {
-                if (!$this->genreWorksScheduledForDeletion->isEmpty()) {
-                    GenreWorkQuery::create()
-                        ->filterByPrimaryKeys($this->genreWorksScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->genrePublicationsScheduledForDeletion !== null) {
+                if (!$this->genrePublicationsScheduledForDeletion->isEmpty()) {
+                    GenrePublicationQuery::create()
+                        ->filterByPrimaryKeys($this->genrePublicationsScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->genreWorksScheduledForDeletion = null;
+                    $this->genrePublicationsScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collGenreWorks !== null) {
-                foreach ($this->collGenreWorks as $referrerFK) {
+            if ($this->collGenrePublications !== null) {
+                foreach ($this->collGenrePublications as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -572,9 +477,6 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
         if ($this->isColumnModified(GenrePeer::NAME)) {
             $modifiedColumns[':p' . $index++]  = '"name"';
         }
-        if ($this->isColumnModified(GenrePeer::CHILDOF)) {
-            $modifiedColumns[':p' . $index++]  = '"childof"';
-        }
 
         $sql = sprintf(
             'INSERT INTO "genre" (%s) VALUES (%s)',
@@ -591,9 +493,6 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
                         break;
                     case '"name"':
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
-                        break;
-                    case '"childof"':
-                        $stmt->bindValue($identifier, $this->childof, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -682,33 +581,13 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
             $failureMap = array();
 
 
-            // We call the validate method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aGenreRelatedByChildof !== null) {
-                if (!$this->aGenreRelatedByChildof->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aGenreRelatedByChildof->getValidationFailures());
-                }
-            }
-
-
             if (($retval = GenrePeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
 
-                if ($this->collGenresRelatedById !== null) {
-                    foreach ($this->collGenresRelatedById as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
-                if ($this->collGenreWorks !== null) {
-                    foreach ($this->collGenreWorks as $referrerFK) {
+                if ($this->collGenrePublications !== null) {
+                    foreach ($this->collGenrePublications as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -756,9 +635,6 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
             case 1:
                 return $this->getName();
                 break;
-            case 2:
-                return $this->getChildof();
-                break;
             default:
                 return null;
                 break;
@@ -790,17 +666,10 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getName(),
-            $keys[2] => $this->getChildof(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aGenreRelatedByChildof) {
-                $result['GenreRelatedByChildof'] = $this->aGenreRelatedByChildof->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->collGenresRelatedById) {
-                $result['GenresRelatedById'] = $this->collGenresRelatedById->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
-            if (null !== $this->collGenreWorks) {
-                $result['GenreWorks'] = $this->collGenreWorks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collGenrePublications) {
+                $result['GenrePublications'] = $this->collGenrePublications->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -842,9 +711,6 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
             case 1:
                 $this->setName($value);
                 break;
-            case 2:
-                $this->setChildof($value);
-                break;
         } // switch()
     }
 
@@ -871,7 +737,6 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setChildof($arr[$keys[2]]);
     }
 
     /**
@@ -885,7 +750,6 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
 
         if ($this->isColumnModified(GenrePeer::ID)) $criteria->add(GenrePeer::ID, $this->id);
         if ($this->isColumnModified(GenrePeer::NAME)) $criteria->add(GenrePeer::NAME, $this->name);
-        if ($this->isColumnModified(GenrePeer::CHILDOF)) $criteria->add(GenrePeer::CHILDOF, $this->childof);
 
         return $criteria;
     }
@@ -950,7 +814,6 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setName($this->getName());
-        $copyObj->setChildof($this->getChildof());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -959,15 +822,9 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getGenresRelatedById() as $relObj) {
+            foreach ($this->getGenrePublications() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addGenreRelatedById($relObj->copy($deepCopy));
-                }
-            }
-
-            foreach ($this->getGenreWorks() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addGenreWork($relObj->copy($deepCopy));
+                    $copyObj->addGenrePublication($relObj->copy($deepCopy));
                 }
             }
 
@@ -1021,58 +878,6 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
         return self::$peer;
     }
 
-    /**
-     * Declares an association between this object and a Genre object.
-     *
-     * @param             Genre $v
-     * @return Genre The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setGenreRelatedByChildof(Genre $v = null)
-    {
-        if ($v === null) {
-            $this->setChildof(NULL);
-        } else {
-            $this->setChildof($v->getId());
-        }
-
-        $this->aGenreRelatedByChildof = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Genre object, it will not be re-added.
-        if ($v !== null) {
-            $v->addGenreRelatedById($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated Genre object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @param $doQuery Executes a query to get the object if required
-     * @return Genre The associated Genre object.
-     * @throws PropelException
-     */
-    public function getGenreRelatedByChildof(PropelPDO $con = null, $doQuery = true)
-    {
-        if ($this->aGenreRelatedByChildof === null && ($this->childof !== null) && $doQuery) {
-            $this->aGenreRelatedByChildof = GenreQuery::create()->findPk($this->childof, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aGenreRelatedByChildof->addGenresRelatedById($this);
-             */
-        }
-
-        return $this->aGenreRelatedByChildof;
-    }
-
 
     /**
      * Initializes a collection based on the name of a relation.
@@ -1084,45 +889,42 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
      */
     public function initRelation($relationName)
     {
-        if ('GenreRelatedById' == $relationName) {
-            $this->initGenresRelatedById();
-        }
-        if ('GenreWork' == $relationName) {
-            $this->initGenreWorks();
+        if ('GenrePublication' == $relationName) {
+            $this->initGenrePublications();
         }
     }
 
     /**
-     * Clears out the collGenresRelatedById collection
+     * Clears out the collGenrePublications collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return Genre The current object (for fluent API support)
-     * @see        addGenresRelatedById()
+     * @see        addGenrePublications()
      */
-    public function clearGenresRelatedById()
+    public function clearGenrePublications()
     {
-        $this->collGenresRelatedById = null; // important to set this to null since that means it is uninitialized
-        $this->collGenresRelatedByIdPartial = null;
+        $this->collGenrePublications = null; // important to set this to null since that means it is uninitialized
+        $this->collGenrePublicationsPartial = null;
 
         return $this;
     }
 
     /**
-     * reset is the collGenresRelatedById collection loaded partially
+     * reset is the collGenrePublications collection loaded partially
      *
      * @return void
      */
-    public function resetPartialGenresRelatedById($v = true)
+    public function resetPartialGenrePublications($v = true)
     {
-        $this->collGenresRelatedByIdPartial = $v;
+        $this->collGenrePublicationsPartial = $v;
     }
 
     /**
-     * Initializes the collGenresRelatedById collection.
+     * Initializes the collGenrePublications collection.
      *
-     * By default this just sets the collGenresRelatedById collection to an empty array (like clearcollGenresRelatedById());
+     * By default this just sets the collGenrePublications collection to an empty array (like clearcollGenrePublications());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1131,17 +933,17 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
      *
      * @return void
      */
-    public function initGenresRelatedById($overrideExisting = true)
+    public function initGenrePublications($overrideExisting = true)
     {
-        if (null !== $this->collGenresRelatedById && !$overrideExisting) {
+        if (null !== $this->collGenrePublications && !$overrideExisting) {
             return;
         }
-        $this->collGenresRelatedById = new PropelObjectCollection();
-        $this->collGenresRelatedById->setModel('Genre');
+        $this->collGenrePublications = new PropelObjectCollection();
+        $this->collGenrePublications->setModel('GenrePublication');
     }
 
     /**
-     * Gets an array of Genre objects which contain a foreign key that references this object.
+     * Gets an array of GenrePublication objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1151,323 +953,105 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|Genre[] List of Genre objects
+     * @return PropelObjectCollection|GenrePublication[] List of GenrePublication objects
      * @throws PropelException
      */
-    public function getGenresRelatedById($criteria = null, PropelPDO $con = null)
+    public function getGenrePublications($criteria = null, PropelPDO $con = null)
     {
-        $partial = $this->collGenresRelatedByIdPartial && !$this->isNew();
-        if (null === $this->collGenresRelatedById || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collGenresRelatedById) {
+        $partial = $this->collGenrePublicationsPartial && !$this->isNew();
+        if (null === $this->collGenrePublications || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collGenrePublications) {
                 // return empty collection
-                $this->initGenresRelatedById();
+                $this->initGenrePublications();
             } else {
-                $collGenresRelatedById = GenreQuery::create(null, $criteria)
-                    ->filterByGenreRelatedByChildof($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collGenresRelatedByIdPartial && count($collGenresRelatedById)) {
-                      $this->initGenresRelatedById(false);
-
-                      foreach($collGenresRelatedById as $obj) {
-                        if (false == $this->collGenresRelatedById->contains($obj)) {
-                          $this->collGenresRelatedById->append($obj);
-                        }
-                      }
-
-                      $this->collGenresRelatedByIdPartial = true;
-                    }
-
-                    $collGenresRelatedById->getInternalIterator()->rewind();
-                    return $collGenresRelatedById;
-                }
-
-                if($partial && $this->collGenresRelatedById) {
-                    foreach($this->collGenresRelatedById as $obj) {
-                        if($obj->isNew()) {
-                            $collGenresRelatedById[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collGenresRelatedById = $collGenresRelatedById;
-                $this->collGenresRelatedByIdPartial = false;
-            }
-        }
-
-        return $this->collGenresRelatedById;
-    }
-
-    /**
-     * Sets a collection of GenreRelatedById objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $genresRelatedById A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     * @return Genre The current object (for fluent API support)
-     */
-    public function setGenresRelatedById(PropelCollection $genresRelatedById, PropelPDO $con = null)
-    {
-        $genresRelatedByIdToDelete = $this->getGenresRelatedById(new Criteria(), $con)->diff($genresRelatedById);
-
-        $this->genresRelatedByIdScheduledForDeletion = unserialize(serialize($genresRelatedByIdToDelete));
-
-        foreach ($genresRelatedByIdToDelete as $genreRelatedByIdRemoved) {
-            $genreRelatedByIdRemoved->setGenreRelatedByChildof(null);
-        }
-
-        $this->collGenresRelatedById = null;
-        foreach ($genresRelatedById as $genreRelatedById) {
-            $this->addGenreRelatedById($genreRelatedById);
-        }
-
-        $this->collGenresRelatedById = $genresRelatedById;
-        $this->collGenresRelatedByIdPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related Genre objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related Genre objects.
-     * @throws PropelException
-     */
-    public function countGenresRelatedById(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collGenresRelatedByIdPartial && !$this->isNew();
-        if (null === $this->collGenresRelatedById || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collGenresRelatedById) {
-                return 0;
-            }
-
-            if($partial && !$criteria) {
-                return count($this->getGenresRelatedById());
-            }
-            $query = GenreQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByGenreRelatedByChildof($this)
-                ->count($con);
-        }
-
-        return count($this->collGenresRelatedById);
-    }
-
-    /**
-     * Method called to associate a Genre object to this object
-     * through the Genre foreign key attribute.
-     *
-     * @param    Genre $l Genre
-     * @return Genre The current object (for fluent API support)
-     */
-    public function addGenreRelatedById(Genre $l)
-    {
-        if ($this->collGenresRelatedById === null) {
-            $this->initGenresRelatedById();
-            $this->collGenresRelatedByIdPartial = true;
-        }
-        if (!in_array($l, $this->collGenresRelatedById->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddGenreRelatedById($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	GenreRelatedById $genreRelatedById The genreRelatedById object to add.
-     */
-    protected function doAddGenreRelatedById($genreRelatedById)
-    {
-        $this->collGenresRelatedById[]= $genreRelatedById;
-        $genreRelatedById->setGenreRelatedByChildof($this);
-    }
-
-    /**
-     * @param	GenreRelatedById $genreRelatedById The genreRelatedById object to remove.
-     * @return Genre The current object (for fluent API support)
-     */
-    public function removeGenreRelatedById($genreRelatedById)
-    {
-        if ($this->getGenresRelatedById()->contains($genreRelatedById)) {
-            $this->collGenresRelatedById->remove($this->collGenresRelatedById->search($genreRelatedById));
-            if (null === $this->genresRelatedByIdScheduledForDeletion) {
-                $this->genresRelatedByIdScheduledForDeletion = clone $this->collGenresRelatedById;
-                $this->genresRelatedByIdScheduledForDeletion->clear();
-            }
-            $this->genresRelatedByIdScheduledForDeletion[]= $genreRelatedById;
-            $genreRelatedById->setGenreRelatedByChildof(null);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Clears out the collGenreWorks collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return Genre The current object (for fluent API support)
-     * @see        addGenreWorks()
-     */
-    public function clearGenreWorks()
-    {
-        $this->collGenreWorks = null; // important to set this to null since that means it is uninitialized
-        $this->collGenreWorksPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * reset is the collGenreWorks collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialGenreWorks($v = true)
-    {
-        $this->collGenreWorksPartial = $v;
-    }
-
-    /**
-     * Initializes the collGenreWorks collection.
-     *
-     * By default this just sets the collGenreWorks collection to an empty array (like clearcollGenreWorks());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initGenreWorks($overrideExisting = true)
-    {
-        if (null !== $this->collGenreWorks && !$overrideExisting) {
-            return;
-        }
-        $this->collGenreWorks = new PropelObjectCollection();
-        $this->collGenreWorks->setModel('GenreWork');
-    }
-
-    /**
-     * Gets an array of GenreWork objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Genre is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|GenreWork[] List of GenreWork objects
-     * @throws PropelException
-     */
-    public function getGenreWorks($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collGenreWorksPartial && !$this->isNew();
-        if (null === $this->collGenreWorks || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collGenreWorks) {
-                // return empty collection
-                $this->initGenreWorks();
-            } else {
-                $collGenreWorks = GenreWorkQuery::create(null, $criteria)
+                $collGenrePublications = GenrePublicationQuery::create(null, $criteria)
                     ->filterByGenre($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    if (false !== $this->collGenreWorksPartial && count($collGenreWorks)) {
-                      $this->initGenreWorks(false);
+                    if (false !== $this->collGenrePublicationsPartial && count($collGenrePublications)) {
+                      $this->initGenrePublications(false);
 
-                      foreach($collGenreWorks as $obj) {
-                        if (false == $this->collGenreWorks->contains($obj)) {
-                          $this->collGenreWorks->append($obj);
+                      foreach($collGenrePublications as $obj) {
+                        if (false == $this->collGenrePublications->contains($obj)) {
+                          $this->collGenrePublications->append($obj);
                         }
                       }
 
-                      $this->collGenreWorksPartial = true;
+                      $this->collGenrePublicationsPartial = true;
                     }
 
-                    $collGenreWorks->getInternalIterator()->rewind();
-                    return $collGenreWorks;
+                    $collGenrePublications->getInternalIterator()->rewind();
+                    return $collGenrePublications;
                 }
 
-                if($partial && $this->collGenreWorks) {
-                    foreach($this->collGenreWorks as $obj) {
+                if($partial && $this->collGenrePublications) {
+                    foreach($this->collGenrePublications as $obj) {
                         if($obj->isNew()) {
-                            $collGenreWorks[] = $obj;
+                            $collGenrePublications[] = $obj;
                         }
                     }
                 }
 
-                $this->collGenreWorks = $collGenreWorks;
-                $this->collGenreWorksPartial = false;
+                $this->collGenrePublications = $collGenrePublications;
+                $this->collGenrePublicationsPartial = false;
             }
         }
 
-        return $this->collGenreWorks;
+        return $this->collGenrePublications;
     }
 
     /**
-     * Sets a collection of GenreWork objects related by a one-to-many relationship
+     * Sets a collection of GenrePublication objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $genreWorks A Propel collection.
+     * @param PropelCollection $genrePublications A Propel collection.
      * @param PropelPDO $con Optional connection object
      * @return Genre The current object (for fluent API support)
      */
-    public function setGenreWorks(PropelCollection $genreWorks, PropelPDO $con = null)
+    public function setGenrePublications(PropelCollection $genrePublications, PropelPDO $con = null)
     {
-        $genreWorksToDelete = $this->getGenreWorks(new Criteria(), $con)->diff($genreWorks);
+        $genrePublicationsToDelete = $this->getGenrePublications(new Criteria(), $con)->diff($genrePublications);
 
-        $this->genreWorksScheduledForDeletion = unserialize(serialize($genreWorksToDelete));
+        $this->genrePublicationsScheduledForDeletion = unserialize(serialize($genrePublicationsToDelete));
 
-        foreach ($genreWorksToDelete as $genreWorkRemoved) {
-            $genreWorkRemoved->setGenre(null);
+        foreach ($genrePublicationsToDelete as $genrePublicationRemoved) {
+            $genrePublicationRemoved->setGenre(null);
         }
 
-        $this->collGenreWorks = null;
-        foreach ($genreWorks as $genreWork) {
-            $this->addGenreWork($genreWork);
+        $this->collGenrePublications = null;
+        foreach ($genrePublications as $genrePublication) {
+            $this->addGenrePublication($genrePublication);
         }
 
-        $this->collGenreWorks = $genreWorks;
-        $this->collGenreWorksPartial = false;
+        $this->collGenrePublications = $genrePublications;
+        $this->collGenrePublicationsPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related GenreWork objects.
+     * Returns the number of related GenrePublication objects.
      *
      * @param Criteria $criteria
      * @param boolean $distinct
      * @param PropelPDO $con
-     * @return int             Count of related GenreWork objects.
+     * @return int             Count of related GenrePublication objects.
      * @throws PropelException
      */
-    public function countGenreWorks(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countGenrePublications(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $partial = $this->collGenreWorksPartial && !$this->isNew();
-        if (null === $this->collGenreWorks || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collGenreWorks) {
+        $partial = $this->collGenrePublicationsPartial && !$this->isNew();
+        if (null === $this->collGenrePublications || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collGenrePublications) {
                 return 0;
             }
 
             if($partial && !$criteria) {
-                return count($this->getGenreWorks());
+                return count($this->getGenrePublications());
             }
-            $query = GenreWorkQuery::create(null, $criteria);
+            $query = GenrePublicationQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
@@ -1477,52 +1061,52 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
                 ->count($con);
         }
 
-        return count($this->collGenreWorks);
+        return count($this->collGenrePublications);
     }
 
     /**
-     * Method called to associate a GenreWork object to this object
-     * through the GenreWork foreign key attribute.
+     * Method called to associate a GenrePublication object to this object
+     * through the GenrePublication foreign key attribute.
      *
-     * @param    GenreWork $l GenreWork
+     * @param    GenrePublication $l GenrePublication
      * @return Genre The current object (for fluent API support)
      */
-    public function addGenreWork(GenreWork $l)
+    public function addGenrePublication(GenrePublication $l)
     {
-        if ($this->collGenreWorks === null) {
-            $this->initGenreWorks();
-            $this->collGenreWorksPartial = true;
+        if ($this->collGenrePublications === null) {
+            $this->initGenrePublications();
+            $this->collGenrePublicationsPartial = true;
         }
-        if (!in_array($l, $this->collGenreWorks->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddGenreWork($l);
+        if (!in_array($l, $this->collGenrePublications->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddGenrePublication($l);
         }
 
         return $this;
     }
 
     /**
-     * @param	GenreWork $genreWork The genreWork object to add.
+     * @param	GenrePublication $genrePublication The genrePublication object to add.
      */
-    protected function doAddGenreWork($genreWork)
+    protected function doAddGenrePublication($genrePublication)
     {
-        $this->collGenreWorks[]= $genreWork;
-        $genreWork->setGenre($this);
+        $this->collGenrePublications[]= $genrePublication;
+        $genrePublication->setGenre($this);
     }
 
     /**
-     * @param	GenreWork $genreWork The genreWork object to remove.
+     * @param	GenrePublication $genrePublication The genrePublication object to remove.
      * @return Genre The current object (for fluent API support)
      */
-    public function removeGenreWork($genreWork)
+    public function removeGenrePublication($genrePublication)
     {
-        if ($this->getGenreWorks()->contains($genreWork)) {
-            $this->collGenreWorks->remove($this->collGenreWorks->search($genreWork));
-            if (null === $this->genreWorksScheduledForDeletion) {
-                $this->genreWorksScheduledForDeletion = clone $this->collGenreWorks;
-                $this->genreWorksScheduledForDeletion->clear();
+        if ($this->getGenrePublications()->contains($genrePublication)) {
+            $this->collGenrePublications->remove($this->collGenrePublications->search($genrePublication));
+            if (null === $this->genrePublicationsScheduledForDeletion) {
+                $this->genrePublicationsScheduledForDeletion = clone $this->collGenrePublications;
+                $this->genrePublicationsScheduledForDeletion->clear();
             }
-            $this->genreWorksScheduledForDeletion[]= clone $genreWork;
-            $genreWork->setGenre(null);
+            $this->genrePublicationsScheduledForDeletion[]= clone $genrePublication;
+            $genrePublication->setGenre(null);
         }
 
         return $this;
@@ -1534,7 +1118,7 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
      * an identical criteria, it returns the collection.
      * Otherwise if this Genre is new, it will return
      * an empty collection; or if this Genre has previously
-     * been saved, it will retrieve related GenreWorks from storage.
+     * been saved, it will retrieve related GenrePublications from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1543,51 +1127,51 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|GenreWork[] List of GenreWork objects
+     * @return PropelObjectCollection|GenrePublication[] List of GenrePublication objects
      */
-    public function getGenreWorksJoinWork($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getGenrePublicationsJoinPublication($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
-        $query = GenreWorkQuery::create(null, $criteria);
-        $query->joinWith('Work', $join_behavior);
+        $query = GenrePublicationQuery::create(null, $criteria);
+        $query->joinWith('Publication', $join_behavior);
 
-        return $this->getGenreWorks($query, $con);
+        return $this->getGenrePublications($query, $con);
     }
 
     /**
-     * Clears out the collWorks collection
+     * Clears out the collPublications collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return Genre The current object (for fluent API support)
-     * @see        addWorks()
+     * @see        addPublications()
      */
-    public function clearWorks()
+    public function clearPublications()
     {
-        $this->collWorks = null; // important to set this to null since that means it is uninitialized
-        $this->collWorksPartial = null;
+        $this->collPublications = null; // important to set this to null since that means it is uninitialized
+        $this->collPublicationsPartial = null;
 
         return $this;
     }
 
     /**
-     * Initializes the collWorks collection.
+     * Initializes the collPublications collection.
      *
-     * By default this just sets the collWorks collection to an empty collection (like clearWorks());
+     * By default this just sets the collPublications collection to an empty collection (like clearPublications());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
      * @return void
      */
-    public function initWorks()
+    public function initPublications()
     {
-        $this->collWorks = new PropelObjectCollection();
-        $this->collWorks->setModel('Work');
+        $this->collPublications = new PropelObjectCollection();
+        $this->collPublications->setModel('Publication');
     }
 
     /**
-     * Gets a collection of Work objects related by a many-to-many relationship
-     * to the current object by way of the genre_work cross-reference table.
+     * Gets a collection of Publication objects related by a many-to-many relationship
+     * to the current object by way of the genre_publication cross-reference table.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1598,73 +1182,73 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
      * @param Criteria $criteria Optional query object to filter the query
      * @param PropelPDO $con Optional connection object
      *
-     * @return PropelObjectCollection|Work[] List of Work objects
+     * @return PropelObjectCollection|Publication[] List of Publication objects
      */
-    public function getWorks($criteria = null, PropelPDO $con = null)
+    public function getPublications($criteria = null, PropelPDO $con = null)
     {
-        if (null === $this->collWorks || null !== $criteria) {
-            if ($this->isNew() && null === $this->collWorks) {
+        if (null === $this->collPublications || null !== $criteria) {
+            if ($this->isNew() && null === $this->collPublications) {
                 // return empty collection
-                $this->initWorks();
+                $this->initPublications();
             } else {
-                $collWorks = WorkQuery::create(null, $criteria)
+                $collPublications = PublicationQuery::create(null, $criteria)
                     ->filterByGenre($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    return $collWorks;
+                    return $collPublications;
                 }
-                $this->collWorks = $collWorks;
+                $this->collPublications = $collPublications;
             }
         }
 
-        return $this->collWorks;
+        return $this->collPublications;
     }
 
     /**
-     * Sets a collection of Work objects related by a many-to-many relationship
-     * to the current object by way of the genre_work cross-reference table.
+     * Sets a collection of Publication objects related by a many-to-many relationship
+     * to the current object by way of the genre_publication cross-reference table.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $works A Propel collection.
+     * @param PropelCollection $publications A Propel collection.
      * @param PropelPDO $con Optional connection object
      * @return Genre The current object (for fluent API support)
      */
-    public function setWorks(PropelCollection $works, PropelPDO $con = null)
+    public function setPublications(PropelCollection $publications, PropelPDO $con = null)
     {
-        $this->clearWorks();
-        $currentWorks = $this->getWorks();
+        $this->clearPublications();
+        $currentPublications = $this->getPublications();
 
-        $this->worksScheduledForDeletion = $currentWorks->diff($works);
+        $this->publicationsScheduledForDeletion = $currentPublications->diff($publications);
 
-        foreach ($works as $work) {
-            if (!$currentWorks->contains($work)) {
-                $this->doAddWork($work);
+        foreach ($publications as $publication) {
+            if (!$currentPublications->contains($publication)) {
+                $this->doAddPublication($publication);
             }
         }
 
-        $this->collWorks = $works;
+        $this->collPublications = $publications;
 
         return $this;
     }
 
     /**
-     * Gets the number of Work objects related by a many-to-many relationship
-     * to the current object by way of the genre_work cross-reference table.
+     * Gets the number of Publication objects related by a many-to-many relationship
+     * to the current object by way of the genre_publication cross-reference table.
      *
      * @param Criteria $criteria Optional query object to filter the query
      * @param boolean $distinct Set to true to force count distinct
      * @param PropelPDO $con Optional connection object
      *
-     * @return int the number of related Work objects
+     * @return int the number of related Publication objects
      */
-    public function countWorks($criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countPublications($criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        if (null === $this->collWorks || null !== $criteria) {
-            if ($this->isNew() && null === $this->collWorks) {
+        if (null === $this->collPublications || null !== $criteria) {
+            if ($this->isNew() && null === $this->collPublications) {
                 return 0;
             } else {
-                $query = WorkQuery::create(null, $criteria);
+                $query = PublicationQuery::create(null, $criteria);
                 if ($distinct) {
                     $query->distinct();
                 }
@@ -1674,57 +1258,57 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
                     ->count($con);
             }
         } else {
-            return count($this->collWorks);
+            return count($this->collPublications);
         }
     }
 
     /**
-     * Associate a Work object to this object
-     * through the genre_work cross reference table.
+     * Associate a Publication object to this object
+     * through the genre_publication cross reference table.
      *
-     * @param  Work $work The GenreWork object to relate
+     * @param  Publication $publication The GenrePublication object to relate
      * @return Genre The current object (for fluent API support)
      */
-    public function addWork(Work $work)
+    public function addPublication(Publication $publication)
     {
-        if ($this->collWorks === null) {
-            $this->initWorks();
+        if ($this->collPublications === null) {
+            $this->initPublications();
         }
-        if (!$this->collWorks->contains($work)) { // only add it if the **same** object is not already associated
-            $this->doAddWork($work);
+        if (!$this->collPublications->contains($publication)) { // only add it if the **same** object is not already associated
+            $this->doAddPublication($publication);
 
-            $this->collWorks[]= $work;
+            $this->collPublications[]= $publication;
         }
 
         return $this;
     }
 
     /**
-     * @param	Work $work The work object to add.
+     * @param	Publication $publication The publication object to add.
      */
-    protected function doAddWork($work)
+    protected function doAddPublication($publication)
     {
-        $genreWork = new GenreWork();
-        $genreWork->setWork($work);
-        $this->addGenreWork($genreWork);
+        $genrePublication = new GenrePublication();
+        $genrePublication->setPublication($publication);
+        $this->addGenrePublication($genrePublication);
     }
 
     /**
-     * Remove a Work object to this object
-     * through the genre_work cross reference table.
+     * Remove a Publication object to this object
+     * through the genre_publication cross reference table.
      *
-     * @param Work $work The GenreWork object to relate
+     * @param Publication $publication The GenrePublication object to relate
      * @return Genre The current object (for fluent API support)
      */
-    public function removeWork(Work $work)
+    public function removePublication(Publication $publication)
     {
-        if ($this->getWorks()->contains($work)) {
-            $this->collWorks->remove($this->collWorks->search($work));
-            if (null === $this->worksScheduledForDeletion) {
-                $this->worksScheduledForDeletion = clone $this->collWorks;
-                $this->worksScheduledForDeletion->clear();
+        if ($this->getPublications()->contains($publication)) {
+            $this->collPublications->remove($this->collPublications->search($publication));
+            if (null === $this->publicationsScheduledForDeletion) {
+                $this->publicationsScheduledForDeletion = clone $this->collPublications;
+                $this->publicationsScheduledForDeletion->clear();
             }
-            $this->worksScheduledForDeletion[]= $work;
+            $this->publicationsScheduledForDeletion[]= $publication;
         }
 
         return $this;
@@ -1737,7 +1321,6 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
     {
         $this->id = null;
         $this->name = null;
-        $this->childof = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
@@ -1760,41 +1343,28 @@ abstract class BaseGenre extends BaseObject implements Persistent, \DTA\Metadata
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
-            if ($this->collGenresRelatedById) {
-                foreach ($this->collGenresRelatedById as $o) {
+            if ($this->collGenrePublications) {
+                foreach ($this->collGenrePublications as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collGenreWorks) {
-                foreach ($this->collGenreWorks as $o) {
+            if ($this->collPublications) {
+                foreach ($this->collPublications as $o) {
                     $o->clearAllReferences($deep);
                 }
-            }
-            if ($this->collWorks) {
-                foreach ($this->collWorks as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
-            if ($this->aGenreRelatedByChildof instanceof Persistent) {
-              $this->aGenreRelatedByChildof->clearAllReferences($deep);
             }
 
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
-        if ($this->collGenresRelatedById instanceof PropelCollection) {
-            $this->collGenresRelatedById->clearIterator();
+        if ($this->collGenrePublications instanceof PropelCollection) {
+            $this->collGenrePublications->clearIterator();
         }
-        $this->collGenresRelatedById = null;
-        if ($this->collGenreWorks instanceof PropelCollection) {
-            $this->collGenreWorks->clearIterator();
+        $this->collGenrePublications = null;
+        if ($this->collPublications instanceof PropelCollection) {
+            $this->collPublications->clearIterator();
         }
-        $this->collGenreWorks = null;
-        if ($this->collWorks instanceof PropelCollection) {
-            $this->collWorks->clearIterator();
-        }
-        $this->collWorks = null;
-        $this->aGenreRelatedByChildof = null;
+        $this->collPublications = null;
     }
 
     /**

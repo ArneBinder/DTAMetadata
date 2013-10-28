@@ -1144,10 +1144,10 @@ abstract class BasePlace extends BaseObject implements Persistent, \DTA\Metadata
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Publication[] List of Publication objects
      */
-    public function getPublicationsJoinWork($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getPublicationsJoinTitle($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = PublicationQuery::create(null, $criteria);
-        $query->joinWith('Work', $join_behavior);
+        $query->joinWith('Title', $join_behavior);
 
         return $this->getPublications($query, $con);
     }
@@ -1219,35 +1219,10 @@ abstract class BasePlace extends BaseObject implements Persistent, \DTA\Metadata
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|Publication[] List of Publication objects
      */
-    public function getPublicationsJoinDatespecificationRelatedByFirstpublicationdateId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getPublicationsJoinDatespecificationRelatedByCreationdateId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = PublicationQuery::create(null, $criteria);
-        $query->joinWith('DatespecificationRelatedByFirstpublicationdateId', $join_behavior);
-
-        return $this->getPublications($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Place is new, it will return
-     * an empty collection; or if this Place has previously
-     * been saved, it will retrieve related Publications from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Place.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Publication[] List of Publication objects
-     */
-    public function getPublicationsJoinFont($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = PublicationQuery::create(null, $criteria);
-        $query->joinWith('Font', $join_behavior);
+        $query->joinWith('DatespecificationRelatedByCreationdateId', $join_behavior);
 
         return $this->getPublications($query, $con);
     }

@@ -20,13 +20,13 @@ use DTA\MetadataBundle\Model\Master\PersonPublicationPeer;
 use DTA\MetadataBundle\Model\Master\PersonPublicationQuery;
 
 /**
- * @method PersonPublicationQuery orderByPersonroleId($order = Criteria::ASC) Order by the personrole_id column
  * @method PersonPublicationQuery orderByPersonId($order = Criteria::ASC) Order by the person_id column
+ * @method PersonPublicationQuery orderByPersonroleId($order = Criteria::ASC) Order by the personrole_id column
  * @method PersonPublicationQuery orderByPublicationId($order = Criteria::ASC) Order by the publication_id column
  * @method PersonPublicationQuery orderById($order = Criteria::ASC) Order by the id column
  *
- * @method PersonPublicationQuery groupByPersonroleId() Group by the personrole_id column
  * @method PersonPublicationQuery groupByPersonId() Group by the person_id column
+ * @method PersonPublicationQuery groupByPersonroleId() Group by the personrole_id column
  * @method PersonPublicationQuery groupByPublicationId() Group by the publication_id column
  * @method PersonPublicationQuery groupById() Group by the id column
  *
@@ -34,13 +34,13 @@ use DTA\MetadataBundle\Model\Master\PersonPublicationQuery;
  * @method PersonPublicationQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method PersonPublicationQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method PersonPublicationQuery leftJoinPersonrole($relationAlias = null) Adds a LEFT JOIN clause to the query using the Personrole relation
- * @method PersonPublicationQuery rightJoinPersonrole($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Personrole relation
- * @method PersonPublicationQuery innerJoinPersonrole($relationAlias = null) Adds a INNER JOIN clause to the query using the Personrole relation
- *
  * @method PersonPublicationQuery leftJoinPerson($relationAlias = null) Adds a LEFT JOIN clause to the query using the Person relation
  * @method PersonPublicationQuery rightJoinPerson($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Person relation
  * @method PersonPublicationQuery innerJoinPerson($relationAlias = null) Adds a INNER JOIN clause to the query using the Person relation
+ *
+ * @method PersonPublicationQuery leftJoinPersonrole($relationAlias = null) Adds a LEFT JOIN clause to the query using the Personrole relation
+ * @method PersonPublicationQuery rightJoinPersonrole($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Personrole relation
+ * @method PersonPublicationQuery innerJoinPersonrole($relationAlias = null) Adds a INNER JOIN clause to the query using the Personrole relation
  *
  * @method PersonPublicationQuery leftJoinPublication($relationAlias = null) Adds a LEFT JOIN clause to the query using the Publication relation
  * @method PersonPublicationQuery rightJoinPublication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Publication relation
@@ -49,12 +49,12 @@ use DTA\MetadataBundle\Model\Master\PersonPublicationQuery;
  * @method PersonPublication findOne(PropelPDO $con = null) Return the first PersonPublication matching the query
  * @method PersonPublication findOneOrCreate(PropelPDO $con = null) Return the first PersonPublication matching the query, or a new PersonPublication object populated from the query conditions when no match is found
  *
- * @method PersonPublication findOneByPersonroleId(int $personrole_id) Return the first PersonPublication filtered by the personrole_id column
  * @method PersonPublication findOneByPersonId(int $person_id) Return the first PersonPublication filtered by the person_id column
+ * @method PersonPublication findOneByPersonroleId(int $personrole_id) Return the first PersonPublication filtered by the personrole_id column
  * @method PersonPublication findOneByPublicationId(int $publication_id) Return the first PersonPublication filtered by the publication_id column
  *
- * @method array findByPersonroleId(int $personrole_id) Return PersonPublication objects filtered by the personrole_id column
  * @method array findByPersonId(int $person_id) Return PersonPublication objects filtered by the person_id column
+ * @method array findByPersonroleId(int $personrole_id) Return PersonPublication objects filtered by the personrole_id column
  * @method array findByPublicationId(int $publication_id) Return PersonPublication objects filtered by the publication_id column
  * @method array findById(int $id) Return PersonPublication objects filtered by the id column
  */
@@ -67,7 +67,7 @@ abstract class BasePersonPublicationQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'DTAMetadata', $modelName = 'DTA\\MetadataBundle\\Model\\Master\\PersonPublication', $modelAlias = null)
+    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Master\\PersonPublication', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -158,7 +158,7 @@ abstract class BasePersonPublicationQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "personrole_id", "person_id", "publication_id", "id" FROM "person_publication" WHERE "id" = :p0';
+        $sql = 'SELECT "person_id", "personrole_id", "publication_id", "id" FROM "person_publication" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -248,50 +248,6 @@ abstract class BasePersonPublicationQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the personrole_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByPersonroleId(1234); // WHERE personrole_id = 1234
-     * $query->filterByPersonroleId(array(12, 34)); // WHERE personrole_id IN (12, 34)
-     * $query->filterByPersonroleId(array('min' => 12)); // WHERE personrole_id >= 12
-     * $query->filterByPersonroleId(array('max' => 12)); // WHERE personrole_id <= 12
-     * </code>
-     *
-     * @see       filterByPersonrole()
-     *
-     * @param     mixed $personroleId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return PersonPublicationQuery The current query, for fluid interface
-     */
-    public function filterByPersonroleId($personroleId = null, $comparison = null)
-    {
-        if (is_array($personroleId)) {
-            $useMinMax = false;
-            if (isset($personroleId['min'])) {
-                $this->addUsingAlias(PersonPublicationPeer::PERSONROLE_ID, $personroleId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($personroleId['max'])) {
-                $this->addUsingAlias(PersonPublicationPeer::PERSONROLE_ID, $personroleId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(PersonPublicationPeer::PERSONROLE_ID, $personroleId, $comparison);
-    }
-
-    /**
      * Filter the query on the person_id column
      *
      * Example usage:
@@ -333,6 +289,50 @@ abstract class BasePersonPublicationQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(PersonPublicationPeer::PERSON_ID, $personId, $comparison);
+    }
+
+    /**
+     * Filter the query on the personrole_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPersonroleId(1234); // WHERE personrole_id = 1234
+     * $query->filterByPersonroleId(array(12, 34)); // WHERE personrole_id IN (12, 34)
+     * $query->filterByPersonroleId(array('min' => 12)); // WHERE personrole_id >= 12
+     * $query->filterByPersonroleId(array('max' => 12)); // WHERE personrole_id <= 12
+     * </code>
+     *
+     * @see       filterByPersonrole()
+     *
+     * @param     mixed $personroleId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return PersonPublicationQuery The current query, for fluid interface
+     */
+    public function filterByPersonroleId($personroleId = null, $comparison = null)
+    {
+        if (is_array($personroleId)) {
+            $useMinMax = false;
+            if (isset($personroleId['min'])) {
+                $this->addUsingAlias(PersonPublicationPeer::PERSONROLE_ID, $personroleId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($personroleId['max'])) {
+                $this->addUsingAlias(PersonPublicationPeer::PERSONROLE_ID, $personroleId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(PersonPublicationPeer::PERSONROLE_ID, $personroleId, $comparison);
     }
 
     /**
@@ -422,82 +422,6 @@ abstract class BasePersonPublicationQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Personrole object
-     *
-     * @param   Personrole|PropelObjectCollection $personrole The related object(s) to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 PersonPublicationQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByPersonrole($personrole, $comparison = null)
-    {
-        if ($personrole instanceof Personrole) {
-            return $this
-                ->addUsingAlias(PersonPublicationPeer::PERSONROLE_ID, $personrole->getId(), $comparison);
-        } elseif ($personrole instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(PersonPublicationPeer::PERSONROLE_ID, $personrole->toKeyValue('PrimaryKey', 'Id'), $comparison);
-        } else {
-            throw new PropelException('filterByPersonrole() only accepts arguments of type Personrole or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Personrole relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return PersonPublicationQuery The current query, for fluid interface
-     */
-    public function joinPersonrole($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Personrole');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Personrole');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Personrole relation Personrole object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\Classification\PersonroleQuery A secondary query class using the current class as primary query
-     */
-    public function usePersonroleQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinPersonrole($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Personrole', '\DTA\MetadataBundle\Model\Classification\PersonroleQuery');
-    }
-
-    /**
      * Filter the query by a related Person object
      *
      * @param   Person|PropelObjectCollection $person The related object(s) to use as filter
@@ -571,6 +495,82 @@ abstract class BasePersonPublicationQuery extends ModelCriteria
         return $this
             ->joinPerson($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Person', '\DTA\MetadataBundle\Model\Data\PersonQuery');
+    }
+
+    /**
+     * Filter the query by a related Personrole object
+     *
+     * @param   Personrole|PropelObjectCollection $personrole The related object(s) to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 PersonPublicationQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByPersonrole($personrole, $comparison = null)
+    {
+        if ($personrole instanceof Personrole) {
+            return $this
+                ->addUsingAlias(PersonPublicationPeer::PERSONROLE_ID, $personrole->getId(), $comparison);
+        } elseif ($personrole instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(PersonPublicationPeer::PERSONROLE_ID, $personrole->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByPersonrole() only accepts arguments of type Personrole or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Personrole relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return PersonPublicationQuery The current query, for fluid interface
+     */
+    public function joinPersonrole($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Personrole');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Personrole');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Personrole relation Personrole object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\Classification\PersonroleQuery A secondary query class using the current class as primary query
+     */
+    public function usePersonroleQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinPersonrole($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Personrole', '\DTA\MetadataBundle\Model\Classification\PersonroleQuery');
     }
 
     /**

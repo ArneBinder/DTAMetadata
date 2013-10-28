@@ -56,8 +56,7 @@ class DatespecificationTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('PublicationRelatedByPublicationdateId', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::ONE_TO_MANY, array('id' => 'publicationdate_id', ), null, null, 'PublicationsRelatedByPublicationdateId');
-        $this->addRelation('PublicationRelatedByFirstpublicationdateId', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::ONE_TO_MANY, array('id' => 'firstpublicationdate_id', ), null, null, 'PublicationsRelatedByFirstpublicationdateId');
-        $this->addRelation('Work', 'DTA\\MetadataBundle\\Model\\Data\\Work', RelationMap::ONE_TO_MANY, array('id' => 'datespecification_id', ), null, null, 'Works');
+        $this->addRelation('PublicationRelatedByCreationdateId', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::ONE_TO_MANY, array('id' => 'creationdate_id', ), null, null, 'PublicationsRelatedByCreationdateId');
     } // buildRelations()
 
     /**

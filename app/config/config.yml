@@ -87,16 +87,16 @@ propel:
 
     # propel database connections
     dbal:
-        default_connection: DTAMetadata
+        default_connection: dtametadata
         connections:
-#            DTAMetadata:
+#            dtametadata:
 #              driver:     "mysql"
 #              user:       "root"
 #              password:   "root"
 #              dsn:        "mysql:host=%database_host%;dbname=%database_name%;charset=%database_charset%"
 #              options:    {}
 #              attributes: {}
-            DTAMetadata:
+            dtametadata:
               # the database parameters are stored in parameters.yml
               driver:     %database_driver%
               user:       %database_user%

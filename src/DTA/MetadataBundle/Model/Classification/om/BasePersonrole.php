@@ -18,8 +18,6 @@ use DTA\MetadataBundle\Model\Classification\PersonrolePeer;
 use DTA\MetadataBundle\Model\Classification\PersonroleQuery;
 use DTA\MetadataBundle\Model\Master\PersonPublication;
 use DTA\MetadataBundle\Model\Master\PersonPublicationQuery;
-use DTA\MetadataBundle\Model\Master\PersonWork;
-use DTA\MetadataBundle\Model\Master\PersonWorkQuery;
 
 abstract class BasePersonrole extends BaseObject implements Persistent, \DTA\MetadataBundle\Model\table_row_view\TableRowViewInterface
 {
@@ -55,30 +53,10 @@ abstract class BasePersonrole extends BaseObject implements Persistent, \DTA\Met
     protected $name;
 
     /**
-     * The value for the applicable_to_publication field.
-     * Note: this column has a database default value of: false
-     * @var        boolean
-     */
-    protected $applicable_to_publication;
-
-    /**
-     * The value for the applicable_to_work field.
-     * Note: this column has a database default value of: false
-     * @var        boolean
-     */
-    protected $applicable_to_work;
-
-    /**
      * @var        PropelObjectCollection|PersonPublication[] Collection to store aggregation of PersonPublication objects.
      */
     protected $collPersonPublications;
     protected $collPersonPublicationsPartial;
-
-    /**
-     * @var        PropelObjectCollection|PersonWork[] Collection to store aggregation of PersonWork objects.
-     */
-    protected $collPersonWorks;
-    protected $collPersonWorksPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -101,40 +79,12 @@ abstract class BasePersonrole extends BaseObject implements Persistent, \DTA\Met
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Id', 'Name', 'ApplicableToPublication', 'ApplicableToWork', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'Name'=>'Name', 'ApplicableToPublication'=>'ApplicableToPublication', 'ApplicableToWork'=>'ApplicableToWork', );
+    public static $tableRowViewCaptions = array('Id', 'Name', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'Name'=>'Name', );
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
     protected $personPublicationsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $personWorksScheduledForDeletion = null;
-
-    /**
-     * Applies default values to this object.
-     * This method should be called from the object's constructor (or
-     * equivalent initialization method).
-     * @see        __construct()
-     */
-    public function applyDefaultValues()
-    {
-        $this->applicable_to_publication = false;
-        $this->applicable_to_work = false;
-    }
-
-    /**
-     * Initializes internal state of BasePersonrole object.
-     * @see        applyDefaults()
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->applyDefaultValues();
-    }
 
     /**
      * Get the [id] column value.
@@ -154,26 +104,6 @@ abstract class BasePersonrole extends BaseObject implements Persistent, \DTA\Met
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * Get the [applicable_to_publication] column value.
-     *
-     * @return boolean
-     */
-    public function getApplicableToPublication()
-    {
-        return $this->applicable_to_publication;
-    }
-
-    /**
-     * Get the [applicable_to_work] column value.
-     *
-     * @return boolean
-     */
-    public function getApplicableToWork()
-    {
-        return $this->applicable_to_work;
     }
 
     /**
@@ -219,64 +149,6 @@ abstract class BasePersonrole extends BaseObject implements Persistent, \DTA\Met
     } // setName()
 
     /**
-     * Sets the value of the [applicable_to_publication] column.
-     * Non-boolean arguments are converted using the following rules:
-     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
-     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
-     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
-     *
-     * @param boolean|integer|string $v The new value
-     * @return Personrole The current object (for fluent API support)
-     */
-    public function setApplicableToPublication($v)
-    {
-        if ($v !== null) {
-            if (is_string($v)) {
-                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
-            } else {
-                $v = (boolean) $v;
-            }
-        }
-
-        if ($this->applicable_to_publication !== $v) {
-            $this->applicable_to_publication = $v;
-            $this->modifiedColumns[] = PersonrolePeer::APPLICABLE_TO_PUBLICATION;
-        }
-
-
-        return $this;
-    } // setApplicableToPublication()
-
-    /**
-     * Sets the value of the [applicable_to_work] column.
-     * Non-boolean arguments are converted using the following rules:
-     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
-     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
-     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
-     *
-     * @param boolean|integer|string $v The new value
-     * @return Personrole The current object (for fluent API support)
-     */
-    public function setApplicableToWork($v)
-    {
-        if ($v !== null) {
-            if (is_string($v)) {
-                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
-            } else {
-                $v = (boolean) $v;
-            }
-        }
-
-        if ($this->applicable_to_work !== $v) {
-            $this->applicable_to_work = $v;
-            $this->modifiedColumns[] = PersonrolePeer::APPLICABLE_TO_WORK;
-        }
-
-
-        return $this;
-    } // setApplicableToWork()
-
-    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -286,14 +158,6 @@ abstract class BasePersonrole extends BaseObject implements Persistent, \DTA\Met
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->applicable_to_publication !== false) {
-                return false;
-            }
-
-            if ($this->applicable_to_work !== false) {
-                return false;
-            }
-
         // otherwise, everything was equal, so return true
         return true;
     } // hasOnlyDefaultValues()
@@ -318,8 +182,6 @@ abstract class BasePersonrole extends BaseObject implements Persistent, \DTA\Met
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->name = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
-            $this->applicable_to_publication = ($row[$startcol + 2] !== null) ? (boolean) $row[$startcol + 2] : null;
-            $this->applicable_to_work = ($row[$startcol + 3] !== null) ? (boolean) $row[$startcol + 3] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -328,7 +190,7 @@ abstract class BasePersonrole extends BaseObject implements Persistent, \DTA\Met
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 4; // 4 = PersonrolePeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 2; // 2 = PersonrolePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Personrole object", $e);
@@ -391,8 +253,6 @@ abstract class BasePersonrole extends BaseObject implements Persistent, \DTA\Met
         if ($deep) {  // also de-associate any related objects?
 
             $this->collPersonPublications = null;
-
-            $this->collPersonWorks = null;
 
         } // if (deep)
     }
@@ -535,23 +395,6 @@ abstract class BasePersonrole extends BaseObject implements Persistent, \DTA\Met
                 }
             }
 
-            if ($this->personWorksScheduledForDeletion !== null) {
-                if (!$this->personWorksScheduledForDeletion->isEmpty()) {
-                    PersonWorkQuery::create()
-                        ->filterByPrimaryKeys($this->personWorksScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->personWorksScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collPersonWorks !== null) {
-                foreach ($this->collPersonWorks as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             $this->alreadyInSave = false;
 
         }
@@ -594,12 +437,6 @@ abstract class BasePersonrole extends BaseObject implements Persistent, \DTA\Met
         if ($this->isColumnModified(PersonrolePeer::NAME)) {
             $modifiedColumns[':p' . $index++]  = '"name"';
         }
-        if ($this->isColumnModified(PersonrolePeer::APPLICABLE_TO_PUBLICATION)) {
-            $modifiedColumns[':p' . $index++]  = '"applicable_to_publication"';
-        }
-        if ($this->isColumnModified(PersonrolePeer::APPLICABLE_TO_WORK)) {
-            $modifiedColumns[':p' . $index++]  = '"applicable_to_work"';
-        }
 
         $sql = sprintf(
             'INSERT INTO "personrole" (%s) VALUES (%s)',
@@ -616,12 +453,6 @@ abstract class BasePersonrole extends BaseObject implements Persistent, \DTA\Met
                         break;
                     case '"name"':
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
-                        break;
-                    case '"applicable_to_publication"':
-                        $stmt->bindValue($identifier, $this->applicable_to_publication, PDO::PARAM_BOOL);
-                        break;
-                    case '"applicable_to_work"':
-                        $stmt->bindValue($identifier, $this->applicable_to_work, PDO::PARAM_BOOL);
                         break;
                 }
             }
@@ -723,14 +554,6 @@ abstract class BasePersonrole extends BaseObject implements Persistent, \DTA\Met
                     }
                 }
 
-                if ($this->collPersonWorks !== null) {
-                    foreach ($this->collPersonWorks as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
 
             $this->alreadyInValidation = false;
         }
@@ -772,12 +595,6 @@ abstract class BasePersonrole extends BaseObject implements Persistent, \DTA\Met
             case 1:
                 return $this->getName();
                 break;
-            case 2:
-                return $this->getApplicableToPublication();
-                break;
-            case 3:
-                return $this->getApplicableToWork();
-                break;
             default:
                 return null;
                 break;
@@ -809,15 +626,10 @@ abstract class BasePersonrole extends BaseObject implements Persistent, \DTA\Met
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getName(),
-            $keys[2] => $this->getApplicableToPublication(),
-            $keys[3] => $this->getApplicableToWork(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->collPersonPublications) {
                 $result['PersonPublications'] = $this->collPersonPublications->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
-            if (null !== $this->collPersonWorks) {
-                $result['PersonWorks'] = $this->collPersonWorks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -859,12 +671,6 @@ abstract class BasePersonrole extends BaseObject implements Persistent, \DTA\Met
             case 1:
                 $this->setName($value);
                 break;
-            case 2:
-                $this->setApplicableToPublication($value);
-                break;
-            case 3:
-                $this->setApplicableToWork($value);
-                break;
         } // switch()
     }
 
@@ -891,8 +697,6 @@ abstract class BasePersonrole extends BaseObject implements Persistent, \DTA\Met
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setApplicableToPublication($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setApplicableToWork($arr[$keys[3]]);
     }
 
     /**
@@ -906,8 +710,6 @@ abstract class BasePersonrole extends BaseObject implements Persistent, \DTA\Met
 
         if ($this->isColumnModified(PersonrolePeer::ID)) $criteria->add(PersonrolePeer::ID, $this->id);
         if ($this->isColumnModified(PersonrolePeer::NAME)) $criteria->add(PersonrolePeer::NAME, $this->name);
-        if ($this->isColumnModified(PersonrolePeer::APPLICABLE_TO_PUBLICATION)) $criteria->add(PersonrolePeer::APPLICABLE_TO_PUBLICATION, $this->applicable_to_publication);
-        if ($this->isColumnModified(PersonrolePeer::APPLICABLE_TO_WORK)) $criteria->add(PersonrolePeer::APPLICABLE_TO_WORK, $this->applicable_to_work);
 
         return $criteria;
     }
@@ -972,8 +774,6 @@ abstract class BasePersonrole extends BaseObject implements Persistent, \DTA\Met
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setName($this->getName());
-        $copyObj->setApplicableToPublication($this->getApplicableToPublication());
-        $copyObj->setApplicableToWork($this->getApplicableToWork());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -985,12 +785,6 @@ abstract class BasePersonrole extends BaseObject implements Persistent, \DTA\Met
             foreach ($this->getPersonPublications() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addPersonPublication($relObj->copy($deepCopy));
-                }
-            }
-
-            foreach ($this->getPersonWorks() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addPersonWork($relObj->copy($deepCopy));
                 }
             }
 
@@ -1057,9 +851,6 @@ abstract class BasePersonrole extends BaseObject implements Persistent, \DTA\Met
     {
         if ('PersonPublication' == $relationName) {
             $this->initPersonPublications();
-        }
-        if ('PersonWork' == $relationName) {
-            $this->initPersonWorks();
         }
     }
 
@@ -1332,287 +1123,16 @@ abstract class BasePersonrole extends BaseObject implements Persistent, \DTA\Met
     }
 
     /**
-     * Clears out the collPersonWorks collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return Personrole The current object (for fluent API support)
-     * @see        addPersonWorks()
-     */
-    public function clearPersonWorks()
-    {
-        $this->collPersonWorks = null; // important to set this to null since that means it is uninitialized
-        $this->collPersonWorksPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * reset is the collPersonWorks collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialPersonWorks($v = true)
-    {
-        $this->collPersonWorksPartial = $v;
-    }
-
-    /**
-     * Initializes the collPersonWorks collection.
-     *
-     * By default this just sets the collPersonWorks collection to an empty array (like clearcollPersonWorks());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initPersonWorks($overrideExisting = true)
-    {
-        if (null !== $this->collPersonWorks && !$overrideExisting) {
-            return;
-        }
-        $this->collPersonWorks = new PropelObjectCollection();
-        $this->collPersonWorks->setModel('PersonWork');
-    }
-
-    /**
-     * Gets an array of PersonWork objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Personrole is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|PersonWork[] List of PersonWork objects
-     * @throws PropelException
-     */
-    public function getPersonWorks($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collPersonWorksPartial && !$this->isNew();
-        if (null === $this->collPersonWorks || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collPersonWorks) {
-                // return empty collection
-                $this->initPersonWorks();
-            } else {
-                $collPersonWorks = PersonWorkQuery::create(null, $criteria)
-                    ->filterByPersonrole($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collPersonWorksPartial && count($collPersonWorks)) {
-                      $this->initPersonWorks(false);
-
-                      foreach($collPersonWorks as $obj) {
-                        if (false == $this->collPersonWorks->contains($obj)) {
-                          $this->collPersonWorks->append($obj);
-                        }
-                      }
-
-                      $this->collPersonWorksPartial = true;
-                    }
-
-                    $collPersonWorks->getInternalIterator()->rewind();
-                    return $collPersonWorks;
-                }
-
-                if($partial && $this->collPersonWorks) {
-                    foreach($this->collPersonWorks as $obj) {
-                        if($obj->isNew()) {
-                            $collPersonWorks[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collPersonWorks = $collPersonWorks;
-                $this->collPersonWorksPartial = false;
-            }
-        }
-
-        return $this->collPersonWorks;
-    }
-
-    /**
-     * Sets a collection of PersonWork objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $personWorks A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     * @return Personrole The current object (for fluent API support)
-     */
-    public function setPersonWorks(PropelCollection $personWorks, PropelPDO $con = null)
-    {
-        $personWorksToDelete = $this->getPersonWorks(new Criteria(), $con)->diff($personWorks);
-
-        $this->personWorksScheduledForDeletion = unserialize(serialize($personWorksToDelete));
-
-        foreach ($personWorksToDelete as $personWorkRemoved) {
-            $personWorkRemoved->setPersonrole(null);
-        }
-
-        $this->collPersonWorks = null;
-        foreach ($personWorks as $personWork) {
-            $this->addPersonWork($personWork);
-        }
-
-        $this->collPersonWorks = $personWorks;
-        $this->collPersonWorksPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related PersonWork objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related PersonWork objects.
-     * @throws PropelException
-     */
-    public function countPersonWorks(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collPersonWorksPartial && !$this->isNew();
-        if (null === $this->collPersonWorks || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collPersonWorks) {
-                return 0;
-            }
-
-            if($partial && !$criteria) {
-                return count($this->getPersonWorks());
-            }
-            $query = PersonWorkQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByPersonrole($this)
-                ->count($con);
-        }
-
-        return count($this->collPersonWorks);
-    }
-
-    /**
-     * Method called to associate a PersonWork object to this object
-     * through the PersonWork foreign key attribute.
-     *
-     * @param    PersonWork $l PersonWork
-     * @return Personrole The current object (for fluent API support)
-     */
-    public function addPersonWork(PersonWork $l)
-    {
-        if ($this->collPersonWorks === null) {
-            $this->initPersonWorks();
-            $this->collPersonWorksPartial = true;
-        }
-        if (!in_array($l, $this->collPersonWorks->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddPersonWork($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	PersonWork $personWork The personWork object to add.
-     */
-    protected function doAddPersonWork($personWork)
-    {
-        $this->collPersonWorks[]= $personWork;
-        $personWork->setPersonrole($this);
-    }
-
-    /**
-     * @param	PersonWork $personWork The personWork object to remove.
-     * @return Personrole The current object (for fluent API support)
-     */
-    public function removePersonWork($personWork)
-    {
-        if ($this->getPersonWorks()->contains($personWork)) {
-            $this->collPersonWorks->remove($this->collPersonWorks->search($personWork));
-            if (null === $this->personWorksScheduledForDeletion) {
-                $this->personWorksScheduledForDeletion = clone $this->collPersonWorks;
-                $this->personWorksScheduledForDeletion->clear();
-            }
-            $this->personWorksScheduledForDeletion[]= clone $personWork;
-            $personWork->setPersonrole(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Personrole is new, it will return
-     * an empty collection; or if this Personrole has previously
-     * been saved, it will retrieve related PersonWorks from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Personrole.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|PersonWork[] List of PersonWork objects
-     */
-    public function getPersonWorksJoinPerson($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = PersonWorkQuery::create(null, $criteria);
-        $query->joinWith('Person', $join_behavior);
-
-        return $this->getPersonWorks($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Personrole is new, it will return
-     * an empty collection; or if this Personrole has previously
-     * been saved, it will retrieve related PersonWorks from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Personrole.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|PersonWork[] List of PersonWork objects
-     */
-    public function getPersonWorksJoinWork($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = PersonWorkQuery::create(null, $criteria);
-        $query->joinWith('Work', $join_behavior);
-
-        return $this->getPersonWorks($query, $con);
-    }
-
-    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
     {
         $this->id = null;
         $this->name = null;
-        $this->applicable_to_publication = null;
-        $this->applicable_to_work = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
-        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -1636,11 +1156,6 @@ abstract class BasePersonrole extends BaseObject implements Persistent, \DTA\Met
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collPersonWorks) {
-                foreach ($this->collPersonWorks as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
 
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
@@ -1649,10 +1164,6 @@ abstract class BasePersonrole extends BaseObject implements Persistent, \DTA\Met
             $this->collPersonPublications->clearIterator();
         }
         $this->collPersonPublications = null;
-        if ($this->collPersonWorks instanceof PropelCollection) {
-            $this->collPersonWorks->clearIterator();
-        }
-        $this->collPersonWorks = null;
     }
 
     /**
