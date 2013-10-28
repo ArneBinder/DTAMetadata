@@ -88,6 +88,7 @@ class DynamicCollectionType extends \Symfony\Component\Form\Extension\Core\Type\
             'themeBlockName' => null,   // see build form for parameter explanation
             'sortable' => true,
             'inlineLabel' => true,
+            'required' => false,
         ));
     }
 

@@ -90,6 +90,7 @@ class SelectOrAddType extends \Symfony\Bridge\Propel1\Form\Type\ModelType {
             'addButton'  => true,
             'empty_value' => 'Keine Auswahl',
             'empty_data' => 0,
+            'required'   => false,
         ));
     }
     
