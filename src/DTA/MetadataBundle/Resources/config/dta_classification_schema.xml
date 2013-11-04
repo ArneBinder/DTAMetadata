@@ -27,7 +27,7 @@
         <column name="name" type="LONGVARCHAR" required="true"/>
     </table>
     
-    <!--Beziehungstypen zwischen Personen und Publikationen oder Werken. Zum Beispiel Verleger, Drucker, Übersetzer oder Autor -->
+    <!--Beziehungstypen zwischen Personen und Publikationen. Zum Beispiel Verleger, Drucker, Übersetzer oder Autor -->
     <table name="personrole" idMethod="native">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>

@@ -13,8 +13,8 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
-use DTA\MetadataBundle\Model\Workflow\Imagesource;
-use DTA\MetadataBundle\Model\Workflow\ImagesourceQuery;
+use DTA\MetadataBundle\Model\Workflow\CopyLocation;
+use DTA\MetadataBundle\Model\Workflow\CopyLocationQuery;
 use DTA\MetadataBundle\Model\Workflow\License;
 use DTA\MetadataBundle\Model\Workflow\LicensePeer;
 use DTA\MetadataBundle\Model\Workflow\LicenseQuery;
@@ -75,10 +75,10 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
     protected $applicable_to_text;
 
     /**
-     * @var        PropelObjectCollection|Imagesource[] Collection to store aggregation of Imagesource objects.
+     * @var        PropelObjectCollection|CopyLocation[] Collection to store aggregation of CopyLocation objects.
      */
-    protected $collImagesources;
-    protected $collImagesourcesPartial;
+    protected $collCopyLocations;
+    protected $collCopyLocationsPartial;
 
     /**
      * @var        PropelObjectCollection|Textsource[] Collection to store aggregation of Textsource objects.
@@ -107,12 +107,12 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Id', 'Name', 'Url', 'ApplicableToImage', 'ApplicableToText', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'Name'=>'Name', 'Url'=>'Url', 'ApplicableToImage'=>'ApplicableToImage', 'ApplicableToText'=>'ApplicableToText', );
+    public static $tableRowViewCaptions = array('Name', 'URL', );	public   $tableRowViewAccessors = array('Name'=>'Name', 'URL'=>'Url', );
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $imagesourcesScheduledForDeletion = null;
+    protected $copyLocationsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -428,7 +428,7 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collImagesources = null;
+            $this->collCopyLocations = null;
 
             $this->collTextsources = null;
 
@@ -556,18 +556,18 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
                 $this->resetModified();
             }
 
-            if ($this->imagesourcesScheduledForDeletion !== null) {
-                if (!$this->imagesourcesScheduledForDeletion->isEmpty()) {
-                    foreach ($this->imagesourcesScheduledForDeletion as $imagesource) {
+            if ($this->copyLocationsScheduledForDeletion !== null) {
+                if (!$this->copyLocationsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->copyLocationsScheduledForDeletion as $copyLocation) {
                         // need to save related object because we set the relation to null
-                        $imagesource->save($con);
+                        $copyLocation->save($con);
                     }
-                    $this->imagesourcesScheduledForDeletion = null;
+                    $this->copyLocationsScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collImagesources !== null) {
-                foreach ($this->collImagesources as $referrerFK) {
+            if ($this->collCopyLocations !== null) {
+                foreach ($this->collCopyLocations as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -761,8 +761,8 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
             }
 
 
-                if ($this->collImagesources !== null) {
-                    foreach ($this->collImagesources as $referrerFK) {
+                if ($this->collCopyLocations !== null) {
+                    foreach ($this->collCopyLocations as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -863,8 +863,8 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
             $keys[4] => $this->getApplicableToText(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->collImagesources) {
-                $result['Imagesources'] = $this->collImagesources->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collCopyLocations) {
+                $result['CopyLocations'] = $this->collCopyLocations->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collTextsources) {
                 $result['Textsources'] = $this->collTextsources->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1038,9 +1038,9 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getImagesources() as $relObj) {
+            foreach ($this->getCopyLocations() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addImagesource($relObj->copy($deepCopy));
+                    $copyObj->addCopyLocation($relObj->copy($deepCopy));
                 }
             }
 
@@ -1111,8 +1111,8 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
      */
     public function initRelation($relationName)
     {
-        if ('Imagesource' == $relationName) {
-            $this->initImagesources();
+        if ('CopyLocation' == $relationName) {
+            $this->initCopyLocations();
         }
         if ('Textsource' == $relationName) {
             $this->initTextsources();
@@ -1120,36 +1120,36 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
     }
 
     /**
-     * Clears out the collImagesources collection
+     * Clears out the collCopyLocations collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return License The current object (for fluent API support)
-     * @see        addImagesources()
+     * @see        addCopyLocations()
      */
-    public function clearImagesources()
+    public function clearCopyLocations()
     {
-        $this->collImagesources = null; // important to set this to null since that means it is uninitialized
-        $this->collImagesourcesPartial = null;
+        $this->collCopyLocations = null; // important to set this to null since that means it is uninitialized
+        $this->collCopyLocationsPartial = null;
 
         return $this;
     }
 
     /**
-     * reset is the collImagesources collection loaded partially
+     * reset is the collCopyLocations collection loaded partially
      *
      * @return void
      */
-    public function resetPartialImagesources($v = true)
+    public function resetPartialCopyLocations($v = true)
     {
-        $this->collImagesourcesPartial = $v;
+        $this->collCopyLocationsPartial = $v;
     }
 
     /**
-     * Initializes the collImagesources collection.
+     * Initializes the collCopyLocations collection.
      *
-     * By default this just sets the collImagesources collection to an empty array (like clearcollImagesources());
+     * By default this just sets the collCopyLocations collection to an empty array (like clearcollCopyLocations());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1158,17 +1158,17 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
      *
      * @return void
      */
-    public function initImagesources($overrideExisting = true)
+    public function initCopyLocations($overrideExisting = true)
     {
-        if (null !== $this->collImagesources && !$overrideExisting) {
+        if (null !== $this->collCopyLocations && !$overrideExisting) {
             return;
         }
-        $this->collImagesources = new PropelObjectCollection();
-        $this->collImagesources->setModel('Imagesource');
+        $this->collCopyLocations = new PropelObjectCollection();
+        $this->collCopyLocations->setModel('CopyLocation');
     }
 
     /**
-     * Gets an array of Imagesource objects which contain a foreign key that references this object.
+     * Gets an array of CopyLocation objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1178,105 +1178,105 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|Imagesource[] List of Imagesource objects
+     * @return PropelObjectCollection|CopyLocation[] List of CopyLocation objects
      * @throws PropelException
      */
-    public function getImagesources($criteria = null, PropelPDO $con = null)
+    public function getCopyLocations($criteria = null, PropelPDO $con = null)
     {
-        $partial = $this->collImagesourcesPartial && !$this->isNew();
-        if (null === $this->collImagesources || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collImagesources) {
+        $partial = $this->collCopyLocationsPartial && !$this->isNew();
+        if (null === $this->collCopyLocations || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCopyLocations) {
                 // return empty collection
-                $this->initImagesources();
+                $this->initCopyLocations();
             } else {
-                $collImagesources = ImagesourceQuery::create(null, $criteria)
+                $collCopyLocations = CopyLocationQuery::create(null, $criteria)
                     ->filterByLicense($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    if (false !== $this->collImagesourcesPartial && count($collImagesources)) {
-                      $this->initImagesources(false);
+                    if (false !== $this->collCopyLocationsPartial && count($collCopyLocations)) {
+                      $this->initCopyLocations(false);
 
-                      foreach($collImagesources as $obj) {
-                        if (false == $this->collImagesources->contains($obj)) {
-                          $this->collImagesources->append($obj);
+                      foreach($collCopyLocations as $obj) {
+                        if (false == $this->collCopyLocations->contains($obj)) {
+                          $this->collCopyLocations->append($obj);
                         }
                       }
 
-                      $this->collImagesourcesPartial = true;
+                      $this->collCopyLocationsPartial = true;
                     }
 
-                    $collImagesources->getInternalIterator()->rewind();
-                    return $collImagesources;
+                    $collCopyLocations->getInternalIterator()->rewind();
+                    return $collCopyLocations;
                 }
 
-                if($partial && $this->collImagesources) {
-                    foreach($this->collImagesources as $obj) {
+                if($partial && $this->collCopyLocations) {
+                    foreach($this->collCopyLocations as $obj) {
                         if($obj->isNew()) {
-                            $collImagesources[] = $obj;
+                            $collCopyLocations[] = $obj;
                         }
                     }
                 }
 
-                $this->collImagesources = $collImagesources;
-                $this->collImagesourcesPartial = false;
+                $this->collCopyLocations = $collCopyLocations;
+                $this->collCopyLocationsPartial = false;
             }
         }
 
-        return $this->collImagesources;
+        return $this->collCopyLocations;
     }
 
     /**
-     * Sets a collection of Imagesource objects related by a one-to-many relationship
+     * Sets a collection of CopyLocation objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $imagesources A Propel collection.
+     * @param PropelCollection $copyLocations A Propel collection.
      * @param PropelPDO $con Optional connection object
      * @return License The current object (for fluent API support)
      */
-    public function setImagesources(PropelCollection $imagesources, PropelPDO $con = null)
+    public function setCopyLocations(PropelCollection $copyLocations, PropelPDO $con = null)
     {
-        $imagesourcesToDelete = $this->getImagesources(new Criteria(), $con)->diff($imagesources);
+        $copyLocationsToDelete = $this->getCopyLocations(new Criteria(), $con)->diff($copyLocations);
 
-        $this->imagesourcesScheduledForDeletion = unserialize(serialize($imagesourcesToDelete));
+        $this->copyLocationsScheduledForDeletion = unserialize(serialize($copyLocationsToDelete));
 
-        foreach ($imagesourcesToDelete as $imagesourceRemoved) {
-            $imagesourceRemoved->setLicense(null);
+        foreach ($copyLocationsToDelete as $copyLocationRemoved) {
+            $copyLocationRemoved->setLicense(null);
         }
 
-        $this->collImagesources = null;
-        foreach ($imagesources as $imagesource) {
-            $this->addImagesource($imagesource);
+        $this->collCopyLocations = null;
+        foreach ($copyLocations as $copyLocation) {
+            $this->addCopyLocation($copyLocation);
         }
 
-        $this->collImagesources = $imagesources;
-        $this->collImagesourcesPartial = false;
+        $this->collCopyLocations = $copyLocations;
+        $this->collCopyLocationsPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related Imagesource objects.
+     * Returns the number of related CopyLocation objects.
      *
      * @param Criteria $criteria
      * @param boolean $distinct
      * @param PropelPDO $con
-     * @return int             Count of related Imagesource objects.
+     * @return int             Count of related CopyLocation objects.
      * @throws PropelException
      */
-    public function countImagesources(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countCopyLocations(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $partial = $this->collImagesourcesPartial && !$this->isNew();
-        if (null === $this->collImagesources || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collImagesources) {
+        $partial = $this->collCopyLocationsPartial && !$this->isNew();
+        if (null === $this->collCopyLocations || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCopyLocations) {
                 return 0;
             }
 
             if($partial && !$criteria) {
-                return count($this->getImagesources());
+                return count($this->getCopyLocations());
             }
-            $query = ImagesourceQuery::create(null, $criteria);
+            $query = CopyLocationQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
@@ -1286,52 +1286,52 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
                 ->count($con);
         }
 
-        return count($this->collImagesources);
+        return count($this->collCopyLocations);
     }
 
     /**
-     * Method called to associate a Imagesource object to this object
-     * through the Imagesource foreign key attribute.
+     * Method called to associate a CopyLocation object to this object
+     * through the CopyLocation foreign key attribute.
      *
-     * @param    Imagesource $l Imagesource
+     * @param    CopyLocation $l CopyLocation
      * @return License The current object (for fluent API support)
      */
-    public function addImagesource(Imagesource $l)
+    public function addCopyLocation(CopyLocation $l)
     {
-        if ($this->collImagesources === null) {
-            $this->initImagesources();
-            $this->collImagesourcesPartial = true;
+        if ($this->collCopyLocations === null) {
+            $this->initCopyLocations();
+            $this->collCopyLocationsPartial = true;
         }
-        if (!in_array($l, $this->collImagesources->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddImagesource($l);
+        if (!in_array($l, $this->collCopyLocations->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddCopyLocation($l);
         }
 
         return $this;
     }
 
     /**
-     * @param	Imagesource $imagesource The imagesource object to add.
+     * @param	CopyLocation $copyLocation The copyLocation object to add.
      */
-    protected function doAddImagesource($imagesource)
+    protected function doAddCopyLocation($copyLocation)
     {
-        $this->collImagesources[]= $imagesource;
-        $imagesource->setLicense($this);
+        $this->collCopyLocations[]= $copyLocation;
+        $copyLocation->setLicense($this);
     }
 
     /**
-     * @param	Imagesource $imagesource The imagesource object to remove.
+     * @param	CopyLocation $copyLocation The copyLocation object to remove.
      * @return License The current object (for fluent API support)
      */
-    public function removeImagesource($imagesource)
+    public function removeCopyLocation($copyLocation)
     {
-        if ($this->getImagesources()->contains($imagesource)) {
-            $this->collImagesources->remove($this->collImagesources->search($imagesource));
-            if (null === $this->imagesourcesScheduledForDeletion) {
-                $this->imagesourcesScheduledForDeletion = clone $this->collImagesources;
-                $this->imagesourcesScheduledForDeletion->clear();
+        if ($this->getCopyLocations()->contains($copyLocation)) {
+            $this->collCopyLocations->remove($this->collCopyLocations->search($copyLocation));
+            if (null === $this->copyLocationsScheduledForDeletion) {
+                $this->copyLocationsScheduledForDeletion = clone $this->collCopyLocations;
+                $this->copyLocationsScheduledForDeletion->clear();
             }
-            $this->imagesourcesScheduledForDeletion[]= $imagesource;
-            $imagesource->setLicense(null);
+            $this->copyLocationsScheduledForDeletion[]= $copyLocation;
+            $copyLocation->setLicense(null);
         }
 
         return $this;
@@ -1343,7 +1343,7 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
      * an identical criteria, it returns the collection.
      * Otherwise if this License is new, it will return
      * an empty collection; or if this License has previously
-     * been saved, it will retrieve related Imagesources from storage.
+     * been saved, it will retrieve related CopyLocations from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1352,14 +1352,14 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Imagesource[] List of Imagesource objects
+     * @return PropelObjectCollection|CopyLocation[] List of CopyLocation objects
      */
-    public function getImagesourcesJoinPublication($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getCopyLocationsJoinPublication($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
-        $query = ImagesourceQuery::create(null, $criteria);
+        $query = CopyLocationQuery::create(null, $criteria);
         $query->joinWith('Publication', $join_behavior);
 
-        return $this->getImagesources($query, $con);
+        return $this->getCopyLocations($query, $con);
     }
 
 
@@ -1368,7 +1368,7 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
      * an identical criteria, it returns the collection.
      * Otherwise if this License is new, it will return
      * an empty collection; or if this License has previously
-     * been saved, it will retrieve related Imagesources from storage.
+     * been saved, it will retrieve related CopyLocations from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1377,14 +1377,14 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Imagesource[] List of Imagesource objects
+     * @return PropelObjectCollection|CopyLocation[] List of CopyLocation objects
      */
-    public function getImagesourcesJoinPartner($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getCopyLocationsJoinPartner($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
-        $query = ImagesourceQuery::create(null, $criteria);
+        $query = CopyLocationQuery::create(null, $criteria);
         $query->joinWith('Partner', $join_behavior);
 
-        return $this->getImagesources($query, $con);
+        return $this->getCopyLocations($query, $con);
     }
 
     /**
@@ -1688,8 +1688,8 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
-            if ($this->collImagesources) {
-                foreach ($this->collImagesources as $o) {
+            if ($this->collCopyLocations) {
+                foreach ($this->collCopyLocations as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -1702,10 +1702,10 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
-        if ($this->collImagesources instanceof PropelCollection) {
-            $this->collImagesources->clearIterator();
+        if ($this->collCopyLocations instanceof PropelCollection) {
+            $this->collCopyLocations->clearIterator();
         }
-        $this->collImagesources = null;
+        $this->collCopyLocations = null;
         if ($this->collTextsources instanceof PropelCollection) {
             $this->collTextsources->clearIterator();
         }

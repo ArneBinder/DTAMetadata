@@ -12,8 +12,6 @@ use \PropelPDO;
 use DTA\MetadataBundle\Model\Data\PublicationPeer;
 use DTA\MetadataBundle\Model\Workflow\Imagesource;
 use DTA\MetadataBundle\Model\Workflow\ImagesourcePeer;
-use DTA\MetadataBundle\Model\Workflow\LicensePeer;
-use DTA\MetadataBundle\Model\Workflow\PartnerPeer;
 use DTA\MetadataBundle\Model\Workflow\map\ImagesourceTableMap;
 
 abstract class BaseImagesourcePeer
@@ -32,13 +30,13 @@ abstract class BaseImagesourcePeer
     const TM_CLASS = 'ImagesourceTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 12;
+    const NUM_COLUMNS = 4;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 12;
+    const NUM_HYDRATE_COLUMNS = 4;
 
     /** the column name for the id field */
     const ID = 'imagesource.id';
@@ -46,35 +44,11 @@ abstract class BaseImagesourcePeer
     /** the column name for the publication_id field */
     const PUBLICATION_ID = 'imagesource.publication_id';
 
-    /** the column name for the partner_id field */
-    const PARTNER_ID = 'imagesource.partner_id';
-
-    /** the column name for the cataloguesignature field */
-    const CATALOGUESIGNATURE = 'imagesource.cataloguesignature';
-
-    /** the column name for the catalogueurl field */
-    const CATALOGUEURL = 'imagesource.catalogueurl';
-
-    /** the column name for the numfaksimiles field */
-    const NUMFAKSIMILES = 'imagesource.numfaksimiles';
-
-    /** the column name for the extentasofcatalogue field */
-    const EXTENTASOFCATALOGUE = 'imagesource.extentasofcatalogue';
-
     /** the column name for the faksimilerefrange field */
     const FAKSIMILEREFRANGE = 'imagesource.faksimilerefrange';
 
     /** the column name for the originalrefrange field */
     const ORIGINALREFRANGE = 'imagesource.originalrefrange';
-
-    /** the column name for the imageurl field */
-    const IMAGEURL = 'imagesource.imageurl';
-
-    /** the column name for the imageurn field */
-    const IMAGEURN = 'imagesource.imageurn';
-
-    /** the column name for the license_id field */
-    const LICENSE_ID = 'imagesource.license_id';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -95,12 +69,12 @@ abstract class BaseImagesourcePeer
      * e.g. ImagesourcePeer::$fieldNames[ImagesourcePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'PartnerId', 'Cataloguesignature', 'Catalogueurl', 'Numfaksimiles', 'Extentasofcatalogue', 'Faksimilerefrange', 'Originalrefrange', 'Imageurl', 'Imageurn', 'LicenseId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'partnerId', 'cataloguesignature', 'catalogueurl', 'numfaksimiles', 'extentasofcatalogue', 'faksimilerefrange', 'originalrefrange', 'imageurl', 'imageurn', 'licenseId', ),
-        BasePeer::TYPE_COLNAME => array (ImagesourcePeer::ID, ImagesourcePeer::PUBLICATION_ID, ImagesourcePeer::PARTNER_ID, ImagesourcePeer::CATALOGUESIGNATURE, ImagesourcePeer::CATALOGUEURL, ImagesourcePeer::NUMFAKSIMILES, ImagesourcePeer::EXTENTASOFCATALOGUE, ImagesourcePeer::FAKSIMILEREFRANGE, ImagesourcePeer::ORIGINALREFRANGE, ImagesourcePeer::IMAGEURL, ImagesourcePeer::IMAGEURN, ImagesourcePeer::LICENSE_ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'PARTNER_ID', 'CATALOGUESIGNATURE', 'CATALOGUEURL', 'NUMFAKSIMILES', 'EXTENTASOFCATALOGUE', 'FAKSIMILEREFRANGE', 'ORIGINALREFRANGE', 'IMAGEURL', 'IMAGEURN', 'LICENSE_ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'partner_id', 'cataloguesignature', 'catalogueurl', 'numfaksimiles', 'extentasofcatalogue', 'faksimilerefrange', 'originalrefrange', 'imageurl', 'imageurn', 'license_id', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'Faksimilerefrange', 'Originalrefrange', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'faksimilerefrange', 'originalrefrange', ),
+        BasePeer::TYPE_COLNAME => array (ImagesourcePeer::ID, ImagesourcePeer::PUBLICATION_ID, ImagesourcePeer::FAKSIMILEREFRANGE, ImagesourcePeer::ORIGINALREFRANGE, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'FAKSIMILEREFRANGE', 'ORIGINALREFRANGE', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'faksimilerefrange', 'originalrefrange', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
     /**
@@ -110,12 +84,12 @@ abstract class BaseImagesourcePeer
      * e.g. ImagesourcePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'PartnerId' => 2, 'Cataloguesignature' => 3, 'Catalogueurl' => 4, 'Numfaksimiles' => 5, 'Extentasofcatalogue' => 6, 'Faksimilerefrange' => 7, 'Originalrefrange' => 8, 'Imageurl' => 9, 'Imageurn' => 10, 'LicenseId' => 11, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'partnerId' => 2, 'cataloguesignature' => 3, 'catalogueurl' => 4, 'numfaksimiles' => 5, 'extentasofcatalogue' => 6, 'faksimilerefrange' => 7, 'originalrefrange' => 8, 'imageurl' => 9, 'imageurn' => 10, 'licenseId' => 11, ),
-        BasePeer::TYPE_COLNAME => array (ImagesourcePeer::ID => 0, ImagesourcePeer::PUBLICATION_ID => 1, ImagesourcePeer::PARTNER_ID => 2, ImagesourcePeer::CATALOGUESIGNATURE => 3, ImagesourcePeer::CATALOGUEURL => 4, ImagesourcePeer::NUMFAKSIMILES => 5, ImagesourcePeer::EXTENTASOFCATALOGUE => 6, ImagesourcePeer::FAKSIMILEREFRANGE => 7, ImagesourcePeer::ORIGINALREFRANGE => 8, ImagesourcePeer::IMAGEURL => 9, ImagesourcePeer::IMAGEURN => 10, ImagesourcePeer::LICENSE_ID => 11, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'PARTNER_ID' => 2, 'CATALOGUESIGNATURE' => 3, 'CATALOGUEURL' => 4, 'NUMFAKSIMILES' => 5, 'EXTENTASOFCATALOGUE' => 6, 'FAKSIMILEREFRANGE' => 7, 'ORIGINALREFRANGE' => 8, 'IMAGEURL' => 9, 'IMAGEURN' => 10, 'LICENSE_ID' => 11, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'partner_id' => 2, 'cataloguesignature' => 3, 'catalogueurl' => 4, 'numfaksimiles' => 5, 'extentasofcatalogue' => 6, 'faksimilerefrange' => 7, 'originalrefrange' => 8, 'imageurl' => 9, 'imageurn' => 10, 'license_id' => 11, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'Faksimilerefrange' => 2, 'Originalrefrange' => 3, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'faksimilerefrange' => 2, 'originalrefrange' => 3, ),
+        BasePeer::TYPE_COLNAME => array (ImagesourcePeer::ID => 0, ImagesourcePeer::PUBLICATION_ID => 1, ImagesourcePeer::FAKSIMILEREFRANGE => 2, ImagesourcePeer::ORIGINALREFRANGE => 3, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'FAKSIMILEREFRANGE' => 2, 'ORIGINALREFRANGE' => 3, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'faksimilerefrange' => 2, 'originalrefrange' => 3, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
     /**
@@ -191,29 +165,13 @@ abstract class BaseImagesourcePeer
         if (null === $alias) {
             $criteria->addSelectColumn(ImagesourcePeer::ID);
             $criteria->addSelectColumn(ImagesourcePeer::PUBLICATION_ID);
-            $criteria->addSelectColumn(ImagesourcePeer::PARTNER_ID);
-            $criteria->addSelectColumn(ImagesourcePeer::CATALOGUESIGNATURE);
-            $criteria->addSelectColumn(ImagesourcePeer::CATALOGUEURL);
-            $criteria->addSelectColumn(ImagesourcePeer::NUMFAKSIMILES);
-            $criteria->addSelectColumn(ImagesourcePeer::EXTENTASOFCATALOGUE);
             $criteria->addSelectColumn(ImagesourcePeer::FAKSIMILEREFRANGE);
             $criteria->addSelectColumn(ImagesourcePeer::ORIGINALREFRANGE);
-            $criteria->addSelectColumn(ImagesourcePeer::IMAGEURL);
-            $criteria->addSelectColumn(ImagesourcePeer::IMAGEURN);
-            $criteria->addSelectColumn(ImagesourcePeer::LICENSE_ID);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.publication_id');
-            $criteria->addSelectColumn($alias . '.partner_id');
-            $criteria->addSelectColumn($alias . '.cataloguesignature');
-            $criteria->addSelectColumn($alias . '.catalogueurl');
-            $criteria->addSelectColumn($alias . '.numfaksimiles');
-            $criteria->addSelectColumn($alias . '.extentasofcatalogue');
             $criteria->addSelectColumn($alias . '.faksimilerefrange');
             $criteria->addSelectColumn($alias . '.originalrefrange');
-            $criteria->addSelectColumn($alias . '.imageurl');
-            $criteria->addSelectColumn($alias . '.imageurn');
-            $criteria->addSelectColumn($alias . '.license_id');
         }
     }
 
@@ -569,108 +527,6 @@ abstract class BaseImagesourcePeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related License table
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return int Number of matching rows.
-     */
-    public static function doCountJoinLicense(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        // we're going to modify criteria, so copy it first
-        $criteria = clone $criteria;
-
-        // We need to set the primary table name, since in the case that there are no WHERE columns
-        // it will be impossible for the BasePeer::createSelectSql() method to determine which
-        // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(ImagesourcePeer::TABLE_NAME);
-
-        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-            $criteria->setDistinct();
-        }
-
-        if (!$criteria->hasSelectClause()) {
-            ImagesourcePeer::addSelectColumns($criteria);
-        }
-
-        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
-
-        // Set the correct dbName
-        $criteria->setDbName(ImagesourcePeer::DATABASE_NAME);
-
-        if ($con === null) {
-            $con = Propel::getConnection(ImagesourcePeer::DATABASE_NAME, Propel::CONNECTION_READ);
-        }
-
-        $criteria->addJoin(ImagesourcePeer::LICENSE_ID, LicensePeer::ID, $join_behavior);
-
-        $stmt = BasePeer::doCount($criteria, $con);
-
-        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $count = (int) $row[0];
-        } else {
-            $count = 0; // no rows returned; we infer that means 0 matches.
-        }
-        $stmt->closeCursor();
-
-        return $count;
-    }
-
-
-    /**
-     * Returns the number of rows matching criteria, joining the related Partner table
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return int Number of matching rows.
-     */
-    public static function doCountJoinPartner(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        // we're going to modify criteria, so copy it first
-        $criteria = clone $criteria;
-
-        // We need to set the primary table name, since in the case that there are no WHERE columns
-        // it will be impossible for the BasePeer::createSelectSql() method to determine which
-        // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(ImagesourcePeer::TABLE_NAME);
-
-        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-            $criteria->setDistinct();
-        }
-
-        if (!$criteria->hasSelectClause()) {
-            ImagesourcePeer::addSelectColumns($criteria);
-        }
-
-        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
-
-        // Set the correct dbName
-        $criteria->setDbName(ImagesourcePeer::DATABASE_NAME);
-
-        if ($con === null) {
-            $con = Propel::getConnection(ImagesourcePeer::DATABASE_NAME, Propel::CONNECTION_READ);
-        }
-
-        $criteria->addJoin(ImagesourcePeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
-
-        $stmt = BasePeer::doCount($criteria, $con);
-
-        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $count = (int) $row[0];
-        } else {
-            $count = 0; // no rows returned; we infer that means 0 matches.
-        }
-        $stmt->closeCursor();
-
-        return $count;
-    }
-
-
-    /**
      * Selects a collection of Imagesource objects pre-filled with their Publication objects.
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
@@ -738,140 +594,6 @@ abstract class BaseImagesourcePeer
 
 
     /**
-     * Selects a collection of Imagesource objects pre-filled with their License objects.
-     * @param      Criteria  $criteria
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of Imagesource objects.
-     * @throws PropelException Any exceptions caught during processing will be
-     *		 rethrown wrapped into a PropelException.
-     */
-    public static function doSelectJoinLicense(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $criteria = clone $criteria;
-
-        // Set the correct dbName if it has not been overridden
-        if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(ImagesourcePeer::DATABASE_NAME);
-        }
-
-        ImagesourcePeer::addSelectColumns($criteria);
-        $startcol = ImagesourcePeer::NUM_HYDRATE_COLUMNS;
-        LicensePeer::addSelectColumns($criteria);
-
-        $criteria->addJoin(ImagesourcePeer::LICENSE_ID, LicensePeer::ID, $join_behavior);
-
-        $stmt = BasePeer::doSelect($criteria, $con);
-        $results = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = ImagesourcePeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = ImagesourcePeer::getInstanceFromPool($key1))) {
-                // We no longer rehydrate the object, since this can cause data loss.
-                // See http://www.propelorm.org/ticket/509
-                // $obj1->hydrate($row, 0, true); // rehydrate
-            } else {
-
-                $cls = ImagesourcePeer::getOMClass();
-
-                $obj1 = new $cls();
-                $obj1->hydrate($row);
-                ImagesourcePeer::addInstanceToPool($obj1, $key1);
-            } // if $obj1 already loaded
-
-            $key2 = LicensePeer::getPrimaryKeyHashFromRow($row, $startcol);
-            if ($key2 !== null) {
-                $obj2 = LicensePeer::getInstanceFromPool($key2);
-                if (!$obj2) {
-
-                    $cls = LicensePeer::getOMClass();
-
-                    $obj2 = new $cls();
-                    $obj2->hydrate($row, $startcol);
-                    LicensePeer::addInstanceToPool($obj2, $key2);
-                } // if obj2 already loaded
-
-                // Add the $obj1 (Imagesource) to $obj2 (License)
-                $obj2->addImagesource($obj1);
-
-            } // if joined row was not null
-
-            $results[] = $obj1;
-        }
-        $stmt->closeCursor();
-
-        return $results;
-    }
-
-
-    /**
-     * Selects a collection of Imagesource objects pre-filled with their Partner objects.
-     * @param      Criteria  $criteria
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of Imagesource objects.
-     * @throws PropelException Any exceptions caught during processing will be
-     *		 rethrown wrapped into a PropelException.
-     */
-    public static function doSelectJoinPartner(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $criteria = clone $criteria;
-
-        // Set the correct dbName if it has not been overridden
-        if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(ImagesourcePeer::DATABASE_NAME);
-        }
-
-        ImagesourcePeer::addSelectColumns($criteria);
-        $startcol = ImagesourcePeer::NUM_HYDRATE_COLUMNS;
-        PartnerPeer::addSelectColumns($criteria);
-
-        $criteria->addJoin(ImagesourcePeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
-
-        $stmt = BasePeer::doSelect($criteria, $con);
-        $results = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = ImagesourcePeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = ImagesourcePeer::getInstanceFromPool($key1))) {
-                // We no longer rehydrate the object, since this can cause data loss.
-                // See http://www.propelorm.org/ticket/509
-                // $obj1->hydrate($row, 0, true); // rehydrate
-            } else {
-
-                $cls = ImagesourcePeer::getOMClass();
-
-                $obj1 = new $cls();
-                $obj1->hydrate($row);
-                ImagesourcePeer::addInstanceToPool($obj1, $key1);
-            } // if $obj1 already loaded
-
-            $key2 = PartnerPeer::getPrimaryKeyHashFromRow($row, $startcol);
-            if ($key2 !== null) {
-                $obj2 = PartnerPeer::getInstanceFromPool($key2);
-                if (!$obj2) {
-
-                    $cls = PartnerPeer::getOMClass();
-
-                    $obj2 = new $cls();
-                    $obj2->hydrate($row, $startcol);
-                    PartnerPeer::addInstanceToPool($obj2, $key2);
-                } // if obj2 already loaded
-
-                // Add the $obj1 (Imagesource) to $obj2 (Partner)
-                $obj2->addImagesource($obj1);
-
-            } // if joined row was not null
-
-            $results[] = $obj1;
-        }
-        $stmt->closeCursor();
-
-        return $results;
-    }
-
-
-    /**
      * Returns the number of rows matching criteria, joining all related tables
      *
      * @param      Criteria $criteria
@@ -908,10 +630,6 @@ abstract class BaseImagesourcePeer
         }
 
         $criteria->addJoin(ImagesourcePeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
-
-        $criteria->addJoin(ImagesourcePeer::LICENSE_ID, LicensePeer::ID, $join_behavior);
-
-        $criteria->addJoin(ImagesourcePeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -950,17 +668,7 @@ abstract class BaseImagesourcePeer
         PublicationPeer::addSelectColumns($criteria);
         $startcol3 = $startcol2 + PublicationPeer::NUM_HYDRATE_COLUMNS;
 
-        LicensePeer::addSelectColumns($criteria);
-        $startcol4 = $startcol3 + LicensePeer::NUM_HYDRATE_COLUMNS;
-
-        PartnerPeer::addSelectColumns($criteria);
-        $startcol5 = $startcol4 + PartnerPeer::NUM_HYDRATE_COLUMNS;
-
         $criteria->addJoin(ImagesourcePeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
-
-        $criteria->addJoin(ImagesourcePeer::LICENSE_ID, LicensePeer::ID, $join_behavior);
-
-        $criteria->addJoin(ImagesourcePeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
@@ -996,495 +704,6 @@ abstract class BaseImagesourcePeer
                 // Add the $obj1 (Imagesource) to the collection in $obj2 (Publication)
                 $obj2->addImagesource($obj1);
             } // if joined row not null
-
-            // Add objects for joined License rows
-
-            $key3 = LicensePeer::getPrimaryKeyHashFromRow($row, $startcol3);
-            if ($key3 !== null) {
-                $obj3 = LicensePeer::getInstanceFromPool($key3);
-                if (!$obj3) {
-
-                    $cls = LicensePeer::getOMClass();
-
-                    $obj3 = new $cls();
-                    $obj3->hydrate($row, $startcol3);
-                    LicensePeer::addInstanceToPool($obj3, $key3);
-                } // if obj3 loaded
-
-                // Add the $obj1 (Imagesource) to the collection in $obj3 (License)
-                $obj3->addImagesource($obj1);
-            } // if joined row not null
-
-            // Add objects for joined Partner rows
-
-            $key4 = PartnerPeer::getPrimaryKeyHashFromRow($row, $startcol4);
-            if ($key4 !== null) {
-                $obj4 = PartnerPeer::getInstanceFromPool($key4);
-                if (!$obj4) {
-
-                    $cls = PartnerPeer::getOMClass();
-
-                    $obj4 = new $cls();
-                    $obj4->hydrate($row, $startcol4);
-                    PartnerPeer::addInstanceToPool($obj4, $key4);
-                } // if obj4 loaded
-
-                // Add the $obj1 (Imagesource) to the collection in $obj4 (Partner)
-                $obj4->addImagesource($obj1);
-            } // if joined row not null
-
-            $results[] = $obj1;
-        }
-        $stmt->closeCursor();
-
-        return $results;
-    }
-
-
-    /**
-     * Returns the number of rows matching criteria, joining the related Publication table
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return int Number of matching rows.
-     */
-    public static function doCountJoinAllExceptPublication(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        // we're going to modify criteria, so copy it first
-        $criteria = clone $criteria;
-
-        // We need to set the primary table name, since in the case that there are no WHERE columns
-        // it will be impossible for the BasePeer::createSelectSql() method to determine which
-        // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(ImagesourcePeer::TABLE_NAME);
-
-        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-            $criteria->setDistinct();
-        }
-
-        if (!$criteria->hasSelectClause()) {
-            ImagesourcePeer::addSelectColumns($criteria);
-        }
-
-        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
-
-        // Set the correct dbName
-        $criteria->setDbName(ImagesourcePeer::DATABASE_NAME);
-
-        if ($con === null) {
-            $con = Propel::getConnection(ImagesourcePeer::DATABASE_NAME, Propel::CONNECTION_READ);
-        }
-
-        $criteria->addJoin(ImagesourcePeer::LICENSE_ID, LicensePeer::ID, $join_behavior);
-
-        $criteria->addJoin(ImagesourcePeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
-
-        $stmt = BasePeer::doCount($criteria, $con);
-
-        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $count = (int) $row[0];
-        } else {
-            $count = 0; // no rows returned; we infer that means 0 matches.
-        }
-        $stmt->closeCursor();
-
-        return $count;
-    }
-
-
-    /**
-     * Returns the number of rows matching criteria, joining the related License table
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return int Number of matching rows.
-     */
-    public static function doCountJoinAllExceptLicense(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        // we're going to modify criteria, so copy it first
-        $criteria = clone $criteria;
-
-        // We need to set the primary table name, since in the case that there are no WHERE columns
-        // it will be impossible for the BasePeer::createSelectSql() method to determine which
-        // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(ImagesourcePeer::TABLE_NAME);
-
-        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-            $criteria->setDistinct();
-        }
-
-        if (!$criteria->hasSelectClause()) {
-            ImagesourcePeer::addSelectColumns($criteria);
-        }
-
-        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
-
-        // Set the correct dbName
-        $criteria->setDbName(ImagesourcePeer::DATABASE_NAME);
-
-        if ($con === null) {
-            $con = Propel::getConnection(ImagesourcePeer::DATABASE_NAME, Propel::CONNECTION_READ);
-        }
-
-        $criteria->addJoin(ImagesourcePeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
-
-        $criteria->addJoin(ImagesourcePeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
-
-        $stmt = BasePeer::doCount($criteria, $con);
-
-        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $count = (int) $row[0];
-        } else {
-            $count = 0; // no rows returned; we infer that means 0 matches.
-        }
-        $stmt->closeCursor();
-
-        return $count;
-    }
-
-
-    /**
-     * Returns the number of rows matching criteria, joining the related Partner table
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return int Number of matching rows.
-     */
-    public static function doCountJoinAllExceptPartner(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        // we're going to modify criteria, so copy it first
-        $criteria = clone $criteria;
-
-        // We need to set the primary table name, since in the case that there are no WHERE columns
-        // it will be impossible for the BasePeer::createSelectSql() method to determine which
-        // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(ImagesourcePeer::TABLE_NAME);
-
-        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-            $criteria->setDistinct();
-        }
-
-        if (!$criteria->hasSelectClause()) {
-            ImagesourcePeer::addSelectColumns($criteria);
-        }
-
-        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
-
-        // Set the correct dbName
-        $criteria->setDbName(ImagesourcePeer::DATABASE_NAME);
-
-        if ($con === null) {
-            $con = Propel::getConnection(ImagesourcePeer::DATABASE_NAME, Propel::CONNECTION_READ);
-        }
-
-        $criteria->addJoin(ImagesourcePeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
-
-        $criteria->addJoin(ImagesourcePeer::LICENSE_ID, LicensePeer::ID, $join_behavior);
-
-        $stmt = BasePeer::doCount($criteria, $con);
-
-        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $count = (int) $row[0];
-        } else {
-            $count = 0; // no rows returned; we infer that means 0 matches.
-        }
-        $stmt->closeCursor();
-
-        return $count;
-    }
-
-
-    /**
-     * Selects a collection of Imagesource objects pre-filled with all related objects except Publication.
-     *
-     * @param      Criteria  $criteria
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of Imagesource objects.
-     * @throws PropelException Any exceptions caught during processing will be
-     *		 rethrown wrapped into a PropelException.
-     */
-    public static function doSelectJoinAllExceptPublication(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $criteria = clone $criteria;
-
-        // Set the correct dbName if it has not been overridden
-        // $criteria->getDbName() will return the same object if not set to another value
-        // so == check is okay and faster
-        if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(ImagesourcePeer::DATABASE_NAME);
-        }
-
-        ImagesourcePeer::addSelectColumns($criteria);
-        $startcol2 = ImagesourcePeer::NUM_HYDRATE_COLUMNS;
-
-        LicensePeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + LicensePeer::NUM_HYDRATE_COLUMNS;
-
-        PartnerPeer::addSelectColumns($criteria);
-        $startcol4 = $startcol3 + PartnerPeer::NUM_HYDRATE_COLUMNS;
-
-        $criteria->addJoin(ImagesourcePeer::LICENSE_ID, LicensePeer::ID, $join_behavior);
-
-        $criteria->addJoin(ImagesourcePeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
-
-
-        $stmt = BasePeer::doSelect($criteria, $con);
-        $results = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = ImagesourcePeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = ImagesourcePeer::getInstanceFromPool($key1))) {
-                // We no longer rehydrate the object, since this can cause data loss.
-                // See http://www.propelorm.org/ticket/509
-                // $obj1->hydrate($row, 0, true); // rehydrate
-            } else {
-                $cls = ImagesourcePeer::getOMClass();
-
-                $obj1 = new $cls();
-                $obj1->hydrate($row);
-                ImagesourcePeer::addInstanceToPool($obj1, $key1);
-            } // if obj1 already loaded
-
-                // Add objects for joined License rows
-
-                $key2 = LicensePeer::getPrimaryKeyHashFromRow($row, $startcol2);
-                if ($key2 !== null) {
-                    $obj2 = LicensePeer::getInstanceFromPool($key2);
-                    if (!$obj2) {
-
-                        $cls = LicensePeer::getOMClass();
-
-                    $obj2 = new $cls();
-                    $obj2->hydrate($row, $startcol2);
-                    LicensePeer::addInstanceToPool($obj2, $key2);
-                } // if $obj2 already loaded
-
-                // Add the $obj1 (Imagesource) to the collection in $obj2 (License)
-                $obj2->addImagesource($obj1);
-
-            } // if joined row is not null
-
-                // Add objects for joined Partner rows
-
-                $key3 = PartnerPeer::getPrimaryKeyHashFromRow($row, $startcol3);
-                if ($key3 !== null) {
-                    $obj3 = PartnerPeer::getInstanceFromPool($key3);
-                    if (!$obj3) {
-
-                        $cls = PartnerPeer::getOMClass();
-
-                    $obj3 = new $cls();
-                    $obj3->hydrate($row, $startcol3);
-                    PartnerPeer::addInstanceToPool($obj3, $key3);
-                } // if $obj3 already loaded
-
-                // Add the $obj1 (Imagesource) to the collection in $obj3 (Partner)
-                $obj3->addImagesource($obj1);
-
-            } // if joined row is not null
-
-            $results[] = $obj1;
-        }
-        $stmt->closeCursor();
-
-        return $results;
-    }
-
-
-    /**
-     * Selects a collection of Imagesource objects pre-filled with all related objects except License.
-     *
-     * @param      Criteria  $criteria
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of Imagesource objects.
-     * @throws PropelException Any exceptions caught during processing will be
-     *		 rethrown wrapped into a PropelException.
-     */
-    public static function doSelectJoinAllExceptLicense(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $criteria = clone $criteria;
-
-        // Set the correct dbName if it has not been overridden
-        // $criteria->getDbName() will return the same object if not set to another value
-        // so == check is okay and faster
-        if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(ImagesourcePeer::DATABASE_NAME);
-        }
-
-        ImagesourcePeer::addSelectColumns($criteria);
-        $startcol2 = ImagesourcePeer::NUM_HYDRATE_COLUMNS;
-
-        PublicationPeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + PublicationPeer::NUM_HYDRATE_COLUMNS;
-
-        PartnerPeer::addSelectColumns($criteria);
-        $startcol4 = $startcol3 + PartnerPeer::NUM_HYDRATE_COLUMNS;
-
-        $criteria->addJoin(ImagesourcePeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
-
-        $criteria->addJoin(ImagesourcePeer::PARTNER_ID, PartnerPeer::ID, $join_behavior);
-
-
-        $stmt = BasePeer::doSelect($criteria, $con);
-        $results = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = ImagesourcePeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = ImagesourcePeer::getInstanceFromPool($key1))) {
-                // We no longer rehydrate the object, since this can cause data loss.
-                // See http://www.propelorm.org/ticket/509
-                // $obj1->hydrate($row, 0, true); // rehydrate
-            } else {
-                $cls = ImagesourcePeer::getOMClass();
-
-                $obj1 = new $cls();
-                $obj1->hydrate($row);
-                ImagesourcePeer::addInstanceToPool($obj1, $key1);
-            } // if obj1 already loaded
-
-                // Add objects for joined Publication rows
-
-                $key2 = PublicationPeer::getPrimaryKeyHashFromRow($row, $startcol2);
-                if ($key2 !== null) {
-                    $obj2 = PublicationPeer::getInstanceFromPool($key2);
-                    if (!$obj2) {
-
-                        $cls = PublicationPeer::getOMClass();
-
-                    $obj2 = new $cls();
-                    $obj2->hydrate($row, $startcol2);
-                    PublicationPeer::addInstanceToPool($obj2, $key2);
-                } // if $obj2 already loaded
-
-                // Add the $obj1 (Imagesource) to the collection in $obj2 (Publication)
-                $obj2->addImagesource($obj1);
-
-            } // if joined row is not null
-
-                // Add objects for joined Partner rows
-
-                $key3 = PartnerPeer::getPrimaryKeyHashFromRow($row, $startcol3);
-                if ($key3 !== null) {
-                    $obj3 = PartnerPeer::getInstanceFromPool($key3);
-                    if (!$obj3) {
-
-                        $cls = PartnerPeer::getOMClass();
-
-                    $obj3 = new $cls();
-                    $obj3->hydrate($row, $startcol3);
-                    PartnerPeer::addInstanceToPool($obj3, $key3);
-                } // if $obj3 already loaded
-
-                // Add the $obj1 (Imagesource) to the collection in $obj3 (Partner)
-                $obj3->addImagesource($obj1);
-
-            } // if joined row is not null
-
-            $results[] = $obj1;
-        }
-        $stmt->closeCursor();
-
-        return $results;
-    }
-
-
-    /**
-     * Selects a collection of Imagesource objects pre-filled with all related objects except Partner.
-     *
-     * @param      Criteria  $criteria
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of Imagesource objects.
-     * @throws PropelException Any exceptions caught during processing will be
-     *		 rethrown wrapped into a PropelException.
-     */
-    public static function doSelectJoinAllExceptPartner(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $criteria = clone $criteria;
-
-        // Set the correct dbName if it has not been overridden
-        // $criteria->getDbName() will return the same object if not set to another value
-        // so == check is okay and faster
-        if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(ImagesourcePeer::DATABASE_NAME);
-        }
-
-        ImagesourcePeer::addSelectColumns($criteria);
-        $startcol2 = ImagesourcePeer::NUM_HYDRATE_COLUMNS;
-
-        PublicationPeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + PublicationPeer::NUM_HYDRATE_COLUMNS;
-
-        LicensePeer::addSelectColumns($criteria);
-        $startcol4 = $startcol3 + LicensePeer::NUM_HYDRATE_COLUMNS;
-
-        $criteria->addJoin(ImagesourcePeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
-
-        $criteria->addJoin(ImagesourcePeer::LICENSE_ID, LicensePeer::ID, $join_behavior);
-
-
-        $stmt = BasePeer::doSelect($criteria, $con);
-        $results = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = ImagesourcePeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = ImagesourcePeer::getInstanceFromPool($key1))) {
-                // We no longer rehydrate the object, since this can cause data loss.
-                // See http://www.propelorm.org/ticket/509
-                // $obj1->hydrate($row, 0, true); // rehydrate
-            } else {
-                $cls = ImagesourcePeer::getOMClass();
-
-                $obj1 = new $cls();
-                $obj1->hydrate($row);
-                ImagesourcePeer::addInstanceToPool($obj1, $key1);
-            } // if obj1 already loaded
-
-                // Add objects for joined Publication rows
-
-                $key2 = PublicationPeer::getPrimaryKeyHashFromRow($row, $startcol2);
-                if ($key2 !== null) {
-                    $obj2 = PublicationPeer::getInstanceFromPool($key2);
-                    if (!$obj2) {
-
-                        $cls = PublicationPeer::getOMClass();
-
-                    $obj2 = new $cls();
-                    $obj2->hydrate($row, $startcol2);
-                    PublicationPeer::addInstanceToPool($obj2, $key2);
-                } // if $obj2 already loaded
-
-                // Add the $obj1 (Imagesource) to the collection in $obj2 (Publication)
-                $obj2->addImagesource($obj1);
-
-            } // if joined row is not null
-
-                // Add objects for joined License rows
-
-                $key3 = LicensePeer::getPrimaryKeyHashFromRow($row, $startcol3);
-                if ($key3 !== null) {
-                    $obj3 = LicensePeer::getInstanceFromPool($key3);
-                    if (!$obj3) {
-
-                        $cls = LicensePeer::getOMClass();
-
-                    $obj3 = new $cls();
-                    $obj3->hydrate($row, $startcol3);
-                    LicensePeer::addInstanceToPool($obj3, $key3);
-                } // if $obj3 already loaded
-
-                // Add the $obj1 (Imagesource) to the collection in $obj3 (License)
-                $obj3->addImagesource($obj1);
-
-            } // if joined row is not null
 
             $results[] = $obj1;
         }

@@ -17,9 +17,8 @@ class HomeController extends DTADomainController {
 
     /** @inheritdoc */
     public $domainMenu = array(
-//        array("caption" => "Meine letzten Bearbeitungen", 'route' => 'home'),
-//        array("caption" => "Von mir und anderen zuletzt bearbeitet", 'route' => 'home'),
-//        array("caption" => "Zuletzt Angesehen", 'route' => 'home'),
+        array("caption" => "Aktuell in Bearbeitung", 'route' => 'home'),
+        array("caption" => "Zuletzt Angesehen", 'route' => 'home'),
     );
     
     public function indexAction(Request $request) {

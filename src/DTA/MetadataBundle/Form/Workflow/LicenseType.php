@@ -17,7 +17,16 @@ class LicenseType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('name');
-        $builder->add('url');
+        $builder->add('name', 'text');
+        $builder->add('url', 'text');
+        
+        $builder->add('applicableToText', 'checkbox', array(
+            'label' => 'Anwendbar auf Text',
+            'required' => false,
+        ));
+        $builder->add('applicableToImage', 'checkbox', array(
+            'label' => 'Anwendbar auf Bild',
+            'required' => false,
+        ));
     }
 }

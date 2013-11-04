@@ -39,6 +39,8 @@ use DTA\MetadataBundle\Model\Master\LanguagePublication;
 use DTA\MetadataBundle\Model\Master\PersonPublication;
 use DTA\MetadataBundle\Model\Master\PublicationPublicationgroup;
 use DTA\MetadataBundle\Model\Master\PublicationTag;
+use DTA\MetadataBundle\Model\Master\RecentUse;
+use DTA\MetadataBundle\Model\Workflow\CopyLocation;
 use DTA\MetadataBundle\Model\Workflow\Imagesource;
 use DTA\MetadataBundle\Model\Workflow\Publicationgroup;
 use DTA\MetadataBundle\Model\Workflow\Task;
@@ -175,9 +177,17 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method PublicationQuery rightJoinPersonPublication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the PersonPublication relation
  * @method PublicationQuery innerJoinPersonPublication($relationAlias = null) Adds a INNER JOIN clause to the query using the PersonPublication relation
  *
+ * @method PublicationQuery leftJoinRecentUse($relationAlias = null) Adds a LEFT JOIN clause to the query using the RecentUse relation
+ * @method PublicationQuery rightJoinRecentUse($relationAlias = null) Adds a RIGHT JOIN clause to the query using the RecentUse relation
+ * @method PublicationQuery innerJoinRecentUse($relationAlias = null) Adds a INNER JOIN clause to the query using the RecentUse relation
+ *
  * @method PublicationQuery leftJoinTask($relationAlias = null) Adds a LEFT JOIN clause to the query using the Task relation
  * @method PublicationQuery rightJoinTask($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Task relation
  * @method PublicationQuery innerJoinTask($relationAlias = null) Adds a INNER JOIN clause to the query using the Task relation
+ *
+ * @method PublicationQuery leftJoinCopyLocation($relationAlias = null) Adds a LEFT JOIN clause to the query using the CopyLocation relation
+ * @method PublicationQuery rightJoinCopyLocation($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CopyLocation relation
+ * @method PublicationQuery innerJoinCopyLocation($relationAlias = null) Adds a INNER JOIN clause to the query using the CopyLocation relation
  *
  * @method PublicationQuery leftJoinImagesource($relationAlias = null) Adds a LEFT JOIN clause to the query using the Imagesource relation
  * @method PublicationQuery rightJoinImagesource($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Imagesource relation
@@ -2716,6 +2726,80 @@ abstract class BasePublicationQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related RecentUse object
+     *
+     * @param   RecentUse|PropelObjectCollection $recentUse  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 PublicationQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByRecentUse($recentUse, $comparison = null)
+    {
+        if ($recentUse instanceof RecentUse) {
+            return $this
+                ->addUsingAlias(PublicationPeer::ID, $recentUse->getPublicationId(), $comparison);
+        } elseif ($recentUse instanceof PropelObjectCollection) {
+            return $this
+                ->useRecentUseQuery()
+                ->filterByPrimaryKeys($recentUse->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByRecentUse() only accepts arguments of type RecentUse or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the RecentUse relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return PublicationQuery The current query, for fluid interface
+     */
+    public function joinRecentUse($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('RecentUse');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'RecentUse');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the RecentUse relation RecentUse object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\Master\RecentUseQuery A secondary query class using the current class as primary query
+     */
+    public function useRecentUseQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinRecentUse($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'RecentUse', '\DTA\MetadataBundle\Model\Master\RecentUseQuery');
+    }
+
+    /**
      * Filter the query by a related Task object
      *
      * @param   Task|PropelObjectCollection $task  the related object to use as filter
@@ -2787,6 +2871,80 @@ abstract class BasePublicationQuery extends ModelCriteria
         return $this
             ->joinTask($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Task', '\DTA\MetadataBundle\Model\Workflow\TaskQuery');
+    }
+
+    /**
+     * Filter the query by a related CopyLocation object
+     *
+     * @param   CopyLocation|PropelObjectCollection $copyLocation  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 PublicationQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByCopyLocation($copyLocation, $comparison = null)
+    {
+        if ($copyLocation instanceof CopyLocation) {
+            return $this
+                ->addUsingAlias(PublicationPeer::ID, $copyLocation->getPublicationId(), $comparison);
+        } elseif ($copyLocation instanceof PropelObjectCollection) {
+            return $this
+                ->useCopyLocationQuery()
+                ->filterByPrimaryKeys($copyLocation->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCopyLocation() only accepts arguments of type CopyLocation or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CopyLocation relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return PublicationQuery The current query, for fluid interface
+     */
+    public function joinCopyLocation($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CopyLocation');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CopyLocation');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CopyLocation relation CopyLocation object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\Workflow\CopyLocationQuery A secondary query class using the current class as primary query
+     */
+    public function useCopyLocationQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinCopyLocation($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CopyLocation', '\DTA\MetadataBundle\Model\Workflow\CopyLocationQuery');
     }
 
     /**

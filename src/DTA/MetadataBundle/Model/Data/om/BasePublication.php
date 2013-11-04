@@ -64,6 +64,10 @@ use DTA\MetadataBundle\Model\Master\PublicationPublicationgroup;
 use DTA\MetadataBundle\Model\Master\PublicationPublicationgroupQuery;
 use DTA\MetadataBundle\Model\Master\PublicationTag;
 use DTA\MetadataBundle\Model\Master\PublicationTagQuery;
+use DTA\MetadataBundle\Model\Master\RecentUse;
+use DTA\MetadataBundle\Model\Master\RecentUseQuery;
+use DTA\MetadataBundle\Model\Workflow\CopyLocation;
+use DTA\MetadataBundle\Model\Workflow\CopyLocationQuery;
 use DTA\MetadataBundle\Model\Workflow\Imagesource;
 use DTA\MetadataBundle\Model\Workflow\ImagesourceQuery;
 use DTA\MetadataBundle\Model\Workflow\Publicationgroup;
@@ -337,10 +341,22 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     protected $collPersonPublicationsPartial;
 
     /**
+     * @var        PropelObjectCollection|RecentUse[] Collection to store aggregation of RecentUse objects.
+     */
+    protected $collRecentUses;
+    protected $collRecentUsesPartial;
+
+    /**
      * @var        PropelObjectCollection|Task[] Collection to store aggregation of Task objects.
      */
     protected $collTasks;
     protected $collTasksPartial;
+
+    /**
+     * @var        PropelObjectCollection|CopyLocation[] Collection to store aggregation of CopyLocation objects.
+     */
+    protected $collCopyLocations;
+    protected $collCopyLocationsPartial;
 
     /**
      * @var        PropelObjectCollection|Imagesource[] Collection to store aggregation of Imagesource objects.
@@ -542,7 +558,19 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
+    protected $recentUsesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
     protected $tasksScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $copyLocationsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -1403,7 +1431,11 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
             $this->collPersonPublications = null;
 
+            $this->collRecentUses = null;
+
             $this->collTasks = null;
+
+            $this->collCopyLocations = null;
 
             $this->collImagesources = null;
 
@@ -2007,6 +2039,23 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 }
             }
 
+            if ($this->recentUsesScheduledForDeletion !== null) {
+                if (!$this->recentUsesScheduledForDeletion->isEmpty()) {
+                    RecentUseQuery::create()
+                        ->filterByPrimaryKeys($this->recentUsesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->recentUsesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collRecentUses !== null) {
+                foreach ($this->collRecentUses as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             if ($this->tasksScheduledForDeletion !== null) {
                 if (!$this->tasksScheduledForDeletion->isEmpty()) {
                     foreach ($this->tasksScheduledForDeletion as $task) {
@@ -2019,6 +2068,23 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
             if ($this->collTasks !== null) {
                 foreach ($this->collTasks as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->copyLocationsScheduledForDeletion !== null) {
+                if (!$this->copyLocationsScheduledForDeletion->isEmpty()) {
+                    CopyLocationQuery::create()
+                        ->filterByPrimaryKeys($this->copyLocationsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->copyLocationsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collCopyLocations !== null) {
+                foreach ($this->collCopyLocations as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -2482,8 +2548,24 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     }
                 }
 
+                if ($this->collRecentUses !== null) {
+                    foreach ($this->collRecentUses as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
                 if ($this->collTasks !== null) {
                     foreach ($this->collTasks as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collCopyLocations !== null) {
+                    foreach ($this->collCopyLocations as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -2715,8 +2797,14 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             if (null !== $this->collPersonPublications) {
                 $result['PersonPublications'] = $this->collPersonPublications->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
+            if (null !== $this->collRecentUses) {
+                $result['RecentUses'] = $this->collRecentUses->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collTasks) {
                 $result['Tasks'] = $this->collTasks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collCopyLocations) {
+                $result['CopyLocations'] = $this->collCopyLocations->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collImagesources) {
                 $result['Imagesources'] = $this->collImagesources->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -3079,9 +3167,21 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 }
             }
 
+            foreach ($this->getRecentUses() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addRecentUse($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getTasks() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addTask($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getCopyLocations() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCopyLocation($relObj->copy($deepCopy));
                 }
             }
 
@@ -3466,8 +3566,14 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ('PersonPublication' == $relationName) {
             $this->initPersonPublications();
         }
+        if ('RecentUse' == $relationName) {
+            $this->initRecentUses();
+        }
         if ('Task' == $relationName) {
             $this->initTasks();
+        }
+        if ('CopyLocation' == $relationName) {
+            $this->initCopyLocations();
         }
         if ('Imagesource' == $relationName) {
             $this->initImagesources();
@@ -7241,6 +7347,249 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     }
 
     /**
+     * Clears out the collRecentUses collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Publication The current object (for fluent API support)
+     * @see        addRecentUses()
+     */
+    public function clearRecentUses()
+    {
+        $this->collRecentUses = null; // important to set this to null since that means it is uninitialized
+        $this->collRecentUsesPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collRecentUses collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialRecentUses($v = true)
+    {
+        $this->collRecentUsesPartial = $v;
+    }
+
+    /**
+     * Initializes the collRecentUses collection.
+     *
+     * By default this just sets the collRecentUses collection to an empty array (like clearcollRecentUses());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initRecentUses($overrideExisting = true)
+    {
+        if (null !== $this->collRecentUses && !$overrideExisting) {
+            return;
+        }
+        $this->collRecentUses = new PropelObjectCollection();
+        $this->collRecentUses->setModel('RecentUse');
+    }
+
+    /**
+     * Gets an array of RecentUse objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Publication is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|RecentUse[] List of RecentUse objects
+     * @throws PropelException
+     */
+    public function getRecentUses($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collRecentUsesPartial && !$this->isNew();
+        if (null === $this->collRecentUses || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collRecentUses) {
+                // return empty collection
+                $this->initRecentUses();
+            } else {
+                $collRecentUses = RecentUseQuery::create(null, $criteria)
+                    ->filterByPublication($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collRecentUsesPartial && count($collRecentUses)) {
+                      $this->initRecentUses(false);
+
+                      foreach($collRecentUses as $obj) {
+                        if (false == $this->collRecentUses->contains($obj)) {
+                          $this->collRecentUses->append($obj);
+                        }
+                      }
+
+                      $this->collRecentUsesPartial = true;
+                    }
+
+                    $collRecentUses->getInternalIterator()->rewind();
+                    return $collRecentUses;
+                }
+
+                if($partial && $this->collRecentUses) {
+                    foreach($this->collRecentUses as $obj) {
+                        if($obj->isNew()) {
+                            $collRecentUses[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collRecentUses = $collRecentUses;
+                $this->collRecentUsesPartial = false;
+            }
+        }
+
+        return $this->collRecentUses;
+    }
+
+    /**
+     * Sets a collection of RecentUse objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $recentUses A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setRecentUses(PropelCollection $recentUses, PropelPDO $con = null)
+    {
+        $recentUsesToDelete = $this->getRecentUses(new Criteria(), $con)->diff($recentUses);
+
+        $this->recentUsesScheduledForDeletion = unserialize(serialize($recentUsesToDelete));
+
+        foreach ($recentUsesToDelete as $recentUseRemoved) {
+            $recentUseRemoved->setPublication(null);
+        }
+
+        $this->collRecentUses = null;
+        foreach ($recentUses as $recentUse) {
+            $this->addRecentUse($recentUse);
+        }
+
+        $this->collRecentUses = $recentUses;
+        $this->collRecentUsesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related RecentUse objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related RecentUse objects.
+     * @throws PropelException
+     */
+    public function countRecentUses(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collRecentUsesPartial && !$this->isNew();
+        if (null === $this->collRecentUses || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collRecentUses) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getRecentUses());
+            }
+            $query = RecentUseQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPublication($this)
+                ->count($con);
+        }
+
+        return count($this->collRecentUses);
+    }
+
+    /**
+     * Method called to associate a RecentUse object to this object
+     * through the RecentUse foreign key attribute.
+     *
+     * @param    RecentUse $l RecentUse
+     * @return Publication The current object (for fluent API support)
+     */
+    public function addRecentUse(RecentUse $l)
+    {
+        if ($this->collRecentUses === null) {
+            $this->initRecentUses();
+            $this->collRecentUsesPartial = true;
+        }
+        if (!in_array($l, $this->collRecentUses->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddRecentUse($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	RecentUse $recentUse The recentUse object to add.
+     */
+    protected function doAddRecentUse($recentUse)
+    {
+        $this->collRecentUses[]= $recentUse;
+        $recentUse->setPublication($this);
+    }
+
+    /**
+     * @param	RecentUse $recentUse The recentUse object to remove.
+     * @return Publication The current object (for fluent API support)
+     */
+    public function removeRecentUse($recentUse)
+    {
+        if ($this->getRecentUses()->contains($recentUse)) {
+            $this->collRecentUses->remove($this->collRecentUses->search($recentUse));
+            if (null === $this->recentUsesScheduledForDeletion) {
+                $this->recentUsesScheduledForDeletion = clone $this->collRecentUses;
+                $this->recentUsesScheduledForDeletion->clear();
+            }
+            $this->recentUsesScheduledForDeletion[]= clone $recentUse;
+            $recentUse->setPublication(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Publication is new, it will return
+     * an empty collection; or if this Publication has previously
+     * been saved, it will retrieve related RecentUses from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Publication.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|RecentUse[] List of RecentUse objects
+     */
+    public function getRecentUsesJoinDtaUser($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = RecentUseQuery::create(null, $criteria);
+        $query->joinWith('DtaUser', $join_behavior);
+
+        return $this->getRecentUses($query, $con);
+    }
+
+    /**
      * Clears out the collTasks collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -7559,6 +7908,274 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     }
 
     /**
+     * Clears out the collCopyLocations collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Publication The current object (for fluent API support)
+     * @see        addCopyLocations()
+     */
+    public function clearCopyLocations()
+    {
+        $this->collCopyLocations = null; // important to set this to null since that means it is uninitialized
+        $this->collCopyLocationsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collCopyLocations collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialCopyLocations($v = true)
+    {
+        $this->collCopyLocationsPartial = $v;
+    }
+
+    /**
+     * Initializes the collCopyLocations collection.
+     *
+     * By default this just sets the collCopyLocations collection to an empty array (like clearcollCopyLocations());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCopyLocations($overrideExisting = true)
+    {
+        if (null !== $this->collCopyLocations && !$overrideExisting) {
+            return;
+        }
+        $this->collCopyLocations = new PropelObjectCollection();
+        $this->collCopyLocations->setModel('CopyLocation');
+    }
+
+    /**
+     * Gets an array of CopyLocation objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Publication is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|CopyLocation[] List of CopyLocation objects
+     * @throws PropelException
+     */
+    public function getCopyLocations($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collCopyLocationsPartial && !$this->isNew();
+        if (null === $this->collCopyLocations || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCopyLocations) {
+                // return empty collection
+                $this->initCopyLocations();
+            } else {
+                $collCopyLocations = CopyLocationQuery::create(null, $criteria)
+                    ->filterByPublication($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collCopyLocationsPartial && count($collCopyLocations)) {
+                      $this->initCopyLocations(false);
+
+                      foreach($collCopyLocations as $obj) {
+                        if (false == $this->collCopyLocations->contains($obj)) {
+                          $this->collCopyLocations->append($obj);
+                        }
+                      }
+
+                      $this->collCopyLocationsPartial = true;
+                    }
+
+                    $collCopyLocations->getInternalIterator()->rewind();
+                    return $collCopyLocations;
+                }
+
+                if($partial && $this->collCopyLocations) {
+                    foreach($this->collCopyLocations as $obj) {
+                        if($obj->isNew()) {
+                            $collCopyLocations[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCopyLocations = $collCopyLocations;
+                $this->collCopyLocationsPartial = false;
+            }
+        }
+
+        return $this->collCopyLocations;
+    }
+
+    /**
+     * Sets a collection of CopyLocation objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $copyLocations A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setCopyLocations(PropelCollection $copyLocations, PropelPDO $con = null)
+    {
+        $copyLocationsToDelete = $this->getCopyLocations(new Criteria(), $con)->diff($copyLocations);
+
+        $this->copyLocationsScheduledForDeletion = unserialize(serialize($copyLocationsToDelete));
+
+        foreach ($copyLocationsToDelete as $copyLocationRemoved) {
+            $copyLocationRemoved->setPublication(null);
+        }
+
+        $this->collCopyLocations = null;
+        foreach ($copyLocations as $copyLocation) {
+            $this->addCopyLocation($copyLocation);
+        }
+
+        $this->collCopyLocations = $copyLocations;
+        $this->collCopyLocationsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related CopyLocation objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related CopyLocation objects.
+     * @throws PropelException
+     */
+    public function countCopyLocations(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collCopyLocationsPartial && !$this->isNew();
+        if (null === $this->collCopyLocations || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCopyLocations) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getCopyLocations());
+            }
+            $query = CopyLocationQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPublication($this)
+                ->count($con);
+        }
+
+        return count($this->collCopyLocations);
+    }
+
+    /**
+     * Method called to associate a CopyLocation object to this object
+     * through the CopyLocation foreign key attribute.
+     *
+     * @param    CopyLocation $l CopyLocation
+     * @return Publication The current object (for fluent API support)
+     */
+    public function addCopyLocation(CopyLocation $l)
+    {
+        if ($this->collCopyLocations === null) {
+            $this->initCopyLocations();
+            $this->collCopyLocationsPartial = true;
+        }
+        if (!in_array($l, $this->collCopyLocations->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddCopyLocation($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	CopyLocation $copyLocation The copyLocation object to add.
+     */
+    protected function doAddCopyLocation($copyLocation)
+    {
+        $this->collCopyLocations[]= $copyLocation;
+        $copyLocation->setPublication($this);
+    }
+
+    /**
+     * @param	CopyLocation $copyLocation The copyLocation object to remove.
+     * @return Publication The current object (for fluent API support)
+     */
+    public function removeCopyLocation($copyLocation)
+    {
+        if ($this->getCopyLocations()->contains($copyLocation)) {
+            $this->collCopyLocations->remove($this->collCopyLocations->search($copyLocation));
+            if (null === $this->copyLocationsScheduledForDeletion) {
+                $this->copyLocationsScheduledForDeletion = clone $this->collCopyLocations;
+                $this->copyLocationsScheduledForDeletion->clear();
+            }
+            $this->copyLocationsScheduledForDeletion[]= clone $copyLocation;
+            $copyLocation->setPublication(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Publication is new, it will return
+     * an empty collection; or if this Publication has previously
+     * been saved, it will retrieve related CopyLocations from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Publication.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|CopyLocation[] List of CopyLocation objects
+     */
+    public function getCopyLocationsJoinPartner($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = CopyLocationQuery::create(null, $criteria);
+        $query->joinWith('Partner', $join_behavior);
+
+        return $this->getCopyLocations($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Publication is new, it will return
+     * an empty collection; or if this Publication has previously
+     * been saved, it will retrieve related CopyLocations from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Publication.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|CopyLocation[] List of CopyLocation objects
+     */
+    public function getCopyLocationsJoinLicense($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = CopyLocationQuery::create(null, $criteria);
+        $query->joinWith('License', $join_behavior);
+
+        return $this->getCopyLocations($query, $con);
+    }
+
+    /**
      * Clears out the collImagesources collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -7774,56 +8391,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         }
 
         return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Publication is new, it will return
-     * an empty collection; or if this Publication has previously
-     * been saved, it will retrieve related Imagesources from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Publication.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Imagesource[] List of Imagesource objects
-     */
-    public function getImagesourcesJoinLicense($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = ImagesourceQuery::create(null, $criteria);
-        $query->joinWith('License', $join_behavior);
-
-        return $this->getImagesources($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Publication is new, it will return
-     * an empty collection; or if this Publication has previously
-     * been saved, it will retrieve related Imagesources from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Publication.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Imagesource[] List of Imagesource objects
-     */
-    public function getImagesourcesJoinPartner($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = ImagesourceQuery::create(null, $criteria);
-        $query->joinWith('Partner', $join_behavior);
-
-        return $this->getImagesources($query, $con);
     }
 
     /**
@@ -9284,8 +9851,18 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collRecentUses) {
+                foreach ($this->collRecentUses as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collTasks) {
                 foreach ($this->collTasks as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collCopyLocations) {
+                foreach ($this->collCopyLocations as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -9412,10 +9989,18 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->collPersonPublications->clearIterator();
         }
         $this->collPersonPublications = null;
+        if ($this->collRecentUses instanceof PropelCollection) {
+            $this->collRecentUses->clearIterator();
+        }
+        $this->collRecentUses = null;
         if ($this->collTasks instanceof PropelCollection) {
             $this->collTasks->clearIterator();
         }
         $this->collTasks = null;
+        if ($this->collCopyLocations instanceof PropelCollection) {
+            $this->collCopyLocations->clearIterator();
+        }
+        $this->collCopyLocations = null;
         if ($this->collImagesources instanceof PropelCollection) {
             $this->collImagesources->clearIterator();
         }

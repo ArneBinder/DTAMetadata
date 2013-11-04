@@ -7,7 +7,7 @@ use \TableMap;
 
 
 /**
- * This class defines the structure of the 'dta_user' table.
+ * This class defines the structure of the 'recent_use' table.
  *
  *
  *
@@ -18,13 +18,13 @@ use \TableMap;
  *
  * @package    propel.generator.src.DTA.MetadataBundle.Model.Master.map
  */
-class DtaUserTableMap extends TableMap
+class RecentUseTableMap extends TableMap
 {
 
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'src.DTA.MetadataBundle.Model.Master.map.DtaUserTableMap';
+    const CLASS_NAME = 'src.DTA.MetadataBundle.Model.Master.map.RecentUseTableMap';
 
     /**
      * Initialize the table attributes, columns and validators
@@ -36,19 +36,16 @@ class DtaUserTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('dta_user');
-        $this->setPhpName('DtaUser');
-        $this->setClassname('DTA\\MetadataBundle\\Model\\Master\\DtaUser');
+        $this->setName('recent_use');
+        $this->setPhpName('RecentUse');
+        $this->setClassname('DTA\\MetadataBundle\\Model\\Master\\RecentUse');
         $this->setPackage('src.DTA.MetadataBundle.Model.Master');
         $this->setUseIdGenerator(true);
-        $this->setPrimaryKeyMethodInfo('dta_user_id_seq');
+        $this->setPrimaryKeyMethodInfo('recent_use_id_seq');
         // columns
-        $this->addColumn('username', 'Username', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('password', 'Password', 'VARCHAR', false, 512, null);
-        $this->addColumn('salt', 'Salt', 'VARCHAR', false, 512, null);
-        $this->addColumn('mail', 'Mail', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('admin', 'Admin', 'BOOLEAN', false, null, false);
-        $this->addColumn('legacy_user_id', 'LegacyUserId', 'INTEGER', false, null, null);
+        $this->addForeignKey('dta_user_id', 'DtaUserId', 'INTEGER', 'dta_user', 'id', true, null, null);
+        $this->addForeignKey('publication_id', 'PublicationId', 'INTEGER', 'publication', 'id', true, null, null);
+        $this->addColumn('date', 'Date', 'TIMESTAMP', true, null, null);
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         // validators
     } // initialize()
@@ -58,8 +55,8 @@ class DtaUserTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('RecentUse', 'DTA\\MetadataBundle\\Model\\Master\\RecentUse', RelationMap::ONE_TO_MANY, array('id' => 'dta_user_id', ), null, null, 'RecentUses');
-        $this->addRelation('Task', 'DTA\\MetadataBundle\\Model\\Workflow\\Task', RelationMap::ONE_TO_MANY, array('id' => 'responsibleuser_id', ), null, null, 'Tasks');
+        $this->addRelation('DtaUser', 'DTA\\MetadataBundle\\Model\\Master\\DtaUser', RelationMap::MANY_TO_ONE, array('dta_user_id' => 'id', ), null, null);
+        $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::MANY_TO_ONE, array('publication_id' => 'id', ), null, null);
     } // buildRelations()
 
     /**
@@ -72,10 +69,10 @@ class DtaUserTableMap extends TableMap
     {
         return array(
             'table_row_view' =>  array (
-  'id' => 'id',
-  'benutzername' => 'username',
-  'mail' => 'mail',
-  'administratorrechte' => 'accessor:adminToString',
+  'DtaUserId' => 'dta_user_id',
+  'PublicationId' => 'publication_id',
+  'Date' => 'date',
+  'Id' => 'id',
 ),
             'auto_add_pk' =>  array (
   'name' => 'id',
@@ -85,4 +82,4 @@ class DtaUserTableMap extends TableMap
         );
     } // getBehaviors()
 
-} // DtaUserTableMap
+} // RecentUseTableMap

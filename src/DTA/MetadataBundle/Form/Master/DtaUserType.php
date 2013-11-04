@@ -21,15 +21,11 @@ class DtaUserType extends BaseAbstractType
         $builder->add('mail','text', array(
             'required' => false,
         ));
-        $builder->add('phone','text', array(
-            'required' => false,
-        ));
         $builder->add('password', 'password', array(
             'required' => false,
         ));
         $builder->add('admin', 'checkbox', array(
             'label' => 'Administratorenrechte',
-            'attr' => array('expanded'=>true),
             'required' => false,
         ));
     }

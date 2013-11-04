@@ -29,19 +29,22 @@ abstract class BaseTasktypePeer
     const TM_CLASS = 'TasktypeTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 5;
+    const NUM_COLUMNS = 6;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 5;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /** the column name for the id field */
     const ID = 'tasktype.id';
 
     /** the column name for the name field */
     const NAME = 'tasktype.name';
+
+    /** the column name for the legacy_tasktype_id field */
+    const LEGACY_TASKTYPE_ID = 'tasktype.legacy_tasktype_id';
 
     /** the column name for the tree_left field */
     const TREE_LEFT = 'tasktype.tree_left';
@@ -88,12 +91,12 @@ abstract class BaseTasktypePeer
      * e.g. TasktypePeer::$fieldNames[TasktypePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'TreeLeft', 'TreeRight', 'TreeLevel', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'treeLeft', 'treeRight', 'treeLevel', ),
-        BasePeer::TYPE_COLNAME => array (TasktypePeer::ID, TasktypePeer::NAME, TasktypePeer::TREE_LEFT, TasktypePeer::TREE_RIGHT, TasktypePeer::TREE_LEVEL, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'TREE_LEFT', 'TREE_RIGHT', 'TREE_LEVEL', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'tree_left', 'tree_right', 'tree_level', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'LegacyTasktypeId', 'TreeLeft', 'TreeRight', 'TreeLevel', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'legacyTasktypeId', 'treeLeft', 'treeRight', 'treeLevel', ),
+        BasePeer::TYPE_COLNAME => array (TasktypePeer::ID, TasktypePeer::NAME, TasktypePeer::LEGACY_TASKTYPE_ID, TasktypePeer::TREE_LEFT, TasktypePeer::TREE_RIGHT, TasktypePeer::TREE_LEVEL, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'LEGACY_TASKTYPE_ID', 'TREE_LEFT', 'TREE_RIGHT', 'TREE_LEVEL', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'legacy_tasktype_id', 'tree_left', 'tree_right', 'tree_level', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -103,12 +106,12 @@ abstract class BaseTasktypePeer
      * e.g. TasktypePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'TreeLeft' => 2, 'TreeRight' => 3, 'TreeLevel' => 4, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'treeLeft' => 2, 'treeRight' => 3, 'treeLevel' => 4, ),
-        BasePeer::TYPE_COLNAME => array (TasktypePeer::ID => 0, TasktypePeer::NAME => 1, TasktypePeer::TREE_LEFT => 2, TasktypePeer::TREE_RIGHT => 3, TasktypePeer::TREE_LEVEL => 4, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'TREE_LEFT' => 2, 'TREE_RIGHT' => 3, 'TREE_LEVEL' => 4, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'tree_left' => 2, 'tree_right' => 3, 'tree_level' => 4, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'LegacyTasktypeId' => 2, 'TreeLeft' => 3, 'TreeRight' => 4, 'TreeLevel' => 5, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'legacyTasktypeId' => 2, 'treeLeft' => 3, 'treeRight' => 4, 'treeLevel' => 5, ),
+        BasePeer::TYPE_COLNAME => array (TasktypePeer::ID => 0, TasktypePeer::NAME => 1, TasktypePeer::LEGACY_TASKTYPE_ID => 2, TasktypePeer::TREE_LEFT => 3, TasktypePeer::TREE_RIGHT => 4, TasktypePeer::TREE_LEVEL => 5, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'LEGACY_TASKTYPE_ID' => 2, 'TREE_LEFT' => 3, 'TREE_RIGHT' => 4, 'TREE_LEVEL' => 5, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'legacy_tasktype_id' => 2, 'tree_left' => 3, 'tree_right' => 4, 'tree_level' => 5, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -184,12 +187,14 @@ abstract class BaseTasktypePeer
         if (null === $alias) {
             $criteria->addSelectColumn(TasktypePeer::ID);
             $criteria->addSelectColumn(TasktypePeer::NAME);
+            $criteria->addSelectColumn(TasktypePeer::LEGACY_TASKTYPE_ID);
             $criteria->addSelectColumn(TasktypePeer::TREE_LEFT);
             $criteria->addSelectColumn(TasktypePeer::TREE_RIGHT);
             $criteria->addSelectColumn(TasktypePeer::TREE_LEVEL);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.name');
+            $criteria->addSelectColumn($alias . '.legacy_tasktype_id');
             $criteria->addSelectColumn($alias . '.tree_left');
             $criteria->addSelectColumn($alias . '.tree_right');
             $criteria->addSelectColumn($alias . '.tree_level');
@@ -945,9 +950,9 @@ abstract class BaseTasktypePeer
                 while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
                     $key = TasktypePeer::getPrimaryKeyHashFromRow($row, 0);
                     if (null !== ($object = TasktypePeer::getInstanceFromPool($key))) {
-                        $object->setLeftValue($row[2]);
-                        $object->setRightValue($row[3]);
-                        $object->setLevel($row[4]);
+                        $object->setLeftValue($row[3]);
+                        $object->setRightValue($row[4]);
+                        $object->setLevel($row[5]);
                         $object->clearNestedSetChildren();
                     }
                 }

@@ -9,7 +9,6 @@ use \PDOStatement;
 use \Propel;
 use \PropelException;
 use \PropelPDO;
-use DTA\MetadataBundle\Model\Workflow\ImagesourcePeer;
 use DTA\MetadataBundle\Model\Workflow\Partner;
 use DTA\MetadataBundle\Model\Workflow\PartnerPeer;
 use DTA\MetadataBundle\Model\Workflow\TextsourcePeer;
@@ -31,13 +30,13 @@ abstract class BasePartnerPeer
     const TM_CLASS = 'PartnerTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 9;
+    const NUM_COLUMNS = 11;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 9;
+    const NUM_HYDRATE_COLUMNS = 11;
 
     /** the column name for the id field */
     const ID = 'partner.id';
@@ -51,8 +50,8 @@ abstract class BasePartnerPeer
     /** the column name for the web field */
     const WEB = 'partner.web';
 
-    /** the column name for the contactperson field */
-    const CONTACTPERSON = 'partner.contactperson';
+    /** the column name for the contact_person field */
+    const CONTACT_PERSON = 'partner.contact_person';
 
     /** the column name for the contactdata field */
     const CONTACTDATA = 'partner.contactdata';
@@ -65,6 +64,12 @@ abstract class BasePartnerPeer
 
     /** the column name for the legacy_partner_id field */
     const LEGACY_PARTNER_ID = 'partner.legacy_partner_id';
+
+    /** the column name for the created_at field */
+    const CREATED_AT = 'partner.created_at';
+
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'partner.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -85,12 +90,12 @@ abstract class BasePartnerPeer
      * e.g. PartnerPeer::$fieldNames[PartnerPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'Mail', 'Web', 'Contactperson', 'Contactdata', 'Comments', 'IsOrganization', 'LegacyPartnerId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'mail', 'web', 'contactperson', 'contactdata', 'comments', 'isOrganization', 'legacyPartnerId', ),
-        BasePeer::TYPE_COLNAME => array (PartnerPeer::ID, PartnerPeer::NAME, PartnerPeer::MAIL, PartnerPeer::WEB, PartnerPeer::CONTACTPERSON, PartnerPeer::CONTACTDATA, PartnerPeer::COMMENTS, PartnerPeer::IS_ORGANIZATION, PartnerPeer::LEGACY_PARTNER_ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'MAIL', 'WEB', 'CONTACTPERSON', 'CONTACTDATA', 'COMMENTS', 'IS_ORGANIZATION', 'LEGACY_PARTNER_ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'mail', 'web', 'contactperson', 'contactdata', 'comments', 'is_organization', 'legacy_partner_id', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'Mail', 'Web', 'ContactPerson', 'Contactdata', 'Comments', 'IsOrganization', 'LegacyPartnerId', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'mail', 'web', 'contactPerson', 'contactdata', 'comments', 'isOrganization', 'legacyPartnerId', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (PartnerPeer::ID, PartnerPeer::NAME, PartnerPeer::MAIL, PartnerPeer::WEB, PartnerPeer::CONTACT_PERSON, PartnerPeer::CONTACTDATA, PartnerPeer::COMMENTS, PartnerPeer::IS_ORGANIZATION, PartnerPeer::LEGACY_PARTNER_ID, PartnerPeer::CREATED_AT, PartnerPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'MAIL', 'WEB', 'CONTACT_PERSON', 'CONTACTDATA', 'COMMENTS', 'IS_ORGANIZATION', 'LEGACY_PARTNER_ID', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'mail', 'web', 'contact_person', 'contactdata', 'comments', 'is_organization', 'legacy_partner_id', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
     );
 
     /**
@@ -100,12 +105,12 @@ abstract class BasePartnerPeer
      * e.g. PartnerPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'Mail' => 2, 'Web' => 3, 'Contactperson' => 4, 'Contactdata' => 5, 'Comments' => 6, 'IsOrganization' => 7, 'LegacyPartnerId' => 8, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'mail' => 2, 'web' => 3, 'contactperson' => 4, 'contactdata' => 5, 'comments' => 6, 'isOrganization' => 7, 'legacyPartnerId' => 8, ),
-        BasePeer::TYPE_COLNAME => array (PartnerPeer::ID => 0, PartnerPeer::NAME => 1, PartnerPeer::MAIL => 2, PartnerPeer::WEB => 3, PartnerPeer::CONTACTPERSON => 4, PartnerPeer::CONTACTDATA => 5, PartnerPeer::COMMENTS => 6, PartnerPeer::IS_ORGANIZATION => 7, PartnerPeer::LEGACY_PARTNER_ID => 8, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'MAIL' => 2, 'WEB' => 3, 'CONTACTPERSON' => 4, 'CONTACTDATA' => 5, 'COMMENTS' => 6, 'IS_ORGANIZATION' => 7, 'LEGACY_PARTNER_ID' => 8, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'mail' => 2, 'web' => 3, 'contactperson' => 4, 'contactdata' => 5, 'comments' => 6, 'is_organization' => 7, 'legacy_partner_id' => 8, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'Mail' => 2, 'Web' => 3, 'ContactPerson' => 4, 'Contactdata' => 5, 'Comments' => 6, 'IsOrganization' => 7, 'LegacyPartnerId' => 8, 'CreatedAt' => 9, 'UpdatedAt' => 10, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'mail' => 2, 'web' => 3, 'contactPerson' => 4, 'contactdata' => 5, 'comments' => 6, 'isOrganization' => 7, 'legacyPartnerId' => 8, 'createdAt' => 9, 'updatedAt' => 10, ),
+        BasePeer::TYPE_COLNAME => array (PartnerPeer::ID => 0, PartnerPeer::NAME => 1, PartnerPeer::MAIL => 2, PartnerPeer::WEB => 3, PartnerPeer::CONTACT_PERSON => 4, PartnerPeer::CONTACTDATA => 5, PartnerPeer::COMMENTS => 6, PartnerPeer::IS_ORGANIZATION => 7, PartnerPeer::LEGACY_PARTNER_ID => 8, PartnerPeer::CREATED_AT => 9, PartnerPeer::UPDATED_AT => 10, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'MAIL' => 2, 'WEB' => 3, 'CONTACT_PERSON' => 4, 'CONTACTDATA' => 5, 'COMMENTS' => 6, 'IS_ORGANIZATION' => 7, 'LEGACY_PARTNER_ID' => 8, 'CREATED_AT' => 9, 'UPDATED_AT' => 10, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'mail' => 2, 'web' => 3, 'contact_person' => 4, 'contactdata' => 5, 'comments' => 6, 'is_organization' => 7, 'legacy_partner_id' => 8, 'created_at' => 9, 'updated_at' => 10, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
     );
 
     /**
@@ -183,21 +188,25 @@ abstract class BasePartnerPeer
             $criteria->addSelectColumn(PartnerPeer::NAME);
             $criteria->addSelectColumn(PartnerPeer::MAIL);
             $criteria->addSelectColumn(PartnerPeer::WEB);
-            $criteria->addSelectColumn(PartnerPeer::CONTACTPERSON);
+            $criteria->addSelectColumn(PartnerPeer::CONTACT_PERSON);
             $criteria->addSelectColumn(PartnerPeer::CONTACTDATA);
             $criteria->addSelectColumn(PartnerPeer::COMMENTS);
             $criteria->addSelectColumn(PartnerPeer::IS_ORGANIZATION);
             $criteria->addSelectColumn(PartnerPeer::LEGACY_PARTNER_ID);
+            $criteria->addSelectColumn(PartnerPeer::CREATED_AT);
+            $criteria->addSelectColumn(PartnerPeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.name');
             $criteria->addSelectColumn($alias . '.mail');
             $criteria->addSelectColumn($alias . '.web');
-            $criteria->addSelectColumn($alias . '.contactperson');
+            $criteria->addSelectColumn($alias . '.contact_person');
             $criteria->addSelectColumn($alias . '.contactdata');
             $criteria->addSelectColumn($alias . '.comments');
             $criteria->addSelectColumn($alias . '.is_organization');
             $criteria->addSelectColumn($alias . '.legacy_partner_id');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -404,9 +413,6 @@ abstract class BasePartnerPeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in ImagesourcePeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        ImagesourcePeer::clearInstancePool();
         // Invalidate objects in TextsourcePeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         TextsourcePeer::clearInstancePool();

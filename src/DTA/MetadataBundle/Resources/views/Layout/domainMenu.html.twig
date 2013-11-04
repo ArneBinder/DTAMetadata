@@ -25,8 +25,8 @@
 </code>
 #}
 
-{# to highlight the active entity #}
-{% set className = app.request.attributes.get('_route_params').className|default("no cn given") %}
+{# to highlight the active entity: get class name from url.  #}
+{% set highlightItem = app.request.attributes.get('_route_params').className|default(app.request.attributes.get('_route')) %}
 
 {% macro input(name, value, type, size) %}
     <input type="{{ type|default('text') }}" name="{{ name }}" value="{{ value|e }}" size="{{ size|default(20) }}" />
@@ -45,7 +45,7 @@
             {% set isInSubMenu = false %}
             {% for child in item.children %}
                 {% if child.modelClass is defined %}
-                    {% set isInSubMenu = isInSubMenu or className == child.modelClass %}
+                    {% set isInSubMenu = isInSubMenu or highlightItem == child.modelClass %}
                 {% endif %}
             {% endfor %}
 
@@ -82,21 +82,24 @@
                 {% endfor %}
                 </ul>
             </li>
-        {% else %} {# item has no children #}
-        {# If the menu element is a model class, add view and create options #}
-        {% if item.modelClass is defined %}
-            {% set active = className == item.modelClass ? "active" : ""%}
-            <li class="{{active}}">
-                
-                   <a href="{{ path(package~'_genericViewAll', {'package':package, 'className':item.modelClass}) }}"> 
-                          {{ item.caption }} 
-                    </a>
-            </li>
-        {# The menu element is a simple link #}
-        {% else %}
-            <li><a href="{{ path(item.route, item.parameters|default({})) }}">{{ item.caption }}</a></li>
+        {# top level link without children #}
+        {% else %} 
+            {# If the menu element is a model class, add view and create options #}
+            {% if item.modelClass is defined %}
+                {% set active = highlightItem == item.modelClass ? "active" : ""%}
+                <li class="{{active}}">
+                    <a href="{{ path(package~'_genericViewAll', {'package':package, 'className':item.modelClass}) }}"> 
+                           {{ item.caption }} 
+                     </a>
+                </li>
+            {# The menu element is a simple link #}
+            {% else %}
+                {% set active = highlightItem == item.route ? "active" : ""%}
+                <li class="{{active}}">
+                    <a href="{{ path(item.route, item.parameters|default({})) }}">{{ item.caption }}</a>
+                </li>
+            {% endif %}
         {% endif %}
-    {% endif %}
     {% endfor %}
                 
     </ul>       

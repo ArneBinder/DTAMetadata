@@ -15,6 +15,7 @@ use \PropelPDO;
 use DTA\MetadataBundle\Model\Master\DtaUser;
 use DTA\MetadataBundle\Model\Master\DtaUserPeer;
 use DTA\MetadataBundle\Model\Master\DtaUserQuery;
+use DTA\MetadataBundle\Model\Master\RecentUse;
 use DTA\MetadataBundle\Model\Workflow\Task;
 
 /**
@@ -23,6 +24,7 @@ use DTA\MetadataBundle\Model\Workflow\Task;
  * @method DtaUserQuery orderBySalt($order = Criteria::ASC) Order by the salt column
  * @method DtaUserQuery orderByMail($order = Criteria::ASC) Order by the mail column
  * @method DtaUserQuery orderByAdmin($order = Criteria::ASC) Order by the admin column
+ * @method DtaUserQuery orderByLegacyUserId($order = Criteria::ASC) Order by the legacy_user_id column
  * @method DtaUserQuery orderById($order = Criteria::ASC) Order by the id column
  *
  * @method DtaUserQuery groupByUsername() Group by the username column
@@ -30,11 +32,16 @@ use DTA\MetadataBundle\Model\Workflow\Task;
  * @method DtaUserQuery groupBySalt() Group by the salt column
  * @method DtaUserQuery groupByMail() Group by the mail column
  * @method DtaUserQuery groupByAdmin() Group by the admin column
+ * @method DtaUserQuery groupByLegacyUserId() Group by the legacy_user_id column
  * @method DtaUserQuery groupById() Group by the id column
  *
  * @method DtaUserQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method DtaUserQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method DtaUserQuery innerJoin($relation) Adds a INNER JOIN clause to the query
+ *
+ * @method DtaUserQuery leftJoinRecentUse($relationAlias = null) Adds a LEFT JOIN clause to the query using the RecentUse relation
+ * @method DtaUserQuery rightJoinRecentUse($relationAlias = null) Adds a RIGHT JOIN clause to the query using the RecentUse relation
+ * @method DtaUserQuery innerJoinRecentUse($relationAlias = null) Adds a INNER JOIN clause to the query using the RecentUse relation
  *
  * @method DtaUserQuery leftJoinTask($relationAlias = null) Adds a LEFT JOIN clause to the query using the Task relation
  * @method DtaUserQuery rightJoinTask($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Task relation
@@ -48,12 +55,14 @@ use DTA\MetadataBundle\Model\Workflow\Task;
  * @method DtaUser findOneBySalt(string $salt) Return the first DtaUser filtered by the salt column
  * @method DtaUser findOneByMail(string $mail) Return the first DtaUser filtered by the mail column
  * @method DtaUser findOneByAdmin(boolean $admin) Return the first DtaUser filtered by the admin column
+ * @method DtaUser findOneByLegacyUserId(int $legacy_user_id) Return the first DtaUser filtered by the legacy_user_id column
  *
  * @method array findByUsername(string $username) Return DtaUser objects filtered by the username column
  * @method array findByPassword(string $password) Return DtaUser objects filtered by the password column
  * @method array findBySalt(string $salt) Return DtaUser objects filtered by the salt column
  * @method array findByMail(string $mail) Return DtaUser objects filtered by the mail column
  * @method array findByAdmin(boolean $admin) Return DtaUser objects filtered by the admin column
+ * @method array findByLegacyUserId(int $legacy_user_id) Return DtaUser objects filtered by the legacy_user_id column
  * @method array findById(int $id) Return DtaUser objects filtered by the id column
  */
 abstract class BaseDtaUserQuery extends ModelCriteria
@@ -156,7 +165,7 @@ abstract class BaseDtaUserQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "username", "password", "salt", "mail", "admin", "id" FROM "dta_user" WHERE "id" = :p0';
+        $sql = 'SELECT "username", "password", "salt", "mail", "admin", "legacy_user_id", "id" FROM "dta_user" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -389,6 +398,48 @@ abstract class BaseDtaUserQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the legacy_user_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByLegacyUserId(1234); // WHERE legacy_user_id = 1234
+     * $query->filterByLegacyUserId(array(12, 34)); // WHERE legacy_user_id IN (12, 34)
+     * $query->filterByLegacyUserId(array('min' => 12)); // WHERE legacy_user_id >= 12
+     * $query->filterByLegacyUserId(array('max' => 12)); // WHERE legacy_user_id <= 12
+     * </code>
+     *
+     * @param     mixed $legacyUserId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return DtaUserQuery The current query, for fluid interface
+     */
+    public function filterByLegacyUserId($legacyUserId = null, $comparison = null)
+    {
+        if (is_array($legacyUserId)) {
+            $useMinMax = false;
+            if (isset($legacyUserId['min'])) {
+                $this->addUsingAlias(DtaUserPeer::LEGACY_USER_ID, $legacyUserId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($legacyUserId['max'])) {
+                $this->addUsingAlias(DtaUserPeer::LEGACY_USER_ID, $legacyUserId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(DtaUserPeer::LEGACY_USER_ID, $legacyUserId, $comparison);
+    }
+
+    /**
      * Filter the query on the id column
      *
      * Example usage:
@@ -428,6 +479,80 @@ abstract class BaseDtaUserQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(DtaUserPeer::ID, $id, $comparison);
+    }
+
+    /**
+     * Filter the query by a related RecentUse object
+     *
+     * @param   RecentUse|PropelObjectCollection $recentUse  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 DtaUserQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByRecentUse($recentUse, $comparison = null)
+    {
+        if ($recentUse instanceof RecentUse) {
+            return $this
+                ->addUsingAlias(DtaUserPeer::ID, $recentUse->getDtaUserId(), $comparison);
+        } elseif ($recentUse instanceof PropelObjectCollection) {
+            return $this
+                ->useRecentUseQuery()
+                ->filterByPrimaryKeys($recentUse->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByRecentUse() only accepts arguments of type RecentUse or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the RecentUse relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return DtaUserQuery The current query, for fluid interface
+     */
+    public function joinRecentUse($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('RecentUse');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'RecentUse');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the RecentUse relation RecentUse object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\Master\RecentUseQuery A secondary query class using the current class as primary query
+     */
+    public function useRecentUseQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinRecentUse($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'RecentUse', '\DTA\MetadataBundle\Model\Master\RecentUseQuery');
     }
 
     /**

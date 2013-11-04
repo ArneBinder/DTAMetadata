@@ -43,6 +43,22 @@ class DTADomainController extends Controller {
         return $this->render($template, $options);
     }
     
+    public function deliverCSV($template, $options = array()){
+        $response = $this->render($template, $options);
+        
+        $response->setStatusCode(200);
+        $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
+        $response->headers->set('Content-Description', 'Submissions Export');
+        $response->headers->set('Content-Disposition', 'attachment; filename=duplicates.csv');
+        $response->headers->set('Content-Transfer-Encoding', 'binary');
+        $response->headers->set('Pragma', 'no-cache');
+        $response->headers->set('Expires', '0');
+
+        $response->sendHeaders();
+        $response->sendContent();
+
+        return $response; 
+    }
     /**
      * Short cuts for adding session messages that report the state of some transaction.
      * @param String $message The message to display

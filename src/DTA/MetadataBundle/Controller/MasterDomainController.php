@@ -31,11 +31,17 @@ class MasterDomainController extends ORMController {
             $error = $session->get(SecurityContext::AUTHENTICATION_ERROR);
             $session->remove(SecurityContext::AUTHENTICATION_ERROR);
         }
+        
+        // provide registered users as dropdown
+        $uq = \DTA\MetadataBundle\Model\Master\DtaUserQuery::create()
+                ->orderByUsername()
+                ->find();
 
         return $this->renderWithDomainData('DTAMetadataBundle:Package_Master:login.html.twig', array(
                     // last username entered by the user
                     'last_username' => $session->get(SecurityContext::LAST_USERNAME),
                     'error' => $error,
+                    'userNames' => $uq,
                 )
         );
     }

@@ -50,9 +50,6 @@
         <column name="directoryname" type="LONGVARCHAR"/>
         <column name="wwwready" type="INTEGER"/>
         
-        
-        
-        
         <column name="legacy_book_id" description="id_book des Datensatzes aus der alten Datenbank, der dem neuen Datensatz zugrundeliegt." type="INTEGER"/>
         
         <!--Workflow-Aspekte -->        

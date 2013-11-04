@@ -1,34 +1,38 @@
 <?php
 
-namespace DTA\MetadataBundle\Model\Workflow\om;
+namespace DTA\MetadataBundle\Model\Master\om;
 
 use \BaseObject;
 use \BasePeer;
 use \Criteria;
+use \DateTime;
 use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
+use \PropelDateTime;
 use \PropelException;
 use \PropelPDO;
 use DTA\MetadataBundle\Model\Data\Publication;
 use DTA\MetadataBundle\Model\Data\PublicationQuery;
-use DTA\MetadataBundle\Model\Workflow\Imagesource;
-use DTA\MetadataBundle\Model\Workflow\ImagesourcePeer;
-use DTA\MetadataBundle\Model\Workflow\ImagesourceQuery;
+use DTA\MetadataBundle\Model\Master\DtaUser;
+use DTA\MetadataBundle\Model\Master\DtaUserQuery;
+use DTA\MetadataBundle\Model\Master\RecentUse;
+use DTA\MetadataBundle\Model\Master\RecentUsePeer;
+use DTA\MetadataBundle\Model\Master\RecentUseQuery;
 
-abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\MetadataBundle\Model\table_row_view\TableRowViewInterface
+abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\MetadataBundle\Model\table_row_view\TableRowViewInterface
 {
     /**
      * Peer class name
      */
-    const PEER = 'DTA\\MetadataBundle\\Model\\Workflow\\ImagesourcePeer';
+    const PEER = 'DTA\\MetadataBundle\\Model\\Master\\RecentUsePeer';
 
     /**
      * The Peer class.
      * Instance provides a convenient way of calling static methods on a class
      * that calling code may not be able to identify.
-     * @var        ImagesourcePeer
+     * @var        RecentUsePeer
      */
     protected static $peer;
 
@@ -39,10 +43,10 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
     protected $startCopy = false;
 
     /**
-     * The value for the id field.
+     * The value for the dta_user_id field.
      * @var        int
      */
-    protected $id;
+    protected $dta_user_id;
 
     /**
      * The value for the publication_id field.
@@ -51,16 +55,21 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
     protected $publication_id;
 
     /**
-     * The value for the faksimilerefrange field.
+     * The value for the date field.
      * @var        string
      */
-    protected $faksimilerefrange;
+    protected $date;
 
     /**
-     * The value for the originalrefrange field.
-     * @var        string
+     * The value for the id field.
+     * @var        int
      */
-    protected $originalrefrange;
+    protected $id;
+
+    /**
+     * @var        DtaUser
+     */
+    protected $aDtaUser;
 
     /**
      * @var        Publication
@@ -88,15 +97,15 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Id', 'PublicationId', 'Faksimilerefrange', 'Originalrefrange', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'PublicationId'=>'PublicationId', 'Faksimilerefrange'=>'Faksimilerefrange', 'Originalrefrange'=>'Originalrefrange', );
+    public static $tableRowViewCaptions = array('DtaUserId', 'PublicationId', 'Date', 'Id', );	public   $tableRowViewAccessors = array('DtaUserId'=>'DtaUserId', 'PublicationId'=>'PublicationId', 'Date'=>'Date', 'Id'=>'Id', );
     /**
-     * Get the [id] column value.
+     * Get the [dta_user_id] column value.
      *
      * @return int
      */
-    public function getId()
+    public function getDtaUserId()
     {
-        return $this->id;
+        return $this->dta_user_id;
     }
 
     /**
@@ -110,51 +119,80 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
     }
 
     /**
-     * Get the [faksimilerefrange] column value.
-     * Referenzierte Faksimileseitenzahlen
-     * @return string
+     * Get the [optionally formatted] temporal [date] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null
+     * @throws PropelException - if unable to parse/validate the date/time value.
      */
-    public function getFaksimilerefrange()
+    public function getDate($format = null)
     {
-        return $this->faksimilerefrange;
+        if ($this->date === null) {
+            return null;
+        }
+
+
+        try {
+            $dt = new DateTime($this->date);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->date, true), $x);
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
-     * Get the [originalrefrange] column value.
-     * Referenzierte Originalseitenzahlen
-     * @return string
+     * Get the [id] column value.
+     *
+     * @return int
      */
-    public function getOriginalrefrange()
+    public function getId()
     {
-        return $this->originalrefrange;
+        return $this->id;
     }
 
     /**
-     * Set the value of [id] column.
+     * Set the value of [dta_user_id] column.
      *
      * @param int $v new value
-     * @return Imagesource The current object (for fluent API support)
+     * @return RecentUse The current object (for fluent API support)
      */
-    public function setId($v)
+    public function setDtaUserId($v)
     {
         if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
-        if ($this->id !== $v) {
-            $this->id = $v;
-            $this->modifiedColumns[] = ImagesourcePeer::ID;
+        if ($this->dta_user_id !== $v) {
+            $this->dta_user_id = $v;
+            $this->modifiedColumns[] = RecentUsePeer::DTA_USER_ID;
+        }
+
+        if ($this->aDtaUser !== null && $this->aDtaUser->getId() !== $v) {
+            $this->aDtaUser = null;
         }
 
 
         return $this;
-    } // setId()
+    } // setDtaUserId()
 
     /**
      * Set the value of [publication_id] column.
      *
      * @param int $v new value
-     * @return Imagesource The current object (for fluent API support)
+     * @return RecentUse The current object (for fluent API support)
      */
     public function setPublicationId($v)
     {
@@ -164,7 +202,7 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
 
         if ($this->publication_id !== $v) {
             $this->publication_id = $v;
-            $this->modifiedColumns[] = ImagesourcePeer::PUBLICATION_ID;
+            $this->modifiedColumns[] = RecentUsePeer::PUBLICATION_ID;
         }
 
         if ($this->aPublication !== null && $this->aPublication->getId() !== $v) {
@@ -176,46 +214,48 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
     } // setPublicationId()
 
     /**
-     * Set the value of [faksimilerefrange] column.
-     * Referenzierte Faksimileseitenzahlen
-     * @param string $v new value
-     * @return Imagesource The current object (for fluent API support)
+     * Sets the value of [date] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return RecentUse The current object (for fluent API support)
      */
-    public function setFaksimilerefrange($v)
+    public function setDate($v)
     {
-        if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
-        }
-
-        if ($this->faksimilerefrange !== $v) {
-            $this->faksimilerefrange = $v;
-            $this->modifiedColumns[] = ImagesourcePeer::FAKSIMILEREFRANGE;
-        }
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->date !== null || $dt !== null) {
+            $currentDateAsString = ($this->date !== null && $tmpDt = new DateTime($this->date)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->date = $newDateAsString;
+                $this->modifiedColumns[] = RecentUsePeer::DATE;
+            }
+        } // if either are not null
 
 
         return $this;
-    } // setFaksimilerefrange()
+    } // setDate()
 
     /**
-     * Set the value of [originalrefrange] column.
-     * Referenzierte Originalseitenzahlen
-     * @param string $v new value
-     * @return Imagesource The current object (for fluent API support)
+     * Set the value of [id] column.
+     *
+     * @param int $v new value
+     * @return RecentUse The current object (for fluent API support)
      */
-    public function setOriginalrefrange($v)
+    public function setId($v)
     {
         if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
+            $v = (int) $v;
         }
 
-        if ($this->originalrefrange !== $v) {
-            $this->originalrefrange = $v;
-            $this->modifiedColumns[] = ImagesourcePeer::ORIGINALREFRANGE;
+        if ($this->id !== $v) {
+            $this->id = $v;
+            $this->modifiedColumns[] = RecentUsePeer::ID;
         }
 
 
         return $this;
-    } // setOriginalrefrange()
+    } // setId()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -249,10 +289,10 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
     {
         try {
 
-            $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
+            $this->dta_user_id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->publication_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-            $this->faksimilerefrange = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-            $this->originalrefrange = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+            $this->date = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+            $this->id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -261,10 +301,10 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 4; // 4 = ImagesourcePeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 4; // 4 = RecentUsePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating Imagesource object", $e);
+            throw new PropelException("Error populating RecentUse object", $e);
         }
     }
 
@@ -284,6 +324,9 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
     public function ensureConsistency()
     {
 
+        if ($this->aDtaUser !== null && $this->dta_user_id !== $this->aDtaUser->getId()) {
+            $this->aDtaUser = null;
+        }
         if ($this->aPublication !== null && $this->publication_id !== $this->aPublication->getId()) {
             $this->aPublication = null;
         }
@@ -310,13 +353,13 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(ImagesourcePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(RecentUsePeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $stmt = ImagesourcePeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+        $stmt = RecentUsePeer::doSelectStmt($this->buildPkeyCriteria(), $con);
         $row = $stmt->fetch(PDO::FETCH_NUM);
         $stmt->closeCursor();
         if (!$row) {
@@ -326,6 +369,7 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->aDtaUser = null;
             $this->aPublication = null;
         } // if (deep)
     }
@@ -347,12 +391,12 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(ImagesourcePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(RecentUsePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = ImagesourceQuery::create()
+            $deleteQuery = RecentUseQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -390,7 +434,7 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(ImagesourcePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(RecentUsePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         $con->beginTransaction();
@@ -410,7 +454,7 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                ImagesourcePeer::addInstanceToPool($this);
+                RecentUsePeer::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -444,6 +488,13 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
             // were passed to this object by their coresponding set
             // method.  This object relates to these object(s) by a
             // foreign key reference.
+
+            if ($this->aDtaUser !== null) {
+                if ($this->aDtaUser->isModified() || $this->aDtaUser->isNew()) {
+                    $affectedRows += $this->aDtaUser->save($con);
+                }
+                $this->setDtaUser($this->aDtaUser);
+            }
 
             if ($this->aPublication !== null) {
                 if ($this->aPublication->isModified() || $this->aPublication->isNew()) {
@@ -483,13 +534,13 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = ImagesourcePeer::ID;
+        $this->modifiedColumns[] = RecentUsePeer::ID;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . ImagesourcePeer::ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . RecentUsePeer::ID . ')');
         }
         if (null === $this->id) {
             try {
-                $stmt = $con->query("SELECT nextval('imagesource_id_seq')");
+                $stmt = $con->query("SELECT nextval('recent_use_id_seq')");
                 $row = $stmt->fetch(PDO::FETCH_NUM);
                 $this->id = $row[0];
             } catch (Exception $e) {
@@ -499,21 +550,21 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
 
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(ImagesourcePeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '"id"';
+        if ($this->isColumnModified(RecentUsePeer::DTA_USER_ID)) {
+            $modifiedColumns[':p' . $index++]  = '"dta_user_id"';
         }
-        if ($this->isColumnModified(ImagesourcePeer::PUBLICATION_ID)) {
+        if ($this->isColumnModified(RecentUsePeer::PUBLICATION_ID)) {
             $modifiedColumns[':p' . $index++]  = '"publication_id"';
         }
-        if ($this->isColumnModified(ImagesourcePeer::FAKSIMILEREFRANGE)) {
-            $modifiedColumns[':p' . $index++]  = '"faksimilerefrange"';
+        if ($this->isColumnModified(RecentUsePeer::DATE)) {
+            $modifiedColumns[':p' . $index++]  = '"date"';
         }
-        if ($this->isColumnModified(ImagesourcePeer::ORIGINALREFRANGE)) {
-            $modifiedColumns[':p' . $index++]  = '"originalrefrange"';
+        if ($this->isColumnModified(RecentUsePeer::ID)) {
+            $modifiedColumns[':p' . $index++]  = '"id"';
         }
 
         $sql = sprintf(
-            'INSERT INTO "imagesource" (%s) VALUES (%s)',
+            'INSERT INTO "recent_use" (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -522,17 +573,17 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '"id"':
-                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
+                    case '"dta_user_id"':
+                        $stmt->bindValue($identifier, $this->dta_user_id, PDO::PARAM_INT);
                         break;
                     case '"publication_id"':
                         $stmt->bindValue($identifier, $this->publication_id, PDO::PARAM_INT);
                         break;
-                    case '"faksimilerefrange"':
-                        $stmt->bindValue($identifier, $this->faksimilerefrange, PDO::PARAM_STR);
+                    case '"date"':
+                        $stmt->bindValue($identifier, $this->date, PDO::PARAM_STR);
                         break;
-                    case '"originalrefrange"':
-                        $stmt->bindValue($identifier, $this->originalrefrange, PDO::PARAM_STR);
+                    case '"id"':
+                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -626,6 +677,12 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
+            if ($this->aDtaUser !== null) {
+                if (!$this->aDtaUser->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aDtaUser->getValidationFailures());
+                }
+            }
+
             if ($this->aPublication !== null) {
                 if (!$this->aPublication->validate($columns)) {
                     $failureMap = array_merge($failureMap, $this->aPublication->getValidationFailures());
@@ -633,7 +690,7 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
             }
 
 
-            if (($retval = ImagesourcePeer::doValidate($this, $columns)) !== true) {
+            if (($retval = RecentUsePeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
@@ -657,7 +714,7 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
      */
     public function getByName($name, $type = BasePeer::TYPE_PHPNAME)
     {
-        $pos = ImagesourcePeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+        $pos = RecentUsePeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -674,16 +731,16 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
     {
         switch ($pos) {
             case 0:
-                return $this->getId();
+                return $this->getDtaUserId();
                 break;
             case 1:
                 return $this->getPublicationId();
                 break;
             case 2:
-                return $this->getFaksimilerefrange();
+                return $this->getDate();
                 break;
             case 3:
-                return $this->getOriginalrefrange();
+                return $this->getId();
                 break;
             default:
                 return null;
@@ -708,18 +765,21 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
      */
     public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['Imagesource'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['RecentUse'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['Imagesource'][$this->getPrimaryKey()] = true;
-        $keys = ImagesourcePeer::getFieldNames($keyType);
+        $alreadyDumpedObjects['RecentUse'][$this->getPrimaryKey()] = true;
+        $keys = RecentUsePeer::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getId(),
+            $keys[0] => $this->getDtaUserId(),
             $keys[1] => $this->getPublicationId(),
-            $keys[2] => $this->getFaksimilerefrange(),
-            $keys[3] => $this->getOriginalrefrange(),
+            $keys[2] => $this->getDate(),
+            $keys[3] => $this->getId(),
         );
         if ($includeForeignObjects) {
+            if (null !== $this->aDtaUser) {
+                $result['DtaUser'] = $this->aDtaUser->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
             if (null !== $this->aPublication) {
                 $result['Publication'] = $this->aPublication->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
@@ -741,7 +801,7 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
      */
     public function setByName($name, $value, $type = BasePeer::TYPE_PHPNAME)
     {
-        $pos = ImagesourcePeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+        $pos = RecentUsePeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 
         $this->setByPosition($pos, $value);
     }
@@ -758,16 +818,16 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
     {
         switch ($pos) {
             case 0:
-                $this->setId($value);
+                $this->setDtaUserId($value);
                 break;
             case 1:
                 $this->setPublicationId($value);
                 break;
             case 2:
-                $this->setFaksimilerefrange($value);
+                $this->setDate($value);
                 break;
             case 3:
-                $this->setOriginalrefrange($value);
+                $this->setId($value);
                 break;
         } // switch()
     }
@@ -791,12 +851,12 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
      */
     public function fromArray($arr, $keyType = BasePeer::TYPE_PHPNAME)
     {
-        $keys = ImagesourcePeer::getFieldNames($keyType);
+        $keys = RecentUsePeer::getFieldNames($keyType);
 
-        if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
+        if (array_key_exists($keys[0], $arr)) $this->setDtaUserId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setPublicationId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setFaksimilerefrange($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setOriginalrefrange($arr[$keys[3]]);
+        if (array_key_exists($keys[2], $arr)) $this->setDate($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setId($arr[$keys[3]]);
     }
 
     /**
@@ -806,12 +866,12 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(ImagesourcePeer::DATABASE_NAME);
+        $criteria = new Criteria(RecentUsePeer::DATABASE_NAME);
 
-        if ($this->isColumnModified(ImagesourcePeer::ID)) $criteria->add(ImagesourcePeer::ID, $this->id);
-        if ($this->isColumnModified(ImagesourcePeer::PUBLICATION_ID)) $criteria->add(ImagesourcePeer::PUBLICATION_ID, $this->publication_id);
-        if ($this->isColumnModified(ImagesourcePeer::FAKSIMILEREFRANGE)) $criteria->add(ImagesourcePeer::FAKSIMILEREFRANGE, $this->faksimilerefrange);
-        if ($this->isColumnModified(ImagesourcePeer::ORIGINALREFRANGE)) $criteria->add(ImagesourcePeer::ORIGINALREFRANGE, $this->originalrefrange);
+        if ($this->isColumnModified(RecentUsePeer::DTA_USER_ID)) $criteria->add(RecentUsePeer::DTA_USER_ID, $this->dta_user_id);
+        if ($this->isColumnModified(RecentUsePeer::PUBLICATION_ID)) $criteria->add(RecentUsePeer::PUBLICATION_ID, $this->publication_id);
+        if ($this->isColumnModified(RecentUsePeer::DATE)) $criteria->add(RecentUsePeer::DATE, $this->date);
+        if ($this->isColumnModified(RecentUsePeer::ID)) $criteria->add(RecentUsePeer::ID, $this->id);
 
         return $criteria;
     }
@@ -826,8 +886,8 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(ImagesourcePeer::DATABASE_NAME);
-        $criteria->add(ImagesourcePeer::ID, $this->id);
+        $criteria = new Criteria(RecentUsePeer::DATABASE_NAME);
+        $criteria->add(RecentUsePeer::ID, $this->id);
 
         return $criteria;
     }
@@ -868,16 +928,16 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param object $copyObj An object of Imagesource (or compatible) type.
+     * @param object $copyObj An object of RecentUse (or compatible) type.
      * @param boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
+        $copyObj->setDtaUserId($this->getDtaUserId());
         $copyObj->setPublicationId($this->getPublicationId());
-        $copyObj->setFaksimilerefrange($this->getFaksimilerefrange());
-        $copyObj->setOriginalrefrange($this->getOriginalrefrange());
+        $copyObj->setDate($this->getDate());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -905,7 +965,7 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
      * objects.
      *
      * @param boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return Imagesource Clone of current object.
+     * @return RecentUse Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -925,22 +985,74 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
      * same instance for all member of this class. The method could therefore
      * be static, but this would prevent one from overriding the behavior.
      *
-     * @return ImagesourcePeer
+     * @return RecentUsePeer
      */
     public function getPeer()
     {
         if (self::$peer === null) {
-            self::$peer = new ImagesourcePeer();
+            self::$peer = new RecentUsePeer();
         }
 
         return self::$peer;
     }
 
     /**
+     * Declares an association between this object and a DtaUser object.
+     *
+     * @param             DtaUser $v
+     * @return RecentUse The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setDtaUser(DtaUser $v = null)
+    {
+        if ($v === null) {
+            $this->setDtaUserId(NULL);
+        } else {
+            $this->setDtaUserId($v->getId());
+        }
+
+        $this->aDtaUser = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the DtaUser object, it will not be re-added.
+        if ($v !== null) {
+            $v->addRecentUse($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated DtaUser object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return DtaUser The associated DtaUser object.
+     * @throws PropelException
+     */
+    public function getDtaUser(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aDtaUser === null && ($this->dta_user_id !== null) && $doQuery) {
+            $this->aDtaUser = DtaUserQuery::create()->findPk($this->dta_user_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aDtaUser->addRecentUses($this);
+             */
+        }
+
+        return $this->aDtaUser;
+    }
+
+    /**
      * Declares an association between this object and a Publication object.
      *
      * @param             Publication $v
-     * @return Imagesource The current object (for fluent API support)
+     * @return RecentUse The current object (for fluent API support)
      * @throws PropelException
      */
     public function setPublication(Publication $v = null)
@@ -956,7 +1068,7 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the Publication object, it will not be re-added.
         if ($v !== null) {
-            $v->addImagesource($this);
+            $v->addRecentUse($this);
         }
 
 
@@ -981,7 +1093,7 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aPublication->addImagesources($this);
+                $this->aPublication->addRecentUses($this);
              */
         }
 
@@ -993,10 +1105,10 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
      */
     public function clear()
     {
-        $this->id = null;
+        $this->dta_user_id = null;
         $this->publication_id = null;
-        $this->faksimilerefrange = null;
-        $this->originalrefrange = null;
+        $this->date = null;
+        $this->id = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
@@ -1019,6 +1131,9 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->aDtaUser instanceof Persistent) {
+              $this->aDtaUser->clearAllReferences($deep);
+            }
             if ($this->aPublication instanceof Persistent) {
               $this->aPublication->clearAllReferences($deep);
             }
@@ -1026,6 +1141,7 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
+        $this->aDtaUser = null;
         $this->aPublication = null;
     }
 
@@ -1036,7 +1152,7 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
      */
     public function __toString()
     {
-        return (string) $this->exportTo(ImagesourcePeer::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(RecentUsePeer::DEFAULT_STRING_FORMAT);
     }
 
     /**

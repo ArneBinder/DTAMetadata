@@ -57,6 +57,10 @@
     <table name="tasktype">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
+        
+         <!--id of the task type id (not present in the old database, parsed by the legacy application from wf2.dot) -->
+        <column name="legacy_tasktype_id" type="INTEGER"/>
+        
         <behavior name="nested_set"/>
         <behavior name="table_row_view">
 <!--            <parameter name="id" value="id"/>-->
@@ -65,17 +69,63 @@
         </behavior>
     </table>
     
+    <!--Bezugsquelle:
+        Wo ein Exemplar eines Buches gefunden werden kann (Partner/Bibliothek:Signatur), welche Qualität es aufweist und ob es verfügbar (?) ist.
+        Entspricht Tabelle 'fundstellen' im alten Modell. 
+        Ist prinzipiell eine many-to-many Beziehung, weist aber zusätzliche Attribute auf (deswegen nicht im Master Schema).-->
+    <table name="copy_location">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="publication_id" type="INTEGER" required="true"/>
+        <column name="partner_id" description="Anbieter Leitdruck" type="INTEGER" required="true"/>
+        <column name="catalogue_signature" type="LONGVARCHAR"/>
+        <!--Interne Kennung der Bibliothek in ihrem Katalog, entspricht der alten Bib-Id-->
+        <column name="catalogue_internal" type="LONGVARCHAR"/>
+        <column name="catalogue_url" type="LONGVARCHAR"/>
+        <column description="Anzahl Faksimiles" name="numfaksimiles" type="INTEGER"/>
+        <column description="Umfang laut Katalog" name="catalogue_extent" type="LONGVARCHAR"/>
+        
+        <!--1: verfügbar, 0: nicht verfügbar, NULL: ungeklärt-->
+        <column name="availability" type="BOOLEAN"/>
+        <column name="comments" type="LONGVARCHAR"/>
+        <column description="URL der Bilddigitalisate" name="imageurl" type="LONGVARCHAR"/>
+        <column description="URN der Bilddigitalisate" name="imageurn" type="LONGVARCHAR"/>
+        <column name="license_id" description="Lizenz" type="INTEGER"/>
+        
+        <!--id of the row in table fundstellen from which this record originates-->
+        <column name="legacy_fundstellen_id" type="INTEGER"/>
+        
+        <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="partner"> <reference local="partner_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="license"> <reference local="license_id" foreign="id"/> </foreign-key>
+        
+        <behavior name="timestampable"/>
+        <behavior name="table_row_view">
+            <parameter name="embedColumns1" value="partner"/>
+            <parameter name="Signatur" value="catalogue_signature"/>
+            <parameter name="embedColumns2" value="publication"/>
+        </behavior>
+    </table>
+    
+
     <table name="partner">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR"/>
         <column name="mail" type="LONGVARCHAR"/>
         <column name="web" type="LONGVARCHAR"/>
-        <column name="contactperson" description="Ansprechpartner" type="LONGVARCHAR"/>
+        <column name="contact_person" description="Ansprechpartner" type="LONGVARCHAR"/>
         <column name="contactdata" type="LONGVARCHAR"/>
         <column name="comments" type="LONGVARCHAR"/>
         <column name="is_organization" type="BOOLEAN" default="false"/>
         
-        <column name="legacy_partner_id" description="id_book_location (=Partner/Bibliothek) des Datensatzes aus der alten Datenbank, der dem neuen Datensatz zugrundeliegt." type="INTEGER"/>
+        <column name="legacy_partner_id" description="partner.id_book_location des Datensatzes aus der alten Datenbank, der dem neuen Datensatz zugrundeliegt." type="INTEGER"/>
+        
+        <behavior name="timestampable"/>
+        <behavior name="table_row_view">
+            <parameter name="Name" value="name"/>
+            <parameter name="Ansprechpartner" value="contact_person"/>
+            <parameter name="Mail" value="mail"/>
+            <parameter name="Web" value="web"/>
+        </behavior>
         
     </table>
 
@@ -85,23 +135,11 @@
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="publication_id" type="INTEGER" required="true"/>
        
-        <column description="Anbieter Leitdruck" name="partner_id" type="INTEGER"/>
-        <column name="cataloguesignature" type="LONGVARCHAR"/>
-        <column name="catalogueurl" description="Link in den Katalog" type="LONGVARCHAR"/>
-        
-        <column description="Anzahl Faksimiles" name="numfaksimiles" type="INTEGER"/>
-        <column description="Umfang laut Katalog" name="extentasofcatalogue" type="LONGVARCHAR"/>
         <!--Bilddigitalisate können teilweise aus anderen Quellen kommen.-->
         <column description="Referenzierte Faksimileseitenzahlen" name="faksimilerefrange" type="LONGVARCHAR"/>
         <column description="Referenzierte Originalseitenzahlen" name="originalrefrange" type="LONGVARCHAR"/>
 
-        <column description="URL der Bilddigitalisate" name="imageurl" type="LONGVARCHAR"/>
-        <column description="URN der Bilddigitalisate" name="imageurn" type="LONGVARCHAR"/>
-        <column name="license_id" description="Lizenz" type="INTEGER"/>
-        
         <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="license"> <reference local="license_id" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="partner" onDelete="setnull"> <reference local="partner_id" foreign="id"/> </foreign-key>
     </table>
     
     <!--Quellenangabe fuer Textdigitalisate-->
@@ -133,6 +171,10 @@
         <column name="applicable_to_image" type="BOOLEAN" required="true" default="false"/>
         <!--Ob diese Lizenz auf Text anwendbar ist -->
         <column name="applicable_to_text" type="BOOLEAN" required="true" default="false"/>
+        <behavior name="table_row_view">
+            <parameter name="Name" value="name"/>
+            <parameter name="URL" value="url"/>
+        </behavior>
     </table>
     
     <table name="publicationgroup">

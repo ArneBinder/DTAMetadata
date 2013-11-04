@@ -12,7 +12,7 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
-use DTA\MetadataBundle\Model\Workflow\Imagesource;
+use DTA\MetadataBundle\Model\Workflow\CopyLocation;
 use DTA\MetadataBundle\Model\Workflow\Partner;
 use DTA\MetadataBundle\Model\Workflow\PartnerPeer;
 use DTA\MetadataBundle\Model\Workflow\PartnerQuery;
@@ -24,21 +24,25 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method PartnerQuery orderByName($order = Criteria::ASC) Order by the name column
  * @method PartnerQuery orderByMail($order = Criteria::ASC) Order by the mail column
  * @method PartnerQuery orderByWeb($order = Criteria::ASC) Order by the web column
- * @method PartnerQuery orderByContactperson($order = Criteria::ASC) Order by the contactperson column
+ * @method PartnerQuery orderByContactPerson($order = Criteria::ASC) Order by the contact_person column
  * @method PartnerQuery orderByContactdata($order = Criteria::ASC) Order by the contactdata column
  * @method PartnerQuery orderByComments($order = Criteria::ASC) Order by the comments column
  * @method PartnerQuery orderByIsOrganization($order = Criteria::ASC) Order by the is_organization column
  * @method PartnerQuery orderByLegacyPartnerId($order = Criteria::ASC) Order by the legacy_partner_id column
+ * @method PartnerQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method PartnerQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method PartnerQuery groupById() Group by the id column
  * @method PartnerQuery groupByName() Group by the name column
  * @method PartnerQuery groupByMail() Group by the mail column
  * @method PartnerQuery groupByWeb() Group by the web column
- * @method PartnerQuery groupByContactperson() Group by the contactperson column
+ * @method PartnerQuery groupByContactPerson() Group by the contact_person column
  * @method PartnerQuery groupByContactdata() Group by the contactdata column
  * @method PartnerQuery groupByComments() Group by the comments column
  * @method PartnerQuery groupByIsOrganization() Group by the is_organization column
  * @method PartnerQuery groupByLegacyPartnerId() Group by the legacy_partner_id column
+ * @method PartnerQuery groupByCreatedAt() Group by the created_at column
+ * @method PartnerQuery groupByUpdatedAt() Group by the updated_at column
  *
  * @method PartnerQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method PartnerQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -48,9 +52,9 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method PartnerQuery rightJoinTask($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Task relation
  * @method PartnerQuery innerJoinTask($relationAlias = null) Adds a INNER JOIN clause to the query using the Task relation
  *
- * @method PartnerQuery leftJoinImagesource($relationAlias = null) Adds a LEFT JOIN clause to the query using the Imagesource relation
- * @method PartnerQuery rightJoinImagesource($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Imagesource relation
- * @method PartnerQuery innerJoinImagesource($relationAlias = null) Adds a INNER JOIN clause to the query using the Imagesource relation
+ * @method PartnerQuery leftJoinCopyLocation($relationAlias = null) Adds a LEFT JOIN clause to the query using the CopyLocation relation
+ * @method PartnerQuery rightJoinCopyLocation($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CopyLocation relation
+ * @method PartnerQuery innerJoinCopyLocation($relationAlias = null) Adds a INNER JOIN clause to the query using the CopyLocation relation
  *
  * @method PartnerQuery leftJoinTextsource($relationAlias = null) Adds a LEFT JOIN clause to the query using the Textsource relation
  * @method PartnerQuery rightJoinTextsource($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Textsource relation
@@ -62,21 +66,25 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method Partner findOneByName(string $name) Return the first Partner filtered by the name column
  * @method Partner findOneByMail(string $mail) Return the first Partner filtered by the mail column
  * @method Partner findOneByWeb(string $web) Return the first Partner filtered by the web column
- * @method Partner findOneByContactperson(string $contactperson) Return the first Partner filtered by the contactperson column
+ * @method Partner findOneByContactPerson(string $contact_person) Return the first Partner filtered by the contact_person column
  * @method Partner findOneByContactdata(string $contactdata) Return the first Partner filtered by the contactdata column
  * @method Partner findOneByComments(string $comments) Return the first Partner filtered by the comments column
  * @method Partner findOneByIsOrganization(boolean $is_organization) Return the first Partner filtered by the is_organization column
  * @method Partner findOneByLegacyPartnerId(int $legacy_partner_id) Return the first Partner filtered by the legacy_partner_id column
+ * @method Partner findOneByCreatedAt(string $created_at) Return the first Partner filtered by the created_at column
+ * @method Partner findOneByUpdatedAt(string $updated_at) Return the first Partner filtered by the updated_at column
  *
  * @method array findById(int $id) Return Partner objects filtered by the id column
  * @method array findByName(string $name) Return Partner objects filtered by the name column
  * @method array findByMail(string $mail) Return Partner objects filtered by the mail column
  * @method array findByWeb(string $web) Return Partner objects filtered by the web column
- * @method array findByContactperson(string $contactperson) Return Partner objects filtered by the contactperson column
+ * @method array findByContactPerson(string $contact_person) Return Partner objects filtered by the contact_person column
  * @method array findByContactdata(string $contactdata) Return Partner objects filtered by the contactdata column
  * @method array findByComments(string $comments) Return Partner objects filtered by the comments column
  * @method array findByIsOrganization(boolean $is_organization) Return Partner objects filtered by the is_organization column
  * @method array findByLegacyPartnerId(int $legacy_partner_id) Return Partner objects filtered by the legacy_partner_id column
+ * @method array findByCreatedAt(string $created_at) Return Partner objects filtered by the created_at column
+ * @method array findByUpdatedAt(string $updated_at) Return Partner objects filtered by the updated_at column
  */
 abstract class BasePartnerQuery extends ModelCriteria
 {
@@ -178,7 +186,7 @@ abstract class BasePartnerQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "name", "mail", "web", "contactperson", "contactdata", "comments", "is_organization", "legacy_partner_id" FROM "partner" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "name", "mail", "web", "contact_person", "contactdata", "comments", "is_organization", "legacy_partner_id", "created_at", "updated_at" FROM "partner" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -397,32 +405,32 @@ abstract class BasePartnerQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the contactperson column
+     * Filter the query on the contact_person column
      *
      * Example usage:
      * <code>
-     * $query->filterByContactperson('fooValue');   // WHERE contactperson = 'fooValue'
-     * $query->filterByContactperson('%fooValue%'); // WHERE contactperson LIKE '%fooValue%'
+     * $query->filterByContactPerson('fooValue');   // WHERE contact_person = 'fooValue'
+     * $query->filterByContactPerson('%fooValue%'); // WHERE contact_person LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $contactperson The value to use as filter.
+     * @param     string $contactPerson The value to use as filter.
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return PartnerQuery The current query, for fluid interface
      */
-    public function filterByContactperson($contactperson = null, $comparison = null)
+    public function filterByContactPerson($contactPerson = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (is_array($contactperson)) {
+            if (is_array($contactPerson)) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $contactperson)) {
-                $contactperson = str_replace('*', '%', $contactperson);
+            } elseif (preg_match('/[\%\*]/', $contactPerson)) {
+                $contactPerson = str_replace('*', '%', $contactPerson);
                 $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(PartnerPeer::CONTACTPERSON, $contactperson, $comparison);
+        return $this->addUsingAlias(PartnerPeer::CONTACT_PERSON, $contactPerson, $comparison);
     }
 
     /**
@@ -553,6 +561,92 @@ abstract class BasePartnerQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return PartnerQuery The current query, for fluid interface
+     */
+    public function filterByCreatedAt($createdAt = null, $comparison = null)
+    {
+        if (is_array($createdAt)) {
+            $useMinMax = false;
+            if (isset($createdAt['min'])) {
+                $this->addUsingAlias(PartnerPeer::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($createdAt['max'])) {
+                $this->addUsingAlias(PartnerPeer::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(PartnerPeer::CREATED_AT, $createdAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the updated_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return PartnerQuery The current query, for fluid interface
+     */
+    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+    {
+        if (is_array($updatedAt)) {
+            $useMinMax = false;
+            if (isset($updatedAt['min'])) {
+                $this->addUsingAlias(PartnerPeer::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($updatedAt['max'])) {
+                $this->addUsingAlias(PartnerPeer::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(PartnerPeer::UPDATED_AT, $updatedAt, $comparison);
+    }
+
+    /**
      * Filter the query by a related Task object
      *
      * @param   Task|PropelObjectCollection $task  the related object to use as filter
@@ -627,41 +721,41 @@ abstract class BasePartnerQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Imagesource object
+     * Filter the query by a related CopyLocation object
      *
-     * @param   Imagesource|PropelObjectCollection $imagesource  the related object to use as filter
+     * @param   CopyLocation|PropelObjectCollection $copyLocation  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return                 PartnerQuery The current query, for fluid interface
      * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterByImagesource($imagesource, $comparison = null)
+    public function filterByCopyLocation($copyLocation, $comparison = null)
     {
-        if ($imagesource instanceof Imagesource) {
+        if ($copyLocation instanceof CopyLocation) {
             return $this
-                ->addUsingAlias(PartnerPeer::ID, $imagesource->getPartnerId(), $comparison);
-        } elseif ($imagesource instanceof PropelObjectCollection) {
+                ->addUsingAlias(PartnerPeer::ID, $copyLocation->getPartnerId(), $comparison);
+        } elseif ($copyLocation instanceof PropelObjectCollection) {
             return $this
-                ->useImagesourceQuery()
-                ->filterByPrimaryKeys($imagesource->getPrimaryKeys())
+                ->useCopyLocationQuery()
+                ->filterByPrimaryKeys($copyLocation->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByImagesource() only accepts arguments of type Imagesource or PropelCollection');
+            throw new PropelException('filterByCopyLocation() only accepts arguments of type CopyLocation or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Imagesource relation
+     * Adds a JOIN clause to the query using the CopyLocation relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return PartnerQuery The current query, for fluid interface
      */
-    public function joinImagesource($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinCopyLocation($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Imagesource');
+        $relationMap = $tableMap->getRelation('CopyLocation');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -676,14 +770,14 @@ abstract class BasePartnerQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Imagesource');
+            $this->addJoinObject($join, 'CopyLocation');
         }
 
         return $this;
     }
 
     /**
-     * Use the Imagesource relation Imagesource object
+     * Use the CopyLocation relation CopyLocation object
      *
      * @see       useQuery()
      *
@@ -691,13 +785,13 @@ abstract class BasePartnerQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \DTA\MetadataBundle\Model\Workflow\ImagesourceQuery A secondary query class using the current class as primary query
+     * @return   \DTA\MetadataBundle\Model\Workflow\CopyLocationQuery A secondary query class using the current class as primary query
      */
-    public function useImagesourceQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useCopyLocationQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinImagesource($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Imagesource', '\DTA\MetadataBundle\Model\Workflow\ImagesourceQuery');
+            ->joinCopyLocation($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CopyLocation', '\DTA\MetadataBundle\Model\Workflow\CopyLocationQuery');
     }
 
     /**
@@ -790,4 +884,69 @@ abstract class BasePartnerQuery extends ModelCriteria
         return $this;
     }
 
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     PartnerQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(PartnerPeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     PartnerQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(PartnerPeer::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     PartnerQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(PartnerPeer::UPDATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     PartnerQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(PartnerPeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     PartnerQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(PartnerPeer::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     PartnerQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(PartnerPeer::CREATED_AT);
+    }
 }

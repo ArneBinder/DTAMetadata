@@ -29,13 +29,13 @@ abstract class BaseDtaUserPeer
     const TM_CLASS = 'DtaUserTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 7;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 7;
 
     /** the column name for the username field */
     const USERNAME = 'dta_user.username';
@@ -51,6 +51,9 @@ abstract class BaseDtaUserPeer
 
     /** the column name for the admin field */
     const ADMIN = 'dta_user.admin';
+
+    /** the column name for the legacy_user_id field */
+    const LEGACY_USER_ID = 'dta_user.legacy_user_id';
 
     /** the column name for the id field */
     const ID = 'dta_user.id';
@@ -74,12 +77,12 @@ abstract class BaseDtaUserPeer
      * e.g. DtaUserPeer::$fieldNames[DtaUserPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Username', 'Password', 'Salt', 'Mail', 'Admin', 'Id', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('username', 'password', 'salt', 'mail', 'admin', 'id', ),
-        BasePeer::TYPE_COLNAME => array (DtaUserPeer::USERNAME, DtaUserPeer::PASSWORD, DtaUserPeer::SALT, DtaUserPeer::MAIL, DtaUserPeer::ADMIN, DtaUserPeer::ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('USERNAME', 'PASSWORD', 'SALT', 'MAIL', 'ADMIN', 'ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('username', 'password', 'salt', 'mail', 'admin', 'id', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+        BasePeer::TYPE_PHPNAME => array ('Username', 'Password', 'Salt', 'Mail', 'Admin', 'LegacyUserId', 'Id', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('username', 'password', 'salt', 'mail', 'admin', 'legacyUserId', 'id', ),
+        BasePeer::TYPE_COLNAME => array (DtaUserPeer::USERNAME, DtaUserPeer::PASSWORD, DtaUserPeer::SALT, DtaUserPeer::MAIL, DtaUserPeer::ADMIN, DtaUserPeer::LEGACY_USER_ID, DtaUserPeer::ID, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('USERNAME', 'PASSWORD', 'SALT', 'MAIL', 'ADMIN', 'LEGACY_USER_ID', 'ID', ),
+        BasePeer::TYPE_FIELDNAME => array ('username', 'password', 'salt', 'mail', 'admin', 'legacy_user_id', 'id', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -89,12 +92,12 @@ abstract class BaseDtaUserPeer
      * e.g. DtaUserPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Username' => 0, 'Password' => 1, 'Salt' => 2, 'Mail' => 3, 'Admin' => 4, 'Id' => 5, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('username' => 0, 'password' => 1, 'salt' => 2, 'mail' => 3, 'admin' => 4, 'id' => 5, ),
-        BasePeer::TYPE_COLNAME => array (DtaUserPeer::USERNAME => 0, DtaUserPeer::PASSWORD => 1, DtaUserPeer::SALT => 2, DtaUserPeer::MAIL => 3, DtaUserPeer::ADMIN => 4, DtaUserPeer::ID => 5, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('USERNAME' => 0, 'PASSWORD' => 1, 'SALT' => 2, 'MAIL' => 3, 'ADMIN' => 4, 'ID' => 5, ),
-        BasePeer::TYPE_FIELDNAME => array ('username' => 0, 'password' => 1, 'salt' => 2, 'mail' => 3, 'admin' => 4, 'id' => 5, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+        BasePeer::TYPE_PHPNAME => array ('Username' => 0, 'Password' => 1, 'Salt' => 2, 'Mail' => 3, 'Admin' => 4, 'LegacyUserId' => 5, 'Id' => 6, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('username' => 0, 'password' => 1, 'salt' => 2, 'mail' => 3, 'admin' => 4, 'legacyUserId' => 5, 'id' => 6, ),
+        BasePeer::TYPE_COLNAME => array (DtaUserPeer::USERNAME => 0, DtaUserPeer::PASSWORD => 1, DtaUserPeer::SALT => 2, DtaUserPeer::MAIL => 3, DtaUserPeer::ADMIN => 4, DtaUserPeer::LEGACY_USER_ID => 5, DtaUserPeer::ID => 6, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('USERNAME' => 0, 'PASSWORD' => 1, 'SALT' => 2, 'MAIL' => 3, 'ADMIN' => 4, 'LEGACY_USER_ID' => 5, 'ID' => 6, ),
+        BasePeer::TYPE_FIELDNAME => array ('username' => 0, 'password' => 1, 'salt' => 2, 'mail' => 3, 'admin' => 4, 'legacy_user_id' => 5, 'id' => 6, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -173,6 +176,7 @@ abstract class BaseDtaUserPeer
             $criteria->addSelectColumn(DtaUserPeer::SALT);
             $criteria->addSelectColumn(DtaUserPeer::MAIL);
             $criteria->addSelectColumn(DtaUserPeer::ADMIN);
+            $criteria->addSelectColumn(DtaUserPeer::LEGACY_USER_ID);
             $criteria->addSelectColumn(DtaUserPeer::ID);
         } else {
             $criteria->addSelectColumn($alias . '.username');
@@ -180,6 +184,7 @@ abstract class BaseDtaUserPeer
             $criteria->addSelectColumn($alias . '.salt');
             $criteria->addSelectColumn($alias . '.mail');
             $criteria->addSelectColumn($alias . '.admin');
+            $criteria->addSelectColumn($alias . '.legacy_user_id');
             $criteria->addSelectColumn($alias . '.id');
         }
     }
@@ -402,11 +407,11 @@ abstract class BaseDtaUserPeer
     public static function getPrimaryKeyHashFromRow($row, $startcol = 0)
     {
         // If the PK cannot be derived from the row, return null.
-        if ($row[$startcol + 5] === null) {
+        if ($row[$startcol + 6] === null) {
             return null;
         }
 
-        return (string) $row[$startcol + 5];
+        return (string) $row[$startcol + 6];
     }
 
     /**
@@ -421,7 +426,7 @@ abstract class BaseDtaUserPeer
     public static function getPrimaryKeyFromRow($row, $startcol = 0)
     {
 
-        return (int) $row[$startcol + 5];
+        return (int) $row[$startcol + 6];
     }
 
     /**

@@ -16,35 +16,17 @@ use DTA\MetadataBundle\Model\Data\Publication;
 use DTA\MetadataBundle\Model\Workflow\Imagesource;
 use DTA\MetadataBundle\Model\Workflow\ImagesourcePeer;
 use DTA\MetadataBundle\Model\Workflow\ImagesourceQuery;
-use DTA\MetadataBundle\Model\Workflow\License;
-use DTA\MetadataBundle\Model\Workflow\Partner;
 
 /**
  * @method ImagesourceQuery orderById($order = Criteria::ASC) Order by the id column
  * @method ImagesourceQuery orderByPublicationId($order = Criteria::ASC) Order by the publication_id column
- * @method ImagesourceQuery orderByPartnerId($order = Criteria::ASC) Order by the partner_id column
- * @method ImagesourceQuery orderByCataloguesignature($order = Criteria::ASC) Order by the cataloguesignature column
- * @method ImagesourceQuery orderByCatalogueurl($order = Criteria::ASC) Order by the catalogueurl column
- * @method ImagesourceQuery orderByNumfaksimiles($order = Criteria::ASC) Order by the numfaksimiles column
- * @method ImagesourceQuery orderByExtentasofcatalogue($order = Criteria::ASC) Order by the extentasofcatalogue column
  * @method ImagesourceQuery orderByFaksimilerefrange($order = Criteria::ASC) Order by the faksimilerefrange column
  * @method ImagesourceQuery orderByOriginalrefrange($order = Criteria::ASC) Order by the originalrefrange column
- * @method ImagesourceQuery orderByImageurl($order = Criteria::ASC) Order by the imageurl column
- * @method ImagesourceQuery orderByImageurn($order = Criteria::ASC) Order by the imageurn column
- * @method ImagesourceQuery orderByLicenseId($order = Criteria::ASC) Order by the license_id column
  *
  * @method ImagesourceQuery groupById() Group by the id column
  * @method ImagesourceQuery groupByPublicationId() Group by the publication_id column
- * @method ImagesourceQuery groupByPartnerId() Group by the partner_id column
- * @method ImagesourceQuery groupByCataloguesignature() Group by the cataloguesignature column
- * @method ImagesourceQuery groupByCatalogueurl() Group by the catalogueurl column
- * @method ImagesourceQuery groupByNumfaksimiles() Group by the numfaksimiles column
- * @method ImagesourceQuery groupByExtentasofcatalogue() Group by the extentasofcatalogue column
  * @method ImagesourceQuery groupByFaksimilerefrange() Group by the faksimilerefrange column
  * @method ImagesourceQuery groupByOriginalrefrange() Group by the originalrefrange column
- * @method ImagesourceQuery groupByImageurl() Group by the imageurl column
- * @method ImagesourceQuery groupByImageurn() Group by the imageurn column
- * @method ImagesourceQuery groupByLicenseId() Group by the license_id column
  *
  * @method ImagesourceQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method ImagesourceQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -54,41 +36,17 @@ use DTA\MetadataBundle\Model\Workflow\Partner;
  * @method ImagesourceQuery rightJoinPublication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Publication relation
  * @method ImagesourceQuery innerJoinPublication($relationAlias = null) Adds a INNER JOIN clause to the query using the Publication relation
  *
- * @method ImagesourceQuery leftJoinLicense($relationAlias = null) Adds a LEFT JOIN clause to the query using the License relation
- * @method ImagesourceQuery rightJoinLicense($relationAlias = null) Adds a RIGHT JOIN clause to the query using the License relation
- * @method ImagesourceQuery innerJoinLicense($relationAlias = null) Adds a INNER JOIN clause to the query using the License relation
- *
- * @method ImagesourceQuery leftJoinPartner($relationAlias = null) Adds a LEFT JOIN clause to the query using the Partner relation
- * @method ImagesourceQuery rightJoinPartner($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Partner relation
- * @method ImagesourceQuery innerJoinPartner($relationAlias = null) Adds a INNER JOIN clause to the query using the Partner relation
- *
  * @method Imagesource findOne(PropelPDO $con = null) Return the first Imagesource matching the query
  * @method Imagesource findOneOrCreate(PropelPDO $con = null) Return the first Imagesource matching the query, or a new Imagesource object populated from the query conditions when no match is found
  *
  * @method Imagesource findOneByPublicationId(int $publication_id) Return the first Imagesource filtered by the publication_id column
- * @method Imagesource findOneByPartnerId(int $partner_id) Return the first Imagesource filtered by the partner_id column
- * @method Imagesource findOneByCataloguesignature(string $cataloguesignature) Return the first Imagesource filtered by the cataloguesignature column
- * @method Imagesource findOneByCatalogueurl(string $catalogueurl) Return the first Imagesource filtered by the catalogueurl column
- * @method Imagesource findOneByNumfaksimiles(int $numfaksimiles) Return the first Imagesource filtered by the numfaksimiles column
- * @method Imagesource findOneByExtentasofcatalogue(string $extentasofcatalogue) Return the first Imagesource filtered by the extentasofcatalogue column
  * @method Imagesource findOneByFaksimilerefrange(string $faksimilerefrange) Return the first Imagesource filtered by the faksimilerefrange column
  * @method Imagesource findOneByOriginalrefrange(string $originalrefrange) Return the first Imagesource filtered by the originalrefrange column
- * @method Imagesource findOneByImageurl(string $imageurl) Return the first Imagesource filtered by the imageurl column
- * @method Imagesource findOneByImageurn(string $imageurn) Return the first Imagesource filtered by the imageurn column
- * @method Imagesource findOneByLicenseId(int $license_id) Return the first Imagesource filtered by the license_id column
  *
  * @method array findById(int $id) Return Imagesource objects filtered by the id column
  * @method array findByPublicationId(int $publication_id) Return Imagesource objects filtered by the publication_id column
- * @method array findByPartnerId(int $partner_id) Return Imagesource objects filtered by the partner_id column
- * @method array findByCataloguesignature(string $cataloguesignature) Return Imagesource objects filtered by the cataloguesignature column
- * @method array findByCatalogueurl(string $catalogueurl) Return Imagesource objects filtered by the catalogueurl column
- * @method array findByNumfaksimiles(int $numfaksimiles) Return Imagesource objects filtered by the numfaksimiles column
- * @method array findByExtentasofcatalogue(string $extentasofcatalogue) Return Imagesource objects filtered by the extentasofcatalogue column
  * @method array findByFaksimilerefrange(string $faksimilerefrange) Return Imagesource objects filtered by the faksimilerefrange column
  * @method array findByOriginalrefrange(string $originalrefrange) Return Imagesource objects filtered by the originalrefrange column
- * @method array findByImageurl(string $imageurl) Return Imagesource objects filtered by the imageurl column
- * @method array findByImageurn(string $imageurn) Return Imagesource objects filtered by the imageurn column
- * @method array findByLicenseId(int $license_id) Return Imagesource objects filtered by the license_id column
  */
 abstract class BaseImagesourceQuery extends ModelCriteria
 {
@@ -190,7 +148,7 @@ abstract class BaseImagesourceQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "publication_id", "partner_id", "cataloguesignature", "catalogueurl", "numfaksimiles", "extentasofcatalogue", "faksimilerefrange", "originalrefrange", "imageurl", "imageurn", "license_id" FROM "imagesource" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "publication_id", "faksimilerefrange", "originalrefrange" FROM "imagesource" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -366,179 +324,6 @@ abstract class BaseImagesourceQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the partner_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByPartnerId(1234); // WHERE partner_id = 1234
-     * $query->filterByPartnerId(array(12, 34)); // WHERE partner_id IN (12, 34)
-     * $query->filterByPartnerId(array('min' => 12)); // WHERE partner_id >= 12
-     * $query->filterByPartnerId(array('max' => 12)); // WHERE partner_id <= 12
-     * </code>
-     *
-     * @see       filterByPartner()
-     *
-     * @param     mixed $partnerId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ImagesourceQuery The current query, for fluid interface
-     */
-    public function filterByPartnerId($partnerId = null, $comparison = null)
-    {
-        if (is_array($partnerId)) {
-            $useMinMax = false;
-            if (isset($partnerId['min'])) {
-                $this->addUsingAlias(ImagesourcePeer::PARTNER_ID, $partnerId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($partnerId['max'])) {
-                $this->addUsingAlias(ImagesourcePeer::PARTNER_ID, $partnerId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(ImagesourcePeer::PARTNER_ID, $partnerId, $comparison);
-    }
-
-    /**
-     * Filter the query on the cataloguesignature column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByCataloguesignature('fooValue');   // WHERE cataloguesignature = 'fooValue'
-     * $query->filterByCataloguesignature('%fooValue%'); // WHERE cataloguesignature LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $cataloguesignature The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ImagesourceQuery The current query, for fluid interface
-     */
-    public function filterByCataloguesignature($cataloguesignature = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($cataloguesignature)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $cataloguesignature)) {
-                $cataloguesignature = str_replace('*', '%', $cataloguesignature);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(ImagesourcePeer::CATALOGUESIGNATURE, $cataloguesignature, $comparison);
-    }
-
-    /**
-     * Filter the query on the catalogueurl column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByCatalogueurl('fooValue');   // WHERE catalogueurl = 'fooValue'
-     * $query->filterByCatalogueurl('%fooValue%'); // WHERE catalogueurl LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $catalogueurl The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ImagesourceQuery The current query, for fluid interface
-     */
-    public function filterByCatalogueurl($catalogueurl = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($catalogueurl)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $catalogueurl)) {
-                $catalogueurl = str_replace('*', '%', $catalogueurl);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(ImagesourcePeer::CATALOGUEURL, $catalogueurl, $comparison);
-    }
-
-    /**
-     * Filter the query on the numfaksimiles column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByNumfaksimiles(1234); // WHERE numfaksimiles = 1234
-     * $query->filterByNumfaksimiles(array(12, 34)); // WHERE numfaksimiles IN (12, 34)
-     * $query->filterByNumfaksimiles(array('min' => 12)); // WHERE numfaksimiles >= 12
-     * $query->filterByNumfaksimiles(array('max' => 12)); // WHERE numfaksimiles <= 12
-     * </code>
-     *
-     * @param     mixed $numfaksimiles The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ImagesourceQuery The current query, for fluid interface
-     */
-    public function filterByNumfaksimiles($numfaksimiles = null, $comparison = null)
-    {
-        if (is_array($numfaksimiles)) {
-            $useMinMax = false;
-            if (isset($numfaksimiles['min'])) {
-                $this->addUsingAlias(ImagesourcePeer::NUMFAKSIMILES, $numfaksimiles['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($numfaksimiles['max'])) {
-                $this->addUsingAlias(ImagesourcePeer::NUMFAKSIMILES, $numfaksimiles['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(ImagesourcePeer::NUMFAKSIMILES, $numfaksimiles, $comparison);
-    }
-
-    /**
-     * Filter the query on the extentasofcatalogue column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByExtentasofcatalogue('fooValue');   // WHERE extentasofcatalogue = 'fooValue'
-     * $query->filterByExtentasofcatalogue('%fooValue%'); // WHERE extentasofcatalogue LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $extentasofcatalogue The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ImagesourceQuery The current query, for fluid interface
-     */
-    public function filterByExtentasofcatalogue($extentasofcatalogue = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($extentasofcatalogue)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $extentasofcatalogue)) {
-                $extentasofcatalogue = str_replace('*', '%', $extentasofcatalogue);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(ImagesourcePeer::EXTENTASOFCATALOGUE, $extentasofcatalogue, $comparison);
-    }
-
-    /**
      * Filter the query on the faksimilerefrange column
      *
      * Example usage:
@@ -594,108 +379,6 @@ abstract class BaseImagesourceQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ImagesourcePeer::ORIGINALREFRANGE, $originalrefrange, $comparison);
-    }
-
-    /**
-     * Filter the query on the imageurl column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByImageurl('fooValue');   // WHERE imageurl = 'fooValue'
-     * $query->filterByImageurl('%fooValue%'); // WHERE imageurl LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $imageurl The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ImagesourceQuery The current query, for fluid interface
-     */
-    public function filterByImageurl($imageurl = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($imageurl)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $imageurl)) {
-                $imageurl = str_replace('*', '%', $imageurl);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(ImagesourcePeer::IMAGEURL, $imageurl, $comparison);
-    }
-
-    /**
-     * Filter the query on the imageurn column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByImageurn('fooValue');   // WHERE imageurn = 'fooValue'
-     * $query->filterByImageurn('%fooValue%'); // WHERE imageurn LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $imageurn The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ImagesourceQuery The current query, for fluid interface
-     */
-    public function filterByImageurn($imageurn = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($imageurn)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $imageurn)) {
-                $imageurn = str_replace('*', '%', $imageurn);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(ImagesourcePeer::IMAGEURN, $imageurn, $comparison);
-    }
-
-    /**
-     * Filter the query on the license_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByLicenseId(1234); // WHERE license_id = 1234
-     * $query->filterByLicenseId(array(12, 34)); // WHERE license_id IN (12, 34)
-     * $query->filterByLicenseId(array('min' => 12)); // WHERE license_id >= 12
-     * $query->filterByLicenseId(array('max' => 12)); // WHERE license_id <= 12
-     * </code>
-     *
-     * @see       filterByLicense()
-     *
-     * @param     mixed $licenseId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ImagesourceQuery The current query, for fluid interface
-     */
-    public function filterByLicenseId($licenseId = null, $comparison = null)
-    {
-        if (is_array($licenseId)) {
-            $useMinMax = false;
-            if (isset($licenseId['min'])) {
-                $this->addUsingAlias(ImagesourcePeer::LICENSE_ID, $licenseId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($licenseId['max'])) {
-                $this->addUsingAlias(ImagesourcePeer::LICENSE_ID, $licenseId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(ImagesourcePeer::LICENSE_ID, $licenseId, $comparison);
     }
 
     /**
@@ -772,158 +455,6 @@ abstract class BaseImagesourceQuery extends ModelCriteria
         return $this
             ->joinPublication($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Publication', '\DTA\MetadataBundle\Model\Data\PublicationQuery');
-    }
-
-    /**
-     * Filter the query by a related License object
-     *
-     * @param   License|PropelObjectCollection $license The related object(s) to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 ImagesourceQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByLicense($license, $comparison = null)
-    {
-        if ($license instanceof License) {
-            return $this
-                ->addUsingAlias(ImagesourcePeer::LICENSE_ID, $license->getId(), $comparison);
-        } elseif ($license instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(ImagesourcePeer::LICENSE_ID, $license->toKeyValue('PrimaryKey', 'Id'), $comparison);
-        } else {
-            throw new PropelException('filterByLicense() only accepts arguments of type License or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the License relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return ImagesourceQuery The current query, for fluid interface
-     */
-    public function joinLicense($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('License');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'License');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the License relation License object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\Workflow\LicenseQuery A secondary query class using the current class as primary query
-     */
-    public function useLicenseQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinLicense($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'License', '\DTA\MetadataBundle\Model\Workflow\LicenseQuery');
-    }
-
-    /**
-     * Filter the query by a related Partner object
-     *
-     * @param   Partner|PropelObjectCollection $partner The related object(s) to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 ImagesourceQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterByPartner($partner, $comparison = null)
-    {
-        if ($partner instanceof Partner) {
-            return $this
-                ->addUsingAlias(ImagesourcePeer::PARTNER_ID, $partner->getId(), $comparison);
-        } elseif ($partner instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(ImagesourcePeer::PARTNER_ID, $partner->toKeyValue('PrimaryKey', 'Id'), $comparison);
-        } else {
-            throw new PropelException('filterByPartner() only accepts arguments of type Partner or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Partner relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return ImagesourceQuery The current query, for fluid interface
-     */
-    public function joinPartner($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Partner');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Partner');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Partner relation Partner object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\Workflow\PartnerQuery A secondary query class using the current class as primary query
-     */
-    public function usePartnerQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinPartner($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Partner', '\DTA\MetadataBundle\Model\Workflow\PartnerQuery');
     }
 
     /**

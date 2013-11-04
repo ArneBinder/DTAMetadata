@@ -1,0 +1,6 @@
+verlag1, verlag2, title, year, dta_pub_verlag, autor1_prename, autor1_lastname
+{% for pair in candidates %}
+    {% for book in pair.books %}
+        {{ pair[0]}}, {{pair[1]}}, {{book.title}}, {{book.year}}, {{book.autor1_prename}}, {{book.autor1_lastname}}
+    {% endfor %}
+{% endfor %}

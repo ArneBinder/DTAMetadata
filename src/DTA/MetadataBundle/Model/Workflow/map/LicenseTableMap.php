@@ -56,7 +56,7 @@ class LicenseTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Imagesource', 'DTA\\MetadataBundle\\Model\\Workflow\\Imagesource', RelationMap::ONE_TO_MANY, array('id' => 'license_id', ), null, null, 'Imagesources');
+        $this->addRelation('CopyLocation', 'DTA\\MetadataBundle\\Model\\Workflow\\CopyLocation', RelationMap::ONE_TO_MANY, array('id' => 'license_id', ), null, null, 'CopyLocations');
         $this->addRelation('Textsource', 'DTA\\MetadataBundle\\Model\\Workflow\\Textsource', RelationMap::ONE_TO_MANY, array('id' => 'license_id', ), null, null, 'Textsources');
     } // buildRelations()
 
@@ -70,11 +70,8 @@ class LicenseTableMap extends TableMap
     {
         return array(
             'table_row_view' =>  array (
-  'Id' => 'id',
   'Name' => 'name',
-  'Url' => 'url',
-  'ApplicableToImage' => 'applicable_to_image',
-  'ApplicableToText' => 'applicable_to_text',
+  'URL' => 'url',
 ),
         );
     } // getBehaviors()

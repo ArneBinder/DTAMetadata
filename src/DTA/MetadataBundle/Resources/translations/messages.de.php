@@ -7,6 +7,7 @@ return array(
     'Category' => 'Kategorie',
     'CategoryWork' => 'Kategorie',
     'Corpus' => 'Korpus',
+    'CopyLocation' => 'Bezugsquelle',
     'Datespecification' => 'Datumsangabe',
     'DtaUser' => 'Benutzer',
     'Font' => 'Schriftart',

@@ -541,6 +541,21 @@ CREATE TABLE "person_publication"
 );
 
 -----------------------------------------------------------------------
+-- recent_use
+-----------------------------------------------------------------------
+
+DROP TABLE IF EXISTS "recent_use" CASCADE;
+
+CREATE TABLE "recent_use"
+(
+    "dta_user_id" INTEGER NOT NULL,
+    "publication_id" INTEGER NOT NULL,
+    "date" TIMESTAMP NOT NULL,
+    "id" serial NOT NULL,
+    PRIMARY KEY ("id")
+);
+
+-----------------------------------------------------------------------
 -- dta_user
 -----------------------------------------------------------------------
 
@@ -553,9 +568,12 @@ CREATE TABLE "dta_user"
     "salt" VARCHAR(512),
     "mail" TEXT,
     "admin" BOOLEAN DEFAULT 'f',
+    "legacy_user_id" INTEGER,
     "id" serial NOT NULL,
     PRIMARY KEY ("id")
 );
+
+COMMENT ON COLUMN "dta_user"."legacy_user_id" IS 'id_user der alten Datenbank, die dem Datensatz zugrundeliegt.';
 
 -----------------------------------------------------------------------
 -- task
@@ -590,11 +608,51 @@ CREATE TABLE "tasktype"
 (
     "id" serial NOT NULL,
     "name" TEXT NOT NULL,
+    "legacy_tasktype_id" INTEGER,
     "tree_left" INTEGER,
     "tree_right" INTEGER,
     "tree_level" INTEGER,
     PRIMARY KEY ("id")
 );
+
+-----------------------------------------------------------------------
+-- copy_location
+-----------------------------------------------------------------------
+
+DROP TABLE IF EXISTS "copy_location" CASCADE;
+
+CREATE TABLE "copy_location"
+(
+    "id" serial NOT NULL,
+    "publication_id" INTEGER NOT NULL,
+    "partner_id" INTEGER NOT NULL,
+    "catalogue_signature" TEXT,
+    "catalogue_internal" TEXT,
+    "catalogue_url" TEXT,
+    "numfaksimiles" INTEGER,
+    "catalogue_extent" TEXT,
+    "availability" BOOLEAN,
+    "comments" TEXT,
+    "imageurl" TEXT,
+    "imageurn" TEXT,
+    "license_id" INTEGER,
+    "legacy_fundstellen_id" INTEGER,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
+    PRIMARY KEY ("id")
+);
+
+COMMENT ON COLUMN "copy_location"."partner_id" IS 'Anbieter Leitdruck';
+
+COMMENT ON COLUMN "copy_location"."numfaksimiles" IS 'Anzahl Faksimiles';
+
+COMMENT ON COLUMN "copy_location"."catalogue_extent" IS 'Umfang laut Katalog';
+
+COMMENT ON COLUMN "copy_location"."imageurl" IS 'URL der Bilddigitalisate';
+
+COMMENT ON COLUMN "copy_location"."imageurn" IS 'URN der Bilddigitalisate';
+
+COMMENT ON COLUMN "copy_location"."license_id" IS 'Lizenz';
 
 -----------------------------------------------------------------------
 -- partner
@@ -608,17 +666,19 @@ CREATE TABLE "partner"
     "name" TEXT,
     "mail" TEXT,
     "web" TEXT,
-    "contactperson" TEXT,
+    "contact_person" TEXT,
     "contactdata" TEXT,
     "comments" TEXT,
     "is_organization" BOOLEAN DEFAULT 'f',
     "legacy_partner_id" INTEGER,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
-COMMENT ON COLUMN "partner"."contactperson" IS 'Ansprechpartner';
+COMMENT ON COLUMN "partner"."contact_person" IS 'Ansprechpartner';
 
-COMMENT ON COLUMN "partner"."legacy_partner_id" IS 'id_book_location (=Partner/Bibliothek) des Datensatzes aus der alten Datenbank, der dem neuen Datensatz zugrundeliegt.';
+COMMENT ON COLUMN "partner"."legacy_partner_id" IS 'partner.id_book_location des Datensatzes aus der alten Datenbank, der dem neuen Datensatz zugrundeliegt.';
 
 -----------------------------------------------------------------------
 -- imagesource
@@ -630,36 +690,14 @@ CREATE TABLE "imagesource"
 (
     "id" serial NOT NULL,
     "publication_id" INTEGER NOT NULL,
-    "partner_id" INTEGER,
-    "cataloguesignature" TEXT,
-    "catalogueurl" TEXT,
-    "numfaksimiles" INTEGER,
-    "extentasofcatalogue" TEXT,
     "faksimilerefrange" TEXT,
     "originalrefrange" TEXT,
-    "imageurl" TEXT,
-    "imageurn" TEXT,
-    "license_id" INTEGER,
     PRIMARY KEY ("id")
 );
-
-COMMENT ON COLUMN "imagesource"."partner_id" IS 'Anbieter Leitdruck';
-
-COMMENT ON COLUMN "imagesource"."catalogueurl" IS 'Link in den Katalog';
-
-COMMENT ON COLUMN "imagesource"."numfaksimiles" IS 'Anzahl Faksimiles';
-
-COMMENT ON COLUMN "imagesource"."extentasofcatalogue" IS 'Umfang laut Katalog';
 
 COMMENT ON COLUMN "imagesource"."faksimilerefrange" IS 'Referenzierte Faksimileseitenzahlen';
 
 COMMENT ON COLUMN "imagesource"."originalrefrange" IS 'Referenzierte Originalseitenzahlen';
-
-COMMENT ON COLUMN "imagesource"."imageurl" IS 'URL der Bilddigitalisate';
-
-COMMENT ON COLUMN "imagesource"."imageurn" IS 'URN der Bilddigitalisate';
-
-COMMENT ON COLUMN "imagesource"."license_id" IS 'Lizenz';
 
 -----------------------------------------------------------------------
 -- textsource
@@ -877,6 +915,14 @@ ALTER TABLE "person_publication" ADD CONSTRAINT "person_publication_FK_3"
     FOREIGN KEY ("publication_id")
     REFERENCES "publication" ("id");
 
+ALTER TABLE "recent_use" ADD CONSTRAINT "recent_use_FK_1"
+    FOREIGN KEY ("dta_user_id")
+    REFERENCES "dta_user" ("id");
+
+ALTER TABLE "recent_use" ADD CONSTRAINT "recent_use_FK_2"
+    FOREIGN KEY ("publication_id")
+    REFERENCES "publication" ("id");
+
 ALTER TABLE "task" ADD CONSTRAINT "task_FK_1"
     FOREIGN KEY ("tasktype_id")
     REFERENCES "tasktype" ("id");
@@ -897,18 +943,21 @@ ALTER TABLE "task" ADD CONSTRAINT "task_FK_5"
     FOREIGN KEY ("responsibleuser_id")
     REFERENCES "dta_user" ("id");
 
-ALTER TABLE "imagesource" ADD CONSTRAINT "imagesource_FK_1"
+ALTER TABLE "copy_location" ADD CONSTRAINT "copy_location_FK_1"
     FOREIGN KEY ("publication_id")
     REFERENCES "publication" ("id");
 
-ALTER TABLE "imagesource" ADD CONSTRAINT "imagesource_FK_2"
+ALTER TABLE "copy_location" ADD CONSTRAINT "copy_location_FK_2"
+    FOREIGN KEY ("partner_id")
+    REFERENCES "partner" ("id");
+
+ALTER TABLE "copy_location" ADD CONSTRAINT "copy_location_FK_3"
     FOREIGN KEY ("license_id")
     REFERENCES "license" ("id");
 
-ALTER TABLE "imagesource" ADD CONSTRAINT "imagesource_FK_3"
-    FOREIGN KEY ("partner_id")
-    REFERENCES "partner" ("id")
-    ON DELETE SET NULL;
+ALTER TABLE "imagesource" ADD CONSTRAINT "imagesource_FK_1"
+    FOREIGN KEY ("publication_id")
+    REFERENCES "publication" ("id");
 
 ALTER TABLE "textsource" ADD CONSTRAINT "textsource_FK_1"
     FOREIGN KEY ("publication_id")

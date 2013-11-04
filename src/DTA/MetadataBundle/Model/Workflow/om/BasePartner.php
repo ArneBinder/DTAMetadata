@@ -5,16 +5,18 @@ namespace DTA\MetadataBundle\Model\Workflow\om;
 use \BaseObject;
 use \BasePeer;
 use \Criteria;
+use \DateTime;
 use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
 use \PropelCollection;
+use \PropelDateTime;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
-use DTA\MetadataBundle\Model\Workflow\Imagesource;
-use DTA\MetadataBundle\Model\Workflow\ImagesourceQuery;
+use DTA\MetadataBundle\Model\Workflow\CopyLocation;
+use DTA\MetadataBundle\Model\Workflow\CopyLocationQuery;
 use DTA\MetadataBundle\Model\Workflow\Partner;
 use DTA\MetadataBundle\Model\Workflow\PartnerPeer;
 use DTA\MetadataBundle\Model\Workflow\PartnerQuery;
@@ -69,10 +71,10 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     protected $web;
 
     /**
-     * The value for the contactperson field.
+     * The value for the contact_person field.
      * @var        string
      */
-    protected $contactperson;
+    protected $contact_person;
 
     /**
      * The value for the contactdata field.
@@ -100,16 +102,28 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     protected $legacy_partner_id;
 
     /**
+     * The value for the created_at field.
+     * @var        string
+     */
+    protected $created_at;
+
+    /**
+     * The value for the updated_at field.
+     * @var        string
+     */
+    protected $updated_at;
+
+    /**
      * @var        PropelObjectCollection|Task[] Collection to store aggregation of Task objects.
      */
     protected $collTasks;
     protected $collTasksPartial;
 
     /**
-     * @var        PropelObjectCollection|Imagesource[] Collection to store aggregation of Imagesource objects.
+     * @var        PropelObjectCollection|CopyLocation[] Collection to store aggregation of CopyLocation objects.
      */
-    protected $collImagesources;
-    protected $collImagesourcesPartial;
+    protected $collCopyLocations;
+    protected $collCopyLocationsPartial;
 
     /**
      * @var        PropelObjectCollection|Textsource[] Collection to store aggregation of Textsource objects.
@@ -138,7 +152,7 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Id', 'Name', 'Mail', 'Web', 'Contactperson', 'Contactdata', 'Comments', 'IsOrganization', 'LegacyPartnerId', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'Name'=>'Name', 'Mail'=>'Mail', 'Web'=>'Web', 'Contactperson'=>'Contactperson', 'Contactdata'=>'Contactdata', 'Comments'=>'Comments', 'IsOrganization'=>'IsOrganization', 'LegacyPartnerId'=>'LegacyPartnerId', );
+    public static $tableRowViewCaptions = array('Name', 'Ansprechpartner', 'Mail', 'Web', );	public   $tableRowViewAccessors = array('Name'=>'Name', 'Ansprechpartner'=>'ContactPerson', 'Mail'=>'Mail', 'Web'=>'Web', );
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -149,7 +163,7 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $imagesourcesScheduledForDeletion = null;
+    protected $copyLocationsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -219,13 +233,13 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     }
 
     /**
-     * Get the [contactperson] column value.
+     * Get the [contact_person] column value.
      * Ansprechpartner
      * @return string
      */
-    public function getContactperson()
+    public function getContactPerson()
     {
-        return $this->contactperson;
+        return $this->contact_person;
     }
 
     /**
@@ -260,12 +274,82 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
 
     /**
      * Get the [legacy_partner_id] column value.
-     * id_book_location (=Partner/Bibliothek) des Datensatzes aus der alten Datenbank, der dem neuen Datensatz zugrundeliegt.
+     * partner.id_book_location des Datensatzes aus der alten Datenbank, der dem neuen Datensatz zugrundeliegt.
      * @return int
      */
     public function getLegacyPartnerId()
     {
         return $this->legacy_partner_id;
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [created_at] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getCreatedAt($format = null)
+    {
+        if ($this->created_at === null) {
+            return null;
+        }
+
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [updated_at] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getUpdatedAt($format = null)
+    {
+        if ($this->updated_at === null) {
+            return null;
+        }
+
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -353,25 +437,25 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     } // setWeb()
 
     /**
-     * Set the value of [contactperson] column.
+     * Set the value of [contact_person] column.
      * Ansprechpartner
      * @param string $v new value
      * @return Partner The current object (for fluent API support)
      */
-    public function setContactperson($v)
+    public function setContactPerson($v)
     {
         if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
-        if ($this->contactperson !== $v) {
-            $this->contactperson = $v;
-            $this->modifiedColumns[] = PartnerPeer::CONTACTPERSON;
+        if ($this->contact_person !== $v) {
+            $this->contact_person = $v;
+            $this->modifiedColumns[] = PartnerPeer::CONTACT_PERSON;
         }
 
 
         return $this;
-    } // setContactperson()
+    } // setContactPerson()
 
     /**
      * Set the value of [contactdata] column.
@@ -446,7 +530,7 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
 
     /**
      * Set the value of [legacy_partner_id] column.
-     * id_book_location (=Partner/Bibliothek) des Datensatzes aus der alten Datenbank, der dem neuen Datensatz zugrundeliegt.
+     * partner.id_book_location des Datensatzes aus der alten Datenbank, der dem neuen Datensatz zugrundeliegt.
      * @param int $v new value
      * @return Partner The current object (for fluent API support)
      */
@@ -464,6 +548,52 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
 
         return $this;
     } // setLegacyPartnerId()
+
+    /**
+     * Sets the value of [created_at] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return Partner The current object (for fluent API support)
+     */
+    public function setCreatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->created_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->created_at !== null && $tmpDt = new DateTime($this->created_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->created_at = $newDateAsString;
+                $this->modifiedColumns[] = PartnerPeer::CREATED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setCreatedAt()
+
+    /**
+     * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return Partner The current object (for fluent API support)
+     */
+    public function setUpdatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->updated_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->updated_at !== null && $tmpDt = new DateTime($this->updated_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->updated_at = $newDateAsString;
+                $this->modifiedColumns[] = PartnerPeer::UPDATED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setUpdatedAt()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -505,11 +635,13 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
             $this->name = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
             $this->mail = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
             $this->web = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-            $this->contactperson = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+            $this->contact_person = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
             $this->contactdata = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
             $this->comments = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
             $this->is_organization = ($row[$startcol + 7] !== null) ? (boolean) $row[$startcol + 7] : null;
             $this->legacy_partner_id = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+            $this->created_at = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+            $this->updated_at = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -518,7 +650,7 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 9; // 9 = PartnerPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 11; // 11 = PartnerPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Partner object", $e);
@@ -582,7 +714,7 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
 
             $this->collTasks = null;
 
-            $this->collImagesources = null;
+            $this->collCopyLocations = null;
 
             $this->collTextsources = null;
 
@@ -658,8 +790,19 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+                if (!$this->isColumnModified(PartnerPeer::CREATED_AT)) {
+                    $this->setCreatedAt(time());
+                }
+                if (!$this->isColumnModified(PartnerPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(PartnerPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -728,18 +871,17 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
                 }
             }
 
-            if ($this->imagesourcesScheduledForDeletion !== null) {
-                if (!$this->imagesourcesScheduledForDeletion->isEmpty()) {
-                    foreach ($this->imagesourcesScheduledForDeletion as $imagesource) {
-                        // need to save related object because we set the relation to null
-                        $imagesource->save($con);
-                    }
-                    $this->imagesourcesScheduledForDeletion = null;
+            if ($this->copyLocationsScheduledForDeletion !== null) {
+                if (!$this->copyLocationsScheduledForDeletion->isEmpty()) {
+                    CopyLocationQuery::create()
+                        ->filterByPrimaryKeys($this->copyLocationsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->copyLocationsScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collImagesources !== null) {
-                foreach ($this->collImagesources as $referrerFK) {
+            if ($this->collCopyLocations !== null) {
+                foreach ($this->collCopyLocations as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -812,8 +954,8 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
         if ($this->isColumnModified(PartnerPeer::WEB)) {
             $modifiedColumns[':p' . $index++]  = '"web"';
         }
-        if ($this->isColumnModified(PartnerPeer::CONTACTPERSON)) {
-            $modifiedColumns[':p' . $index++]  = '"contactperson"';
+        if ($this->isColumnModified(PartnerPeer::CONTACT_PERSON)) {
+            $modifiedColumns[':p' . $index++]  = '"contact_person"';
         }
         if ($this->isColumnModified(PartnerPeer::CONTACTDATA)) {
             $modifiedColumns[':p' . $index++]  = '"contactdata"';
@@ -826,6 +968,12 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
         }
         if ($this->isColumnModified(PartnerPeer::LEGACY_PARTNER_ID)) {
             $modifiedColumns[':p' . $index++]  = '"legacy_partner_id"';
+        }
+        if ($this->isColumnModified(PartnerPeer::CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '"created_at"';
+        }
+        if ($this->isColumnModified(PartnerPeer::UPDATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '"updated_at"';
         }
 
         $sql = sprintf(
@@ -850,8 +998,8 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
                     case '"web"':
                         $stmt->bindValue($identifier, $this->web, PDO::PARAM_STR);
                         break;
-                    case '"contactperson"':
-                        $stmt->bindValue($identifier, $this->contactperson, PDO::PARAM_STR);
+                    case '"contact_person"':
+                        $stmt->bindValue($identifier, $this->contact_person, PDO::PARAM_STR);
                         break;
                     case '"contactdata"':
                         $stmt->bindValue($identifier, $this->contactdata, PDO::PARAM_STR);
@@ -864,6 +1012,12 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
                         break;
                     case '"legacy_partner_id"':
                         $stmt->bindValue($identifier, $this->legacy_partner_id, PDO::PARAM_INT);
+                        break;
+                    case '"created_at"':
+                        $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
+                        break;
+                    case '"updated_at"':
+                        $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -965,8 +1119,8 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
                     }
                 }
 
-                if ($this->collImagesources !== null) {
-                    foreach ($this->collImagesources as $referrerFK) {
+                if ($this->collCopyLocations !== null) {
+                    foreach ($this->collCopyLocations as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -1029,7 +1183,7 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
                 return $this->getWeb();
                 break;
             case 4:
-                return $this->getContactperson();
+                return $this->getContactPerson();
                 break;
             case 5:
                 return $this->getContactdata();
@@ -1042,6 +1196,12 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
                 break;
             case 8:
                 return $this->getLegacyPartnerId();
+                break;
+            case 9:
+                return $this->getCreatedAt();
+                break;
+            case 10:
+                return $this->getUpdatedAt();
                 break;
             default:
                 return null;
@@ -1076,18 +1236,20 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
             $keys[1] => $this->getName(),
             $keys[2] => $this->getMail(),
             $keys[3] => $this->getWeb(),
-            $keys[4] => $this->getContactperson(),
+            $keys[4] => $this->getContactPerson(),
             $keys[5] => $this->getContactdata(),
             $keys[6] => $this->getComments(),
             $keys[7] => $this->getIsOrganization(),
             $keys[8] => $this->getLegacyPartnerId(),
+            $keys[9] => $this->getCreatedAt(),
+            $keys[10] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->collTasks) {
                 $result['Tasks'] = $this->collTasks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collImagesources) {
-                $result['Imagesources'] = $this->collImagesources->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collCopyLocations) {
+                $result['CopyLocations'] = $this->collCopyLocations->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collTextsources) {
                 $result['Textsources'] = $this->collTextsources->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1139,7 +1301,7 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
                 $this->setWeb($value);
                 break;
             case 4:
-                $this->setContactperson($value);
+                $this->setContactPerson($value);
                 break;
             case 5:
                 $this->setContactdata($value);
@@ -1152,6 +1314,12 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
                 break;
             case 8:
                 $this->setLegacyPartnerId($value);
+                break;
+            case 9:
+                $this->setCreatedAt($value);
+                break;
+            case 10:
+                $this->setUpdatedAt($value);
                 break;
         } // switch()
     }
@@ -1181,11 +1349,13 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
         if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setMail($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setWeb($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setContactperson($arr[$keys[4]]);
+        if (array_key_exists($keys[4], $arr)) $this->setContactPerson($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setContactdata($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setComments($arr[$keys[6]]);
         if (array_key_exists($keys[7], $arr)) $this->setIsOrganization($arr[$keys[7]]);
         if (array_key_exists($keys[8], $arr)) $this->setLegacyPartnerId($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setCreatedAt($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setUpdatedAt($arr[$keys[10]]);
     }
 
     /**
@@ -1201,11 +1371,13 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
         if ($this->isColumnModified(PartnerPeer::NAME)) $criteria->add(PartnerPeer::NAME, $this->name);
         if ($this->isColumnModified(PartnerPeer::MAIL)) $criteria->add(PartnerPeer::MAIL, $this->mail);
         if ($this->isColumnModified(PartnerPeer::WEB)) $criteria->add(PartnerPeer::WEB, $this->web);
-        if ($this->isColumnModified(PartnerPeer::CONTACTPERSON)) $criteria->add(PartnerPeer::CONTACTPERSON, $this->contactperson);
+        if ($this->isColumnModified(PartnerPeer::CONTACT_PERSON)) $criteria->add(PartnerPeer::CONTACT_PERSON, $this->contact_person);
         if ($this->isColumnModified(PartnerPeer::CONTACTDATA)) $criteria->add(PartnerPeer::CONTACTDATA, $this->contactdata);
         if ($this->isColumnModified(PartnerPeer::COMMENTS)) $criteria->add(PartnerPeer::COMMENTS, $this->comments);
         if ($this->isColumnModified(PartnerPeer::IS_ORGANIZATION)) $criteria->add(PartnerPeer::IS_ORGANIZATION, $this->is_organization);
         if ($this->isColumnModified(PartnerPeer::LEGACY_PARTNER_ID)) $criteria->add(PartnerPeer::LEGACY_PARTNER_ID, $this->legacy_partner_id);
+        if ($this->isColumnModified(PartnerPeer::CREATED_AT)) $criteria->add(PartnerPeer::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(PartnerPeer::UPDATED_AT)) $criteria->add(PartnerPeer::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -1272,11 +1444,13 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
         $copyObj->setName($this->getName());
         $copyObj->setMail($this->getMail());
         $copyObj->setWeb($this->getWeb());
-        $copyObj->setContactperson($this->getContactperson());
+        $copyObj->setContactPerson($this->getContactPerson());
         $copyObj->setContactdata($this->getContactdata());
         $copyObj->setComments($this->getComments());
         $copyObj->setIsOrganization($this->getIsOrganization());
         $copyObj->setLegacyPartnerId($this->getLegacyPartnerId());
+        $copyObj->setCreatedAt($this->getCreatedAt());
+        $copyObj->setUpdatedAt($this->getUpdatedAt());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1291,9 +1465,9 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
                 }
             }
 
-            foreach ($this->getImagesources() as $relObj) {
+            foreach ($this->getCopyLocations() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addImagesource($relObj->copy($deepCopy));
+                    $copyObj->addCopyLocation($relObj->copy($deepCopy));
                 }
             }
 
@@ -1367,8 +1541,8 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
         if ('Task' == $relationName) {
             $this->initTasks();
         }
-        if ('Imagesource' == $relationName) {
-            $this->initImagesources();
+        if ('CopyLocation' == $relationName) {
+            $this->initCopyLocations();
         }
         if ('Textsource' == $relationName) {
             $this->initTextsources();
@@ -1694,36 +1868,36 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     }
 
     /**
-     * Clears out the collImagesources collection
+     * Clears out the collCopyLocations collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return Partner The current object (for fluent API support)
-     * @see        addImagesources()
+     * @see        addCopyLocations()
      */
-    public function clearImagesources()
+    public function clearCopyLocations()
     {
-        $this->collImagesources = null; // important to set this to null since that means it is uninitialized
-        $this->collImagesourcesPartial = null;
+        $this->collCopyLocations = null; // important to set this to null since that means it is uninitialized
+        $this->collCopyLocationsPartial = null;
 
         return $this;
     }
 
     /**
-     * reset is the collImagesources collection loaded partially
+     * reset is the collCopyLocations collection loaded partially
      *
      * @return void
      */
-    public function resetPartialImagesources($v = true)
+    public function resetPartialCopyLocations($v = true)
     {
-        $this->collImagesourcesPartial = $v;
+        $this->collCopyLocationsPartial = $v;
     }
 
     /**
-     * Initializes the collImagesources collection.
+     * Initializes the collCopyLocations collection.
      *
-     * By default this just sets the collImagesources collection to an empty array (like clearcollImagesources());
+     * By default this just sets the collCopyLocations collection to an empty array (like clearcollCopyLocations());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1732,17 +1906,17 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
      *
      * @return void
      */
-    public function initImagesources($overrideExisting = true)
+    public function initCopyLocations($overrideExisting = true)
     {
-        if (null !== $this->collImagesources && !$overrideExisting) {
+        if (null !== $this->collCopyLocations && !$overrideExisting) {
             return;
         }
-        $this->collImagesources = new PropelObjectCollection();
-        $this->collImagesources->setModel('Imagesource');
+        $this->collCopyLocations = new PropelObjectCollection();
+        $this->collCopyLocations->setModel('CopyLocation');
     }
 
     /**
-     * Gets an array of Imagesource objects which contain a foreign key that references this object.
+     * Gets an array of CopyLocation objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1752,105 +1926,105 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|Imagesource[] List of Imagesource objects
+     * @return PropelObjectCollection|CopyLocation[] List of CopyLocation objects
      * @throws PropelException
      */
-    public function getImagesources($criteria = null, PropelPDO $con = null)
+    public function getCopyLocations($criteria = null, PropelPDO $con = null)
     {
-        $partial = $this->collImagesourcesPartial && !$this->isNew();
-        if (null === $this->collImagesources || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collImagesources) {
+        $partial = $this->collCopyLocationsPartial && !$this->isNew();
+        if (null === $this->collCopyLocations || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCopyLocations) {
                 // return empty collection
-                $this->initImagesources();
+                $this->initCopyLocations();
             } else {
-                $collImagesources = ImagesourceQuery::create(null, $criteria)
+                $collCopyLocations = CopyLocationQuery::create(null, $criteria)
                     ->filterByPartner($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    if (false !== $this->collImagesourcesPartial && count($collImagesources)) {
-                      $this->initImagesources(false);
+                    if (false !== $this->collCopyLocationsPartial && count($collCopyLocations)) {
+                      $this->initCopyLocations(false);
 
-                      foreach($collImagesources as $obj) {
-                        if (false == $this->collImagesources->contains($obj)) {
-                          $this->collImagesources->append($obj);
+                      foreach($collCopyLocations as $obj) {
+                        if (false == $this->collCopyLocations->contains($obj)) {
+                          $this->collCopyLocations->append($obj);
                         }
                       }
 
-                      $this->collImagesourcesPartial = true;
+                      $this->collCopyLocationsPartial = true;
                     }
 
-                    $collImagesources->getInternalIterator()->rewind();
-                    return $collImagesources;
+                    $collCopyLocations->getInternalIterator()->rewind();
+                    return $collCopyLocations;
                 }
 
-                if($partial && $this->collImagesources) {
-                    foreach($this->collImagesources as $obj) {
+                if($partial && $this->collCopyLocations) {
+                    foreach($this->collCopyLocations as $obj) {
                         if($obj->isNew()) {
-                            $collImagesources[] = $obj;
+                            $collCopyLocations[] = $obj;
                         }
                     }
                 }
 
-                $this->collImagesources = $collImagesources;
-                $this->collImagesourcesPartial = false;
+                $this->collCopyLocations = $collCopyLocations;
+                $this->collCopyLocationsPartial = false;
             }
         }
 
-        return $this->collImagesources;
+        return $this->collCopyLocations;
     }
 
     /**
-     * Sets a collection of Imagesource objects related by a one-to-many relationship
+     * Sets a collection of CopyLocation objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $imagesources A Propel collection.
+     * @param PropelCollection $copyLocations A Propel collection.
      * @param PropelPDO $con Optional connection object
      * @return Partner The current object (for fluent API support)
      */
-    public function setImagesources(PropelCollection $imagesources, PropelPDO $con = null)
+    public function setCopyLocations(PropelCollection $copyLocations, PropelPDO $con = null)
     {
-        $imagesourcesToDelete = $this->getImagesources(new Criteria(), $con)->diff($imagesources);
+        $copyLocationsToDelete = $this->getCopyLocations(new Criteria(), $con)->diff($copyLocations);
 
-        $this->imagesourcesScheduledForDeletion = unserialize(serialize($imagesourcesToDelete));
+        $this->copyLocationsScheduledForDeletion = unserialize(serialize($copyLocationsToDelete));
 
-        foreach ($imagesourcesToDelete as $imagesourceRemoved) {
-            $imagesourceRemoved->setPartner(null);
+        foreach ($copyLocationsToDelete as $copyLocationRemoved) {
+            $copyLocationRemoved->setPartner(null);
         }
 
-        $this->collImagesources = null;
-        foreach ($imagesources as $imagesource) {
-            $this->addImagesource($imagesource);
+        $this->collCopyLocations = null;
+        foreach ($copyLocations as $copyLocation) {
+            $this->addCopyLocation($copyLocation);
         }
 
-        $this->collImagesources = $imagesources;
-        $this->collImagesourcesPartial = false;
+        $this->collCopyLocations = $copyLocations;
+        $this->collCopyLocationsPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related Imagesource objects.
+     * Returns the number of related CopyLocation objects.
      *
      * @param Criteria $criteria
      * @param boolean $distinct
      * @param PropelPDO $con
-     * @return int             Count of related Imagesource objects.
+     * @return int             Count of related CopyLocation objects.
      * @throws PropelException
      */
-    public function countImagesources(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countCopyLocations(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $partial = $this->collImagesourcesPartial && !$this->isNew();
-        if (null === $this->collImagesources || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collImagesources) {
+        $partial = $this->collCopyLocationsPartial && !$this->isNew();
+        if (null === $this->collCopyLocations || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCopyLocations) {
                 return 0;
             }
 
             if($partial && !$criteria) {
-                return count($this->getImagesources());
+                return count($this->getCopyLocations());
             }
-            $query = ImagesourceQuery::create(null, $criteria);
+            $query = CopyLocationQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
@@ -1860,52 +2034,52 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
                 ->count($con);
         }
 
-        return count($this->collImagesources);
+        return count($this->collCopyLocations);
     }
 
     /**
-     * Method called to associate a Imagesource object to this object
-     * through the Imagesource foreign key attribute.
+     * Method called to associate a CopyLocation object to this object
+     * through the CopyLocation foreign key attribute.
      *
-     * @param    Imagesource $l Imagesource
+     * @param    CopyLocation $l CopyLocation
      * @return Partner The current object (for fluent API support)
      */
-    public function addImagesource(Imagesource $l)
+    public function addCopyLocation(CopyLocation $l)
     {
-        if ($this->collImagesources === null) {
-            $this->initImagesources();
-            $this->collImagesourcesPartial = true;
+        if ($this->collCopyLocations === null) {
+            $this->initCopyLocations();
+            $this->collCopyLocationsPartial = true;
         }
-        if (!in_array($l, $this->collImagesources->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddImagesource($l);
+        if (!in_array($l, $this->collCopyLocations->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddCopyLocation($l);
         }
 
         return $this;
     }
 
     /**
-     * @param	Imagesource $imagesource The imagesource object to add.
+     * @param	CopyLocation $copyLocation The copyLocation object to add.
      */
-    protected function doAddImagesource($imagesource)
+    protected function doAddCopyLocation($copyLocation)
     {
-        $this->collImagesources[]= $imagesource;
-        $imagesource->setPartner($this);
+        $this->collCopyLocations[]= $copyLocation;
+        $copyLocation->setPartner($this);
     }
 
     /**
-     * @param	Imagesource $imagesource The imagesource object to remove.
+     * @param	CopyLocation $copyLocation The copyLocation object to remove.
      * @return Partner The current object (for fluent API support)
      */
-    public function removeImagesource($imagesource)
+    public function removeCopyLocation($copyLocation)
     {
-        if ($this->getImagesources()->contains($imagesource)) {
-            $this->collImagesources->remove($this->collImagesources->search($imagesource));
-            if (null === $this->imagesourcesScheduledForDeletion) {
-                $this->imagesourcesScheduledForDeletion = clone $this->collImagesources;
-                $this->imagesourcesScheduledForDeletion->clear();
+        if ($this->getCopyLocations()->contains($copyLocation)) {
+            $this->collCopyLocations->remove($this->collCopyLocations->search($copyLocation));
+            if (null === $this->copyLocationsScheduledForDeletion) {
+                $this->copyLocationsScheduledForDeletion = clone $this->collCopyLocations;
+                $this->copyLocationsScheduledForDeletion->clear();
             }
-            $this->imagesourcesScheduledForDeletion[]= $imagesource;
-            $imagesource->setPartner(null);
+            $this->copyLocationsScheduledForDeletion[]= clone $copyLocation;
+            $copyLocation->setPartner(null);
         }
 
         return $this;
@@ -1917,7 +2091,7 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
      * an identical criteria, it returns the collection.
      * Otherwise if this Partner is new, it will return
      * an empty collection; or if this Partner has previously
-     * been saved, it will retrieve related Imagesources from storage.
+     * been saved, it will retrieve related CopyLocations from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1926,14 +2100,14 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Imagesource[] List of Imagesource objects
+     * @return PropelObjectCollection|CopyLocation[] List of CopyLocation objects
      */
-    public function getImagesourcesJoinPublication($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getCopyLocationsJoinPublication($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
-        $query = ImagesourceQuery::create(null, $criteria);
+        $query = CopyLocationQuery::create(null, $criteria);
         $query->joinWith('Publication', $join_behavior);
 
-        return $this->getImagesources($query, $con);
+        return $this->getCopyLocations($query, $con);
     }
 
 
@@ -1942,7 +2116,7 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
      * an identical criteria, it returns the collection.
      * Otherwise if this Partner is new, it will return
      * an empty collection; or if this Partner has previously
-     * been saved, it will retrieve related Imagesources from storage.
+     * been saved, it will retrieve related CopyLocations from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1951,14 +2125,14 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Imagesource[] List of Imagesource objects
+     * @return PropelObjectCollection|CopyLocation[] List of CopyLocation objects
      */
-    public function getImagesourcesJoinLicense($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getCopyLocationsJoinLicense($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
-        $query = ImagesourceQuery::create(null, $criteria);
+        $query = CopyLocationQuery::create(null, $criteria);
         $query->joinWith('License', $join_behavior);
 
-        return $this->getImagesources($query, $con);
+        return $this->getCopyLocations($query, $con);
     }
 
     /**
@@ -2238,11 +2412,13 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
         $this->name = null;
         $this->mail = null;
         $this->web = null;
-        $this->contactperson = null;
+        $this->contact_person = null;
         $this->contactdata = null;
         $this->comments = null;
         $this->is_organization = null;
         $this->legacy_partner_id = null;
+        $this->created_at = null;
+        $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
@@ -2271,8 +2447,8 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collImagesources) {
-                foreach ($this->collImagesources as $o) {
+            if ($this->collCopyLocations) {
+                foreach ($this->collCopyLocations as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -2289,10 +2465,10 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
             $this->collTasks->clearIterator();
         }
         $this->collTasks = null;
-        if ($this->collImagesources instanceof PropelCollection) {
-            $this->collImagesources->clearIterator();
+        if ($this->collCopyLocations instanceof PropelCollection) {
+            $this->collCopyLocations->clearIterator();
         }
-        $this->collImagesources = null;
+        $this->collCopyLocations = null;
         if ($this->collTextsources instanceof PropelCollection) {
             $this->collTextsources->clearIterator();
         }
@@ -2317,6 +2493,20 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     Partner The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = PartnerPeer::UPDATED_AT;
+
+        return $this;
     }
 
     // table_row_view behavior

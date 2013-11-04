@@ -69,6 +69,14 @@
         <foreign-key foreignTable="personrole"> <reference local="personrole_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
     </table>
+    
+    <table name="recent_use" idMethod="native">
+        <column name="dta_user_id" type="INTEGER" required="true"/>
+        <column name="publication_id" type="INTEGER" required="true"/>
+        <column name="date" type="TIMESTAMP" required="true"/>
+        <foreign-key foreignTable="dta_user"> <reference local="dta_user_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
+    </table>
 
     <table name="dta_user">
         <column name="username" type="LONGVARCHAR"/>
@@ -77,6 +85,8 @@
         <column name="mail" type="LONGVARCHAR"/>
         <column name="admin" type="BOOLEAN" default="false"/>
         
+        <column name="legacy_user_id" description="id_user der alten Datenbank, die dem Datensatz zugrundeliegt." type="INTEGER"/>
+
         <behavior name="table_row_view">
             <parameter name="id" value="id"/>
             <parameter name="benutzername" value="username"/>

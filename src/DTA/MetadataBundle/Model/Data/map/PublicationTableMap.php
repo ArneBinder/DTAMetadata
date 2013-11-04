@@ -92,7 +92,9 @@ class PublicationTableMap extends TableMap
         $this->addRelation('FontPublication', 'DTA\\MetadataBundle\\Model\\Master\\FontPublication', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'FontPublications');
         $this->addRelation('PublicationPublicationgroup', 'DTA\\MetadataBundle\\Model\\Master\\PublicationPublicationgroup', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationPublicationgroups');
         $this->addRelation('PersonPublication', 'DTA\\MetadataBundle\\Model\\Master\\PersonPublication', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PersonPublications');
+        $this->addRelation('RecentUse', 'DTA\\MetadataBundle\\Model\\Master\\RecentUse', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'RecentUses');
         $this->addRelation('Task', 'DTA\\MetadataBundle\\Model\\Workflow\\Task', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Tasks');
+        $this->addRelation('CopyLocation', 'DTA\\MetadataBundle\\Model\\Workflow\\CopyLocation', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'CopyLocations');
         $this->addRelation('Imagesource', 'DTA\\MetadataBundle\\Model\\Workflow\\Imagesource', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Imagesources');
         $this->addRelation('Textsource', 'DTA\\MetadataBundle\\Model\\Workflow\\Textsource', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Textsources');
         $this->addRelation('Language', 'DTA\\MetadataBundle\\Model\\Data\\Language', RelationMap::MANY_TO_MANY, array(), null, null, 'Languages');

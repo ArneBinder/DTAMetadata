@@ -2,10 +2,10 @@
 
 /**
  * Data object containing the SQL and PHP code to migrate the database
- * up to version 1382719712.
- * Generated on 2013-10-25 18:48:32 by macbookdata
+ * up to version 1383213776.
+ * Generated on 2013-10-31 11:02:56 by macbookdata
  */
-class PropelMigration_1382719712
+class PropelMigration_1383213776
 {
 
     public function preUp($manager)
@@ -37,10 +37,18 @@ class PropelMigration_1382719712
     public function getUpSQL()
     {
         return array (
-  'DTAMetadata' => '
-ALTER TABLE "task" RENAME COLUMN "active" TO "done";
-
-ALTER TABLE "task" DROP COLUMN "activated_date";
+  'dtametadata' => '
+CREATE TABLE "copy_location"
+(
+    "id" serial NOT NULL,
+    "publication_id" INTEGER NOT NULL,
+    "partner_id" INTEGER NOT NULL,
+    "signature" TEXT NOT NULL,
+    "availability" BOOLEAN,
+    "comments" TEXT,
+    "legacy_fundstellen_id" INTEGER,
+    PRIMARY KEY ("id")
+);
 ',
 );
     }
@@ -54,10 +62,8 @@ ALTER TABLE "task" DROP COLUMN "activated_date";
     public function getDownSQL()
     {
         return array (
-  'DTAMetadata' => '
-ALTER TABLE "task" RENAME COLUMN "done" TO "active";
-
-ALTER TABLE "task" ADD "activated_date" DATE;
+  'dtametadata' => '
+DROP TABLE IF EXISTS "copy_location" CASCADE;
 ',
 );
     }

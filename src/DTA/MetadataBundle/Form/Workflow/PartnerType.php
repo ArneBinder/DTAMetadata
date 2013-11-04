@@ -22,7 +22,7 @@ class PartnerType extends BaseAbstractType
             'label' => "Ist eine Organisation",
             'required' => false
         ));
-        $builder->add('person');
+        $builder->add('contactPerson');
         $builder->add('comments');
         $builder->add('contact_data', 'textarea');
     }

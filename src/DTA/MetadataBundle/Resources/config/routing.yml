@@ -6,6 +6,10 @@ convertDump:
   path: /Convert
   defaults: { _controller: DTAMetadataBundle:DumpConversion:convert }
 
+nearDuplicateProposal:
+  path: /Duplicate
+  defaults: { _controller: DTAMetadataBundle:DumpConversion:nearDuplicateProposal }
+  
 # ==============================================================================
 # home controller
 # ==============================================================================

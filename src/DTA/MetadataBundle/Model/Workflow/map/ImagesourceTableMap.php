@@ -45,16 +45,8 @@ class ImagesourceTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('publication_id', 'PublicationId', 'INTEGER', 'publication', 'id', true, null, null);
-        $this->addForeignKey('partner_id', 'PartnerId', 'INTEGER', 'partner', 'id', false, null, null);
-        $this->addColumn('cataloguesignature', 'Cataloguesignature', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('catalogueurl', 'Catalogueurl', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('numfaksimiles', 'Numfaksimiles', 'INTEGER', false, null, null);
-        $this->addColumn('extentasofcatalogue', 'Extentasofcatalogue', 'LONGVARCHAR', false, null, null);
         $this->addColumn('faksimilerefrange', 'Faksimilerefrange', 'LONGVARCHAR', false, null, null);
         $this->addColumn('originalrefrange', 'Originalrefrange', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('imageurl', 'Imageurl', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('imageurn', 'Imageurn', 'LONGVARCHAR', false, null, null);
-        $this->addForeignKey('license_id', 'LicenseId', 'INTEGER', 'license', 'id', false, null, null);
         // validators
     } // initialize()
 
@@ -64,8 +56,6 @@ class ImagesourceTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::MANY_TO_ONE, array('publication_id' => 'id', ), null, null);
-        $this->addRelation('License', 'DTA\\MetadataBundle\\Model\\Workflow\\License', RelationMap::MANY_TO_ONE, array('license_id' => 'id', ), null, null);
-        $this->addRelation('Partner', 'DTA\\MetadataBundle\\Model\\Workflow\\Partner', RelationMap::MANY_TO_ONE, array('partner_id' => 'id', ), 'SET NULL', null);
     } // buildRelations()
 
     /**
@@ -80,16 +70,8 @@ class ImagesourceTableMap extends TableMap
             'table_row_view' =>  array (
   'Id' => 'id',
   'PublicationId' => 'publication_id',
-  'PartnerId' => 'partner_id',
-  'Cataloguesignature' => 'cataloguesignature',
-  'Catalogueurl' => 'catalogueurl',
-  'Numfaksimiles' => 'numfaksimiles',
-  'Extentasofcatalogue' => 'extentasofcatalogue',
   'Faksimilerefrange' => 'faksimilerefrange',
   'Originalrefrange' => 'originalrefrange',
-  'Imageurl' => 'imageurl',
-  'Imageurn' => 'imageurn',
-  'LicenseId' => 'license_id',
 ),
         );
     } // getBehaviors()

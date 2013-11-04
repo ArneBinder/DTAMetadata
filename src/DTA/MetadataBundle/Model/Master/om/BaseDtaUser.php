@@ -16,6 +16,8 @@ use \PropelPDO;
 use DTA\MetadataBundle\Model\Master\DtaUser;
 use DTA\MetadataBundle\Model\Master\DtaUserPeer;
 use DTA\MetadataBundle\Model\Master\DtaUserQuery;
+use DTA\MetadataBundle\Model\Master\RecentUse;
+use DTA\MetadataBundle\Model\Master\RecentUseQuery;
 use DTA\MetadataBundle\Model\Workflow\Task;
 use DTA\MetadataBundle\Model\Workflow\TaskQuery;
 
@@ -72,10 +74,22 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     protected $admin;
 
     /**
+     * The value for the legacy_user_id field.
+     * @var        int
+     */
+    protected $legacy_user_id;
+
+    /**
      * The value for the id field.
      * @var        int
      */
     protected $id;
+
+    /**
+     * @var        PropelObjectCollection|RecentUse[] Collection to store aggregation of RecentUse objects.
+     */
+    protected $collRecentUses;
+    protected $collRecentUsesPartial;
 
     /**
      * @var        PropelObjectCollection|Task[] Collection to store aggregation of Task objects.
@@ -105,6 +119,12 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
 
     // table_row_view behavior
     public static $tableRowViewCaptions = array('id', 'benutzername', 'mail', 'administratorrechte', );	public   $tableRowViewAccessors = array('id'=>'Id', 'benutzername'=>'Username', 'mail'=>'Mail', 'administratorrechte'=>'accessor:adminToString', );
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $recentUsesScheduledForDeletion = null;
+
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -180,6 +200,16 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     public function getAdmin()
     {
         return $this->admin;
+    }
+
+    /**
+     * Get the [legacy_user_id] column value.
+     * id_user der alten Datenbank, die dem Datensatz zugrundeliegt.
+     * @return int
+     */
+    public function getLegacyUserId()
+    {
+        return $this->legacy_user_id;
     }
 
     /**
@@ -306,6 +336,27 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     } // setAdmin()
 
     /**
+     * Set the value of [legacy_user_id] column.
+     * id_user der alten Datenbank, die dem Datensatz zugrundeliegt.
+     * @param int $v new value
+     * @return DtaUser The current object (for fluent API support)
+     */
+    public function setLegacyUserId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->legacy_user_id !== $v) {
+            $this->legacy_user_id = $v;
+            $this->modifiedColumns[] = DtaUserPeer::LEGACY_USER_ID;
+        }
+
+
+        return $this;
+    } // setLegacyUserId()
+
+    /**
      * Set the value of [id] column.
      *
      * @param int $v new value
@@ -367,7 +418,8 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
             $this->salt = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
             $this->mail = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
             $this->admin = ($row[$startcol + 4] !== null) ? (boolean) $row[$startcol + 4] : null;
-            $this->id = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+            $this->legacy_user_id = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+            $this->id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -376,7 +428,7 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 6; // 6 = DtaUserPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 7; // 7 = DtaUserPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating DtaUser object", $e);
@@ -437,6 +489,8 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
         $this->hydrate($row, 0, true); // rehydrate
 
         if ($deep) {  // also de-associate any related objects?
+
+            $this->collRecentUses = null;
 
             $this->collTasks = null;
 
@@ -564,6 +618,23 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
                 $this->resetModified();
             }
 
+            if ($this->recentUsesScheduledForDeletion !== null) {
+                if (!$this->recentUsesScheduledForDeletion->isEmpty()) {
+                    RecentUseQuery::create()
+                        ->filterByPrimaryKeys($this->recentUsesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->recentUsesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collRecentUses !== null) {
+                foreach ($this->collRecentUses as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             if ($this->tasksScheduledForDeletion !== null) {
                 if (!$this->tasksScheduledForDeletion->isEmpty()) {
                     foreach ($this->tasksScheduledForDeletion as $task) {
@@ -633,6 +704,9 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
         if ($this->isColumnModified(DtaUserPeer::ADMIN)) {
             $modifiedColumns[':p' . $index++]  = '"admin"';
         }
+        if ($this->isColumnModified(DtaUserPeer::LEGACY_USER_ID)) {
+            $modifiedColumns[':p' . $index++]  = '"legacy_user_id"';
+        }
         if ($this->isColumnModified(DtaUserPeer::ID)) {
             $modifiedColumns[':p' . $index++]  = '"id"';
         }
@@ -661,6 +735,9 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
                         break;
                     case '"admin"':
                         $stmt->bindValue($identifier, $this->admin, PDO::PARAM_BOOL);
+                        break;
+                    case '"legacy_user_id"':
+                        $stmt->bindValue($identifier, $this->legacy_user_id, PDO::PARAM_INT);
                         break;
                     case '"id"':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
@@ -757,6 +834,14 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
             }
 
 
+                if ($this->collRecentUses !== null) {
+                    foreach ($this->collRecentUses as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
                 if ($this->collTasks !== null) {
                     foreach ($this->collTasks as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -816,6 +901,9 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
                 return $this->getAdmin();
                 break;
             case 5:
+                return $this->getLegacyUserId();
+                break;
+            case 6:
                 return $this->getId();
                 break;
             default:
@@ -852,9 +940,13 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
             $keys[2] => $this->getSalt(),
             $keys[3] => $this->getMail(),
             $keys[4] => $this->getAdmin(),
-            $keys[5] => $this->getId(),
+            $keys[5] => $this->getLegacyUserId(),
+            $keys[6] => $this->getId(),
         );
         if ($includeForeignObjects) {
+            if (null !== $this->collRecentUses) {
+                $result['RecentUses'] = $this->collRecentUses->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collTasks) {
                 $result['Tasks'] = $this->collTasks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -908,6 +1000,9 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
                 $this->setAdmin($value);
                 break;
             case 5:
+                $this->setLegacyUserId($value);
+                break;
+            case 6:
                 $this->setId($value);
                 break;
         } // switch()
@@ -939,7 +1034,8 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
         if (array_key_exists($keys[2], $arr)) $this->setSalt($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setMail($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setAdmin($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setId($arr[$keys[5]]);
+        if (array_key_exists($keys[5], $arr)) $this->setLegacyUserId($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setId($arr[$keys[6]]);
     }
 
     /**
@@ -956,6 +1052,7 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
         if ($this->isColumnModified(DtaUserPeer::SALT)) $criteria->add(DtaUserPeer::SALT, $this->salt);
         if ($this->isColumnModified(DtaUserPeer::MAIL)) $criteria->add(DtaUserPeer::MAIL, $this->mail);
         if ($this->isColumnModified(DtaUserPeer::ADMIN)) $criteria->add(DtaUserPeer::ADMIN, $this->admin);
+        if ($this->isColumnModified(DtaUserPeer::LEGACY_USER_ID)) $criteria->add(DtaUserPeer::LEGACY_USER_ID, $this->legacy_user_id);
         if ($this->isColumnModified(DtaUserPeer::ID)) $criteria->add(DtaUserPeer::ID, $this->id);
 
         return $criteria;
@@ -1025,6 +1122,7 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
         $copyObj->setSalt($this->getSalt());
         $copyObj->setMail($this->getMail());
         $copyObj->setAdmin($this->getAdmin());
+        $copyObj->setLegacyUserId($this->getLegacyUserId());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1032,6 +1130,12 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
             $copyObj->setNew(false);
             // store object hash to prevent cycle
             $this->startCopy = true;
+
+            foreach ($this->getRecentUses() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addRecentUse($relObj->copy($deepCopy));
+                }
+            }
 
             foreach ($this->getTasks() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
@@ -1100,9 +1204,255 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
      */
     public function initRelation($relationName)
     {
+        if ('RecentUse' == $relationName) {
+            $this->initRecentUses();
+        }
         if ('Task' == $relationName) {
             $this->initTasks();
         }
+    }
+
+    /**
+     * Clears out the collRecentUses collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return DtaUser The current object (for fluent API support)
+     * @see        addRecentUses()
+     */
+    public function clearRecentUses()
+    {
+        $this->collRecentUses = null; // important to set this to null since that means it is uninitialized
+        $this->collRecentUsesPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collRecentUses collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialRecentUses($v = true)
+    {
+        $this->collRecentUsesPartial = $v;
+    }
+
+    /**
+     * Initializes the collRecentUses collection.
+     *
+     * By default this just sets the collRecentUses collection to an empty array (like clearcollRecentUses());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initRecentUses($overrideExisting = true)
+    {
+        if (null !== $this->collRecentUses && !$overrideExisting) {
+            return;
+        }
+        $this->collRecentUses = new PropelObjectCollection();
+        $this->collRecentUses->setModel('RecentUse');
+    }
+
+    /**
+     * Gets an array of RecentUse objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this DtaUser is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|RecentUse[] List of RecentUse objects
+     * @throws PropelException
+     */
+    public function getRecentUses($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collRecentUsesPartial && !$this->isNew();
+        if (null === $this->collRecentUses || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collRecentUses) {
+                // return empty collection
+                $this->initRecentUses();
+            } else {
+                $collRecentUses = RecentUseQuery::create(null, $criteria)
+                    ->filterByDtaUser($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collRecentUsesPartial && count($collRecentUses)) {
+                      $this->initRecentUses(false);
+
+                      foreach($collRecentUses as $obj) {
+                        if (false == $this->collRecentUses->contains($obj)) {
+                          $this->collRecentUses->append($obj);
+                        }
+                      }
+
+                      $this->collRecentUsesPartial = true;
+                    }
+
+                    $collRecentUses->getInternalIterator()->rewind();
+                    return $collRecentUses;
+                }
+
+                if($partial && $this->collRecentUses) {
+                    foreach($this->collRecentUses as $obj) {
+                        if($obj->isNew()) {
+                            $collRecentUses[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collRecentUses = $collRecentUses;
+                $this->collRecentUsesPartial = false;
+            }
+        }
+
+        return $this->collRecentUses;
+    }
+
+    /**
+     * Sets a collection of RecentUse objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $recentUses A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return DtaUser The current object (for fluent API support)
+     */
+    public function setRecentUses(PropelCollection $recentUses, PropelPDO $con = null)
+    {
+        $recentUsesToDelete = $this->getRecentUses(new Criteria(), $con)->diff($recentUses);
+
+        $this->recentUsesScheduledForDeletion = unserialize(serialize($recentUsesToDelete));
+
+        foreach ($recentUsesToDelete as $recentUseRemoved) {
+            $recentUseRemoved->setDtaUser(null);
+        }
+
+        $this->collRecentUses = null;
+        foreach ($recentUses as $recentUse) {
+            $this->addRecentUse($recentUse);
+        }
+
+        $this->collRecentUses = $recentUses;
+        $this->collRecentUsesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related RecentUse objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related RecentUse objects.
+     * @throws PropelException
+     */
+    public function countRecentUses(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collRecentUsesPartial && !$this->isNew();
+        if (null === $this->collRecentUses || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collRecentUses) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getRecentUses());
+            }
+            $query = RecentUseQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByDtaUser($this)
+                ->count($con);
+        }
+
+        return count($this->collRecentUses);
+    }
+
+    /**
+     * Method called to associate a RecentUse object to this object
+     * through the RecentUse foreign key attribute.
+     *
+     * @param    RecentUse $l RecentUse
+     * @return DtaUser The current object (for fluent API support)
+     */
+    public function addRecentUse(RecentUse $l)
+    {
+        if ($this->collRecentUses === null) {
+            $this->initRecentUses();
+            $this->collRecentUsesPartial = true;
+        }
+        if (!in_array($l, $this->collRecentUses->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddRecentUse($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	RecentUse $recentUse The recentUse object to add.
+     */
+    protected function doAddRecentUse($recentUse)
+    {
+        $this->collRecentUses[]= $recentUse;
+        $recentUse->setDtaUser($this);
+    }
+
+    /**
+     * @param	RecentUse $recentUse The recentUse object to remove.
+     * @return DtaUser The current object (for fluent API support)
+     */
+    public function removeRecentUse($recentUse)
+    {
+        if ($this->getRecentUses()->contains($recentUse)) {
+            $this->collRecentUses->remove($this->collRecentUses->search($recentUse));
+            if (null === $this->recentUsesScheduledForDeletion) {
+                $this->recentUsesScheduledForDeletion = clone $this->collRecentUses;
+                $this->recentUsesScheduledForDeletion->clear();
+            }
+            $this->recentUsesScheduledForDeletion[]= clone $recentUse;
+            $recentUse->setDtaUser(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this DtaUser is new, it will return
+     * an empty collection; or if this DtaUser has previously
+     * been saved, it will retrieve related RecentUses from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in DtaUser.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|RecentUse[] List of RecentUse objects
+     */
+    public function getRecentUsesJoinPublication($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = RecentUseQuery::create(null, $criteria);
+        $query->joinWith('Publication', $join_behavior);
+
+        return $this->getRecentUses($query, $con);
     }
 
     /**
@@ -1433,6 +1783,7 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
         $this->salt = null;
         $this->mail = null;
         $this->admin = null;
+        $this->legacy_user_id = null;
         $this->id = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
@@ -1457,6 +1808,11 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->collRecentUses) {
+                foreach ($this->collRecentUses as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collTasks) {
                 foreach ($this->collTasks as $o) {
                     $o->clearAllReferences($deep);
@@ -1466,6 +1822,10 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
+        if ($this->collRecentUses instanceof PropelCollection) {
+            $this->collRecentUses->clearIterator();
+        }
+        $this->collRecentUses = null;
         if ($this->collTasks instanceof PropelCollection) {
             $this->collTasks->clearIterator();
         }

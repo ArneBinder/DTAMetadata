@@ -47,11 +47,13 @@ class PartnerTableMap extends TableMap
         $this->addColumn('name', 'Name', 'LONGVARCHAR', false, null, null);
         $this->addColumn('mail', 'Mail', 'LONGVARCHAR', false, null, null);
         $this->addColumn('web', 'Web', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('contactperson', 'Contactperson', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('contact_person', 'ContactPerson', 'LONGVARCHAR', false, null, null);
         $this->addColumn('contactdata', 'Contactdata', 'LONGVARCHAR', false, null, null);
         $this->addColumn('comments', 'Comments', 'LONGVARCHAR', false, null, null);
         $this->addColumn('is_organization', 'IsOrganization', 'BOOLEAN', false, null, false);
         $this->addColumn('legacy_partner_id', 'LegacyPartnerId', 'INTEGER', false, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -61,7 +63,7 @@ class PartnerTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Task', 'DTA\\MetadataBundle\\Model\\Workflow\\Task', RelationMap::ONE_TO_MANY, array('id' => 'partner_id', ), null, null, 'Tasks');
-        $this->addRelation('Imagesource', 'DTA\\MetadataBundle\\Model\\Workflow\\Imagesource', RelationMap::ONE_TO_MANY, array('id' => 'partner_id', ), 'SET NULL', null, 'Imagesources');
+        $this->addRelation('CopyLocation', 'DTA\\MetadataBundle\\Model\\Workflow\\CopyLocation', RelationMap::ONE_TO_MANY, array('id' => 'partner_id', ), null, null, 'CopyLocations');
         $this->addRelation('Textsource', 'DTA\\MetadataBundle\\Model\\Workflow\\Textsource', RelationMap::ONE_TO_MANY, array('id' => 'partner_id', ), 'SET NULL', null, 'Textsources');
     } // buildRelations()
 
@@ -74,16 +76,16 @@ class PartnerTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
+),
             'table_row_view' =>  array (
-  'Id' => 'id',
   'Name' => 'name',
+  'Ansprechpartner' => 'contact_person',
   'Mail' => 'mail',
   'Web' => 'web',
-  'Contactperson' => 'contactperson',
-  'Contactdata' => 'contactdata',
-  'Comments' => 'comments',
-  'IsOrganization' => 'is_organization',
-  'LegacyPartnerId' => 'legacy_partner_id',
 ),
         );
     } // getBehaviors()

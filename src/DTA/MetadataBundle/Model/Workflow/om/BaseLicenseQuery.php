@@ -12,7 +12,7 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
-use DTA\MetadataBundle\Model\Workflow\Imagesource;
+use DTA\MetadataBundle\Model\Workflow\CopyLocation;
 use DTA\MetadataBundle\Model\Workflow\License;
 use DTA\MetadataBundle\Model\Workflow\LicensePeer;
 use DTA\MetadataBundle\Model\Workflow\LicenseQuery;
@@ -35,9 +35,9 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method LicenseQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method LicenseQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method LicenseQuery leftJoinImagesource($relationAlias = null) Adds a LEFT JOIN clause to the query using the Imagesource relation
- * @method LicenseQuery rightJoinImagesource($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Imagesource relation
- * @method LicenseQuery innerJoinImagesource($relationAlias = null) Adds a INNER JOIN clause to the query using the Imagesource relation
+ * @method LicenseQuery leftJoinCopyLocation($relationAlias = null) Adds a LEFT JOIN clause to the query using the CopyLocation relation
+ * @method LicenseQuery rightJoinCopyLocation($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CopyLocation relation
+ * @method LicenseQuery innerJoinCopyLocation($relationAlias = null) Adds a INNER JOIN clause to the query using the CopyLocation relation
  *
  * @method LicenseQuery leftJoinTextsource($relationAlias = null) Adds a LEFT JOIN clause to the query using the Textsource relation
  * @method LicenseQuery rightJoinTextsource($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Textsource relation
@@ -401,41 +401,41 @@ abstract class BaseLicenseQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Imagesource object
+     * Filter the query by a related CopyLocation object
      *
-     * @param   Imagesource|PropelObjectCollection $imagesource  the related object to use as filter
+     * @param   CopyLocation|PropelObjectCollection $copyLocation  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return                 LicenseQuery The current query, for fluid interface
      * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterByImagesource($imagesource, $comparison = null)
+    public function filterByCopyLocation($copyLocation, $comparison = null)
     {
-        if ($imagesource instanceof Imagesource) {
+        if ($copyLocation instanceof CopyLocation) {
             return $this
-                ->addUsingAlias(LicensePeer::ID, $imagesource->getLicenseId(), $comparison);
-        } elseif ($imagesource instanceof PropelObjectCollection) {
+                ->addUsingAlias(LicensePeer::ID, $copyLocation->getLicenseId(), $comparison);
+        } elseif ($copyLocation instanceof PropelObjectCollection) {
             return $this
-                ->useImagesourceQuery()
-                ->filterByPrimaryKeys($imagesource->getPrimaryKeys())
+                ->useCopyLocationQuery()
+                ->filterByPrimaryKeys($copyLocation->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByImagesource() only accepts arguments of type Imagesource or PropelCollection');
+            throw new PropelException('filterByCopyLocation() only accepts arguments of type CopyLocation or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Imagesource relation
+     * Adds a JOIN clause to the query using the CopyLocation relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return LicenseQuery The current query, for fluid interface
      */
-    public function joinImagesource($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinCopyLocation($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Imagesource');
+        $relationMap = $tableMap->getRelation('CopyLocation');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -450,14 +450,14 @@ abstract class BaseLicenseQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Imagesource');
+            $this->addJoinObject($join, 'CopyLocation');
         }
 
         return $this;
     }
 
     /**
-     * Use the Imagesource relation Imagesource object
+     * Use the CopyLocation relation CopyLocation object
      *
      * @see       useQuery()
      *
@@ -465,13 +465,13 @@ abstract class BaseLicenseQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \DTA\MetadataBundle\Model\Workflow\ImagesourceQuery A secondary query class using the current class as primary query
+     * @return   \DTA\MetadataBundle\Model\Workflow\CopyLocationQuery A secondary query class using the current class as primary query
      */
-    public function useImagesourceQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useCopyLocationQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
-            ->joinImagesource($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Imagesource', '\DTA\MetadataBundle\Model\Workflow\ImagesourceQuery');
+            ->joinCopyLocation($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CopyLocation', '\DTA\MetadataBundle\Model\Workflow\CopyLocationQuery');
     }
 
     /**
