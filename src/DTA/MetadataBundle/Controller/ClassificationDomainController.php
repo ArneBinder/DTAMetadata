@@ -16,10 +16,9 @@ class ClassificationDomainController extends ORMController {
 //                array('caption' => "DTA", 'route' => 'home'),
 //                array('caption' => "DWDS", 'route' => 'home'))),
         array("caption" => "Genres", "modelClass" => 'Genre'),
-        array("caption" => "Korpora", "modelClass" => 'Corpus'),
         array("caption" => "Kategorien", "modelClass" => 'Category'),
         array("caption" => "Schlagworte", "modelClass" => 'Tag'),
-        array("caption" => "Verwandte Werke", 'route' => 'home'),
+        array("caption" => "Publikationsgruppen", 'route' => 'home'),
     );
 
     public function indexAction() {

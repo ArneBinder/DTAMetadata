@@ -372,7 +372,7 @@ class ORMController extends DTADomainController {
      * Visits recursively all nested form elements and saves them.
      * @param Form $form The form object that contains the data defined by the top level form type (PersonType, NamefragmentType, ...)
      */
-    private function saveRecursively(\Symfony\Component\Form\Form $form) {
+    protected function saveRecursively(\Symfony\Component\Form\Form $form) {
 
         $entity = $form->getData();
         if (is_object($entity)) {

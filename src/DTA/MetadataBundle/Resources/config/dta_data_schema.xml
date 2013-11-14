@@ -44,11 +44,14 @@
         <column name="numpagesnumeric" description="Umfang (normiert)" type="INTEGER"/>
     
         <column name="comment" description="Anmerkungen" type="LONGVARCHAR"/>
+        <column name="encoding_comment" description="Kommentar Encoding" type="LONGVARCHAR"/>
         
         <column name="doi" type="LONGVARCHAR"/>
         <column name="format" type="LONGVARCHAR"/>
         <column name="directoryname" type="LONGVARCHAR"/>
         <column name="wwwready" type="INTEGER"/>
+        
+        <column name="last_changed_by_user_id" type="INTEGER"/>
         
         <column name="legacy_book_id" description="id_book des Datensatzes aus der alten Datenbank, der dem neuen Datensatz zugrundeliegt." type="INTEGER"/>
         
@@ -58,13 +61,14 @@
         <behavior name="table_row_view">
             <parameter name="Titel" value="accessor:getTitle"/>
             <parameter name="erster Autor" value="accessor:getFirstAuthor"/>
-            <parameter name="entstanden" value="accessor:getDatespecification"/>
+            <parameter name="entstanden" value="accessor:getDatespecificationRelatedByCreationdateId"/>
             <!--<parameter name="Verlag" value="accessor:getPublishingCompany"/>-->
             <parameter name="veröffentlicht" value="accessor:getDatespecificationRelatedByPublicationdateId"/>
             <!--<parameter name="embedcolumnsstatus" value="status"/>-->
             <parameter name="embedcolumnstitle" value="title"/>
         </behavior>
         
+        <behavior name="timestampable"/>
         <behavior name="reconstructed_flaggable">
             <parameter name="column" value="publishingcompany_id"/>
         </behavior>
@@ -75,6 +79,7 @@
         <foreign-key foreignTable="place"> <reference local="place_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="datespecification"> <reference local="publicationdate_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="datespecification"> <reference local="creationdate_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="dta_user" phpName="LastChangedByUser" refPhpName="LastChangedPublication"> <reference local="last_changed_by_user_id" foreign="id"/> </foreign-key>
     </table>
 
                 
@@ -251,23 +256,26 @@
     
     <!-- Namensfragmente sind Bestandteile eines Namens, z.B. Vor- oder Nachname. -->
     <table name="namefragment">
-        <behavior name="sortable">
-            <parameter name="use_scope" value="true"/>
-            <parameter name="scope_column" value="personalname_id"/>
-        </behavior>
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="personalname_id" type="INTEGER" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
         <column name="namefragmenttypeid" type="INTEGER" required="true"/>
+
+        <foreign-key foreignTable="namefragmenttype"> 
+            <reference local="namefragmenttypeid" foreign="id"/> 
+        </foreign-key>
+        <foreign-key foreignTable="personalname" onDelete="cascade"> <reference local="personalname_id" foreign="id"/> </foreign-key>
         
+        <behavior name="sortable">
+            <parameter name="use_scope" value="true"/>
+            <parameter name="scope_column" value="personalname_id"/>
+        </behavior>
         <behavior name="table_row_view">
             <parameter name="bestandteil" value="name"/>
             <parameter name="embedcolumnsart" value="namefragmenttype"/>
         </behavior>
-        
-        <foreign-key foreignTable="namefragmenttype"> <reference local="namefragmenttypeid" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="personalname" onDelete="cascade"> <reference local="personalname_id" foreign="id"/> </foreign-key>
     </table>
+    
     <table name="title">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <behavior name="table_row_view">
@@ -313,11 +321,17 @@
     <table name="font">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
+        <behavior name="table_row_view">
+            <parameter name="Name" value="name"/>
+        </behavior>
     </table>
     
     <table name="language">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
+        <behavior name="table_row_view">
+            <parameter name="Name" value="name"/>
+        </behavior>
     </table>
     
 </database>

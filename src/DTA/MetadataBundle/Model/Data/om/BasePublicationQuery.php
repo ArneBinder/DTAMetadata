@@ -33,6 +33,7 @@ use DTA\MetadataBundle\Model\Data\Publishingcompany;
 use DTA\MetadataBundle\Model\Data\Title;
 use DTA\MetadataBundle\Model\Data\Volume;
 use DTA\MetadataBundle\Model\Master\CategoryPublication;
+use DTA\MetadataBundle\Model\Master\DtaUser;
 use DTA\MetadataBundle\Model\Master\FontPublication;
 use DTA\MetadataBundle\Model\Master\GenrePublication;
 use DTA\MetadataBundle\Model\Master\LanguagePublication;
@@ -61,11 +62,15 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method PublicationQuery orderByNumpages($order = Criteria::ASC) Order by the numpages column
  * @method PublicationQuery orderByNumpagesnumeric($order = Criteria::ASC) Order by the numpagesnumeric column
  * @method PublicationQuery orderByComment($order = Criteria::ASC) Order by the comment column
+ * @method PublicationQuery orderByEncodingComment($order = Criteria::ASC) Order by the encoding_comment column
  * @method PublicationQuery orderByDoi($order = Criteria::ASC) Order by the doi column
  * @method PublicationQuery orderByFormat($order = Criteria::ASC) Order by the format column
  * @method PublicationQuery orderByDirectoryname($order = Criteria::ASC) Order by the directoryname column
  * @method PublicationQuery orderByWwwready($order = Criteria::ASC) Order by the wwwready column
+ * @method PublicationQuery orderByLastChangedByUserId($order = Criteria::ASC) Order by the last_changed_by_user_id column
  * @method PublicationQuery orderByLegacyBookId($order = Criteria::ASC) Order by the legacy_book_id column
+ * @method PublicationQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method PublicationQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  * @method PublicationQuery orderByPublishingcompanyIdIsReconstructed($order = Criteria::ASC) Order by the publishingcompany_id_is_reconstructed column
  *
  * @method PublicationQuery groupById() Group by the id column
@@ -82,11 +87,15 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method PublicationQuery groupByNumpages() Group by the numpages column
  * @method PublicationQuery groupByNumpagesnumeric() Group by the numpagesnumeric column
  * @method PublicationQuery groupByComment() Group by the comment column
+ * @method PublicationQuery groupByEncodingComment() Group by the encoding_comment column
  * @method PublicationQuery groupByDoi() Group by the doi column
  * @method PublicationQuery groupByFormat() Group by the format column
  * @method PublicationQuery groupByDirectoryname() Group by the directoryname column
  * @method PublicationQuery groupByWwwready() Group by the wwwready column
+ * @method PublicationQuery groupByLastChangedByUserId() Group by the last_changed_by_user_id column
  * @method PublicationQuery groupByLegacyBookId() Group by the legacy_book_id column
+ * @method PublicationQuery groupByCreatedAt() Group by the created_at column
+ * @method PublicationQuery groupByUpdatedAt() Group by the updated_at column
  * @method PublicationQuery groupByPublishingcompanyIdIsReconstructed() Group by the publishingcompany_id_is_reconstructed column
  *
  * @method PublicationQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
@@ -112,6 +121,10 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method PublicationQuery leftJoinDatespecificationRelatedByCreationdateId($relationAlias = null) Adds a LEFT JOIN clause to the query using the DatespecificationRelatedByCreationdateId relation
  * @method PublicationQuery rightJoinDatespecificationRelatedByCreationdateId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the DatespecificationRelatedByCreationdateId relation
  * @method PublicationQuery innerJoinDatespecificationRelatedByCreationdateId($relationAlias = null) Adds a INNER JOIN clause to the query using the DatespecificationRelatedByCreationdateId relation
+ *
+ * @method PublicationQuery leftJoinLastChangedByUser($relationAlias = null) Adds a LEFT JOIN clause to the query using the LastChangedByUser relation
+ * @method PublicationQuery rightJoinLastChangedByUser($relationAlias = null) Adds a RIGHT JOIN clause to the query using the LastChangedByUser relation
+ * @method PublicationQuery innerJoinLastChangedByUser($relationAlias = null) Adds a INNER JOIN clause to the query using the LastChangedByUser relation
  *
  * @method PublicationQuery leftJoinPublicationM($relationAlias = null) Adds a LEFT JOIN clause to the query using the PublicationM relation
  * @method PublicationQuery rightJoinPublicationM($relationAlias = null) Adds a RIGHT JOIN clause to the query using the PublicationM relation
@@ -213,11 +226,15 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method Publication findOneByNumpages(string $numpages) Return the first Publication filtered by the numpages column
  * @method Publication findOneByNumpagesnumeric(int $numpagesnumeric) Return the first Publication filtered by the numpagesnumeric column
  * @method Publication findOneByComment(string $comment) Return the first Publication filtered by the comment column
+ * @method Publication findOneByEncodingComment(string $encoding_comment) Return the first Publication filtered by the encoding_comment column
  * @method Publication findOneByDoi(string $doi) Return the first Publication filtered by the doi column
  * @method Publication findOneByFormat(string $format) Return the first Publication filtered by the format column
  * @method Publication findOneByDirectoryname(string $directoryname) Return the first Publication filtered by the directoryname column
  * @method Publication findOneByWwwready(int $wwwready) Return the first Publication filtered by the wwwready column
+ * @method Publication findOneByLastChangedByUserId(int $last_changed_by_user_id) Return the first Publication filtered by the last_changed_by_user_id column
  * @method Publication findOneByLegacyBookId(int $legacy_book_id) Return the first Publication filtered by the legacy_book_id column
+ * @method Publication findOneByCreatedAt(string $created_at) Return the first Publication filtered by the created_at column
+ * @method Publication findOneByUpdatedAt(string $updated_at) Return the first Publication filtered by the updated_at column
  * @method Publication findOneByPublishingcompanyIdIsReconstructed(boolean $publishingcompany_id_is_reconstructed) Return the first Publication filtered by the publishingcompany_id_is_reconstructed column
  *
  * @method array findById(int $id) Return Publication objects filtered by the id column
@@ -234,11 +251,15 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method array findByNumpages(string $numpages) Return Publication objects filtered by the numpages column
  * @method array findByNumpagesnumeric(int $numpagesnumeric) Return Publication objects filtered by the numpagesnumeric column
  * @method array findByComment(string $comment) Return Publication objects filtered by the comment column
+ * @method array findByEncodingComment(string $encoding_comment) Return Publication objects filtered by the encoding_comment column
  * @method array findByDoi(string $doi) Return Publication objects filtered by the doi column
  * @method array findByFormat(string $format) Return Publication objects filtered by the format column
  * @method array findByDirectoryname(string $directoryname) Return Publication objects filtered by the directoryname column
  * @method array findByWwwready(int $wwwready) Return Publication objects filtered by the wwwready column
+ * @method array findByLastChangedByUserId(int $last_changed_by_user_id) Return Publication objects filtered by the last_changed_by_user_id column
  * @method array findByLegacyBookId(int $legacy_book_id) Return Publication objects filtered by the legacy_book_id column
+ * @method array findByCreatedAt(string $created_at) Return Publication objects filtered by the created_at column
+ * @method array findByUpdatedAt(string $updated_at) Return Publication objects filtered by the updated_at column
  * @method array findByPublishingcompanyIdIsReconstructed(boolean $publishingcompany_id_is_reconstructed) Return Publication objects filtered by the publishingcompany_id_is_reconstructed column
  */
 abstract class BasePublicationQuery extends ModelCriteria
@@ -341,7 +362,7 @@ abstract class BasePublicationQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "title_id", "firsteditionpublication_id", "place_id", "publicationdate_id", "creationdate_id", "publishingcompany_id", "partner_id", "editiondescription", "digitaleditioneditor", "transcriptioncomment", "numpages", "numpagesnumeric", "comment", "doi", "format", "directoryname", "wwwready", "legacy_book_id", "publishingcompany_id_is_reconstructed" FROM "publication" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "title_id", "firsteditionpublication_id", "place_id", "publicationdate_id", "creationdate_id", "publishingcompany_id", "partner_id", "editiondescription", "digitaleditioneditor", "transcriptioncomment", "numpages", "numpagesnumeric", "comment", "encoding_comment", "doi", "format", "directoryname", "wwwready", "last_changed_by_user_id", "legacy_book_id", "created_at", "updated_at", "publishingcompany_id_is_reconstructed" FROM "publication" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -964,6 +985,35 @@ abstract class BasePublicationQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the encoding_comment column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByEncodingComment('fooValue');   // WHERE encoding_comment = 'fooValue'
+     * $query->filterByEncodingComment('%fooValue%'); // WHERE encoding_comment LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $encodingComment The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return PublicationQuery The current query, for fluid interface
+     */
+    public function filterByEncodingComment($encodingComment = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($encodingComment)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $encodingComment)) {
+                $encodingComment = str_replace('*', '%', $encodingComment);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(PublicationPeer::ENCODING_COMMENT, $encodingComment, $comparison);
+    }
+
+    /**
      * Filter the query on the doi column
      *
      * Example usage:
@@ -1093,6 +1143,50 @@ abstract class BasePublicationQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the last_changed_by_user_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByLastChangedByUserId(1234); // WHERE last_changed_by_user_id = 1234
+     * $query->filterByLastChangedByUserId(array(12, 34)); // WHERE last_changed_by_user_id IN (12, 34)
+     * $query->filterByLastChangedByUserId(array('min' => 12)); // WHERE last_changed_by_user_id >= 12
+     * $query->filterByLastChangedByUserId(array('max' => 12)); // WHERE last_changed_by_user_id <= 12
+     * </code>
+     *
+     * @see       filterByLastChangedByUser()
+     *
+     * @param     mixed $lastChangedByUserId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return PublicationQuery The current query, for fluid interface
+     */
+    public function filterByLastChangedByUserId($lastChangedByUserId = null, $comparison = null)
+    {
+        if (is_array($lastChangedByUserId)) {
+            $useMinMax = false;
+            if (isset($lastChangedByUserId['min'])) {
+                $this->addUsingAlias(PublicationPeer::LAST_CHANGED_BY_USER_ID, $lastChangedByUserId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($lastChangedByUserId['max'])) {
+                $this->addUsingAlias(PublicationPeer::LAST_CHANGED_BY_USER_ID, $lastChangedByUserId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(PublicationPeer::LAST_CHANGED_BY_USER_ID, $lastChangedByUserId, $comparison);
+    }
+
+    /**
      * Filter the query on the legacy_book_id column
      *
      * Example usage:
@@ -1132,6 +1226,92 @@ abstract class BasePublicationQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(PublicationPeer::LEGACY_BOOK_ID, $legacyBookId, $comparison);
+    }
+
+    /**
+     * Filter the query on the created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return PublicationQuery The current query, for fluid interface
+     */
+    public function filterByCreatedAt($createdAt = null, $comparison = null)
+    {
+        if (is_array($createdAt)) {
+            $useMinMax = false;
+            if (isset($createdAt['min'])) {
+                $this->addUsingAlias(PublicationPeer::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($createdAt['max'])) {
+                $this->addUsingAlias(PublicationPeer::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(PublicationPeer::CREATED_AT, $createdAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the updated_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return PublicationQuery The current query, for fluid interface
+     */
+    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+    {
+        if (is_array($updatedAt)) {
+            $useMinMax = false;
+            if (isset($updatedAt['min'])) {
+                $this->addUsingAlias(PublicationPeer::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($updatedAt['max'])) {
+                $this->addUsingAlias(PublicationPeer::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(PublicationPeer::UPDATED_AT, $updatedAt, $comparison);
     }
 
     /**
@@ -1539,6 +1719,82 @@ abstract class BasePublicationQuery extends ModelCriteria
         return $this
             ->joinDatespecificationRelatedByCreationdateId($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'DatespecificationRelatedByCreationdateId', '\DTA\MetadataBundle\Model\Data\DatespecificationQuery');
+    }
+
+    /**
+     * Filter the query by a related DtaUser object
+     *
+     * @param   DtaUser|PropelObjectCollection $dtaUser The related object(s) to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 PublicationQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByLastChangedByUser($dtaUser, $comparison = null)
+    {
+        if ($dtaUser instanceof DtaUser) {
+            return $this
+                ->addUsingAlias(PublicationPeer::LAST_CHANGED_BY_USER_ID, $dtaUser->getId(), $comparison);
+        } elseif ($dtaUser instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(PublicationPeer::LAST_CHANGED_BY_USER_ID, $dtaUser->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByLastChangedByUser() only accepts arguments of type DtaUser or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the LastChangedByUser relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return PublicationQuery The current query, for fluid interface
+     */
+    public function joinLastChangedByUser($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('LastChangedByUser');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'LastChangedByUser');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the LastChangedByUser relation DtaUser object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\Master\DtaUserQuery A secondary query class using the current class as primary query
+     */
+    public function useLastChangedByUserQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinLastChangedByUser($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'LastChangedByUser', '\DTA\MetadataBundle\Model\Master\DtaUserQuery');
     }
 
     /**
@@ -3213,4 +3469,69 @@ abstract class BasePublicationQuery extends ModelCriteria
         return $this;
     }
 
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     PublicationQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(PublicationPeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     PublicationQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(PublicationPeer::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     PublicationQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(PublicationPeer::UPDATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     PublicationQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(PublicationPeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     PublicationQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(PublicationPeer::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     PublicationQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(PublicationPeer::CREATED_AT);
+    }
 }

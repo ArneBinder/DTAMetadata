@@ -22,7 +22,9 @@ security:
         dev:
             pattern:  ^/(_(profiler|wdt)|css|images|js)/
             security: false
-
+        import:
+            pattern: ^/Convert
+            security: false
         login:
             pattern: ^/Login
             security: false

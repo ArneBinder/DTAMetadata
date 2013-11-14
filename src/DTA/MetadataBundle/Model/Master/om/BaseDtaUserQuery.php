@@ -12,6 +12,7 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use DTA\MetadataBundle\Model\Data\Publication;
 use DTA\MetadataBundle\Model\Master\DtaUser;
 use DTA\MetadataBundle\Model\Master\DtaUserPeer;
 use DTA\MetadataBundle\Model\Master\DtaUserQuery;
@@ -38,6 +39,10 @@ use DTA\MetadataBundle\Model\Workflow\Task;
  * @method DtaUserQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method DtaUserQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method DtaUserQuery innerJoin($relation) Adds a INNER JOIN clause to the query
+ *
+ * @method DtaUserQuery leftJoinLastChangedPublication($relationAlias = null) Adds a LEFT JOIN clause to the query using the LastChangedPublication relation
+ * @method DtaUserQuery rightJoinLastChangedPublication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the LastChangedPublication relation
+ * @method DtaUserQuery innerJoinLastChangedPublication($relationAlias = null) Adds a INNER JOIN clause to the query using the LastChangedPublication relation
  *
  * @method DtaUserQuery leftJoinRecentUse($relationAlias = null) Adds a LEFT JOIN clause to the query using the RecentUse relation
  * @method DtaUserQuery rightJoinRecentUse($relationAlias = null) Adds a RIGHT JOIN clause to the query using the RecentUse relation
@@ -479,6 +484,80 @@ abstract class BaseDtaUserQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(DtaUserPeer::ID, $id, $comparison);
+    }
+
+    /**
+     * Filter the query by a related Publication object
+     *
+     * @param   Publication|PropelObjectCollection $publication  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 DtaUserQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByLastChangedPublication($publication, $comparison = null)
+    {
+        if ($publication instanceof Publication) {
+            return $this
+                ->addUsingAlias(DtaUserPeer::ID, $publication->getLastChangedByUserId(), $comparison);
+        } elseif ($publication instanceof PropelObjectCollection) {
+            return $this
+                ->useLastChangedPublicationQuery()
+                ->filterByPrimaryKeys($publication->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByLastChangedPublication() only accepts arguments of type Publication or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the LastChangedPublication relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return DtaUserQuery The current query, for fluid interface
+     */
+    public function joinLastChangedPublication($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('LastChangedPublication');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'LastChangedPublication');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the LastChangedPublication relation Publication object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\Data\PublicationQuery A secondary query class using the current class as primary query
+     */
+    public function useLastChangedPublicationQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinLastChangedPublication($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'LastChangedPublication', '\DTA\MetadataBundle\Model\Data\PublicationQuery');
     }
 
     /**

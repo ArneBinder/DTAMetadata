@@ -26,33 +26,39 @@
         {% for col in columns %}    
             <th> {{ col|trans }} </th>
         {% endfor %}
-        <th style="width:180px">Datensatz bearbeiten{#{ "listView.editColumn.caption"|trans }#}</th>
+        {# <th style="width:180px">Datensatz bearbeiten</th>#}
     </thead>
     {% endblock tableHead %}
-
+    {% spaceless %}
     {% block tableBody %}
+        {# Which column text is turned into a hyperlink to view or edit the entity #}
+        {% set linkColumn = linkColumn|default(1) %}
         {% for datum in data %}
-            {# all propel objects implement this method #}
+    
             {% set recordId = attribute(datum, "getId") %}
+            {% set editLoc = path(package~'_genericCreateOrEdit', {'package':package, 'className':className, 'recordId':recordId}) %}
+            {% set deleteLoc = path(package~'_deleteRecord', {'package':package, 'className':className, 'recordId':recordId }) %}
+    
             {# highlight affected record #}
-            <tr {% if recordId == updatedObjectId|default(0) %}class="success"{% endif %}>
+            <tr {% if recordId == updatedObjectId|default(3) %}class="success"{% endif %}>
 
             {% for col in columns %}
                 <td>
+                    {# turn the column content into a link if it is in the linkColumn (see above) #}
+                    {% if loop.index == linkColumn %}
+                        <span class="glyphicon glyphicon-edit"></span><a name="record{{recordId}}" href="{{ editLoc }}">
+                    {% endif %}
                     {{ datum.getAttributeByTableViewColumName(col) }}
+                    {% if loop.index == linkColumn %} </a> {% endif %}
                 </td>
             {% endfor %}
-                {# Display edit buttons instead of Ids #}
-                <td>
-                    {% set editLoc = path(package~'_genericCreateOrEdit', {'package':package, 'className':className, 'recordId':recordId}) %}
-                    <a name="record{{recordId}}" class="glyphicon glyphicon-edit" 
-                       href="{{ editLoc }}">{{ "listView.edit.row.buttonSuffix"|trans }}</a>
-                    {% set deleteLoc = path(package~'_deleteRecord', {'package':package, 'className':className, 'recordId':recordId }) %}
+                {#<td>
                     <a href="{{ deleteLoc }}" 
                        title="Den Datensatz {{recordId}} wirklich löschen?"
-                       class="confirmClick glyphicon glyphicon-trash">löschen {#className|trans~#}
+                       class="confirmClick glyphicon glyphicon-trash">löschen
                     </a>
-                </td>
+                </td>#}
             </tr>
         {% endfor %}
     {% endblock tableBody %}
+    {% endspaceless %}

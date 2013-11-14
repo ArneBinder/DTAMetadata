@@ -86,7 +86,7 @@ abstract class BaseFont extends BaseObject implements Persistent, \DTA\MetadataB
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Id', 'Name', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'Name'=>'Name', );
+    public static $tableRowViewCaptions = array('Name', );	public   $tableRowViewAccessors = array('Name'=>'Name', );
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection

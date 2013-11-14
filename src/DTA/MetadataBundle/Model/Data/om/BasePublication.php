@@ -5,11 +5,13 @@ namespace DTA\MetadataBundle\Model\Data\om;
 use \BaseObject;
 use \BasePeer;
 use \Criteria;
+use \DateTime;
 use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
 use \PropelCollection;
+use \PropelDateTime;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
@@ -52,6 +54,8 @@ use DTA\MetadataBundle\Model\Data\Volume;
 use DTA\MetadataBundle\Model\Data\VolumeQuery;
 use DTA\MetadataBundle\Model\Master\CategoryPublication;
 use DTA\MetadataBundle\Model\Master\CategoryPublicationQuery;
+use DTA\MetadataBundle\Model\Master\DtaUser;
+use DTA\MetadataBundle\Model\Master\DtaUserQuery;
 use DTA\MetadataBundle\Model\Master\FontPublication;
 use DTA\MetadataBundle\Model\Master\FontPublicationQuery;
 use DTA\MetadataBundle\Model\Master\GenrePublication;
@@ -183,6 +187,12 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     protected $comment;
 
     /**
+     * The value for the encoding_comment field.
+     * @var        string
+     */
+    protected $encoding_comment;
+
+    /**
      * The value for the doi field.
      * @var        string
      */
@@ -207,10 +217,28 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     protected $wwwready;
 
     /**
+     * The value for the last_changed_by_user_id field.
+     * @var        int
+     */
+    protected $last_changed_by_user_id;
+
+    /**
      * The value for the legacy_book_id field.
      * @var        int
      */
     protected $legacy_book_id;
+
+    /**
+     * The value for the created_at field.
+     * @var        string
+     */
+    protected $created_at;
+
+    /**
+     * The value for the updated_at field.
+     * @var        string
+     */
+    protected $updated_at;
 
     /**
      * The value for the publishingcompany_id_is_reconstructed field.
@@ -243,6 +271,11 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      * @var        Datespecification
      */
     protected $aDatespecificationRelatedByCreationdateId;
+
+    /**
+     * @var        DtaUser
+     */
+    protected $aLastChangedByUser;
 
     /**
      * @var        PropelObjectCollection|PublicationM[] Collection to store aggregation of PublicationM objects.
@@ -421,7 +454,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Titel', 'erster Autor', 'entstanden', 'veröffentlicht', );	public   $tableRowViewAccessors = array('Titel'=>'accessor:getTitle', 'erster Autor'=>'accessor:getFirstAuthor', 'entstanden'=>'accessor:getDatespecification', 'veröffentlicht'=>'accessor:getDatespecificationRelatedByPublicationdateId', );
+    public static $tableRowViewCaptions = array('Titel', 'erster Autor', 'entstanden', 'veröffentlicht', );	public   $tableRowViewAccessors = array('Titel'=>'accessor:getTitle', 'erster Autor'=>'accessor:getFirstAuthor', 'entstanden'=>'accessor:getDatespecificationRelatedByCreationdateId', 'veröffentlicht'=>'accessor:getDatespecificationRelatedByPublicationdateId', );
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -746,6 +779,16 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     }
 
     /**
+     * Get the [encoding_comment] column value.
+     * Kommentar Encoding
+     * @return string
+     */
+    public function getEncodingComment()
+    {
+        return $this->encoding_comment;
+    }
+
+    /**
      * Get the [doi] column value.
      *
      * @return string
@@ -786,6 +829,16 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     }
 
     /**
+     * Get the [last_changed_by_user_id] column value.
+     *
+     * @return int
+     */
+    public function getLastChangedByUserId()
+    {
+        return $this->last_changed_by_user_id;
+    }
+
+    /**
      * Get the [legacy_book_id] column value.
      * id_book des Datensatzes aus der alten Datenbank, der dem neuen Datensatz zugrundeliegt.
      * @return int
@@ -793,6 +846,76 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     public function getLegacyBookId()
     {
         return $this->legacy_book_id;
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [created_at] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getCreatedAt($format = null)
+    {
+        if ($this->created_at === null) {
+            return null;
+        }
+
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [updated_at] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getUpdatedAt($format = null)
+    {
+        if ($this->updated_at === null) {
+            return null;
+        }
+
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -1120,6 +1243,27 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     } // setComment()
 
     /**
+     * Set the value of [encoding_comment] column.
+     * Kommentar Encoding
+     * @param string $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setEncodingComment($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->encoding_comment !== $v) {
+            $this->encoding_comment = $v;
+            $this->modifiedColumns[] = PublicationPeer::ENCODING_COMMENT;
+        }
+
+
+        return $this;
+    } // setEncodingComment()
+
+    /**
      * Set the value of [doi] column.
      *
      * @param string $v new value
@@ -1204,6 +1348,31 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     } // setWwwready()
 
     /**
+     * Set the value of [last_changed_by_user_id] column.
+     *
+     * @param int $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setLastChangedByUserId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->last_changed_by_user_id !== $v) {
+            $this->last_changed_by_user_id = $v;
+            $this->modifiedColumns[] = PublicationPeer::LAST_CHANGED_BY_USER_ID;
+        }
+
+        if ($this->aLastChangedByUser !== null && $this->aLastChangedByUser->getId() !== $v) {
+            $this->aLastChangedByUser = null;
+        }
+
+
+        return $this;
+    } // setLastChangedByUserId()
+
+    /**
      * Set the value of [legacy_book_id] column.
      * id_book des Datensatzes aus der alten Datenbank, der dem neuen Datensatz zugrundeliegt.
      * @param int $v new value
@@ -1223,6 +1392,52 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
         return $this;
     } // setLegacyBookId()
+
+    /**
+     * Sets the value of [created_at] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setCreatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->created_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->created_at !== null && $tmpDt = new DateTime($this->created_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->created_at = $newDateAsString;
+                $this->modifiedColumns[] = PublicationPeer::CREATED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setCreatedAt()
+
+    /**
+     * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setUpdatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->updated_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->updated_at !== null && $tmpDt = new DateTime($this->updated_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->updated_at = $newDateAsString;
+                $this->modifiedColumns[] = PublicationPeer::UPDATED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setUpdatedAt()
 
     /**
      * Sets the value of the [publishingcompany_id_is_reconstructed] column.
@@ -1303,12 +1518,16 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->numpages = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
             $this->numpagesnumeric = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
             $this->comment = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
-            $this->doi = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
-            $this->format = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
-            $this->directoryname = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
-            $this->wwwready = ($row[$startcol + 17] !== null) ? (int) $row[$startcol + 17] : null;
-            $this->legacy_book_id = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
-            $this->publishingcompany_id_is_reconstructed = ($row[$startcol + 19] !== null) ? (boolean) $row[$startcol + 19] : null;
+            $this->encoding_comment = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
+            $this->doi = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+            $this->format = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
+            $this->directoryname = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
+            $this->wwwready = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
+            $this->last_changed_by_user_id = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
+            $this->legacy_book_id = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
+            $this->created_at = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
+            $this->updated_at = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
+            $this->publishingcompany_id_is_reconstructed = ($row[$startcol + 23] !== null) ? (boolean) $row[$startcol + 23] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -1317,7 +1536,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 20; // 20 = PublicationPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 24; // 24 = PublicationPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Publication object", $e);
@@ -1354,6 +1573,9 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         }
         if ($this->aPublishingcompany !== null && $this->publishingcompany_id !== $this->aPublishingcompany->getId()) {
             $this->aPublishingcompany = null;
+        }
+        if ($this->aLastChangedByUser !== null && $this->last_changed_by_user_id !== $this->aLastChangedByUser->getId()) {
+            $this->aLastChangedByUser = null;
         }
     } // ensureConsistency
 
@@ -1399,6 +1621,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->aPlace = null;
             $this->aDatespecificationRelatedByPublicationdateId = null;
             $this->aDatespecificationRelatedByCreationdateId = null;
+            $this->aLastChangedByUser = null;
             $this->collPublicationMs = null;
 
             $this->collPublicationDms = null;
@@ -1519,8 +1742,19 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+                if (!$this->isColumnModified(PublicationPeer::CREATED_AT)) {
+                    $this->setCreatedAt(time());
+                }
+                if (!$this->isColumnModified(PublicationPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(PublicationPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -1598,6 +1832,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     $affectedRows += $this->aDatespecificationRelatedByCreationdateId->save($con);
                 }
                 $this->setDatespecificationRelatedByCreationdateId($this->aDatespecificationRelatedByCreationdateId);
+            }
+
+            if ($this->aLastChangedByUser !== null) {
+                if ($this->aLastChangedByUser->isModified() || $this->aLastChangedByUser->isNew()) {
+                    $affectedRows += $this->aLastChangedByUser->save($con);
+                }
+                $this->setLastChangedByUser($this->aLastChangedByUser);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -2203,6 +2444,9 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ($this->isColumnModified(PublicationPeer::COMMENT)) {
             $modifiedColumns[':p' . $index++]  = '"comment"';
         }
+        if ($this->isColumnModified(PublicationPeer::ENCODING_COMMENT)) {
+            $modifiedColumns[':p' . $index++]  = '"encoding_comment"';
+        }
         if ($this->isColumnModified(PublicationPeer::DOI)) {
             $modifiedColumns[':p' . $index++]  = '"doi"';
         }
@@ -2215,8 +2459,17 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ($this->isColumnModified(PublicationPeer::WWWREADY)) {
             $modifiedColumns[':p' . $index++]  = '"wwwready"';
         }
+        if ($this->isColumnModified(PublicationPeer::LAST_CHANGED_BY_USER_ID)) {
+            $modifiedColumns[':p' . $index++]  = '"last_changed_by_user_id"';
+        }
         if ($this->isColumnModified(PublicationPeer::LEGACY_BOOK_ID)) {
             $modifiedColumns[':p' . $index++]  = '"legacy_book_id"';
+        }
+        if ($this->isColumnModified(PublicationPeer::CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '"created_at"';
+        }
+        if ($this->isColumnModified(PublicationPeer::UPDATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '"updated_at"';
         }
         if ($this->isColumnModified(PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED)) {
             $modifiedColumns[':p' . $index++]  = '"publishingcompany_id_is_reconstructed"';
@@ -2274,6 +2527,9 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     case '"comment"':
                         $stmt->bindValue($identifier, $this->comment, PDO::PARAM_STR);
                         break;
+                    case '"encoding_comment"':
+                        $stmt->bindValue($identifier, $this->encoding_comment, PDO::PARAM_STR);
+                        break;
                     case '"doi"':
                         $stmt->bindValue($identifier, $this->doi, PDO::PARAM_STR);
                         break;
@@ -2286,8 +2542,17 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     case '"wwwready"':
                         $stmt->bindValue($identifier, $this->wwwready, PDO::PARAM_INT);
                         break;
+                    case '"last_changed_by_user_id"':
+                        $stmt->bindValue($identifier, $this->last_changed_by_user_id, PDO::PARAM_INT);
+                        break;
                     case '"legacy_book_id"':
                         $stmt->bindValue($identifier, $this->legacy_book_id, PDO::PARAM_INT);
+                        break;
+                    case '"created_at"':
+                        $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
+                        break;
+                    case '"updated_at"':
+                        $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                     case '"publishingcompany_id_is_reconstructed"':
                         $stmt->bindValue($identifier, $this->publishingcompany_id_is_reconstructed, PDO::PARAM_BOOL);
@@ -2411,6 +2676,12 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             if ($this->aDatespecificationRelatedByCreationdateId !== null) {
                 if (!$this->aDatespecificationRelatedByCreationdateId->validate($columns)) {
                     $failureMap = array_merge($failureMap, $this->aDatespecificationRelatedByCreationdateId->getValidationFailures());
+                }
+            }
+
+            if ($this->aLastChangedByUser !== null) {
+                if (!$this->aLastChangedByUser->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aLastChangedByUser->getValidationFailures());
                 }
             }
 
@@ -2666,21 +2937,33 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return $this->getComment();
                 break;
             case 14:
-                return $this->getDoi();
+                return $this->getEncodingComment();
                 break;
             case 15:
-                return $this->getFormat();
+                return $this->getDoi();
                 break;
             case 16:
-                return $this->getDirectoryname();
+                return $this->getFormat();
                 break;
             case 17:
-                return $this->getWwwready();
+                return $this->getDirectoryname();
                 break;
             case 18:
-                return $this->getLegacyBookId();
+                return $this->getWwwready();
                 break;
             case 19:
+                return $this->getLastChangedByUserId();
+                break;
+            case 20:
+                return $this->getLegacyBookId();
+                break;
+            case 21:
+                return $this->getCreatedAt();
+                break;
+            case 22:
+                return $this->getUpdatedAt();
+                break;
+            case 23:
                 return $this->getPublishingcompanyIdIsReconstructed();
                 break;
             default:
@@ -2726,12 +3009,16 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $keys[11] => $this->getNumpages(),
             $keys[12] => $this->getNumpagesnumeric(),
             $keys[13] => $this->getComment(),
-            $keys[14] => $this->getDoi(),
-            $keys[15] => $this->getFormat(),
-            $keys[16] => $this->getDirectoryname(),
-            $keys[17] => $this->getWwwready(),
-            $keys[18] => $this->getLegacyBookId(),
-            $keys[19] => $this->getPublishingcompanyIdIsReconstructed(),
+            $keys[14] => $this->getEncodingComment(),
+            $keys[15] => $this->getDoi(),
+            $keys[16] => $this->getFormat(),
+            $keys[17] => $this->getDirectoryname(),
+            $keys[18] => $this->getWwwready(),
+            $keys[19] => $this->getLastChangedByUserId(),
+            $keys[20] => $this->getLegacyBookId(),
+            $keys[21] => $this->getCreatedAt(),
+            $keys[22] => $this->getUpdatedAt(),
+            $keys[23] => $this->getPublishingcompanyIdIsReconstructed(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aTitle) {
@@ -2748,6 +3035,9 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             }
             if (null !== $this->aDatespecificationRelatedByCreationdateId) {
                 $result['DatespecificationRelatedByCreationdateId'] = $this->aDatespecificationRelatedByCreationdateId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aLastChangedByUser) {
+                $result['LastChangedByUser'] = $this->aLastChangedByUser->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->collPublicationMs) {
                 $result['PublicationMs'] = $this->collPublicationMs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -2889,21 +3179,33 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 $this->setComment($value);
                 break;
             case 14:
-                $this->setDoi($value);
+                $this->setEncodingComment($value);
                 break;
             case 15:
-                $this->setFormat($value);
+                $this->setDoi($value);
                 break;
             case 16:
-                $this->setDirectoryname($value);
+                $this->setFormat($value);
                 break;
             case 17:
-                $this->setWwwready($value);
+                $this->setDirectoryname($value);
                 break;
             case 18:
-                $this->setLegacyBookId($value);
+                $this->setWwwready($value);
                 break;
             case 19:
+                $this->setLastChangedByUserId($value);
+                break;
+            case 20:
+                $this->setLegacyBookId($value);
+                break;
+            case 21:
+                $this->setCreatedAt($value);
+                break;
+            case 22:
+                $this->setUpdatedAt($value);
+                break;
+            case 23:
                 $this->setPublishingcompanyIdIsReconstructed($value);
                 break;
         } // switch()
@@ -2944,12 +3246,16 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if (array_key_exists($keys[11], $arr)) $this->setNumpages($arr[$keys[11]]);
         if (array_key_exists($keys[12], $arr)) $this->setNumpagesnumeric($arr[$keys[12]]);
         if (array_key_exists($keys[13], $arr)) $this->setComment($arr[$keys[13]]);
-        if (array_key_exists($keys[14], $arr)) $this->setDoi($arr[$keys[14]]);
-        if (array_key_exists($keys[15], $arr)) $this->setFormat($arr[$keys[15]]);
-        if (array_key_exists($keys[16], $arr)) $this->setDirectoryname($arr[$keys[16]]);
-        if (array_key_exists($keys[17], $arr)) $this->setWwwready($arr[$keys[17]]);
-        if (array_key_exists($keys[18], $arr)) $this->setLegacyBookId($arr[$keys[18]]);
-        if (array_key_exists($keys[19], $arr)) $this->setPublishingcompanyIdIsReconstructed($arr[$keys[19]]);
+        if (array_key_exists($keys[14], $arr)) $this->setEncodingComment($arr[$keys[14]]);
+        if (array_key_exists($keys[15], $arr)) $this->setDoi($arr[$keys[15]]);
+        if (array_key_exists($keys[16], $arr)) $this->setFormat($arr[$keys[16]]);
+        if (array_key_exists($keys[17], $arr)) $this->setDirectoryname($arr[$keys[17]]);
+        if (array_key_exists($keys[18], $arr)) $this->setWwwready($arr[$keys[18]]);
+        if (array_key_exists($keys[19], $arr)) $this->setLastChangedByUserId($arr[$keys[19]]);
+        if (array_key_exists($keys[20], $arr)) $this->setLegacyBookId($arr[$keys[20]]);
+        if (array_key_exists($keys[21], $arr)) $this->setCreatedAt($arr[$keys[21]]);
+        if (array_key_exists($keys[22], $arr)) $this->setUpdatedAt($arr[$keys[22]]);
+        if (array_key_exists($keys[23], $arr)) $this->setPublishingcompanyIdIsReconstructed($arr[$keys[23]]);
     }
 
     /**
@@ -2975,11 +3281,15 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ($this->isColumnModified(PublicationPeer::NUMPAGES)) $criteria->add(PublicationPeer::NUMPAGES, $this->numpages);
         if ($this->isColumnModified(PublicationPeer::NUMPAGESNUMERIC)) $criteria->add(PublicationPeer::NUMPAGESNUMERIC, $this->numpagesnumeric);
         if ($this->isColumnModified(PublicationPeer::COMMENT)) $criteria->add(PublicationPeer::COMMENT, $this->comment);
+        if ($this->isColumnModified(PublicationPeer::ENCODING_COMMENT)) $criteria->add(PublicationPeer::ENCODING_COMMENT, $this->encoding_comment);
         if ($this->isColumnModified(PublicationPeer::DOI)) $criteria->add(PublicationPeer::DOI, $this->doi);
         if ($this->isColumnModified(PublicationPeer::FORMAT)) $criteria->add(PublicationPeer::FORMAT, $this->format);
         if ($this->isColumnModified(PublicationPeer::DIRECTORYNAME)) $criteria->add(PublicationPeer::DIRECTORYNAME, $this->directoryname);
         if ($this->isColumnModified(PublicationPeer::WWWREADY)) $criteria->add(PublicationPeer::WWWREADY, $this->wwwready);
+        if ($this->isColumnModified(PublicationPeer::LAST_CHANGED_BY_USER_ID)) $criteria->add(PublicationPeer::LAST_CHANGED_BY_USER_ID, $this->last_changed_by_user_id);
         if ($this->isColumnModified(PublicationPeer::LEGACY_BOOK_ID)) $criteria->add(PublicationPeer::LEGACY_BOOK_ID, $this->legacy_book_id);
+        if ($this->isColumnModified(PublicationPeer::CREATED_AT)) $criteria->add(PublicationPeer::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(PublicationPeer::UPDATED_AT)) $criteria->add(PublicationPeer::UPDATED_AT, $this->updated_at);
         if ($this->isColumnModified(PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED)) $criteria->add(PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED, $this->publishingcompany_id_is_reconstructed);
 
         return $criteria;
@@ -3057,11 +3367,15 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         $copyObj->setNumpages($this->getNumpages());
         $copyObj->setNumpagesnumeric($this->getNumpagesnumeric());
         $copyObj->setComment($this->getComment());
+        $copyObj->setEncodingComment($this->getEncodingComment());
         $copyObj->setDoi($this->getDoi());
         $copyObj->setFormat($this->getFormat());
         $copyObj->setDirectoryname($this->getDirectoryname());
         $copyObj->setWwwready($this->getWwwready());
+        $copyObj->setLastChangedByUserId($this->getLastChangedByUserId());
         $copyObj->setLegacyBookId($this->getLegacyBookId());
+        $copyObj->setCreatedAt($this->getCreatedAt());
+        $copyObj->setUpdatedAt($this->getUpdatedAt());
         $copyObj->setPublishingcompanyIdIsReconstructed($this->getPublishingcompanyIdIsReconstructed());
 
         if ($deepCopy && !$this->startCopy) {
@@ -3505,6 +3819,58 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         }
 
         return $this->aDatespecificationRelatedByCreationdateId;
+    }
+
+    /**
+     * Declares an association between this object and a DtaUser object.
+     *
+     * @param             DtaUser $v
+     * @return Publication The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setLastChangedByUser(DtaUser $v = null)
+    {
+        if ($v === null) {
+            $this->setLastChangedByUserId(NULL);
+        } else {
+            $this->setLastChangedByUserId($v->getId());
+        }
+
+        $this->aLastChangedByUser = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the DtaUser object, it will not be re-added.
+        if ($v !== null) {
+            $v->addLastChangedPublication($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated DtaUser object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return DtaUser The associated DtaUser object.
+     * @throws PropelException
+     */
+    public function getLastChangedByUser(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aLastChangedByUser === null && ($this->last_changed_by_user_id !== null) && $doQuery) {
+            $this->aLastChangedByUser = DtaUserQuery::create()->findPk($this->last_changed_by_user_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aLastChangedByUser->addLastChangedPublications($this);
+             */
+        }
+
+        return $this->aLastChangedByUser;
     }
 
 
@@ -9742,11 +10108,15 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         $this->numpages = null;
         $this->numpagesnumeric = null;
         $this->comment = null;
+        $this->encoding_comment = null;
         $this->doi = null;
         $this->format = null;
         $this->directoryname = null;
         $this->wwwready = null;
+        $this->last_changed_by_user_id = null;
         $this->legacy_book_id = null;
+        $this->created_at = null;
+        $this->updated_at = null;
         $this->publishingcompany_id_is_reconstructed = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
@@ -9921,6 +10291,9 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             if ($this->aDatespecificationRelatedByCreationdateId instanceof Persistent) {
               $this->aDatespecificationRelatedByCreationdateId->clearAllReferences($deep);
             }
+            if ($this->aLastChangedByUser instanceof Persistent) {
+              $this->aLastChangedByUser->clearAllReferences($deep);
+            }
 
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
@@ -10038,6 +10411,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         $this->aPlace = null;
         $this->aDatespecificationRelatedByPublicationdateId = null;
         $this->aDatespecificationRelatedByCreationdateId = null;
+        $this->aLastChangedByUser = null;
     }
 
     /**
@@ -10116,6 +10490,20 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             return "-";
         }
     }
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     Publication The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = PublicationPeer::UPDATED_AT;
+
+        return $this;
+    }
+
     // reconstructed_flaggable behavior
     /**
     * Returns all columns that can be flagged as reconstructed.

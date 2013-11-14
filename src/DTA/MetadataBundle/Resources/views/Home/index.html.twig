@@ -3,6 +3,9 @@
 {% block title %}DTA Metadatenbank{% endblock %}
 
 {% block core %}
+{% for pn in testData %}
+{{pn}}
+{% endfor %}
 <h3>Bearbeitungsverlauf</h3>
 <table class="table" style="width:49%">
 <thead>
@@ -26,4 +29,6 @@
   </tr>
 </tbody>
 </table>
+<h3>Offene Tasks (einzel und gruppe)</h3>
+
 {% endblock %}

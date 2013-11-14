@@ -12,11 +12,11 @@
 {% block work %}
 {{ dta.beginFieldset({'caption':'Werk'})}}
 
-    {{ form_row(form.publication.work.title) }}
+    {{ form_row(form.publication.title) }}
     
-    {{ form_row(form.publication.work.PersonWorks) }}
+    {{ form_row(form.publication.PersonPublications) }}
     
-    {% set modalId = 'moreOptionsForWork' %}
+    {% set modalId = 'moreOptionsForPublication' %}
     
     {{ dta.beginLabelledContent({'labelCaption':'', 'controlId':'none'}) }}
         {{ dta.btnLaunchModal({'id':modalId, 'caption':'weitere Angaben...'})}}
@@ -29,10 +29,10 @@
        })            
     }}
 
-        {{ form_row(form.publication.work.doi) }}
-        {{ form_row(form.publication.work.comments) }}
-        {{ form_row(form.publication.work.format) }}
-        {{ form_row(form.publication.work.directoryname) }}
+        {{ form_row(form.publication.doi) }}
+        {{ form_row(form.publication.comments) }}
+        {{ form_row(form.publication.format) }}
+        {{ form_row(form.publication.directoryname) }}
 
     {{ dta.endModal({
             'id': modalId,
@@ -52,7 +52,7 @@
     {{ dta.beginLabelledContent({'controlId':'none', 'labelCaption':'Datierung'}) }}
         {{ form_row(form.publication.DatespecificationRelatedByPublicationdateId) }}
         {{ form_row(form.publication.DatespecificationRelatedByFirstpublicationdateId) }}
-        {{ form_row(form.publication.work.datespecification) }}
+        {{ form_row(form.publication.datespecification) }}
     {{ dta.endLabelledContent() }}
     
     {{ form_row(form.publication.volume_alphanumeric) }}
@@ -97,10 +97,10 @@
         $("#taggerTest").select2({tags:["fraktur", "antiqua", "schwabacher"]});
     </script-->
     {{ form_row(form.publication.font, {'label':'vorherrschende Schriftart'}) }}
-    {{ form_row(form.publication.work.LanguageWorks, {'label':'vorherrschende Sprache'}) }}
-    {{ form_row(form.publication.work.GenreWorks, {'label':'Genre'}) }}
-    {{ form_row(form.publication.work.CategoryWorks, {'label':'Kategorien'}) }}
-    {{ form_row(form.publication.work.WorkTags, {'label':'Schlagworte'}) }}
+    {{ form_row(form.publication.LanguagePublications, {'label':'vorherrschende Sprache'}) }}
+    {{ form_row(form.publication.GenrePublications, {'label':'Genre'}) }}
+    {{ form_row(form.publication.CategoryPublications, {'label':'Kategorien'}) }}
+    {{ form_row(form.publication.PublicationTags, {'label':'Schlagworte'}) }}
     
 {{ dta.endFieldset()}}
 {% endblock %}

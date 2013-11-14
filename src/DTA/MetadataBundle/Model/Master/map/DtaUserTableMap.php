@@ -58,6 +58,7 @@ class DtaUserTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('LastChangedPublication', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::ONE_TO_MANY, array('id' => 'last_changed_by_user_id', ), null, null, 'LastChangedPublications');
         $this->addRelation('RecentUse', 'DTA\\MetadataBundle\\Model\\Master\\RecentUse', RelationMap::ONE_TO_MANY, array('id' => 'dta_user_id', ), null, null, 'RecentUses');
         $this->addRelation('Task', 'DTA\\MetadataBundle\\Model\\Workflow\\Task', RelationMap::ONE_TO_MANY, array('id' => 'responsibleuser_id', ), null, null, 'Tasks');
     } // buildRelations()

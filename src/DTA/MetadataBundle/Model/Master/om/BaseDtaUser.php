@@ -13,6 +13,8 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use DTA\MetadataBundle\Model\Data\Publication;
+use DTA\MetadataBundle\Model\Data\PublicationQuery;
 use DTA\MetadataBundle\Model\Master\DtaUser;
 use DTA\MetadataBundle\Model\Master\DtaUserPeer;
 use DTA\MetadataBundle\Model\Master\DtaUserQuery;
@@ -86,6 +88,12 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     protected $id;
 
     /**
+     * @var        PropelObjectCollection|Publication[] Collection to store aggregation of Publication objects.
+     */
+    protected $collLastChangedPublications;
+    protected $collLastChangedPublicationsPartial;
+
+    /**
      * @var        PropelObjectCollection|RecentUse[] Collection to store aggregation of RecentUse objects.
      */
     protected $collRecentUses;
@@ -119,6 +127,12 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
 
     // table_row_view behavior
     public static $tableRowViewCaptions = array('id', 'benutzername', 'mail', 'administratorrechte', );	public   $tableRowViewAccessors = array('id'=>'Id', 'benutzername'=>'Username', 'mail'=>'Mail', 'administratorrechte'=>'accessor:adminToString', );
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $lastChangedPublicationsScheduledForDeletion = null;
+
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -490,6 +504,8 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->collLastChangedPublications = null;
+
             $this->collRecentUses = null;
 
             $this->collTasks = null;
@@ -616,6 +632,24 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->lastChangedPublicationsScheduledForDeletion !== null) {
+                if (!$this->lastChangedPublicationsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->lastChangedPublicationsScheduledForDeletion as $lastChangedPublication) {
+                        // need to save related object because we set the relation to null
+                        $lastChangedPublication->save($con);
+                    }
+                    $this->lastChangedPublicationsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collLastChangedPublications !== null) {
+                foreach ($this->collLastChangedPublications as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             if ($this->recentUsesScheduledForDeletion !== null) {
@@ -834,6 +868,14 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
             }
 
 
+                if ($this->collLastChangedPublications !== null) {
+                    foreach ($this->collLastChangedPublications as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
                 if ($this->collRecentUses !== null) {
                     foreach ($this->collRecentUses as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -944,6 +986,9 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
             $keys[6] => $this->getId(),
         );
         if ($includeForeignObjects) {
+            if (null !== $this->collLastChangedPublications) {
+                $result['LastChangedPublications'] = $this->collLastChangedPublications->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collRecentUses) {
                 $result['RecentUses'] = $this->collRecentUses->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1131,6 +1176,12 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
             // store object hash to prevent cycle
             $this->startCopy = true;
 
+            foreach ($this->getLastChangedPublications() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addLastChangedPublication($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getRecentUses() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addRecentUse($relObj->copy($deepCopy));
@@ -1204,12 +1255,358 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
      */
     public function initRelation($relationName)
     {
+        if ('LastChangedPublication' == $relationName) {
+            $this->initLastChangedPublications();
+        }
         if ('RecentUse' == $relationName) {
             $this->initRecentUses();
         }
         if ('Task' == $relationName) {
             $this->initTasks();
         }
+    }
+
+    /**
+     * Clears out the collLastChangedPublications collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return DtaUser The current object (for fluent API support)
+     * @see        addLastChangedPublications()
+     */
+    public function clearLastChangedPublications()
+    {
+        $this->collLastChangedPublications = null; // important to set this to null since that means it is uninitialized
+        $this->collLastChangedPublicationsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collLastChangedPublications collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialLastChangedPublications($v = true)
+    {
+        $this->collLastChangedPublicationsPartial = $v;
+    }
+
+    /**
+     * Initializes the collLastChangedPublications collection.
+     *
+     * By default this just sets the collLastChangedPublications collection to an empty array (like clearcollLastChangedPublications());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initLastChangedPublications($overrideExisting = true)
+    {
+        if (null !== $this->collLastChangedPublications && !$overrideExisting) {
+            return;
+        }
+        $this->collLastChangedPublications = new PropelObjectCollection();
+        $this->collLastChangedPublications->setModel('Publication');
+    }
+
+    /**
+     * Gets an array of Publication objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this DtaUser is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     * @throws PropelException
+     */
+    public function getLastChangedPublications($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collLastChangedPublicationsPartial && !$this->isNew();
+        if (null === $this->collLastChangedPublications || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collLastChangedPublications) {
+                // return empty collection
+                $this->initLastChangedPublications();
+            } else {
+                $collLastChangedPublications = PublicationQuery::create(null, $criteria)
+                    ->filterByLastChangedByUser($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collLastChangedPublicationsPartial && count($collLastChangedPublications)) {
+                      $this->initLastChangedPublications(false);
+
+                      foreach($collLastChangedPublications as $obj) {
+                        if (false == $this->collLastChangedPublications->contains($obj)) {
+                          $this->collLastChangedPublications->append($obj);
+                        }
+                      }
+
+                      $this->collLastChangedPublicationsPartial = true;
+                    }
+
+                    $collLastChangedPublications->getInternalIterator()->rewind();
+                    return $collLastChangedPublications;
+                }
+
+                if($partial && $this->collLastChangedPublications) {
+                    foreach($this->collLastChangedPublications as $obj) {
+                        if($obj->isNew()) {
+                            $collLastChangedPublications[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collLastChangedPublications = $collLastChangedPublications;
+                $this->collLastChangedPublicationsPartial = false;
+            }
+        }
+
+        return $this->collLastChangedPublications;
+    }
+
+    /**
+     * Sets a collection of LastChangedPublication objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $lastChangedPublications A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return DtaUser The current object (for fluent API support)
+     */
+    public function setLastChangedPublications(PropelCollection $lastChangedPublications, PropelPDO $con = null)
+    {
+        $lastChangedPublicationsToDelete = $this->getLastChangedPublications(new Criteria(), $con)->diff($lastChangedPublications);
+
+        $this->lastChangedPublicationsScheduledForDeletion = unserialize(serialize($lastChangedPublicationsToDelete));
+
+        foreach ($lastChangedPublicationsToDelete as $lastChangedPublicationRemoved) {
+            $lastChangedPublicationRemoved->setLastChangedByUser(null);
+        }
+
+        $this->collLastChangedPublications = null;
+        foreach ($lastChangedPublications as $lastChangedPublication) {
+            $this->addLastChangedPublication($lastChangedPublication);
+        }
+
+        $this->collLastChangedPublications = $lastChangedPublications;
+        $this->collLastChangedPublicationsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Publication objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Publication objects.
+     * @throws PropelException
+     */
+    public function countLastChangedPublications(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collLastChangedPublicationsPartial && !$this->isNew();
+        if (null === $this->collLastChangedPublications || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collLastChangedPublications) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getLastChangedPublications());
+            }
+            $query = PublicationQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByLastChangedByUser($this)
+                ->count($con);
+        }
+
+        return count($this->collLastChangedPublications);
+    }
+
+    /**
+     * Method called to associate a Publication object to this object
+     * through the Publication foreign key attribute.
+     *
+     * @param    Publication $l Publication
+     * @return DtaUser The current object (for fluent API support)
+     */
+    public function addLastChangedPublication(Publication $l)
+    {
+        if ($this->collLastChangedPublications === null) {
+            $this->initLastChangedPublications();
+            $this->collLastChangedPublicationsPartial = true;
+        }
+        if (!in_array($l, $this->collLastChangedPublications->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddLastChangedPublication($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	LastChangedPublication $lastChangedPublication The lastChangedPublication object to add.
+     */
+    protected function doAddLastChangedPublication($lastChangedPublication)
+    {
+        $this->collLastChangedPublications[]= $lastChangedPublication;
+        $lastChangedPublication->setLastChangedByUser($this);
+    }
+
+    /**
+     * @param	LastChangedPublication $lastChangedPublication The lastChangedPublication object to remove.
+     * @return DtaUser The current object (for fluent API support)
+     */
+    public function removeLastChangedPublication($lastChangedPublication)
+    {
+        if ($this->getLastChangedPublications()->contains($lastChangedPublication)) {
+            $this->collLastChangedPublications->remove($this->collLastChangedPublications->search($lastChangedPublication));
+            if (null === $this->lastChangedPublicationsScheduledForDeletion) {
+                $this->lastChangedPublicationsScheduledForDeletion = clone $this->collLastChangedPublications;
+                $this->lastChangedPublicationsScheduledForDeletion->clear();
+            }
+            $this->lastChangedPublicationsScheduledForDeletion[]= $lastChangedPublication;
+            $lastChangedPublication->setLastChangedByUser(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this DtaUser is new, it will return
+     * an empty collection; or if this DtaUser has previously
+     * been saved, it will retrieve related LastChangedPublications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in DtaUser.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getLastChangedPublicationsJoinTitle($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Title', $join_behavior);
+
+        return $this->getLastChangedPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this DtaUser is new, it will return
+     * an empty collection; or if this DtaUser has previously
+     * been saved, it will retrieve related LastChangedPublications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in DtaUser.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getLastChangedPublicationsJoinPublishingcompany($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Publishingcompany', $join_behavior);
+
+        return $this->getLastChangedPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this DtaUser is new, it will return
+     * an empty collection; or if this DtaUser has previously
+     * been saved, it will retrieve related LastChangedPublications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in DtaUser.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getLastChangedPublicationsJoinPlace($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Place', $join_behavior);
+
+        return $this->getLastChangedPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this DtaUser is new, it will return
+     * an empty collection; or if this DtaUser has previously
+     * been saved, it will retrieve related LastChangedPublications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in DtaUser.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getLastChangedPublicationsJoinDatespecificationRelatedByPublicationdateId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('DatespecificationRelatedByPublicationdateId', $join_behavior);
+
+        return $this->getLastChangedPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this DtaUser is new, it will return
+     * an empty collection; or if this DtaUser has previously
+     * been saved, it will retrieve related LastChangedPublications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in DtaUser.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getLastChangedPublicationsJoinDatespecificationRelatedByCreationdateId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('DatespecificationRelatedByCreationdateId', $join_behavior);
+
+        return $this->getLastChangedPublications($query, $con);
     }
 
     /**
@@ -1808,6 +2205,11 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->collLastChangedPublications) {
+                foreach ($this->collLastChangedPublications as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collRecentUses) {
                 foreach ($this->collRecentUses as $o) {
                     $o->clearAllReferences($deep);
@@ -1822,6 +2224,10 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
+        if ($this->collLastChangedPublications instanceof PropelCollection) {
+            $this->collLastChangedPublications->clearIterator();
+        }
+        $this->collLastChangedPublications = null;
         if ($this->collRecentUses instanceof PropelCollection) {
             $this->collRecentUses->clearIterator();
         }

@@ -3,6 +3,7 @@
 namespace DTA\MetadataBundle\Model\Data;
 
 use DTA\MetadataBundle\Model\Data\om\BasePublication;
+use DTA\MetadataBundle\Model;
 
 class Publication extends BasePublication
 {
@@ -65,7 +66,7 @@ class Publication extends BasePublication
      */
     public function getFirstAuthor(){
         $id = $this->getId();
-        $query = Master\PersonPublicationQuery::create()->findAuthors($id);
+        $query = Model\Master\PersonPublicationQuery::create()->findAuthors($id);
         $author = $query->findOne();
         if($author === null)
             return "keine Angabe";

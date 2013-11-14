@@ -114,11 +114,15 @@ CREATE TABLE "publication"
     "numpages" TEXT,
     "numpagesnumeric" INTEGER,
     "comment" TEXT,
+    "encoding_comment" TEXT,
     "doi" TEXT,
     "format" TEXT,
     "directoryname" TEXT,
     "wwwready" INTEGER,
+    "last_changed_by_user_id" INTEGER,
     "legacy_book_id" INTEGER,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     "publishingcompany_id_is_reconstructed" BOOLEAN DEFAULT 'f',
     PRIMARY KEY ("id")
 );
@@ -146,6 +150,8 @@ COMMENT ON COLUMN "publication"."numpages" IS 'Anzahl Seiten (Umfang)';
 COMMENT ON COLUMN "publication"."numpagesnumeric" IS 'Umfang (normiert)';
 
 COMMENT ON COLUMN "publication"."comment" IS 'Anmerkungen';
+
+COMMENT ON COLUMN "publication"."encoding_comment" IS 'Kommentar Encoding';
 
 COMMENT ON COLUMN "publication"."legacy_book_id" IS 'id_book des Datensatzes aus der alten Datenbank, der dem neuen Datensatz zugrundeliegt.';
 
@@ -779,6 +785,10 @@ ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_4"
 ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_5"
     FOREIGN KEY ("creationdate_id")
     REFERENCES "datespecification" ("id");
+
+ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_6"
+    FOREIGN KEY ("last_changed_by_user_id")
+    REFERENCES "dta_user" ("id");
 
 ALTER TABLE "publication_m" ADD CONSTRAINT "publication_m_FK_1"
     FOREIGN KEY ("publication_id")

@@ -67,7 +67,6 @@ class FontTableMap extends TableMap
     {
         return array(
             'table_row_view' =>  array (
-  'Id' => 'id',
   'Name' => 'name',
 ),
         );

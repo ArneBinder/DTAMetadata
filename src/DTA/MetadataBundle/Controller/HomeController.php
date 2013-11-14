@@ -10,7 +10,7 @@ use DTA\MetadataBundle\Form;
 /**
  * Controls the functionality of the home page, e.g. the recently edited, viewed, created boxes.
  */
-class HomeController extends DTADomainController {
+class HomeController extends ORMController {
 
     /** @inheritdoc */
     public $package = "Home";
@@ -32,9 +32,12 @@ class HomeController extends DTADomainController {
 //        $tree = $this->retrieveSubtree($root);
 //        doesn't work if foreign keys (tasks using this task type) impose integrity constraints.
 //        $ttq->findOneById(5)->delete();
+
+//        $personalName = Model\Data\PersonQuery::create()->findOneByGnd('119066882');
+//        Model\Data\PersonalnameQuery::create()->filterByNamefragment($personalName->getRepresentativePersonalName()->getNamefragments())->find();
         
         return $this->renderWithDomainData('DTAMetadataBundle:Home:index.html.twig', array(
-            'testData' => 0,//$tree, 
+            'testData' => null
         ));
     }
 }

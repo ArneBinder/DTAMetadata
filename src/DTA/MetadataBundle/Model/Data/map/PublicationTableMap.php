@@ -57,11 +57,15 @@ class PublicationTableMap extends TableMap
         $this->addColumn('numpages', 'Numpages', 'LONGVARCHAR', false, null, null);
         $this->addColumn('numpagesnumeric', 'Numpagesnumeric', 'INTEGER', false, null, null);
         $this->addColumn('comment', 'Comment', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('encoding_comment', 'EncodingComment', 'LONGVARCHAR', false, null, null);
         $this->addColumn('doi', 'Doi', 'LONGVARCHAR', false, null, null);
         $this->addColumn('format', 'Format', 'LONGVARCHAR', false, null, null);
         $this->addColumn('directoryname', 'Directoryname', 'LONGVARCHAR', false, null, null);
         $this->addColumn('wwwready', 'Wwwready', 'INTEGER', false, null, null);
+        $this->addForeignKey('last_changed_by_user_id', 'LastChangedByUserId', 'INTEGER', 'dta_user', 'id', false, null, null);
         $this->addColumn('legacy_book_id', 'LegacyBookId', 'INTEGER', false, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('publishingcompany_id_is_reconstructed', 'PublishingcompanyIdIsReconstructed', 'BOOLEAN', false, null, false);
         // validators
     } // initialize()
@@ -76,6 +80,7 @@ class PublicationTableMap extends TableMap
         $this->addRelation('Place', 'DTA\\MetadataBundle\\Model\\Data\\Place', RelationMap::MANY_TO_ONE, array('place_id' => 'id', ), null, null);
         $this->addRelation('DatespecificationRelatedByPublicationdateId', 'DTA\\MetadataBundle\\Model\\Data\\Datespecification', RelationMap::MANY_TO_ONE, array('publicationdate_id' => 'id', ), null, null);
         $this->addRelation('DatespecificationRelatedByCreationdateId', 'DTA\\MetadataBundle\\Model\\Data\\Datespecification', RelationMap::MANY_TO_ONE, array('creationdate_id' => 'id', ), null, null);
+        $this->addRelation('LastChangedByUser', 'DTA\\MetadataBundle\\Model\\Master\\DtaUser', RelationMap::MANY_TO_ONE, array('last_changed_by_user_id' => 'id', ), null, null);
         $this->addRelation('PublicationM', 'DTA\\MetadataBundle\\Model\\Data\\PublicationM', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationMs');
         $this->addRelation('PublicationDm', 'DTA\\MetadataBundle\\Model\\Data\\PublicationDm', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationDms');
         $this->addRelation('PublicationDs', 'DTA\\MetadataBundle\\Model\\Data\\PublicationDs', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationDss');
@@ -117,9 +122,14 @@ class PublicationTableMap extends TableMap
             'table_row_view' =>  array (
   'Titel' => 'accessor:getTitle',
   'erster Autor' => 'accessor:getFirstAuthor',
-  'entstanden' => 'accessor:getDatespecification',
+  'entstanden' => 'accessor:getDatespecificationRelatedByCreationdateId',
   'veröffentlicht' => 'accessor:getDatespecificationRelatedByPublicationdateId',
   'embedcolumnstitle' => 'title',
+),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
 ),
             'reconstructed_flaggable' =>  array (
   'column' => 'publishingcompany_id',

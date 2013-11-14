@@ -1342,6 +1342,31 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
         return $this->getPublicationsRelatedByPublicationdateId($query, $con);
     }
 
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Datespecification is new, it will return
+     * an empty collection; or if this Datespecification has previously
+     * been saved, it will retrieve related PublicationsRelatedByPublicationdateId from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Datespecification.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsRelatedByPublicationdateIdJoinLastChangedByUser($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('LastChangedByUser', $join_behavior);
+
+        return $this->getPublicationsRelatedByPublicationdateId($query, $con);
+    }
+
     /**
      * Clears out the collPublicationsRelatedByCreationdateId collection
      *
@@ -1631,6 +1656,31 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
     {
         $query = PublicationQuery::create(null, $criteria);
         $query->joinWith('Place', $join_behavior);
+
+        return $this->getPublicationsRelatedByCreationdateId($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Datespecification is new, it will return
+     * an empty collection; or if this Datespecification has previously
+     * been saved, it will retrieve related PublicationsRelatedByCreationdateId from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Datespecification.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsRelatedByCreationdateIdJoinLastChangedByUser($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('LastChangedByUser', $join_behavior);
 
         return $this->getPublicationsRelatedByCreationdateId($query, $con);
     }

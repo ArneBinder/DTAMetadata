@@ -25,8 +25,80 @@ class PublicationType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('work', new WorkType());
-
+        
+        $builder->add('title', new TitleType());
+        $builder->add('datespecification', new Data\DatespecificationType(), array(
+            'label' => 'Entstehungsjahr des Textes'
+        ));
+        $builder->add('PersonPublications', new DynamicCollectionType(), array(
+            'type' => new Master\PersonPublicationType(),
+            'inlineLabel' => false,
+            'sortable' => false,
+            'label' => 'Werkbezogene Personalia',
+            'options' => array('isPublicationSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
+        ));
+        $builder->add('CategoryPublications', new DynamicCollectionType(), array(
+            'type' => new Master\CategoryPublicationType(),
+            'inlineLabel' => false,
+            'sortable' => false,
+            'label' => 'Kategorien',
+            'options' => array('isPublicationSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
+        ));
+        
+        
+/**
+ * @todo A more compact version using the select2 capabilities is strongly desirable.
+ */
+//        $builder->add('categories', new SelectOrAddType(), array(
+//            'class' => '\DTA\MetadataBundle\Model\Data\Category',
+//            'property' => 'Name',
+//            'multiple' => true,
+//        ));
+        
+        $builder->add('LanguagePublications', new DynamicCollectionType(), array(
+            'type' => new Master\LanguagePublicationType(),
+            // TODO remove inlineLabel option from the dynamic collection type.
+            'inlineLabel' => false,
+            'sortable' => true,
+            'label' => 'vorherrschende Sprache',
+//            'options' => array('isPublicationSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
+        ));
+        
+        $builder->add('GenrePublications', new DynamicCollectionType(), array(
+            'type' => new Master\GenrePublicationType(),
+            'inlineLabel' => false,
+            'sortable' => false,
+            'label' => 'Genres',
+        ));
+        
+        $builder->add('CategoryPublications', new DynamicCollectionType(), array(
+            'type' => new Master\CategoryPublicationType(),
+            'inlineLabel' => false,
+            'sortable' => false,
+            'label' => 'Kategorien',
+            'options' => array('isPublicationSelectable'=>false),
+        ));
+        
+        $builder->add('PublicationTags', new DynamicCollectionType(), array(
+            'type' => new Master\PublicationTagType(),
+            'inlineLabel' => false,
+            'sortable' => false,
+            'label' => 'Schlagworte',
+        ));
+        
+        $builder->add('doi', 'text', array('required' => false));
+        $builder->add('comments');
+        $builder->add('format', 'text', array('required' => false));
+        $builder->add('directoryname', 'text', array('required' => false));
+        
+//        // with tagging
+//        $builder->add('languages', new SelectOrAddType(), array(
+//            'class' => '\DTA\MetadataBundle\Model\Data\Language',
+//            'property' => 'Name',
+//            'label' => 'vorherrschende Sprache',
+//            'multiple' => true,
+//        ));
+        
         $builder->add('PersonPublications', new DynamicCollectionType(), array(
             'type' => new Master\PersonPublicationType(),
             'inlineLabel' => false,
