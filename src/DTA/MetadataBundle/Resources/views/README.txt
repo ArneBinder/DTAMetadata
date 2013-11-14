@@ -2,7 +2,7 @@
 The basic page template is base.html.twig.
 
 Each domain inherits from it in the domain specific base templates 
-(DataDomain.html.twig, ConceptualDomain.html.twig, etc.)
+(DataDomain.html.twig, ClassificationDomain.html.twig, etc.)
 
 # Symfony conventions
 

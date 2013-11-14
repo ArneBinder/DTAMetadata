@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="de">
+    
+    <head>
+        {% include("DTAMetadataBundle::head.html.twig") %}
+    </head>
+    
+    <body style="min-width: 900px">
+
+        {% include 'DTAMetadataBundle:Layout:mainMenu.html.twig' %}
+        
+        <div class="container-fluid" style="padding: 0 30px;">
+            
+        {#  ---------------------------------------------
+            Print session flash (status results of actions)
+            --------------------------------------------- #}
+            
+            {% for flashType in ['success', 'warning', 'error'] %} 
+                {% for flash in app.session.flashbag.get(flashType) %} 
+                <div class="alert alert-{{flashType}}">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    {{ flash }}
+                </div>
+                {% endfor %} 
+            
+            {% endfor %}
+            
+        {#  ---------------------------------------------
+            The content goes into the core block 
+            --------------------------------------------- #}
+                
+            {# fluid: Allow stacking of sidebar and main content if too few space is available #}
+            <div class="row-fluid" id="core" style="padding: 0 0px">
+                {% block core %}
+                {% endblock %}
+            </div><!--/row-->
+            
+            
+            <footer>
+            {% block footer %}
+                <!--
+                <hr/>
+                <p>© DTA(v 2.0)</p>
+                -->
+            {% endblock %}
+            </footer>
+
+        </div><!--/.fluid-container-->
+
+        <!-- Placed at the end of the document so the pages load faster -->
+        {#<script src="{{ asset('js/jquery.min.js') }}"></script>#}
+        {#<script src="{{ asset('js/jquery-ui.min.js') }}"></script>#}
+        
+        <script type="text/javascript">
+            
+            $(document).ready(function() {
+            
+                // automatically focus the first form input
+                $('form:first input:first').focus();
+                
+                // confirm functionality
+                $('a.confirmClick').on('click', confirmCriticalAction);
+
+    
+            });
+
+            /**
+             * Requests a confirmation on clicking a link which e.g. deletes something.
+             * Uses the link's title attribute to determine the warning message.
+             * @param event the jquery event to stop the click action if necessary
+             */
+            function confirmCriticalAction(event){
+                if(confirm($(this).attr('title'))){
+                    return true;
+                } else {
+                    event.preventDefault();
+                };
+            }
+
+        </script>
+    </body>
+</html>

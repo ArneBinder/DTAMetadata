@@ -1,0 +1,62 @@
+{# Renders all database entities of a certain type.
+    
+    Assumes that the objects stored in data are propel objects, or, more specifically
+    implement a getId method for highlighting 
+ #}
+
+{% extends 'DTAMetadataBundle::listView.html.twig' %}
+
+{% block title %} Zeige: {{ className|trans }} {% endblock %}
+
+
+    {% block preTable %}
+        <h3>{{ title|default(className|trans) }}
+            {# add entity button  #}
+            <a class="btn btn-mini listView-add-button pull-right" href="{{ path(package~'_genericCreateOrEdit', {'package':package, 'className':className}) }}">
+                <i class="icon-plus"></i>
+                {{ className|trans }} hinzufügen
+            </a>
+        </h3>
+    {% endblock preTable %}
+    
+    
+    {% block tableHead %}
+        <table class="table" {# style="table-layout: fixed" #} > {# further bootstrap table classes: table-hover #}
+        <thead>
+            {% for col in columns %}    
+                <th> {{ col|trans }} </th>
+            {% endfor %}
+            <th style="width:180px">Datensatz bearbeiten{#{ "listView.editColumn.caption"|trans }#}</th>
+        </thead>
+    {% endblock tableHead %}
+
+    {% block tableBody %}
+        {% for datum in data %}
+            {# all propel objects implement this method #}
+            {% set recordId = attribute(datum, "getId") %}
+            
+            {# highlight affected record #}
+            {% set rowClasses = recordId == updatedObjectId|default(0) ? "success" : "" %}
+            {# highlight workflow table row #}
+            {% set rowClasses = datum.treelevel == 1 ? rowClasses~" active" : rowClasses %}
+            <tr class="{{ rowClasses }}">
+
+            {% for col in columns %}
+                <td>
+                    {{ datum.getAttributeByTableViewColumName(col) }}
+                </td>
+            {% endfor %}
+                {# Display edit buttons instead of Ids #}
+                <td>
+                    {% set editLoc = path(package~'_genericCreateOrEdit', {'package':package, 'className':className, 'recordId':recordId}) %}
+                    <a name="record{{recordId}}" class="glyphicon glyphicon-edit" 
+                       href="{{ editLoc }}">{{ "listView.edit.row.buttonSuffix"|trans }}</a>
+                    {% set deleteLoc = path(package~'_deleteRecord', {'package':package, 'className':className, 'recordId':recordId }) %}
+                    <a href="{{ deleteLoc }}" 
+                       title="Den Datensatz {{recordId}} wirklich löschen?"
+                       class="confirmClick glyphicon glyphicon-trash">löschen {#className|trans~#}
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+    {% endblock tableBody %}

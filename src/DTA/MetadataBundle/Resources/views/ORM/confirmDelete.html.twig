@@ -1,10 +1,10 @@
-{% extends 'DTAMetadataBundle:'~ domainKey ~':index.html.twig' %}
+{% extends 'DTAMetadataBundle:Layout:base.html.twig' %}
 
 {% block title %} Wirklich löschen? {% endblock %}
 
 {% block core %}
 
-    <form action="{{ path('deleteRecord',{'domainKey':domainKey, 'className':className, 'recordId': recordId}) }}" method="POST">
+    <form action="{{ path(package~'_deleteRecord',{'package':package, 'className':className, 'recordId': recordId}) }}" method="POST">
         <label class="checkbox">
             <input type="checkbox" name="reallyDelete" checked="checked">
             Really delete record {{ recordId }}

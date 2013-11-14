@@ -1,0 +1,99 @@
+{# ------------------------------ labelled inputs (see getbootstrap.com/css/#forms-horizontal) ------------------------------ #}
+
+{#
+    pass:
+        controlId:      id of the control to label
+        labelCaption:   label text
+#}
+{% macro beginLabelledContent(configuration) %}
+<div class="form-group">
+    <label for="{{configuration.controlId}}" class="col-lg-{{formLabelWidth}} control-label">{{configuration.labelCaption}}</label>
+    <div class="col-lg-{{formWidgetWidth}}">
+{% endmacro %}
+
+{% macro endLabelledContent() %}
+    </div>
+</div>
+{% endmacro %}
+
+
+{# ------------------------------ collapsible field sets ------------------------------ #}
+
+{# pass the following: 
+    caption: legend of the fieldset
+    collapsed: whether or not the fieldset shall be initially collapsed
+    id: an optional id for the fieldset
+#}
+{% macro beginFieldset(configuration) %}
+    {% set id = configuration.id|default('randomId'~random()) %}
+    <fieldset>
+        {# <span class="glyphicon glyphicon-minus"></span>&nbsp; #}
+        <legend data-toggle="collapse" data-target="#{{id}}">
+            {{configuration.caption}}
+        </legend>
+        <div class="collapse {{ configuration.collapsed|default(false) ? '' : 'in'}}" id="{{id}}">
+
+{% endmacro %}
+
+{% macro endFieldset() %}
+    </div>
+</fieldset>
+{% endmacro %}      
+
+{# ------------------------------ modals ------------------------------ #}
+
+{# pass the following: 
+    id: id of the modal to toggle
+    class: css class to apply to the button
+    caption: title of the button
+#}
+{% macro btnLaunchModal(configuration) %}
+    <a data-toggle="modal" href="#{{configuration.id}}" class="{{configuration.class|default('btn btn-default btn-xs')}}">{{configuration.caption}}</a>
+{% endmacro %}
+
+{# pass the following: 
+    id: id of the modal
+    title: headline of the window
+#}
+{% macro beginModal(configuration) %}
+{% spaceless %}
+  <!-- Modal -->
+  <div class="modal fade" id="{{configuration.id}}" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" style="width:90%">
+      <div class="modal-content">
+        <div class="modal-header">
+          {% if not configuration.hideWindowCloser|default(false) %}
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          {% endif %}
+          <h4 id="{{configuration.id}}-title"class="modal-title">{{configuration.title}}</h4>
+        </div>
+        <div class="modal-body">
+{% endspaceless %}
+{% endmacro %}
+
+{# pass the following: 
+    id: id of the modal
+    target: URL for the submit button to link to
+    confirm: 
+        caption:    caption of the submit button
+        onClick:    javascript to execute
+    cancelCaption: caption of the abort button
+#}
+{% macro endModal(configuration) %}
+{% spaceless %}        
+        </div>
+        <div class="modal-footer">
+          
+          {% if not configuration.hideCancelButton|default(false) %}
+          <button type="button" class="btn btn-default" data-dismiss="modal">{{configuration.cancelCaption|default('modal.closeWithoutAction'|trans)}}</button>
+          {% endif %}
+        
+          <a id="{{configuration.id}}-submitLink" href="{{configuration.confirm.target}}" {% for attrname, attrvalue in configuration.confirm.attr|default({}) %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+            <button type="button" class="btn btn-primary">{{configuration.confirm.caption}}</button>
+          </a>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+{% endspaceless %}
+{% endmacro %}  

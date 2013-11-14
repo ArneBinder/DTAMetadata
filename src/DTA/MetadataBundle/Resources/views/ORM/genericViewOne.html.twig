@@ -1,0 +1,15 @@
+{# Renders a single database entity.
+    
+    Assumes that the object passed via the data variable is a propel object.
+    Especially expects a getId method for highlighting.
+ #}
+
+{#% extends 'DTAMetadataBundle:Package_'~ package ~':index.html.twig' %#}
+
+{% extends 'DTAMetadataBundle:Layout:base.html.twig' %}
+
+{% block title %} Zeige: {{ className|trans }} {% endblock %}
+
+{% block core %}
+{{ dump(data) }}
+{% endblock core %}

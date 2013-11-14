@@ -1,0 +1,34 @@
+{# 
+    Template for generating html edit/create forms for any model type (i.e. database entity).
+
+    Depending on how the form shall be served, this logic is included by
+        - an ajax response generating template (ORM/ajaxModalForm.html.twig)
+        - a html page generating template (ORM/createOrEdit.html.twig)
+    
+    Delivers a specialized template if available:
+
+        This template can be overriden by simply defining a properly named template for the model class to render.
+        The naming convention is <className>Form.html.twig where the according file must be placed under
+        the src/DTAMetadataBundle/Resources/views/Form/standalone directory. As the name implies,
+        this will affect only standalone forms for the specific entity, because the autoform must
+        receive the class as "top level class", i.e. the class for which the root form is rendered.
+        ! Note that there's still the form wrapper which then includes the altered template instead of the autoform.
+        This is useful because the form wrapper handles some of the logic where to submit the form.
+    
+#}
+
+    {# If a specific template has been defined for this form type, use it instead of the default one. #}
+    {% set specializedTemplate = specializedTemplate is defined ? specializedTemplate :
+           dtaMetadataBundlePath ~ 'Resources/views/Form/Entity/' ~ className ~ '.html.twig' %}
+
+    {% if file_exists(specializedTemplate) %}
+
+        {% include 'DTAMetadataBundle:Form/Entity:'~className~'.html.twig' %}
+
+    {% else %}
+
+        {# the option inlineLabel removes the additional column for the root entity label. #}
+        {{ form_row(form, {'inlineLabel':true, 'hideLabel':true}) }}
+        {{ form_rest(form) }}
+
+    {% endif %}

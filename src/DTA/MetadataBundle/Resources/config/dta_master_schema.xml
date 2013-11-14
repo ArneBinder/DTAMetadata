@@ -6,46 +6,55 @@
 -->
 
 <!--The name attribute refers to the connection to use. See app/config/config.yml under
-    propel > dbal > connections for connection setup. -->
-<database name="DTAMetadata" namespace="DTA\MetadataBundle\Model" defaultIdMethod="native">
+    propel > dbal > connections for connection setup or ./runtime-conf.xml if that doesn't work -->
+<database name="dtametadata" namespace="DTA\MetadataBundle\Model\Master" defaultIdMethod="native">
   
+    <behavior name="auto_add_pk"/>
+    
     <!-- This parameter set is added to each entity that doesn't implement the table_row_view behavior. 
     It is not added to tables/entities that define the bahavior. -->
     <behavior name="table_row_view">
         <!--If no parameters are defined, all columns are added. (WITHOUT embedding any related entities) -->
     </behavior>
     
-    <table name="language_work" isCrossRef="true">
-        <column name="language_id" type="INTEGER" primaryKey="true" required="true"/>
-        <column name="work_id" type="INTEGER" primaryKey="true" required="true"/>
+    <table name="language_publication" isCrossRef="true">
+        <column name="language_id" type="INTEGER" required="true"/>
+        <column name="publication_id" type="INTEGER" required="true"/>
         <foreign-key foreignTable="language"> <reference local="language_id" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="work"> <reference local="work_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
     </table>
     
-    <table name="genre_work" isCrossRef="true">
-        <column name="genre_id" type="INTEGER" primaryKey="true" required="true"/>
-        <column name="work_id" type="INTEGER" primaryKey="true" required="true"/>
+    <table name="genre_publication" isCrossRef="true">
+        <column name="genre_id" type="INTEGER" required="true"/>
+        <column name="publication_id" type="INTEGER" required="true"/>
         <foreign-key foreignTable="genre"> <reference local="genre_id" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="work"> <reference local="work_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
     </table>
     
-    <table name="work_tag" isCrossRef="true">
-        <column name="tag_id" type="INTEGER" primaryKey="true" required="true"/>
-        <column name="work_id" type="INTEGER" primaryKey="true" required="true"/>
+    <table name="publication_tag" isCrossRef="true">
+        <column name="tag_id" type="INTEGER" required="true"/>
+        <column name="publication_id" type="INTEGER" required="true"/>
         <foreign-key foreignTable="tag"> <reference local="tag_id" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="work"> <reference local="work_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
     </table>
     
-    <table name="category_work" isCrossRef="true">
-        <column name="category_id" type="INTEGER" primaryKey="true" required="true"/>
-        <column name="work_id" type="INTEGER" primaryKey="true" required="true"/>
+    <table name="category_publication" isCrossRef="true">
+        <column name="category_id" type="INTEGER" required="true"/>
+        <column name="publication_id" type="INTEGER" required="true"/>
         <foreign-key foreignTable="category"> <reference local="category_id" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="work"> <reference local="work_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
+    </table>
+    
+    <table name="font_publication" isCrossRef="true">
+        <column name="font_id" type="INTEGER" required="true"/>
+        <column name="publication_id" type="INTEGER" required="true"/>
+        <foreign-key foreignTable="font"> <reference local="font_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
     </table>
     
     <table name="publication_publicationgroup" isCrossRef="true">
-        <column name="publicationgroup_id" type="INTEGER" primaryKey="true" required="true"/>
-        <column name="publication_id" type="INTEGER" primaryKey="true" required="true"/>
+        <column name="publicationgroup_id" type="INTEGER" required="true"/>
+        <column name="publication_id" type="INTEGER" required="true"/>
         <foreign-key foreignTable="publicationgroup"> <reference local="publicationgroup_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="publication">
             <reference local="publication_id" foreign="id"/>
@@ -53,40 +62,35 @@
     </table>
 
     <table name="person_publication" idMethod="native">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="personrole_id" type="INTEGER" required="true"/>
         <column name="person_id" type="INTEGER" required="true"/>
+        <column name="personrole_id" type="INTEGER" required="true"/>
         <column name="publication_id" type="INTEGER" required="true"/>
-        
-        <foreign-key foreignTable="personrole"> <reference local="personrole_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="person"> <reference local="person_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="personrole"> <reference local="personrole_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
     </table>
     
-    <table name="person_work" idMethod="native">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="person_id" type="INTEGER" required="true"/>
-        <column name="personrole_id" type="INTEGER" required="true"/>
-        <column name="work_id" type="INTEGER" required="true"/>
-        <foreign-key foreignTable="person"> <reference local="person_id" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="personrole"> <reference local="personrole_id" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="work"> <reference local="work_id" foreign="id"/> </foreign-key>
+    <table name="recent_use" idMethod="native">
+        <column name="dta_user_id" type="INTEGER" required="true"/>
+        <column name="publication_id" type="INTEGER" required="true"/>
+        <column name="date" type="TIMESTAMP" required="true"/>
+        <foreign-key foreignTable="dta_user"> <reference local="dta_user_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
     </table>
 
     <table name="dta_user">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="username" type="LONGVARCHAR" required="false"/>
-        <column name="password" type="VARCHAR" size="512" required="false"/>
-        <column name="salt" type="VARCHAR" size="512" required="false"/>
-        <column name="mail" type="LONGVARCHAR" required="false"/>
-        <column name="phone" type="LONGVARCHAR" required="false"/>
-        <column name="admin" type="BOOLEAN" default="false" required="false"/>
+        <column name="username" type="LONGVARCHAR"/>
+        <column name="password" type="VARCHAR" size="512"/>
+        <column name="salt" type="VARCHAR" size="512"/>
+        <column name="mail" type="LONGVARCHAR"/>
+        <column name="admin" type="BOOLEAN" default="false"/>
         
+        <column name="legacy_user_id" description="id_user der alten Datenbank, die dem Datensatz zugrundeliegt." type="INTEGER"/>
+
         <behavior name="table_row_view">
             <parameter name="id" value="id"/>
             <parameter name="benutzername" value="username"/>
             <parameter name="mail" value="mail"/>
-            <parameter name="telefon" value="phone"/>
             <parameter name="administratorrechte" value="accessor:adminToString"/>
         </behavior>
         

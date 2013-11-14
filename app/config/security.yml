@@ -8,8 +8,7 @@ security:
     encoders:
 #        in_memory: plaintext
         Symfony\Component\Security\Core\User\User: plaintext
-        DTA\MetadataBundle\Model\DtaUser: 
-            # if changed, also change in User.php in method save()
+        DTA\MetadataBundle\Model\Master\DtaUser: 
             algorithm: sha512
             iterations: 5000
             encode_as_base64: true
@@ -23,9 +22,11 @@ security:
         dev:
             pattern:  ^/(_(profiler|wdt)|css|images|js)/
             security: false
-
+        import:
+            pattern: ^/Convert
+            security: false
         login:
-            pattern: ^/Anmeldung
+            pattern: ^/Login
             security: false
 
 #        only sensible after database deletion (because the login system will stay active)
@@ -41,7 +42,7 @@ security:
             pattern:    ^/
             form_login:
                 # The target of the route "login" is used to display the login form.
-                # @see AdministrationDomainController->loginFormAction() 
+                # @see MasterDomainController->loginFormAction() 
                 login_path: login       
                 # The symfony firewall automatically catches the credentials provided, so no custom implementation of this route is needed.
                 check_path: login_check
@@ -60,12 +61,12 @@ security:
 #                    admin: { password: adminpass, roles: [ 'ROLE_ADMIN' ] }
         main:
             propel:
-                class: DTA\MetadataBundle\Model\DtaUser
+                class: DTA\MetadataBundle\Model\Master\DtaUser
                 property: username
                     
     access_control:
         - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/administration, roles: ROLE_ADMIN }
+        - { path: ^/Master, roles: ROLE_ADMIN }
         - { path: ^/, roles: ROLE_USER }
         #- { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: https }
         #- { path: ^/_internal/secure, roles: IS_AUTHENTICATED_ANONYMOUSLY, ip: 127.0.0.1 }

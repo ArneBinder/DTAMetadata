@@ -1,0 +1,11 @@
+.xmlsh           { background:#fff; font-family:monospace; font-weight:bold }
+.xmlsh-bracket   { font-weight:normal; color:black }
+.xmlsh-doctype   { font-weight:normal; color:#6495ED }
+.xmlsh-comment   { font-weight:normal; color:#aaa !important; font-style:italic }
+.xmlsh-entity    { font-weight:normal; color:#8B008B }
+.xmlsh-tag       { font-weight:normal; color:#191970 }
+.xmlsh-aname     { font-weight:normal; color:green }
+.xmlsh-avalue    { font-weight:normal; color:#8B0000 }
+.xmlsh-namespace { font-weight:normal; color:#DAA520 }
+.xmlsh-equal     { font-weight:normal }
+.xmlsh-quote     { font-weight:normal }

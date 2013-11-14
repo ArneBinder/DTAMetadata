@@ -1,0 +1,32 @@
+/* 
+    Document   : dtaFrankClarinSubmit
+    Created on : 23.08.2013, 12:05:11
+    Author     : macbookdata
+    Description:
+        As used on www.deutschestextarchiv.de/dtae/metadaten
+*/
+
+p.dta-p { text-indent:2em }
+.dta-sp p { text-indent:0 !important }
+.dta-p-in-sp-really { padding-top:10px }
+
+
+#xsltext .speaker    { background:#def; font-weight:normal }
+#xsltext .speaker *  { background:#def }
+#xsltext .stage      { font-style:normal; background:#fed }
+#xsltext .stage .c, #xsltext .stage .et { font-style:normal; background:#fed }
+.fr         { font-family:Georgia !important; border:1px dotted silver }
+.dta-salute { text-indent:3em; background:#F5F6CE; white-space:nowrap }
+.c.dta-salute { text-indent:0em !important; margin-bottom:.5em }
+.dta-closer { text-align:right; margin-right:10em }
+.dta-lg     { margin-bottom:10px; margin-top:0 !important; margin-left:2em; /*background:url(static/images/bg-lg.png) repeat-y*/ }
+.footnotesep, .footnotesep-long { margin-top:15px }
+#xsltext q.quote, #xsltext q.quote * { background:#effddf }
+p           { margin-bottom:10px; margin-top:0 !important }
+
+
+
+
+#header { background:#A2C35C }
+a       { color:#89A54E }
+

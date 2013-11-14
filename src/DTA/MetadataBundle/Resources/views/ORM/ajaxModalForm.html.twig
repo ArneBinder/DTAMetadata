@@ -1,0 +1,35 @@
+{# 
+
+    Renders a form for creating any database entity, 
+    but for use as ajax requested form (marked up as a twitter/bootstrap modal).
+
+    className, captionProperty and package are passed by the calling controller:
+    DTABaseController->generateAjaxModalFormAction. The controller itself just passes these values on,
+    as drawn from the URL parameters, e.g.
+    .../genericNew/ajax/Namefragmenttype/Name results in 
+    package = ajax, className = Namefragmenttype, captionProperty = Name
+
+ #}
+
+    {# modal markup generation helper is imported from here #}
+    {% import "DTAMetadataBundle:form:buildingBlocks.html.twig" as dta %}
+
+    {{ dta.beginModal({
+            'id': modalId,
+            'title': submitRouteParameters.className|trans
+       })            
+    }}
+        
+        {% set submitURL = path(package~'_ajaxModalForm', submitRouteParameters) %}
+        <form action="{{ submitURL }}" method="post" {{ form_enctype(form) }} class="form-horizontal">
+            
+            {% include 'DTAMetadataBundle:Form:genericBaseForm.html.twig' with {'className': submitRouteParameters.className }%}
+            
+        </form>
+
+    {{ dta.endModal({
+            'id': modalId,
+            'cancelCaption': 'Abbrechen',
+            'confirm': { 'caption':'Hinzufügen', 'target': submitURL}
+       })
+    }}

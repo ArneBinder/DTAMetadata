@@ -35,6 +35,10 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  * The property determines which attribute will be used to summarize each entity in a select option
  * @author carlwitt
  * 
+ * when posting the data, an ajax-friendly response is requested
+ * in this case, the additional select box element (<option>) is returned
+ * which is then added to the select box before the add button
+ * 
  * @todo A switch to control data transfer from the select box to the new entity dialog would be nice.
  * Consider for instance selecting a category. If no match is found using the typeahead, the same data
  * has to be entered into the new entity box again. 
@@ -61,15 +65,14 @@ class SelectOrAddType extends \Symfony\Bridge\Propel1\Form\Type\ModelType {
         $className = $options['class'];
         
         // extract the class name (e.g. Status)
-        $parts = explode('\\', $className);
-        $modelClass = array_pop($parts);
+        $parts = explode('\\', $className);     // $className is fully classified, e.g. DTA\MetadataBundle\Model\Workflow\Task
+        $modelClass = array_pop($parts);        // The class name is the last part (Task)
+        $package = array_pop($parts);           // The package name is the second last part (Workflow)
         
         $view->vars['selectOrAddConfiguration'] = array(
             'modalRetrievePathParameters' => array(
+                'package'   => $package,
                 'className' => $modelClass,
-                'domainKey' => 'ajax',                      // when posting the data, request ajax-friendly response 
-                                                            // in this case, the additional select box element (<option>) is returned
-                                                            // which is then added to the select box before the add button
                 'property' => $options['property'],
             ),
             'searchable' => $options['searchable'],
@@ -83,8 +86,11 @@ class SelectOrAddType extends \Symfony\Bridge\Propel1\Form\Type\ModelType {
         parent::setDefaultOptions($resolver);
         
         $resolver->setDefaults(array(
-            'searchable' => false,          // whether to apply the select2 plugin to add typeahead functionality
+            'searchable' => true,          // whether to apply the select2 plugin to add typeahead functionality
             'addButton'  => true,
+            'empty_value' => 'Keine Auswahl',
+            'empty_data' => 0,
+            'required'   => false,
         ));
     }
     

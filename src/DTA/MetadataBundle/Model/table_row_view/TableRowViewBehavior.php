@@ -169,7 +169,11 @@ class TableRowViewBehavior extends Behavior {
                 $accessor = $columnOrEntityOrAccessor;
                 $caption = $captionOrIndicator;
                 $behavior->addViewElement($caption, $accessor);
+            } elseif(!strncmp($columnOrEntityOrAccessor, "closure:", strlen("closure:"))) {
                 // ... or simply a column taken from the entity itself
+                $accessor = $columnOrEntityOrAccessor;
+                $caption = $captionOrIndicator;
+                $behavior->addClosureAccessor($caption, $accessor);
             } else {
                 $column = $columnOrEntityOrAccessor;
                 $caption = $captionOrIndicator;

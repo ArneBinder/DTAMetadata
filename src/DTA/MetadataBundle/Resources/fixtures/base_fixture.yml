@@ -1,0 +1,240 @@
+
+# ------------------------------------------------------------------------------
+# basic categories and types
+# ------------------------------------------------------------------------------
+
+DTA\MetadataBundle\Model\Classification\Categorytype:
+    Categorytype_1:
+        name: Wissensgebiet
+    Categorytype_2:
+        name: "Präsentationsform"
+    Categorytype_3:
+        name: "Textsorte"
+    Categorytype_4:
+        name: "Sitz im Leben"
+    Categorytype_5:
+        name: "Nicht verwenden"
+DTA\MetadataBundle\Model\Classification\Genre:
+    Genre_1:
+        name: "Belletristik: allgemeine"
+    Genre_2:
+        name: "Belletristik: Lyrik"
+    Genre_3:
+        name: "Belletristik: Epik"
+    Genre_4:
+        name: "Belletristik: Dramatik"
+    Genre_5:
+        name: "Sachliteratur: allgemeine"
+    Genre_6:
+        name: "Sachliteratur: Fachliteratur"
+    Genre_7:
+        name: "Sachliteratur: Gebrauchsliteratur"
+DTA\MetadataBundle\Model\Classification\Namefragmenttype:
+    Namefragmenttype_1:
+        name: Vorname
+    Namefragmenttype_2:
+        name: Nachname
+    Namefragmenttype_3:
+        name: Adelstitel
+    Namefragmenttype_4:
+        name: Generation
+    Namefragmenttype_5:
+        name: Pseudonym
+    Namefragmenttype_6:
+        name: Alternative Schreibweise
+DTA\MetadataBundle\Model\Classification\Personrole:
+    Personrole_1:
+        name: Autor
+    Personrole_2:
+        name: Verleger
+    Personrole_3:
+        name: Übersetzer
+    Personrole_4:
+        name: Drucker
+DTA\MetadataBundle\Model\Classification\Titlefragmenttype:
+    Titlefragmenttype_1:
+        name: Haupttitel
+    Titlefragmenttype_2:
+        name: Untertitel
+    Titlefragmenttype_3:
+        name: Kurztitel
+    Titlefragmenttype_4:
+        name: Auflage
+DTA\MetadataBundle\Model\Data\Font:
+    Font_1:
+        name: Textur
+    Font_2:
+        name: Rotunda
+    Font_3:
+        name: Schwabacher
+    Font_4:
+        name: Fraktur
+    Font_5:
+        name: Antiqua
+    Font_6:
+        name: Handschrift
+DTA\MetadataBundle\Model\Data\Language:
+    Language_1:
+        name: Neuhochdeutsch
+    Language_2:
+        name: Mittelhochdeutsch
+    Language_3:
+        name: Althochdeutsch
+    Language_4:
+        name: Bayerisch
+    Language_5:
+        name: Altsächsisch
+    Language_6:
+        name: Obersächsisch
+    Language_7:
+        name: Schwäbisch
+    Language_8:
+        name: Walser-Dialekt
+    Language_9:
+        name: 'Schweizerdeutsch, Allemannisch, Elsässisch'
+    Language_10:
+        name: Ost-Jiddisch
+    Language_11:
+        name: West-Jiddisch
+    Language_12:
+        name: Mittelniederdeutsch
+    Language_13:
+        name: Niederdeutsch
+    Language_14:
+        name: Latein
+DTA\MetadataBundle\Model\Workflow\License:
+    License_1:
+        name: 'gemeinfrei (CC0)'
+        applicable_to_image: true
+        applicable_to_text: true
+    License_2:
+        name: 'CC by-sa 2.0 (de)'
+        applicable_to_image: true
+        applicable_to_text: true
+    License_3:
+        name: 'CC by-nc 3.0 (de)'
+        applicable_to_image: true
+        applicable_to_text: true
+
+        
+DTA\MetadataBundle\Model\Workflow\Tasktype:
+    Tasktype_35:
+        name: GrobiZoning
+        legacy_tasktype_id: 31
+        tree_left: 15
+        tree_right: 16
+        tree_level: 2
+    Tasktype_37:
+        name: Convert2TEIP5
+        legacy_tasktype_id: 59
+        tree_left: 11
+        tree_right: 12
+        tree_level: 2
+    Tasktype_29:
+        name: 'Gruppe A: Double Keying'
+        tree_left: 2
+        tree_right: 13
+        tree_level: 1
+    Tasktype_38:
+        name: OCR2
+        legacy_tasktype_id: 45
+        tree_left: 17
+        tree_right: 18
+        tree_level: 2
+    Tasktype_34:
+        name: 'Gruppe B'
+        tree_left: 14
+        tree_right: 19
+        tree_level: 1
+    Tasktype_40:
+        name: 'Scannen (fakultativ)'
+        legacy_tasktype_id: 20
+        tree_left: 21
+        tree_right: 22
+        tree_level: 2
+    Tasktype_39:
+        name: 'Gruppe C'
+        tree_left: 20
+        tree_right: 23
+        tree_level: 1
+    Tasktype_42:
+        name: OCR
+        legacy_tasktype_id: 40
+        tree_left: 25
+        tree_right: 26
+        tree_level: 2
+    Tasktype_43:
+        name: DON
+        legacy_tasktype_id: 55
+        tree_left: 27
+        tree_right: 28
+        tree_level: 2
+    Tasktype_44:
+        name: Compare
+        legacy_tasktype_id: 60
+        tree_left: 29
+        tree_right: 30
+        tree_level: 2
+    Tasktype_45:
+        name: DON2XML
+        legacy_tasktype_id: 65
+        tree_left: 31
+        tree_right: 32
+        tree_level: 2
+    Tasktype_46:
+        name: CoordinateMerge_Don
+        legacy_tasktype_id: 75
+        tree_left: 33
+        tree_right: 34
+        tree_level: 2
+    Tasktype_33:
+        name: Workflows
+        tree_left: 1
+        tree_right: 38
+        tree_level: 0
+    Tasktype_47:
+        name: Nachkorrektur
+        legacy_tasktype_id: 70
+        tree_left: 35
+        tree_right: 36
+        tree_level: 2
+    Tasktype_41:
+        name: 'Gruppe D (OCR-Workflow, nach Zoning)'
+        tree_left: 24
+        tree_right: 37
+        tree_level: 1
+    Tasktype_30:
+        name: Textbeschaffung
+        legacy_tasktype_id: 10
+        tree_left: 3
+        tree_right: 4
+        tree_level: 2
+    Tasktype_31:
+        name: Vorkorrektur
+        legacy_tasktype_id: 58
+        tree_left: 5
+        tree_right: 6
+        tree_level: 2
+    Tasktype_32:
+        name: Zoning
+        legacy_tasktype_id: 30
+        tree_left: 7
+        tree_right: 8
+        tree_level: 2
+    Tasktype_36:
+        name: Abtippen
+        legacy_tasktype_id: 50
+        tree_left: 9
+        tree_right: 10
+        tree_level: 2
+        
+# ------------------------------------------------------------------------------        
+# Test data
+# ------------------------------------------------------------------------------
+
+DTA\MetadataBundle\Model\Master\DtaUser:
+    DtaUser_1:
+        username: Carl Witt
+        salt: 6e145800af4083d354da87df70e92fe5
+        password: gszsoJ8ZI4vPkOkO0BKzv16wyRampVzO3F6gA7XxhWKBXC42jKEI6xjgDQ5TGNZm55ipm2fcdCw7LD+EZC0HWw==
+        admin: true

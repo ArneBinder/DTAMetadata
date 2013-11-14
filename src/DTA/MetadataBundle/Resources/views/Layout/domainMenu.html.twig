@@ -1,0 +1,106 @@
+{# Takes a nested set of model entities and creates a submenu with links to the CRUD actions on them.
+    
+    For custom behavior, specify a route and optionally parameters, like in the data domain controller.
+    Using the children property on an item, a submenu can be rendered (data domain menu entry > related entries)
+
+    The translation engine is used to generate the german descriptions from the model class names,
+    if no caption is given (e.g. einteilige Monographie for Monograph)
+
+<code>
+    public static $domainMenu = array(
+        array("caption" => "Publikationen", "route" => 'listAllPublications', "parameters" => array("option1", "option2"), "children" => array(
+                array('caption' => "Alle Publikationsarten", 'route' => 'home'),
+                array('caption' => "Bücher", 'modelClass' => 'Monograph'),
+                array('caption' => "Zeitschriften", 'modelClass' => 'Magazine'),
+                array('caption' => "Reihen", 'modelClass' => 'Series'),
+                array('caption' => "Essays", 'modelClass' => 'Essay'))),
+        array("caption" => "Personen", "route" => 'home', "children" => array(
+                array('caption' => "Alle Personen", 'route' => 'home'),
+                array('caption' => "Autoren", 'modelClass' => 'Author'),
+                array('caption' => "Verleger", 'modelClass' => 'Publisher'),
+                array('caption' => "Übersetzer", 'modelClass' => 'Translator'),
+                array('caption' => "Drucker", 'modelClass' => 'Printer'))),
+        array("caption" => "Verlage", 'modelClass' => 'PublishingCompany'),
+    );
+</code>
+#}
+
+{# to highlight the active entity: get class name from url.  #}
+{% set highlightItem = app.request.attributes.get('_route_params').className|default(app.request.attributes.get('_route')) %}
+
+{% macro input(name, value, type, size) %}
+    <input type="{{ type|default('text') }}" name="{{ name }}" value="{{ value|e }}" size="{{ size|default(20) }}" />
+{% endmacro %}
+
+<div class="nav ">
+    <ul class="nav navbar-nav">
+            
+    {# render top level links #}
+    {% for item in domainMenu %}
+        
+        {# top level link with children #}
+        {% if item.children is defined %}
+
+            {# find out whether to highlight the current item #}
+            {% set isInSubMenu = false %}
+            {% for child in item.children %}
+                {% if child.modelClass is defined %}
+                    {% set isInSubMenu = isInSubMenu or highlightItem == child.modelClass %}
+                {% endif %}
+            {% endfor %}
+
+            <li class="dropdown {{ isInSubMenu ? "active" : ""}}"> 
+                
+                <a data-toggle="dropdown" class="dropdown-toggle" href="#"> 
+                    {{ item.caption}}
+                    <b class="caret"></b>
+                </a>
+                
+                {# the dropdown menu #}
+                <ul class="dropdown-menu" role="menu" style="min-width:180px">
+                {% for child in item.children%}
+                        
+                    {% if child.kind|default('') == 'divider' %}
+                    <li class="divider"></li>
+                    {% elseif child.modelClass is defined %}
+                    {# If the menu element is a model class, add view and create options #}
+                    <li>
+                        <a href="{{ path(package~'_genericViewAll', {'package':package, 'className':child.modelClass}) }}">
+                            {{ child.caption|default(child.modelClass|trans)}} 
+                            {#<span class="glyphicon glyphicon-plus pull-right"></span>
+                            <span class="glyphicon glyphicon-list pull-right"></span>#}
+                        </a>
+                    {#<p style="padding: 0 10px"> 
+                        &nbsp;{{ child.caption|default(child.modelClass|trans) }} 
+                        <a href="#" class="glyphicon glyphicon-plus pull-right">&nbsp;</a>
+                        <a href="#" class="glyphicon glyphicon-eye-open pull-right">&nbsp;</a>
+                    </p>#}
+                    </li>
+                    {% else %}
+                    <li><a href="{{ path(child.route, child.parameters|default({})) }}">{{ child.caption }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                </ul>
+            </li>
+        {# top level link without children #}
+        {% else %} 
+            {# If the menu element is a model class, add view and create options #}
+            {% if item.modelClass is defined %}
+                {% set active = highlightItem == item.modelClass ? "active" : ""%}
+                <li class="{{active}}">
+                    <a href="{{ path(package~'_genericViewAll', {'package':package, 'className':item.modelClass}) }}"> 
+                           {{ item.caption }} 
+                     </a>
+                </li>
+            {# The menu element is a simple link #}
+            {% else %}
+                {% set active = highlightItem == item.route ? "active" : ""%}
+                <li class="{{active}}">
+                    <a href="{{ path(item.route, item.parameters|default({})) }}">{{ item.caption }}</a>
+                </li>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+                
+    </ul>       
+</div><!--/.nav-collapse -->

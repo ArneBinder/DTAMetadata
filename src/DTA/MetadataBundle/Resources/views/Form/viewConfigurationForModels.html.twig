@@ -22,20 +22,114 @@
     {{ form_row(form, {'expanded':true}) }}
 {% endblock %}
 
-{# --------------------- Space and Time --------------------- #}
+{% block imagesource_row %}
+    {% import  'DTAMetadataBundle:form:buildingBlocks.html.twig' as dta %}
+    <div>
+    {{ form_row(form.partner) }}
+            
+    {{ dta.beginLabelledContent({'labelCaption':'Katalogeintrag', 'controlId':'none'}) }}
+        {{ form_widget(form.cataloguesignature, {'label':false, 'attr':{'placeholder':'Signatur'} }) }}
+        {{ form_widget(form.catalogueurl, {'label':false, 'attr':{'placeholder':'URL'} }) }}
+    {{ dta.endLabelledContent() }}
+    
+    {{ dta.beginLabelledContent({'labelCaption':'Umfang', 'controlId':'none'}) }}
+        {{ form_row(form.numfaksimiles, {'inlineLabel':true}) }}
+        {{ form_row(form.extentasofcatalogue, {'inlineLabel':true}) }}
+    {{ dta.endLabelledContent() }}
+            
+    {{ dta.beginLabelledContent({'labelCaption':'Quellenangabe für', 'controlId':'none'}) }}
+        <div class="form-inline">
+            {{ form_row(form.faksimilerefrange, {'inlineLabel':true, 'attr':{'placeholder':'5-11'} }) }}
+            {{ form_row(form.originalrefrange, {'inlineLabel':true,'attr':{'placeholder':'2-8'} }) }}
+        </div>
+    {{ dta.endLabelledContent() }}
+            
+    {% set modalId = 'extraOptionsModalFor'~id %}
+    
+    {{ dta.beginLabelledContent({'labelCaption':'', 'controlId':'none'}) }}
+        {{ dta.btnLaunchModal({'id':modalId, 'caption':'weitere Angaben...'})}}
+    {{ dta.endLabelledContent() }}
 
+
+    {{ dta.beginModal({
+            'id': modalId,
+            'title': 'Weitere Angaben zur Bildquelle',
+            'hideWindowCloser': true 
+       })            
+    }}
+
+        {{ form_row(form.imageurl) }}
+        {{ form_row(form.imageurn) }}
+        {{ form_row(form.license) }}
+
+    {{ dta.endModal({
+            'id': modalId,
+            'confirm': {'caption': 'Fertig', 'target': '#', 'attr':{'data-dismiss':'modal'} },
+            'hideCancelButton': true,
+       })
+    }}
+
+    </div>
+{% endblock %}
+
+{% block textsource_row %}
+    <div>
+        {{ form_row(form.partner) }}
+        {{ form_row(form.texturl) }}
+        {{ form_row(form.attribution) }}
+        {{ form_row(form.license) }}
+    </div>
+{% endblock %}
+
+
+{# --------------------- Space and Time --------------------- #}
+        
 {% block datespecification_row %}
-    {{ form_row(form, {'inlineControls':true }) }}
+    {% import  'DTAMetadataBundle:form:buildingBlocks.html.twig' as dta %}
+    
+    {{ dta.beginLabelledContent({'controlId':id, 'labelCaption': form.vars.label }) }}
+ 
+            {{ form_errors(form.year) }}
+            {{ form_label(form.year) }}
+            {{ form_widget(form.year) }}
+
+
+            {# add addtional options to a modal #}
+            {% set modalId = 'extraOptionsModalFor'~id %}
+            {{ dta.btnLaunchModal({'id':modalId, 'caption':'mehr...'})}}
+
+            {{ dta.beginModal({
+                    'id': modalId,
+                    'title': 'Weitere Optionen zur Datumsangabe',
+                    'hideWindowCloser': true 
+               })            
+            }}
+            
+            {{ form_row(form.comments) }}
+            
+            {{ dta.beginLabelledContent({'controlId':form.yearIsReconstructed.vars.id, 'labelCaption': form.yearIsReconstructed.vars.label }) }}
+                {{ form_widget(form.yearIsReconstructed) }}
+            {{ dta.endLabelledContent() }}
+
+            {{ dta.endModal({
+                    'id': modalId,
+                    'confirm': {'caption': 'Fertig', 'target': '#', 'attr':{'data-dismiss':'modal'} },
+                    'hideCancelButton': true,
+               })
+            }}
+    
+    {{ dta.endLabelledContent() }}
+
 {% endblock %}
 
 {# --------------------- Title --------------------- #}
 
 {% block title_row %}
-    {{ form_row(form, {'inlineLabel':false}) }}
+    {{ form_row(form, {'inlineLabel':false,'hideLabel':false}) }}
 {% endblock %}
 
 {% block titlefragment_row %}
-    <div class="control-group form-inline">
+    <div class="form-inline">
             {{ form_widget(form.titlefragmenttype)}}
             {{ form_widget(form.name,{'attr':{'class':'medium-text'} }) }} 
             <br/>
@@ -57,7 +151,7 @@
 {% endblock %}
 
 {% block namefragment_row %}
-    <div class="control-group form-inline">
+    <div class="form-inline">
             {{ form_widget(form.namefragmenttype)}}
             {{ form_widget(form.name) }} 
             {{ form_rest(form) }}
@@ -67,23 +161,45 @@
 {# --------------------- Person / Work / Publication Relations --------------------- #}
 
 {% block personwork_row %}
-    <div class="control-group form-inline">
+    <div class="dynamic-collection-deletable">
         {{ form_row(form.personrole, {'inlineLabel':true,'hideLabel':true}) }}
         {{ form_row(form.person, {'hideLabel':true,'inlineLabel':true}) }}
     </div>
 {% endblock %}
+
 {% block personpublication_row %}
-    <div class="control-group form-inline">
-        {{ form_row(form.personrole, {'inlineLabel':true,'hideLabel':true}) }}
-        {{ form_row(form.person, {'hideLabel':true,'inlineLabel':true}) }}
-    </div>
+  <div class="dynamic-collection-deletable">
+    {{ form_row(form.personrole, {'inlineLabel':true,'hideLabel':true}) }}
+    {{ form_row(form.person, {'hideLabel':true,'inlineLabel':true}) }}
+  </div>
 {% endblock %}
+
 {% block categorywork_row %}
-     {{ form_row(form, {'inlineLabel':true, 'hideLabel':true, 'inlineControls': true}) }}
+    <div class="dynamic-collection-deletable">
+        {{ form_row(form, {'inlineLabel':true, 'hideLabel':true, 'inlineChildren': true}) }}
+    </div>
 {% endblock %}
 
 {% block category_row %}
-    <div class="control-group form-inline">
-        {{ form_row(form, {'inlineLabel':true, 'hideLabel':true, 'inlineControls': true}) }}
+    <div class="dynamic-collection-deletable">
+        {{ form_row(form, {'inlineLabel':true, 'hideLabel':true, 'inlineChildren': true}) }}
+    </div>
+{% endblock %}
+
+{% block languagework_row %}
+    <div class="form-inline">
+        {{ form_widget(form.language)}}
+    </div>
+{% endblock %}
+
+{% block genrework_row %}
+    <div class="form-inline">
+        {{ form_widget(form.genre)}}
+    </div>
+{% endblock %}
+
+{% block worktag_row %}
+    <div class="form-inline">
+        {{ form_widget(form.tag)}}
     </div>
 {% endblock %}

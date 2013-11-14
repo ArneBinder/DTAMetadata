@@ -7,6 +7,10 @@ imports:
 # Precautionary include in case anyone should wish to register the DTA form types as services.
 # This would make them available in the form builders under aliases e.g. 'dynamicCollection', 'selectOrAdd', ...
     - { resource: '@DTAMetadataBundle/Resources/config/services.yml' }
+
+parameters:
+    # propel supports pgsql|mysql|sqlite|mssql|oracle
+    database_vendor: pgsql
     
 framework:
     #esi:             ~
@@ -40,6 +44,10 @@ twig:
     # absolute path on the server to the web directory, needed sometimes for file_exists
     globals:
         dtaMetadataBundlePath: %kernel.root_dir%/../src/DTA/MetadataBundle/
+        # for horizontal forms (getbootstrap.com/css/#forms)
+        # sets the number of grid columns for the label and widget form columns
+        formLabelWidth: 2
+        formWidgetWidth: 10
 
 
 # Assetic Configuration
@@ -60,43 +68,40 @@ propel:
 #     http://propelorm.org/reference/buildtime-configuration.html#general_build_settings
     build_properties:
       
-      # database abstraction
-      propel.database: pgsql
+      propel.database: %database_vendor%
 #      propel.sql.dir: ${propel.output.dir}/pgsql
       
-      propel.builder.pluralizer.class: builder.util.StandardEnglishPluralizer
-      
-      # custom behaviors
-      propel.behavior.reconstructed_flaggable.class: src.DTA.MetadataBundle.Model.reconstructed_flaggable.ReconstructedFlaggableBehavior
-      propel.behavior.table_row_view.class: src.DTA.MetadataBundle.Model.table_row_view.TableRowViewBehavior
-
       # TODO: for testing, non-enforcement of the foreign key constraints is more practical (set to MyISAM)
       propel.mysql.tableType: InnoDB
+      
+      propel.builder.pluralizer.class: builder.util.StandardEnglishPluralizer
       
       # multiple schemas with the same database name
       propel.packageObjectModel: true
       
-      # leads to problems with code location and autoloading
-      #propel.namespace.autoPackage: true
+      # derives the package attribute (which leads to subdirectories for model classes)
+      # from the namespace attribute
+#      propel.namespace.autoPackage: true
+#      propel.schema.autoNamespace: true
+    logging: true
 
     # propel database connections
     dbal:
-        default_connection: DTAMetadata
+        default_connection: dtametadata
         connections:
-#            DTAMetadata:
+#            dtametadata:
 #              driver:     "mysql"
 #              user:       "root"
 #              password:   "root"
 #              dsn:        "mysql:host=%database_host%;dbname=%database_name%;charset=%database_charset%"
 #              options:    {}
 #              attributes: {}
-            DTAMetadata:
+            dtametadata:
               # the database parameters are stored in parameters.yml
               driver:     %database_driver%
               user:       %database_user%
               password:   %database_password%
-#              dsn:        "pgsql:host=%database_host%;dbname=%database_name%"
-              dsn: pgsql:host=localhost;dbname=DTAMetadata
+              dsn:        "%database_vendor%:host=%database_host%;dbname=%database_name%"
               options:    {}
               attributes: {}
 # this was only used to generate a schema from an existing database (which was in turn generated with the mysql workbench graphical tools)
@@ -133,19 +138,19 @@ swiftmailer:
 #        auto_generate_proxy_classes: %kernel.debug%
 #        auto_mapping: true
 #
-#monolog:
-#    handlers:
-#        applog:
-#            type: stream
-#            path: /var/log/symfony.log
-#            level: error
-#        main:
-#            type: fingers_crossed
-#            action_level: warning
-#            handler: file
-#        file:
-#            type: stream
-#            level: debug
-#        syslog:
-#            type: syslog
-#            level: error
+monolog:
+    handlers:
+        applog:
+            type: stream
+            path: ../app/logs/symfony.log
+            level: error
+        main:
+            type: fingers_crossed
+            action_level: warning
+            handler: file
+        file:
+            type: stream
+            level: debug
+        syslog:
+            type: syslog
+            level: error

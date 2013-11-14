@@ -32,7 +32,7 @@ function createGui(){
     });
 
     // formInfo is set within the formWrapper template
-    if(formInfo.action == 'new'){
+    if(typeof formInfo != 'undefined' && formInfo.action == 'new'){
         // create default fragment for empty collections
         var holders = $('.dynamic-collection.list').parent();
         $('a.add-entity', holders).click();
@@ -103,7 +103,7 @@ function addFormElement(){
         
         // add a caption to feed the enumeration (with just a plain div, list elements can't be numbered)
         // without the list-style-type set to decimal, more compact list elements are possible and preferred
-        $newFormLi.prepend($('<span/>').text(translatedModelClassName));
+//        $newFormLi.prepend($('<span/>').text(translatedModelClassName));
 
         // initialize the rank hidden input field
         var rank = elementId + 1; // the rank is 1-based

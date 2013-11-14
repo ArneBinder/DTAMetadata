@@ -22,6 +22,6 @@
     
     {{ macros.beginDropDown(topLevel, child) }}
     <li><a href="{{ path('home') }}">Anzeigen und suchen</a></li>
-    <li><a href="{{ path('genericNew', child.modelClass) }}">Neu anlegen</a></li>
+    <li><a href="{{ path(package~'_genericNew', child.modelClass) }}">Neu anlegen</a></li>
     {{ macros.endDropDown() }}
 {% endmacro %}

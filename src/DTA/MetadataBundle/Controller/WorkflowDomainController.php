@@ -5,41 +5,55 @@ namespace DTA\MetadataBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
-/**
- * Route prefix for all action routes, i.e. this page.
- * @Route("/arbeitsfluss")
- */
-class WorkflowDomainController extends DTADomainController {
+class WorkflowDomainController extends ORMController {
 
     /** @inheritdoc */
-    public static $domainKey = "WorkflowDomain";
+    public $package = "Workflow";
 
     /** @inheritdoc */
     public  $domainMenu = array(
+        array("caption" => "Workflows", 'route' => 'Workflow_tasktypeViewAll'),
         array("caption" => "Tasks", 'modelClass' => 'Task'),
         array("caption" => "Publikationsgruppen", 'modelClass' => 'Publicationgroup'),
-        array("caption" => "Nachweise", 'modelClass' => 'Imagesource'),
-        array("caption" => "Arbeitsschritte", 'modelClass' => 'Tasktype'),
         array("caption" => "Partner", 'modelClass' => 'Partner'),
+        array("caption" => "Lizenztypen", 'modelClass' => 'License'),
         array("caption" => "Reporting", 'route' => 'reporting'),
+//        array("caption" => "Bezugsquellen", 'modelClass' => 'CopyLocation'),
     );
 
-    /**
-     * 
-     * @return type
-     * @Route("/", name="workflowDomain")
-     */
     public function indexAction() {
 
-        return $this->renderControllerSpecificAction('DTAMetadataBundle:WorkflowDomain:index.html.twig', array(
+        return $this->renderWithDomainData('DTAMetadataBundle:Package_Workflow:index.html.twig', array(
+                ));
+    }
+    
+    public function tasktypeViewAllAction($package, $updatedObjectId = 0) {
+        
+        $className="Tasktype";
+        $classNames = $this->relatedClassNames($package, $className);
+
+        // for retrieving the entities
+        $query = \DTA\MetadataBundle\Model\Workflow\TasktypeQuery::create();
+        
+        // for retrieving the column names
+        $modelClass = new $classNames["model"];
+        
+        $records = $query
+                ->filterByTreeLevel(array('min'=>1))
+                ->orderByTreeLeft()
+                ->find();
+        
+        return $this->renderWithDomainData("DTAMetadataBundle:Package_Workflow:tasktypeViewAll.html.twig", array(
+                    'title' => 'Arbeitsschritte der verschiedenen Workflows',
+                    'className' => $className,
+                    'columns' => $modelClass::getTableViewColumnNames(),
+                    'data' => $records,
+                    'updatedObjectId' => $updatedObjectId,
                 ));
     }
 
-    /**
-     * @Route("/statistiken", name="reporting")
-     */
     public function reportingAction() {
-        return $this->renderControllerSpecificAction('DTAMetadataBundle:WorkflowDomain:reporting.html.twig');
+        return $this->renderWithDomainData('DTAMetadataBundle:Package_Workflow:reporting.html.twig');
     }
 
 }

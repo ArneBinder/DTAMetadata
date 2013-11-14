@@ -1,11 +1,15 @@
 /* 
  * GUI logic for the selectOrAdd form type. (/src/DTA/MetadataBundle/Form/DerivedType/SelectOrAddType.php)
  * Allows either selection of an existing database entity or creation of a new one in a nested form (modal).
+ * 
+ * This file is responsible for adding the markup. Prototype DOM is expected to 
+ * be available on the page already as #selectOrAddModalPrototype.
+ * 
  */
 
 jQuery(function(){
+    // enable all searchable select boxes with typeahead functionality for new dom elements
     var searchableConfiguration = {};
-    // enable all searchable select boxes with typeahead functionality
     jQuery('.selectOrAdd.select.searchable').select2(searchableConfiguration);
     jQuery('body').on('DOMNodeInserted', function(e){
         $(e.target).find('.selectOrAdd.select.searchable').select2(searchableConfiguration)
@@ -33,7 +37,7 @@ function selectOrAdd_launchAddDialog(){
         $addButton.data('modal', $modal);
         
     } else {
-        $addButton.data('modal').modal();
+        $($addButton.data('modal').selector).modal();
     }
     
 }
@@ -50,13 +54,14 @@ function selectOrAdd_submitFormData(modal){
     var formData = form.serialize();
     var targetUrl = form.attr("action");
     
-    console.log(targetUrl);
-    
     jQuery.post(targetUrl, formData, function(data){
-        $modal.modal('hide');
+        // toggle loading state (off)
+        console.log(data);
+        $('body').modalmanager('loading');
         selectOrAdd_updateSelectWidget($modal,data)
     } );
-    $modal.modal('loading');
+    
+    $('body').modalmanager('loading');
 
 }
 
@@ -82,39 +87,42 @@ function selectOrAdd_updateSelectWidget($modal, data){
 }
 
 /**
- * loads the form wrapped in modal markup (header, body, footer).
- * The responsible controller action is DTABaseController->generateAjaxForm.
+ * loads the form wrapped in modal markup.
+ * The responsible controller action is ORMController->ajaxModalFormAction.
+ * @param addButton    dom element    button belonging to the select or add widget
  */
 function createAjaxFormModal(addButton){
     
     // the href attribute is preset to '#modal_for_<select box id>'
     // @see dtaFormExtensions.html.twig under {% block selectOrAdd_widget %} 
     var modalId = $(addButton).attr('href');
-    var rawId = modalId.substr(1); // id without #
     
     // the url to the form generating controller routine is rendered from the template engine into a hidden input
     // @see dtaFormExtensions.html.twig under {% block selectOrAdd_widget %}
     var modalRetrieveUrl = $(addButton).siblings('input[name=modalRetrieveUrl]').val();
     
-    // the actual modal content is delivered wrapped around the form by the controller 
-    // this is useful because it allows for translation (model names into german) 
-    // and generation of the submit href based on internal routes
-    // @see DTABaseController generateAjaxModalForm
-    var $modal = $('<div class="modal container hide fade" tabindex="-1">')
-         .attr('id', rawId);
-    
-    // put modal in the containing div, although the position probably doesn't matter
-    $(addButton).parent().append($modal);
-    
+    var $body = $('body');
     // create the backdrop and wait for next modal to be triggered
-    $('body').modalmanager('loading');
+    $body.modalmanager('loading');
 
+    var selectWidget = $(addButton).parent().children('select.selectOrAdd');
+    
     // fill the modal with modal skeleton markup (header, body, footer) and form inputs
-    $modal.load(modalRetrieveUrl, '', function(data){
-        $modal.modal();
-    });
+    $.get(modalRetrieveUrl, '', function(data){
+        // the actual modal content is delivered with the modal markup by the controller 
+        // this is useful because it allows for translation (model names) 
+        // and generation of the submit href based on internal routes
+        // @see ORMController generateAjaxModalForm
         
-    return $modal;
+        $body.append(data);        
+        $("#"+modalId+"-submitLink").on('click',function(e){selectOrAdd_submitFormData($("#"+modalId)); e.preventDefault();});
+        
+        var modal = $("#"+modalId);
+        modal.data('selectWidget', selectWidget);
+        modal.modal();
+    });
+
+    return $("#"+modalId);
 }
 
     
