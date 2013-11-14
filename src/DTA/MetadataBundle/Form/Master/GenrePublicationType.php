@@ -7,10 +7,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 use DTA\MetadataBundle\Model\Classification\GenreQuery;
 
-class GenreWorkType extends BaseAbstractType
+class GenrePublicationType extends BaseAbstractType
 {
     protected $options = array(
-        'data_class' => 'DTA\MetadataBundle\Model\Master\GenreWork',
+        'data_class' => 'DTA\MetadataBundle\Model\Master\GenrePublication',
         'name'       => 'genrework',
     );
 
@@ -23,7 +23,7 @@ class GenreWorkType extends BaseAbstractType
             'class' => '\DTA\MetadataBundle\Model\Classification\Genre',
             'property' => 'Name',
             'label' => 'Genre',
-            'query' => GenreQuery::create()->filterByChildof(null, GenreQuery::ISNOTNULL),
+//            'query' => GenreQuery::create()->filterByChildof(null, GenreQuery::ISNOTNULL),
         ));
     }
 }

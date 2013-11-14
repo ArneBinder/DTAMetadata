@@ -23,14 +23,6 @@ class Publication extends BasePublication
     private $wrapperPublicationClass = "";
     
     /**
-     * Used in the select or add control to add works on the fly.
-     * @return string
-     */
-    public function getSelectBoxString(){
-        return $this->getWork()->getTitle();
-    }
-    
-    /**
      * Retrieves the publication(M/J/Ms/etc.) object which uses this object.
      */
     private function getDynamicType(){
@@ -57,5 +49,27 @@ class Publication extends BasePublication
             $this->getDynamicType();
         }
         return $this->wrapperPublicationClass;
+    }
+    
+    /**
+     * Used in the select or add control to add works on the fly.
+     * @return string
+     */
+    public function getSelectBoxString(){
+        return $this->getTitle();
+    }
+    
+    /**
+     * Used in displaying all publications (table row view behavior in the data schema definition) to select an author.
+     * @return string
+     */
+    public function getFirstAuthor(){
+        $id = $this->getId();
+        $query = Master\PersonPublicationQuery::create()->findAuthors($id);
+        $author = $query->findOne();
+        if($author === null)
+            return "keine Angabe";
+        else
+            return PersonQuery::create()->findOneById($author->getPersonId())->getRepresentativePersonalname();
     }
 }

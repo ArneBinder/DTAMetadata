@@ -5,10 +5,10 @@ namespace DTA\MetadataBundle\Form\Master;
 use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class LanguageWorkType extends BaseAbstractType
+class LanguagePublicationType extends BaseAbstractType
 {
     protected $options = array(
-        'data_class' => 'DTA\MetadataBundle\Model\Master\LanguageWork',
+        'data_class' => 'DTA\MetadataBundle\Model\Master\LanguagePublication',
         'name'       => 'languagework',
     );
 

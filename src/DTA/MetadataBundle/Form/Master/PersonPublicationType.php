@@ -34,7 +34,6 @@ class PersonPublicationType extends BaseAbstractType
         ));
         $builder->add('personrole', 'model', array(
             'class' => '\DTA\MetadataBundle\Model\Classification\Personrole',
-            'query' => \DTA\MetadataBundle\Model\Classification\PersonroleQuery::create()->filterByApplicableToPublication(true),
             'property' => 'name',
         ));
 

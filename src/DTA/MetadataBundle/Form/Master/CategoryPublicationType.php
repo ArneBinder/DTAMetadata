@@ -6,10 +6,10 @@ use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class CategoryWorkType extends BaseAbstractType
+class CategoryPublicationType extends BaseAbstractType
 {
     protected $options = array(
-        'data_class' => 'DTA\MetadataBundle\Model\Master\CategoryWork',
+        'data_class' => 'DTA\MetadataBundle\Model\Master\CategoryPublication',
         'name'       => 'categorywork',
     );
 
@@ -18,7 +18,7 @@ class CategoryWorkType extends BaseAbstractType
         parent::setDefaultOptions($resolver);
         
         $resolver->setDefaults(array(
-            'isWorkSelectable'  => true,
+            'isPublicationSelectable'  => true,
         ));
     }
     /**
@@ -34,9 +34,9 @@ class CategoryWorkType extends BaseAbstractType
                 'label' => " "
             ));
         // display the work selection input only if the work id was not specified (e.g. via the embedding work form)
-        if($options['isWorkSelectable'] === true){
+        if($options['isPublicationSelectable'] === true){
             $builder->add('work', new \DTA\MetadataBundle\Form\DerivedType\SelectOrAddType(), array(
-                'class' => '\DTA\MetadataBundle\Model\Data\Work',
+                'class' => '\DTA\MetadataBundle\Model\Data\Publication',
                 'property' => 'SelectBoxString',
                 'searchable' => true,
                 'addButton' => true,

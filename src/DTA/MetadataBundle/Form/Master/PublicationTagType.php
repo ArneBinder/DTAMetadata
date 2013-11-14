@@ -5,10 +5,10 @@ namespace DTA\MetadataBundle\Form\Master;
 use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class WorkTagType extends BaseAbstractType
+class PublicationTagType extends BaseAbstractType
 {
     protected $options = array(
-        'data_class' => 'DTA\MetadataBundle\Model\Master\WorkTag',
+        'data_class' => 'DTA\MetadataBundle\Model\Master\PublicationTag',
         'name'       => 'worktag',
     );
 
