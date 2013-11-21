@@ -89,7 +89,7 @@ abstract class BaseGenrePublication extends BaseObject implements Persistent, \D
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array();	public   $tableRowViewAccessors = array();
+    public static $tableRowViewCaptions = array();	public   $tableRowViewAccessors = array();	public static $queryConstructionString = NULL;
     /**
      * Get the [genre_id] column value.
      *
@@ -1109,6 +1109,22 @@ abstract class BaseGenrePublication extends BaseObject implements Persistent, \D
             if( is_a($result, 'DateTime') )
                 $result = $result->format('d/m/Y');
             return $result;
+        }
+    }
+
+    /**
+     * @return The propel query object for retrieving the records.
+     */
+    public static function getRowViewQueryObject(){
+        $rc = new \ReflectionClass(get_called_class());
+        $queryConstructionString = $rc->getStaticPropertyValue("queryConstructionString");
+        if($queryConstructionString === NULL){
+            $classShortName = $rc->getShortName();
+            $package = \DTA\MetadataBundle\Controller\ORMController::getPackageName($rc->getName());
+            $queryClass = \DTA\MetadataBundle\Controller\ORMController::relatedClassNames($package, $classShortName)['query'];
+            return new $queryClass;
+        } else {
+            return eval('return '.$queryConstructionString);
         }
     }
 

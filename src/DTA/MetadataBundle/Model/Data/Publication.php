@@ -65,12 +65,21 @@ class Publication extends BasePublication
      * @return string
      */
     public function getFirstAuthor(){
-        $id = $this->getId();
-        $query = Model\Master\PersonPublicationQuery::create()->findAuthors($id);
-        $author = $query->findOne();
-        if($author === null)
-            return "keine Angabe";
-        else
-            return PersonQuery::create()->findOneById($author->getPersonId())->getRepresentativePersonalname();
+        // TODO first person publication might not be the first author
+        $personPublications = $this->getPersonPublications();
+        if(count($personPublications) == 0 ) return NULL;
+        $firstPersonPublication = $personPublications[0];
+        $personalNames = $firstPersonPublication->getPerson()->getPersonalnames();
+        if(count($personalNames) == 0 ) return NULL;
+        return $personalNames[0];
+        
+//        $id = $this->getId();
+//        $author = Model\Master\PersonPublicationQuery::create()
+//                ->findAuthors($id);
+//        $author = $query->findOne();
+//        if($author === null)
+//            return "keine Angabe";
+//        else
+//            return PersonQuery::create()->findOneById($author->getPersonId())->getRepresentativePersonalname();
     }
 }

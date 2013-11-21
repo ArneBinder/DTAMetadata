@@ -176,7 +176,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Name', 'Ansprechpartner', 'Mail', 'Web', 'Signatur', 'Titel', 'erster Autor', 'entstanden', 'veröffentlicht', );	public   $tableRowViewAccessors = array('Name'=>'accessor:getEmbeddedColumn1OfPartner', 'Ansprechpartner'=>'accessor:getEmbeddedColumn2OfPartner', 'Mail'=>'accessor:getEmbeddedColumn3OfPartner', 'Web'=>'accessor:getEmbeddedColumn4OfPartner', 'Signatur'=>'CatalogueSignature', 'Titel'=>'accessor:getEmbeddedColumn1OfPublication', 'erster Autor'=>'accessor:getEmbeddedColumn2OfPublication', 'entstanden'=>'accessor:getEmbeddedColumn3OfPublication', 'veröffentlicht'=>'accessor:getEmbeddedColumn4OfPublication', );
+    public static $tableRowViewCaptions = array('Name', 'Ansprechpartner', 'Mail', 'Web', 'Signatur', 'Titel', 'erster Autor', 'Verlag', 'veröffentlicht', );	public   $tableRowViewAccessors = array('Name'=>'accessor:getEmbeddedColumn1OfPartner', 'Ansprechpartner'=>'accessor:getEmbeddedColumn2OfPartner', 'Mail'=>'accessor:getEmbeddedColumn3OfPartner', 'Web'=>'accessor:getEmbeddedColumn4OfPartner', 'Signatur'=>'CatalogueSignature', 'Titel'=>'accessor:getEmbeddedColumn1OfPublication', 'erster Autor'=>'accessor:getEmbeddedColumn2OfPublication', 'Verlag'=>'accessor:getEmbeddedColumn3OfPublication', 'veröffentlicht'=>'accessor:getEmbeddedColumn4OfPublication', );	public static $queryConstructionString = NULL;
     /**
      * Get the [id] column value.
      *
@@ -2004,6 +2004,22 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     }
 
     /**
+     * @return The propel query object for retrieving the records.
+     */
+    public static function getRowViewQueryObject(){
+        $rc = new \ReflectionClass(get_called_class());
+        $queryConstructionString = $rc->getStaticPropertyValue("queryConstructionString");
+        if($queryConstructionString === NULL){
+            $classShortName = $rc->getShortName();
+            $package = \DTA\MetadataBundle\Controller\ORMController::getPackageName($rc->getName());
+            $queryClass = \DTA\MetadataBundle\Controller\ORMController::relatedClassNames($package, $classShortName)['query'];
+            return new $queryClass;
+        } else {
+            return eval('return '.$queryConstructionString);
+        }
+    }
+
+    /**
      * Cascades the get to a related entity (possibly recursively)
      */
 
@@ -2064,7 +2080,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     public function getEmbeddedColumn3OfPublication(){
 
         $relatedEntity = $this->getPublication();
-        return $relatedEntity->getAttributeByTableViewColumName("entstanden");
+        return $relatedEntity->getAttributeByTableViewColumName("Verlag");
 
     }    /**
      * Cascades the get to a related entity (possibly recursively)

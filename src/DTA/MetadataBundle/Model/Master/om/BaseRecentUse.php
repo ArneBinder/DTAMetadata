@@ -97,7 +97,7 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('DtaUserId', 'PublicationId', 'Date', 'Id', );	public   $tableRowViewAccessors = array('DtaUserId'=>'DtaUserId', 'PublicationId'=>'PublicationId', 'Date'=>'Date', 'Id'=>'Id', );
+    public static $tableRowViewCaptions = array('DtaUserId', 'PublicationId', 'Date', 'Id', );	public   $tableRowViewAccessors = array('DtaUserId'=>'DtaUserId', 'PublicationId'=>'PublicationId', 'Date'=>'Date', 'Id'=>'Id', );	public static $queryConstructionString = NULL;
     /**
      * Get the [dta_user_id] column value.
      *
@@ -1193,6 +1193,22 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
             if( is_a($result, 'DateTime') )
                 $result = $result->format('d/m/Y');
             return $result;
+        }
+    }
+
+    /**
+     * @return The propel query object for retrieving the records.
+     */
+    public static function getRowViewQueryObject(){
+        $rc = new \ReflectionClass(get_called_class());
+        $queryConstructionString = $rc->getStaticPropertyValue("queryConstructionString");
+        if($queryConstructionString === NULL){
+            $classShortName = $rc->getShortName();
+            $package = \DTA\MetadataBundle\Controller\ORMController::getPackageName($rc->getName());
+            $queryClass = \DTA\MetadataBundle\Controller\ORMController::relatedClassNames($package, $classShortName)['query'];
+            return new $queryClass;
+        } else {
+            return eval('return '.$queryConstructionString);
         }
     }
 

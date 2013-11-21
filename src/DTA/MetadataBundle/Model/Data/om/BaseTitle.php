@@ -89,7 +89,7 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('titel', );	public   $tableRowViewAccessors = array('titel'=>'accessor:__toString', );
+    public static $tableRowViewCaptions = array('titel', );	public   $tableRowViewAccessors = array('titel'=>'accessor:__toString', );	public static $queryConstructionString = NULL;
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -1819,6 +1819,22 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
             if( is_a($result, 'DateTime') )
                 $result = $result->format('d/m/Y');
             return $result;
+        }
+    }
+
+    /**
+     * @return The propel query object for retrieving the records.
+     */
+    public static function getRowViewQueryObject(){
+        $rc = new \ReflectionClass(get_called_class());
+        $queryConstructionString = $rc->getStaticPropertyValue("queryConstructionString");
+        if($queryConstructionString === NULL){
+            $classShortName = $rc->getShortName();
+            $package = \DTA\MetadataBundle\Controller\ORMController::getPackageName($rc->getName());
+            $queryClass = \DTA\MetadataBundle\Controller\ORMController::relatedClassNames($package, $classShortName)['query'];
+            return new $queryClass;
+        } else {
+            return eval('return '.$queryConstructionString);
         }
     }
 

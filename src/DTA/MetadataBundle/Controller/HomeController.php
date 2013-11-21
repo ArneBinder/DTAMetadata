@@ -22,6 +22,22 @@ class HomeController extends ORMController {
     );
     
     public function indexAction(Request $request) {
+        
+        
+        
+//                "DTA\\MetadataBundle\\Model\\$package\\" . $className,
+//        $rc = new \ReflectionClass('DTA\MetadataBundle\Model\Data\Publication');
+//        $tableRowViewCaptions = $rc->getStaticPropertyValue("tableRowViewCaptions");
+
+        
+//        $fpp = $p->getPersonPublications()[0];
+//        $fpn = $fpp->getPerson()->getPersonalnames()[0];
+        
+//        $accessor = $this->tableRowViewAccessors[$columnName];
+//        $result = $this->getByName($accessor, \BasePeer::TYPE_PHPNAME);
+
+//        $fpn = new Model\Master\PersonPublication();
+        
 //        $p = new Model\Publication();
 //        $p->setNumpages(101);
 //        $p->save();
@@ -35,9 +51,12 @@ class HomeController extends ORMController {
 
 //        $personalName = Model\Data\PersonQuery::create()->findOneByGnd('119066882');
 //        Model\Data\PersonalnameQuery::create()->filterByNamefragment($personalName->getRepresentativePersonalName()->getNamefragments())->find();
-        
         return $this->renderWithDomainData('DTAMetadataBundle:Home:index.html.twig', array(
-            'testData' => null
+            'testData' => 
+//            $queryClass
+//            $queryConstructionString
+             NULL
+            //$p->getPersonalnames()
         ));
     }
 }

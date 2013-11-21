@@ -68,8 +68,8 @@ class PersonTableMap extends TableMap
         return array(
             'table_row_view' =>  array (
   'erster name@representative' => 'personalname',
-  'namen gesamt@count' => 'personalname',
   'gnd' => 'gnd',
+  'query' => 'DTA\\MetadataBundle\\Model\\Data\\PersonQuery::create()->joinWith(\'Personalname\')->joinWith(\'Personalname.Namefragment\')->joinWith(\'Namefragment.Namefragmenttype\')->orderBy(\'Namefragmenttype.id\', \\Criteria::DESC)->orderBy(\'Namefragment.name\');',
 ),
         );
     } // getBehaviors()

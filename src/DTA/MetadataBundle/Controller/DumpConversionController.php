@@ -25,7 +25,8 @@ class DumpConversionController extends ORMController {
         
     /** Stores problematic actions taken in the conversion process. */
     private $warnings;
-        
+    private $messages;
+    
     /**
      * @param type $username MySQL access parameters.
      * @param type $password MySQL access parameters.
@@ -49,19 +50,25 @@ class DumpConversionController extends ORMController {
         
         // stores warning messages generated during the conversion
         $this->warnings = array();
-            
+        $this->messages = array();
+        
         // import dump
         $importDumpCommand = "$this->mysqlExec -u $this->username -p$this->password dtadb < $this->dumpPath";
-        echo $importDumpCommand;
+        $this->messages[] = array("import dump command: " => $importDumpCommand);
         system($importDumpCommand);
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // ERASE ALL DATA FROM THE WORKING (TARGET DATABASE) vvvvvv
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            
-        echo system("$this->phpExec ../app/console propel:sql:build");
-        echo system("$this->phpExec ../app/console propel:sql:insert --force");
-        echo system("$this->phpExec ../app/console propel:fixtures:load @DTAMetadataBundle");
-            
+        
+        $result = system("$this->phpExec ../app/console propel:sql:build");
+        $this->messages[] = array("building database schema from xml model: " => $result );
+        
+        $result = system("$this->phpExec ../app/console propel:sql:insert --force");
+        $this->messages[] = array("resetting target database: " => $result);
+        
+        $result = system("$this->phpExec ../app/console propel:fixtures:load @DTAMetadataBundle");
+        $this->messages[] = array("loading database fixtures: " => $result);
+        
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // ERASE ALL DATA FROM THE WORKING (TARGET DATABASE) ^^^^^^^
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -71,21 +78,32 @@ class DumpConversionController extends ORMController {
         // remove some old records
         $this->cleanUpOldDatabase($dbh);
             
-//        $this->convertPartners($dbh);
-//        $this->convertPublishingCompanies($dbh);
-        $this->convertPlaces($dbh);
-        $this->convertUsers($dbh);    // before publication because of last changed by user id
-//        $this->convertAuthors($dbh);
-//        $this->convertSingleFieldPersons($dbh);
-          $this->convertPublication($dbh);
+        // convert single entities
         
-        return $this->renderWithDomainData('DTAMetadataBundle:DumpConversion:conversionResult.html.twig', array('warnings' => $this->warnings));
+        $this->convertUsers($dbh);          // before publication because of last changed by user id
+        
+        $this->convertPublications($dbh);
+        
+        $this->convertPartners($dbh);
+        
+        $this->convertPublishingCompanies($dbh);
+        
+        $this->convertPlaces($dbh);
+        
+        $this->convertAuthors($dbh);        // after publication because during merging duplicate persons, information is easiest retained by adding the merged person as author via the known legacy book id
+        
+        $this->convertSingleFieldPersons($dbh);
+        
+        return $this->renderWithDomainData('DTAMetadataBundle:DumpConversion:conversionResult.html.twig', array(
+            'warnings' => $this->warnings,
+            'messages' => $this->messages,
+        ));
     }
         
     /* ---------------------------------------------------------------------
      * partner
      * ------------------------------------------------------------------ */
-    function convertPublication($dbh) {
+    function convertPublications($dbh) {
         
         $rawData = "
             SELECT 
@@ -355,48 +373,83 @@ class DumpConversionController extends ORMController {
                         FROM book
                         WHERE autor2_prename <> '' OR autor2_lastname <> '' OR autor2_pnd <> ''
                     ) as names 
-                    GROUP BY
-                        lastname, firstname, pnd
+                    -- GROUP BY
+                    --    lastname, firstname, pnd
                     ORDER BY
                         lastname, 
                         firstname, 
-                        pnd DESC -- NULL pnds come second and the record can be identified as duplicate. ";
+                        pnd DESC -- NULL pnds come second and the record with the not null pnd is used as base for the merge of subsequent persons with same name";
                             
-                            
+        $lastPerson = NULL;
+        $lastFirstname = NULL;
+        $lastLastname = NULL;
+        
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
             array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
-                        
-            // convert name
-            $name = new Model\Data\Personalname();
-            if ($row['firstname'] !== NULL)
-                $name->addNamefragment(new Model\Data\Namefragment('Vorname', $row['firstname']));
-            if ($row['lastname'] !== NULL)
-                $name->addNamefragment(new Model\Data\Namefragment('Nachname', $row['lastname']));
-                    
-            // if the gnd is already used by another person, this is a duplicate
+
+            $publication = Model\Data\PublicationQuery::create()
+                        ->findOneByLegacyBookId($row['id_book']);
+            $gndCollisions = NULL;
+            
+            // try to detect duplicates with duplicate gnds
             if ($row['pnd'] !== NULL) {
-                
+
                 $gndCollisions = Model\Data\PersonQuery::create()
                         ->filterByGnd($row['pnd'])
                         ->find();
-                            
+
+                // if the gnd is already used by another person, this is for sure a duplicate
                 // GND is ensured to be unique, so this can be either 0 or 1
-                if ($gndCollisions->count() == 1) {
-                    $collision = $gndCollisions[0];
-                    $this->warnings[] = array(
-                        'message' => 'Personen-Duplikat: GND bereits vergeben.',
-                        'action' => 'Datensatz übersprungen.',
-                        'record' => $row,
-                        'collision due to' => "ID: " . $collision->getId() . "; " . $collision->getRepresentativePersonalName());
-                    continue;
-                }
+//                if ($gndCollisions->count() == 1) {
+//                    $collision = $gndCollisions[0];
+//                    $this->warnings[] = array(
+//                        'message' => 'Personen-Duplikat: GND bereits vergeben.',
+//                        'action' => 'Datensatz übersprungen.',
+//                        'record' => $row,
+//                        'collision due to' => "ID: " . $collision->getId() . "; " . $collision->getRepresentativePersonalName());
+//                    continue;
+//                }
+            }
+            
+//            $p = new Model\Data\Publication();
+//            $p->getDatespecificationRelatedByCreationdateId()
+                
+            // subsequent rows usually contain the same person but a different book
+            // if the row refers to the same person
+            if($lastPerson !== NULL 
+                    && $row['firstname'] == $lastFirstname 
+                    && $row['lastname']  == $lastLastname){
+                
+                $publication
+                    ->addPersonPublication(new Model\Master\PersonPublication($lastPerson->getId(), 'Autor'))
+                    ->save();
+                
+            } else if($gndCollisions !== NULL && $gndCollisions->count() == 1){
+                
+                $publication
+                    ->addPersonPublication(new Model\Master\PersonPublication($gndCollisions[0]->getId(), 'Autor'))
+                    ->save();
+                
+            } else {
+                
+                // create the name object
+                $name = new Model\Data\Personalname();
+                if ($row['firstname'] !== NULL)
+                    $name->addNamefragment(new Model\Data\Namefragment('Vorname', $row['firstname']));
+                if ($row['lastname'] !== NULL)
+                    $name->addNamefragment(new Model\Data\Namefragment('Nachname', $row['lastname']));
+
+                $person = new Model\Data\Person();
+                $person->setGnd($row['pnd'])            // does nothing if pnd is NULL
+                        ->addPersonalname($name)
+                        ->save();
+                
+                $lastPerson = $person;
+                $lastFirstname = $row['firstname'];
+                $lastLastname  = $row['lastname'];
             }
                 
-            $person = new Model\Data\Person();
-            $person->setGnd($row['pnd'])
-                    ->addPersonalname($name)
-                    ->save();
         }
     }
         
@@ -447,7 +500,6 @@ class DumpConversionController extends ORMController {
                 ) as condensedNames 
                 WHERE person IS NOT NULL AND LENGTH(person) > 2
             ) as names
-            GROUP BY person
             ORDER BY person";
                 
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
@@ -457,7 +509,7 @@ class DumpConversionController extends ORMController {
             $person = new Model\Data\Person();
             $gnd = NULL;
             $name = new Model\Data\Personalname();
-            var_dump($row);
+            
             // if there's a GND finding duplicates is mostly simple
             // also remove the GND string part from the name to make splitting easier
             if ($row['hash_position'] !== 0) {
@@ -467,13 +519,14 @@ class DumpConversionController extends ORMController {
                 $row['person'] = substr($row['person'], 0, $row['hash_position'] - 2);
                     
                 $collision = Model\Data\PersonQuery::create()->findOneByGnd($gnd);
-                if ($collision !== NULL)
-                    echo "skipped";
-                $this->warnings[] = array(
-                    'message' => 'Personen-Duplikat: GND bereits vergeben.',
-                    'action' => 'Datensatz übersprungen.',
-                    'record' => $row,
-                    'collision due to' => "ID: " . $collision->getId() . "; " . $collision->getRepresentativePersonalName());
+                if ($collision !== NULL){
+                    
+                    $this->warnings[] = array(
+                        'message' => 'Personen-Duplikat: GND bereits vergeben.',
+                        'action' => 'Datensatz übersprungen.',
+                        'record' => $row,
+                        'collision due to' => "ID: " . $collision->getId() . "; " . $collision->getRepresentativePersonalName());
+                }
                 continue;
             } // if no GND is given, no duplicate detection is performed.
             // assume a ',' is indicating first name, last name format
@@ -493,7 +546,6 @@ class DumpConversionController extends ORMController {
             $person->setGnd($gnd)
                     ->addPersonalname($name)
                     ->save();
-            echo "note me" . $person->getRepresentativePersonalname() . "<br/>";
         }
     }
         
@@ -525,7 +577,7 @@ class DumpConversionController extends ORMController {
         // !!!
             
         foreach ($queries as $query) {
-            echo $query . '<br/>';
+            $this->messages[] = array("clean up database command: " => $query);
             $dbh->query($query);
         }
     }
@@ -548,7 +600,6 @@ class DumpConversionController extends ORMController {
         $candidates = array();
         for ($i = 0; $i < count($array); $i++) {
             for ($j = $i; $j < count($array); $j++) {
-//                echo "$j <br/>";
                 $similarity = -1;
                 similar_text($array[$i], $array[$j], $similarity);
                 if ($similarity > 70 && $array[$i] != $array[$j]) {

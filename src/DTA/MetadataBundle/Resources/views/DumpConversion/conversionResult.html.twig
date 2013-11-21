@@ -1,8 +1,18 @@
+{% extends 'DTAMetadataBundle:Layout:base.html.twig' %}
+
 {% block title %}Dump Conversion results{% endblock %}
+
+{% block mainMenu %}{% endblock %}
+{% block currentDomainMenu %}{% endblock %}
 
 {% block core %}
 
 <h1> Warnings </h1>
 
 {{dump(warnings)}}
+
+<h1> Messages </h1>
+
+{{dump(messages)}}
+
 {% endblock %}

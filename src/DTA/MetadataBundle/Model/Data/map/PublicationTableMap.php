@@ -122,9 +122,10 @@ class PublicationTableMap extends TableMap
             'table_row_view' =>  array (
   'Titel' => 'accessor:getTitle',
   'erster Autor' => 'accessor:getFirstAuthor',
-  'entstanden' => 'accessor:getDatespecificationRelatedByCreationdateId',
+  'Verlag' => 'accessor:getPublishingCompany',
   'veröffentlicht' => 'accessor:getDatespecificationRelatedByPublicationdateId',
   'embedcolumnstitle' => 'title',
+  'query' => '\\DTA\\MetadataBundle\\Model\\Data\\PublicationQuery::create()                         ->leftJoinWith(\'Title\')                         ->leftJoinWith(\'Title.Titlefragment\')                         ->leftJoinWith(\'DatespecificationRelatedByPublicationdateId\')                         ->leftJoinWith(\'PersonPublication\')                         ->leftJoin(\'PersonPublication.Person\')                         ->leftJoin(\'Person.Personalname\')                         ->leftJoin(\'Personalname.Namefragment\');',
 ),
             'timestampable' =>  array (
   'create_column' => 'created_at',

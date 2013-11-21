@@ -14,6 +14,8 @@ interface TableRowViewInterface {
     /* To access the data using the specified column names */
     public function getAttributeByTableViewColumName($columnName);    
     
+    /* Returns the propel query object to retrieve the records. */
+    public static function getRowViewQueryObject();
 }
 
 ?>

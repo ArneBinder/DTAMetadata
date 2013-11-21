@@ -22,7 +22,7 @@ class DataDomainController extends ORMController {
         'publication' => array(
             "caption" => "Publikationen", 
             "children"=>array(
-                array("caption" => "Alle anzeigen", "route" => "home"),
+                array("caption" => "Alle anzeigen", "modelClass"=> 'Publication'),
                 array("kind" => "divider"),
                 // the rest is added in the controller constructor
         )), 
@@ -83,29 +83,6 @@ class DataDomainController extends ORMController {
 //        }
 //        return 0;
 //    }
-    
-    public function viewPersonsAction() {
-        $persons = Model\Data\PersonQuery::create()
-                ->joinWith('Personalname')
-                ->joinWith('Personalname.Namefragment')
-                ->joinWith('Namefragment.Namefragmenttype')
-                ->orderBy('Namefragmenttype.id', \Criteria::DESC)   // to sort by last name
-                ->orderBy('Namefragment.name')
-                ->find();
-        
-//        $sortByPersonalname = function($p1, $p2){ return strcmp($p1->getRepresentativePersonalname()->__toString(), $p2->getRepresentativePersonalname()->__toString());};
-//        $records = array();
-//        foreach($persons as $person){
-//            $records[] = $person;
-//        }
-//        extremely slow
-//        @uasort($records, $sortByPersonalname);
-        return $this->renderWithDomainData('DTAMetadataBundle:ORM:genericViewAll.html.twig', array(
-                'className' => 'Person',
-                'columns' => Model\Data\Person::getTableViewColumnNames(),
-                'data' => $persons,
-            ));
-    }
     
     public function viewPersonsByRoleAction($personRoleId) {
         

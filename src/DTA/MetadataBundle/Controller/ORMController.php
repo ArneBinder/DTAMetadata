@@ -27,13 +27,18 @@ class ORMController extends DTADomainController {
      * @param String $package   The namespace/package name of the class (Data/Workflow/Classification/Master)
      * @param String $className The basic name of the class, all lower-case except the first letter (Work, Personalname, Namefragmenttype)
      */
-    protected function relatedClassNames($package, $className) {
+    public static function relatedClassNames($package, $className) {
         return array(
             "model"     => "DTA\\MetadataBundle\\Model\\$package\\" . $className,             // the actual propel active record
             "query"     => "DTA\\MetadataBundle\\Model\\$package\\" . $className . "Query",   // utility class for generating queries
             "peer"      => "DTA\\MetadataBundle\\Model\\$package\\" . $className . "Peer",    // utility class for reflection
             "formType"  => "DTA\\MetadataBundle\\Form\\$package\\" . $className . "Type",     // class for generating form inputs
         );
+    }
+    
+    public static function getPackageName($fullyQualifiedClassName){
+        $nameSpaceParts = explode('\\', $fullyQualifiedClassName);
+        return $nameSpaceParts[count($nameSpaceParts)-2];
     }
     
     private function getControllerClassName($package) {
@@ -149,13 +154,12 @@ class ORMController extends DTADomainController {
         
         $classNames = $this->relatedClassNames($package, $className);
 
-        // for retrieving the entities
-        $query = new $classNames['query'];
-        
         // for retrieving the column names
         $modelClass = new $classNames["model"];
         
-        $records = $query->orderById()->find();
+        $query = $modelClass::getRowViewQueryObject();
+        
+        $records = $query->find();
         
         return $this->renderWithDomainData("DTAMetadataBundle:ORM:genericViewAll.html.twig", array(
                     'className' => $className,

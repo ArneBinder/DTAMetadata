@@ -102,7 +102,7 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('PersonId', 'PersonroleId', 'PublicationId', 'Id', );	public   $tableRowViewAccessors = array('PersonId'=>'PersonId', 'PersonroleId'=>'PersonroleId', 'PublicationId'=>'PublicationId', 'Id'=>'Id', );
+    public static $tableRowViewCaptions = array('PersonId', 'PersonroleId', 'PublicationId', 'Id', );	public   $tableRowViewAccessors = array('PersonId'=>'PersonId', 'PersonroleId'=>'PersonroleId', 'PublicationId'=>'PublicationId', 'Id'=>'Id', );	public static $queryConstructionString = NULL;
     /**
      * Get the [person_id] column value.
      *
@@ -1251,6 +1251,22 @@ abstract class BasePersonPublication extends BaseObject implements Persistent, \
             if( is_a($result, 'DateTime') )
                 $result = $result->format('d/m/Y');
             return $result;
+        }
+    }
+
+    /**
+     * @return The propel query object for retrieving the records.
+     */
+    public static function getRowViewQueryObject(){
+        $rc = new \ReflectionClass(get_called_class());
+        $queryConstructionString = $rc->getStaticPropertyValue("queryConstructionString");
+        if($queryConstructionString === NULL){
+            $classShortName = $rc->getShortName();
+            $package = \DTA\MetadataBundle\Controller\ORMController::getPackageName($rc->getName());
+            $queryClass = \DTA\MetadataBundle\Controller\ORMController::relatedClassNames($package, $classShortName)['query'];
+            return new $queryClass;
+        } else {
+            return eval('return '.$queryConstructionString);
         }
     }
 

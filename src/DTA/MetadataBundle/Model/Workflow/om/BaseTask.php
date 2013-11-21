@@ -166,7 +166,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Typ', 'Zuordnung', 'Abgeschlossen', 'Start', 'Ende', 'Für', 'Verantwortlich', );	public   $tableRowViewAccessors = array('Typ'=>'accessor:getEmbeddedColumn1OfTasktype', 'Zuordnung'=>'accessor:getEmbeddedColumn2OfTasktype', 'Abgeschlossen'=>'Done', 'Start'=>'StartDate', 'Ende'=>'EndDate', 'Für'=>'accessor:getReferee', 'Verantwortlich'=>'accessor:getResponsibleUser', );
+    public static $tableRowViewCaptions = array('Typ', 'Zuordnung', 'Abgeschlossen', 'Start', 'Ende', 'Für', 'Verantwortlich', );	public   $tableRowViewAccessors = array('Typ'=>'accessor:getEmbeddedColumn1OfTasktype', 'Zuordnung'=>'accessor:getEmbeddedColumn2OfTasktype', 'Abgeschlossen'=>'Done', 'Start'=>'StartDate', 'Ende'=>'EndDate', 'Für'=>'accessor:getReferee', 'Verantwortlich'=>'accessor:getResponsibleUser', );	public static $queryConstructionString = NULL;
     /**
      * Get the [id] column value.
      *
@@ -2008,6 +2008,22 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
             if( is_a($result, 'DateTime') )
                 $result = $result->format('d/m/Y');
             return $result;
+        }
+    }
+
+    /**
+     * @return The propel query object for retrieving the records.
+     */
+    public static function getRowViewQueryObject(){
+        $rc = new \ReflectionClass(get_called_class());
+        $queryConstructionString = $rc->getStaticPropertyValue("queryConstructionString");
+        if($queryConstructionString === NULL){
+            $classShortName = $rc->getShortName();
+            $package = \DTA\MetadataBundle\Controller\ORMController::getPackageName($rc->getName());
+            $queryClass = \DTA\MetadataBundle\Controller\ORMController::relatedClassNames($package, $classShortName)['query'];
+            return new $queryClass;
+        } else {
+            return eval('return '.$queryConstructionString);
         }
     }
 

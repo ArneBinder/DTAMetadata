@@ -19,6 +19,8 @@
         </h3>
     {% endblock preTable %}
     
+
+
     
     {% block tableHead %}
     <table class="table fullyFeatured table-striped table-hover" {# style="table-layout: fixed" #} > {# further bootstrap table classes: table-hover #}
@@ -29,8 +31,8 @@
         {# <th style="width:180px">Datensatz bearbeiten</th>#}
     </thead>
     {% endblock tableHead %}
-    {% spaceless %}
     {% block tableBody %}
+    {% spaceless %}
         {# Which column text is turned into a hyperlink to view or edit the entity #}
         {% set linkColumn = linkColumn|default(1) %}
         {% for datum in data %}
@@ -40,17 +42,17 @@
             {% set deleteLoc = path(package~'_deleteRecord', {'package':package, 'className':className, 'recordId':recordId }) %}
     
             {# highlight affected record #}
-            <tr {% if recordId == updatedObjectId|default(3) %}class="success"{% endif %}>
+            <tr{% if recordId == updatedObjectId|default(0) %} class="success"{% endif %}>
 
             {% for col in columns %}
-                <td>
-                    {# turn the column content into a link if it is in the linkColumn (see above) #}
-                    {% if loop.index == linkColumn %}
-                        <span class="glyphicon glyphicon-edit"></span><a name="record{{recordId}}" href="{{ editLoc }}">
-                    {% endif %}
-                    {{ datum.getAttributeByTableViewColumName(col) }}
-                    {% if loop.index == linkColumn %} </a> {% endif %}
-                </td>
+                {% set cellContent = datum.getAttributeByTableViewColumName(col)%}
+                {# turn the column content into a link if it is in the linkColumn (see above) #}
+                {% set linkMarkup  = loop.index == linkColumn ? 
+                    "<span class='glyphicon glyphicon-edit'></span>" ~
+                    "<a name='record" ~ recordId ~ "' href='" ~ editLoc ~ "'>" : "" %}
+                {% set linkMarkupEnd = loop.index == linkColumn ? 
+                    "</a>" : "" %}
+                <td>{{linkMarkup|raw()}}{{cellContent}}{{linkMarkupEnd|raw()}}</td>
             {% endfor %}
                 {#<td>
                     <a href="{{ deleteLoc }}" 
@@ -60,5 +62,5 @@
                 </td>#}
             </tr>
         {% endfor %}
-    {% endblock tableBody %}
     {% endspaceless %}
+    {% endblock tableBody %}

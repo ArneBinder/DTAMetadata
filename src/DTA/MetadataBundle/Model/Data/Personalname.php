@@ -24,13 +24,7 @@ class Personalname extends BasePersonalname
      * otherwise.
      */
     public function __toString(){
-// TODO: If there should be any issue with the order, switch to the more complicated query structure.
-        $allNF = NamefragmentQuery::create()
-                ->filterByPersonalnameId($this->getId())
-                ->joinWith('Namefragmenttype')  // no further queries needed to hydrate the namefragment types 
-                ->orderByRank('asc')            // the rank represents the order of the fragments (i.e. first name 1, last name 1, first name 2)
-                ->find();
-        
+        $allNF = $this->getNameFragments();
         $firstNames = array();
         $lastNames  = array();
         $simpleName = true;

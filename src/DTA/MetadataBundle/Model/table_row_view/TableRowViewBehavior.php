@@ -104,6 +104,18 @@ class TableRowViewBehavior extends Behavior {
         // strings, containing the php code of the single methods
     );
     
+    /** [optional] Executable code that generates the propel query object for the class to return records in a certain manner (e.g. more efficient). 
+     * A valid string would be 
+     * "DTA\MetadataBundle\Model\Data\PersonQuery::create()
+        ->joinWith('Personalname')
+        ->joinWith('Personalname.Namefragment')
+        ->joinWith('Namefragment.Namefragmenttype')
+        ->orderBy('Namefragmenttype.id', \Criteria::DESC)   // to sort by last name
+        ->orderBy('Namefragment.name');"
+     * 
+     */
+    public $queryConstructionString = NULL;
+    
     private $built = false;
     
     /**
@@ -148,16 +160,19 @@ class TableRowViewBehavior extends Behavior {
     private static function resolveParameters(TableRowViewBehavior &$behavior) {
 
         // cross ref tables are only for maintaining many-to-many relationships and don't represent entities.
+        // Still they're added since the behavior is usually applied to an entire set of tables (schema).
         if ($behavior->getTable()->getIsCrossRef())
             return;
 
         foreach ($behavior->getParameters() as $captionOrIndicator => $columnOrEntityOrAccessor) {
 
-            // check whether parameter name is an indicator to embed columns ... 
+            // check whether the string starts with 'embedColumns'
             if (!strncmp($captionOrIndicator, "embedColumns", strlen("embedColumns"))) {
                 $entity = $columnOrEntityOrAccessor;
                 $behavior->resolveEmbeddedColumns($entity);
                 // ... or to insert a complex entity as single column ... 
+            } elseif(!strncmp($captionOrIndicator, "query", strlen("query"))) {
+                $behavior->queryConstructionString = $columnOrEntityOrAccessor;
             } elseif ($behavior->getTable()->getDatabase()->hasTable($columnOrEntityOrAccessor)) {
                 $entity = $columnOrEntityOrAccessor;
                 $caption = $captionOrIndicator;
@@ -169,11 +184,7 @@ class TableRowViewBehavior extends Behavior {
                 $accessor = $columnOrEntityOrAccessor;
                 $caption = $captionOrIndicator;
                 $behavior->addViewElement($caption, $accessor);
-            } elseif(!strncmp($columnOrEntityOrAccessor, "closure:", strlen("closure:"))) {
-                // ... or simply a column taken from the entity itself
-                $accessor = $columnOrEntityOrAccessor;
-                $caption = $captionOrIndicator;
-                $behavior->addClosureAccessor($caption, $accessor);
+                // or if it defines how to construct the query object
             } else {
                 $column = $columnOrEntityOrAccessor;
                 $caption = $captionOrIndicator;
@@ -331,8 +342,11 @@ class TableRowViewBehavior extends Behavior {
         foreach ($this->accessors as $caption => $accessor)
             $accessorsString .= "'$caption'=>'$accessor', ";
         $accessorsString .= ");";
+        
+        $queryConstructionStringValue = $this->queryConstructionString === NULL ? 'NULL' : '"' . $this->queryConstructionString . '"';
+        $queryConstruction = 'public static $queryConstructionString = ' . $queryConstructionStringValue . ';';
 
-        return $captionsString . "\r\t" . $accessorsString . "\r";
+        return $captionsString . "\r\t" . $accessorsString . "\r\t" . $queryConstruction . "\r";
     }
 
     /**

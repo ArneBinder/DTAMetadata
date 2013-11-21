@@ -124,7 +124,8 @@ CREATE TABLE "publication"
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
     "publishingcompany_id_is_reconstructed" BOOLEAN DEFAULT 'f',
-    PRIMARY KEY ("id")
+    PRIMARY KEY ("id"),
+    CONSTRAINT "publication_U_1" UNIQUE ("legacy_book_id")
 );
 
 COMMENT ON COLUMN "publication"."firsteditionpublication_id" IS 'Publikation, die die Informationen zur Erstauflage enthält';

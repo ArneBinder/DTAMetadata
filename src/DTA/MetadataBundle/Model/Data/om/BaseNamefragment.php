@@ -115,7 +115,7 @@ abstract class BaseNamefragment extends BaseObject implements Persistent, \DTA\M
     protected $oldScope;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('bestandteil', );	public   $tableRowViewAccessors = array('bestandteil'=>'Name', );
+    public static $tableRowViewCaptions = array('bestandteil', );	public   $tableRowViewAccessors = array('bestandteil'=>'Name', );	public static $queryConstructionString = NULL;
     /**
      * Get the [id] column value.
      *
@@ -1626,6 +1626,22 @@ abstract class BaseNamefragment extends BaseObject implements Persistent, \DTA\M
             if( is_a($result, 'DateTime') )
                 $result = $result->format('d/m/Y');
             return $result;
+        }
+    }
+
+    /**
+     * @return The propel query object for retrieving the records.
+     */
+    public static function getRowViewQueryObject(){
+        $rc = new \ReflectionClass(get_called_class());
+        $queryConstructionString = $rc->getStaticPropertyValue("queryConstructionString");
+        if($queryConstructionString === NULL){
+            $classShortName = $rc->getShortName();
+            $package = \DTA\MetadataBundle\Controller\ORMController::getPackageName($rc->getName());
+            $queryClass = \DTA\MetadataBundle\Controller\ORMController::relatedClassNames($package, $classShortName)['query'];
+            return new $queryClass;
+        } else {
+            return eval('return '.$queryConstructionString);
         }
     }
 

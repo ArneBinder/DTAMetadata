@@ -122,7 +122,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
     protected $oldScope;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Id', 'Name', 'TitleId', 'TitlefragmenttypeId', 'SortableRank', 'NameIsReconstructed', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'Name'=>'Name', 'TitleId'=>'TitleId', 'TitlefragmenttypeId'=>'TitlefragmenttypeId', 'SortableRank'=>'SortableRank', 'NameIsReconstructed'=>'NameIsReconstructed', );
+    public static $tableRowViewCaptions = array('Id', 'Name', 'TitleId', 'TitlefragmenttypeId', 'SortableRank', 'NameIsReconstructed', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'Name'=>'Name', 'TitleId'=>'TitleId', 'TitlefragmenttypeId'=>'TitlefragmenttypeId', 'SortableRank'=>'SortableRank', 'NameIsReconstructed'=>'NameIsReconstructed', );	public static $queryConstructionString = NULL;
     /**
      * Applies default values to this object.
      * This method should be called from the object's constructor (or
@@ -1756,6 +1756,22 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
             if( is_a($result, 'DateTime') )
                 $result = $result->format('d/m/Y');
             return $result;
+        }
+    }
+
+    /**
+     * @return The propel query object for retrieving the records.
+     */
+    public static function getRowViewQueryObject(){
+        $rc = new \ReflectionClass(get_called_class());
+        $queryConstructionString = $rc->getStaticPropertyValue("queryConstructionString");
+        if($queryConstructionString === NULL){
+            $classShortName = $rc->getShortName();
+            $package = \DTA\MetadataBundle\Controller\ORMController::getPackageName($rc->getName());
+            $queryClass = \DTA\MetadataBundle\Controller\ORMController::relatedClassNames($package, $classShortName)['query'];
+            return new $queryClass;
+        } else {
+            return eval('return '.$queryConstructionString);
         }
     }
 

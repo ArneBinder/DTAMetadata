@@ -152,7 +152,7 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Name', 'Ansprechpartner', 'Mail', 'Web', );	public   $tableRowViewAccessors = array('Name'=>'Name', 'Ansprechpartner'=>'ContactPerson', 'Mail'=>'Mail', 'Web'=>'Web', );
+    public static $tableRowViewCaptions = array('Name', 'Ansprechpartner', 'Mail', 'Web', );	public   $tableRowViewAccessors = array('Name'=>'Name', 'Ansprechpartner'=>'ContactPerson', 'Mail'=>'Mail', 'Web'=>'Web', );	public static $queryConstructionString = NULL;
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -2537,6 +2537,22 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
             if( is_a($result, 'DateTime') )
                 $result = $result->format('d/m/Y');
             return $result;
+        }
+    }
+
+    /**
+     * @return The propel query object for retrieving the records.
+     */
+    public static function getRowViewQueryObject(){
+        $rc = new \ReflectionClass(get_called_class());
+        $queryConstructionString = $rc->getStaticPropertyValue("queryConstructionString");
+        if($queryConstructionString === NULL){
+            $classShortName = $rc->getShortName();
+            $package = \DTA\MetadataBundle\Controller\ORMController::getPackageName($rc->getName());
+            $queryClass = \DTA\MetadataBundle\Controller\ORMController::relatedClassNames($package, $classShortName)['query'];
+            return new $queryClass;
+        } else {
+            return eval('return '.$queryConstructionString);
         }
     }
 

@@ -454,7 +454,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Titel', 'erster Autor', 'entstanden', 'veröffentlicht', );	public   $tableRowViewAccessors = array('Titel'=>'accessor:getTitle', 'erster Autor'=>'accessor:getFirstAuthor', 'entstanden'=>'accessor:getDatespecificationRelatedByCreationdateId', 'veröffentlicht'=>'accessor:getDatespecificationRelatedByPublicationdateId', );
+    public static $tableRowViewCaptions = array('Titel', 'erster Autor', 'Verlag', 'veröffentlicht', );	public   $tableRowViewAccessors = array('Titel'=>'accessor:getTitle', 'erster Autor'=>'accessor:getFirstAuthor', 'Verlag'=>'accessor:getPublishingCompany', 'veröffentlicht'=>'accessor:getDatespecificationRelatedByPublicationdateId', );	public static $queryConstructionString = "\DTA\MetadataBundle\Model\Data\PublicationQuery::create()                         ->leftJoinWith('Title')                         ->leftJoinWith('Title.Titlefragment')                         ->leftJoinWith('DatespecificationRelatedByPublicationdateId')                         ->leftJoinWith('PersonPublication')                         ->leftJoin('PersonPublication.Person')                         ->leftJoin('Person.Personalname')                         ->leftJoin('Personalname.Namefragment');";
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -10462,6 +10462,22 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             if( is_a($result, 'DateTime') )
                 $result = $result->format('d/m/Y');
             return $result;
+        }
+    }
+
+    /**
+     * @return The propel query object for retrieving the records.
+     */
+    public static function getRowViewQueryObject(){
+        $rc = new \ReflectionClass(get_called_class());
+        $queryConstructionString = $rc->getStaticPropertyValue("queryConstructionString");
+        if($queryConstructionString === NULL){
+            $classShortName = $rc->getShortName();
+            $package = \DTA\MetadataBundle\Controller\ORMController::getPackageName($rc->getName());
+            $queryClass = \DTA\MetadataBundle\Controller\ORMController::relatedClassNames($package, $classShortName)['query'];
+            return new $queryClass;
+        } else {
+            return eval('return '.$queryConstructionString);
         }
     }
 

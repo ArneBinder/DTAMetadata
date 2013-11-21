@@ -87,7 +87,7 @@ abstract class BasePerson extends BaseObject implements Persistent, \DTA\Metadat
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('erster name', 'namen gesamt', 'gnd', );	public   $tableRowViewAccessors = array('erster name'=>'accessor:getRepresentativePersonalname', 'namen gesamt'=>'accessor:countPersonalnames', 'gnd'=>'Gnd', );
+    public static $tableRowViewCaptions = array('erster name', 'gnd', );	public   $tableRowViewAccessors = array('erster name'=>'accessor:getRepresentativePersonalname', 'gnd'=>'Gnd', );	public static $queryConstructionString = "DTA\MetadataBundle\Model\Data\PersonQuery::create()->joinWith('Personalname')->joinWith('Personalname.Namefragment')->joinWith('Namefragment.Namefragmenttype')->orderBy('Namefragmenttype.id', \Criteria::DESC)->orderBy('Namefragment.name');";
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -1494,6 +1494,22 @@ abstract class BasePerson extends BaseObject implements Persistent, \DTA\Metadat
             if( is_a($result, 'DateTime') )
                 $result = $result->format('d/m/Y');
             return $result;
+        }
+    }
+
+    /**
+     * @return The propel query object for retrieving the records.
+     */
+    public static function getRowViewQueryObject(){
+        $rc = new \ReflectionClass(get_called_class());
+        $queryConstructionString = $rc->getStaticPropertyValue("queryConstructionString");
+        if($queryConstructionString === NULL){
+            $classShortName = $rc->getShortName();
+            $package = \DTA\MetadataBundle\Controller\ORMController::getPackageName($rc->getName());
+            $queryClass = \DTA\MetadataBundle\Controller\ORMController::relatedClassNames($package, $classShortName)['query'];
+            return new $queryClass;
+        } else {
+            return eval('return '.$queryConstructionString);
         }
     }
 

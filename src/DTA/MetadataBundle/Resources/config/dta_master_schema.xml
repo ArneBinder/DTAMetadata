@@ -61,6 +61,7 @@
         </foreign-key>
     </table>
 
+    <!--this is not considered cross ref because you can't simply add a person to a publication without specifying its role. -->
     <table name="person_publication" idMethod="native">
         <column name="person_id" type="INTEGER" required="true"/>
         <column name="personrole_id" type="INTEGER" required="true"/>
