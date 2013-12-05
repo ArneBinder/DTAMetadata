@@ -8,6 +8,9 @@
     propel > dbal > connections for connection setup. -->
 <database name="dtametadata" namespace="DTA\MetadataBundle\Model\Data" defaultIdMethod="native">
   
+    <!--Add the columns created_at and updated_at to all entities. These columns are automatically updated when making changes to the database.-->
+    <behavior name="timestampable"/>
+    
     <!-- This parameter set is added to each entity that doesn't implement the table_row_view behavior. 
     It is not added to tables/entities that define the bahavior. -->
     <behavior name="table_row_view">
@@ -31,6 +34,10 @@
         <column name="creationdate_id" description="Erscheinungsjahr der Erstausgabe" type="INTEGER"/>
         <column name="publishingcompany_id" description="Verlag" type="INTEGER"/>
         <column name="source_id" description="Zur Sicherheit aus der alten DB übernommen" type="INTEGER"/>
+        
+        <column name="legacygenre" description="Alt-Angabe zum Genre, zur Weiterverarbeitung bei Umstellung auf das neue Genre-System." type="LONGVARCHAR"/>
+        <column name="type" description="Publikationstyp. Zur späteren Differenzierung über Publikationstypen." type="LONGVARCHAR"/>
+        <column name="dirname" description="Publikationstyp. Zur späteren Differenzierung über Publikationstypen." type="LONGVARCHAR"/>
         
         <!-- Bild- und Textquellen über die imageSource Tabelle dargestellt, da publication:imageSource eine 1:n Beziehung ist -->
 
@@ -79,7 +86,6 @@
                     ->leftJoinWith('Personalname.Namefragment');" />
         </behavior>
         
-        <behavior name="timestampable"/>
         <behavior name="reconstructed_flaggable">
             <parameter name="column" value="publishingcompany_id"/>
         </behavior>

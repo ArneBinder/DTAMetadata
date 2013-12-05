@@ -112,6 +112,7 @@
         <column name="mail" type="LONGVARCHAR"/>
         <column name="admin" type="BOOLEAN" default="false"/>
         
+        <behavior name="timestampable"/>
         <behavior name="table_row_view">
             <parameter name="id" value="id"/>
             <parameter name="benutzername" value="username"/>

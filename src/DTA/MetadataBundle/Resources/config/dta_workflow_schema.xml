@@ -7,6 +7,9 @@
 
 <database name="dtametadata" namespace="DTA\MetadataBundle\Model\Workflow" defaultIdMethod="native">
   
+    <!--Add the columns created_at and updated_at to all entities. These columns are automatically updated when making changes to the database.-->
+    <behavior name="timestampable"/>
+    
     <!-- This parameter set is added to each entity that doesn't implement the table_row_view behavior. 
     It is not added to tables/entities that define the bahavior. -->
     <behavior name="table_row_view">
@@ -39,7 +42,6 @@
         <foreign-key foreignTable="dta_user"> <reference local="responsibleuser_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="copy_location"> <reference local="copylocation_id" foreign="id"/> </foreign-key>
         
-        <behavior name="timestampable"/>
         <behavior name="table_row_view">
             <parameter name="embedColumns1" value="tasktype"/>
             <parameter name="Abgeschlossen" value="closed"/>
@@ -100,7 +102,6 @@
         <foreign-key foreignTable="partner"> <reference local="partner_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="license"> <reference local="license_id" foreign="id"/> </foreign-key>
         
-        <behavior name="timestampable"/>
         <behavior name="table_row_view">
             <!--<parameter name="embedColumns1" value="partner"/>-->
             <parameter name="Signatur" value="catalogue_signature"/>
@@ -131,7 +132,6 @@
         <column name="comments" type="LONGVARCHAR"/>
         <column name="is_organization" type="BOOLEAN" default="false"/>
         
-        <behavior name="timestampable"/>
         <behavior name="table_row_view">
             <parameter name="Name" value="name"/>
             <parameter name="Ansprechpartner" value="contact_person"/>

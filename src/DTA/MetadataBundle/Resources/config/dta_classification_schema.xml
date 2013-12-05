@@ -9,6 +9,9 @@
     propel > dbal > connections for connection setup. -->
 <database name="dtametadata" namespace="DTA\MetadataBundle\Model\Classification" defaultIdMethod="native">
   
+    <!--Add the columns created_at and updated_at to all entities. These columns are automatically updated when making changes to the database.-->
+    <behavior name="timestampable"/>
+    
     <!-- This parameter set is added to each entity that doesn't implement the table_row_view behavior. 
     It is not added to tables/entities that define the bahavior. -->
     <behavior name="table_row_view">
