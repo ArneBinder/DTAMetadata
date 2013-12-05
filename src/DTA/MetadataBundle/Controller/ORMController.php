@@ -23,50 +23,6 @@ class ORMController extends DTADomainController {
     // because the server redirects to the ajax response page
     
     /**
-     * Returns the fully qualified class names for generic loading.
-     * @param String $package   The namespace/package name of the class (Data/Workflow/Classification/Master)
-     * @param String $className The basic name of the class, all lower-case except the first letter (Work, Personalname, Namefragmenttype)
-     */
-    public static function relatedClassNames($package, $className) {
-        return array(
-            "model"     => "DTA\\MetadataBundle\\Model\\$package\\" . $className,             // the actual propel active record
-            "query"     => "DTA\\MetadataBundle\\Model\\$package\\" . $className . "Query",   // utility class for generating queries
-            "peer"      => "DTA\\MetadataBundle\\Model\\$package\\" . $className . "Peer",    // utility class for reflection
-            "formType"  => "DTA\\MetadataBundle\\Form\\$package\\" . $className . "Type",     // class for generating form inputs
-        );
-    }
-    
-    public static function getPackageName($fullyQualifiedClassName){
-        $nameSpaceParts = explode('\\', $fullyQualifiedClassName);
-        return $nameSpaceParts[count($nameSpaceParts)-2];
-    }
-    
-    private function getControllerClassName($package) {
-        return "DTA\\MetadataBundle\\Controller\\" . $package . "DomainController";
-    }
-//    
-//    /**
-//     * Routes a request to specialized methods.
-//     * This is necessary since routes are parsed from annotations, and these are not inherited to the controllers.
-//     * So the only route that exists is that in the base class, causing each request to end up there.
-//     * The base class then calls the according method, that a specialized class has inherited from it.
-//     * @param type $package             Controller to address
-//     * @param type $methodName          Method to call
-//     * @param type $methodParameters    Parameters to pass to the call
-//     */
-//    private function useSpecializedImplementation($package, $methodName, $methodParameters){
-//        
-//        // get right controller for that package
-//        $controllerName = $this->getControllerClassName($package);
-//        $controller = new $controllerName;
-//        
-//        // setting the container is crucial for all kinds of things to work
-//        $controller->setContainer($this->container);
-//        
-//        return call_user_func_array( array($controller, $methodName), $methodParameters );
-//    }
-
-    /**
      * Deletes a record from the database after having asked for a confirmation.
      * @param type $package   like in genericViewOneAction
      * @param type $className   like in genericViewOneAction
@@ -119,12 +75,12 @@ class ORMController extends DTADomainController {
     }
 
     /**
-     * Renders a single entity.
+     * Renders a single entity for ajax display (i.e. without any additional markup like menus or footers).
      * @param string $package      domain/object model package (Data, Classification, Workflow, Master)
      * @param string $className    model class
      * @param int    $recordId     
      */
-    public function genericViewAction($package, $className, $recordId) {
+    public function genericViewAction(Request $request, $package, $className, $recordId) {
         
         if($this->package === null){ // called through a HTTP request, not from another controller
             return $this->useSpecializedImplementation($package, __METHOD__, array('package'=>$package, 'className'=>$className, 'recordId' => $recordId));
@@ -133,13 +89,27 @@ class ORMController extends DTADomainController {
         $classNames = $this->relatedClassNames($package, $className);
 
         // for retrieving the entities
-        $query = new $classNames['query'];
+        $query    = new $classNames['query'];
+        $formType = new $classNames['formType'];
         
-        $records = $query->findOneById($recordId);
+        $record = $query->findOneById($recordId);
         
-        return $this->renderWithDomainData("DTAMetadataBundle:ORM:genericViewOne.html.twig", array(
+        $form = $this->genericCreateOrEdit($request, array(
+                    'package'   => $package, 
+                    'className' => $className, 
+                    'recordId'  => $recordId), 
+                    $record, array());
+        
+//        return $this->renderWithDomainData("DTAMetadataBundle:ORM:createOrEdit.html.twig", array(
+//                    'form' => $form['form']->createView(),
+//                    'transaction' => $form['transaction'],    // whether the form is for edit or create
+//                    'className' => $className,
+//                    'recordId' => $recordId,
+//                ));
+        
+        return $this->renderWithDomainData("DTAMetadataBundle:Form:genericBaseForm.html.twig", array(
                     'className' => $className,
-                    'data' => $records,
+                    'form' => $form['form']->createView(),
                 ));
     }
     
@@ -370,7 +340,24 @@ class ORMController extends DTADomainController {
                 
     }
 
+    /**
+     * Returns the fully qualified class names for generic loading.
+     * @param String $package   The namespace/package name of the class (Data/Workflow/Classification/Master)
+     * @param String $className The basic name of the class, all lower-case except the first letter (Work, Personalname, Namefragmenttype)
+     */
+    public static function relatedClassNames($package, $className) {
+        return array(
+            "model"     => "DTA\\MetadataBundle\\Model\\$package\\" . $className,             // the actual propel active record
+            "query"     => "DTA\\MetadataBundle\\Model\\$package\\" . $className . "Query",   // utility class for generating queries
+            "peer"      => "DTA\\MetadataBundle\\Model\\$package\\" . $className . "Peer",    // utility class for reflection
+            "formType"  => "DTA\\MetadataBundle\\Form\\$package\\" . $className . "Type",     // class for generating form inputs
+        );
+    }
     
+    public static function getPackageName($fullyQualifiedClassName){
+        $nameSpaceParts = explode('\\', $fullyQualifiedClassName);
+        return $nameSpaceParts[count($nameSpaceParts)-2];
+    }
     
     /**
      * Visits recursively all nested form elements and saves them.

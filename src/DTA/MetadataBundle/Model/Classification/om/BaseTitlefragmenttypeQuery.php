@@ -49,8 +49,14 @@ abstract class BaseTitlefragmenttypeQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Classification\\Titlefragmenttype', $modelAlias = null)
+    public function __construct($dbName = null, $modelName = null, $modelAlias = null)
     {
+        if (null === $dbName) {
+            $dbName = 'dtametadata';
+        }
+        if (null === $modelName) {
+            $modelName = 'DTA\\MetadataBundle\\Model\\Classification\\Titlefragmenttype';
+        }
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
@@ -67,10 +73,8 @@ abstract class BaseTitlefragmenttypeQuery extends ModelCriteria
         if ($criteria instanceof TitlefragmenttypeQuery) {
             return $criteria;
         }
-        $query = new TitlefragmenttypeQuery();
-        if (null !== $modelAlias) {
-            $query->setModelAlias($modelAlias);
-        }
+        $query = new TitlefragmenttypeQuery(null, null, $modelAlias);
+
         if ($criteria instanceof Criteria) {
             $query->mergeWith($criteria);
         }
@@ -98,7 +102,7 @@ abstract class BaseTitlefragmenttypeQuery extends ModelCriteria
             return null;
         }
         if ((null !== ($obj = TitlefragmenttypePeer::getInstanceFromPool((string) $key))) && !$this->formatter) {
-            // the object is alredy in the instance pool
+            // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {

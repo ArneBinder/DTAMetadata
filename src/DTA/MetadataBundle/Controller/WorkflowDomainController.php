@@ -12,13 +12,13 @@ class WorkflowDomainController extends ORMController {
 
     /** @inheritdoc */
     public  $domainMenu = array(
-        array("caption" => "Workflows", 'route' => 'Workflow_tasktypeViewAll'),
-        array("caption" => "Tasks", 'modelClass' => 'Task'),
         array("caption" => "Publikationsgruppen", 'modelClass' => 'Publicationgroup'),
-        array("caption" => "Partner", 'modelClass' => 'Partner'),
+        array("caption" => "Workflows", 'route' => 'Workflow_tasktypeViewAll'),
         array("caption" => "Lizenztypen", 'modelClass' => 'License'),
+        array("caption" => "Tasks", 'modelClass' => 'Task'),
+        array("caption" => "Fundstellen", 'modelClass' => 'CopyLocation'),
+        array("caption" => "Partner", 'modelClass' => 'Partner'),
         array("caption" => "Reporting", 'route' => 'reporting'),
-//        array("caption" => "Bezugsquellen", 'modelClass' => 'CopyLocation'),
     );
 
     public function indexAction() {

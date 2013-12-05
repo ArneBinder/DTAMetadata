@@ -14,6 +14,7 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use DTA\MetadataBundle\Model\Data\Publication;
 use DTA\MetadataBundle\Model\Master\DtaUser;
+use DTA\MetadataBundle\Model\Workflow\CopyLocation;
 use DTA\MetadataBundle\Model\Workflow\Partner;
 use DTA\MetadataBundle\Model\Workflow\Publicationgroup;
 use DTA\MetadataBundle\Model\Workflow\Task;
@@ -24,7 +25,7 @@ use DTA\MetadataBundle\Model\Workflow\Tasktype;
 /**
  * @method TaskQuery orderById($order = Criteria::ASC) Order by the id column
  * @method TaskQuery orderByTasktypeId($order = Criteria::ASC) Order by the tasktype_id column
- * @method TaskQuery orderByDone($order = Criteria::ASC) Order by the done column
+ * @method TaskQuery orderByClosed($order = Criteria::ASC) Order by the closed column
  * @method TaskQuery orderByStartDate($order = Criteria::ASC) Order by the start_date column
  * @method TaskQuery orderByEndDate($order = Criteria::ASC) Order by the end_date column
  * @method TaskQuery orderByComments($order = Criteria::ASC) Order by the comments column
@@ -32,12 +33,13 @@ use DTA\MetadataBundle\Model\Workflow\Tasktype;
  * @method TaskQuery orderByPublicationId($order = Criteria::ASC) Order by the publication_id column
  * @method TaskQuery orderByPartnerId($order = Criteria::ASC) Order by the partner_id column
  * @method TaskQuery orderByResponsibleuserId($order = Criteria::ASC) Order by the responsibleuser_id column
+ * @method TaskQuery orderByCopylocationId($order = Criteria::ASC) Order by the copylocation_id column
  * @method TaskQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method TaskQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method TaskQuery groupById() Group by the id column
  * @method TaskQuery groupByTasktypeId() Group by the tasktype_id column
- * @method TaskQuery groupByDone() Group by the done column
+ * @method TaskQuery groupByClosed() Group by the closed column
  * @method TaskQuery groupByStartDate() Group by the start_date column
  * @method TaskQuery groupByEndDate() Group by the end_date column
  * @method TaskQuery groupByComments() Group by the comments column
@@ -45,6 +47,7 @@ use DTA\MetadataBundle\Model\Workflow\Tasktype;
  * @method TaskQuery groupByPublicationId() Group by the publication_id column
  * @method TaskQuery groupByPartnerId() Group by the partner_id column
  * @method TaskQuery groupByResponsibleuserId() Group by the responsibleuser_id column
+ * @method TaskQuery groupByCopylocationId() Group by the copylocation_id column
  * @method TaskQuery groupByCreatedAt() Group by the created_at column
  * @method TaskQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -72,11 +75,15 @@ use DTA\MetadataBundle\Model\Workflow\Tasktype;
  * @method TaskQuery rightJoinDtaUser($relationAlias = null) Adds a RIGHT JOIN clause to the query using the DtaUser relation
  * @method TaskQuery innerJoinDtaUser($relationAlias = null) Adds a INNER JOIN clause to the query using the DtaUser relation
  *
+ * @method TaskQuery leftJoinCopyLocation($relationAlias = null) Adds a LEFT JOIN clause to the query using the CopyLocation relation
+ * @method TaskQuery rightJoinCopyLocation($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CopyLocation relation
+ * @method TaskQuery innerJoinCopyLocation($relationAlias = null) Adds a INNER JOIN clause to the query using the CopyLocation relation
+ *
  * @method Task findOne(PropelPDO $con = null) Return the first Task matching the query
  * @method Task findOneOrCreate(PropelPDO $con = null) Return the first Task matching the query, or a new Task object populated from the query conditions when no match is found
  *
  * @method Task findOneByTasktypeId(int $tasktype_id) Return the first Task filtered by the tasktype_id column
- * @method Task findOneByDone(boolean $done) Return the first Task filtered by the done column
+ * @method Task findOneByClosed(boolean $closed) Return the first Task filtered by the closed column
  * @method Task findOneByStartDate(string $start_date) Return the first Task filtered by the start_date column
  * @method Task findOneByEndDate(string $end_date) Return the first Task filtered by the end_date column
  * @method Task findOneByComments(string $comments) Return the first Task filtered by the comments column
@@ -84,12 +91,13 @@ use DTA\MetadataBundle\Model\Workflow\Tasktype;
  * @method Task findOneByPublicationId(int $publication_id) Return the first Task filtered by the publication_id column
  * @method Task findOneByPartnerId(int $partner_id) Return the first Task filtered by the partner_id column
  * @method Task findOneByResponsibleuserId(int $responsibleuser_id) Return the first Task filtered by the responsibleuser_id column
+ * @method Task findOneByCopylocationId(int $copylocation_id) Return the first Task filtered by the copylocation_id column
  * @method Task findOneByCreatedAt(string $created_at) Return the first Task filtered by the created_at column
  * @method Task findOneByUpdatedAt(string $updated_at) Return the first Task filtered by the updated_at column
  *
  * @method array findById(int $id) Return Task objects filtered by the id column
  * @method array findByTasktypeId(int $tasktype_id) Return Task objects filtered by the tasktype_id column
- * @method array findByDone(boolean $done) Return Task objects filtered by the done column
+ * @method array findByClosed(boolean $closed) Return Task objects filtered by the closed column
  * @method array findByStartDate(string $start_date) Return Task objects filtered by the start_date column
  * @method array findByEndDate(string $end_date) Return Task objects filtered by the end_date column
  * @method array findByComments(string $comments) Return Task objects filtered by the comments column
@@ -97,6 +105,7 @@ use DTA\MetadataBundle\Model\Workflow\Tasktype;
  * @method array findByPublicationId(int $publication_id) Return Task objects filtered by the publication_id column
  * @method array findByPartnerId(int $partner_id) Return Task objects filtered by the partner_id column
  * @method array findByResponsibleuserId(int $responsibleuser_id) Return Task objects filtered by the responsibleuser_id column
+ * @method array findByCopylocationId(int $copylocation_id) Return Task objects filtered by the copylocation_id column
  * @method array findByCreatedAt(string $created_at) Return Task objects filtered by the created_at column
  * @method array findByUpdatedAt(string $updated_at) Return Task objects filtered by the updated_at column
  */
@@ -109,8 +118,14 @@ abstract class BaseTaskQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Workflow\\Task', $modelAlias = null)
+    public function __construct($dbName = null, $modelName = null, $modelAlias = null)
     {
+        if (null === $dbName) {
+            $dbName = 'dtametadata';
+        }
+        if (null === $modelName) {
+            $modelName = 'DTA\\MetadataBundle\\Model\\Workflow\\Task';
+        }
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
@@ -127,10 +142,8 @@ abstract class BaseTaskQuery extends ModelCriteria
         if ($criteria instanceof TaskQuery) {
             return $criteria;
         }
-        $query = new TaskQuery();
-        if (null !== $modelAlias) {
-            $query->setModelAlias($modelAlias);
-        }
+        $query = new TaskQuery(null, null, $modelAlias);
+
         if ($criteria instanceof Criteria) {
             $query->mergeWith($criteria);
         }
@@ -158,7 +171,7 @@ abstract class BaseTaskQuery extends ModelCriteria
             return null;
         }
         if ((null !== ($obj = TaskPeer::getInstanceFromPool((string) $key))) && !$this->formatter) {
-            // the object is alredy in the instance pool
+            // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
@@ -200,7 +213,7 @@ abstract class BaseTaskQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "tasktype_id", "done", "start_date", "end_date", "comments", "publicationgroup_id", "publication_id", "partner_id", "responsibleuser_id", "created_at", "updated_at" FROM "task" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "tasktype_id", "closed", "start_date", "end_date", "comments", "publicationgroup_id", "publication_id", "partner_id", "responsibleuser_id", "copylocation_id", "created_at", "updated_at" FROM "task" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -376,15 +389,15 @@ abstract class BaseTaskQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the done column
+     * Filter the query on the closed column
      *
      * Example usage:
      * <code>
-     * $query->filterByDone(true); // WHERE done = true
-     * $query->filterByDone('yes'); // WHERE done = true
+     * $query->filterByClosed(true); // WHERE closed = true
+     * $query->filterByClosed('yes'); // WHERE closed = true
      * </code>
      *
-     * @param     boolean|string $done The value to use as filter.
+     * @param     boolean|string $closed The value to use as filter.
      *              Non-boolean arguments are converted using the following rules:
      *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
      *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
@@ -393,13 +406,13 @@ abstract class BaseTaskQuery extends ModelCriteria
      *
      * @return TaskQuery The current query, for fluid interface
      */
-    public function filterByDone($done = null, $comparison = null)
+    public function filterByClosed($closed = null, $comparison = null)
     {
-        if (is_string($done)) {
-            $done = in_array(strtolower($done), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        if (is_string($closed)) {
+            $closed = in_array(strtolower($closed), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
         }
 
-        return $this->addUsingAlias(TaskPeer::DONE, $done, $comparison);
+        return $this->addUsingAlias(TaskPeer::CLOSED, $closed, $comparison);
     }
 
     /**
@@ -409,7 +422,7 @@ abstract class BaseTaskQuery extends ModelCriteria
      * <code>
      * $query->filterByStartDate('2011-03-14'); // WHERE start_date = '2011-03-14'
      * $query->filterByStartDate('now'); // WHERE start_date = '2011-03-14'
-     * $query->filterByStartDate(array('max' => 'yesterday')); // WHERE start_date > '2011-03-13'
+     * $query->filterByStartDate(array('max' => 'yesterday')); // WHERE start_date < '2011-03-13'
      * </code>
      *
      * @param     mixed $startDate The value to use as filter.
@@ -452,7 +465,7 @@ abstract class BaseTaskQuery extends ModelCriteria
      * <code>
      * $query->filterByEndDate('2011-03-14'); // WHERE end_date = '2011-03-14'
      * $query->filterByEndDate('now'); // WHERE end_date = '2011-03-14'
-     * $query->filterByEndDate(array('max' => 'yesterday')); // WHERE end_date > '2011-03-13'
+     * $query->filterByEndDate(array('max' => 'yesterday')); // WHERE end_date < '2011-03-13'
      * </code>
      *
      * @param     mixed $endDate The value to use as filter.
@@ -694,13 +707,57 @@ abstract class BaseTaskQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the copylocation_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCopylocationId(1234); // WHERE copylocation_id = 1234
+     * $query->filterByCopylocationId(array(12, 34)); // WHERE copylocation_id IN (12, 34)
+     * $query->filterByCopylocationId(array('min' => 12)); // WHERE copylocation_id >= 12
+     * $query->filterByCopylocationId(array('max' => 12)); // WHERE copylocation_id <= 12
+     * </code>
+     *
+     * @see       filterByCopyLocation()
+     *
+     * @param     mixed $copylocationId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return TaskQuery The current query, for fluid interface
+     */
+    public function filterByCopylocationId($copylocationId = null, $comparison = null)
+    {
+        if (is_array($copylocationId)) {
+            $useMinMax = false;
+            if (isset($copylocationId['min'])) {
+                $this->addUsingAlias(TaskPeer::COPYLOCATION_ID, $copylocationId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($copylocationId['max'])) {
+                $this->addUsingAlias(TaskPeer::COPYLOCATION_ID, $copylocationId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(TaskPeer::COPYLOCATION_ID, $copylocationId, $comparison);
+    }
+
+    /**
      * Filter the query on the created_at column
      *
      * Example usage:
      * <code>
      * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
      * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
-     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at < '2011-03-13'
      * </code>
      *
      * @param     mixed $createdAt The value to use as filter.
@@ -743,7 +800,7 @@ abstract class BaseTaskQuery extends ModelCriteria
      * <code>
      * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
      * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
-     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at < '2011-03-13'
      * </code>
      *
      * @param     mixed $updatedAt The value to use as filter.
@@ -1157,6 +1214,82 @@ abstract class BaseTaskQuery extends ModelCriteria
         return $this
             ->joinDtaUser($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'DtaUser', '\DTA\MetadataBundle\Model\Master\DtaUserQuery');
+    }
+
+    /**
+     * Filter the query by a related CopyLocation object
+     *
+     * @param   CopyLocation|PropelObjectCollection $copyLocation The related object(s) to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 TaskQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByCopyLocation($copyLocation, $comparison = null)
+    {
+        if ($copyLocation instanceof CopyLocation) {
+            return $this
+                ->addUsingAlias(TaskPeer::COPYLOCATION_ID, $copyLocation->getId(), $comparison);
+        } elseif ($copyLocation instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(TaskPeer::COPYLOCATION_ID, $copyLocation->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByCopyLocation() only accepts arguments of type CopyLocation or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CopyLocation relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return TaskQuery The current query, for fluid interface
+     */
+    public function joinCopyLocation($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CopyLocation');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CopyLocation');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CopyLocation relation CopyLocation object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\Workflow\CopyLocationQuery A secondary query class using the current class as primary query
+     */
+    public function useCopyLocationQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinCopyLocation($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CopyLocation', '\DTA\MetadataBundle\Model\Workflow\CopyLocationQuery');
     }
 
     /**

@@ -28,7 +28,7 @@ abstract class BasePublicationPublicationgroupPeer
     const OM_CLASS = 'DTA\\MetadataBundle\\Model\\Master\\PublicationPublicationgroup';
 
     /** the related TableMap class for this table */
-    const TM_CLASS = 'PublicationPublicationgroupTableMap';
+    const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Master\\map\\PublicationPublicationgroupTableMap';
 
     /** The total number of columns. */
     const NUM_COLUMNS = 3;
@@ -39,20 +39,20 @@ abstract class BasePublicationPublicationgroupPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 3;
 
+    /** the column name for the id field */
+    const ID = 'publication_publicationgroup.id';
+
     /** the column name for the publicationgroup_id field */
     const PUBLICATIONGROUP_ID = 'publication_publicationgroup.publicationgroup_id';
 
     /** the column name for the publication_id field */
     const PUBLICATION_ID = 'publication_publicationgroup.publication_id';
 
-    /** the column name for the id field */
-    const ID = 'publication_publicationgroup.id';
-
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
 
     /**
-     * An identiy map to hold any loaded instances of PublicationPublicationgroup objects.
+     * An identity map to hold any loaded instances of PublicationPublicationgroup objects.
      * This must be public so that other peer classes can access this when hydrating from JOIN
      * queries.
      * @var        array PublicationPublicationgroup[]
@@ -67,11 +67,11 @@ abstract class BasePublicationPublicationgroupPeer
      * e.g. PublicationPublicationgroupPeer::$fieldNames[PublicationPublicationgroupPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('PublicationgroupId', 'PublicationId', 'Id', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('publicationgroupId', 'publicationId', 'id', ),
-        BasePeer::TYPE_COLNAME => array (PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID, PublicationPublicationgroupPeer::PUBLICATION_ID, PublicationPublicationgroupPeer::ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('PUBLICATIONGROUP_ID', 'PUBLICATION_ID', 'ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('publicationgroup_id', 'publication_id', 'id', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationgroupId', 'PublicationId', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationgroupId', 'publicationId', ),
+        BasePeer::TYPE_COLNAME => array (PublicationPublicationgroupPeer::ID, PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID, PublicationPublicationgroupPeer::PUBLICATION_ID, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATIONGROUP_ID', 'PUBLICATION_ID', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'publicationgroup_id', 'publication_id', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
@@ -82,11 +82,11 @@ abstract class BasePublicationPublicationgroupPeer
      * e.g. PublicationPublicationgroupPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('PublicationgroupId' => 0, 'PublicationId' => 1, 'Id' => 2, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('publicationgroupId' => 0, 'publicationId' => 1, 'id' => 2, ),
-        BasePeer::TYPE_COLNAME => array (PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID => 0, PublicationPublicationgroupPeer::PUBLICATION_ID => 1, PublicationPublicationgroupPeer::ID => 2, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('PUBLICATIONGROUP_ID' => 0, 'PUBLICATION_ID' => 1, 'ID' => 2, ),
-        BasePeer::TYPE_FIELDNAME => array ('publicationgroup_id' => 0, 'publication_id' => 1, 'id' => 2, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationgroupId' => 1, 'PublicationId' => 2, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationgroupId' => 1, 'publicationId' => 2, ),
+        BasePeer::TYPE_COLNAME => array (PublicationPublicationgroupPeer::ID => 0, PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID => 1, PublicationPublicationgroupPeer::PUBLICATION_ID => 2, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATIONGROUP_ID' => 1, 'PUBLICATION_ID' => 2, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publicationgroup_id' => 1, 'publication_id' => 2, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
@@ -161,13 +161,13 @@ abstract class BasePublicationPublicationgroupPeer
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
+            $criteria->addSelectColumn(PublicationPublicationgroupPeer::ID);
             $criteria->addSelectColumn(PublicationPublicationgroupPeer::PUBLICATIONGROUP_ID);
             $criteria->addSelectColumn(PublicationPublicationgroupPeer::PUBLICATION_ID);
-            $criteria->addSelectColumn(PublicationPublicationgroupPeer::ID);
         } else {
+            $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.publicationgroup_id');
             $criteria->addSelectColumn($alias . '.publication_id');
-            $criteria->addSelectColumn($alias . '.id');
         }
     }
 
@@ -220,7 +220,7 @@ abstract class BasePublicationPublicationgroupPeer
      *
      * @param      Criteria $criteria object used to create the SELECT statement.
      * @param      PropelPDO $con
-     * @return                 PublicationPublicationgroup
+     * @return PublicationPublicationgroup
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -287,7 +287,7 @@ abstract class BasePublicationPublicationgroupPeer
      * to the cache in order to ensure that the same objects are always returned by doSelect*()
      * and retrieveByPK*() calls.
      *
-     * @param      PublicationPublicationgroup $obj A PublicationPublicationgroup object.
+     * @param PublicationPublicationgroup $obj A PublicationPublicationgroup object.
      * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
     public static function addInstanceToPool($obj, $key = null)
@@ -337,7 +337,7 @@ abstract class BasePublicationPublicationgroupPeer
      * a multi-column primary key, a serialize()d version of the primary key will be returned.
      *
      * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-     * @return   PublicationPublicationgroup Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+     * @return PublicationPublicationgroup Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
      * @see        getPrimaryKeyHash()
      */
     public static function getInstanceFromPool($key)
@@ -358,10 +358,8 @@ abstract class BasePublicationPublicationgroupPeer
      */
     public static function clearInstancePool($and_clear_all_references = false)
     {
-      if ($and_clear_all_references)
-      {
-        foreach (PublicationPublicationgroupPeer::$instances as $instance)
-        {
+      if ($and_clear_all_references) {
+        foreach (PublicationPublicationgroupPeer::$instances as $instance) {
           $instance->clearAllReferences(true);
         }
       }
@@ -389,11 +387,11 @@ abstract class BasePublicationPublicationgroupPeer
     public static function getPrimaryKeyHashFromRow($row, $startcol = 0)
     {
         // If the PK cannot be derived from the row, return null.
-        if ($row[$startcol + 2] === null) {
+        if ($row[$startcol] === null) {
             return null;
         }
 
-        return (string) $row[$startcol + 2];
+        return (string) $row[$startcol];
     }
 
     /**
@@ -408,7 +406,7 @@ abstract class BasePublicationPublicationgroupPeer
     public static function getPrimaryKeyFromRow($row, $startcol = 0)
     {
 
-        return (int) $row[$startcol + 2];
+        return (int) $row[$startcol];
     }
 
     /**
@@ -1120,7 +1118,7 @@ abstract class BasePublicationPublicationgroupPeer
     {
       $dbMap = Propel::getDatabaseMap(BasePublicationPublicationgroupPeer::DATABASE_NAME);
       if (!$dbMap->hasTable(BasePublicationPublicationgroupPeer::TABLE_NAME)) {
-        $dbMap->addTableObject(new PublicationPublicationgroupTableMap());
+        $dbMap->addTableObject(new \DTA\MetadataBundle\Model\Master\map\PublicationPublicationgroupTableMap());
       }
     }
 
@@ -1170,7 +1168,7 @@ abstract class BasePublicationPublicationgroupPeer
             $con->beginTransaction();
             $pk = BasePeer::doInsert($criteria, $con);
             $con->commit();
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -1243,7 +1241,7 @@ abstract class BasePublicationPublicationgroupPeer
             $con->commit();
 
             return $affectedRows;
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -1302,7 +1300,7 @@ abstract class BasePublicationPublicationgroupPeer
             $con->commit();
 
             return $affectedRows;
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -1315,7 +1313,7 @@ abstract class BasePublicationPublicationgroupPeer
      *
      * NOTICE: This does not apply to primary or foreign keys for now.
      *
-     * @param      PublicationPublicationgroup $obj The object to validate.
+     * @param PublicationPublicationgroup $obj The object to validate.
      * @param      mixed $cols Column name or array of column names.
      *
      * @return mixed TRUE if all columns are valid or the error message of the first invalid column.
@@ -1348,7 +1346,7 @@ abstract class BasePublicationPublicationgroupPeer
     /**
      * Retrieve a single object by pkey.
      *
-     * @param      int $pk the primary key.
+     * @param int $pk the primary key.
      * @param      PropelPDO $con the connection to use
      * @return PublicationPublicationgroup
      */

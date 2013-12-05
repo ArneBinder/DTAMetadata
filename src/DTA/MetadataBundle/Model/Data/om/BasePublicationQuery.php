@@ -14,6 +14,7 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use DTA\MetadataBundle\Model\Classification\Category;
 use DTA\MetadataBundle\Model\Classification\Genre;
+use DTA\MetadataBundle\Model\Classification\Source;
 use DTA\MetadataBundle\Model\Classification\Tag;
 use DTA\MetadataBundle\Model\Data\Datespecification;
 use DTA\MetadataBundle\Model\Data\Font;
@@ -55,6 +56,7 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method PublicationQuery orderByPublicationdateId($order = Criteria::ASC) Order by the publicationdate_id column
  * @method PublicationQuery orderByCreationdateId($order = Criteria::ASC) Order by the creationdate_id column
  * @method PublicationQuery orderByPublishingcompanyId($order = Criteria::ASC) Order by the publishingcompany_id column
+ * @method PublicationQuery orderBySourceId($order = Criteria::ASC) Order by the source_id column
  * @method PublicationQuery orderByPartnerId($order = Criteria::ASC) Order by the partner_id column
  * @method PublicationQuery orderByEditiondescription($order = Criteria::ASC) Order by the editiondescription column
  * @method PublicationQuery orderByDigitaleditioneditor($order = Criteria::ASC) Order by the digitaleditioneditor column
@@ -68,7 +70,6 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method PublicationQuery orderByDirectoryname($order = Criteria::ASC) Order by the directoryname column
  * @method PublicationQuery orderByWwwready($order = Criteria::ASC) Order by the wwwready column
  * @method PublicationQuery orderByLastChangedByUserId($order = Criteria::ASC) Order by the last_changed_by_user_id column
- * @method PublicationQuery orderByLegacyBookId($order = Criteria::ASC) Order by the legacy_book_id column
  * @method PublicationQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method PublicationQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  * @method PublicationQuery orderByPublishingcompanyIdIsReconstructed($order = Criteria::ASC) Order by the publishingcompany_id_is_reconstructed column
@@ -80,6 +81,7 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method PublicationQuery groupByPublicationdateId() Group by the publicationdate_id column
  * @method PublicationQuery groupByCreationdateId() Group by the creationdate_id column
  * @method PublicationQuery groupByPublishingcompanyId() Group by the publishingcompany_id column
+ * @method PublicationQuery groupBySourceId() Group by the source_id column
  * @method PublicationQuery groupByPartnerId() Group by the partner_id column
  * @method PublicationQuery groupByEditiondescription() Group by the editiondescription column
  * @method PublicationQuery groupByDigitaleditioneditor() Group by the digitaleditioneditor column
@@ -93,7 +95,6 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method PublicationQuery groupByDirectoryname() Group by the directoryname column
  * @method PublicationQuery groupByWwwready() Group by the wwwready column
  * @method PublicationQuery groupByLastChangedByUserId() Group by the last_changed_by_user_id column
- * @method PublicationQuery groupByLegacyBookId() Group by the legacy_book_id column
  * @method PublicationQuery groupByCreatedAt() Group by the created_at column
  * @method PublicationQuery groupByUpdatedAt() Group by the updated_at column
  * @method PublicationQuery groupByPublishingcompanyIdIsReconstructed() Group by the publishingcompany_id_is_reconstructed column
@@ -105,6 +106,10 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method PublicationQuery leftJoinTitle($relationAlias = null) Adds a LEFT JOIN clause to the query using the Title relation
  * @method PublicationQuery rightJoinTitle($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Title relation
  * @method PublicationQuery innerJoinTitle($relationAlias = null) Adds a INNER JOIN clause to the query using the Title relation
+ *
+ * @method PublicationQuery leftJoinSource($relationAlias = null) Adds a LEFT JOIN clause to the query using the Source relation
+ * @method PublicationQuery rightJoinSource($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Source relation
+ * @method PublicationQuery innerJoinSource($relationAlias = null) Adds a INNER JOIN clause to the query using the Source relation
  *
  * @method PublicationQuery leftJoinPublishingcompany($relationAlias = null) Adds a LEFT JOIN clause to the query using the Publishingcompany relation
  * @method PublicationQuery rightJoinPublishingcompany($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Publishingcompany relation
@@ -219,6 +224,7 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method Publication findOneByPublicationdateId(int $publicationdate_id) Return the first Publication filtered by the publicationdate_id column
  * @method Publication findOneByCreationdateId(int $creationdate_id) Return the first Publication filtered by the creationdate_id column
  * @method Publication findOneByPublishingcompanyId(int $publishingcompany_id) Return the first Publication filtered by the publishingcompany_id column
+ * @method Publication findOneBySourceId(int $source_id) Return the first Publication filtered by the source_id column
  * @method Publication findOneByPartnerId(int $partner_id) Return the first Publication filtered by the partner_id column
  * @method Publication findOneByEditiondescription(string $editiondescription) Return the first Publication filtered by the editiondescription column
  * @method Publication findOneByDigitaleditioneditor(string $digitaleditioneditor) Return the first Publication filtered by the digitaleditioneditor column
@@ -232,7 +238,6 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method Publication findOneByDirectoryname(string $directoryname) Return the first Publication filtered by the directoryname column
  * @method Publication findOneByWwwready(int $wwwready) Return the first Publication filtered by the wwwready column
  * @method Publication findOneByLastChangedByUserId(int $last_changed_by_user_id) Return the first Publication filtered by the last_changed_by_user_id column
- * @method Publication findOneByLegacyBookId(int $legacy_book_id) Return the first Publication filtered by the legacy_book_id column
  * @method Publication findOneByCreatedAt(string $created_at) Return the first Publication filtered by the created_at column
  * @method Publication findOneByUpdatedAt(string $updated_at) Return the first Publication filtered by the updated_at column
  * @method Publication findOneByPublishingcompanyIdIsReconstructed(boolean $publishingcompany_id_is_reconstructed) Return the first Publication filtered by the publishingcompany_id_is_reconstructed column
@@ -244,6 +249,7 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method array findByPublicationdateId(int $publicationdate_id) Return Publication objects filtered by the publicationdate_id column
  * @method array findByCreationdateId(int $creationdate_id) Return Publication objects filtered by the creationdate_id column
  * @method array findByPublishingcompanyId(int $publishingcompany_id) Return Publication objects filtered by the publishingcompany_id column
+ * @method array findBySourceId(int $source_id) Return Publication objects filtered by the source_id column
  * @method array findByPartnerId(int $partner_id) Return Publication objects filtered by the partner_id column
  * @method array findByEditiondescription(string $editiondescription) Return Publication objects filtered by the editiondescription column
  * @method array findByDigitaleditioneditor(string $digitaleditioneditor) Return Publication objects filtered by the digitaleditioneditor column
@@ -257,7 +263,6 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method array findByDirectoryname(string $directoryname) Return Publication objects filtered by the directoryname column
  * @method array findByWwwready(int $wwwready) Return Publication objects filtered by the wwwready column
  * @method array findByLastChangedByUserId(int $last_changed_by_user_id) Return Publication objects filtered by the last_changed_by_user_id column
- * @method array findByLegacyBookId(int $legacy_book_id) Return Publication objects filtered by the legacy_book_id column
  * @method array findByCreatedAt(string $created_at) Return Publication objects filtered by the created_at column
  * @method array findByUpdatedAt(string $updated_at) Return Publication objects filtered by the updated_at column
  * @method array findByPublishingcompanyIdIsReconstructed(boolean $publishingcompany_id_is_reconstructed) Return Publication objects filtered by the publishingcompany_id_is_reconstructed column
@@ -271,8 +276,14 @@ abstract class BasePublicationQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Data\\Publication', $modelAlias = null)
+    public function __construct($dbName = null, $modelName = null, $modelAlias = null)
     {
+        if (null === $dbName) {
+            $dbName = 'dtametadata';
+        }
+        if (null === $modelName) {
+            $modelName = 'DTA\\MetadataBundle\\Model\\Data\\Publication';
+        }
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
@@ -289,10 +300,8 @@ abstract class BasePublicationQuery extends ModelCriteria
         if ($criteria instanceof PublicationQuery) {
             return $criteria;
         }
-        $query = new PublicationQuery();
-        if (null !== $modelAlias) {
-            $query->setModelAlias($modelAlias);
-        }
+        $query = new PublicationQuery(null, null, $modelAlias);
+
         if ($criteria instanceof Criteria) {
             $query->mergeWith($criteria);
         }
@@ -320,7 +329,7 @@ abstract class BasePublicationQuery extends ModelCriteria
             return null;
         }
         if ((null !== ($obj = PublicationPeer::getInstanceFromPool((string) $key))) && !$this->formatter) {
-            // the object is alredy in the instance pool
+            // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
@@ -362,7 +371,7 @@ abstract class BasePublicationQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "title_id", "firsteditionpublication_id", "place_id", "publicationdate_id", "creationdate_id", "publishingcompany_id", "partner_id", "editiondescription", "digitaleditioneditor", "transcriptioncomment", "numpages", "numpagesnumeric", "comment", "encoding_comment", "doi", "format", "directoryname", "wwwready", "last_changed_by_user_id", "legacy_book_id", "created_at", "updated_at", "publishingcompany_id_is_reconstructed" FROM "publication" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "title_id", "firsteditionpublication_id", "place_id", "publicationdate_id", "creationdate_id", "publishingcompany_id", "source_id", "partner_id", "editiondescription", "digitaleditioneditor", "transcriptioncomment", "numpages", "numpagesnumeric", "comment", "encoding_comment", "doi", "format", "directoryname", "wwwready", "last_changed_by_user_id", "created_at", "updated_at", "publishingcompany_id_is_reconstructed" FROM "publication" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -753,6 +762,50 @@ abstract class BasePublicationQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(PublicationPeer::PUBLISHINGCOMPANY_ID, $publishingcompanyId, $comparison);
+    }
+
+    /**
+     * Filter the query on the source_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterBySourceId(1234); // WHERE source_id = 1234
+     * $query->filterBySourceId(array(12, 34)); // WHERE source_id IN (12, 34)
+     * $query->filterBySourceId(array('min' => 12)); // WHERE source_id >= 12
+     * $query->filterBySourceId(array('max' => 12)); // WHERE source_id <= 12
+     * </code>
+     *
+     * @see       filterBySource()
+     *
+     * @param     mixed $sourceId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return PublicationQuery The current query, for fluid interface
+     */
+    public function filterBySourceId($sourceId = null, $comparison = null)
+    {
+        if (is_array($sourceId)) {
+            $useMinMax = false;
+            if (isset($sourceId['min'])) {
+                $this->addUsingAlias(PublicationPeer::SOURCE_ID, $sourceId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($sourceId['max'])) {
+                $this->addUsingAlias(PublicationPeer::SOURCE_ID, $sourceId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(PublicationPeer::SOURCE_ID, $sourceId, $comparison);
     }
 
     /**
@@ -1187,55 +1240,13 @@ abstract class BasePublicationQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the legacy_book_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByLegacyBookId(1234); // WHERE legacy_book_id = 1234
-     * $query->filterByLegacyBookId(array(12, 34)); // WHERE legacy_book_id IN (12, 34)
-     * $query->filterByLegacyBookId(array('min' => 12)); // WHERE legacy_book_id >= 12
-     * $query->filterByLegacyBookId(array('max' => 12)); // WHERE legacy_book_id <= 12
-     * </code>
-     *
-     * @param     mixed $legacyBookId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return PublicationQuery The current query, for fluid interface
-     */
-    public function filterByLegacyBookId($legacyBookId = null, $comparison = null)
-    {
-        if (is_array($legacyBookId)) {
-            $useMinMax = false;
-            if (isset($legacyBookId['min'])) {
-                $this->addUsingAlias(PublicationPeer::LEGACY_BOOK_ID, $legacyBookId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($legacyBookId['max'])) {
-                $this->addUsingAlias(PublicationPeer::LEGACY_BOOK_ID, $legacyBookId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(PublicationPeer::LEGACY_BOOK_ID, $legacyBookId, $comparison);
-    }
-
-    /**
      * Filter the query on the created_at column
      *
      * Example usage:
      * <code>
      * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
      * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
-     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at < '2011-03-13'
      * </code>
      *
      * @param     mixed $createdAt The value to use as filter.
@@ -1278,7 +1289,7 @@ abstract class BasePublicationQuery extends ModelCriteria
      * <code>
      * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
      * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
-     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at < '2011-03-13'
      * </code>
      *
      * @param     mixed $updatedAt The value to use as filter.
@@ -1415,6 +1426,82 @@ abstract class BasePublicationQuery extends ModelCriteria
         return $this
             ->joinTitle($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Title', '\DTA\MetadataBundle\Model\Data\TitleQuery');
+    }
+
+    /**
+     * Filter the query by a related Source object
+     *
+     * @param   Source|PropelObjectCollection $source The related object(s) to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 PublicationQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterBySource($source, $comparison = null)
+    {
+        if ($source instanceof Source) {
+            return $this
+                ->addUsingAlias(PublicationPeer::SOURCE_ID, $source->getId(), $comparison);
+        } elseif ($source instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(PublicationPeer::SOURCE_ID, $source->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterBySource() only accepts arguments of type Source or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Source relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return PublicationQuery The current query, for fluid interface
+     */
+    public function joinSource($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Source');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Source');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Source relation Source object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\Classification\SourceQuery A secondary query class using the current class as primary query
+     */
+    public function useSourceQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinSource($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Source', '\DTA\MetadataBundle\Model\Classification\SourceQuery');
     }
 
     /**

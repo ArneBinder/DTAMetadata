@@ -40,16 +40,14 @@ class DtaUserTableMap extends TableMap
         $this->setPhpName('DtaUser');
         $this->setClassname('DTA\\MetadataBundle\\Model\\Master\\DtaUser');
         $this->setPackage('src.DTA.MetadataBundle.Model.Master');
-        $this->setUseIdGenerator(true);
-        $this->setPrimaryKeyMethodInfo('dta_user_id_seq');
+        $this->setUseIdGenerator(false);
         // columns
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('username', 'Username', 'LONGVARCHAR', false, null, null);
         $this->addColumn('password', 'Password', 'VARCHAR', false, 512, null);
         $this->addColumn('salt', 'Salt', 'VARCHAR', false, 512, null);
         $this->addColumn('mail', 'Mail', 'LONGVARCHAR', false, null, null);
         $this->addColumn('admin', 'Admin', 'BOOLEAN', false, null, false);
-        $this->addColumn('legacy_user_id', 'LegacyUserId', 'INTEGER', false, null, null);
-        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         // validators
     } // initialize()
 
@@ -77,11 +75,6 @@ class DtaUserTableMap extends TableMap
   'benutzername' => 'username',
   'mail' => 'mail',
   'administratorrechte' => 'accessor:adminToString',
-),
-            'auto_add_pk' =>  array (
-  'name' => 'id',
-  'autoIncrement' => 'true',
-  'type' => 'INTEGER',
 ),
         );
     } // getBehaviors()

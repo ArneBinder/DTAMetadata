@@ -3,10 +3,16 @@
 {% block title %}DTA Metadatenbank{% endblock %}
 
 {% block core %}
+
+{#
 {{ dump(testData) }}
-{#% for pn in testData %}
+{% for pn in testData %}
 {{pn}}
-{% endfor %#}
+{% endfor %}
+{{ url('root') }}
+#}
+
+
 <h3>Bearbeitungsverlauf</h3>
 <table class="table" style="width:49%">
 <thead>
@@ -17,15 +23,15 @@
 </thead>
 <tbody>
   <tr>
-    <td>Otto</td>
+    <td>...</td>
     <td>21.11.2013</td>
   </tr>
   <tr>
-    <td>Thornton</td>
+    <td>...</td>
     <td>11.10.2013</td>
   </tr>
   <tr>
-    <td>the Bird</td>
+    <td>...</td>
     <td>13.09.2013</td>
   </tr>
 </tbody>

@@ -62,8 +62,14 @@ abstract class BasePublicationMsQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Data\\PublicationMs', $modelAlias = null)
+    public function __construct($dbName = null, $modelName = null, $modelAlias = null)
     {
+        if (null === $dbName) {
+            $dbName = 'dtametadata';
+        }
+        if (null === $modelName) {
+            $modelName = 'DTA\\MetadataBundle\\Model\\Data\\PublicationMs';
+        }
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
@@ -80,10 +86,8 @@ abstract class BasePublicationMsQuery extends ModelCriteria
         if ($criteria instanceof PublicationMsQuery) {
             return $criteria;
         }
-        $query = new PublicationMsQuery();
-        if (null !== $modelAlias) {
-            $query->setModelAlias($modelAlias);
-        }
+        $query = new PublicationMsQuery(null, null, $modelAlias);
+
         if ($criteria instanceof Criteria) {
             $query->mergeWith($criteria);
         }
@@ -111,7 +115,7 @@ abstract class BasePublicationMsQuery extends ModelCriteria
             return null;
         }
         if ((null !== ($obj = PublicationMsPeer::getInstanceFromPool((string) $key))) && !$this->formatter) {
-            // the object is alredy in the instance pool
+            // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {

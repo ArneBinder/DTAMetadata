@@ -33,7 +33,7 @@ abstract class BasePublicationM extends BaseObject implements Persistent, \DTA\M
     protected static $peer;
 
     /**
-     * The flag var to prevent infinit loop in deep copy
+     * The flag var to prevent infinite loop in deep copy
      * @var       boolean
      */
     protected $startCopy = false;
@@ -84,6 +84,7 @@ abstract class BasePublicationM extends BaseObject implements Persistent, \DTA\M
      */
     public function getId()
     {
+
         return $this->id;
     }
 
@@ -94,13 +95,14 @@ abstract class BasePublicationM extends BaseObject implements Persistent, \DTA\M
      */
     public function getPublicationId()
     {
+
         return $this->publication_id;
     }
 
     /**
      * Set the value of [id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return PublicationM The current object (for fluent API support)
      */
     public function setId($v)
@@ -121,7 +123,7 @@ abstract class BasePublicationM extends BaseObject implements Persistent, \DTA\M
     /**
      * Set the value of [publication_id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return PublicationM The current object (for fluent API support)
      */
     public function setPublicationId($v)
@@ -166,7 +168,7 @@ abstract class BasePublicationM extends BaseObject implements Persistent, \DTA\M
      * more tables.
      *
      * @param array $row The row returned by PDOStatement->fetch(PDO::FETCH_NUM)
-     * @param int $startcol 0-based offset column which indicates which restultset column to start with.
+     * @param int $startcol 0-based offset column which indicates which resultset column to start with.
      * @param boolean $rehydrate Whether this object is being re-hydrated from the database.
      * @return int             next starting column
      * @throws PropelException - Any caught Exception will be rewrapped as a PropelException.
@@ -185,6 +187,7 @@ abstract class BasePublicationM extends BaseObject implements Persistent, \DTA\M
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
+
             return $startcol + 2; // 2 = PublicationMPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -365,7 +368,7 @@ abstract class BasePublicationM extends BaseObject implements Persistent, \DTA\M
             $this->alreadyInSave = true;
 
             // We call the save method on the following object(s) if they
-            // were passed to this object by their coresponding set
+            // were passed to this object by their corresponding set
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
@@ -519,10 +522,10 @@ abstract class BasePublicationM extends BaseObject implements Persistent, \DTA\M
      *
      * In addition to checking the current object, all related objects will
      * also be validated.  If all pass then <code>true</code> is returned; otherwise
-     * an aggreagated array of ValidationFailed objects will be returned.
+     * an aggregated array of ValidationFailed objects will be returned.
      *
      * @param array $columns Array of column names to validate.
-     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objets otherwise.
+     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objects otherwise.
      */
     protected function doValidate($columns = null)
     {
@@ -534,7 +537,7 @@ abstract class BasePublicationM extends BaseObject implements Persistent, \DTA\M
 
 
             // We call the validate method on the following object(s) if they
-            // were passed to this object by their coresponding set
+            // were passed to this object by their corresponding set
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
@@ -623,6 +626,11 @@ abstract class BasePublicationM extends BaseObject implements Persistent, \DTA\M
             $keys[0] => $this->getId(),
             $keys[1] => $this->getPublicationId(),
         );
+        $virtualColumns = $this->virtualColumns;
+        foreach ($virtualColumns as $key => $virtualColumn) {
+            $result[$key] = $virtualColumn;
+        }
+
         if ($includeForeignObjects) {
             if (null !== $this->aPublication) {
                 $result['Publication'] = $this->aPublication->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
@@ -831,7 +839,7 @@ abstract class BasePublicationM extends BaseObject implements Persistent, \DTA\M
     /**
      * Declares an association between this object and a Publication object.
      *
-     * @param             Publication $v
+     * @param                  Publication $v
      * @return PublicationM The current object (for fluent API support)
      * @throws PropelException
      */
@@ -901,7 +909,7 @@ abstract class BasePublicationM extends BaseObject implements Persistent, \DTA\M
      *
      * This method is a user-space workaround for PHP's inability to garbage collect
      * objects with circular references (even in PHP 5.3). This is currently necessary
-     * when using Propel in certain daemon or large-volumne/high-memory operations.
+     * when using Propel in certain daemon or large-volume/high-memory operations.
      *
      * @param boolean $deep Whether to also clear the references on all referrer objects.
      */

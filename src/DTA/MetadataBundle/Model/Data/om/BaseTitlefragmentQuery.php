@@ -70,8 +70,14 @@ abstract class BaseTitlefragmentQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Data\\Titlefragment', $modelAlias = null)
+    public function __construct($dbName = null, $modelName = null, $modelAlias = null)
     {
+        if (null === $dbName) {
+            $dbName = 'dtametadata';
+        }
+        if (null === $modelName) {
+            $modelName = 'DTA\\MetadataBundle\\Model\\Data\\Titlefragment';
+        }
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
@@ -88,10 +94,8 @@ abstract class BaseTitlefragmentQuery extends ModelCriteria
         if ($criteria instanceof TitlefragmentQuery) {
             return $criteria;
         }
-        $query = new TitlefragmentQuery();
-        if (null !== $modelAlias) {
-            $query->setModelAlias($modelAlias);
-        }
+        $query = new TitlefragmentQuery(null, null, $modelAlias);
+
         if ($criteria instanceof Criteria) {
             $query->mergeWith($criteria);
         }
@@ -119,7 +123,7 @@ abstract class BaseTitlefragmentQuery extends ModelCriteria
             return null;
         }
         if ((null !== ($obj = TitlefragmentPeer::getInstanceFromPool((string) $key))) && !$this->formatter) {
-            // the object is alredy in the instance pool
+            // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
@@ -651,25 +655,31 @@ abstract class BaseTitlefragmentQuery extends ModelCriteria
     /**
      * Returns the objects in a certain list, from the list scope
      *
-     * @param     int $scope		Scope to determine which objects node to return
+     * @param int $scope Scope to determine which objects node to return
      *
-     * @return    TitlefragmentQuery The current query, for fluid interface
+     * @return TitlefragmentQuery The current query, for fluid interface
      */
-    public function inList($scope = null)
+    public function inList($scope)
     {
-        return $this->addUsingAlias(TitlefragmentPeer::SCOPE_COL, $scope, Criteria::EQUAL);
+
+        TitlefragmentPeer::sortableApplyScopeCriteria($this, $scope, 'addUsingAlias');
+
+        return $this;
     }
 
     /**
      * Filter the query based on a rank in the list
      *
      * @param     integer   $rank rank
-     * @param     int $scope		Scope to determine which suite to consider
+     * @param int $scope Scope to determine which objects node to return
+
      *
      * @return    TitlefragmentQuery The current query, for fluid interface
      */
-    public function filterByRank($rank, $scope = null)
+    public function filterByRank($rank, $scope)
     {
+
+
         return $this
             ->inList($scope)
             ->addUsingAlias(TitlefragmentPeer::RANK_COL, $rank, Criteria::EQUAL);
@@ -702,13 +712,14 @@ abstract class BaseTitlefragmentQuery extends ModelCriteria
      * Get an item from the list based on its rank
      *
      * @param     integer   $rank rank
-     * @param     int $scope		Scope to determine which suite to consider
+     * @param int $scope Scope to determine which objects node to return
      * @param     PropelPDO $con optional connection
      *
      * @return    Titlefragment
      */
-    public function findOneByRank($rank, $scope = null, PropelPDO $con = null)
+    public function findOneByRank($rank, $scope, PropelPDO $con = null)
     {
+
         return $this
             ->filterByRank($rank, $scope)
             ->findOne($con);
@@ -717,13 +728,16 @@ abstract class BaseTitlefragmentQuery extends ModelCriteria
     /**
      * Returns a list of objects
      *
-     * @param      int $scope		Scope to determine which list to return
+     * @param int $scope Scope to determine which objects node to return
+
      * @param      PropelPDO $con	Connection to use.
      *
      * @return     mixed the list of results, formatted by the current formatter
      */
-    public function findList($scope = null, $con = null)
+    public function findList($scope, $con = null)
     {
+
+
         return $this
             ->inList($scope)
             ->orderByRank()
@@ -733,19 +747,43 @@ abstract class BaseTitlefragmentQuery extends ModelCriteria
     /**
      * Get the highest rank
      *
-     * @param      int $scope		Scope to determine which suite to consider
+     * @param int $scope Scope to determine which objects node to return
+
      * @param     PropelPDO optional connection
      *
      * @return    integer highest position
      */
-    public function getMaxRank($scope = null, PropelPDO $con = null)
+    public function getMaxRank($scope, PropelPDO $con = null)
     {
         if ($con === null) {
             $con = Propel::getConnection(TitlefragmentPeer::DATABASE_NAME);
         }
         // shift the objects with a position lower than the one of object
         $this->addSelectColumn('MAX(' . TitlefragmentPeer::RANK_COL . ')');
-        $this->add(TitlefragmentPeer::SCOPE_COL, $scope, Criteria::EQUAL);
+
+        TitlefragmentPeer::sortableApplyScopeCriteria($this, $scope);
+        $stmt = $this->doSelect($con);
+
+        return $stmt->fetchColumn();
+    }
+
+    /**
+     * Get the highest rank by a scope with a array format.
+     *
+     * @param     int $scope		The scope value as scalar type or array($value1, ...).
+
+     * @param     PropelPDO optional connection
+     *
+     * @return    integer highest position
+     */
+    public function getMaxRankArray($scope, PropelPDO $con = null)
+    {
+        if ($con === null) {
+            $con = Propel::getConnection(TitlefragmentPeer::DATABASE_NAME);
+        }
+        // shift the objects with a position lower than the one of object
+        $this->addSelectColumn('MAX(' . TitlefragmentPeer::RANK_COL . ')');
+        TitlefragmentPeer::sortableApplyScopeCriteria($this, $scope);
         $stmt = $this->doSelect($con);
 
         return $stmt->fetchColumn();
@@ -781,7 +819,7 @@ abstract class BaseTitlefragmentQuery extends ModelCriteria
             $con->commit();
 
             return true;
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollback();
             throw $e;
         }

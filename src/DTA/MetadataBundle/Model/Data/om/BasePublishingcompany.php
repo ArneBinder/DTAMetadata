@@ -35,7 +35,7 @@ abstract class BasePublishingcompany extends BaseObject implements Persistent, \
     protected static $peer;
 
     /**
-     * The flag var to prevent infinit loop in deep copy
+     * The flag var to prevent infinite loop in deep copy
      * @var       boolean
      */
     protected $startCopy = false;
@@ -99,6 +99,7 @@ abstract class BasePublishingcompany extends BaseObject implements Persistent, \
      */
     public function getId()
     {
+
         return $this->id;
     }
 
@@ -109,6 +110,7 @@ abstract class BasePublishingcompany extends BaseObject implements Persistent, \
      */
     public function getName()
     {
+
         return $this->name;
     }
 
@@ -119,13 +121,14 @@ abstract class BasePublishingcompany extends BaseObject implements Persistent, \
      */
     public function getGnd()
     {
+
         return $this->gnd;
     }
 
     /**
      * Set the value of [id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Publishingcompany The current object (for fluent API support)
      */
     public function setId($v)
@@ -146,7 +149,7 @@ abstract class BasePublishingcompany extends BaseObject implements Persistent, \
     /**
      * Set the value of [name] column.
      *
-     * @param string $v new value
+     * @param  string $v new value
      * @return Publishingcompany The current object (for fluent API support)
      */
     public function setName($v)
@@ -167,7 +170,7 @@ abstract class BasePublishingcompany extends BaseObject implements Persistent, \
     /**
      * Set the value of [gnd] column.
      *
-     * @param string $v new value
+     * @param  string $v new value
      * @return Publishingcompany The current object (for fluent API support)
      */
     public function setGnd($v)
@@ -208,7 +211,7 @@ abstract class BasePublishingcompany extends BaseObject implements Persistent, \
      * more tables.
      *
      * @param array $row The row returned by PDOStatement->fetch(PDO::FETCH_NUM)
-     * @param int $startcol 0-based offset column which indicates which restultset column to start with.
+     * @param int $startcol 0-based offset column which indicates which resultset column to start with.
      * @param boolean $rehydrate Whether this object is being re-hydrated from the database.
      * @return int             next starting column
      * @throws PropelException - Any caught Exception will be rewrapped as a PropelException.
@@ -228,6 +231,7 @@ abstract class BasePublishingcompany extends BaseObject implements Persistent, \
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
+
             return $startcol + 3; // 3 = PublishingcompanyPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -572,10 +576,10 @@ abstract class BasePublishingcompany extends BaseObject implements Persistent, \
      *
      * In addition to checking the current object, all related objects will
      * also be validated.  If all pass then <code>true</code> is returned; otherwise
-     * an aggreagated array of ValidationFailed objects will be returned.
+     * an aggregated array of ValidationFailed objects will be returned.
      *
      * @param array $columns Array of column names to validate.
-     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objets otherwise.
+     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objects otherwise.
      */
     protected function doValidate($columns = null)
     {
@@ -676,6 +680,11 @@ abstract class BasePublishingcompany extends BaseObject implements Persistent, \
             $keys[1] => $this->getName(),
             $keys[2] => $this->getGnd(),
         );
+        $virtualColumns = $this->virtualColumns;
+        foreach ($virtualColumns as $key => $virtualColumn) {
+            $result[$key] = $virtualColumn;
+        }
+
         if ($includeForeignObjects) {
             if (null !== $this->collPublications) {
                 $result['Publications'] = $this->collPublications->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -986,7 +995,7 @@ abstract class BasePublishingcompany extends BaseObject implements Persistent, \
                     if (false !== $this->collPublicationsPartial && count($collPublications)) {
                       $this->initPublications(false);
 
-                      foreach($collPublications as $obj) {
+                      foreach ($collPublications as $obj) {
                         if (false == $this->collPublications->contains($obj)) {
                           $this->collPublications->append($obj);
                         }
@@ -996,12 +1005,13 @@ abstract class BasePublishingcompany extends BaseObject implements Persistent, \
                     }
 
                     $collPublications->getInternalIterator()->rewind();
+
                     return $collPublications;
                 }
 
-                if($partial && $this->collPublications) {
-                    foreach($this->collPublications as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collPublications) {
+                    foreach ($this->collPublications as $obj) {
+                        if ($obj->isNew()) {
                             $collPublications[] = $obj;
                         }
                     }
@@ -1029,7 +1039,8 @@ abstract class BasePublishingcompany extends BaseObject implements Persistent, \
     {
         $publicationsToDelete = $this->getPublications(new Criteria(), $con)->diff($publications);
 
-        $this->publicationsScheduledForDeletion = unserialize(serialize($publicationsToDelete));
+
+        $this->publicationsScheduledForDeletion = $publicationsToDelete;
 
         foreach ($publicationsToDelete as $publicationRemoved) {
             $publicationRemoved->setPublishingcompany(null);
@@ -1063,7 +1074,7 @@ abstract class BasePublishingcompany extends BaseObject implements Persistent, \
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getPublications());
             }
             $query = PublicationQuery::create(null, $criteria);
@@ -1092,8 +1103,13 @@ abstract class BasePublishingcompany extends BaseObject implements Persistent, \
             $this->initPublications();
             $this->collPublicationsPartial = true;
         }
+
         if (!in_array($l, $this->collPublications->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddPublication($l);
+
+            if ($this->publicationsScheduledForDeletion and $this->publicationsScheduledForDeletion->contains($l)) {
+                $this->publicationsScheduledForDeletion->remove($this->publicationsScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -1148,6 +1164,31 @@ abstract class BasePublishingcompany extends BaseObject implements Persistent, \
     {
         $query = PublicationQuery::create(null, $criteria);
         $query->joinWith('Title', $join_behavior);
+
+        return $this->getPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Publishingcompany is new, it will return
+     * an empty collection; or if this Publishingcompany has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Publishingcompany.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinSource($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Source', $join_behavior);
 
         return $this->getPublications($query, $con);
     }
@@ -1274,7 +1315,7 @@ abstract class BasePublishingcompany extends BaseObject implements Persistent, \
      *
      * This method is a user-space workaround for PHP's inability to garbage collect
      * objects with circular references (even in PHP 5.3). This is currently necessary
-     * when using Propel in certain daemon or large-volumne/high-memory operations.
+     * when using Propel in certain daemon or large-volume/high-memory operations.
      *
      * @param boolean $deep Whether to also clear the references on all referrer objects.
      */

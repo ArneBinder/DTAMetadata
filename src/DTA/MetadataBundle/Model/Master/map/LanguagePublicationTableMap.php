@@ -44,9 +44,9 @@ class LanguagePublicationTableMap extends TableMap
         $this->setPrimaryKeyMethodInfo('language_publication_id_seq');
         $this->setIsCrossRef(true);
         // columns
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('language_id', 'LanguageId', 'INTEGER', 'language', 'id', true, null, null);
         $this->addForeignKey('publication_id', 'PublicationId', 'INTEGER', 'publication', 'id', true, null, null);
-        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         // validators
     } // initialize()
 
@@ -69,14 +69,9 @@ class LanguagePublicationTableMap extends TableMap
     {
         return array(
             'table_row_view' =>  array (
+  'Id' => 'id',
   'LanguageId' => 'language_id',
   'PublicationId' => 'publication_id',
-  'Id' => 'id',
-),
-            'auto_add_pk' =>  array (
-  'name' => 'id',
-  'autoIncrement' => 'true',
-  'type' => 'INTEGER',
 ),
         );
     } // getBehaviors()

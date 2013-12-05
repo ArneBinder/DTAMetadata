@@ -91,40 +91,32 @@ class DataDomainController extends ORMController {
         
         $rows = array();//new \ArrayObject();
         
-        if( $role->getApplicableToPublication() ) {
-            $personPublications = Model\Master\PersonPublicationQuery::create()
-                    ->filterByPersonroleId($personRoleId)
-                    ->find();
-            foreach ($personPublications as $pp) {
-                
-                // the concrete publication object (PublicationM, PublicationJ, etc.) for which the publication provides the basic data fields
-                $wrapper = $pp->getPublication()->getWrapperPublication();
-                $wrapperClassName = $pp->getPublication()->getWrapperPublicationClass();
-                // generate a link to the publication 
-                $linkTarget = $this->generateUrl("Data_genericCreateOrEdit", array(
-                        'className'=> $wrapperClassName,
-                        'recordId'=>$wrapper->getId()
-                    )
-                );
-                
-                $linkTo = function($href,$title){return '<a href="'.$href.'">'.$title.'</a>';};
-                $rows[] = array(
-                    'repName' => $pp->getPerson()->getRepresentativePersonalname()->__toString(),
-                    'context' => $linkTo($linkTarget, $pp->getPublication()->getWork()->getTitle())
-                );
-            }
-        }
-        
-        if( $role->getApplicableToWork() ) {
-            $personWorks = Model\Master\PersonWorkQuery::create()
-                    ->filterByPersonroleId($personRoleId)
-                    ->find();
-            foreach ($personWorks as $pp) {
-                $rows[] = array(
-                    'repName' => $pp->getPerson()->getRepresentativePersonalname()->__toString(),
-                    'context' => $pp->getWork()->getTitle()
-                );
-            }
+        $personPublications = Model\Master\PersonPublicationQuery::create()
+                ->filterByPersonroleId($personRoleId)
+                ->leftJoinWith('Person')
+                ->leftJoinWith('Person.Personalname')
+                ->leftJoinWith('Personalname.Namefragment')
+                ->leftJoinWith('Publication')
+                ->leftJoinWith('Publication.Title')
+                ->leftJoinWith('Title.Titlefragment')
+                ->find();
+        foreach ($personPublications as $pp) {
+
+            // the concrete publication object (PublicationM, PublicationJ, etc.) for which the publication provides the basic data fields
+            $wrapper = $pp->getPublication();//->getWrapperPublication();
+//            $wrapperClassName = $pp->getPublication()->getWrapperPublicationClass();
+            // generate a link to the publication 
+            $linkTarget = $this->generateUrl("Data_genericCreateOrEdit", array(
+                    'className'=> 'Publication', //$wrapperClassName,
+                    'recordId'=>$wrapper->getId()
+                )
+            );
+
+            $linkTo = function($href,$title){return '<a href="'.$href.'">'.$title.'</a>';};
+            $rows[] = array(
+                'repName' => $pp->getPerson()->getRepresentativePersonalname()->__toString(),
+                'context' => $linkTo($linkTarget, $pp->getPublication()->getTitle())
+            );
         }
         
         $columns = array('Name', 'Publikation/Werk');

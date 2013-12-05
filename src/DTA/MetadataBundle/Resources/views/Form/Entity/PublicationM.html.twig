@@ -51,13 +51,12 @@
     
     {{ dta.beginLabelledContent({'controlId':'none', 'labelCaption':'Datierung'}) }}
         {{ form_row(form.publication.DatespecificationRelatedByPublicationdateId) }}
-        {{ form_row(form.publication.DatespecificationRelatedByFirstpublicationdateId) }}
-        {{ form_row(form.publication.datespecification) }}
+        {{ form_row(form.publication.DatespecificationRelatedByCreationDateId) }}
     {{ dta.endLabelledContent() }}
     
-    {{ form_row(form.publication.volume_alphanumeric) }}
+    {#{ form_row(form.publication.volume_alphanumeric) }}
     {{ form_row(form.publication.volume_numeric) }}
-    {{ form_row(form.publication.volumes_total) }}
+    {{ form_row(form.publication.volumes_total) }#}
     
     {{ form_row(form.publication.publishingcompany) }}
     

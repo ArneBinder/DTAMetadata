@@ -26,16 +26,19 @@ abstract class BaseDtaUserPeer
     const OM_CLASS = 'DTA\\MetadataBundle\\Model\\Master\\DtaUser';
 
     /** the related TableMap class for this table */
-    const TM_CLASS = 'DtaUserTableMap';
+    const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Master\\map\\DtaUserTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 7;
+    const NUM_COLUMNS = 6;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 7;
+    const NUM_HYDRATE_COLUMNS = 6;
+
+    /** the column name for the id field */
+    const ID = 'dta_user.id';
 
     /** the column name for the username field */
     const USERNAME = 'dta_user.username';
@@ -52,17 +55,11 @@ abstract class BaseDtaUserPeer
     /** the column name for the admin field */
     const ADMIN = 'dta_user.admin';
 
-    /** the column name for the legacy_user_id field */
-    const LEGACY_USER_ID = 'dta_user.legacy_user_id';
-
-    /** the column name for the id field */
-    const ID = 'dta_user.id';
-
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
 
     /**
-     * An identiy map to hold any loaded instances of DtaUser objects.
+     * An identity map to hold any loaded instances of DtaUser objects.
      * This must be public so that other peer classes can access this when hydrating from JOIN
      * queries.
      * @var        array DtaUser[]
@@ -77,12 +74,12 @@ abstract class BaseDtaUserPeer
      * e.g. DtaUserPeer::$fieldNames[DtaUserPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Username', 'Password', 'Salt', 'Mail', 'Admin', 'LegacyUserId', 'Id', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('username', 'password', 'salt', 'mail', 'admin', 'legacyUserId', 'id', ),
-        BasePeer::TYPE_COLNAME => array (DtaUserPeer::USERNAME, DtaUserPeer::PASSWORD, DtaUserPeer::SALT, DtaUserPeer::MAIL, DtaUserPeer::ADMIN, DtaUserPeer::LEGACY_USER_ID, DtaUserPeer::ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('USERNAME', 'PASSWORD', 'SALT', 'MAIL', 'ADMIN', 'LEGACY_USER_ID', 'ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('username', 'password', 'salt', 'mail', 'admin', 'legacy_user_id', 'id', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Username', 'Password', 'Salt', 'Mail', 'Admin', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'username', 'password', 'salt', 'mail', 'admin', ),
+        BasePeer::TYPE_COLNAME => array (DtaUserPeer::ID, DtaUserPeer::USERNAME, DtaUserPeer::PASSWORD, DtaUserPeer::SALT, DtaUserPeer::MAIL, DtaUserPeer::ADMIN, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'USERNAME', 'PASSWORD', 'SALT', 'MAIL', 'ADMIN', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'username', 'password', 'salt', 'mail', 'admin', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -92,12 +89,12 @@ abstract class BaseDtaUserPeer
      * e.g. DtaUserPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Username' => 0, 'Password' => 1, 'Salt' => 2, 'Mail' => 3, 'Admin' => 4, 'LegacyUserId' => 5, 'Id' => 6, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('username' => 0, 'password' => 1, 'salt' => 2, 'mail' => 3, 'admin' => 4, 'legacyUserId' => 5, 'id' => 6, ),
-        BasePeer::TYPE_COLNAME => array (DtaUserPeer::USERNAME => 0, DtaUserPeer::PASSWORD => 1, DtaUserPeer::SALT => 2, DtaUserPeer::MAIL => 3, DtaUserPeer::ADMIN => 4, DtaUserPeer::LEGACY_USER_ID => 5, DtaUserPeer::ID => 6, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('USERNAME' => 0, 'PASSWORD' => 1, 'SALT' => 2, 'MAIL' => 3, 'ADMIN' => 4, 'LEGACY_USER_ID' => 5, 'ID' => 6, ),
-        BasePeer::TYPE_FIELDNAME => array ('username' => 0, 'password' => 1, 'salt' => 2, 'mail' => 3, 'admin' => 4, 'legacy_user_id' => 5, 'id' => 6, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Username' => 1, 'Password' => 2, 'Salt' => 3, 'Mail' => 4, 'Admin' => 5, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'username' => 1, 'password' => 2, 'salt' => 3, 'mail' => 4, 'admin' => 5, ),
+        BasePeer::TYPE_COLNAME => array (DtaUserPeer::ID => 0, DtaUserPeer::USERNAME => 1, DtaUserPeer::PASSWORD => 2, DtaUserPeer::SALT => 3, DtaUserPeer::MAIL => 4, DtaUserPeer::ADMIN => 5, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'USERNAME' => 1, 'PASSWORD' => 2, 'SALT' => 3, 'MAIL' => 4, 'ADMIN' => 5, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'username' => 1, 'password' => 2, 'salt' => 3, 'mail' => 4, 'admin' => 5, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -171,21 +168,19 @@ abstract class BaseDtaUserPeer
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
+            $criteria->addSelectColumn(DtaUserPeer::ID);
             $criteria->addSelectColumn(DtaUserPeer::USERNAME);
             $criteria->addSelectColumn(DtaUserPeer::PASSWORD);
             $criteria->addSelectColumn(DtaUserPeer::SALT);
             $criteria->addSelectColumn(DtaUserPeer::MAIL);
             $criteria->addSelectColumn(DtaUserPeer::ADMIN);
-            $criteria->addSelectColumn(DtaUserPeer::LEGACY_USER_ID);
-            $criteria->addSelectColumn(DtaUserPeer::ID);
         } else {
+            $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.username');
             $criteria->addSelectColumn($alias . '.password');
             $criteria->addSelectColumn($alias . '.salt');
             $criteria->addSelectColumn($alias . '.mail');
             $criteria->addSelectColumn($alias . '.admin');
-            $criteria->addSelectColumn($alias . '.legacy_user_id');
-            $criteria->addSelectColumn($alias . '.id');
         }
     }
 
@@ -238,7 +233,7 @@ abstract class BaseDtaUserPeer
      *
      * @param      Criteria $criteria object used to create the SELECT statement.
      * @param      PropelPDO $con
-     * @return                 DtaUser
+     * @return DtaUser
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -305,7 +300,7 @@ abstract class BaseDtaUserPeer
      * to the cache in order to ensure that the same objects are always returned by doSelect*()
      * and retrieveByPK*() calls.
      *
-     * @param      DtaUser $obj A DtaUser object.
+     * @param DtaUser $obj A DtaUser object.
      * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
     public static function addInstanceToPool($obj, $key = null)
@@ -355,7 +350,7 @@ abstract class BaseDtaUserPeer
      * a multi-column primary key, a serialize()d version of the primary key will be returned.
      *
      * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-     * @return   DtaUser Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+     * @return DtaUser Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
      * @see        getPrimaryKeyHash()
      */
     public static function getInstanceFromPool($key)
@@ -376,10 +371,8 @@ abstract class BaseDtaUserPeer
      */
     public static function clearInstancePool($and_clear_all_references = false)
     {
-      if ($and_clear_all_references)
-      {
-        foreach (DtaUserPeer::$instances as $instance)
-        {
+      if ($and_clear_all_references) {
+        foreach (DtaUserPeer::$instances as $instance) {
           $instance->clearAllReferences(true);
         }
       }
@@ -407,11 +400,11 @@ abstract class BaseDtaUserPeer
     public static function getPrimaryKeyHashFromRow($row, $startcol = 0)
     {
         // If the PK cannot be derived from the row, return null.
-        if ($row[$startcol + 6] === null) {
+        if ($row[$startcol] === null) {
             return null;
         }
 
-        return (string) $row[$startcol + 6];
+        return (string) $row[$startcol];
     }
 
     /**
@@ -426,7 +419,7 @@ abstract class BaseDtaUserPeer
     public static function getPrimaryKeyFromRow($row, $startcol = 0)
     {
 
-        return (int) $row[$startcol + 6];
+        return (int) $row[$startcol];
     }
 
     /**
@@ -507,7 +500,7 @@ abstract class BaseDtaUserPeer
     {
       $dbMap = Propel::getDatabaseMap(BaseDtaUserPeer::DATABASE_NAME);
       if (!$dbMap->hasTable(BaseDtaUserPeer::TABLE_NAME)) {
-        $dbMap->addTableObject(new DtaUserTableMap());
+        $dbMap->addTableObject(new \DTA\MetadataBundle\Model\Master\map\DtaUserTableMap());
       }
     }
 
@@ -543,10 +536,6 @@ abstract class BaseDtaUserPeer
             $criteria = $values->buildCriteria(); // build Criteria from DtaUser object
         }
 
-        if ($criteria->containsKey(DtaUserPeer::ID) && $criteria->keyContainsValue(DtaUserPeer::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.DtaUserPeer::ID.')');
-        }
-
 
         // Set the correct dbName
         $criteria->setDbName(DtaUserPeer::DATABASE_NAME);
@@ -557,7 +546,7 @@ abstract class BaseDtaUserPeer
             $con->beginTransaction();
             $pk = BasePeer::doInsert($criteria, $con);
             $con->commit();
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -630,7 +619,7 @@ abstract class BaseDtaUserPeer
             $con->commit();
 
             return $affectedRows;
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -689,7 +678,7 @@ abstract class BaseDtaUserPeer
             $con->commit();
 
             return $affectedRows;
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -702,7 +691,7 @@ abstract class BaseDtaUserPeer
      *
      * NOTICE: This does not apply to primary or foreign keys for now.
      *
-     * @param      DtaUser $obj The object to validate.
+     * @param DtaUser $obj The object to validate.
      * @param      mixed $cols Column name or array of column names.
      *
      * @return mixed TRUE if all columns are valid or the error message of the first invalid column.
@@ -735,7 +724,7 @@ abstract class BaseDtaUserPeer
     /**
      * Retrieve a single object by pkey.
      *
-     * @param      int $pk the primary key.
+     * @param int $pk the primary key.
      * @param      PropelPDO $con the connection to use
      * @return DtaUser
      */

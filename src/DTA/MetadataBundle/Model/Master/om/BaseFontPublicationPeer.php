@@ -28,7 +28,7 @@ abstract class BaseFontPublicationPeer
     const OM_CLASS = 'DTA\\MetadataBundle\\Model\\Master\\FontPublication';
 
     /** the related TableMap class for this table */
-    const TM_CLASS = 'FontPublicationTableMap';
+    const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Master\\map\\FontPublicationTableMap';
 
     /** The total number of columns. */
     const NUM_COLUMNS = 3;
@@ -39,20 +39,20 @@ abstract class BaseFontPublicationPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 3;
 
+    /** the column name for the id field */
+    const ID = 'font_publication.id';
+
     /** the column name for the font_id field */
     const FONT_ID = 'font_publication.font_id';
 
     /** the column name for the publication_id field */
     const PUBLICATION_ID = 'font_publication.publication_id';
 
-    /** the column name for the id field */
-    const ID = 'font_publication.id';
-
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
 
     /**
-     * An identiy map to hold any loaded instances of FontPublication objects.
+     * An identity map to hold any loaded instances of FontPublication objects.
      * This must be public so that other peer classes can access this when hydrating from JOIN
      * queries.
      * @var        array FontPublication[]
@@ -67,11 +67,11 @@ abstract class BaseFontPublicationPeer
      * e.g. FontPublicationPeer::$fieldNames[FontPublicationPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('FontId', 'PublicationId', 'Id', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('fontId', 'publicationId', 'id', ),
-        BasePeer::TYPE_COLNAME => array (FontPublicationPeer::FONT_ID, FontPublicationPeer::PUBLICATION_ID, FontPublicationPeer::ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('FONT_ID', 'PUBLICATION_ID', 'ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('font_id', 'publication_id', 'id', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'FontId', 'PublicationId', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'fontId', 'publicationId', ),
+        BasePeer::TYPE_COLNAME => array (FontPublicationPeer::ID, FontPublicationPeer::FONT_ID, FontPublicationPeer::PUBLICATION_ID, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'FONT_ID', 'PUBLICATION_ID', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'font_id', 'publication_id', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
@@ -82,11 +82,11 @@ abstract class BaseFontPublicationPeer
      * e.g. FontPublicationPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('FontId' => 0, 'PublicationId' => 1, 'Id' => 2, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('fontId' => 0, 'publicationId' => 1, 'id' => 2, ),
-        BasePeer::TYPE_COLNAME => array (FontPublicationPeer::FONT_ID => 0, FontPublicationPeer::PUBLICATION_ID => 1, FontPublicationPeer::ID => 2, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('FONT_ID' => 0, 'PUBLICATION_ID' => 1, 'ID' => 2, ),
-        BasePeer::TYPE_FIELDNAME => array ('font_id' => 0, 'publication_id' => 1, 'id' => 2, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'FontId' => 1, 'PublicationId' => 2, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'fontId' => 1, 'publicationId' => 2, ),
+        BasePeer::TYPE_COLNAME => array (FontPublicationPeer::ID => 0, FontPublicationPeer::FONT_ID => 1, FontPublicationPeer::PUBLICATION_ID => 2, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'FONT_ID' => 1, 'PUBLICATION_ID' => 2, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'font_id' => 1, 'publication_id' => 2, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
@@ -161,13 +161,13 @@ abstract class BaseFontPublicationPeer
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
+            $criteria->addSelectColumn(FontPublicationPeer::ID);
             $criteria->addSelectColumn(FontPublicationPeer::FONT_ID);
             $criteria->addSelectColumn(FontPublicationPeer::PUBLICATION_ID);
-            $criteria->addSelectColumn(FontPublicationPeer::ID);
         } else {
+            $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.font_id');
             $criteria->addSelectColumn($alias . '.publication_id');
-            $criteria->addSelectColumn($alias . '.id');
         }
     }
 
@@ -220,7 +220,7 @@ abstract class BaseFontPublicationPeer
      *
      * @param      Criteria $criteria object used to create the SELECT statement.
      * @param      PropelPDO $con
-     * @return                 FontPublication
+     * @return FontPublication
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -287,7 +287,7 @@ abstract class BaseFontPublicationPeer
      * to the cache in order to ensure that the same objects are always returned by doSelect*()
      * and retrieveByPK*() calls.
      *
-     * @param      FontPublication $obj A FontPublication object.
+     * @param FontPublication $obj A FontPublication object.
      * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
     public static function addInstanceToPool($obj, $key = null)
@@ -337,7 +337,7 @@ abstract class BaseFontPublicationPeer
      * a multi-column primary key, a serialize()d version of the primary key will be returned.
      *
      * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-     * @return   FontPublication Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+     * @return FontPublication Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
      * @see        getPrimaryKeyHash()
      */
     public static function getInstanceFromPool($key)
@@ -358,10 +358,8 @@ abstract class BaseFontPublicationPeer
      */
     public static function clearInstancePool($and_clear_all_references = false)
     {
-      if ($and_clear_all_references)
-      {
-        foreach (FontPublicationPeer::$instances as $instance)
-        {
+      if ($and_clear_all_references) {
+        foreach (FontPublicationPeer::$instances as $instance) {
           $instance->clearAllReferences(true);
         }
       }
@@ -389,11 +387,11 @@ abstract class BaseFontPublicationPeer
     public static function getPrimaryKeyHashFromRow($row, $startcol = 0)
     {
         // If the PK cannot be derived from the row, return null.
-        if ($row[$startcol + 2] === null) {
+        if ($row[$startcol] === null) {
             return null;
         }
 
-        return (string) $row[$startcol + 2];
+        return (string) $row[$startcol];
     }
 
     /**
@@ -408,7 +406,7 @@ abstract class BaseFontPublicationPeer
     public static function getPrimaryKeyFromRow($row, $startcol = 0)
     {
 
-        return (int) $row[$startcol + 2];
+        return (int) $row[$startcol];
     }
 
     /**
@@ -1120,7 +1118,7 @@ abstract class BaseFontPublicationPeer
     {
       $dbMap = Propel::getDatabaseMap(BaseFontPublicationPeer::DATABASE_NAME);
       if (!$dbMap->hasTable(BaseFontPublicationPeer::TABLE_NAME)) {
-        $dbMap->addTableObject(new FontPublicationTableMap());
+        $dbMap->addTableObject(new \DTA\MetadataBundle\Model\Master\map\FontPublicationTableMap());
       }
     }
 
@@ -1170,7 +1168,7 @@ abstract class BaseFontPublicationPeer
             $con->beginTransaction();
             $pk = BasePeer::doInsert($criteria, $con);
             $con->commit();
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -1243,7 +1241,7 @@ abstract class BaseFontPublicationPeer
             $con->commit();
 
             return $affectedRows;
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -1302,7 +1300,7 @@ abstract class BaseFontPublicationPeer
             $con->commit();
 
             return $affectedRows;
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -1315,7 +1313,7 @@ abstract class BaseFontPublicationPeer
      *
      * NOTICE: This does not apply to primary or foreign keys for now.
      *
-     * @param      FontPublication $obj The object to validate.
+     * @param FontPublication $obj The object to validate.
      * @param      mixed $cols Column name or array of column names.
      *
      * @return mixed TRUE if all columns are valid or the error message of the first invalid column.
@@ -1348,7 +1346,7 @@ abstract class BaseFontPublicationPeer
     /**
      * Retrieve a single object by pkey.
      *
-     * @param      int $pk the primary key.
+     * @param int $pk the primary key.
      * @param      PropelPDO $con the connection to use
      * @return FontPublication
      */

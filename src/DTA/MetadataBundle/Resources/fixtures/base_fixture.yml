@@ -115,115 +115,127 @@ DTA\MetadataBundle\Model\Workflow\License:
         name: 'CC by-nc 3.0 (de)'
         applicable_to_image: true
         applicable_to_text: true
-
-        
+DTA\MetadataBundle\Model\Classification\Source:
+    Source_1:
+        name: 'china'
+    Source_2:
+        name: 'don'
+    Source_3:
+        name: 'kt'
+    Source_4:
+        name: 'n/a'
 DTA\MetadataBundle\Model\Workflow\Tasktype:
     Tasktype_35:
         name: GrobiZoning
-        legacy_tasktype_id: 31
+        id: 31
         tree_left: 15
         tree_right: 16
         tree_level: 2
     Tasktype_37:
         name: Convert2TEIP5
-        legacy_tasktype_id: 59
+        id: 59
         tree_left: 11
         tree_right: 12
         tree_level: 2
     Tasktype_29:
         name: 'Gruppe A: Double Keying'
+        id: 2
         tree_left: 2
         tree_right: 13
         tree_level: 1
     Tasktype_38:
         name: OCR2
-        legacy_tasktype_id: 45
+        id: 45
         tree_left: 17
         tree_right: 18
         tree_level: 2
     Tasktype_34:
+        id: 3
         name: 'Gruppe B'
         tree_left: 14
         tree_right: 19
         tree_level: 1
     Tasktype_40:
         name: 'Scannen (fakultativ)'
-        legacy_tasktype_id: 20
+        id: 20
         tree_left: 21
         tree_right: 22
         tree_level: 2
     Tasktype_39:
+        id: 4
         name: 'Gruppe C'
         tree_left: 20
         tree_right: 23
         tree_level: 1
     Tasktype_42:
         name: OCR
-        legacy_tasktype_id: 40
+        id: 40
         tree_left: 25
         tree_right: 26
         tree_level: 2
     Tasktype_43:
         name: DON
-        legacy_tasktype_id: 55
+        id: 55
         tree_left: 27
         tree_right: 28
         tree_level: 2
     Tasktype_44:
         name: Compare
-        legacy_tasktype_id: 60
+        id: 60
         tree_left: 29
         tree_right: 30
         tree_level: 2
     Tasktype_45:
         name: DON2XML
-        legacy_tasktype_id: 65
+        id: 65
         tree_left: 31
         tree_right: 32
         tree_level: 2
     Tasktype_46:
         name: CoordinateMerge_Don
-        legacy_tasktype_id: 75
+        id: 75
         tree_left: 33
         tree_right: 34
         tree_level: 2
     Tasktype_33:
+        id: 1
         name: Workflows
         tree_left: 1
         tree_right: 38
         tree_level: 0
     Tasktype_47:
         name: Nachkorrektur
-        legacy_tasktype_id: 70
+        id: 70
         tree_left: 35
         tree_right: 36
         tree_level: 2
     Tasktype_41:
+        id: 5
         name: 'Gruppe D (OCR-Workflow, nach Zoning)'
         tree_left: 24
         tree_right: 37
         tree_level: 1
     Tasktype_30:
         name: Textbeschaffung
-        legacy_tasktype_id: 10
+        id: 10
         tree_left: 3
         tree_right: 4
         tree_level: 2
     Tasktype_31:
         name: Vorkorrektur
-        legacy_tasktype_id: 58
+        id: 58
         tree_left: 5
         tree_right: 6
         tree_level: 2
     Tasktype_32:
         name: Zoning
-        legacy_tasktype_id: 30
+        id: 30
         tree_left: 7
         tree_right: 8
         tree_level: 2
     Tasktype_36:
         name: Abtippen
-        legacy_tasktype_id: 50
+        id: 50
         tree_left: 9
         tree_right: 10
         tree_level: 2
@@ -234,6 +246,7 @@ DTA\MetadataBundle\Model\Workflow\Tasktype:
 
 DTA\MetadataBundle\Model\Master\DtaUser:
     DtaUser_1:
+        id: 100
         username: Carl Witt
         salt: 6e145800af4083d354da87df70e92fe5
         password: gszsoJ8ZI4vPkOkO0BKzv16wyRampVzO3F6gA7XxhWKBXC42jKEI6xjgDQ5TGNZm55ipm2fcdCw7LD+EZC0HWw==

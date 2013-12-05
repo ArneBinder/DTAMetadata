@@ -43,10 +43,10 @@ class RecentUseTableMap extends TableMap
         $this->setUseIdGenerator(true);
         $this->setPrimaryKeyMethodInfo('recent_use_id_seq');
         // columns
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('dta_user_id', 'DtaUserId', 'INTEGER', 'dta_user', 'id', true, null, null);
         $this->addForeignKey('publication_id', 'PublicationId', 'INTEGER', 'publication', 'id', true, null, null);
         $this->addColumn('date', 'Date', 'TIMESTAMP', true, null, null);
-        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         // validators
     } // initialize()
 
@@ -69,15 +69,10 @@ class RecentUseTableMap extends TableMap
     {
         return array(
             'table_row_view' =>  array (
+  'Id' => 'id',
   'DtaUserId' => 'dta_user_id',
   'PublicationId' => 'publication_id',
   'Date' => 'date',
-  'Id' => 'id',
-),
-            'auto_add_pk' =>  array (
-  'name' => 'id',
-  'autoIncrement' => 'true',
-  'type' => 'INTEGER',
 ),
         );
     } // getBehaviors()

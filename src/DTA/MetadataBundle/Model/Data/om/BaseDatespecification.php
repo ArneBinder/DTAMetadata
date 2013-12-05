@@ -35,7 +35,7 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
     protected static $peer;
 
     /**
-     * The flag var to prevent infinit loop in deep copy
+     * The flag var to prevent infinite loop in deep copy
      * @var       boolean
      */
     protected $startCopy = false;
@@ -139,6 +139,7 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
      */
     public function getId()
     {
+
         return $this->id;
     }
 
@@ -149,6 +150,7 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
      */
     public function getYear()
     {
+
         return $this->year;
     }
 
@@ -159,6 +161,7 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
      */
     public function getComments()
     {
+
         return $this->comments;
     }
 
@@ -169,13 +172,14 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
      */
     public function getYearIsReconstructed()
     {
+
         return $this->year_is_reconstructed;
     }
 
     /**
      * Set the value of [id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Datespecification The current object (for fluent API support)
      */
     public function setId($v)
@@ -196,7 +200,7 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
     /**
      * Set the value of [year] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Datespecification The current object (for fluent API support)
      */
     public function setYear($v)
@@ -217,7 +221,7 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
     /**
      * Set the value of [comments] column.
      *
-     * @param string $v new value
+     * @param  string $v new value
      * @return Datespecification The current object (for fluent API support)
      */
     public function setComments($v)
@@ -291,7 +295,7 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
      * more tables.
      *
      * @param array $row The row returned by PDOStatement->fetch(PDO::FETCH_NUM)
-     * @param int $startcol 0-based offset column which indicates which restultset column to start with.
+     * @param int $startcol 0-based offset column which indicates which resultset column to start with.
      * @param boolean $rehydrate Whether this object is being re-hydrated from the database.
      * @return int             next starting column
      * @throws PropelException - Any caught Exception will be rewrapped as a PropelException.
@@ -312,6 +316,7 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
+
             return $startcol + 4; // 4 = DatespecificationPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -682,10 +687,10 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
      *
      * In addition to checking the current object, all related objects will
      * also be validated.  If all pass then <code>true</code> is returned; otherwise
-     * an aggreagated array of ValidationFailed objects will be returned.
+     * an aggregated array of ValidationFailed objects will be returned.
      *
      * @param array $columns Array of column names to validate.
-     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objets otherwise.
+     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objects otherwise.
      */
     protected function doValidate($columns = null)
     {
@@ -798,6 +803,11 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
             $keys[2] => $this->getComments(),
             $keys[3] => $this->getYearIsReconstructed(),
         );
+        $virtualColumns = $this->virtualColumns;
+        foreach ($virtualColumns as $key => $virtualColumn) {
+            $result[$key] = $virtualColumn;
+        }
+
         if ($includeForeignObjects) {
             if (null !== $this->collPublicationsRelatedByPublicationdateId) {
                 $result['PublicationsRelatedByPublicationdateId'] = $this->collPublicationsRelatedByPublicationdateId->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1126,7 +1136,7 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
                     if (false !== $this->collPublicationsRelatedByPublicationdateIdPartial && count($collPublicationsRelatedByPublicationdateId)) {
                       $this->initPublicationsRelatedByPublicationdateId(false);
 
-                      foreach($collPublicationsRelatedByPublicationdateId as $obj) {
+                      foreach ($collPublicationsRelatedByPublicationdateId as $obj) {
                         if (false == $this->collPublicationsRelatedByPublicationdateId->contains($obj)) {
                           $this->collPublicationsRelatedByPublicationdateId->append($obj);
                         }
@@ -1136,12 +1146,13 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
                     }
 
                     $collPublicationsRelatedByPublicationdateId->getInternalIterator()->rewind();
+
                     return $collPublicationsRelatedByPublicationdateId;
                 }
 
-                if($partial && $this->collPublicationsRelatedByPublicationdateId) {
-                    foreach($this->collPublicationsRelatedByPublicationdateId as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collPublicationsRelatedByPublicationdateId) {
+                    foreach ($this->collPublicationsRelatedByPublicationdateId as $obj) {
+                        if ($obj->isNew()) {
                             $collPublicationsRelatedByPublicationdateId[] = $obj;
                         }
                     }
@@ -1169,7 +1180,8 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
     {
         $publicationsRelatedByPublicationdateIdToDelete = $this->getPublicationsRelatedByPublicationdateId(new Criteria(), $con)->diff($publicationsRelatedByPublicationdateId);
 
-        $this->publicationsRelatedByPublicationdateIdScheduledForDeletion = unserialize(serialize($publicationsRelatedByPublicationdateIdToDelete));
+
+        $this->publicationsRelatedByPublicationdateIdScheduledForDeletion = $publicationsRelatedByPublicationdateIdToDelete;
 
         foreach ($publicationsRelatedByPublicationdateIdToDelete as $publicationRelatedByPublicationdateIdRemoved) {
             $publicationRelatedByPublicationdateIdRemoved->setDatespecificationRelatedByPublicationdateId(null);
@@ -1203,7 +1215,7 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getPublicationsRelatedByPublicationdateId());
             }
             $query = PublicationQuery::create(null, $criteria);
@@ -1232,8 +1244,13 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
             $this->initPublicationsRelatedByPublicationdateId();
             $this->collPublicationsRelatedByPublicationdateIdPartial = true;
         }
+
         if (!in_array($l, $this->collPublicationsRelatedByPublicationdateId->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddPublicationRelatedByPublicationdateId($l);
+
+            if ($this->publicationsRelatedByPublicationdateIdScheduledForDeletion and $this->publicationsRelatedByPublicationdateIdScheduledForDeletion->contains($l)) {
+                $this->publicationsRelatedByPublicationdateIdScheduledForDeletion->remove($this->publicationsRelatedByPublicationdateIdScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -1288,6 +1305,31 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
     {
         $query = PublicationQuery::create(null, $criteria);
         $query->joinWith('Title', $join_behavior);
+
+        return $this->getPublicationsRelatedByPublicationdateId($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Datespecification is new, it will return
+     * an empty collection; or if this Datespecification has previously
+     * been saved, it will retrieve related PublicationsRelatedByPublicationdateId from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Datespecification.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsRelatedByPublicationdateIdJoinSource($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Source', $join_behavior);
 
         return $this->getPublicationsRelatedByPublicationdateId($query, $con);
     }
@@ -1444,7 +1486,7 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
                     if (false !== $this->collPublicationsRelatedByCreationdateIdPartial && count($collPublicationsRelatedByCreationdateId)) {
                       $this->initPublicationsRelatedByCreationdateId(false);
 
-                      foreach($collPublicationsRelatedByCreationdateId as $obj) {
+                      foreach ($collPublicationsRelatedByCreationdateId as $obj) {
                         if (false == $this->collPublicationsRelatedByCreationdateId->contains($obj)) {
                           $this->collPublicationsRelatedByCreationdateId->append($obj);
                         }
@@ -1454,12 +1496,13 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
                     }
 
                     $collPublicationsRelatedByCreationdateId->getInternalIterator()->rewind();
+
                     return $collPublicationsRelatedByCreationdateId;
                 }
 
-                if($partial && $this->collPublicationsRelatedByCreationdateId) {
-                    foreach($this->collPublicationsRelatedByCreationdateId as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collPublicationsRelatedByCreationdateId) {
+                    foreach ($this->collPublicationsRelatedByCreationdateId as $obj) {
+                        if ($obj->isNew()) {
                             $collPublicationsRelatedByCreationdateId[] = $obj;
                         }
                     }
@@ -1487,7 +1530,8 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
     {
         $publicationsRelatedByCreationdateIdToDelete = $this->getPublicationsRelatedByCreationdateId(new Criteria(), $con)->diff($publicationsRelatedByCreationdateId);
 
-        $this->publicationsRelatedByCreationdateIdScheduledForDeletion = unserialize(serialize($publicationsRelatedByCreationdateIdToDelete));
+
+        $this->publicationsRelatedByCreationdateIdScheduledForDeletion = $publicationsRelatedByCreationdateIdToDelete;
 
         foreach ($publicationsRelatedByCreationdateIdToDelete as $publicationRelatedByCreationdateIdRemoved) {
             $publicationRelatedByCreationdateIdRemoved->setDatespecificationRelatedByCreationdateId(null);
@@ -1521,7 +1565,7 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getPublicationsRelatedByCreationdateId());
             }
             $query = PublicationQuery::create(null, $criteria);
@@ -1550,8 +1594,13 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
             $this->initPublicationsRelatedByCreationdateId();
             $this->collPublicationsRelatedByCreationdateIdPartial = true;
         }
+
         if (!in_array($l, $this->collPublicationsRelatedByCreationdateId->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddPublicationRelatedByCreationdateId($l);
+
+            if ($this->publicationsRelatedByCreationdateIdScheduledForDeletion and $this->publicationsRelatedByCreationdateIdScheduledForDeletion->contains($l)) {
+                $this->publicationsRelatedByCreationdateIdScheduledForDeletion->remove($this->publicationsRelatedByCreationdateIdScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -1606,6 +1655,31 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
     {
         $query = PublicationQuery::create(null, $criteria);
         $query->joinWith('Title', $join_behavior);
+
+        return $this->getPublicationsRelatedByCreationdateId($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Datespecification is new, it will return
+     * an empty collection; or if this Datespecification has previously
+     * been saved, it will retrieve related PublicationsRelatedByCreationdateId from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Datespecification.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsRelatedByCreationdateIdJoinSource($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Source', $join_behavior);
 
         return $this->getPublicationsRelatedByCreationdateId($query, $con);
     }
@@ -1709,7 +1783,7 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
      *
      * This method is a user-space workaround for PHP's inability to garbage collect
      * objects with circular references (even in PHP 5.3). This is currently necessary
-     * when using Propel in certain daemon or large-volumne/high-memory operations.
+     * when using Propel in certain daemon or large-volume/high-memory operations.
      *
      * @param boolean $deep Whether to also clear the references on all referrer objects.
      */

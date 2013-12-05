@@ -26,16 +26,16 @@ abstract class BasePublicationgroupPeer
     const OM_CLASS = 'DTA\\MetadataBundle\\Model\\Workflow\\Publicationgroup';
 
     /** the related TableMap class for this table */
-    const TM_CLASS = 'PublicationgroupTableMap';
+    const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Workflow\\map\\PublicationgroupTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 2;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 3;
+    const NUM_HYDRATE_COLUMNS = 2;
 
     /** the column name for the id field */
     const ID = 'publicationgroup.id';
@@ -43,14 +43,11 @@ abstract class BasePublicationgroupPeer
     /** the column name for the name field */
     const NAME = 'publicationgroup.name';
 
-    /** the column name for the legacy_group_id field */
-    const LEGACY_GROUP_ID = 'publicationgroup.legacy_group_id';
-
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
 
     /**
-     * An identiy map to hold any loaded instances of Publicationgroup objects.
+     * An identity map to hold any loaded instances of Publicationgroup objects.
      * This must be public so that other peer classes can access this when hydrating from JOIN
      * queries.
      * @var        array Publicationgroup[]
@@ -65,12 +62,12 @@ abstract class BasePublicationgroupPeer
      * e.g. PublicationgroupPeer::$fieldNames[PublicationgroupPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'LegacyGroupId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'legacyGroupId', ),
-        BasePeer::TYPE_COLNAME => array (PublicationgroupPeer::ID, PublicationgroupPeer::NAME, PublicationgroupPeer::LEGACY_GROUP_ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'LEGACY_GROUP_ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'legacy_group_id', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', ),
+        BasePeer::TYPE_COLNAME => array (PublicationgroupPeer::ID, PublicationgroupPeer::NAME, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'name', ),
+        BasePeer::TYPE_NUM => array (0, 1, )
     );
 
     /**
@@ -80,12 +77,12 @@ abstract class BasePublicationgroupPeer
      * e.g. PublicationgroupPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'LegacyGroupId' => 2, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'legacyGroupId' => 2, ),
-        BasePeer::TYPE_COLNAME => array (PublicationgroupPeer::ID => 0, PublicationgroupPeer::NAME => 1, PublicationgroupPeer::LEGACY_GROUP_ID => 2, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'LEGACY_GROUP_ID' => 2, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'legacy_group_id' => 2, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, ),
+        BasePeer::TYPE_COLNAME => array (PublicationgroupPeer::ID => 0, PublicationgroupPeer::NAME => 1, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, ),
+        BasePeer::TYPE_NUM => array (0, 1, )
     );
 
     /**
@@ -161,11 +158,9 @@ abstract class BasePublicationgroupPeer
         if (null === $alias) {
             $criteria->addSelectColumn(PublicationgroupPeer::ID);
             $criteria->addSelectColumn(PublicationgroupPeer::NAME);
-            $criteria->addSelectColumn(PublicationgroupPeer::LEGACY_GROUP_ID);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.name');
-            $criteria->addSelectColumn($alias . '.legacy_group_id');
         }
     }
 
@@ -218,7 +213,7 @@ abstract class BasePublicationgroupPeer
      *
      * @param      Criteria $criteria object used to create the SELECT statement.
      * @param      PropelPDO $con
-     * @return                 Publicationgroup
+     * @return Publicationgroup
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -285,7 +280,7 @@ abstract class BasePublicationgroupPeer
      * to the cache in order to ensure that the same objects are always returned by doSelect*()
      * and retrieveByPK*() calls.
      *
-     * @param      Publicationgroup $obj A Publicationgroup object.
+     * @param Publicationgroup $obj A Publicationgroup object.
      * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
     public static function addInstanceToPool($obj, $key = null)
@@ -335,7 +330,7 @@ abstract class BasePublicationgroupPeer
      * a multi-column primary key, a serialize()d version of the primary key will be returned.
      *
      * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-     * @return   Publicationgroup Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+     * @return Publicationgroup Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
      * @see        getPrimaryKeyHash()
      */
     public static function getInstanceFromPool($key)
@@ -356,10 +351,8 @@ abstract class BasePublicationgroupPeer
      */
     public static function clearInstancePool($and_clear_all_references = false)
     {
-      if ($and_clear_all_references)
-      {
-        foreach (PublicationgroupPeer::$instances as $instance)
-        {
+      if ($and_clear_all_references) {
+        foreach (PublicationgroupPeer::$instances as $instance) {
           $instance->clearAllReferences(true);
         }
       }
@@ -487,7 +480,7 @@ abstract class BasePublicationgroupPeer
     {
       $dbMap = Propel::getDatabaseMap(BasePublicationgroupPeer::DATABASE_NAME);
       if (!$dbMap->hasTable(BasePublicationgroupPeer::TABLE_NAME)) {
-        $dbMap->addTableObject(new PublicationgroupTableMap());
+        $dbMap->addTableObject(new \DTA\MetadataBundle\Model\Workflow\map\PublicationgroupTableMap());
       }
     }
 
@@ -523,10 +516,6 @@ abstract class BasePublicationgroupPeer
             $criteria = $values->buildCriteria(); // build Criteria from Publicationgroup object
         }
 
-        if ($criteria->containsKey(PublicationgroupPeer::ID) && $criteria->keyContainsValue(PublicationgroupPeer::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.PublicationgroupPeer::ID.')');
-        }
-
 
         // Set the correct dbName
         $criteria->setDbName(PublicationgroupPeer::DATABASE_NAME);
@@ -537,7 +526,7 @@ abstract class BasePublicationgroupPeer
             $con->beginTransaction();
             $pk = BasePeer::doInsert($criteria, $con);
             $con->commit();
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -610,7 +599,7 @@ abstract class BasePublicationgroupPeer
             $con->commit();
 
             return $affectedRows;
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -669,7 +658,7 @@ abstract class BasePublicationgroupPeer
             $con->commit();
 
             return $affectedRows;
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -682,7 +671,7 @@ abstract class BasePublicationgroupPeer
      *
      * NOTICE: This does not apply to primary or foreign keys for now.
      *
-     * @param      Publicationgroup $obj The object to validate.
+     * @param Publicationgroup $obj The object to validate.
      * @param      mixed $cols Column name or array of column names.
      *
      * @return mixed TRUE if all columns are valid or the error message of the first invalid column.
@@ -715,7 +704,7 @@ abstract class BasePublicationgroupPeer
     /**
      * Retrieve a single object by pkey.
      *
-     * @param      int $pk the primary key.
+     * @param int $pk the primary key.
      * @param      PropelPDO $con the connection to use
      * @return Publicationgroup
      */

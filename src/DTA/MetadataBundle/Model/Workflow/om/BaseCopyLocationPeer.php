@@ -29,16 +29,16 @@ abstract class BaseCopyLocationPeer
     const OM_CLASS = 'DTA\\MetadataBundle\\Model\\Workflow\\CopyLocation';
 
     /** the related TableMap class for this table */
-    const TM_CLASS = 'CopyLocationTableMap';
+    const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Workflow\\map\\CopyLocationTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 16;
+    const NUM_COLUMNS = 15;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 16;
+    const NUM_HYDRATE_COLUMNS = 15;
 
     /** the column name for the id field */
     const ID = 'copy_location.id';
@@ -79,9 +79,6 @@ abstract class BaseCopyLocationPeer
     /** the column name for the license_id field */
     const LICENSE_ID = 'copy_location.license_id';
 
-    /** the column name for the legacy_fundstellen_id field */
-    const LEGACY_FUNDSTELLEN_ID = 'copy_location.legacy_fundstellen_id';
-
     /** the column name for the created_at field */
     const CREATED_AT = 'copy_location.created_at';
 
@@ -92,7 +89,7 @@ abstract class BaseCopyLocationPeer
     const DEFAULT_STRING_FORMAT = 'YAML';
 
     /**
-     * An identiy map to hold any loaded instances of CopyLocation objects.
+     * An identity map to hold any loaded instances of CopyLocation objects.
      * This must be public so that other peer classes can access this when hydrating from JOIN
      * queries.
      * @var        array CopyLocation[]
@@ -107,12 +104,12 @@ abstract class BaseCopyLocationPeer
      * e.g. CopyLocationPeer::$fieldNames[CopyLocationPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'PartnerId', 'CatalogueSignature', 'CatalogueInternal', 'CatalogueUrl', 'Numfaksimiles', 'CatalogueExtent', 'Availability', 'Comments', 'Imageurl', 'Imageurn', 'LicenseId', 'LegacyFundstellenId', 'CreatedAt', 'UpdatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'partnerId', 'catalogueSignature', 'catalogueInternal', 'catalogueUrl', 'numfaksimiles', 'catalogueExtent', 'availability', 'comments', 'imageurl', 'imageurn', 'licenseId', 'legacyFundstellenId', 'createdAt', 'updatedAt', ),
-        BasePeer::TYPE_COLNAME => array (CopyLocationPeer::ID, CopyLocationPeer::PUBLICATION_ID, CopyLocationPeer::PARTNER_ID, CopyLocationPeer::CATALOGUE_SIGNATURE, CopyLocationPeer::CATALOGUE_INTERNAL, CopyLocationPeer::CATALOGUE_URL, CopyLocationPeer::NUMFAKSIMILES, CopyLocationPeer::CATALOGUE_EXTENT, CopyLocationPeer::AVAILABILITY, CopyLocationPeer::COMMENTS, CopyLocationPeer::IMAGEURL, CopyLocationPeer::IMAGEURN, CopyLocationPeer::LICENSE_ID, CopyLocationPeer::LEGACY_FUNDSTELLEN_ID, CopyLocationPeer::CREATED_AT, CopyLocationPeer::UPDATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'PARTNER_ID', 'CATALOGUE_SIGNATURE', 'CATALOGUE_INTERNAL', 'CATALOGUE_URL', 'NUMFAKSIMILES', 'CATALOGUE_EXTENT', 'AVAILABILITY', 'COMMENTS', 'IMAGEURL', 'IMAGEURN', 'LICENSE_ID', 'LEGACY_FUNDSTELLEN_ID', 'CREATED_AT', 'UPDATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'partner_id', 'catalogue_signature', 'catalogue_internal', 'catalogue_url', 'numfaksimiles', 'catalogue_extent', 'availability', 'comments', 'imageurl', 'imageurn', 'license_id', 'legacy_fundstellen_id', 'created_at', 'updated_at', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'PartnerId', 'CatalogueSignature', 'CatalogueInternal', 'CatalogueUrl', 'Numfaksimiles', 'CatalogueExtent', 'Availability', 'Comments', 'Imageurl', 'Imageurn', 'LicenseId', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'partnerId', 'catalogueSignature', 'catalogueInternal', 'catalogueUrl', 'numfaksimiles', 'catalogueExtent', 'availability', 'comments', 'imageurl', 'imageurn', 'licenseId', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (CopyLocationPeer::ID, CopyLocationPeer::PUBLICATION_ID, CopyLocationPeer::PARTNER_ID, CopyLocationPeer::CATALOGUE_SIGNATURE, CopyLocationPeer::CATALOGUE_INTERNAL, CopyLocationPeer::CATALOGUE_URL, CopyLocationPeer::NUMFAKSIMILES, CopyLocationPeer::CATALOGUE_EXTENT, CopyLocationPeer::AVAILABILITY, CopyLocationPeer::COMMENTS, CopyLocationPeer::IMAGEURL, CopyLocationPeer::IMAGEURN, CopyLocationPeer::LICENSE_ID, CopyLocationPeer::CREATED_AT, CopyLocationPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'PARTNER_ID', 'CATALOGUE_SIGNATURE', 'CATALOGUE_INTERNAL', 'CATALOGUE_URL', 'NUMFAKSIMILES', 'CATALOGUE_EXTENT', 'AVAILABILITY', 'COMMENTS', 'IMAGEURL', 'IMAGEURN', 'LICENSE_ID', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'partner_id', 'catalogue_signature', 'catalogue_internal', 'catalogue_url', 'numfaksimiles', 'catalogue_extent', 'availability', 'comments', 'imageurl', 'imageurn', 'license_id', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, )
     );
 
     /**
@@ -122,12 +119,12 @@ abstract class BaseCopyLocationPeer
      * e.g. CopyLocationPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'PartnerId' => 2, 'CatalogueSignature' => 3, 'CatalogueInternal' => 4, 'CatalogueUrl' => 5, 'Numfaksimiles' => 6, 'CatalogueExtent' => 7, 'Availability' => 8, 'Comments' => 9, 'Imageurl' => 10, 'Imageurn' => 11, 'LicenseId' => 12, 'LegacyFundstellenId' => 13, 'CreatedAt' => 14, 'UpdatedAt' => 15, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'partnerId' => 2, 'catalogueSignature' => 3, 'catalogueInternal' => 4, 'catalogueUrl' => 5, 'numfaksimiles' => 6, 'catalogueExtent' => 7, 'availability' => 8, 'comments' => 9, 'imageurl' => 10, 'imageurn' => 11, 'licenseId' => 12, 'legacyFundstellenId' => 13, 'createdAt' => 14, 'updatedAt' => 15, ),
-        BasePeer::TYPE_COLNAME => array (CopyLocationPeer::ID => 0, CopyLocationPeer::PUBLICATION_ID => 1, CopyLocationPeer::PARTNER_ID => 2, CopyLocationPeer::CATALOGUE_SIGNATURE => 3, CopyLocationPeer::CATALOGUE_INTERNAL => 4, CopyLocationPeer::CATALOGUE_URL => 5, CopyLocationPeer::NUMFAKSIMILES => 6, CopyLocationPeer::CATALOGUE_EXTENT => 7, CopyLocationPeer::AVAILABILITY => 8, CopyLocationPeer::COMMENTS => 9, CopyLocationPeer::IMAGEURL => 10, CopyLocationPeer::IMAGEURN => 11, CopyLocationPeer::LICENSE_ID => 12, CopyLocationPeer::LEGACY_FUNDSTELLEN_ID => 13, CopyLocationPeer::CREATED_AT => 14, CopyLocationPeer::UPDATED_AT => 15, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'PARTNER_ID' => 2, 'CATALOGUE_SIGNATURE' => 3, 'CATALOGUE_INTERNAL' => 4, 'CATALOGUE_URL' => 5, 'NUMFAKSIMILES' => 6, 'CATALOGUE_EXTENT' => 7, 'AVAILABILITY' => 8, 'COMMENTS' => 9, 'IMAGEURL' => 10, 'IMAGEURN' => 11, 'LICENSE_ID' => 12, 'LEGACY_FUNDSTELLEN_ID' => 13, 'CREATED_AT' => 14, 'UPDATED_AT' => 15, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'partner_id' => 2, 'catalogue_signature' => 3, 'catalogue_internal' => 4, 'catalogue_url' => 5, 'numfaksimiles' => 6, 'catalogue_extent' => 7, 'availability' => 8, 'comments' => 9, 'imageurl' => 10, 'imageurn' => 11, 'license_id' => 12, 'legacy_fundstellen_id' => 13, 'created_at' => 14, 'updated_at' => 15, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'PartnerId' => 2, 'CatalogueSignature' => 3, 'CatalogueInternal' => 4, 'CatalogueUrl' => 5, 'Numfaksimiles' => 6, 'CatalogueExtent' => 7, 'Availability' => 8, 'Comments' => 9, 'Imageurl' => 10, 'Imageurn' => 11, 'LicenseId' => 12, 'CreatedAt' => 13, 'UpdatedAt' => 14, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'partnerId' => 2, 'catalogueSignature' => 3, 'catalogueInternal' => 4, 'catalogueUrl' => 5, 'numfaksimiles' => 6, 'catalogueExtent' => 7, 'availability' => 8, 'comments' => 9, 'imageurl' => 10, 'imageurn' => 11, 'licenseId' => 12, 'createdAt' => 13, 'updatedAt' => 14, ),
+        BasePeer::TYPE_COLNAME => array (CopyLocationPeer::ID => 0, CopyLocationPeer::PUBLICATION_ID => 1, CopyLocationPeer::PARTNER_ID => 2, CopyLocationPeer::CATALOGUE_SIGNATURE => 3, CopyLocationPeer::CATALOGUE_INTERNAL => 4, CopyLocationPeer::CATALOGUE_URL => 5, CopyLocationPeer::NUMFAKSIMILES => 6, CopyLocationPeer::CATALOGUE_EXTENT => 7, CopyLocationPeer::AVAILABILITY => 8, CopyLocationPeer::COMMENTS => 9, CopyLocationPeer::IMAGEURL => 10, CopyLocationPeer::IMAGEURN => 11, CopyLocationPeer::LICENSE_ID => 12, CopyLocationPeer::CREATED_AT => 13, CopyLocationPeer::UPDATED_AT => 14, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'PARTNER_ID' => 2, 'CATALOGUE_SIGNATURE' => 3, 'CATALOGUE_INTERNAL' => 4, 'CATALOGUE_URL' => 5, 'NUMFAKSIMILES' => 6, 'CATALOGUE_EXTENT' => 7, 'AVAILABILITY' => 8, 'COMMENTS' => 9, 'IMAGEURL' => 10, 'IMAGEURN' => 11, 'LICENSE_ID' => 12, 'CREATED_AT' => 13, 'UPDATED_AT' => 14, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'partner_id' => 2, 'catalogue_signature' => 3, 'catalogue_internal' => 4, 'catalogue_url' => 5, 'numfaksimiles' => 6, 'catalogue_extent' => 7, 'availability' => 8, 'comments' => 9, 'imageurl' => 10, 'imageurn' => 11, 'license_id' => 12, 'created_at' => 13, 'updated_at' => 14, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, )
     );
 
     /**
@@ -214,7 +211,6 @@ abstract class BaseCopyLocationPeer
             $criteria->addSelectColumn(CopyLocationPeer::IMAGEURL);
             $criteria->addSelectColumn(CopyLocationPeer::IMAGEURN);
             $criteria->addSelectColumn(CopyLocationPeer::LICENSE_ID);
-            $criteria->addSelectColumn(CopyLocationPeer::LEGACY_FUNDSTELLEN_ID);
             $criteria->addSelectColumn(CopyLocationPeer::CREATED_AT);
             $criteria->addSelectColumn(CopyLocationPeer::UPDATED_AT);
         } else {
@@ -231,7 +227,6 @@ abstract class BaseCopyLocationPeer
             $criteria->addSelectColumn($alias . '.imageurl');
             $criteria->addSelectColumn($alias . '.imageurn');
             $criteria->addSelectColumn($alias . '.license_id');
-            $criteria->addSelectColumn($alias . '.legacy_fundstellen_id');
             $criteria->addSelectColumn($alias . '.created_at');
             $criteria->addSelectColumn($alias . '.updated_at');
         }
@@ -286,7 +281,7 @@ abstract class BaseCopyLocationPeer
      *
      * @param      Criteria $criteria object used to create the SELECT statement.
      * @param      PropelPDO $con
-     * @return                 CopyLocation
+     * @return CopyLocation
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -353,7 +348,7 @@ abstract class BaseCopyLocationPeer
      * to the cache in order to ensure that the same objects are always returned by doSelect*()
      * and retrieveByPK*() calls.
      *
-     * @param      CopyLocation $obj A CopyLocation object.
+     * @param CopyLocation $obj A CopyLocation object.
      * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
     public static function addInstanceToPool($obj, $key = null)
@@ -403,7 +398,7 @@ abstract class BaseCopyLocationPeer
      * a multi-column primary key, a serialize()d version of the primary key will be returned.
      *
      * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-     * @return   CopyLocation Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+     * @return CopyLocation Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
      * @see        getPrimaryKeyHash()
      */
     public static function getInstanceFromPool($key)
@@ -424,10 +419,8 @@ abstract class BaseCopyLocationPeer
      */
     public static function clearInstancePool($and_clear_all_references = false)
     {
-      if ($and_clear_all_references)
-      {
-        foreach (CopyLocationPeer::$instances as $instance)
-        {
+      if ($and_clear_all_references) {
+        foreach (CopyLocationPeer::$instances as $instance) {
           $instance->clearAllReferences(true);
         }
       }
@@ -1532,7 +1525,7 @@ abstract class BaseCopyLocationPeer
     {
       $dbMap = Propel::getDatabaseMap(BaseCopyLocationPeer::DATABASE_NAME);
       if (!$dbMap->hasTable(BaseCopyLocationPeer::TABLE_NAME)) {
-        $dbMap->addTableObject(new CopyLocationTableMap());
+        $dbMap->addTableObject(new \DTA\MetadataBundle\Model\Workflow\map\CopyLocationTableMap());
       }
     }
 
@@ -1568,10 +1561,6 @@ abstract class BaseCopyLocationPeer
             $criteria = $values->buildCriteria(); // build Criteria from CopyLocation object
         }
 
-        if ($criteria->containsKey(CopyLocationPeer::ID) && $criteria->keyContainsValue(CopyLocationPeer::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.CopyLocationPeer::ID.')');
-        }
-
 
         // Set the correct dbName
         $criteria->setDbName(CopyLocationPeer::DATABASE_NAME);
@@ -1582,7 +1571,7 @@ abstract class BaseCopyLocationPeer
             $con->beginTransaction();
             $pk = BasePeer::doInsert($criteria, $con);
             $con->commit();
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -1655,7 +1644,7 @@ abstract class BaseCopyLocationPeer
             $con->commit();
 
             return $affectedRows;
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -1714,7 +1703,7 @@ abstract class BaseCopyLocationPeer
             $con->commit();
 
             return $affectedRows;
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -1727,7 +1716,7 @@ abstract class BaseCopyLocationPeer
      *
      * NOTICE: This does not apply to primary or foreign keys for now.
      *
-     * @param      CopyLocation $obj The object to validate.
+     * @param CopyLocation $obj The object to validate.
      * @param      mixed $cols Column name or array of column names.
      *
      * @return mixed TRUE if all columns are valid or the error message of the first invalid column.
@@ -1760,7 +1749,7 @@ abstract class BaseCopyLocationPeer
     /**
      * Retrieve a single object by pkey.
      *
-     * @param      int $pk the primary key.
+     * @param int $pk the primary key.
      * @param      PropelPDO $con the connection to use
      * @return CopyLocation
      */

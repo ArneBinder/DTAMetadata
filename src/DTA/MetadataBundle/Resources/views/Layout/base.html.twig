@@ -63,6 +63,7 @@
                 // confirm functionality
                 $('a.confirmClick').on('click', confirmCriticalAction);
 
+                $
 
                 // ------------------------------------------------------
                 // DataTables plugin setup
@@ -128,6 +129,8 @@
                     event.preventDefault();
                 };
             }
+            {% block additionalJS %}
+            {% endblock %}
 
         </script>
     </body>

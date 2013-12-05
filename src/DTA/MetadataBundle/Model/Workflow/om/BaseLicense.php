@@ -37,7 +37,7 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
     protected static $peer;
 
     /**
-     * The flag var to prevent infinit loop in deep copy
+     * The flag var to prevent infinite loop in deep copy
      * @var       boolean
      */
     protected $startCopy = false;
@@ -149,6 +149,7 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
      */
     public function getId()
     {
+
         return $this->id;
     }
 
@@ -159,6 +160,7 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
      */
     public function getName()
     {
+
         return $this->name;
     }
 
@@ -169,6 +171,7 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
      */
     public function getUrl()
     {
+
         return $this->url;
     }
 
@@ -179,6 +182,7 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
      */
     public function getApplicableToImage()
     {
+
         return $this->applicable_to_image;
     }
 
@@ -189,13 +193,14 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
      */
     public function getApplicableToText()
     {
+
         return $this->applicable_to_text;
     }
 
     /**
      * Set the value of [id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return License The current object (for fluent API support)
      */
     public function setId($v)
@@ -216,7 +221,7 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
     /**
      * Set the value of [name] column.
      *
-     * @param string $v new value
+     * @param  string $v new value
      * @return License The current object (for fluent API support)
      */
     public function setName($v)
@@ -237,7 +242,7 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
     /**
      * Set the value of [url] column.
      *
-     * @param string $v new value
+     * @param  string $v new value
      * @return License The current object (for fluent API support)
      */
     public function setUrl($v)
@@ -344,7 +349,7 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
      * more tables.
      *
      * @param array $row The row returned by PDOStatement->fetch(PDO::FETCH_NUM)
-     * @param int $startcol 0-based offset column which indicates which restultset column to start with.
+     * @param int $startcol 0-based offset column which indicates which resultset column to start with.
      * @param boolean $rehydrate Whether this object is being re-hydrated from the database.
      * @return int             next starting column
      * @throws PropelException - Any caught Exception will be rewrapped as a PropelException.
@@ -366,6 +371,7 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
+
             return $startcol + 5; // 5 = LicensePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -742,10 +748,10 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
      *
      * In addition to checking the current object, all related objects will
      * also be validated.  If all pass then <code>true</code> is returned; otherwise
-     * an aggreagated array of ValidationFailed objects will be returned.
+     * an aggregated array of ValidationFailed objects will be returned.
      *
      * @param array $columns Array of column names to validate.
-     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objets otherwise.
+     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objects otherwise.
      */
     protected function doValidate($columns = null)
     {
@@ -862,6 +868,11 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
             $keys[3] => $this->getApplicableToImage(),
             $keys[4] => $this->getApplicableToText(),
         );
+        $virtualColumns = $this->virtualColumns;
+        foreach ($virtualColumns as $key => $virtualColumn) {
+            $result[$key] = $virtualColumn;
+        }
+
         if ($includeForeignObjects) {
             if (null !== $this->collCopyLocations) {
                 $result['CopyLocations'] = $this->collCopyLocations->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1196,7 +1207,7 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
                     if (false !== $this->collCopyLocationsPartial && count($collCopyLocations)) {
                       $this->initCopyLocations(false);
 
-                      foreach($collCopyLocations as $obj) {
+                      foreach ($collCopyLocations as $obj) {
                         if (false == $this->collCopyLocations->contains($obj)) {
                           $this->collCopyLocations->append($obj);
                         }
@@ -1206,12 +1217,13 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
                     }
 
                     $collCopyLocations->getInternalIterator()->rewind();
+
                     return $collCopyLocations;
                 }
 
-                if($partial && $this->collCopyLocations) {
-                    foreach($this->collCopyLocations as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collCopyLocations) {
+                    foreach ($this->collCopyLocations as $obj) {
+                        if ($obj->isNew()) {
                             $collCopyLocations[] = $obj;
                         }
                     }
@@ -1239,7 +1251,8 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
     {
         $copyLocationsToDelete = $this->getCopyLocations(new Criteria(), $con)->diff($copyLocations);
 
-        $this->copyLocationsScheduledForDeletion = unserialize(serialize($copyLocationsToDelete));
+
+        $this->copyLocationsScheduledForDeletion = $copyLocationsToDelete;
 
         foreach ($copyLocationsToDelete as $copyLocationRemoved) {
             $copyLocationRemoved->setLicense(null);
@@ -1273,7 +1286,7 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getCopyLocations());
             }
             $query = CopyLocationQuery::create(null, $criteria);
@@ -1302,8 +1315,13 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
             $this->initCopyLocations();
             $this->collCopyLocationsPartial = true;
         }
+
         if (!in_array($l, $this->collCopyLocations->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddCopyLocation($l);
+
+            if ($this->copyLocationsScheduledForDeletion and $this->copyLocationsScheduledForDeletion->contains($l)) {
+                $this->copyLocationsScheduledForDeletion->remove($this->copyLocationsScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -1464,7 +1482,7 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
                     if (false !== $this->collTextsourcesPartial && count($collTextsources)) {
                       $this->initTextsources(false);
 
-                      foreach($collTextsources as $obj) {
+                      foreach ($collTextsources as $obj) {
                         if (false == $this->collTextsources->contains($obj)) {
                           $this->collTextsources->append($obj);
                         }
@@ -1474,12 +1492,13 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
                     }
 
                     $collTextsources->getInternalIterator()->rewind();
+
                     return $collTextsources;
                 }
 
-                if($partial && $this->collTextsources) {
-                    foreach($this->collTextsources as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collTextsources) {
+                    foreach ($this->collTextsources as $obj) {
+                        if ($obj->isNew()) {
                             $collTextsources[] = $obj;
                         }
                     }
@@ -1507,7 +1526,8 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
     {
         $textsourcesToDelete = $this->getTextsources(new Criteria(), $con)->diff($textsources);
 
-        $this->textsourcesScheduledForDeletion = unserialize(serialize($textsourcesToDelete));
+
+        $this->textsourcesScheduledForDeletion = $textsourcesToDelete;
 
         foreach ($textsourcesToDelete as $textsourceRemoved) {
             $textsourceRemoved->setLicense(null);
@@ -1541,7 +1561,7 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getTextsources());
             }
             $query = TextsourceQuery::create(null, $criteria);
@@ -1570,8 +1590,13 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
             $this->initTextsources();
             $this->collTextsourcesPartial = true;
         }
+
         if (!in_array($l, $this->collTextsources->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddTextsource($l);
+
+            if ($this->textsourcesScheduledForDeletion and $this->textsourcesScheduledForDeletion->contains($l)) {
+                $this->textsourcesScheduledForDeletion->remove($this->textsourcesScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -1680,7 +1705,7 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
      *
      * This method is a user-space workaround for PHP's inability to garbage collect
      * objects with circular references (even in PHP 5.3). This is currently necessary
-     * when using Propel in certain daemon or large-volumne/high-memory operations.
+     * when using Propel in certain daemon or large-volume/high-memory operations.
      *
      * @param boolean $deep Whether to also clear the references on all referrer objects.
      */

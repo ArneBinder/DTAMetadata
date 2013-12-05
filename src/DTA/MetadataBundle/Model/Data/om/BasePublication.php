@@ -19,6 +19,8 @@ use DTA\MetadataBundle\Model\Classification\Category;
 use DTA\MetadataBundle\Model\Classification\CategoryQuery;
 use DTA\MetadataBundle\Model\Classification\Genre;
 use DTA\MetadataBundle\Model\Classification\GenreQuery;
+use DTA\MetadataBundle\Model\Classification\Source;
+use DTA\MetadataBundle\Model\Classification\SourceQuery;
 use DTA\MetadataBundle\Model\Classification\Tag;
 use DTA\MetadataBundle\Model\Classification\TagQuery;
 use DTA\MetadataBundle\Model\Data\Datespecification;
@@ -97,7 +99,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     protected static $peer;
 
     /**
-     * The flag var to prevent infinit loop in deep copy
+     * The flag var to prevent infinite loop in deep copy
      * @var       boolean
      */
     protected $startCopy = false;
@@ -143,6 +145,12 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      * @var        int
      */
     protected $publishingcompany_id;
+
+    /**
+     * The value for the source_id field.
+     * @var        int
+     */
+    protected $source_id;
 
     /**
      * The value for the partner_id field.
@@ -223,12 +231,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     protected $last_changed_by_user_id;
 
     /**
-     * The value for the legacy_book_id field.
-     * @var        int
-     */
-    protected $legacy_book_id;
-
-    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -251,6 +253,11 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      * @var        Title
      */
     protected $aTitle;
+
+    /**
+     * @var        Source
+     */
+    protected $aSource;
 
     /**
      * @var        Publishingcompany
@@ -454,7 +461,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Titel', 'erster Autor', 'Verlag', 'veröffentlicht', );	public   $tableRowViewAccessors = array('Titel'=>'accessor:getTitle', 'erster Autor'=>'accessor:getFirstAuthor', 'Verlag'=>'accessor:getPublishingCompany', 'veröffentlicht'=>'accessor:getDatespecificationRelatedByPublicationdateId', );	public static $queryConstructionString = "\DTA\MetadataBundle\Model\Data\PublicationQuery::create()                         ->leftJoinWith('Title')                         ->leftJoinWith('Title.Titlefragment')                         ->leftJoinWith('DatespecificationRelatedByPublicationdateId')                         ->leftJoinWith('PersonPublication')                         ->leftJoin('PersonPublication.Person')                         ->leftJoin('Person.Personalname')                         ->leftJoin('Personalname.Namefragment');";
+    public static $tableRowViewCaptions = array('Titel', 'erster Autor', 'Verlag', 'veröffentlicht', );	public   $tableRowViewAccessors = array('Titel'=>'accessor:getTitle', 'erster Autor'=>'accessor:getFirstAuthor', 'Verlag'=>'accessor:getPublishingCompany', 'veröffentlicht'=>'accessor:getDatespecificationRelatedByPublicationdateId', );	public static $queryConstructionString = "\DTA\MetadataBundle\Model\Data\PublicationQuery::create()                     ->leftJoinWith('Title')                     ->leftJoinWith('Title.Titlefragment')                     ->leftJoinWith('DatespecificationRelatedByPublicationdateId')                     ->leftJoinWith('PersonPublication')                     ->leftJoinWith('PersonPublication.Person')                     ->leftJoinWith('Person.Personalname')                     ->leftJoinWith('Personalname.Namefragment');";
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -645,6 +652,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function getId()
     {
+
         return $this->id;
     }
 
@@ -655,6 +663,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function getTitleId()
     {
+
         return $this->title_id;
     }
 
@@ -665,6 +674,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function getFirsteditionpublicationId()
     {
+
         return $this->firsteditionpublication_id;
     }
 
@@ -675,6 +685,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function getPlaceId()
     {
+
         return $this->place_id;
     }
 
@@ -685,6 +696,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function getPublicationdateId()
     {
+
         return $this->publicationdate_id;
     }
 
@@ -695,6 +707,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function getCreationdateId()
     {
+
         return $this->creationdate_id;
     }
 
@@ -705,7 +718,19 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function getPublishingcompanyId()
     {
+
         return $this->publishingcompany_id;
+    }
+
+    /**
+     * Get the [source_id] column value.
+     * Zur Sicherheit aus der alten DB übernommen
+     * @return int
+     */
+    public function getSourceId()
+    {
+
+        return $this->source_id;
     }
 
     /**
@@ -715,6 +740,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function getPartnerId()
     {
+
         return $this->partner_id;
     }
 
@@ -725,6 +751,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function getEditiondescription()
     {
+
         return $this->editiondescription;
     }
 
@@ -735,6 +762,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function getDigitaleditioneditor()
     {
+
         return $this->digitaleditioneditor;
     }
 
@@ -745,6 +773,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function getTranscriptioncomment()
     {
+
         return $this->transcriptioncomment;
     }
 
@@ -755,6 +784,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function getNumpages()
     {
+
         return $this->numpages;
     }
 
@@ -765,6 +795,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function getNumpagesnumeric()
     {
+
         return $this->numpagesnumeric;
     }
 
@@ -775,6 +806,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function getComment()
     {
+
         return $this->comment;
     }
 
@@ -785,6 +817,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function getEncodingComment()
     {
+
         return $this->encoding_comment;
     }
 
@@ -795,6 +828,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function getDoi()
     {
+
         return $this->doi;
     }
 
@@ -805,6 +839,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function getFormat()
     {
+
         return $this->format;
     }
 
@@ -815,6 +850,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function getDirectoryname()
     {
+
         return $this->directoryname;
     }
 
@@ -825,6 +861,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function getWwwready()
     {
+
         return $this->wwwready;
     }
 
@@ -835,17 +872,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function getLastChangedByUserId()
     {
-        return $this->last_changed_by_user_id;
-    }
 
-    /**
-     * Get the [legacy_book_id] column value.
-     * id_book des Datensatzes aus der alten Datenbank, der dem neuen Datensatz zugrundeliegt.
-     * @return int
-     */
-    public function getLegacyBookId()
-    {
-        return $this->legacy_book_id;
+        return $this->last_changed_by_user_id;
     }
 
     /**
@@ -925,13 +953,14 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function getPublishingcompanyIdIsReconstructed()
     {
+
         return $this->publishingcompany_id_is_reconstructed;
     }
 
     /**
      * Set the value of [id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Publication The current object (for fluent API support)
      */
     public function setId($v)
@@ -952,7 +981,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * Set the value of [title_id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Publication The current object (for fluent API support)
      */
     public function setTitleId($v)
@@ -977,7 +1006,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * Set the value of [firsteditionpublication_id] column.
      * Publikation, die die Informationen zur Erstauflage enthält
-     * @param int $v new value
+     * @param  int $v new value
      * @return Publication The current object (for fluent API support)
      */
     public function setFirsteditionpublicationId($v)
@@ -998,7 +1027,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * Set the value of [place_id] column.
      * Druckort
-     * @param int $v new value
+     * @param  int $v new value
      * @return Publication The current object (for fluent API support)
      */
     public function setPlaceId($v)
@@ -1023,7 +1052,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * Set the value of [publicationdate_id] column.
      * Erscheinungsjahr
-     * @param int $v new value
+     * @param  int $v new value
      * @return Publication The current object (for fluent API support)
      */
     public function setPublicationdateId($v)
@@ -1048,7 +1077,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * Set the value of [creationdate_id] column.
      * Erscheinungsjahr der Erstausgabe
-     * @param int $v new value
+     * @param  int $v new value
      * @return Publication The current object (for fluent API support)
      */
     public function setCreationdateId($v)
@@ -1073,7 +1102,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * Set the value of [publishingcompany_id] column.
      * Verlag
-     * @param int $v new value
+     * @param  int $v new value
      * @return Publication The current object (for fluent API support)
      */
     public function setPublishingcompanyId($v)
@@ -1096,9 +1125,34 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     } // setPublishingcompanyId()
 
     /**
+     * Set the value of [source_id] column.
+     * Zur Sicherheit aus der alten DB übernommen
+     * @param  int $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setSourceId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->source_id !== $v) {
+            $this->source_id = $v;
+            $this->modifiedColumns[] = PublicationPeer::SOURCE_ID;
+        }
+
+        if ($this->aSource !== null && $this->aSource->getId() !== $v) {
+            $this->aSource = null;
+        }
+
+
+        return $this;
+    } // setSourceId()
+
+    /**
      * Set the value of [partner_id] column.
      * akquiriert über
-     * @param int $v new value
+     * @param  int $v new value
      * @return Publication The current object (for fluent API support)
      */
     public function setPartnerId($v)
@@ -1119,7 +1173,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * Set the value of [editiondescription] column.
      * Art der Ausgabe
-     * @param string $v new value
+     * @param  string $v new value
      * @return Publication The current object (for fluent API support)
      */
     public function setEditiondescription($v)
@@ -1140,7 +1194,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * Set the value of [digitaleditioneditor] column.
      * Bearbeiter der digitalen Edition
-     * @param string $v new value
+     * @param  string $v new value
      * @return Publication The current object (for fluent API support)
      */
     public function setDigitaleditioneditor($v)
@@ -1161,7 +1215,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * Set the value of [transcriptioncomment] column.
      * Bemerkungen zu den Transkriptionsrichtlinien
-     * @param string $v new value
+     * @param  string $v new value
      * @return Publication The current object (for fluent API support)
      */
     public function setTranscriptioncomment($v)
@@ -1182,7 +1236,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * Set the value of [numpages] column.
      * Anzahl Seiten (Umfang)
-     * @param string $v new value
+     * @param  string $v new value
      * @return Publication The current object (for fluent API support)
      */
     public function setNumpages($v)
@@ -1203,7 +1257,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * Set the value of [numpagesnumeric] column.
      * Umfang (normiert)
-     * @param int $v new value
+     * @param  int $v new value
      * @return Publication The current object (for fluent API support)
      */
     public function setNumpagesnumeric($v)
@@ -1224,7 +1278,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * Set the value of [comment] column.
      * Anmerkungen
-     * @param string $v new value
+     * @param  string $v new value
      * @return Publication The current object (for fluent API support)
      */
     public function setComment($v)
@@ -1245,7 +1299,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * Set the value of [encoding_comment] column.
      * Kommentar Encoding
-     * @param string $v new value
+     * @param  string $v new value
      * @return Publication The current object (for fluent API support)
      */
     public function setEncodingComment($v)
@@ -1266,7 +1320,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * Set the value of [doi] column.
      *
-     * @param string $v new value
+     * @param  string $v new value
      * @return Publication The current object (for fluent API support)
      */
     public function setDoi($v)
@@ -1287,7 +1341,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * Set the value of [format] column.
      *
-     * @param string $v new value
+     * @param  string $v new value
      * @return Publication The current object (for fluent API support)
      */
     public function setFormat($v)
@@ -1308,7 +1362,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * Set the value of [directoryname] column.
      *
-     * @param string $v new value
+     * @param  string $v new value
      * @return Publication The current object (for fluent API support)
      */
     public function setDirectoryname($v)
@@ -1329,7 +1383,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * Set the value of [wwwready] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Publication The current object (for fluent API support)
      */
     public function setWwwready($v)
@@ -1350,7 +1404,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * Set the value of [last_changed_by_user_id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Publication The current object (for fluent API support)
      */
     public function setLastChangedByUserId($v)
@@ -1371,27 +1425,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
         return $this;
     } // setLastChangedByUserId()
-
-    /**
-     * Set the value of [legacy_book_id] column.
-     * id_book des Datensatzes aus der alten Datenbank, der dem neuen Datensatz zugrundeliegt.
-     * @param int $v new value
-     * @return Publication The current object (for fluent API support)
-     */
-    public function setLegacyBookId($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->legacy_book_id !== $v) {
-            $this->legacy_book_id = $v;
-            $this->modifiedColumns[] = PublicationPeer::LEGACY_BOOK_ID;
-        }
-
-
-        return $this;
-    } // setLegacyBookId()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -1495,7 +1528,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      * more tables.
      *
      * @param array $row The row returned by PDOStatement->fetch(PDO::FETCH_NUM)
-     * @param int $startcol 0-based offset column which indicates which restultset column to start with.
+     * @param int $startcol 0-based offset column which indicates which resultset column to start with.
      * @param boolean $rehydrate Whether this object is being re-hydrated from the database.
      * @return int             next starting column
      * @throws PropelException - Any caught Exception will be rewrapped as a PropelException.
@@ -1511,20 +1544,20 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->publicationdate_id = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
             $this->creationdate_id = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
             $this->publishingcompany_id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-            $this->partner_id = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-            $this->editiondescription = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
-            $this->digitaleditioneditor = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-            $this->transcriptioncomment = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
-            $this->numpages = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
-            $this->numpagesnumeric = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
-            $this->comment = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
-            $this->encoding_comment = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
-            $this->doi = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
-            $this->format = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
-            $this->directoryname = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
-            $this->wwwready = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
-            $this->last_changed_by_user_id = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
-            $this->legacy_book_id = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
+            $this->source_id = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
+            $this->partner_id = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+            $this->editiondescription = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+            $this->digitaleditioneditor = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+            $this->transcriptioncomment = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+            $this->numpages = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+            $this->numpagesnumeric = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
+            $this->comment = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
+            $this->encoding_comment = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+            $this->doi = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
+            $this->format = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
+            $this->directoryname = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
+            $this->wwwready = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
+            $this->last_changed_by_user_id = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
             $this->created_at = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
             $this->updated_at = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
             $this->publishingcompany_id_is_reconstructed = ($row[$startcol + 23] !== null) ? (boolean) $row[$startcol + 23] : null;
@@ -1536,6 +1569,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
+
             return $startcol + 24; // 24 = PublicationPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -1573,6 +1607,9 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         }
         if ($this->aPublishingcompany !== null && $this->publishingcompany_id !== $this->aPublishingcompany->getId()) {
             $this->aPublishingcompany = null;
+        }
+        if ($this->aSource !== null && $this->source_id !== $this->aSource->getId()) {
+            $this->aSource = null;
         }
         if ($this->aLastChangedByUser !== null && $this->last_changed_by_user_id !== $this->aLastChangedByUser->getId()) {
             $this->aLastChangedByUser = null;
@@ -1617,6 +1654,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ($deep) {  // also de-associate any related objects?
 
             $this->aTitle = null;
+            $this->aSource = null;
             $this->aPublishingcompany = null;
             $this->aPlace = null;
             $this->aDatespecificationRelatedByPublicationdateId = null;
@@ -1795,7 +1833,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->alreadyInSave = true;
 
             // We call the save method on the following object(s) if they
-            // were passed to this object by their coresponding set
+            // were passed to this object by their corresponding set
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
@@ -1804,6 +1842,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     $affectedRows += $this->aTitle->save($con);
                 }
                 $this->setTitle($this->aTitle);
+            }
+
+            if ($this->aSource !== null) {
+                if ($this->aSource->isModified() || $this->aSource->isNew()) {
+                    $affectedRows += $this->aSource->save($con);
+                }
+                $this->setSource($this->aSource);
             }
 
             if ($this->aPublishingcompany !== null) {
@@ -2386,20 +2431,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = PublicationPeer::ID;
-        if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . PublicationPeer::ID . ')');
-        }
-        if (null === $this->id) {
-            try {
-                $stmt = $con->query("SELECT nextval('publication_id_seq')");
-                $row = $stmt->fetch(PDO::FETCH_NUM);
-                $this->id = $row[0];
-            } catch (Exception $e) {
-                throw new PropelException('Unable to get sequence id.', $e);
-            }
-        }
-
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(PublicationPeer::ID)) {
@@ -2422,6 +2453,9 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         }
         if ($this->isColumnModified(PublicationPeer::PUBLISHINGCOMPANY_ID)) {
             $modifiedColumns[':p' . $index++]  = '"publishingcompany_id"';
+        }
+        if ($this->isColumnModified(PublicationPeer::SOURCE_ID)) {
+            $modifiedColumns[':p' . $index++]  = '"source_id"';
         }
         if ($this->isColumnModified(PublicationPeer::PARTNER_ID)) {
             $modifiedColumns[':p' . $index++]  = '"partner_id"';
@@ -2461,9 +2495,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         }
         if ($this->isColumnModified(PublicationPeer::LAST_CHANGED_BY_USER_ID)) {
             $modifiedColumns[':p' . $index++]  = '"last_changed_by_user_id"';
-        }
-        if ($this->isColumnModified(PublicationPeer::LEGACY_BOOK_ID)) {
-            $modifiedColumns[':p' . $index++]  = '"legacy_book_id"';
         }
         if ($this->isColumnModified(PublicationPeer::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '"created_at"';
@@ -2506,6 +2537,9 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     case '"publishingcompany_id"':
                         $stmt->bindValue($identifier, $this->publishingcompany_id, PDO::PARAM_INT);
                         break;
+                    case '"source_id"':
+                        $stmt->bindValue($identifier, $this->source_id, PDO::PARAM_INT);
+                        break;
                     case '"partner_id"':
                         $stmt->bindValue($identifier, $this->partner_id, PDO::PARAM_INT);
                         break;
@@ -2544,9 +2578,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                         break;
                     case '"last_changed_by_user_id"':
                         $stmt->bindValue($identifier, $this->last_changed_by_user_id, PDO::PARAM_INT);
-                        break;
-                    case '"legacy_book_id"':
-                        $stmt->bindValue($identifier, $this->legacy_book_id, PDO::PARAM_INT);
                         break;
                     case '"created_at"':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
@@ -2630,10 +2661,10 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      *
      * In addition to checking the current object, all related objects will
      * also be validated.  If all pass then <code>true</code> is returned; otherwise
-     * an aggreagated array of ValidationFailed objects will be returned.
+     * an aggregated array of ValidationFailed objects will be returned.
      *
      * @param array $columns Array of column names to validate.
-     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objets otherwise.
+     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objects otherwise.
      */
     protected function doValidate($columns = null)
     {
@@ -2645,13 +2676,19 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
 
             // We call the validate method on the following object(s) if they
-            // were passed to this object by their coresponding set
+            // were passed to this object by their corresponding set
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
             if ($this->aTitle !== null) {
                 if (!$this->aTitle->validate($columns)) {
                     $failureMap = array_merge($failureMap, $this->aTitle->getValidationFailures());
+                }
+            }
+
+            if ($this->aSource !== null) {
+                if (!$this->aSource->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aSource->getValidationFailures());
                 }
             }
 
@@ -2916,46 +2953,46 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return $this->getPublishingcompanyId();
                 break;
             case 7:
-                return $this->getPartnerId();
+                return $this->getSourceId();
                 break;
             case 8:
-                return $this->getEditiondescription();
+                return $this->getPartnerId();
                 break;
             case 9:
-                return $this->getDigitaleditioneditor();
+                return $this->getEditiondescription();
                 break;
             case 10:
-                return $this->getTranscriptioncomment();
+                return $this->getDigitaleditioneditor();
                 break;
             case 11:
-                return $this->getNumpages();
+                return $this->getTranscriptioncomment();
                 break;
             case 12:
-                return $this->getNumpagesnumeric();
+                return $this->getNumpages();
                 break;
             case 13:
-                return $this->getComment();
+                return $this->getNumpagesnumeric();
                 break;
             case 14:
-                return $this->getEncodingComment();
+                return $this->getComment();
                 break;
             case 15:
-                return $this->getDoi();
+                return $this->getEncodingComment();
                 break;
             case 16:
-                return $this->getFormat();
+                return $this->getDoi();
                 break;
             case 17:
-                return $this->getDirectoryname();
+                return $this->getFormat();
                 break;
             case 18:
-                return $this->getWwwready();
+                return $this->getDirectoryname();
                 break;
             case 19:
-                return $this->getLastChangedByUserId();
+                return $this->getWwwready();
                 break;
             case 20:
-                return $this->getLegacyBookId();
+                return $this->getLastChangedByUserId();
                 break;
             case 21:
                 return $this->getCreatedAt();
@@ -3002,27 +3039,35 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $keys[4] => $this->getPublicationdateId(),
             $keys[5] => $this->getCreationdateId(),
             $keys[6] => $this->getPublishingcompanyId(),
-            $keys[7] => $this->getPartnerId(),
-            $keys[8] => $this->getEditiondescription(),
-            $keys[9] => $this->getDigitaleditioneditor(),
-            $keys[10] => $this->getTranscriptioncomment(),
-            $keys[11] => $this->getNumpages(),
-            $keys[12] => $this->getNumpagesnumeric(),
-            $keys[13] => $this->getComment(),
-            $keys[14] => $this->getEncodingComment(),
-            $keys[15] => $this->getDoi(),
-            $keys[16] => $this->getFormat(),
-            $keys[17] => $this->getDirectoryname(),
-            $keys[18] => $this->getWwwready(),
-            $keys[19] => $this->getLastChangedByUserId(),
-            $keys[20] => $this->getLegacyBookId(),
+            $keys[7] => $this->getSourceId(),
+            $keys[8] => $this->getPartnerId(),
+            $keys[9] => $this->getEditiondescription(),
+            $keys[10] => $this->getDigitaleditioneditor(),
+            $keys[11] => $this->getTranscriptioncomment(),
+            $keys[12] => $this->getNumpages(),
+            $keys[13] => $this->getNumpagesnumeric(),
+            $keys[14] => $this->getComment(),
+            $keys[15] => $this->getEncodingComment(),
+            $keys[16] => $this->getDoi(),
+            $keys[17] => $this->getFormat(),
+            $keys[18] => $this->getDirectoryname(),
+            $keys[19] => $this->getWwwready(),
+            $keys[20] => $this->getLastChangedByUserId(),
             $keys[21] => $this->getCreatedAt(),
             $keys[22] => $this->getUpdatedAt(),
             $keys[23] => $this->getPublishingcompanyIdIsReconstructed(),
         );
+        $virtualColumns = $this->virtualColumns;
+        foreach ($virtualColumns as $key => $virtualColumn) {
+            $result[$key] = $virtualColumn;
+        }
+
         if ($includeForeignObjects) {
             if (null !== $this->aTitle) {
                 $result['Title'] = $this->aTitle->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aSource) {
+                $result['Source'] = $this->aSource->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->aPublishingcompany) {
                 $result['Publishingcompany'] = $this->aPublishingcompany->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
@@ -3158,46 +3203,46 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 $this->setPublishingcompanyId($value);
                 break;
             case 7:
-                $this->setPartnerId($value);
+                $this->setSourceId($value);
                 break;
             case 8:
-                $this->setEditiondescription($value);
+                $this->setPartnerId($value);
                 break;
             case 9:
-                $this->setDigitaleditioneditor($value);
+                $this->setEditiondescription($value);
                 break;
             case 10:
-                $this->setTranscriptioncomment($value);
+                $this->setDigitaleditioneditor($value);
                 break;
             case 11:
-                $this->setNumpages($value);
+                $this->setTranscriptioncomment($value);
                 break;
             case 12:
-                $this->setNumpagesnumeric($value);
+                $this->setNumpages($value);
                 break;
             case 13:
-                $this->setComment($value);
+                $this->setNumpagesnumeric($value);
                 break;
             case 14:
-                $this->setEncodingComment($value);
+                $this->setComment($value);
                 break;
             case 15:
-                $this->setDoi($value);
+                $this->setEncodingComment($value);
                 break;
             case 16:
-                $this->setFormat($value);
+                $this->setDoi($value);
                 break;
             case 17:
-                $this->setDirectoryname($value);
+                $this->setFormat($value);
                 break;
             case 18:
-                $this->setWwwready($value);
+                $this->setDirectoryname($value);
                 break;
             case 19:
-                $this->setLastChangedByUserId($value);
+                $this->setWwwready($value);
                 break;
             case 20:
-                $this->setLegacyBookId($value);
+                $this->setLastChangedByUserId($value);
                 break;
             case 21:
                 $this->setCreatedAt($value);
@@ -3239,20 +3284,20 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if (array_key_exists($keys[4], $arr)) $this->setPublicationdateId($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setCreationdateId($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setPublishingcompanyId($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setPartnerId($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setEditiondescription($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setDigitaleditioneditor($arr[$keys[9]]);
-        if (array_key_exists($keys[10], $arr)) $this->setTranscriptioncomment($arr[$keys[10]]);
-        if (array_key_exists($keys[11], $arr)) $this->setNumpages($arr[$keys[11]]);
-        if (array_key_exists($keys[12], $arr)) $this->setNumpagesnumeric($arr[$keys[12]]);
-        if (array_key_exists($keys[13], $arr)) $this->setComment($arr[$keys[13]]);
-        if (array_key_exists($keys[14], $arr)) $this->setEncodingComment($arr[$keys[14]]);
-        if (array_key_exists($keys[15], $arr)) $this->setDoi($arr[$keys[15]]);
-        if (array_key_exists($keys[16], $arr)) $this->setFormat($arr[$keys[16]]);
-        if (array_key_exists($keys[17], $arr)) $this->setDirectoryname($arr[$keys[17]]);
-        if (array_key_exists($keys[18], $arr)) $this->setWwwready($arr[$keys[18]]);
-        if (array_key_exists($keys[19], $arr)) $this->setLastChangedByUserId($arr[$keys[19]]);
-        if (array_key_exists($keys[20], $arr)) $this->setLegacyBookId($arr[$keys[20]]);
+        if (array_key_exists($keys[7], $arr)) $this->setSourceId($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setPartnerId($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setEditiondescription($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setDigitaleditioneditor($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setTranscriptioncomment($arr[$keys[11]]);
+        if (array_key_exists($keys[12], $arr)) $this->setNumpages($arr[$keys[12]]);
+        if (array_key_exists($keys[13], $arr)) $this->setNumpagesnumeric($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setComment($arr[$keys[14]]);
+        if (array_key_exists($keys[15], $arr)) $this->setEncodingComment($arr[$keys[15]]);
+        if (array_key_exists($keys[16], $arr)) $this->setDoi($arr[$keys[16]]);
+        if (array_key_exists($keys[17], $arr)) $this->setFormat($arr[$keys[17]]);
+        if (array_key_exists($keys[18], $arr)) $this->setDirectoryname($arr[$keys[18]]);
+        if (array_key_exists($keys[19], $arr)) $this->setWwwready($arr[$keys[19]]);
+        if (array_key_exists($keys[20], $arr)) $this->setLastChangedByUserId($arr[$keys[20]]);
         if (array_key_exists($keys[21], $arr)) $this->setCreatedAt($arr[$keys[21]]);
         if (array_key_exists($keys[22], $arr)) $this->setUpdatedAt($arr[$keys[22]]);
         if (array_key_exists($keys[23], $arr)) $this->setPublishingcompanyIdIsReconstructed($arr[$keys[23]]);
@@ -3274,6 +3319,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ($this->isColumnModified(PublicationPeer::PUBLICATIONDATE_ID)) $criteria->add(PublicationPeer::PUBLICATIONDATE_ID, $this->publicationdate_id);
         if ($this->isColumnModified(PublicationPeer::CREATIONDATE_ID)) $criteria->add(PublicationPeer::CREATIONDATE_ID, $this->creationdate_id);
         if ($this->isColumnModified(PublicationPeer::PUBLISHINGCOMPANY_ID)) $criteria->add(PublicationPeer::PUBLISHINGCOMPANY_ID, $this->publishingcompany_id);
+        if ($this->isColumnModified(PublicationPeer::SOURCE_ID)) $criteria->add(PublicationPeer::SOURCE_ID, $this->source_id);
         if ($this->isColumnModified(PublicationPeer::PARTNER_ID)) $criteria->add(PublicationPeer::PARTNER_ID, $this->partner_id);
         if ($this->isColumnModified(PublicationPeer::EDITIONDESCRIPTION)) $criteria->add(PublicationPeer::EDITIONDESCRIPTION, $this->editiondescription);
         if ($this->isColumnModified(PublicationPeer::DIGITALEDITIONEDITOR)) $criteria->add(PublicationPeer::DIGITALEDITIONEDITOR, $this->digitaleditioneditor);
@@ -3287,7 +3333,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ($this->isColumnModified(PublicationPeer::DIRECTORYNAME)) $criteria->add(PublicationPeer::DIRECTORYNAME, $this->directoryname);
         if ($this->isColumnModified(PublicationPeer::WWWREADY)) $criteria->add(PublicationPeer::WWWREADY, $this->wwwready);
         if ($this->isColumnModified(PublicationPeer::LAST_CHANGED_BY_USER_ID)) $criteria->add(PublicationPeer::LAST_CHANGED_BY_USER_ID, $this->last_changed_by_user_id);
-        if ($this->isColumnModified(PublicationPeer::LEGACY_BOOK_ID)) $criteria->add(PublicationPeer::LEGACY_BOOK_ID, $this->legacy_book_id);
         if ($this->isColumnModified(PublicationPeer::CREATED_AT)) $criteria->add(PublicationPeer::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(PublicationPeer::UPDATED_AT)) $criteria->add(PublicationPeer::UPDATED_AT, $this->updated_at);
         if ($this->isColumnModified(PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED)) $criteria->add(PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED, $this->publishingcompany_id_is_reconstructed);
@@ -3360,6 +3405,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         $copyObj->setPublicationdateId($this->getPublicationdateId());
         $copyObj->setCreationdateId($this->getCreationdateId());
         $copyObj->setPublishingcompanyId($this->getPublishingcompanyId());
+        $copyObj->setSourceId($this->getSourceId());
         $copyObj->setPartnerId($this->getPartnerId());
         $copyObj->setEditiondescription($this->getEditiondescription());
         $copyObj->setDigitaleditioneditor($this->getDigitaleditioneditor());
@@ -3373,7 +3419,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         $copyObj->setDirectoryname($this->getDirectoryname());
         $copyObj->setWwwready($this->getWwwready());
         $copyObj->setLastChangedByUserId($this->getLastChangedByUserId());
-        $copyObj->setLegacyBookId($this->getLegacyBookId());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         $copyObj->setPublishingcompanyIdIsReconstructed($this->getPublishingcompanyIdIsReconstructed());
@@ -3564,7 +3609,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * Declares an association between this object and a Title object.
      *
-     * @param             Title $v
+     * @param                  Title $v
      * @return Publication The current object (for fluent API support)
      * @throws PropelException
      */
@@ -3614,9 +3659,61 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     }
 
     /**
+     * Declares an association between this object and a Source object.
+     *
+     * @param                  Source $v
+     * @return Publication The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setSource(Source $v = null)
+    {
+        if ($v === null) {
+            $this->setSourceId(NULL);
+        } else {
+            $this->setSourceId($v->getId());
+        }
+
+        $this->aSource = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Source object, it will not be re-added.
+        if ($v !== null) {
+            $v->addPublication($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Source object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return Source The associated Source object.
+     * @throws PropelException
+     */
+    public function getSource(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aSource === null && ($this->source_id !== null) && $doQuery) {
+            $this->aSource = SourceQuery::create()->findPk($this->source_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aSource->addPublications($this);
+             */
+        }
+
+        return $this->aSource;
+    }
+
+    /**
      * Declares an association between this object and a Publishingcompany object.
      *
-     * @param             Publishingcompany $v
+     * @param                  Publishingcompany $v
      * @return Publication The current object (for fluent API support)
      * @throws PropelException
      */
@@ -3668,7 +3765,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * Declares an association between this object and a Place object.
      *
-     * @param             Place $v
+     * @param                  Place $v
      * @return Publication The current object (for fluent API support)
      * @throws PropelException
      */
@@ -3720,7 +3817,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * Declares an association between this object and a Datespecification object.
      *
-     * @param             Datespecification $v
+     * @param                  Datespecification $v
      * @return Publication The current object (for fluent API support)
      * @throws PropelException
      */
@@ -3772,7 +3869,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * Declares an association between this object and a Datespecification object.
      *
-     * @param             Datespecification $v
+     * @param                  Datespecification $v
      * @return Publication The current object (for fluent API support)
      * @throws PropelException
      */
@@ -3824,7 +3921,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * Declares an association between this object and a DtaUser object.
      *
-     * @param             DtaUser $v
+     * @param                  DtaUser $v
      * @return Publication The current object (for fluent API support)
      * @throws PropelException
      */
@@ -4026,7 +4123,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     if (false !== $this->collPublicationMsPartial && count($collPublicationMs)) {
                       $this->initPublicationMs(false);
 
-                      foreach($collPublicationMs as $obj) {
+                      foreach ($collPublicationMs as $obj) {
                         if (false == $this->collPublicationMs->contains($obj)) {
                           $this->collPublicationMs->append($obj);
                         }
@@ -4036,12 +4133,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     }
 
                     $collPublicationMs->getInternalIterator()->rewind();
+
                     return $collPublicationMs;
                 }
 
-                if($partial && $this->collPublicationMs) {
-                    foreach($this->collPublicationMs as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collPublicationMs) {
+                    foreach ($this->collPublicationMs as $obj) {
+                        if ($obj->isNew()) {
                             $collPublicationMs[] = $obj;
                         }
                     }
@@ -4069,7 +4167,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     {
         $publicationMsToDelete = $this->getPublicationMs(new Criteria(), $con)->diff($publicationMs);
 
-        $this->publicationMsScheduledForDeletion = unserialize(serialize($publicationMsToDelete));
+
+        $this->publicationMsScheduledForDeletion = $publicationMsToDelete;
 
         foreach ($publicationMsToDelete as $publicationMRemoved) {
             $publicationMRemoved->setPublication(null);
@@ -4103,7 +4202,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getPublicationMs());
             }
             $query = PublicationMQuery::create(null, $criteria);
@@ -4132,8 +4231,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->initPublicationMs();
             $this->collPublicationMsPartial = true;
         }
+
         if (!in_array($l, $this->collPublicationMs->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddPublicationM($l);
+
+            if ($this->publicationMsScheduledForDeletion and $this->publicationMsScheduledForDeletion->contains($l)) {
+                $this->publicationMsScheduledForDeletion->remove($this->publicationMsScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -4244,7 +4348,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     if (false !== $this->collPublicationDmsPartial && count($collPublicationDms)) {
                       $this->initPublicationDms(false);
 
-                      foreach($collPublicationDms as $obj) {
+                      foreach ($collPublicationDms as $obj) {
                         if (false == $this->collPublicationDms->contains($obj)) {
                           $this->collPublicationDms->append($obj);
                         }
@@ -4254,12 +4358,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     }
 
                     $collPublicationDms->getInternalIterator()->rewind();
+
                     return $collPublicationDms;
                 }
 
-                if($partial && $this->collPublicationDms) {
-                    foreach($this->collPublicationDms as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collPublicationDms) {
+                    foreach ($this->collPublicationDms as $obj) {
+                        if ($obj->isNew()) {
                             $collPublicationDms[] = $obj;
                         }
                     }
@@ -4287,7 +4392,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     {
         $publicationDmsToDelete = $this->getPublicationDms(new Criteria(), $con)->diff($publicationDms);
 
-        $this->publicationDmsScheduledForDeletion = unserialize(serialize($publicationDmsToDelete));
+
+        $this->publicationDmsScheduledForDeletion = $publicationDmsToDelete;
 
         foreach ($publicationDmsToDelete as $publicationDmRemoved) {
             $publicationDmRemoved->setPublication(null);
@@ -4321,7 +4427,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getPublicationDms());
             }
             $query = PublicationDmQuery::create(null, $criteria);
@@ -4350,8 +4456,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->initPublicationDms();
             $this->collPublicationDmsPartial = true;
         }
+
         if (!in_array($l, $this->collPublicationDms->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddPublicationDm($l);
+
+            if ($this->publicationDmsScheduledForDeletion and $this->publicationDmsScheduledForDeletion->contains($l)) {
+                $this->publicationDmsScheduledForDeletion->remove($this->publicationDmsScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -4462,7 +4573,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     if (false !== $this->collPublicationDssPartial && count($collPublicationDss)) {
                       $this->initPublicationDss(false);
 
-                      foreach($collPublicationDss as $obj) {
+                      foreach ($collPublicationDss as $obj) {
                         if (false == $this->collPublicationDss->contains($obj)) {
                           $this->collPublicationDss->append($obj);
                         }
@@ -4472,12 +4583,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     }
 
                     $collPublicationDss->getInternalIterator()->rewind();
+
                     return $collPublicationDss;
                 }
 
-                if($partial && $this->collPublicationDss) {
-                    foreach($this->collPublicationDss as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collPublicationDss) {
+                    foreach ($this->collPublicationDss as $obj) {
+                        if ($obj->isNew()) {
                             $collPublicationDss[] = $obj;
                         }
                     }
@@ -4505,7 +4617,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     {
         $publicationDssToDelete = $this->getPublicationDss(new Criteria(), $con)->diff($publicationDss);
 
-        $this->publicationDssScheduledForDeletion = unserialize(serialize($publicationDssToDelete));
+
+        $this->publicationDssScheduledForDeletion = $publicationDssToDelete;
 
         foreach ($publicationDssToDelete as $publicationDsRemoved) {
             $publicationDsRemoved->setPublication(null);
@@ -4539,7 +4652,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getPublicationDss());
             }
             $query = PublicationDsQuery::create(null, $criteria);
@@ -4568,8 +4681,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->initPublicationDss();
             $this->collPublicationDssPartial = true;
         }
+
         if (!in_array($l, $this->collPublicationDss->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddPublicationDs($l);
+
+            if ($this->publicationDssScheduledForDeletion and $this->publicationDssScheduledForDeletion->contains($l)) {
+                $this->publicationDssScheduledForDeletion->remove($this->publicationDssScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -4705,7 +4823,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     if (false !== $this->collPublicationMssPartial && count($collPublicationMss)) {
                       $this->initPublicationMss(false);
 
-                      foreach($collPublicationMss as $obj) {
+                      foreach ($collPublicationMss as $obj) {
                         if (false == $this->collPublicationMss->contains($obj)) {
                           $this->collPublicationMss->append($obj);
                         }
@@ -4715,12 +4833,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     }
 
                     $collPublicationMss->getInternalIterator()->rewind();
+
                     return $collPublicationMss;
                 }
 
-                if($partial && $this->collPublicationMss) {
-                    foreach($this->collPublicationMss as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collPublicationMss) {
+                    foreach ($this->collPublicationMss as $obj) {
+                        if ($obj->isNew()) {
                             $collPublicationMss[] = $obj;
                         }
                     }
@@ -4748,7 +4867,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     {
         $publicationMssToDelete = $this->getPublicationMss(new Criteria(), $con)->diff($publicationMss);
 
-        $this->publicationMssScheduledForDeletion = unserialize(serialize($publicationMssToDelete));
+
+        $this->publicationMssScheduledForDeletion = $publicationMssToDelete;
 
         foreach ($publicationMssToDelete as $publicationMsRemoved) {
             $publicationMsRemoved->setPublication(null);
@@ -4782,7 +4902,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getPublicationMss());
             }
             $query = PublicationMsQuery::create(null, $criteria);
@@ -4811,8 +4931,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->initPublicationMss();
             $this->collPublicationMssPartial = true;
         }
+
         if (!in_array($l, $this->collPublicationMss->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddPublicationMs($l);
+
+            if ($this->publicationMssScheduledForDeletion and $this->publicationMssScheduledForDeletion->contains($l)) {
+                $this->publicationMssScheduledForDeletion->remove($this->publicationMssScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -4948,7 +5073,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     if (false !== $this->collPublicationJasPartial && count($collPublicationJas)) {
                       $this->initPublicationJas(false);
 
-                      foreach($collPublicationJas as $obj) {
+                      foreach ($collPublicationJas as $obj) {
                         if (false == $this->collPublicationJas->contains($obj)) {
                           $this->collPublicationJas->append($obj);
                         }
@@ -4958,12 +5083,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     }
 
                     $collPublicationJas->getInternalIterator()->rewind();
+
                     return $collPublicationJas;
                 }
 
-                if($partial && $this->collPublicationJas) {
-                    foreach($this->collPublicationJas as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collPublicationJas) {
+                    foreach ($this->collPublicationJas as $obj) {
+                        if ($obj->isNew()) {
                             $collPublicationJas[] = $obj;
                         }
                     }
@@ -4991,7 +5117,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     {
         $publicationJasToDelete = $this->getPublicationJas(new Criteria(), $con)->diff($publicationJas);
 
-        $this->publicationJasScheduledForDeletion = unserialize(serialize($publicationJasToDelete));
+
+        $this->publicationJasScheduledForDeletion = $publicationJasToDelete;
 
         foreach ($publicationJasToDelete as $publicationJaRemoved) {
             $publicationJaRemoved->setPublication(null);
@@ -5025,7 +5152,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getPublicationJas());
             }
             $query = PublicationJaQuery::create(null, $criteria);
@@ -5054,8 +5181,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->initPublicationJas();
             $this->collPublicationJasPartial = true;
         }
+
         if (!in_array($l, $this->collPublicationJas->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddPublicationJa($l);
+
+            if ($this->publicationJasScheduledForDeletion and $this->publicationJasScheduledForDeletion->contains($l)) {
+                $this->publicationJasScheduledForDeletion->remove($this->publicationJasScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -5166,7 +5298,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     if (false !== $this->collPublicationMmssPartial && count($collPublicationMmss)) {
                       $this->initPublicationMmss(false);
 
-                      foreach($collPublicationMmss as $obj) {
+                      foreach ($collPublicationMmss as $obj) {
                         if (false == $this->collPublicationMmss->contains($obj)) {
                           $this->collPublicationMmss->append($obj);
                         }
@@ -5176,12 +5308,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     }
 
                     $collPublicationMmss->getInternalIterator()->rewind();
+
                     return $collPublicationMmss;
                 }
 
-                if($partial && $this->collPublicationMmss) {
-                    foreach($this->collPublicationMmss as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collPublicationMmss) {
+                    foreach ($this->collPublicationMmss as $obj) {
+                        if ($obj->isNew()) {
                             $collPublicationMmss[] = $obj;
                         }
                     }
@@ -5209,7 +5342,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     {
         $publicationMmssToDelete = $this->getPublicationMmss(new Criteria(), $con)->diff($publicationMmss);
 
-        $this->publicationMmssScheduledForDeletion = unserialize(serialize($publicationMmssToDelete));
+
+        $this->publicationMmssScheduledForDeletion = $publicationMmssToDelete;
 
         foreach ($publicationMmssToDelete as $publicationMmsRemoved) {
             $publicationMmsRemoved->setPublication(null);
@@ -5243,7 +5377,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getPublicationMmss());
             }
             $query = PublicationMmsQuery::create(null, $criteria);
@@ -5272,8 +5406,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->initPublicationMmss();
             $this->collPublicationMmssPartial = true;
         }
+
         if (!in_array($l, $this->collPublicationMmss->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddPublicationMms($l);
+
+            if ($this->publicationMmssScheduledForDeletion and $this->publicationMmssScheduledForDeletion->contains($l)) {
+                $this->publicationMmssScheduledForDeletion->remove($this->publicationMmssScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -5409,7 +5548,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     if (false !== $this->collPublicationJsPartial && count($collPublicationJs)) {
                       $this->initPublicationJs(false);
 
-                      foreach($collPublicationJs as $obj) {
+                      foreach ($collPublicationJs as $obj) {
                         if (false == $this->collPublicationJs->contains($obj)) {
                           $this->collPublicationJs->append($obj);
                         }
@@ -5419,12 +5558,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     }
 
                     $collPublicationJs->getInternalIterator()->rewind();
+
                     return $collPublicationJs;
                 }
 
-                if($partial && $this->collPublicationJs) {
-                    foreach($this->collPublicationJs as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collPublicationJs) {
+                    foreach ($this->collPublicationJs as $obj) {
+                        if ($obj->isNew()) {
                             $collPublicationJs[] = $obj;
                         }
                     }
@@ -5452,7 +5592,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     {
         $publicationJsToDelete = $this->getPublicationJs(new Criteria(), $con)->diff($publicationJs);
 
-        $this->publicationJsScheduledForDeletion = unserialize(serialize($publicationJsToDelete));
+
+        $this->publicationJsScheduledForDeletion = $publicationJsToDelete;
 
         foreach ($publicationJsToDelete as $publicationJRemoved) {
             $publicationJRemoved->setPublication(null);
@@ -5486,7 +5627,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getPublicationJs());
             }
             $query = PublicationJQuery::create(null, $criteria);
@@ -5515,8 +5656,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->initPublicationJs();
             $this->collPublicationJsPartial = true;
         }
+
         if (!in_array($l, $this->collPublicationJs->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddPublicationJ($l);
+
+            if ($this->publicationJsScheduledForDeletion and $this->publicationJsScheduledForDeletion->contains($l)) {
+                $this->publicationJsScheduledForDeletion->remove($this->publicationJsScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -5627,7 +5773,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     if (false !== $this->collVolumesRelatedByPublicationIdPartial && count($collVolumesRelatedByPublicationId)) {
                       $this->initVolumesRelatedByPublicationId(false);
 
-                      foreach($collVolumesRelatedByPublicationId as $obj) {
+                      foreach ($collVolumesRelatedByPublicationId as $obj) {
                         if (false == $this->collVolumesRelatedByPublicationId->contains($obj)) {
                           $this->collVolumesRelatedByPublicationId->append($obj);
                         }
@@ -5637,12 +5783,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     }
 
                     $collVolumesRelatedByPublicationId->getInternalIterator()->rewind();
+
                     return $collVolumesRelatedByPublicationId;
                 }
 
-                if($partial && $this->collVolumesRelatedByPublicationId) {
-                    foreach($this->collVolumesRelatedByPublicationId as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collVolumesRelatedByPublicationId) {
+                    foreach ($this->collVolumesRelatedByPublicationId as $obj) {
+                        if ($obj->isNew()) {
                             $collVolumesRelatedByPublicationId[] = $obj;
                         }
                     }
@@ -5670,7 +5817,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     {
         $volumesRelatedByPublicationIdToDelete = $this->getVolumesRelatedByPublicationId(new Criteria(), $con)->diff($volumesRelatedByPublicationId);
 
-        $this->volumesRelatedByPublicationIdScheduledForDeletion = unserialize(serialize($volumesRelatedByPublicationIdToDelete));
+
+        $this->volumesRelatedByPublicationIdScheduledForDeletion = $volumesRelatedByPublicationIdToDelete;
 
         foreach ($volumesRelatedByPublicationIdToDelete as $volumeRelatedByPublicationIdRemoved) {
             $volumeRelatedByPublicationIdRemoved->setPublicationRelatedByPublicationId(null);
@@ -5704,7 +5852,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getVolumesRelatedByPublicationId());
             }
             $query = VolumeQuery::create(null, $criteria);
@@ -5733,8 +5881,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->initVolumesRelatedByPublicationId();
             $this->collVolumesRelatedByPublicationIdPartial = true;
         }
+
         if (!in_array($l, $this->collVolumesRelatedByPublicationId->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddVolumeRelatedByPublicationId($l);
+
+            if ($this->volumesRelatedByPublicationIdScheduledForDeletion and $this->volumesRelatedByPublicationIdScheduledForDeletion->contains($l)) {
+                $this->volumesRelatedByPublicationIdScheduledForDeletion->remove($this->volumesRelatedByPublicationIdScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -5845,7 +5998,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     if (false !== $this->collVolumesRelatedByParentpublicationIdPartial && count($collVolumesRelatedByParentpublicationId)) {
                       $this->initVolumesRelatedByParentpublicationId(false);
 
-                      foreach($collVolumesRelatedByParentpublicationId as $obj) {
+                      foreach ($collVolumesRelatedByParentpublicationId as $obj) {
                         if (false == $this->collVolumesRelatedByParentpublicationId->contains($obj)) {
                           $this->collVolumesRelatedByParentpublicationId->append($obj);
                         }
@@ -5855,12 +6008,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     }
 
                     $collVolumesRelatedByParentpublicationId->getInternalIterator()->rewind();
+
                     return $collVolumesRelatedByParentpublicationId;
                 }
 
-                if($partial && $this->collVolumesRelatedByParentpublicationId) {
-                    foreach($this->collVolumesRelatedByParentpublicationId as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collVolumesRelatedByParentpublicationId) {
+                    foreach ($this->collVolumesRelatedByParentpublicationId as $obj) {
+                        if ($obj->isNew()) {
                             $collVolumesRelatedByParentpublicationId[] = $obj;
                         }
                     }
@@ -5888,7 +6042,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     {
         $volumesRelatedByParentpublicationIdToDelete = $this->getVolumesRelatedByParentpublicationId(new Criteria(), $con)->diff($volumesRelatedByParentpublicationId);
 
-        $this->volumesRelatedByParentpublicationIdScheduledForDeletion = unserialize(serialize($volumesRelatedByParentpublicationIdToDelete));
+
+        $this->volumesRelatedByParentpublicationIdScheduledForDeletion = $volumesRelatedByParentpublicationIdToDelete;
 
         foreach ($volumesRelatedByParentpublicationIdToDelete as $volumeRelatedByParentpublicationIdRemoved) {
             $volumeRelatedByParentpublicationIdRemoved->setPublicationRelatedByParentpublicationId(null);
@@ -5922,7 +6077,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getVolumesRelatedByParentpublicationId());
             }
             $query = VolumeQuery::create(null, $criteria);
@@ -5951,8 +6106,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->initVolumesRelatedByParentpublicationId();
             $this->collVolumesRelatedByParentpublicationIdPartial = true;
         }
+
         if (!in_array($l, $this->collVolumesRelatedByParentpublicationId->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddVolumeRelatedByParentpublicationId($l);
+
+            if ($this->volumesRelatedByParentpublicationIdScheduledForDeletion and $this->volumesRelatedByParentpublicationIdScheduledForDeletion->contains($l)) {
+                $this->volumesRelatedByParentpublicationIdScheduledForDeletion->remove($this->volumesRelatedByParentpublicationIdScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -6063,7 +6223,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     if (false !== $this->collLanguagePublicationsPartial && count($collLanguagePublications)) {
                       $this->initLanguagePublications(false);
 
-                      foreach($collLanguagePublications as $obj) {
+                      foreach ($collLanguagePublications as $obj) {
                         if (false == $this->collLanguagePublications->contains($obj)) {
                           $this->collLanguagePublications->append($obj);
                         }
@@ -6073,12 +6233,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     }
 
                     $collLanguagePublications->getInternalIterator()->rewind();
+
                     return $collLanguagePublications;
                 }
 
-                if($partial && $this->collLanguagePublications) {
-                    foreach($this->collLanguagePublications as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collLanguagePublications) {
+                    foreach ($this->collLanguagePublications as $obj) {
+                        if ($obj->isNew()) {
                             $collLanguagePublications[] = $obj;
                         }
                     }
@@ -6106,7 +6267,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     {
         $languagePublicationsToDelete = $this->getLanguagePublications(new Criteria(), $con)->diff($languagePublications);
 
-        $this->languagePublicationsScheduledForDeletion = unserialize(serialize($languagePublicationsToDelete));
+
+        $this->languagePublicationsScheduledForDeletion = $languagePublicationsToDelete;
 
         foreach ($languagePublicationsToDelete as $languagePublicationRemoved) {
             $languagePublicationRemoved->setPublication(null);
@@ -6140,7 +6302,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getLanguagePublications());
             }
             $query = LanguagePublicationQuery::create(null, $criteria);
@@ -6169,8 +6331,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->initLanguagePublications();
             $this->collLanguagePublicationsPartial = true;
         }
+
         if (!in_array($l, $this->collLanguagePublications->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddLanguagePublication($l);
+
+            if ($this->languagePublicationsScheduledForDeletion and $this->languagePublicationsScheduledForDeletion->contains($l)) {
+                $this->languagePublicationsScheduledForDeletion->remove($this->languagePublicationsScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -6306,7 +6473,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     if (false !== $this->collGenrePublicationsPartial && count($collGenrePublications)) {
                       $this->initGenrePublications(false);
 
-                      foreach($collGenrePublications as $obj) {
+                      foreach ($collGenrePublications as $obj) {
                         if (false == $this->collGenrePublications->contains($obj)) {
                           $this->collGenrePublications->append($obj);
                         }
@@ -6316,12 +6483,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     }
 
                     $collGenrePublications->getInternalIterator()->rewind();
+
                     return $collGenrePublications;
                 }
 
-                if($partial && $this->collGenrePublications) {
-                    foreach($this->collGenrePublications as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collGenrePublications) {
+                    foreach ($this->collGenrePublications as $obj) {
+                        if ($obj->isNew()) {
                             $collGenrePublications[] = $obj;
                         }
                     }
@@ -6349,7 +6517,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     {
         $genrePublicationsToDelete = $this->getGenrePublications(new Criteria(), $con)->diff($genrePublications);
 
-        $this->genrePublicationsScheduledForDeletion = unserialize(serialize($genrePublicationsToDelete));
+
+        $this->genrePublicationsScheduledForDeletion = $genrePublicationsToDelete;
 
         foreach ($genrePublicationsToDelete as $genrePublicationRemoved) {
             $genrePublicationRemoved->setPublication(null);
@@ -6383,7 +6552,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getGenrePublications());
             }
             $query = GenrePublicationQuery::create(null, $criteria);
@@ -6412,8 +6581,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->initGenrePublications();
             $this->collGenrePublicationsPartial = true;
         }
+
         if (!in_array($l, $this->collGenrePublications->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddGenrePublication($l);
+
+            if ($this->genrePublicationsScheduledForDeletion and $this->genrePublicationsScheduledForDeletion->contains($l)) {
+                $this->genrePublicationsScheduledForDeletion->remove($this->genrePublicationsScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -6549,7 +6723,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     if (false !== $this->collPublicationTagsPartial && count($collPublicationTags)) {
                       $this->initPublicationTags(false);
 
-                      foreach($collPublicationTags as $obj) {
+                      foreach ($collPublicationTags as $obj) {
                         if (false == $this->collPublicationTags->contains($obj)) {
                           $this->collPublicationTags->append($obj);
                         }
@@ -6559,12 +6733,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     }
 
                     $collPublicationTags->getInternalIterator()->rewind();
+
                     return $collPublicationTags;
                 }
 
-                if($partial && $this->collPublicationTags) {
-                    foreach($this->collPublicationTags as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collPublicationTags) {
+                    foreach ($this->collPublicationTags as $obj) {
+                        if ($obj->isNew()) {
                             $collPublicationTags[] = $obj;
                         }
                     }
@@ -6592,7 +6767,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     {
         $publicationTagsToDelete = $this->getPublicationTags(new Criteria(), $con)->diff($publicationTags);
 
-        $this->publicationTagsScheduledForDeletion = unserialize(serialize($publicationTagsToDelete));
+
+        $this->publicationTagsScheduledForDeletion = $publicationTagsToDelete;
 
         foreach ($publicationTagsToDelete as $publicationTagRemoved) {
             $publicationTagRemoved->setPublication(null);
@@ -6626,7 +6802,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getPublicationTags());
             }
             $query = PublicationTagQuery::create(null, $criteria);
@@ -6655,8 +6831,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->initPublicationTags();
             $this->collPublicationTagsPartial = true;
         }
+
         if (!in_array($l, $this->collPublicationTags->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddPublicationTag($l);
+
+            if ($this->publicationTagsScheduledForDeletion and $this->publicationTagsScheduledForDeletion->contains($l)) {
+                $this->publicationTagsScheduledForDeletion->remove($this->publicationTagsScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -6792,7 +6973,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     if (false !== $this->collCategoryPublicationsPartial && count($collCategoryPublications)) {
                       $this->initCategoryPublications(false);
 
-                      foreach($collCategoryPublications as $obj) {
+                      foreach ($collCategoryPublications as $obj) {
                         if (false == $this->collCategoryPublications->contains($obj)) {
                           $this->collCategoryPublications->append($obj);
                         }
@@ -6802,12 +6983,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     }
 
                     $collCategoryPublications->getInternalIterator()->rewind();
+
                     return $collCategoryPublications;
                 }
 
-                if($partial && $this->collCategoryPublications) {
-                    foreach($this->collCategoryPublications as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collCategoryPublications) {
+                    foreach ($this->collCategoryPublications as $obj) {
+                        if ($obj->isNew()) {
                             $collCategoryPublications[] = $obj;
                         }
                     }
@@ -6835,7 +7017,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     {
         $categoryPublicationsToDelete = $this->getCategoryPublications(new Criteria(), $con)->diff($categoryPublications);
 
-        $this->categoryPublicationsScheduledForDeletion = unserialize(serialize($categoryPublicationsToDelete));
+
+        $this->categoryPublicationsScheduledForDeletion = $categoryPublicationsToDelete;
 
         foreach ($categoryPublicationsToDelete as $categoryPublicationRemoved) {
             $categoryPublicationRemoved->setPublication(null);
@@ -6869,7 +7052,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getCategoryPublications());
             }
             $query = CategoryPublicationQuery::create(null, $criteria);
@@ -6898,8 +7081,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->initCategoryPublications();
             $this->collCategoryPublicationsPartial = true;
         }
+
         if (!in_array($l, $this->collCategoryPublications->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddCategoryPublication($l);
+
+            if ($this->categoryPublicationsScheduledForDeletion and $this->categoryPublicationsScheduledForDeletion->contains($l)) {
+                $this->categoryPublicationsScheduledForDeletion->remove($this->categoryPublicationsScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -7035,7 +7223,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     if (false !== $this->collFontPublicationsPartial && count($collFontPublications)) {
                       $this->initFontPublications(false);
 
-                      foreach($collFontPublications as $obj) {
+                      foreach ($collFontPublications as $obj) {
                         if (false == $this->collFontPublications->contains($obj)) {
                           $this->collFontPublications->append($obj);
                         }
@@ -7045,12 +7233,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     }
 
                     $collFontPublications->getInternalIterator()->rewind();
+
                     return $collFontPublications;
                 }
 
-                if($partial && $this->collFontPublications) {
-                    foreach($this->collFontPublications as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collFontPublications) {
+                    foreach ($this->collFontPublications as $obj) {
+                        if ($obj->isNew()) {
                             $collFontPublications[] = $obj;
                         }
                     }
@@ -7078,7 +7267,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     {
         $fontPublicationsToDelete = $this->getFontPublications(new Criteria(), $con)->diff($fontPublications);
 
-        $this->fontPublicationsScheduledForDeletion = unserialize(serialize($fontPublicationsToDelete));
+
+        $this->fontPublicationsScheduledForDeletion = $fontPublicationsToDelete;
 
         foreach ($fontPublicationsToDelete as $fontPublicationRemoved) {
             $fontPublicationRemoved->setPublication(null);
@@ -7112,7 +7302,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getFontPublications());
             }
             $query = FontPublicationQuery::create(null, $criteria);
@@ -7141,8 +7331,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->initFontPublications();
             $this->collFontPublicationsPartial = true;
         }
+
         if (!in_array($l, $this->collFontPublications->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddFontPublication($l);
+
+            if ($this->fontPublicationsScheduledForDeletion and $this->fontPublicationsScheduledForDeletion->contains($l)) {
+                $this->fontPublicationsScheduledForDeletion->remove($this->fontPublicationsScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -7278,7 +7473,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     if (false !== $this->collPublicationPublicationgroupsPartial && count($collPublicationPublicationgroups)) {
                       $this->initPublicationPublicationgroups(false);
 
-                      foreach($collPublicationPublicationgroups as $obj) {
+                      foreach ($collPublicationPublicationgroups as $obj) {
                         if (false == $this->collPublicationPublicationgroups->contains($obj)) {
                           $this->collPublicationPublicationgroups->append($obj);
                         }
@@ -7288,12 +7483,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     }
 
                     $collPublicationPublicationgroups->getInternalIterator()->rewind();
+
                     return $collPublicationPublicationgroups;
                 }
 
-                if($partial && $this->collPublicationPublicationgroups) {
-                    foreach($this->collPublicationPublicationgroups as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collPublicationPublicationgroups) {
+                    foreach ($this->collPublicationPublicationgroups as $obj) {
+                        if ($obj->isNew()) {
                             $collPublicationPublicationgroups[] = $obj;
                         }
                     }
@@ -7321,7 +7517,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     {
         $publicationPublicationgroupsToDelete = $this->getPublicationPublicationgroups(new Criteria(), $con)->diff($publicationPublicationgroups);
 
-        $this->publicationPublicationgroupsScheduledForDeletion = unserialize(serialize($publicationPublicationgroupsToDelete));
+
+        $this->publicationPublicationgroupsScheduledForDeletion = $publicationPublicationgroupsToDelete;
 
         foreach ($publicationPublicationgroupsToDelete as $publicationPublicationgroupRemoved) {
             $publicationPublicationgroupRemoved->setPublication(null);
@@ -7355,7 +7552,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getPublicationPublicationgroups());
             }
             $query = PublicationPublicationgroupQuery::create(null, $criteria);
@@ -7384,8 +7581,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->initPublicationPublicationgroups();
             $this->collPublicationPublicationgroupsPartial = true;
         }
+
         if (!in_array($l, $this->collPublicationPublicationgroups->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddPublicationPublicationgroup($l);
+
+            if ($this->publicationPublicationgroupsScheduledForDeletion and $this->publicationPublicationgroupsScheduledForDeletion->contains($l)) {
+                $this->publicationPublicationgroupsScheduledForDeletion->remove($this->publicationPublicationgroupsScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -7521,7 +7723,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     if (false !== $this->collPersonPublicationsPartial && count($collPersonPublications)) {
                       $this->initPersonPublications(false);
 
-                      foreach($collPersonPublications as $obj) {
+                      foreach ($collPersonPublications as $obj) {
                         if (false == $this->collPersonPublications->contains($obj)) {
                           $this->collPersonPublications->append($obj);
                         }
@@ -7531,12 +7733,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     }
 
                     $collPersonPublications->getInternalIterator()->rewind();
+
                     return $collPersonPublications;
                 }
 
-                if($partial && $this->collPersonPublications) {
-                    foreach($this->collPersonPublications as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collPersonPublications) {
+                    foreach ($this->collPersonPublications as $obj) {
+                        if ($obj->isNew()) {
                             $collPersonPublications[] = $obj;
                         }
                     }
@@ -7564,7 +7767,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     {
         $personPublicationsToDelete = $this->getPersonPublications(new Criteria(), $con)->diff($personPublications);
 
-        $this->personPublicationsScheduledForDeletion = unserialize(serialize($personPublicationsToDelete));
+
+        $this->personPublicationsScheduledForDeletion = $personPublicationsToDelete;
 
         foreach ($personPublicationsToDelete as $personPublicationRemoved) {
             $personPublicationRemoved->setPublication(null);
@@ -7598,7 +7802,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getPersonPublications());
             }
             $query = PersonPublicationQuery::create(null, $criteria);
@@ -7627,8 +7831,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->initPersonPublications();
             $this->collPersonPublicationsPartial = true;
         }
+
         if (!in_array($l, $this->collPersonPublications->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddPersonPublication($l);
+
+            if ($this->personPublicationsScheduledForDeletion and $this->personPublicationsScheduledForDeletion->contains($l)) {
+                $this->personPublicationsScheduledForDeletion->remove($this->personPublicationsScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -7789,7 +7998,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     if (false !== $this->collRecentUsesPartial && count($collRecentUses)) {
                       $this->initRecentUses(false);
 
-                      foreach($collRecentUses as $obj) {
+                      foreach ($collRecentUses as $obj) {
                         if (false == $this->collRecentUses->contains($obj)) {
                           $this->collRecentUses->append($obj);
                         }
@@ -7799,12 +8008,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     }
 
                     $collRecentUses->getInternalIterator()->rewind();
+
                     return $collRecentUses;
                 }
 
-                if($partial && $this->collRecentUses) {
-                    foreach($this->collRecentUses as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collRecentUses) {
+                    foreach ($this->collRecentUses as $obj) {
+                        if ($obj->isNew()) {
                             $collRecentUses[] = $obj;
                         }
                     }
@@ -7832,7 +8042,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     {
         $recentUsesToDelete = $this->getRecentUses(new Criteria(), $con)->diff($recentUses);
 
-        $this->recentUsesScheduledForDeletion = unserialize(serialize($recentUsesToDelete));
+
+        $this->recentUsesScheduledForDeletion = $recentUsesToDelete;
 
         foreach ($recentUsesToDelete as $recentUseRemoved) {
             $recentUseRemoved->setPublication(null);
@@ -7866,7 +8077,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getRecentUses());
             }
             $query = RecentUseQuery::create(null, $criteria);
@@ -7895,8 +8106,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->initRecentUses();
             $this->collRecentUsesPartial = true;
         }
+
         if (!in_array($l, $this->collRecentUses->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddRecentUse($l);
+
+            if ($this->recentUsesScheduledForDeletion and $this->recentUsesScheduledForDeletion->contains($l)) {
+                $this->recentUsesScheduledForDeletion->remove($this->recentUsesScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -8032,7 +8248,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     if (false !== $this->collTasksPartial && count($collTasks)) {
                       $this->initTasks(false);
 
-                      foreach($collTasks as $obj) {
+                      foreach ($collTasks as $obj) {
                         if (false == $this->collTasks->contains($obj)) {
                           $this->collTasks->append($obj);
                         }
@@ -8042,12 +8258,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     }
 
                     $collTasks->getInternalIterator()->rewind();
+
                     return $collTasks;
                 }
 
-                if($partial && $this->collTasks) {
-                    foreach($this->collTasks as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collTasks) {
+                    foreach ($this->collTasks as $obj) {
+                        if ($obj->isNew()) {
                             $collTasks[] = $obj;
                         }
                     }
@@ -8075,7 +8292,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     {
         $tasksToDelete = $this->getTasks(new Criteria(), $con)->diff($tasks);
 
-        $this->tasksScheduledForDeletion = unserialize(serialize($tasksToDelete));
+
+        $this->tasksScheduledForDeletion = $tasksToDelete;
 
         foreach ($tasksToDelete as $taskRemoved) {
             $taskRemoved->setPublication(null);
@@ -8109,7 +8327,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getTasks());
             }
             $query = TaskQuery::create(null, $criteria);
@@ -8138,8 +8356,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->initTasks();
             $this->collTasksPartial = true;
         }
+
         if (!in_array($l, $this->collTasks->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddTask($l);
+
+            if ($this->tasksScheduledForDeletion and $this->tasksScheduledForDeletion->contains($l)) {
+                $this->tasksScheduledForDeletion->remove($this->tasksScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -8273,6 +8496,31 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         return $this->getTasks($query, $con);
     }
 
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Publication is new, it will return
+     * an empty collection; or if this Publication has previously
+     * been saved, it will retrieve related Tasks from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Publication.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Task[] List of Task objects
+     */
+    public function getTasksJoinCopyLocation($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = TaskQuery::create(null, $criteria);
+        $query->joinWith('CopyLocation', $join_behavior);
+
+        return $this->getTasks($query, $con);
+    }
+
     /**
      * Clears out the collCopyLocations collection
      *
@@ -8350,7 +8598,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     if (false !== $this->collCopyLocationsPartial && count($collCopyLocations)) {
                       $this->initCopyLocations(false);
 
-                      foreach($collCopyLocations as $obj) {
+                      foreach ($collCopyLocations as $obj) {
                         if (false == $this->collCopyLocations->contains($obj)) {
                           $this->collCopyLocations->append($obj);
                         }
@@ -8360,12 +8608,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     }
 
                     $collCopyLocations->getInternalIterator()->rewind();
+
                     return $collCopyLocations;
                 }
 
-                if($partial && $this->collCopyLocations) {
-                    foreach($this->collCopyLocations as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collCopyLocations) {
+                    foreach ($this->collCopyLocations as $obj) {
+                        if ($obj->isNew()) {
                             $collCopyLocations[] = $obj;
                         }
                     }
@@ -8393,7 +8642,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     {
         $copyLocationsToDelete = $this->getCopyLocations(new Criteria(), $con)->diff($copyLocations);
 
-        $this->copyLocationsScheduledForDeletion = unserialize(serialize($copyLocationsToDelete));
+
+        $this->copyLocationsScheduledForDeletion = $copyLocationsToDelete;
 
         foreach ($copyLocationsToDelete as $copyLocationRemoved) {
             $copyLocationRemoved->setPublication(null);
@@ -8427,7 +8677,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getCopyLocations());
             }
             $query = CopyLocationQuery::create(null, $criteria);
@@ -8456,8 +8706,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->initCopyLocations();
             $this->collCopyLocationsPartial = true;
         }
+
         if (!in_array($l, $this->collCopyLocations->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddCopyLocation($l);
+
+            if ($this->copyLocationsScheduledForDeletion and $this->copyLocationsScheduledForDeletion->contains($l)) {
+                $this->copyLocationsScheduledForDeletion->remove($this->copyLocationsScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -8618,7 +8873,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     if (false !== $this->collImagesourcesPartial && count($collImagesources)) {
                       $this->initImagesources(false);
 
-                      foreach($collImagesources as $obj) {
+                      foreach ($collImagesources as $obj) {
                         if (false == $this->collImagesources->contains($obj)) {
                           $this->collImagesources->append($obj);
                         }
@@ -8628,12 +8883,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     }
 
                     $collImagesources->getInternalIterator()->rewind();
+
                     return $collImagesources;
                 }
 
-                if($partial && $this->collImagesources) {
-                    foreach($this->collImagesources as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collImagesources) {
+                    foreach ($this->collImagesources as $obj) {
+                        if ($obj->isNew()) {
                             $collImagesources[] = $obj;
                         }
                     }
@@ -8661,7 +8917,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     {
         $imagesourcesToDelete = $this->getImagesources(new Criteria(), $con)->diff($imagesources);
 
-        $this->imagesourcesScheduledForDeletion = unserialize(serialize($imagesourcesToDelete));
+
+        $this->imagesourcesScheduledForDeletion = $imagesourcesToDelete;
 
         foreach ($imagesourcesToDelete as $imagesourceRemoved) {
             $imagesourceRemoved->setPublication(null);
@@ -8695,7 +8952,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getImagesources());
             }
             $query = ImagesourceQuery::create(null, $criteria);
@@ -8724,8 +8981,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->initImagesources();
             $this->collImagesourcesPartial = true;
         }
+
         if (!in_array($l, $this->collImagesources->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddImagesource($l);
+
+            if ($this->imagesourcesScheduledForDeletion and $this->imagesourcesScheduledForDeletion->contains($l)) {
+                $this->imagesourcesScheduledForDeletion->remove($this->imagesourcesScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -8836,7 +9098,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     if (false !== $this->collTextsourcesPartial && count($collTextsources)) {
                       $this->initTextsources(false);
 
-                      foreach($collTextsources as $obj) {
+                      foreach ($collTextsources as $obj) {
                         if (false == $this->collTextsources->contains($obj)) {
                           $this->collTextsources->append($obj);
                         }
@@ -8846,12 +9108,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     }
 
                     $collTextsources->getInternalIterator()->rewind();
+
                     return $collTextsources;
                 }
 
-                if($partial && $this->collTextsources) {
-                    foreach($this->collTextsources as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collTextsources) {
+                    foreach ($this->collTextsources as $obj) {
+                        if ($obj->isNew()) {
                             $collTextsources[] = $obj;
                         }
                     }
@@ -8879,7 +9142,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     {
         $textsourcesToDelete = $this->getTextsources(new Criteria(), $con)->diff($textsources);
 
-        $this->textsourcesScheduledForDeletion = unserialize(serialize($textsourcesToDelete));
+
+        $this->textsourcesScheduledForDeletion = $textsourcesToDelete;
 
         foreach ($textsourcesToDelete as $textsourceRemoved) {
             $textsourceRemoved->setPublication(null);
@@ -8913,7 +9177,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getTextsources());
             }
             $query = TextsourceQuery::create(null, $criteria);
@@ -8942,8 +9206,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->initTextsources();
             $this->collTextsourcesPartial = true;
         }
+
         if (!in_array($l, $this->collTextsources->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddTextsource($l);
+
+            if ($this->textsourcesScheduledForDeletion and $this->textsourcesScheduledForDeletion->contains($l)) {
+                $this->textsourcesScheduledForDeletion->remove($this->textsourcesScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -9107,7 +9376,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     public function setLanguages(PropelCollection $languages, PropelPDO $con = null)
     {
         $this->clearLanguages();
-        $currentLanguages = $this->getLanguages();
+        $currentLanguages = $this->getLanguages(null, $con);
 
         $this->languagesScheduledForDeletion = $currentLanguages->diff($languages);
 
@@ -9164,10 +9433,14 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ($this->collLanguages === null) {
             $this->initLanguages();
         }
+
         if (!$this->collLanguages->contains($language)) { // only add it if the **same** object is not already associated
             $this->doAddLanguage($language);
+            $this->collLanguages[] = $language;
 
-            $this->collLanguages[]= $language;
+            if ($this->languagesScheduledForDeletion and $this->languagesScheduledForDeletion->contains($language)) {
+                $this->languagesScheduledForDeletion->remove($this->languagesScheduledForDeletion->search($language));
+            }
         }
 
         return $this;
@@ -9176,11 +9449,18 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * @param	Language $language The language object to add.
      */
-    protected function doAddLanguage($language)
+    protected function doAddLanguage(Language $language)
     {
-        $languagePublication = new LanguagePublication();
-        $languagePublication->setLanguage($language);
-        $this->addLanguagePublication($languagePublication);
+        // set the back reference to this object directly as using provided method either results
+        // in endless loop or in multiple relations
+        if (!$language->getPublications()->contains($this)) {
+            $languagePublication = new LanguagePublication();
+            $languagePublication->setLanguage($language);
+            $this->addLanguagePublication($languagePublication);
+
+            $foreignCollection = $language->getPublications();
+            $foreignCollection[] = $this;
+        }
     }
 
     /**
@@ -9284,7 +9564,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     public function setGenres(PropelCollection $genres, PropelPDO $con = null)
     {
         $this->clearGenres();
-        $currentGenres = $this->getGenres();
+        $currentGenres = $this->getGenres(null, $con);
 
         $this->genresScheduledForDeletion = $currentGenres->diff($genres);
 
@@ -9341,10 +9621,14 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ($this->collGenres === null) {
             $this->initGenres();
         }
+
         if (!$this->collGenres->contains($genre)) { // only add it if the **same** object is not already associated
             $this->doAddGenre($genre);
+            $this->collGenres[] = $genre;
 
-            $this->collGenres[]= $genre;
+            if ($this->genresScheduledForDeletion and $this->genresScheduledForDeletion->contains($genre)) {
+                $this->genresScheduledForDeletion->remove($this->genresScheduledForDeletion->search($genre));
+            }
         }
 
         return $this;
@@ -9353,11 +9637,18 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * @param	Genre $genre The genre object to add.
      */
-    protected function doAddGenre($genre)
+    protected function doAddGenre(Genre $genre)
     {
-        $genrePublication = new GenrePublication();
-        $genrePublication->setGenre($genre);
-        $this->addGenrePublication($genrePublication);
+        // set the back reference to this object directly as using provided method either results
+        // in endless loop or in multiple relations
+        if (!$genre->getPublications()->contains($this)) {
+            $genrePublication = new GenrePublication();
+            $genrePublication->setGenre($genre);
+            $this->addGenrePublication($genrePublication);
+
+            $foreignCollection = $genre->getPublications();
+            $foreignCollection[] = $this;
+        }
     }
 
     /**
@@ -9461,7 +9752,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     public function setTags(PropelCollection $tags, PropelPDO $con = null)
     {
         $this->clearTags();
-        $currentTags = $this->getTags();
+        $currentTags = $this->getTags(null, $con);
 
         $this->tagsScheduledForDeletion = $currentTags->diff($tags);
 
@@ -9518,10 +9809,14 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ($this->collTags === null) {
             $this->initTags();
         }
+
         if (!$this->collTags->contains($tag)) { // only add it if the **same** object is not already associated
             $this->doAddTag($tag);
+            $this->collTags[] = $tag;
 
-            $this->collTags[]= $tag;
+            if ($this->tagsScheduledForDeletion and $this->tagsScheduledForDeletion->contains($tag)) {
+                $this->tagsScheduledForDeletion->remove($this->tagsScheduledForDeletion->search($tag));
+            }
         }
 
         return $this;
@@ -9530,11 +9825,18 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * @param	Tag $tag The tag object to add.
      */
-    protected function doAddTag($tag)
+    protected function doAddTag(Tag $tag)
     {
-        $publicationTag = new PublicationTag();
-        $publicationTag->setTag($tag);
-        $this->addPublicationTag($publicationTag);
+        // set the back reference to this object directly as using provided method either results
+        // in endless loop or in multiple relations
+        if (!$tag->getPublications()->contains($this)) {
+            $publicationTag = new PublicationTag();
+            $publicationTag->setTag($tag);
+            $this->addPublicationTag($publicationTag);
+
+            $foreignCollection = $tag->getPublications();
+            $foreignCollection[] = $this;
+        }
     }
 
     /**
@@ -9638,7 +9940,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     public function setCategories(PropelCollection $categories, PropelPDO $con = null)
     {
         $this->clearCategories();
-        $currentCategories = $this->getCategories();
+        $currentCategories = $this->getCategories(null, $con);
 
         $this->categoriesScheduledForDeletion = $currentCategories->diff($categories);
 
@@ -9695,10 +9997,14 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ($this->collCategories === null) {
             $this->initCategories();
         }
+
         if (!$this->collCategories->contains($category)) { // only add it if the **same** object is not already associated
             $this->doAddCategory($category);
+            $this->collCategories[] = $category;
 
-            $this->collCategories[]= $category;
+            if ($this->categoriesScheduledForDeletion and $this->categoriesScheduledForDeletion->contains($category)) {
+                $this->categoriesScheduledForDeletion->remove($this->categoriesScheduledForDeletion->search($category));
+            }
         }
 
         return $this;
@@ -9707,11 +10013,18 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * @param	Category $category The category object to add.
      */
-    protected function doAddCategory($category)
+    protected function doAddCategory(Category $category)
     {
-        $categoryPublication = new CategoryPublication();
-        $categoryPublication->setCategory($category);
-        $this->addCategoryPublication($categoryPublication);
+        // set the back reference to this object directly as using provided method either results
+        // in endless loop or in multiple relations
+        if (!$category->getPublications()->contains($this)) {
+            $categoryPublication = new CategoryPublication();
+            $categoryPublication->setCategory($category);
+            $this->addCategoryPublication($categoryPublication);
+
+            $foreignCollection = $category->getPublications();
+            $foreignCollection[] = $this;
+        }
     }
 
     /**
@@ -9815,7 +10128,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     public function setFonts(PropelCollection $fonts, PropelPDO $con = null)
     {
         $this->clearFonts();
-        $currentFonts = $this->getFonts();
+        $currentFonts = $this->getFonts(null, $con);
 
         $this->fontsScheduledForDeletion = $currentFonts->diff($fonts);
 
@@ -9872,10 +10185,14 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ($this->collFonts === null) {
             $this->initFonts();
         }
+
         if (!$this->collFonts->contains($font)) { // only add it if the **same** object is not already associated
             $this->doAddFont($font);
+            $this->collFonts[] = $font;
 
-            $this->collFonts[]= $font;
+            if ($this->fontsScheduledForDeletion and $this->fontsScheduledForDeletion->contains($font)) {
+                $this->fontsScheduledForDeletion->remove($this->fontsScheduledForDeletion->search($font));
+            }
         }
 
         return $this;
@@ -9884,11 +10201,18 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * @param	Font $font The font object to add.
      */
-    protected function doAddFont($font)
+    protected function doAddFont(Font $font)
     {
-        $fontPublication = new FontPublication();
-        $fontPublication->setFont($font);
-        $this->addFontPublication($fontPublication);
+        // set the back reference to this object directly as using provided method either results
+        // in endless loop or in multiple relations
+        if (!$font->getPublications()->contains($this)) {
+            $fontPublication = new FontPublication();
+            $fontPublication->setFont($font);
+            $this->addFontPublication($fontPublication);
+
+            $foreignCollection = $font->getPublications();
+            $foreignCollection[] = $this;
+        }
     }
 
     /**
@@ -9992,7 +10316,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     public function setPublicationgroups(PropelCollection $publicationgroups, PropelPDO $con = null)
     {
         $this->clearPublicationgroups();
-        $currentPublicationgroups = $this->getPublicationgroups();
+        $currentPublicationgroups = $this->getPublicationgroups(null, $con);
 
         $this->publicationgroupsScheduledForDeletion = $currentPublicationgroups->diff($publicationgroups);
 
@@ -10049,10 +10373,14 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ($this->collPublicationgroups === null) {
             $this->initPublicationgroups();
         }
+
         if (!$this->collPublicationgroups->contains($publicationgroup)) { // only add it if the **same** object is not already associated
             $this->doAddPublicationgroup($publicationgroup);
+            $this->collPublicationgroups[] = $publicationgroup;
 
-            $this->collPublicationgroups[]= $publicationgroup;
+            if ($this->publicationgroupsScheduledForDeletion and $this->publicationgroupsScheduledForDeletion->contains($publicationgroup)) {
+                $this->publicationgroupsScheduledForDeletion->remove($this->publicationgroupsScheduledForDeletion->search($publicationgroup));
+            }
         }
 
         return $this;
@@ -10061,11 +10389,18 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     /**
      * @param	Publicationgroup $publicationgroup The publicationgroup object to add.
      */
-    protected function doAddPublicationgroup($publicationgroup)
+    protected function doAddPublicationgroup(Publicationgroup $publicationgroup)
     {
-        $publicationPublicationgroup = new PublicationPublicationgroup();
-        $publicationPublicationgroup->setPublicationgroup($publicationgroup);
-        $this->addPublicationPublicationgroup($publicationPublicationgroup);
+        // set the back reference to this object directly as using provided method either results
+        // in endless loop or in multiple relations
+        if (!$publicationgroup->getPublications()->contains($this)) {
+            $publicationPublicationgroup = new PublicationPublicationgroup();
+            $publicationPublicationgroup->setPublicationgroup($publicationgroup);
+            $this->addPublicationPublicationgroup($publicationPublicationgroup);
+
+            $foreignCollection = $publicationgroup->getPublications();
+            $foreignCollection[] = $this;
+        }
     }
 
     /**
@@ -10101,6 +10436,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         $this->publicationdate_id = null;
         $this->creationdate_id = null;
         $this->publishingcompany_id = null;
+        $this->source_id = null;
         $this->partner_id = null;
         $this->editiondescription = null;
         $this->digitaleditioneditor = null;
@@ -10114,7 +10450,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         $this->directoryname = null;
         $this->wwwready = null;
         $this->last_changed_by_user_id = null;
-        $this->legacy_book_id = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->publishingcompany_id_is_reconstructed = null;
@@ -10133,7 +10468,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      *
      * This method is a user-space workaround for PHP's inability to garbage collect
      * objects with circular references (even in PHP 5.3). This is currently necessary
-     * when using Propel in certain daemon or large-volumne/high-memory operations.
+     * when using Propel in certain daemon or large-volume/high-memory operations.
      *
      * @param boolean $deep Whether to also clear the references on all referrer objects.
      */
@@ -10279,6 +10614,9 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             if ($this->aTitle instanceof Persistent) {
               $this->aTitle->clearAllReferences($deep);
             }
+            if ($this->aSource instanceof Persistent) {
+              $this->aSource->clearAllReferences($deep);
+            }
             if ($this->aPublishingcompany instanceof Persistent) {
               $this->aPublishingcompany->clearAllReferences($deep);
             }
@@ -10407,6 +10745,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         }
         $this->collPublicationgroups = null;
         $this->aTitle = null;
+        $this->aSource = null;
         $this->aPublishingcompany = null;
         $this->aPlace = null;
         $this->aDatespecificationRelatedByPublicationdateId = null;

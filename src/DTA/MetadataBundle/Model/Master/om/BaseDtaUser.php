@@ -39,10 +39,16 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     protected static $peer;
 
     /**
-     * The flag var to prevent infinit loop in deep copy
+     * The flag var to prevent infinite loop in deep copy
      * @var       boolean
      */
     protected $startCopy = false;
+
+    /**
+     * The value for the id field.
+     * @var        int
+     */
+    protected $id;
 
     /**
      * The value for the username field.
@@ -74,18 +80,6 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
      * @var        boolean
      */
     protected $admin;
-
-    /**
-     * The value for the legacy_user_id field.
-     * @var        int
-     */
-    protected $legacy_user_id;
-
-    /**
-     * The value for the id field.
-     * @var        int
-     */
-    protected $id;
 
     /**
      * @var        PropelObjectCollection|Publication[] Collection to store aggregation of Publication objects.
@@ -167,12 +161,24 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     }
 
     /**
+     * Get the [id] column value.
+     *
+     * @return int
+     */
+    public function getId()
+    {
+
+        return $this->id;
+    }
+
+    /**
      * Get the [username] column value.
      *
      * @return string
      */
     public function getUsername()
     {
+
         return $this->username;
     }
 
@@ -183,6 +189,7 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
      */
     public function getPassword()
     {
+
         return $this->password;
     }
 
@@ -193,6 +200,7 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
      */
     public function getSalt()
     {
+
         return $this->salt;
     }
 
@@ -203,6 +211,7 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
      */
     public function getMail()
     {
+
         return $this->mail;
     }
 
@@ -213,33 +222,35 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
      */
     public function getAdmin()
     {
+
         return $this->admin;
     }
 
     /**
-     * Get the [legacy_user_id] column value.
-     * id_user der alten Datenbank, die dem Datensatz zugrundeliegt.
-     * @return int
-     */
-    public function getLegacyUserId()
-    {
-        return $this->legacy_user_id;
-    }
-
-    /**
-     * Get the [id] column value.
+     * Set the value of [id] column.
      *
-     * @return int
+     * @param  int $v new value
+     * @return DtaUser The current object (for fluent API support)
      */
-    public function getId()
+    public function setId($v)
     {
-        return $this->id;
-    }
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->id !== $v) {
+            $this->id = $v;
+            $this->modifiedColumns[] = DtaUserPeer::ID;
+        }
+
+
+        return $this;
+    } // setId()
 
     /**
      * Set the value of [username] column.
      *
-     * @param string $v new value
+     * @param  string $v new value
      * @return DtaUser The current object (for fluent API support)
      */
     public function setUsername($v)
@@ -260,7 +271,7 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     /**
      * Set the value of [password] column.
      *
-     * @param string $v new value
+     * @param  string $v new value
      * @return DtaUser The current object (for fluent API support)
      */
     public function setPassword($v)
@@ -281,7 +292,7 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     /**
      * Set the value of [salt] column.
      *
-     * @param string $v new value
+     * @param  string $v new value
      * @return DtaUser The current object (for fluent API support)
      */
     public function setSalt($v)
@@ -302,7 +313,7 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     /**
      * Set the value of [mail] column.
      *
-     * @param string $v new value
+     * @param  string $v new value
      * @return DtaUser The current object (for fluent API support)
      */
     public function setMail($v)
@@ -350,48 +361,6 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     } // setAdmin()
 
     /**
-     * Set the value of [legacy_user_id] column.
-     * id_user der alten Datenbank, die dem Datensatz zugrundeliegt.
-     * @param int $v new value
-     * @return DtaUser The current object (for fluent API support)
-     */
-    public function setLegacyUserId($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->legacy_user_id !== $v) {
-            $this->legacy_user_id = $v;
-            $this->modifiedColumns[] = DtaUserPeer::LEGACY_USER_ID;
-        }
-
-
-        return $this;
-    } // setLegacyUserId()
-
-    /**
-     * Set the value of [id] column.
-     *
-     * @param int $v new value
-     * @return DtaUser The current object (for fluent API support)
-     */
-    public function setId($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->id !== $v) {
-            $this->id = $v;
-            $this->modifiedColumns[] = DtaUserPeer::ID;
-        }
-
-
-        return $this;
-    } // setId()
-
-    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -418,7 +387,7 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
      * more tables.
      *
      * @param array $row The row returned by PDOStatement->fetch(PDO::FETCH_NUM)
-     * @param int $startcol 0-based offset column which indicates which restultset column to start with.
+     * @param int $startcol 0-based offset column which indicates which resultset column to start with.
      * @param boolean $rehydrate Whether this object is being re-hydrated from the database.
      * @return int             next starting column
      * @throws PropelException - Any caught Exception will be rewrapped as a PropelException.
@@ -427,13 +396,12 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     {
         try {
 
-            $this->username = ($row[$startcol + 0] !== null) ? (string) $row[$startcol + 0] : null;
-            $this->password = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
-            $this->salt = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-            $this->mail = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-            $this->admin = ($row[$startcol + 4] !== null) ? (boolean) $row[$startcol + 4] : null;
-            $this->legacy_user_id = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
-            $this->id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
+            $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
+            $this->username = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
+            $this->password = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+            $this->salt = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+            $this->mail = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+            $this->admin = ($row[$startcol + 5] !== null) ? (boolean) $row[$startcol + 5] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -442,7 +410,8 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 7; // 7 = DtaUserPeer::NUM_HYDRATE_COLUMNS.
+
+            return $startcol + 6; // 6 = DtaUserPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating DtaUser object", $e);
@@ -707,22 +676,11 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = DtaUserPeer::ID;
-        if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . DtaUserPeer::ID . ')');
-        }
-        if (null === $this->id) {
-            try {
-                $stmt = $con->query("SELECT nextval('dta_user_id_seq')");
-                $row = $stmt->fetch(PDO::FETCH_NUM);
-                $this->id = $row[0];
-            } catch (Exception $e) {
-                throw new PropelException('Unable to get sequence id.', $e);
-            }
-        }
-
 
          // check the columns in natural order for more readable SQL queries
+        if ($this->isColumnModified(DtaUserPeer::ID)) {
+            $modifiedColumns[':p' . $index++]  = '"id"';
+        }
         if ($this->isColumnModified(DtaUserPeer::USERNAME)) {
             $modifiedColumns[':p' . $index++]  = '"username"';
         }
@@ -738,12 +696,6 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
         if ($this->isColumnModified(DtaUserPeer::ADMIN)) {
             $modifiedColumns[':p' . $index++]  = '"admin"';
         }
-        if ($this->isColumnModified(DtaUserPeer::LEGACY_USER_ID)) {
-            $modifiedColumns[':p' . $index++]  = '"legacy_user_id"';
-        }
-        if ($this->isColumnModified(DtaUserPeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '"id"';
-        }
 
         $sql = sprintf(
             'INSERT INTO "dta_user" (%s) VALUES (%s)',
@@ -755,6 +707,9 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
+                    case '"id"':
+                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
+                        break;
                     case '"username"':
                         $stmt->bindValue($identifier, $this->username, PDO::PARAM_STR);
                         break;
@@ -769,12 +724,6 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
                         break;
                     case '"admin"':
                         $stmt->bindValue($identifier, $this->admin, PDO::PARAM_BOOL);
-                        break;
-                    case '"legacy_user_id"':
-                        $stmt->bindValue($identifier, $this->legacy_user_id, PDO::PARAM_INT);
-                        break;
-                    case '"id"':
-                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -849,10 +798,10 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
      *
      * In addition to checking the current object, all related objects will
      * also be validated.  If all pass then <code>true</code> is returned; otherwise
-     * an aggreagated array of ValidationFailed objects will be returned.
+     * an aggregated array of ValidationFailed objects will be returned.
      *
      * @param array $columns Array of column names to validate.
-     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objets otherwise.
+     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objects otherwise.
      */
     protected function doValidate($columns = null)
     {
@@ -928,25 +877,22 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     {
         switch ($pos) {
             case 0:
-                return $this->getUsername();
+                return $this->getId();
                 break;
             case 1:
-                return $this->getPassword();
+                return $this->getUsername();
                 break;
             case 2:
-                return $this->getSalt();
+                return $this->getPassword();
                 break;
             case 3:
-                return $this->getMail();
+                return $this->getSalt();
                 break;
             case 4:
-                return $this->getAdmin();
+                return $this->getMail();
                 break;
             case 5:
-                return $this->getLegacyUserId();
-                break;
-            case 6:
-                return $this->getId();
+                return $this->getAdmin();
                 break;
             default:
                 return null;
@@ -977,14 +923,18 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
         $alreadyDumpedObjects['DtaUser'][$this->getPrimaryKey()] = true;
         $keys = DtaUserPeer::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getUsername(),
-            $keys[1] => $this->getPassword(),
-            $keys[2] => $this->getSalt(),
-            $keys[3] => $this->getMail(),
-            $keys[4] => $this->getAdmin(),
-            $keys[5] => $this->getLegacyUserId(),
-            $keys[6] => $this->getId(),
+            $keys[0] => $this->getId(),
+            $keys[1] => $this->getUsername(),
+            $keys[2] => $this->getPassword(),
+            $keys[3] => $this->getSalt(),
+            $keys[4] => $this->getMail(),
+            $keys[5] => $this->getAdmin(),
         );
+        $virtualColumns = $this->virtualColumns;
+        foreach ($virtualColumns as $key => $virtualColumn) {
+            $result[$key] = $virtualColumn;
+        }
+
         if ($includeForeignObjects) {
             if (null !== $this->collLastChangedPublications) {
                 $result['LastChangedPublications'] = $this->collLastChangedPublications->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1030,25 +980,22 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     {
         switch ($pos) {
             case 0:
-                $this->setUsername($value);
+                $this->setId($value);
                 break;
             case 1:
-                $this->setPassword($value);
+                $this->setUsername($value);
                 break;
             case 2:
-                $this->setSalt($value);
+                $this->setPassword($value);
                 break;
             case 3:
-                $this->setMail($value);
+                $this->setSalt($value);
                 break;
             case 4:
-                $this->setAdmin($value);
+                $this->setMail($value);
                 break;
             case 5:
-                $this->setLegacyUserId($value);
-                break;
-            case 6:
-                $this->setId($value);
+                $this->setAdmin($value);
                 break;
         } // switch()
     }
@@ -1074,13 +1021,12 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     {
         $keys = DtaUserPeer::getFieldNames($keyType);
 
-        if (array_key_exists($keys[0], $arr)) $this->setUsername($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setPassword($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setSalt($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setMail($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setAdmin($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setLegacyUserId($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setId($arr[$keys[6]]);
+        if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
+        if (array_key_exists($keys[1], $arr)) $this->setUsername($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setPassword($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setSalt($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setMail($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setAdmin($arr[$keys[5]]);
     }
 
     /**
@@ -1092,13 +1038,12 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     {
         $criteria = new Criteria(DtaUserPeer::DATABASE_NAME);
 
+        if ($this->isColumnModified(DtaUserPeer::ID)) $criteria->add(DtaUserPeer::ID, $this->id);
         if ($this->isColumnModified(DtaUserPeer::USERNAME)) $criteria->add(DtaUserPeer::USERNAME, $this->username);
         if ($this->isColumnModified(DtaUserPeer::PASSWORD)) $criteria->add(DtaUserPeer::PASSWORD, $this->password);
         if ($this->isColumnModified(DtaUserPeer::SALT)) $criteria->add(DtaUserPeer::SALT, $this->salt);
         if ($this->isColumnModified(DtaUserPeer::MAIL)) $criteria->add(DtaUserPeer::MAIL, $this->mail);
         if ($this->isColumnModified(DtaUserPeer::ADMIN)) $criteria->add(DtaUserPeer::ADMIN, $this->admin);
-        if ($this->isColumnModified(DtaUserPeer::LEGACY_USER_ID)) $criteria->add(DtaUserPeer::LEGACY_USER_ID, $this->legacy_user_id);
-        if ($this->isColumnModified(DtaUserPeer::ID)) $criteria->add(DtaUserPeer::ID, $this->id);
 
         return $criteria;
     }
@@ -1167,7 +1112,6 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
         $copyObj->setSalt($this->getSalt());
         $copyObj->setMail($this->getMail());
         $copyObj->setAdmin($this->getAdmin());
-        $copyObj->setLegacyUserId($this->getLegacyUserId());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1343,7 +1287,7 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
                     if (false !== $this->collLastChangedPublicationsPartial && count($collLastChangedPublications)) {
                       $this->initLastChangedPublications(false);
 
-                      foreach($collLastChangedPublications as $obj) {
+                      foreach ($collLastChangedPublications as $obj) {
                         if (false == $this->collLastChangedPublications->contains($obj)) {
                           $this->collLastChangedPublications->append($obj);
                         }
@@ -1353,12 +1297,13 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
                     }
 
                     $collLastChangedPublications->getInternalIterator()->rewind();
+
                     return $collLastChangedPublications;
                 }
 
-                if($partial && $this->collLastChangedPublications) {
-                    foreach($this->collLastChangedPublications as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collLastChangedPublications) {
+                    foreach ($this->collLastChangedPublications as $obj) {
+                        if ($obj->isNew()) {
                             $collLastChangedPublications[] = $obj;
                         }
                     }
@@ -1386,7 +1331,8 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     {
         $lastChangedPublicationsToDelete = $this->getLastChangedPublications(new Criteria(), $con)->diff($lastChangedPublications);
 
-        $this->lastChangedPublicationsScheduledForDeletion = unserialize(serialize($lastChangedPublicationsToDelete));
+
+        $this->lastChangedPublicationsScheduledForDeletion = $lastChangedPublicationsToDelete;
 
         foreach ($lastChangedPublicationsToDelete as $lastChangedPublicationRemoved) {
             $lastChangedPublicationRemoved->setLastChangedByUser(null);
@@ -1420,7 +1366,7 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getLastChangedPublications());
             }
             $query = PublicationQuery::create(null, $criteria);
@@ -1449,8 +1395,13 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
             $this->initLastChangedPublications();
             $this->collLastChangedPublicationsPartial = true;
         }
+
         if (!in_array($l, $this->collLastChangedPublications->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddLastChangedPublication($l);
+
+            if ($this->lastChangedPublicationsScheduledForDeletion and $this->lastChangedPublicationsScheduledForDeletion->contains($l)) {
+                $this->lastChangedPublicationsScheduledForDeletion->remove($this->lastChangedPublicationsScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -1505,6 +1456,31 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     {
         $query = PublicationQuery::create(null, $criteria);
         $query->joinWith('Title', $join_behavior);
+
+        return $this->getLastChangedPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this DtaUser is new, it will return
+     * an empty collection; or if this DtaUser has previously
+     * been saved, it will retrieve related LastChangedPublications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in DtaUser.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getLastChangedPublicationsJoinSource($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Source', $join_behavior);
 
         return $this->getLastChangedPublications($query, $con);
     }
@@ -1686,7 +1662,7 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
                     if (false !== $this->collRecentUsesPartial && count($collRecentUses)) {
                       $this->initRecentUses(false);
 
-                      foreach($collRecentUses as $obj) {
+                      foreach ($collRecentUses as $obj) {
                         if (false == $this->collRecentUses->contains($obj)) {
                           $this->collRecentUses->append($obj);
                         }
@@ -1696,12 +1672,13 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
                     }
 
                     $collRecentUses->getInternalIterator()->rewind();
+
                     return $collRecentUses;
                 }
 
-                if($partial && $this->collRecentUses) {
-                    foreach($this->collRecentUses as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collRecentUses) {
+                    foreach ($this->collRecentUses as $obj) {
+                        if ($obj->isNew()) {
                             $collRecentUses[] = $obj;
                         }
                     }
@@ -1729,7 +1706,8 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     {
         $recentUsesToDelete = $this->getRecentUses(new Criteria(), $con)->diff($recentUses);
 
-        $this->recentUsesScheduledForDeletion = unserialize(serialize($recentUsesToDelete));
+
+        $this->recentUsesScheduledForDeletion = $recentUsesToDelete;
 
         foreach ($recentUsesToDelete as $recentUseRemoved) {
             $recentUseRemoved->setDtaUser(null);
@@ -1763,7 +1741,7 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getRecentUses());
             }
             $query = RecentUseQuery::create(null, $criteria);
@@ -1792,8 +1770,13 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
             $this->initRecentUses();
             $this->collRecentUsesPartial = true;
         }
+
         if (!in_array($l, $this->collRecentUses->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddRecentUse($l);
+
+            if ($this->recentUsesScheduledForDeletion and $this->recentUsesScheduledForDeletion->contains($l)) {
+                $this->recentUsesScheduledForDeletion->remove($this->recentUsesScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -1929,7 +1912,7 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
                     if (false !== $this->collTasksPartial && count($collTasks)) {
                       $this->initTasks(false);
 
-                      foreach($collTasks as $obj) {
+                      foreach ($collTasks as $obj) {
                         if (false == $this->collTasks->contains($obj)) {
                           $this->collTasks->append($obj);
                         }
@@ -1939,12 +1922,13 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
                     }
 
                     $collTasks->getInternalIterator()->rewind();
+
                     return $collTasks;
                 }
 
-                if($partial && $this->collTasks) {
-                    foreach($this->collTasks as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collTasks) {
+                    foreach ($this->collTasks as $obj) {
+                        if ($obj->isNew()) {
                             $collTasks[] = $obj;
                         }
                     }
@@ -1972,7 +1956,8 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
     {
         $tasksToDelete = $this->getTasks(new Criteria(), $con)->diff($tasks);
 
-        $this->tasksScheduledForDeletion = unserialize(serialize($tasksToDelete));
+
+        $this->tasksScheduledForDeletion = $tasksToDelete;
 
         foreach ($tasksToDelete as $taskRemoved) {
             $taskRemoved->setDtaUser(null);
@@ -2006,7 +1991,7 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getTasks());
             }
             $query = TaskQuery::create(null, $criteria);
@@ -2035,8 +2020,13 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
             $this->initTasks();
             $this->collTasksPartial = true;
         }
+
         if (!in_array($l, $this->collTasks->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddTask($l);
+
+            if ($this->tasksScheduledForDeletion and $this->tasksScheduledForDeletion->contains($l)) {
+                $this->tasksScheduledForDeletion->remove($this->tasksScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -2170,18 +2160,42 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
         return $this->getTasks($query, $con);
     }
 
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this DtaUser is new, it will return
+     * an empty collection; or if this DtaUser has previously
+     * been saved, it will retrieve related Tasks from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in DtaUser.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Task[] List of Task objects
+     */
+    public function getTasksJoinCopyLocation($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = TaskQuery::create(null, $criteria);
+        $query->joinWith('CopyLocation', $join_behavior);
+
+        return $this->getTasks($query, $con);
+    }
+
     /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
     {
+        $this->id = null;
         $this->username = null;
         $this->password = null;
         $this->salt = null;
         $this->mail = null;
         $this->admin = null;
-        $this->legacy_user_id = null;
-        $this->id = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
@@ -2197,7 +2211,7 @@ abstract class BaseDtaUser extends BaseObject implements Persistent, \DTA\Metada
      *
      * This method is a user-space workaround for PHP's inability to garbage collect
      * objects with circular references (even in PHP 5.3). This is currently necessary
-     * when using Propel in certain daemon or large-volumne/high-memory operations.
+     * when using Propel in certain daemon or large-volume/high-memory operations.
      *
      * @param boolean $deep Whether to also clear the references on all referrer objects.
      */

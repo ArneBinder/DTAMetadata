@@ -27,9 +27,7 @@ class PublicationType extends BaseAbstractType
     {
         
         $builder->add('title', new TitleType());
-        $builder->add('datespecification', new Data\DatespecificationType(), array(
-            'label' => 'Entstehungsjahr des Textes'
-        ));
+        
         $builder->add('PersonPublications', new DynamicCollectionType(), array(
             'type' => new Master\PersonPublicationType(),
             'inlineLabel' => false,
@@ -86,8 +84,8 @@ class PublicationType extends BaseAbstractType
             'label' => 'Schlagworte',
         ));
         
-        $builder->add('doi', 'text', array('required' => false));
-        $builder->add('comments');
+        $builder->add('doi', 'text', array('required' => false,'read_only' => true,));
+        $builder->add('comment');
         $builder->add('format', 'text', array('required' => false));
         $builder->add('directoryname', 'text', array('required' => false));
         
@@ -111,6 +109,7 @@ class PublicationType extends BaseAbstractType
             'class' => 'DTA\MetadataBundle\Model\Data\Place',
             'property' => 'Name',
             'label' => 'Druckort',
+            'required' => false,
             
         ));
         
@@ -118,14 +117,11 @@ class PublicationType extends BaseAbstractType
             'label' => 'Erscheinungsjahr'
         ));
         
-        $builder->add('DatespecificationRelatedByFirstpublicationdateId', new Data\DatespecificationType(), array(
-            'label' => 'Erscheinungsjahr der Erstausgabe'
-        ));
 
         
-        $builder->add('volume_alphanumeric', 'text');
-        $builder->add('volume_numeric', 'text');
-        $builder->add('volumes_total', 'text');
+//        $builder->add('volume_alphanumeric', 'text');
+//        $builder->add('volume_numeric', 'text');
+//        $builder->add('volumes_total', 'text');
         
         $builder->add('editiondescription', 'text', array(
             'required' => false
@@ -138,6 +134,7 @@ class PublicationType extends BaseAbstractType
             'class' => 'DTA\MetadataBundle\Model\Data\Publishingcompany',
             'property' => 'Name',
             'label' => 'Verlag',
+            'required' => false,
         ));
             
         $builder->add('ImageSources', new DynamicCollectionType(), array(
@@ -164,11 +161,11 @@ class PublicationType extends BaseAbstractType
         $builder->add('digitaleditioneditor', 'text', array('required'=>false));
         $builder->add('transcriptioncomment', 'textarea', array('required'=>false));
         
-        $builder->add('font', new SelectOrAddType(), array(
-            'class' => '\DTA\MetadataBundle\Model\Data\Font',
-            'property' => 'Name',
-            'label' => 'vorherrschende Schriftart',
-        ));
+//        $builder->add('font', new SelectOrAddType(), array(
+//            'class' => '\DTA\MetadataBundle\Model\Data\Font',
+//            'property' => 'Name',
+//            'label' => 'vorherrschende Schriftart',
+//        ));
         
         $builder->add('comment', 'textarea', array(
             'required' => false,

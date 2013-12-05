@@ -20,14 +20,12 @@ use DTA\MetadataBundle\Model\Workflow\TasktypeQuery;
 /**
  * @method TasktypeQuery orderById($order = Criteria::ASC) Order by the id column
  * @method TasktypeQuery orderByName($order = Criteria::ASC) Order by the name column
- * @method TasktypeQuery orderByLegacyTasktypeId($order = Criteria::ASC) Order by the legacy_tasktype_id column
  * @method TasktypeQuery orderByTreeLeft($order = Criteria::ASC) Order by the tree_left column
  * @method TasktypeQuery orderByTreeRight($order = Criteria::ASC) Order by the tree_right column
  * @method TasktypeQuery orderByTreeLevel($order = Criteria::ASC) Order by the tree_level column
  *
  * @method TasktypeQuery groupById() Group by the id column
  * @method TasktypeQuery groupByName() Group by the name column
- * @method TasktypeQuery groupByLegacyTasktypeId() Group by the legacy_tasktype_id column
  * @method TasktypeQuery groupByTreeLeft() Group by the tree_left column
  * @method TasktypeQuery groupByTreeRight() Group by the tree_right column
  * @method TasktypeQuery groupByTreeLevel() Group by the tree_level column
@@ -44,14 +42,12 @@ use DTA\MetadataBundle\Model\Workflow\TasktypeQuery;
  * @method Tasktype findOneOrCreate(PropelPDO $con = null) Return the first Tasktype matching the query, or a new Tasktype object populated from the query conditions when no match is found
  *
  * @method Tasktype findOneByName(string $name) Return the first Tasktype filtered by the name column
- * @method Tasktype findOneByLegacyTasktypeId(int $legacy_tasktype_id) Return the first Tasktype filtered by the legacy_tasktype_id column
  * @method Tasktype findOneByTreeLeft(int $tree_left) Return the first Tasktype filtered by the tree_left column
  * @method Tasktype findOneByTreeRight(int $tree_right) Return the first Tasktype filtered by the tree_right column
  * @method Tasktype findOneByTreeLevel(int $tree_level) Return the first Tasktype filtered by the tree_level column
  *
  * @method array findById(int $id) Return Tasktype objects filtered by the id column
  * @method array findByName(string $name) Return Tasktype objects filtered by the name column
- * @method array findByLegacyTasktypeId(int $legacy_tasktype_id) Return Tasktype objects filtered by the legacy_tasktype_id column
  * @method array findByTreeLeft(int $tree_left) Return Tasktype objects filtered by the tree_left column
  * @method array findByTreeRight(int $tree_right) Return Tasktype objects filtered by the tree_right column
  * @method array findByTreeLevel(int $tree_level) Return Tasktype objects filtered by the tree_level column
@@ -65,8 +61,14 @@ abstract class BaseTasktypeQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Workflow\\Tasktype', $modelAlias = null)
+    public function __construct($dbName = null, $modelName = null, $modelAlias = null)
     {
+        if (null === $dbName) {
+            $dbName = 'dtametadata';
+        }
+        if (null === $modelName) {
+            $modelName = 'DTA\\MetadataBundle\\Model\\Workflow\\Tasktype';
+        }
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
@@ -83,10 +85,8 @@ abstract class BaseTasktypeQuery extends ModelCriteria
         if ($criteria instanceof TasktypeQuery) {
             return $criteria;
         }
-        $query = new TasktypeQuery();
-        if (null !== $modelAlias) {
-            $query->setModelAlias($modelAlias);
-        }
+        $query = new TasktypeQuery(null, null, $modelAlias);
+
         if ($criteria instanceof Criteria) {
             $query->mergeWith($criteria);
         }
@@ -114,7 +114,7 @@ abstract class BaseTasktypeQuery extends ModelCriteria
             return null;
         }
         if ((null !== ($obj = TasktypePeer::getInstanceFromPool((string) $key))) && !$this->formatter) {
-            // the object is alredy in the instance pool
+            // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
@@ -156,7 +156,7 @@ abstract class BaseTasktypeQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "name", "legacy_tasktype_id", "tree_left", "tree_right", "tree_level" FROM "tasktype" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "name", "tree_left", "tree_right", "tree_level" FROM "tasktype" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -314,48 +314,6 @@ abstract class BaseTasktypeQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(TasktypePeer::NAME, $name, $comparison);
-    }
-
-    /**
-     * Filter the query on the legacy_tasktype_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByLegacyTasktypeId(1234); // WHERE legacy_tasktype_id = 1234
-     * $query->filterByLegacyTasktypeId(array(12, 34)); // WHERE legacy_tasktype_id IN (12, 34)
-     * $query->filterByLegacyTasktypeId(array('min' => 12)); // WHERE legacy_tasktype_id >= 12
-     * $query->filterByLegacyTasktypeId(array('max' => 12)); // WHERE legacy_tasktype_id <= 12
-     * </code>
-     *
-     * @param     mixed $legacyTasktypeId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return TasktypeQuery The current query, for fluid interface
-     */
-    public function filterByLegacyTasktypeId($legacyTasktypeId = null, $comparison = null)
-    {
-        if (is_array($legacyTasktypeId)) {
-            $useMinMax = false;
-            if (isset($legacyTasktypeId['min'])) {
-                $this->addUsingAlias(TasktypePeer::LEGACY_TASKTYPE_ID, $legacyTasktypeId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($legacyTasktypeId['max'])) {
-                $this->addUsingAlias(TasktypePeer::LEGACY_TASKTYPE_ID, $legacyTasktypeId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(TasktypePeer::LEGACY_TASKTYPE_ID, $legacyTasktypeId, $comparison);
     }
 
     /**

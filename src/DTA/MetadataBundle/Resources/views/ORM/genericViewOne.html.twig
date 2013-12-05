@@ -4,12 +4,8 @@
     Especially expects a getId method for highlighting.
  #}
 
-{#% extends 'DTAMetadataBundle:Package_'~ package ~':index.html.twig' %#}
-
-{% extends 'DTAMetadataBundle:Layout:base.html.twig' %}
-
-{% block title %} Zeige: {{ className|trans }} {% endblock %}
 
 {% block core %}
-{{ dump(data) }}
+    {{ form_row(form, {'inlineLabel':true, 'hideLabel':true}) }}
+    {{ form_rest(form) }}
 {% endblock core %}

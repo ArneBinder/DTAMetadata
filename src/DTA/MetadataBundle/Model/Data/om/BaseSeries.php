@@ -41,7 +41,7 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
     protected static $peer;
 
     /**
-     * The flag var to prevent infinit loop in deep copy
+     * The flag var to prevent infinite loop in deep copy
      * @var       boolean
      */
     protected $startCopy = false;
@@ -128,6 +128,7 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
      */
     public function getId()
     {
+
         return $this->id;
     }
 
@@ -138,13 +139,14 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
      */
     public function getTitleId()
     {
+
         return $this->title_id;
     }
 
     /**
      * Set the value of [id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Series The current object (for fluent API support)
      */
     public function setId($v)
@@ -165,7 +167,7 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
     /**
      * Set the value of [title_id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Series The current object (for fluent API support)
      */
     public function setTitleId($v)
@@ -210,7 +212,7 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
      * more tables.
      *
      * @param array $row The row returned by PDOStatement->fetch(PDO::FETCH_NUM)
-     * @param int $startcol 0-based offset column which indicates which restultset column to start with.
+     * @param int $startcol 0-based offset column which indicates which resultset column to start with.
      * @param boolean $rehydrate Whether this object is being re-hydrated from the database.
      * @return int             next starting column
      * @throws PropelException - Any caught Exception will be rewrapped as a PropelException.
@@ -229,6 +231,7 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
+
             return $startcol + 2; // 2 = SeriesPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -415,7 +418,7 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
             $this->alreadyInSave = true;
 
             // We call the save method on the following object(s) if they
-            // were passed to this object by their coresponding set
+            // were passed to this object by their corresponding set
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
@@ -620,10 +623,10 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
      *
      * In addition to checking the current object, all related objects will
      * also be validated.  If all pass then <code>true</code> is returned; otherwise
-     * an aggreagated array of ValidationFailed objects will be returned.
+     * an aggregated array of ValidationFailed objects will be returned.
      *
      * @param array $columns Array of column names to validate.
-     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objets otherwise.
+     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objects otherwise.
      */
     protected function doValidate($columns = null)
     {
@@ -635,7 +638,7 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
 
 
             // We call the validate method on the following object(s) if they
-            // were passed to this object by their coresponding set
+            // were passed to this object by their corresponding set
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
@@ -748,6 +751,11 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
             $keys[0] => $this->getId(),
             $keys[1] => $this->getTitleId(),
         );
+        $virtualColumns = $this->virtualColumns;
+        foreach ($virtualColumns as $key => $virtualColumn) {
+            $result[$key] = $virtualColumn;
+        }
+
         if ($includeForeignObjects) {
             if (null !== $this->aTitle) {
                 $result['Title'] = $this->aTitle->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
@@ -983,7 +991,7 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
     /**
      * Declares an association between this object and a Title object.
      *
-     * @param             Title $v
+     * @param                  Title $v
      * @return Series The current object (for fluent API support)
      * @throws PropelException
      */
@@ -1131,7 +1139,7 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
                     if (false !== $this->collPublicationDssPartial && count($collPublicationDss)) {
                       $this->initPublicationDss(false);
 
-                      foreach($collPublicationDss as $obj) {
+                      foreach ($collPublicationDss as $obj) {
                         if (false == $this->collPublicationDss->contains($obj)) {
                           $this->collPublicationDss->append($obj);
                         }
@@ -1141,12 +1149,13 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
                     }
 
                     $collPublicationDss->getInternalIterator()->rewind();
+
                     return $collPublicationDss;
                 }
 
-                if($partial && $this->collPublicationDss) {
-                    foreach($this->collPublicationDss as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collPublicationDss) {
+                    foreach ($this->collPublicationDss as $obj) {
+                        if ($obj->isNew()) {
                             $collPublicationDss[] = $obj;
                         }
                     }
@@ -1174,7 +1183,8 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
     {
         $publicationDssToDelete = $this->getPublicationDss(new Criteria(), $con)->diff($publicationDss);
 
-        $this->publicationDssScheduledForDeletion = unserialize(serialize($publicationDssToDelete));
+
+        $this->publicationDssScheduledForDeletion = $publicationDssToDelete;
 
         foreach ($publicationDssToDelete as $publicationDsRemoved) {
             $publicationDsRemoved->setSeries(null);
@@ -1208,7 +1218,7 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getPublicationDss());
             }
             $query = PublicationDsQuery::create(null, $criteria);
@@ -1237,8 +1247,13 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
             $this->initPublicationDss();
             $this->collPublicationDssPartial = true;
         }
+
         if (!in_array($l, $this->collPublicationDss->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddPublicationDs($l);
+
+            if ($this->publicationDssScheduledForDeletion and $this->publicationDssScheduledForDeletion->contains($l)) {
+                $this->publicationDssScheduledForDeletion->remove($this->publicationDssScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -1374,7 +1389,7 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
                     if (false !== $this->collPublicationMssPartial && count($collPublicationMss)) {
                       $this->initPublicationMss(false);
 
-                      foreach($collPublicationMss as $obj) {
+                      foreach ($collPublicationMss as $obj) {
                         if (false == $this->collPublicationMss->contains($obj)) {
                           $this->collPublicationMss->append($obj);
                         }
@@ -1384,12 +1399,13 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
                     }
 
                     $collPublicationMss->getInternalIterator()->rewind();
+
                     return $collPublicationMss;
                 }
 
-                if($partial && $this->collPublicationMss) {
-                    foreach($this->collPublicationMss as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collPublicationMss) {
+                    foreach ($this->collPublicationMss as $obj) {
+                        if ($obj->isNew()) {
                             $collPublicationMss[] = $obj;
                         }
                     }
@@ -1417,7 +1433,8 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
     {
         $publicationMssToDelete = $this->getPublicationMss(new Criteria(), $con)->diff($publicationMss);
 
-        $this->publicationMssScheduledForDeletion = unserialize(serialize($publicationMssToDelete));
+
+        $this->publicationMssScheduledForDeletion = $publicationMssToDelete;
 
         foreach ($publicationMssToDelete as $publicationMsRemoved) {
             $publicationMsRemoved->setSeries(null);
@@ -1451,7 +1468,7 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getPublicationMss());
             }
             $query = PublicationMsQuery::create(null, $criteria);
@@ -1480,8 +1497,13 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
             $this->initPublicationMss();
             $this->collPublicationMssPartial = true;
         }
+
         if (!in_array($l, $this->collPublicationMss->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddPublicationMs($l);
+
+            if ($this->publicationMssScheduledForDeletion and $this->publicationMssScheduledForDeletion->contains($l)) {
+                $this->publicationMssScheduledForDeletion->remove($this->publicationMssScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -1617,7 +1639,7 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
                     if (false !== $this->collPublicationMmssPartial && count($collPublicationMmss)) {
                       $this->initPublicationMmss(false);
 
-                      foreach($collPublicationMmss as $obj) {
+                      foreach ($collPublicationMmss as $obj) {
                         if (false == $this->collPublicationMmss->contains($obj)) {
                           $this->collPublicationMmss->append($obj);
                         }
@@ -1627,12 +1649,13 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
                     }
 
                     $collPublicationMmss->getInternalIterator()->rewind();
+
                     return $collPublicationMmss;
                 }
 
-                if($partial && $this->collPublicationMmss) {
-                    foreach($this->collPublicationMmss as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collPublicationMmss) {
+                    foreach ($this->collPublicationMmss as $obj) {
+                        if ($obj->isNew()) {
                             $collPublicationMmss[] = $obj;
                         }
                     }
@@ -1660,7 +1683,8 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
     {
         $publicationMmssToDelete = $this->getPublicationMmss(new Criteria(), $con)->diff($publicationMmss);
 
-        $this->publicationMmssScheduledForDeletion = unserialize(serialize($publicationMmssToDelete));
+
+        $this->publicationMmssScheduledForDeletion = $publicationMmssToDelete;
 
         foreach ($publicationMmssToDelete as $publicationMmsRemoved) {
             $publicationMmsRemoved->setSeries(null);
@@ -1694,7 +1718,7 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getPublicationMmss());
             }
             $query = PublicationMmsQuery::create(null, $criteria);
@@ -1723,8 +1747,13 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
             $this->initPublicationMmss();
             $this->collPublicationMmssPartial = true;
         }
+
         if (!in_array($l, $this->collPublicationMmss->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddPublicationMms($l);
+
+            if ($this->publicationMmssScheduledForDeletion and $this->publicationMmssScheduledForDeletion->contains($l)) {
+                $this->publicationMmssScheduledForDeletion->remove($this->publicationMmssScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -1804,7 +1833,7 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
      *
      * This method is a user-space workaround for PHP's inability to garbage collect
      * objects with circular references (even in PHP 5.3). This is currently necessary
-     * when using Propel in certain daemon or large-volumne/high-memory operations.
+     * when using Propel in certain daemon or large-volume/high-memory operations.
      *
      * @param boolean $deep Whether to also clear the references on all referrer objects.
      */

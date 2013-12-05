@@ -9,8 +9,6 @@
     propel > dbal > connections for connection setup or ./runtime-conf.xml if that doesn't work -->
 <database name="dtametadata" namespace="DTA\MetadataBundle\Model\Master" defaultIdMethod="native">
   
-    <behavior name="auto_add_pk"/>
-    
     <!-- This parameter set is added to each entity that doesn't implement the table_row_view behavior. 
     It is not added to tables/entities that define the bahavior. -->
     <behavior name="table_row_view">
@@ -18,6 +16,9 @@
     </behavior>
     
     <table name="language_publication" isCrossRef="true">
+        
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        
         <column name="language_id" type="INTEGER" required="true"/>
         <column name="publication_id" type="INTEGER" required="true"/>
         <foreign-key foreignTable="language"> <reference local="language_id" foreign="id"/> </foreign-key>
@@ -25,6 +26,9 @@
     </table>
     
     <table name="genre_publication" isCrossRef="true">
+        
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        
         <column name="genre_id" type="INTEGER" required="true"/>
         <column name="publication_id" type="INTEGER" required="true"/>
         <foreign-key foreignTable="genre"> <reference local="genre_id" foreign="id"/> </foreign-key>
@@ -32,6 +36,9 @@
     </table>
     
     <table name="publication_tag" isCrossRef="true">
+        
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        
         <column name="tag_id" type="INTEGER" required="true"/>
         <column name="publication_id" type="INTEGER" required="true"/>
         <foreign-key foreignTable="tag"> <reference local="tag_id" foreign="id"/> </foreign-key>
@@ -39,6 +46,9 @@
     </table>
     
     <table name="category_publication" isCrossRef="true">
+        
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+
         <column name="category_id" type="INTEGER" required="true"/>
         <column name="publication_id" type="INTEGER" required="true"/>
         <foreign-key foreignTable="category"> <reference local="category_id" foreign="id"/> </foreign-key>
@@ -46,6 +56,9 @@
     </table>
     
     <table name="font_publication" isCrossRef="true">
+        
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        
         <column name="font_id" type="INTEGER" required="true"/>
         <column name="publication_id" type="INTEGER" required="true"/>
         <foreign-key foreignTable="font"> <reference local="font_id" foreign="id"/> </foreign-key>
@@ -53,6 +66,9 @@
     </table>
     
     <table name="publication_publicationgroup" isCrossRef="true">
+        
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        
         <column name="publicationgroup_id" type="INTEGER" required="true"/>
         <column name="publication_id" type="INTEGER" required="true"/>
         <foreign-key foreignTable="publicationgroup"> <reference local="publicationgroup_id" foreign="id"/> </foreign-key>
@@ -63,6 +79,9 @@
 
     <!--this is not considered cross ref because you can't simply add a person to a publication without specifying its role. -->
     <table name="person_publication" idMethod="native">
+        
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>        
+
         <column name="person_id" type="INTEGER" required="true"/>
         <column name="personrole_id" type="INTEGER" required="true"/>
         <column name="publication_id" type="INTEGER" required="true"/>
@@ -72,6 +91,9 @@
     </table>
     
     <table name="recent_use" idMethod="native">
+        
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        
         <column name="dta_user_id" type="INTEGER" required="true"/>
         <column name="publication_id" type="INTEGER" required="true"/>
         <column name="date" type="TIMESTAMP" required="true"/>
@@ -80,14 +102,16 @@
     </table>
 
     <table name="dta_user">
+        
+        <!--During conversion, the ids are set as the ids of the legacy database.-->
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="false" required="true"/>
+        
         <column name="username" type="LONGVARCHAR"/>
         <column name="password" type="VARCHAR" size="512"/>
         <column name="salt" type="VARCHAR" size="512"/>
         <column name="mail" type="LONGVARCHAR"/>
         <column name="admin" type="BOOLEAN" default="false"/>
         
-        <column name="legacy_user_id" description="id_user der alten Datenbank, die dem Datensatz zugrundeliegt." type="INTEGER"/>
-
         <behavior name="table_row_view">
             <parameter name="id" value="id"/>
             <parameter name="benutzername" value="username"/>

@@ -40,8 +40,7 @@ class PublicationTableMap extends TableMap
         $this->setPhpName('Publication');
         $this->setClassname('DTA\\MetadataBundle\\Model\\Data\\Publication');
         $this->setPackage('src.DTA.MetadataBundle.Model.Data');
-        $this->setUseIdGenerator(true);
-        $this->setPrimaryKeyMethodInfo('publication_id_seq');
+        $this->setUseIdGenerator(false);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('title_id', 'TitleId', 'INTEGER', 'title', 'id', true, null, null);
@@ -50,6 +49,7 @@ class PublicationTableMap extends TableMap
         $this->addForeignKey('publicationdate_id', 'PublicationdateId', 'INTEGER', 'datespecification', 'id', false, null, null);
         $this->addForeignKey('creationdate_id', 'CreationdateId', 'INTEGER', 'datespecification', 'id', false, null, null);
         $this->addForeignKey('publishingcompany_id', 'PublishingcompanyId', 'INTEGER', 'publishingcompany', 'id', false, null, null);
+        $this->addForeignKey('source_id', 'SourceId', 'INTEGER', 'source', 'id', false, null, null);
         $this->addColumn('partner_id', 'PartnerId', 'INTEGER', false, null, null);
         $this->addColumn('editiondescription', 'Editiondescription', 'LONGVARCHAR', false, null, null);
         $this->addColumn('digitaleditioneditor', 'Digitaleditioneditor', 'LONGVARCHAR', false, null, null);
@@ -63,7 +63,6 @@ class PublicationTableMap extends TableMap
         $this->addColumn('directoryname', 'Directoryname', 'LONGVARCHAR', false, null, null);
         $this->addColumn('wwwready', 'Wwwready', 'INTEGER', false, null, null);
         $this->addForeignKey('last_changed_by_user_id', 'LastChangedByUserId', 'INTEGER', 'dta_user', 'id', false, null, null);
-        $this->addColumn('legacy_book_id', 'LegacyBookId', 'INTEGER', false, null, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('publishingcompany_id_is_reconstructed', 'PublishingcompanyIdIsReconstructed', 'BOOLEAN', false, null, false);
@@ -76,6 +75,7 @@ class PublicationTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Title', 'DTA\\MetadataBundle\\Model\\Data\\Title', RelationMap::MANY_TO_ONE, array('title_id' => 'id', ), null, null);
+        $this->addRelation('Source', 'DTA\\MetadataBundle\\Model\\Classification\\Source', RelationMap::MANY_TO_ONE, array('source_id' => 'id', ), null, null);
         $this->addRelation('Publishingcompany', 'DTA\\MetadataBundle\\Model\\Data\\Publishingcompany', RelationMap::MANY_TO_ONE, array('publishingcompany_id' => 'id', ), null, null);
         $this->addRelation('Place', 'DTA\\MetadataBundle\\Model\\Data\\Place', RelationMap::MANY_TO_ONE, array('place_id' => 'id', ), null, null);
         $this->addRelation('DatespecificationRelatedByPublicationdateId', 'DTA\\MetadataBundle\\Model\\Data\\Datespecification', RelationMap::MANY_TO_ONE, array('publicationdate_id' => 'id', ), null, null);
@@ -125,7 +125,7 @@ class PublicationTableMap extends TableMap
   'Verlag' => 'accessor:getPublishingCompany',
   'veröffentlicht' => 'accessor:getDatespecificationRelatedByPublicationdateId',
   'embedcolumnstitle' => 'title',
-  'query' => '\\DTA\\MetadataBundle\\Model\\Data\\PublicationQuery::create()                         ->leftJoinWith(\'Title\')                         ->leftJoinWith(\'Title.Titlefragment\')                         ->leftJoinWith(\'DatespecificationRelatedByPublicationdateId\')                         ->leftJoinWith(\'PersonPublication\')                         ->leftJoin(\'PersonPublication.Person\')                         ->leftJoin(\'Person.Personalname\')                         ->leftJoin(\'Personalname.Namefragment\');',
+  'query' => '\\DTA\\MetadataBundle\\Model\\Data\\PublicationQuery::create()                     ->leftJoinWith(\'Title\')                     ->leftJoinWith(\'Title.Titlefragment\')                     ->leftJoinWith(\'DatespecificationRelatedByPublicationdateId\')                     ->leftJoinWith(\'PersonPublication\')                     ->leftJoinWith(\'PersonPublication.Person\')                     ->leftJoinWith(\'Person.Personalname\')                     ->leftJoinWith(\'Personalname.Namefragment\');',
 ),
             'timestampable' =>  array (
   'create_column' => 'created_at',

@@ -35,7 +35,7 @@ abstract class BaseTitlefragmenttype extends BaseObject implements Persistent, \
     protected static $peer;
 
     /**
-     * The flag var to prevent infinit loop in deep copy
+     * The flag var to prevent infinite loop in deep copy
      * @var       boolean
      */
     protected $startCopy = false;
@@ -93,6 +93,7 @@ abstract class BaseTitlefragmenttype extends BaseObject implements Persistent, \
      */
     public function getId()
     {
+
         return $this->id;
     }
 
@@ -103,13 +104,14 @@ abstract class BaseTitlefragmenttype extends BaseObject implements Persistent, \
      */
     public function getName()
     {
+
         return $this->name;
     }
 
     /**
      * Set the value of [id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Titlefragmenttype The current object (for fluent API support)
      */
     public function setId($v)
@@ -130,7 +132,7 @@ abstract class BaseTitlefragmenttype extends BaseObject implements Persistent, \
     /**
      * Set the value of [name] column.
      *
-     * @param string $v new value
+     * @param  string $v new value
      * @return Titlefragmenttype The current object (for fluent API support)
      */
     public function setName($v)
@@ -171,7 +173,7 @@ abstract class BaseTitlefragmenttype extends BaseObject implements Persistent, \
      * more tables.
      *
      * @param array $row The row returned by PDOStatement->fetch(PDO::FETCH_NUM)
-     * @param int $startcol 0-based offset column which indicates which restultset column to start with.
+     * @param int $startcol 0-based offset column which indicates which resultset column to start with.
      * @param boolean $rehydrate Whether this object is being re-hydrated from the database.
      * @return int             next starting column
      * @throws PropelException - Any caught Exception will be rewrapped as a PropelException.
@@ -190,6 +192,7 @@ abstract class BaseTitlefragmenttype extends BaseObject implements Persistent, \
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
+
             return $startcol + 2; // 2 = TitlefragmenttypePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -527,10 +530,10 @@ abstract class BaseTitlefragmenttype extends BaseObject implements Persistent, \
      *
      * In addition to checking the current object, all related objects will
      * also be validated.  If all pass then <code>true</code> is returned; otherwise
-     * an aggreagated array of ValidationFailed objects will be returned.
+     * an aggregated array of ValidationFailed objects will be returned.
      *
      * @param array $columns Array of column names to validate.
-     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objets otherwise.
+     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objects otherwise.
      */
     protected function doValidate($columns = null)
     {
@@ -627,6 +630,11 @@ abstract class BaseTitlefragmenttype extends BaseObject implements Persistent, \
             $keys[0] => $this->getId(),
             $keys[1] => $this->getName(),
         );
+        $virtualColumns = $this->virtualColumns;
+        foreach ($virtualColumns as $key => $virtualColumn) {
+            $result[$key] = $virtualColumn;
+        }
+
         if ($includeForeignObjects) {
             if (null !== $this->collTitlefragments) {
                 $result['Titlefragments'] = $this->collTitlefragments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -931,7 +939,7 @@ abstract class BaseTitlefragmenttype extends BaseObject implements Persistent, \
                     if (false !== $this->collTitlefragmentsPartial && count($collTitlefragments)) {
                       $this->initTitlefragments(false);
 
-                      foreach($collTitlefragments as $obj) {
+                      foreach ($collTitlefragments as $obj) {
                         if (false == $this->collTitlefragments->contains($obj)) {
                           $this->collTitlefragments->append($obj);
                         }
@@ -941,12 +949,13 @@ abstract class BaseTitlefragmenttype extends BaseObject implements Persistent, \
                     }
 
                     $collTitlefragments->getInternalIterator()->rewind();
+
                     return $collTitlefragments;
                 }
 
-                if($partial && $this->collTitlefragments) {
-                    foreach($this->collTitlefragments as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collTitlefragments) {
+                    foreach ($this->collTitlefragments as $obj) {
+                        if ($obj->isNew()) {
                             $collTitlefragments[] = $obj;
                         }
                     }
@@ -974,7 +983,8 @@ abstract class BaseTitlefragmenttype extends BaseObject implements Persistent, \
     {
         $titlefragmentsToDelete = $this->getTitlefragments(new Criteria(), $con)->diff($titlefragments);
 
-        $this->titlefragmentsScheduledForDeletion = unserialize(serialize($titlefragmentsToDelete));
+
+        $this->titlefragmentsScheduledForDeletion = $titlefragmentsToDelete;
 
         foreach ($titlefragmentsToDelete as $titlefragmentRemoved) {
             $titlefragmentRemoved->setTitlefragmenttype(null);
@@ -1008,7 +1018,7 @@ abstract class BaseTitlefragmenttype extends BaseObject implements Persistent, \
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getTitlefragments());
             }
             $query = TitlefragmentQuery::create(null, $criteria);
@@ -1037,8 +1047,13 @@ abstract class BaseTitlefragmenttype extends BaseObject implements Persistent, \
             $this->initTitlefragments();
             $this->collTitlefragmentsPartial = true;
         }
+
         if (!in_array($l, $this->collTitlefragments->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddTitlefragment($l);
+
+            if ($this->titlefragmentsScheduledForDeletion and $this->titlefragmentsScheduledForDeletion->contains($l)) {
+                $this->titlefragmentsScheduledForDeletion->remove($this->titlefragmentsScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -1118,7 +1133,7 @@ abstract class BaseTitlefragmenttype extends BaseObject implements Persistent, \
      *
      * This method is a user-space workaround for PHP's inability to garbage collect
      * objects with circular references (even in PHP 5.3). This is currently necessary
-     * when using Propel in certain daemon or large-volumne/high-memory operations.
+     * when using Propel in certain daemon or large-volume/high-memory operations.
      *
      * @param boolean $deep Whether to also clear the references on all referrer objects.
      */

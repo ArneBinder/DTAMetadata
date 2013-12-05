@@ -58,8 +58,14 @@ abstract class BasePersonalnameQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Data\\Personalname', $modelAlias = null)
+    public function __construct($dbName = null, $modelName = null, $modelAlias = null)
     {
+        if (null === $dbName) {
+            $dbName = 'dtametadata';
+        }
+        if (null === $modelName) {
+            $modelName = 'DTA\\MetadataBundle\\Model\\Data\\Personalname';
+        }
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
@@ -76,10 +82,8 @@ abstract class BasePersonalnameQuery extends ModelCriteria
         if ($criteria instanceof PersonalnameQuery) {
             return $criteria;
         }
-        $query = new PersonalnameQuery();
-        if (null !== $modelAlias) {
-            $query->setModelAlias($modelAlias);
-        }
+        $query = new PersonalnameQuery(null, null, $modelAlias);
+
         if ($criteria instanceof Criteria) {
             $query->mergeWith($criteria);
         }
@@ -107,7 +111,7 @@ abstract class BasePersonalnameQuery extends ModelCriteria
             return null;
         }
         if ((null !== ($obj = PersonalnamePeer::getInstanceFromPool((string) $key))) && !$this->formatter) {
-            // the object is alredy in the instance pool
+            // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
@@ -543,6 +547,8 @@ abstract class BasePersonalnameQuery extends ModelCriteria
      */
     public function filterByRank($rank)
     {
+
+
         return $this
             ->addUsingAlias(PersonalnamePeer::RANK_COL, $rank, Criteria::EQUAL);
     }
@@ -580,6 +586,7 @@ abstract class BasePersonalnameQuery extends ModelCriteria
      */
     public function findOneByRank($rank, PropelPDO $con = null)
     {
+
         return $this
             ->filterByRank($rank)
             ->findOne($con);
@@ -594,6 +601,8 @@ abstract class BasePersonalnameQuery extends ModelCriteria
      */
     public function findList($con = null)
     {
+
+
         return $this
             ->orderByRank()
             ->find($con);
@@ -607,6 +616,25 @@ abstract class BasePersonalnameQuery extends ModelCriteria
      * @return    integer highest position
      */
     public function getMaxRank(PropelPDO $con = null)
+    {
+        if ($con === null) {
+            $con = Propel::getConnection(PersonalnamePeer::DATABASE_NAME);
+        }
+        // shift the objects with a position lower than the one of object
+        $this->addSelectColumn('MAX(' . PersonalnamePeer::RANK_COL . ')');
+        $stmt = $this->doSelect($con);
+
+        return $stmt->fetchColumn();
+    }
+
+    /**
+     * Get the highest rank by a scope with a array format.
+     *
+     * @param     PropelPDO optional connection
+     *
+     * @return    integer highest position
+     */
+    public function getMaxRankArray(PropelPDO $con = null)
     {
         if ($con === null) {
             $con = Propel::getConnection(PersonalnamePeer::DATABASE_NAME);
@@ -648,7 +676,7 @@ abstract class BasePersonalnameQuery extends ModelCriteria
             $con->commit();
 
             return true;
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollback();
             throw $e;
         }

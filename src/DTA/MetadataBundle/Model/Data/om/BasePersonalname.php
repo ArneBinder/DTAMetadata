@@ -37,7 +37,7 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
     protected static $peer;
 
     /**
-     * The flag var to prevent infinit loop in deep copy
+     * The flag var to prevent infinite loop in deep copy
      * @var       boolean
      */
     protected $startCopy = false;
@@ -114,6 +114,7 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
      */
     public function getId()
     {
+
         return $this->id;
     }
 
@@ -124,6 +125,7 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
      */
     public function getPersonId()
     {
+
         return $this->person_id;
     }
 
@@ -134,13 +136,14 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
      */
     public function getSortableRank()
     {
+
         return $this->sortable_rank;
     }
 
     /**
      * Set the value of [id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Personalname The current object (for fluent API support)
      */
     public function setId($v)
@@ -161,7 +164,7 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
     /**
      * Set the value of [person_id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Personalname The current object (for fluent API support)
      */
     public function setPersonId($v)
@@ -186,7 +189,7 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
     /**
      * Set the value of [sortable_rank] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Personalname The current object (for fluent API support)
      */
     public function setSortableRank($v)
@@ -227,7 +230,7 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
      * more tables.
      *
      * @param array $row The row returned by PDOStatement->fetch(PDO::FETCH_NUM)
-     * @param int $startcol 0-based offset column which indicates which restultset column to start with.
+     * @param int $startcol 0-based offset column which indicates which resultset column to start with.
      * @param boolean $rehydrate Whether this object is being re-hydrated from the database.
      * @return int             next starting column
      * @throws PropelException - Any caught Exception will be rewrapped as a PropelException.
@@ -247,6 +250,7 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
+
             return $startcol + 3; // 3 = PersonalnamePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -396,7 +400,7 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
                 $ret = $ret && $this->preInsert($con);
                 // sortable behavior
                 if (!$this->isColumnModified(PersonalnamePeer::RANK_COL)) {
-                    $this->setSortableRank(PersonalnameQuery::create()->getMaxRank($con) + 1);
+                    $this->setSortableRank(PersonalnameQuery::create()->getMaxRankArray($con) + 1);
                 }
 
             } else {
@@ -441,7 +445,7 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
             $this->alreadyInSave = true;
 
             // We call the save method on the following object(s) if they
-            // were passed to this object by their coresponding set
+            // were passed to this object by their corresponding set
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
@@ -618,10 +622,10 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
      *
      * In addition to checking the current object, all related objects will
      * also be validated.  If all pass then <code>true</code> is returned; otherwise
-     * an aggreagated array of ValidationFailed objects will be returned.
+     * an aggregated array of ValidationFailed objects will be returned.
      *
      * @param array $columns Array of column names to validate.
-     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objets otherwise.
+     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objects otherwise.
      */
     protected function doValidate($columns = null)
     {
@@ -633,7 +637,7 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
 
 
             // We call the validate method on the following object(s) if they
-            // were passed to this object by their coresponding set
+            // were passed to this object by their corresponding set
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
@@ -734,6 +738,11 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
             $keys[1] => $this->getPersonId(),
             $keys[2] => $this->getSortableRank(),
         );
+        $virtualColumns = $this->virtualColumns;
+        foreach ($virtualColumns as $key => $virtualColumn) {
+            $result[$key] = $virtualColumn;
+        }
+
         if ($includeForeignObjects) {
             if (null !== $this->aPerson) {
                 $result['Person'] = $this->aPerson->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
@@ -957,7 +966,7 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
     /**
      * Declares an association between this object and a Person object.
      *
-     * @param             Person $v
+     * @param                  Person $v
      * @return Personalname The current object (for fluent API support)
      * @throws PropelException
      */
@@ -1099,7 +1108,7 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
                     if (false !== $this->collNamefragmentsPartial && count($collNamefragments)) {
                       $this->initNamefragments(false);
 
-                      foreach($collNamefragments as $obj) {
+                      foreach ($collNamefragments as $obj) {
                         if (false == $this->collNamefragments->contains($obj)) {
                           $this->collNamefragments->append($obj);
                         }
@@ -1109,12 +1118,13 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
                     }
 
                     $collNamefragments->getInternalIterator()->rewind();
+
                     return $collNamefragments;
                 }
 
-                if($partial && $this->collNamefragments) {
-                    foreach($this->collNamefragments as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collNamefragments) {
+                    foreach ($this->collNamefragments as $obj) {
+                        if ($obj->isNew()) {
                             $collNamefragments[] = $obj;
                         }
                     }
@@ -1142,7 +1152,8 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
     {
         $namefragmentsToDelete = $this->getNamefragments(new Criteria(), $con)->diff($namefragments);
 
-        $this->namefragmentsScheduledForDeletion = unserialize(serialize($namefragmentsToDelete));
+
+        $this->namefragmentsScheduledForDeletion = $namefragmentsToDelete;
 
         foreach ($namefragmentsToDelete as $namefragmentRemoved) {
             $namefragmentRemoved->setPersonalname(null);
@@ -1176,7 +1187,7 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getNamefragments());
             }
             $query = NamefragmentQuery::create(null, $criteria);
@@ -1205,8 +1216,13 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
             $this->initNamefragments();
             $this->collNamefragmentsPartial = true;
         }
+
         if (!in_array($l, $this->collNamefragments->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddNamefragment($l);
+
+            if ($this->namefragmentsScheduledForDeletion and $this->namefragmentsScheduledForDeletion->contains($l)) {
+                $this->namefragmentsScheduledForDeletion->remove($this->namefragmentsScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -1287,7 +1303,7 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
      *
      * This method is a user-space workaround for PHP's inability to garbage collect
      * objects with circular references (even in PHP 5.3). This is currently necessary
-     * when using Propel in certain daemon or large-volumne/high-memory operations.
+     * when using Propel in certain daemon or large-volume/high-memory operations.
      *
      * @param boolean $deep Whether to also clear the references on all referrer objects.
      */
@@ -1376,7 +1392,7 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
      */
     public function isLast(PropelPDO $con = null)
     {
-        return $this->getSortableRank() == PersonalnameQuery::create()->getMaxRank($con);
+        return $this->getSortableRank() == PersonalnameQuery::create()->getMaxRankArray($con);
     }
 
     /**
@@ -1389,7 +1405,12 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
     public function getNext(PropelPDO $con = null)
     {
 
-        return PersonalnameQuery::create()->findOneByRank($this->getSortableRank() + 1, $con);
+        $query = PersonalnameQuery::create();
+
+        $query->filterByRank($this->getSortableRank() + 1);
+
+
+        return $query->findOne($con);
     }
 
     /**
@@ -1402,7 +1423,12 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
     public function getPrevious(PropelPDO $con = null)
     {
 
-        return PersonalnameQuery::create()->findOneByRank($this->getSortableRank() - 1, $con);
+        $query = PersonalnameQuery::create();
+
+        $query->filterByRank($this->getSortableRank() - 1);
+
+
+        return $query->findOne($con);
     }
 
     /**
@@ -1418,7 +1444,7 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
      */
     public function insertAtRank($rank, PropelPDO $con = null)
     {
-        $maxRank = PersonalnameQuery::create()->getMaxRank($con);
+        $maxRank = PersonalnameQuery::create()->getMaxRankArray($con);
         if ($rank < 1 || $rank > $maxRank + 1) {
             throw new PropelException('Invalid rank ' . $rank);
         }
@@ -1447,7 +1473,7 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
      */
     public function insertAtBottom(PropelPDO $con = null)
     {
-        $this->setSortableRank(PersonalnameQuery::create()->getMaxRank($con) + 1);
+        $this->setSortableRank(PersonalnameQuery::create()->getMaxRankArray($con) + 1);
 
         return $this;
     }
@@ -1482,7 +1508,7 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
         if ($con === null) {
             $con = Propel::getConnection(PersonalnamePeer::DATABASE_NAME);
         }
-        if ($newRank < 1 || $newRank > PersonalnameQuery::create()->getMaxRank($con)) {
+        if ($newRank < 1 || $newRank > PersonalnameQuery::create()->getMaxRankArray($con)) {
             throw new PropelException('Invalid rank ' . $newRank);
         }
 
@@ -1631,7 +1657,7 @@ abstract class BasePersonalname extends BaseObject implements Persistent, \DTA\M
         }
         $con->beginTransaction();
         try {
-            $bottom = PersonalnameQuery::create()->getMaxRank($con);
+            $bottom = PersonalnameQuery::create()->getMaxRankArray($con);
             $res = $this->moveToRank($bottom, $con);
             $con->commit();
 

@@ -39,7 +39,7 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
     protected static $peer;
 
     /**
-     * The flag var to prevent infinit loop in deep copy
+     * The flag var to prevent infinite loop in deep copy
      * @var       boolean
      */
     protected $startCopy = false;
@@ -115,13 +115,14 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
      */
     public function getId()
     {
+
         return $this->id;
     }
 
     /**
      * Set the value of [id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Title The current object (for fluent API support)
      */
     public function setId($v)
@@ -162,7 +163,7 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
      * more tables.
      *
      * @param array $row The row returned by PDOStatement->fetch(PDO::FETCH_NUM)
-     * @param int $startcol 0-based offset column which indicates which restultset column to start with.
+     * @param int $startcol 0-based offset column which indicates which resultset column to start with.
      * @param boolean $rehydrate Whether this object is being re-hydrated from the database.
      * @return int             next starting column
      * @throws PropelException - Any caught Exception will be rewrapped as a PropelException.
@@ -180,6 +181,7 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
+
             return $startcol + 1; // 1 = TitlePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -549,10 +551,10 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
      *
      * In addition to checking the current object, all related objects will
      * also be validated.  If all pass then <code>true</code> is returned; otherwise
-     * an aggreagated array of ValidationFailed objects will be returned.
+     * an aggregated array of ValidationFailed objects will be returned.
      *
      * @param array $columns Array of column names to validate.
-     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objets otherwise.
+     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objects otherwise.
      */
     protected function doValidate($columns = null)
     {
@@ -661,6 +663,11 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
         $result = array(
             $keys[0] => $this->getId(),
         );
+        $virtualColumns = $this->virtualColumns;
+        foreach ($virtualColumns as $key => $virtualColumn) {
+            $result[$key] = $virtualColumn;
+        }
+
         if ($includeForeignObjects) {
             if (null !== $this->collPublications) {
                 $result['Publications'] = $this->collPublications->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -983,7 +990,7 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
                     if (false !== $this->collPublicationsPartial && count($collPublications)) {
                       $this->initPublications(false);
 
-                      foreach($collPublications as $obj) {
+                      foreach ($collPublications as $obj) {
                         if (false == $this->collPublications->contains($obj)) {
                           $this->collPublications->append($obj);
                         }
@@ -993,12 +1000,13 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
                     }
 
                     $collPublications->getInternalIterator()->rewind();
+
                     return $collPublications;
                 }
 
-                if($partial && $this->collPublications) {
-                    foreach($this->collPublications as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collPublications) {
+                    foreach ($this->collPublications as $obj) {
+                        if ($obj->isNew()) {
                             $collPublications[] = $obj;
                         }
                     }
@@ -1026,7 +1034,8 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
     {
         $publicationsToDelete = $this->getPublications(new Criteria(), $con)->diff($publications);
 
-        $this->publicationsScheduledForDeletion = unserialize(serialize($publicationsToDelete));
+
+        $this->publicationsScheduledForDeletion = $publicationsToDelete;
 
         foreach ($publicationsToDelete as $publicationRemoved) {
             $publicationRemoved->setTitle(null);
@@ -1060,7 +1069,7 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getPublications());
             }
             $query = PublicationQuery::create(null, $criteria);
@@ -1089,8 +1098,13 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
             $this->initPublications();
             $this->collPublicationsPartial = true;
         }
+
         if (!in_array($l, $this->collPublications->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddPublication($l);
+
+            if ($this->publicationsScheduledForDeletion and $this->publicationsScheduledForDeletion->contains($l)) {
+                $this->publicationsScheduledForDeletion->remove($this->publicationsScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -1122,6 +1136,31 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
         }
 
         return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinSource($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Source', $join_behavior);
+
+        return $this->getPublications($query, $con);
     }
 
 
@@ -1326,7 +1365,7 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
                     if (false !== $this->collSeriesPartial && count($collSeries)) {
                       $this->initSeries(false);
 
-                      foreach($collSeries as $obj) {
+                      foreach ($collSeries as $obj) {
                         if (false == $this->collSeries->contains($obj)) {
                           $this->collSeries->append($obj);
                         }
@@ -1336,12 +1375,13 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
                     }
 
                     $collSeries->getInternalIterator()->rewind();
+
                     return $collSeries;
                 }
 
-                if($partial && $this->collSeries) {
-                    foreach($this->collSeries as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collSeries) {
+                    foreach ($this->collSeries as $obj) {
+                        if ($obj->isNew()) {
                             $collSeries[] = $obj;
                         }
                     }
@@ -1369,7 +1409,8 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
     {
         $seriesToDelete = $this->getSeries(new Criteria(), $con)->diff($series);
 
-        $this->seriesScheduledForDeletion = unserialize(serialize($seriesToDelete));
+
+        $this->seriesScheduledForDeletion = $seriesToDelete;
 
         foreach ($seriesToDelete as $seriesRemoved) {
             $seriesRemoved->setTitle(null);
@@ -1403,7 +1444,7 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getSeries());
             }
             $query = SeriesQuery::create(null, $criteria);
@@ -1432,8 +1473,13 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
             $this->initSeries();
             $this->collSeriesPartial = true;
         }
+
         if (!in_array($l, $this->collSeries->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddSeries($l);
+
+            if ($this->seriesScheduledForDeletion and $this->seriesScheduledForDeletion->contains($l)) {
+                $this->seriesScheduledForDeletion->remove($this->seriesScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -1544,7 +1590,7 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
                     if (false !== $this->collTitlefragmentsPartial && count($collTitlefragments)) {
                       $this->initTitlefragments(false);
 
-                      foreach($collTitlefragments as $obj) {
+                      foreach ($collTitlefragments as $obj) {
                         if (false == $this->collTitlefragments->contains($obj)) {
                           $this->collTitlefragments->append($obj);
                         }
@@ -1554,12 +1600,13 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
                     }
 
                     $collTitlefragments->getInternalIterator()->rewind();
+
                     return $collTitlefragments;
                 }
 
-                if($partial && $this->collTitlefragments) {
-                    foreach($this->collTitlefragments as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collTitlefragments) {
+                    foreach ($this->collTitlefragments as $obj) {
+                        if ($obj->isNew()) {
                             $collTitlefragments[] = $obj;
                         }
                     }
@@ -1587,7 +1634,8 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
     {
         $titlefragmentsToDelete = $this->getTitlefragments(new Criteria(), $con)->diff($titlefragments);
 
-        $this->titlefragmentsScheduledForDeletion = unserialize(serialize($titlefragmentsToDelete));
+
+        $this->titlefragmentsScheduledForDeletion = $titlefragmentsToDelete;
 
         foreach ($titlefragmentsToDelete as $titlefragmentRemoved) {
             $titlefragmentRemoved->setTitle(null);
@@ -1621,7 +1669,7 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getTitlefragments());
             }
             $query = TitlefragmentQuery::create(null, $criteria);
@@ -1650,8 +1698,13 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
             $this->initTitlefragments();
             $this->collTitlefragmentsPartial = true;
         }
+
         if (!in_array($l, $this->collTitlefragments->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddTitlefragment($l);
+
+            if ($this->titlefragmentsScheduledForDeletion and $this->titlefragmentsScheduledForDeletion->contains($l)) {
+                $this->titlefragmentsScheduledForDeletion->remove($this->titlefragmentsScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -1730,7 +1783,7 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
      *
      * This method is a user-space workaround for PHP's inability to garbage collect
      * objects with circular references (even in PHP 5.3). This is currently necessary
-     * when using Propel in certain daemon or large-volumne/high-memory operations.
+     * when using Propel in certain daemon or large-volume/high-memory operations.
      *
      * @param boolean $deep Whether to also clear the references on all referrer objects.
      */

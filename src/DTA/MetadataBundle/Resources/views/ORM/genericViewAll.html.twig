@@ -23,6 +23,7 @@
 
     
     {% block tableHead %}
+
     <table class="table fullyFeatured table-striped table-hover" {# style="table-layout: fixed" #} > {# further bootstrap table classes: table-hover #}
     <thead>
         {% for col in columns %}    
@@ -49,10 +50,10 @@
                 {# turn the column content into a link if it is in the linkColumn (see above) #}
                 {% set linkMarkup  = loop.index == linkColumn ? 
                     "<span class='glyphicon glyphicon-edit'></span>" ~
-                    "<a name='record" ~ recordId ~ "' href='" ~ editLoc ~ "'>" : "" %}
+                    "<a name='" ~ package ~ "/" ~ className ~ "/" ~ recordId ~ "' href='" ~ editLoc ~ "'>" : "" %}
                 {% set linkMarkupEnd = loop.index == linkColumn ? 
                     "</a>" : "" %}
-                <td>{{linkMarkup|raw()}}{{cellContent}}{{linkMarkupEnd|raw()}}</td>
+                <td {{ loop.index == linkColumn ? 'onclick="loadDetailPopover(this)"' : ''}}>{{linkMarkup|raw()}}{{cellContent}}{{linkMarkupEnd|raw()}}</td>
             {% endfor %}
                 {#<td>
                     <a href="{{ deleteLoc }}" 
@@ -64,3 +65,35 @@
         {% endfor %}
     {% endspaceless %}
     {% endblock tableBody %}
+
+    {%block additionalJS%}
+
+        function loadDetailPopover(tdElement){
+            var attrs = $('a', tdElement).attr('name').split('/');
+            var package   = attrs[0];
+            var className = attrs[1];
+            var recordId  = attrs[2];
+            var modalId   = recordId;
+            
+            if( $(tdElement).hasClass('loaded') ){
+                return true;
+            } else {
+                // $(tdElement).css('background-image', 'url("{{asset("bundles/webprofiler/images/profiler/spinner.gif")}}") no-repeat ');
+                //$(tdElement).css('border', '1px solid gray');
+                $(tdElement).addClass('loaded');
+                
+                //$.get( "{{ url("root") }}" + package + "/ajaxModalForm/" + className + "/" + modalId + "/Id/" + recordId, function( data ) {
+                $.get( "{{ url("root") }}" + package + "/show/" + className + "/" + recordId, function( data ) {
+                    $(tdElement).popover({'title':'{{className|trans}}', 'trigger':'click', 'container' : 'body', 
+                        placement: 'bottom',
+                        html: true, 
+                        content:data,
+                        animation: false
+                    });
+                    //$(tdElement).css('background-image', 'none');
+                    $(tdElement).popover('show');
+                });
+            }
+        }
+
+    {% endblock additionalJS%}

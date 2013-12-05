@@ -14,6 +14,9 @@ nearDuplicateProposal:
 # home controller
 # ==============================================================================
 
+root: 
+  path: /
+  defaults: { _controller: DTAMetadataBundle:Home:index }
 home: 
   path: /Home
   defaults: { _controller: DTAMetadataBundle:Home:index }

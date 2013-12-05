@@ -29,7 +29,7 @@ abstract class BaseNamefragmentPeer
     const OM_CLASS = 'DTA\\MetadataBundle\\Model\\Data\\Namefragment';
 
     /** the related TableMap class for this table */
-    const TM_CLASS = 'NamefragmentTableMap';
+    const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Data\\map\\NamefragmentTableMap';
 
     /** The total number of columns. */
     const NUM_COLUMNS = 5;
@@ -59,7 +59,7 @@ abstract class BaseNamefragmentPeer
     const DEFAULT_STRING_FORMAT = 'YAML';
 
     /**
-     * An identiy map to hold any loaded instances of Namefragment objects.
+     * An identity map to hold any loaded instances of Namefragment objects.
      * This must be public so that other peer classes can access this when hydrating from JOIN
      * queries.
      * @var        array Namefragment[]
@@ -243,7 +243,7 @@ abstract class BaseNamefragmentPeer
      *
      * @param      Criteria $criteria object used to create the SELECT statement.
      * @param      PropelPDO $con
-     * @return                 Namefragment
+     * @return Namefragment
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -310,7 +310,7 @@ abstract class BaseNamefragmentPeer
      * to the cache in order to ensure that the same objects are always returned by doSelect*()
      * and retrieveByPK*() calls.
      *
-     * @param      Namefragment $obj A Namefragment object.
+     * @param Namefragment $obj A Namefragment object.
      * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
     public static function addInstanceToPool($obj, $key = null)
@@ -360,7 +360,7 @@ abstract class BaseNamefragmentPeer
      * a multi-column primary key, a serialize()d version of the primary key will be returned.
      *
      * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-     * @return   Namefragment Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+     * @return Namefragment Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
      * @see        getPrimaryKeyHash()
      */
     public static function getInstanceFromPool($key)
@@ -381,10 +381,8 @@ abstract class BaseNamefragmentPeer
      */
     public static function clearInstancePool($and_clear_all_references = false)
     {
-      if ($and_clear_all_references)
-      {
-        foreach (NamefragmentPeer::$instances as $instance)
-        {
+      if ($and_clear_all_references) {
+        foreach (NamefragmentPeer::$instances as $instance) {
           $instance->clearAllReferences(true);
         }
       }
@@ -1143,7 +1141,7 @@ abstract class BaseNamefragmentPeer
     {
       $dbMap = Propel::getDatabaseMap(BaseNamefragmentPeer::DATABASE_NAME);
       if (!$dbMap->hasTable(BaseNamefragmentPeer::TABLE_NAME)) {
-        $dbMap->addTableObject(new NamefragmentTableMap());
+        $dbMap->addTableObject(new \DTA\MetadataBundle\Model\Data\map\NamefragmentTableMap());
       }
     }
 
@@ -1193,7 +1191,7 @@ abstract class BaseNamefragmentPeer
             $con->beginTransaction();
             $pk = BasePeer::doInsert($criteria, $con);
             $con->commit();
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -1266,7 +1264,7 @@ abstract class BaseNamefragmentPeer
             $con->commit();
 
             return $affectedRows;
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -1325,7 +1323,7 @@ abstract class BaseNamefragmentPeer
             $con->commit();
 
             return $affectedRows;
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -1338,7 +1336,7 @@ abstract class BaseNamefragmentPeer
      *
      * NOTICE: This does not apply to primary or foreign keys for now.
      *
-     * @param      Namefragment $obj The object to validate.
+     * @param Namefragment $obj The object to validate.
      * @param      mixed $cols Column name or array of column names.
      *
      * @return mixed TRUE if all columns are valid or the error message of the first invalid column.
@@ -1371,7 +1369,7 @@ abstract class BaseNamefragmentPeer
     /**
      * Retrieve a single object by pkey.
      *
-     * @param      int $pk the primary key.
+     * @param int $pk the primary key.
      * @param      PropelPDO $con the connection to use
      * @return Namefragment
      */
@@ -1439,7 +1437,7 @@ abstract class BaseNamefragmentPeer
         // shift the objects with a position lower than the one of object
         $c = new Criteria();
         $c->addSelectColumn('MAX(' . NamefragmentPeer::RANK_COL . ')');
-        $c->add(NamefragmentPeer::SCOPE_COL, $scope, Criteria::EQUAL);
+        NamefragmentPeer::sortableApplyScopeCriteria($c, $scope);
         $stmt = NamefragmentPeer::doSelectStmt($c, $con);
 
         return $stmt->fetchColumn();
@@ -1462,7 +1460,7 @@ abstract class BaseNamefragmentPeer
 
         $c = new Criteria;
         $c->add(NamefragmentPeer::RANK_COL, $rank);
-        $c->add(NamefragmentPeer::SCOPE_COL, $scope, Criteria::EQUAL);
+        NamefragmentPeer::sortableApplyScopeCriteria($c, $scope);
 
         return NamefragmentPeer::doSelectOne($c, $con);
     }
@@ -1497,7 +1495,7 @@ abstract class BaseNamefragmentPeer
             $con->commit();
 
             return true;
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollback();
             throw $e;
         }
@@ -1538,7 +1536,7 @@ abstract class BaseNamefragmentPeer
     /**
      * Return an array of sortable objects in the given scope ordered by position
      *
-     * @param     int       $scope  the scope of the list
+     * @param     mixed     $scope  the scope of the list
      * @param     string    $order  sorting order, to be chosen between Criteria::ASC (default) and Criteria::DESC
      * @param     PropelPDO $con    optional connection
      *
@@ -1547,7 +1545,7 @@ abstract class BaseNamefragmentPeer
     public static function retrieveList($scope, $order = Criteria::ASC, PropelPDO $con = null)
     {
         $c = new Criteria();
-        $c->add(NamefragmentPeer::SCOPE_COL, $scope);
+        NamefragmentPeer::sortableApplyScopeCriteria($c, $scope);
 
         return NamefragmentPeer::doSelectOrderByRank($c, $order, $con);
     }
@@ -1555,7 +1553,7 @@ abstract class BaseNamefragmentPeer
     /**
      * Return the number of sortable objects in the given scope
      *
-     * @param     int       $scope  the scope of the list
+     * @param     mixed     $scope  the scope of the list
      * @param     PropelPDO $con    optional connection
      *
      * @return    array list of sortable objects
@@ -1563,7 +1561,7 @@ abstract class BaseNamefragmentPeer
     public static function countList($scope, PropelPDO $con = null)
     {
         $c = new Criteria();
-        $c->add(NamefragmentPeer::SCOPE_COL, $scope);
+        NamefragmentPeer::sortableApplyScopeCriteria($c, $scope);
 
         return NamefragmentPeer::doCount($c, $con);
     }
@@ -1571,7 +1569,7 @@ abstract class BaseNamefragmentPeer
     /**
      * Deletes the sortable objects in the given scope
      *
-     * @param     int       $scope  the scope of the list
+     * @param     mixed     $scope  the scope of the list
      * @param     PropelPDO $con    optional connection
      *
      * @return    int number of deleted objects
@@ -1579,9 +1577,24 @@ abstract class BaseNamefragmentPeer
     public static function deleteList($scope, PropelPDO $con = null)
     {
         $c = new Criteria();
-        $c->add(NamefragmentPeer::SCOPE_COL, $scope);
+        NamefragmentPeer::sortableApplyScopeCriteria($c, $scope);
 
         return NamefragmentPeer::doDelete($c, $con);
+    }
+
+    /**
+     * Applies all scope fields to the given criteria.
+     *
+     * @param  Criteria $criteria Applies the values directly to this criteria.
+     * @param  mixed    $scope    The scope value as scalar type or array($value1, ...).
+     * @param  string   $method   The method we use to apply the values.
+     *
+     */
+    public static function sortableApplyScopeCriteria(Criteria $criteria, $scope, $method = 'add')
+    {
+
+        $criteria->$method(NamefragmentPeer::PERSONALNAME_ID, $scope, Criteria::EQUAL);
+
     }
 
     /**
@@ -1591,7 +1604,7 @@ abstract class BaseNamefragmentPeer
      * @param      int $delta Value to be shifted by, can be negative
      * @param      int $first First node to be shifted
      * @param      int $last  Last node to be shifted
-     * @param      int $scope Scope to use for the shift
+     * @param      mixed $scope Scope to use for the shift. Scalar value (single scope) or array
      * @param      PropelPDO $con Connection to use.
      */
     public static function shiftRank($delta, $first = null, $last = null, $scope = null, PropelPDO $con = null)
@@ -1607,7 +1620,7 @@ abstract class BaseNamefragmentPeer
         if (null !== $last) {
             $whereCriteria->addAnd(NamefragmentPeer::RANK_COL, $last, Criteria::LESS_EQUAL);
         }
-        $whereCriteria->add(NamefragmentPeer::SCOPE_COL, $scope, Criteria::EQUAL);
+        NamefragmentPeer::sortableApplyScopeCriteria($whereCriteria, $scope);
 
         $valuesCriteria = new Criteria(NamefragmentPeer::DATABASE_NAME);
         $valuesCriteria->add(NamefragmentPeer::RANK_COL, array('raw' => NamefragmentPeer::RANK_COL . ' + ?', 'value' => $delta), Criteria::CUSTOM_EQUAL);

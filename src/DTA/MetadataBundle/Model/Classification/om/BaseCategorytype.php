@@ -35,7 +35,7 @@ abstract class BaseCategorytype extends BaseObject implements Persistent, \DTA\M
     protected static $peer;
 
     /**
-     * The flag var to prevent infinit loop in deep copy
+     * The flag var to prevent infinite loop in deep copy
      * @var       boolean
      */
     protected $startCopy = false;
@@ -93,6 +93,7 @@ abstract class BaseCategorytype extends BaseObject implements Persistent, \DTA\M
      */
     public function getId()
     {
+
         return $this->id;
     }
 
@@ -103,13 +104,14 @@ abstract class BaseCategorytype extends BaseObject implements Persistent, \DTA\M
      */
     public function getName()
     {
+
         return $this->name;
     }
 
     /**
      * Set the value of [id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Categorytype The current object (for fluent API support)
      */
     public function setId($v)
@@ -130,7 +132,7 @@ abstract class BaseCategorytype extends BaseObject implements Persistent, \DTA\M
     /**
      * Set the value of [name] column.
      *
-     * @param string $v new value
+     * @param  string $v new value
      * @return Categorytype The current object (for fluent API support)
      */
     public function setName($v)
@@ -171,7 +173,7 @@ abstract class BaseCategorytype extends BaseObject implements Persistent, \DTA\M
      * more tables.
      *
      * @param array $row The row returned by PDOStatement->fetch(PDO::FETCH_NUM)
-     * @param int $startcol 0-based offset column which indicates which restultset column to start with.
+     * @param int $startcol 0-based offset column which indicates which resultset column to start with.
      * @param boolean $rehydrate Whether this object is being re-hydrated from the database.
      * @return int             next starting column
      * @throws PropelException - Any caught Exception will be rewrapped as a PropelException.
@@ -190,6 +192,7 @@ abstract class BaseCategorytype extends BaseObject implements Persistent, \DTA\M
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
+
             return $startcol + 2; // 2 = CategorytypePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -527,10 +530,10 @@ abstract class BaseCategorytype extends BaseObject implements Persistent, \DTA\M
      *
      * In addition to checking the current object, all related objects will
      * also be validated.  If all pass then <code>true</code> is returned; otherwise
-     * an aggreagated array of ValidationFailed objects will be returned.
+     * an aggregated array of ValidationFailed objects will be returned.
      *
      * @param array $columns Array of column names to validate.
-     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objets otherwise.
+     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objects otherwise.
      */
     protected function doValidate($columns = null)
     {
@@ -627,6 +630,11 @@ abstract class BaseCategorytype extends BaseObject implements Persistent, \DTA\M
             $keys[0] => $this->getId(),
             $keys[1] => $this->getName(),
         );
+        $virtualColumns = $this->virtualColumns;
+        foreach ($virtualColumns as $key => $virtualColumn) {
+            $result[$key] = $virtualColumn;
+        }
+
         if ($includeForeignObjects) {
             if (null !== $this->collCategories) {
                 $result['Categories'] = $this->collCategories->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -931,7 +939,7 @@ abstract class BaseCategorytype extends BaseObject implements Persistent, \DTA\M
                     if (false !== $this->collCategoriesPartial && count($collCategories)) {
                       $this->initCategories(false);
 
-                      foreach($collCategories as $obj) {
+                      foreach ($collCategories as $obj) {
                         if (false == $this->collCategories->contains($obj)) {
                           $this->collCategories->append($obj);
                         }
@@ -941,12 +949,13 @@ abstract class BaseCategorytype extends BaseObject implements Persistent, \DTA\M
                     }
 
                     $collCategories->getInternalIterator()->rewind();
+
                     return $collCategories;
                 }
 
-                if($partial && $this->collCategories) {
-                    foreach($this->collCategories as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collCategories) {
+                    foreach ($this->collCategories as $obj) {
+                        if ($obj->isNew()) {
                             $collCategories[] = $obj;
                         }
                     }
@@ -974,7 +983,8 @@ abstract class BaseCategorytype extends BaseObject implements Persistent, \DTA\M
     {
         $categoriesToDelete = $this->getCategories(new Criteria(), $con)->diff($categories);
 
-        $this->categoriesScheduledForDeletion = unserialize(serialize($categoriesToDelete));
+
+        $this->categoriesScheduledForDeletion = $categoriesToDelete;
 
         foreach ($categoriesToDelete as $categoryRemoved) {
             $categoryRemoved->setCategorytype(null);
@@ -1008,7 +1018,7 @@ abstract class BaseCategorytype extends BaseObject implements Persistent, \DTA\M
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getCategories());
             }
             $query = CategoryQuery::create(null, $criteria);
@@ -1037,8 +1047,13 @@ abstract class BaseCategorytype extends BaseObject implements Persistent, \DTA\M
             $this->initCategories();
             $this->collCategoriesPartial = true;
         }
+
         if (!in_array($l, $this->collCategories->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddCategory($l);
+
+            if ($this->categoriesScheduledForDeletion and $this->categoriesScheduledForDeletion->contains($l)) {
+                $this->categoriesScheduledForDeletion->remove($this->categoriesScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -1093,7 +1108,7 @@ abstract class BaseCategorytype extends BaseObject implements Persistent, \DTA\M
      *
      * This method is a user-space workaround for PHP's inability to garbage collect
      * objects with circular references (even in PHP 5.3). This is currently necessary
-     * when using Propel in certain daemon or large-volumne/high-memory operations.
+     * when using Propel in certain daemon or large-volume/high-memory operations.
      *
      * @param boolean $deep Whether to also clear the references on all referrer objects.
      */

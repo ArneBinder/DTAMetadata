@@ -26,7 +26,7 @@ abstract class BasePersonrolePeer
     const OM_CLASS = 'DTA\\MetadataBundle\\Model\\Classification\\Personrole';
 
     /** the related TableMap class for this table */
-    const TM_CLASS = 'PersonroleTableMap';
+    const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Classification\\map\\PersonroleTableMap';
 
     /** The total number of columns. */
     const NUM_COLUMNS = 2;
@@ -47,7 +47,7 @@ abstract class BasePersonrolePeer
     const DEFAULT_STRING_FORMAT = 'YAML';
 
     /**
-     * An identiy map to hold any loaded instances of Personrole objects.
+     * An identity map to hold any loaded instances of Personrole objects.
      * This must be public so that other peer classes can access this when hydrating from JOIN
      * queries.
      * @var        array Personrole[]
@@ -213,7 +213,7 @@ abstract class BasePersonrolePeer
      *
      * @param      Criteria $criteria object used to create the SELECT statement.
      * @param      PropelPDO $con
-     * @return                 Personrole
+     * @return Personrole
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -280,7 +280,7 @@ abstract class BasePersonrolePeer
      * to the cache in order to ensure that the same objects are always returned by doSelect*()
      * and retrieveByPK*() calls.
      *
-     * @param      Personrole $obj A Personrole object.
+     * @param Personrole $obj A Personrole object.
      * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
     public static function addInstanceToPool($obj, $key = null)
@@ -330,7 +330,7 @@ abstract class BasePersonrolePeer
      * a multi-column primary key, a serialize()d version of the primary key will be returned.
      *
      * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-     * @return   Personrole Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+     * @return Personrole Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
      * @see        getPrimaryKeyHash()
      */
     public static function getInstanceFromPool($key)
@@ -351,10 +351,8 @@ abstract class BasePersonrolePeer
      */
     public static function clearInstancePool($and_clear_all_references = false)
     {
-      if ($and_clear_all_references)
-      {
-        foreach (PersonrolePeer::$instances as $instance)
-        {
+      if ($and_clear_all_references) {
+        foreach (PersonrolePeer::$instances as $instance) {
           $instance->clearAllReferences(true);
         }
       }
@@ -482,7 +480,7 @@ abstract class BasePersonrolePeer
     {
       $dbMap = Propel::getDatabaseMap(BasePersonrolePeer::DATABASE_NAME);
       if (!$dbMap->hasTable(BasePersonrolePeer::TABLE_NAME)) {
-        $dbMap->addTableObject(new PersonroleTableMap());
+        $dbMap->addTableObject(new \DTA\MetadataBundle\Model\Classification\map\PersonroleTableMap());
       }
     }
 
@@ -532,7 +530,7 @@ abstract class BasePersonrolePeer
             $con->beginTransaction();
             $pk = BasePeer::doInsert($criteria, $con);
             $con->commit();
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -605,7 +603,7 @@ abstract class BasePersonrolePeer
             $con->commit();
 
             return $affectedRows;
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -664,7 +662,7 @@ abstract class BasePersonrolePeer
             $con->commit();
 
             return $affectedRows;
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -677,7 +675,7 @@ abstract class BasePersonrolePeer
      *
      * NOTICE: This does not apply to primary or foreign keys for now.
      *
-     * @param      Personrole $obj The object to validate.
+     * @param Personrole $obj The object to validate.
      * @param      mixed $cols Column name or array of column names.
      *
      * @return mixed TRUE if all columns are valid or the error message of the first invalid column.
@@ -710,7 +708,7 @@ abstract class BasePersonrolePeer
     /**
      * Retrieve a single object by pkey.
      *
-     * @param      int $pk the primary key.
+     * @param int $pk the primary key.
      * @param      PropelPDO $con the connection to use
      * @return Personrole
      */

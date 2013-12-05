@@ -28,7 +28,7 @@ abstract class BaseRecentUsePeer
     const OM_CLASS = 'DTA\\MetadataBundle\\Model\\Master\\RecentUse';
 
     /** the related TableMap class for this table */
-    const TM_CLASS = 'RecentUseTableMap';
+    const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Master\\map\\RecentUseTableMap';
 
     /** The total number of columns. */
     const NUM_COLUMNS = 4;
@@ -39,6 +39,9 @@ abstract class BaseRecentUsePeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 4;
 
+    /** the column name for the id field */
+    const ID = 'recent_use.id';
+
     /** the column name for the dta_user_id field */
     const DTA_USER_ID = 'recent_use.dta_user_id';
 
@@ -48,14 +51,11 @@ abstract class BaseRecentUsePeer
     /** the column name for the date field */
     const DATE = 'recent_use.date';
 
-    /** the column name for the id field */
-    const ID = 'recent_use.id';
-
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
 
     /**
-     * An identiy map to hold any loaded instances of RecentUse objects.
+     * An identity map to hold any loaded instances of RecentUse objects.
      * This must be public so that other peer classes can access this when hydrating from JOIN
      * queries.
      * @var        array RecentUse[]
@@ -70,11 +70,11 @@ abstract class BaseRecentUsePeer
      * e.g. RecentUsePeer::$fieldNames[RecentUsePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('DtaUserId', 'PublicationId', 'Date', 'Id', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('dtaUserId', 'publicationId', 'date', 'id', ),
-        BasePeer::TYPE_COLNAME => array (RecentUsePeer::DTA_USER_ID, RecentUsePeer::PUBLICATION_ID, RecentUsePeer::DATE, RecentUsePeer::ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('DTA_USER_ID', 'PUBLICATION_ID', 'DATE', 'ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('dta_user_id', 'publication_id', 'date', 'id', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'DtaUserId', 'PublicationId', 'Date', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'dtaUserId', 'publicationId', 'date', ),
+        BasePeer::TYPE_COLNAME => array (RecentUsePeer::ID, RecentUsePeer::DTA_USER_ID, RecentUsePeer::PUBLICATION_ID, RecentUsePeer::DATE, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'DTA_USER_ID', 'PUBLICATION_ID', 'DATE', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'dta_user_id', 'publication_id', 'date', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
@@ -85,11 +85,11 @@ abstract class BaseRecentUsePeer
      * e.g. RecentUsePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('DtaUserId' => 0, 'PublicationId' => 1, 'Date' => 2, 'Id' => 3, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('dtaUserId' => 0, 'publicationId' => 1, 'date' => 2, 'id' => 3, ),
-        BasePeer::TYPE_COLNAME => array (RecentUsePeer::DTA_USER_ID => 0, RecentUsePeer::PUBLICATION_ID => 1, RecentUsePeer::DATE => 2, RecentUsePeer::ID => 3, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('DTA_USER_ID' => 0, 'PUBLICATION_ID' => 1, 'DATE' => 2, 'ID' => 3, ),
-        BasePeer::TYPE_FIELDNAME => array ('dta_user_id' => 0, 'publication_id' => 1, 'date' => 2, 'id' => 3, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'DtaUserId' => 1, 'PublicationId' => 2, 'Date' => 3, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'dtaUserId' => 1, 'publicationId' => 2, 'date' => 3, ),
+        BasePeer::TYPE_COLNAME => array (RecentUsePeer::ID => 0, RecentUsePeer::DTA_USER_ID => 1, RecentUsePeer::PUBLICATION_ID => 2, RecentUsePeer::DATE => 3, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'DTA_USER_ID' => 1, 'PUBLICATION_ID' => 2, 'DATE' => 3, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'dta_user_id' => 1, 'publication_id' => 2, 'date' => 3, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
@@ -164,15 +164,15 @@ abstract class BaseRecentUsePeer
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
+            $criteria->addSelectColumn(RecentUsePeer::ID);
             $criteria->addSelectColumn(RecentUsePeer::DTA_USER_ID);
             $criteria->addSelectColumn(RecentUsePeer::PUBLICATION_ID);
             $criteria->addSelectColumn(RecentUsePeer::DATE);
-            $criteria->addSelectColumn(RecentUsePeer::ID);
         } else {
+            $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.dta_user_id');
             $criteria->addSelectColumn($alias . '.publication_id');
             $criteria->addSelectColumn($alias . '.date');
-            $criteria->addSelectColumn($alias . '.id');
         }
     }
 
@@ -225,7 +225,7 @@ abstract class BaseRecentUsePeer
      *
      * @param      Criteria $criteria object used to create the SELECT statement.
      * @param      PropelPDO $con
-     * @return                 RecentUse
+     * @return RecentUse
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -292,7 +292,7 @@ abstract class BaseRecentUsePeer
      * to the cache in order to ensure that the same objects are always returned by doSelect*()
      * and retrieveByPK*() calls.
      *
-     * @param      RecentUse $obj A RecentUse object.
+     * @param RecentUse $obj A RecentUse object.
      * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
     public static function addInstanceToPool($obj, $key = null)
@@ -342,7 +342,7 @@ abstract class BaseRecentUsePeer
      * a multi-column primary key, a serialize()d version of the primary key will be returned.
      *
      * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-     * @return   RecentUse Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+     * @return RecentUse Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
      * @see        getPrimaryKeyHash()
      */
     public static function getInstanceFromPool($key)
@@ -363,10 +363,8 @@ abstract class BaseRecentUsePeer
      */
     public static function clearInstancePool($and_clear_all_references = false)
     {
-      if ($and_clear_all_references)
-      {
-        foreach (RecentUsePeer::$instances as $instance)
-        {
+      if ($and_clear_all_references) {
+        foreach (RecentUsePeer::$instances as $instance) {
           $instance->clearAllReferences(true);
         }
       }
@@ -394,11 +392,11 @@ abstract class BaseRecentUsePeer
     public static function getPrimaryKeyHashFromRow($row, $startcol = 0)
     {
         // If the PK cannot be derived from the row, return null.
-        if ($row[$startcol + 3] === null) {
+        if ($row[$startcol] === null) {
             return null;
         }
 
-        return (string) $row[$startcol + 3];
+        return (string) $row[$startcol];
     }
 
     /**
@@ -413,7 +411,7 @@ abstract class BaseRecentUsePeer
     public static function getPrimaryKeyFromRow($row, $startcol = 0)
     {
 
-        return (int) $row[$startcol + 3];
+        return (int) $row[$startcol];
     }
 
     /**
@@ -1125,7 +1123,7 @@ abstract class BaseRecentUsePeer
     {
       $dbMap = Propel::getDatabaseMap(BaseRecentUsePeer::DATABASE_NAME);
       if (!$dbMap->hasTable(BaseRecentUsePeer::TABLE_NAME)) {
-        $dbMap->addTableObject(new RecentUseTableMap());
+        $dbMap->addTableObject(new \DTA\MetadataBundle\Model\Master\map\RecentUseTableMap());
       }
     }
 
@@ -1175,7 +1173,7 @@ abstract class BaseRecentUsePeer
             $con->beginTransaction();
             $pk = BasePeer::doInsert($criteria, $con);
             $con->commit();
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -1248,7 +1246,7 @@ abstract class BaseRecentUsePeer
             $con->commit();
 
             return $affectedRows;
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -1307,7 +1305,7 @@ abstract class BaseRecentUsePeer
             $con->commit();
 
             return $affectedRows;
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -1320,7 +1318,7 @@ abstract class BaseRecentUsePeer
      *
      * NOTICE: This does not apply to primary or foreign keys for now.
      *
-     * @param      RecentUse $obj The object to validate.
+     * @param RecentUse $obj The object to validate.
      * @param      mixed $cols Column name or array of column names.
      *
      * @return mixed TRUE if all columns are valid or the error message of the first invalid column.
@@ -1353,7 +1351,7 @@ abstract class BaseRecentUsePeer
     /**
      * Retrieve a single object by pkey.
      *
-     * @param      int $pk the primary key.
+     * @param int $pk the primary key.
      * @param      PropelPDO $con the connection to use
      * @return RecentUse
      */

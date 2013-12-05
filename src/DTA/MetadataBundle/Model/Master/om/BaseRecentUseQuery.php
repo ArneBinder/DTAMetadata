@@ -19,15 +19,15 @@ use DTA\MetadataBundle\Model\Master\RecentUsePeer;
 use DTA\MetadataBundle\Model\Master\RecentUseQuery;
 
 /**
+ * @method RecentUseQuery orderById($order = Criteria::ASC) Order by the id column
  * @method RecentUseQuery orderByDtaUserId($order = Criteria::ASC) Order by the dta_user_id column
  * @method RecentUseQuery orderByPublicationId($order = Criteria::ASC) Order by the publication_id column
  * @method RecentUseQuery orderByDate($order = Criteria::ASC) Order by the date column
- * @method RecentUseQuery orderById($order = Criteria::ASC) Order by the id column
  *
+ * @method RecentUseQuery groupById() Group by the id column
  * @method RecentUseQuery groupByDtaUserId() Group by the dta_user_id column
  * @method RecentUseQuery groupByPublicationId() Group by the publication_id column
  * @method RecentUseQuery groupByDate() Group by the date column
- * @method RecentUseQuery groupById() Group by the id column
  *
  * @method RecentUseQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method RecentUseQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -48,10 +48,10 @@ use DTA\MetadataBundle\Model\Master\RecentUseQuery;
  * @method RecentUse findOneByPublicationId(int $publication_id) Return the first RecentUse filtered by the publication_id column
  * @method RecentUse findOneByDate(string $date) Return the first RecentUse filtered by the date column
  *
+ * @method array findById(int $id) Return RecentUse objects filtered by the id column
  * @method array findByDtaUserId(int $dta_user_id) Return RecentUse objects filtered by the dta_user_id column
  * @method array findByPublicationId(int $publication_id) Return RecentUse objects filtered by the publication_id column
  * @method array findByDate(string $date) Return RecentUse objects filtered by the date column
- * @method array findById(int $id) Return RecentUse objects filtered by the id column
  */
 abstract class BaseRecentUseQuery extends ModelCriteria
 {
@@ -62,8 +62,14 @@ abstract class BaseRecentUseQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Master\\RecentUse', $modelAlias = null)
+    public function __construct($dbName = null, $modelName = null, $modelAlias = null)
     {
+        if (null === $dbName) {
+            $dbName = 'dtametadata';
+        }
+        if (null === $modelName) {
+            $modelName = 'DTA\\MetadataBundle\\Model\\Master\\RecentUse';
+        }
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
@@ -80,10 +86,8 @@ abstract class BaseRecentUseQuery extends ModelCriteria
         if ($criteria instanceof RecentUseQuery) {
             return $criteria;
         }
-        $query = new RecentUseQuery();
-        if (null !== $modelAlias) {
-            $query->setModelAlias($modelAlias);
-        }
+        $query = new RecentUseQuery(null, null, $modelAlias);
+
         if ($criteria instanceof Criteria) {
             $query->mergeWith($criteria);
         }
@@ -111,7 +115,7 @@ abstract class BaseRecentUseQuery extends ModelCriteria
             return null;
         }
         if ((null !== ($obj = RecentUsePeer::getInstanceFromPool((string) $key))) && !$this->formatter) {
-            // the object is alredy in the instance pool
+            // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
@@ -153,7 +157,7 @@ abstract class BaseRecentUseQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "dta_user_id", "publication_id", "date", "id" FROM "recent_use" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "dta_user_id", "publication_id", "date" FROM "recent_use" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -240,6 +244,48 @@ abstract class BaseRecentUseQuery extends ModelCriteria
     {
 
         return $this->addUsingAlias(RecentUsePeer::ID, $keys, Criteria::IN);
+    }
+
+    /**
+     * Filter the query on the id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterById(1234); // WHERE id = 1234
+     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
+     * </code>
+     *
+     * @param     mixed $id The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return RecentUseQuery The current query, for fluid interface
+     */
+    public function filterById($id = null, $comparison = null)
+    {
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(RecentUsePeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(RecentUsePeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(RecentUsePeer::ID, $id, $comparison);
     }
 
     /**
@@ -337,7 +383,7 @@ abstract class BaseRecentUseQuery extends ModelCriteria
      * <code>
      * $query->filterByDate('2011-03-14'); // WHERE date = '2011-03-14'
      * $query->filterByDate('now'); // WHERE date = '2011-03-14'
-     * $query->filterByDate(array('max' => 'yesterday')); // WHERE date > '2011-03-13'
+     * $query->filterByDate(array('max' => 'yesterday')); // WHERE date < '2011-03-13'
      * </code>
      *
      * @param     mixed $date The value to use as filter.
@@ -371,48 +417,6 @@ abstract class BaseRecentUseQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(RecentUsePeer::DATE, $date, $comparison);
-    }
-
-    /**
-     * Filter the query on the id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterById(1234); // WHERE id = 1234
-     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id >= 12
-     * $query->filterById(array('max' => 12)); // WHERE id <= 12
-     * </code>
-     *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return RecentUseQuery The current query, for fluid interface
-     */
-    public function filterById($id = null, $comparison = null)
-    {
-        if (is_array($id)) {
-            $useMinMax = false;
-            if (isset($id['min'])) {
-                $this->addUsingAlias(RecentUsePeer::ID, $id['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($id['max'])) {
-                $this->addUsingAlias(RecentUsePeer::ID, $id['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(RecentUsePeer::ID, $id, $comparison);
     }
 
     /**

@@ -28,7 +28,6 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method PartnerQuery orderByContactdata($order = Criteria::ASC) Order by the contactdata column
  * @method PartnerQuery orderByComments($order = Criteria::ASC) Order by the comments column
  * @method PartnerQuery orderByIsOrganization($order = Criteria::ASC) Order by the is_organization column
- * @method PartnerQuery orderByLegacyPartnerId($order = Criteria::ASC) Order by the legacy_partner_id column
  * @method PartnerQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method PartnerQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -40,7 +39,6 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method PartnerQuery groupByContactdata() Group by the contactdata column
  * @method PartnerQuery groupByComments() Group by the comments column
  * @method PartnerQuery groupByIsOrganization() Group by the is_organization column
- * @method PartnerQuery groupByLegacyPartnerId() Group by the legacy_partner_id column
  * @method PartnerQuery groupByCreatedAt() Group by the created_at column
  * @method PartnerQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -70,7 +68,6 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method Partner findOneByContactdata(string $contactdata) Return the first Partner filtered by the contactdata column
  * @method Partner findOneByComments(string $comments) Return the first Partner filtered by the comments column
  * @method Partner findOneByIsOrganization(boolean $is_organization) Return the first Partner filtered by the is_organization column
- * @method Partner findOneByLegacyPartnerId(int $legacy_partner_id) Return the first Partner filtered by the legacy_partner_id column
  * @method Partner findOneByCreatedAt(string $created_at) Return the first Partner filtered by the created_at column
  * @method Partner findOneByUpdatedAt(string $updated_at) Return the first Partner filtered by the updated_at column
  *
@@ -82,7 +79,6 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method array findByContactdata(string $contactdata) Return Partner objects filtered by the contactdata column
  * @method array findByComments(string $comments) Return Partner objects filtered by the comments column
  * @method array findByIsOrganization(boolean $is_organization) Return Partner objects filtered by the is_organization column
- * @method array findByLegacyPartnerId(int $legacy_partner_id) Return Partner objects filtered by the legacy_partner_id column
  * @method array findByCreatedAt(string $created_at) Return Partner objects filtered by the created_at column
  * @method array findByUpdatedAt(string $updated_at) Return Partner objects filtered by the updated_at column
  */
@@ -95,8 +91,14 @@ abstract class BasePartnerQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Workflow\\Partner', $modelAlias = null)
+    public function __construct($dbName = null, $modelName = null, $modelAlias = null)
     {
+        if (null === $dbName) {
+            $dbName = 'dtametadata';
+        }
+        if (null === $modelName) {
+            $modelName = 'DTA\\MetadataBundle\\Model\\Workflow\\Partner';
+        }
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
@@ -113,10 +115,8 @@ abstract class BasePartnerQuery extends ModelCriteria
         if ($criteria instanceof PartnerQuery) {
             return $criteria;
         }
-        $query = new PartnerQuery();
-        if (null !== $modelAlias) {
-            $query->setModelAlias($modelAlias);
-        }
+        $query = new PartnerQuery(null, null, $modelAlias);
+
         if ($criteria instanceof Criteria) {
             $query->mergeWith($criteria);
         }
@@ -144,7 +144,7 @@ abstract class BasePartnerQuery extends ModelCriteria
             return null;
         }
         if ((null !== ($obj = PartnerPeer::getInstanceFromPool((string) $key))) && !$this->formatter) {
-            // the object is alredy in the instance pool
+            // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
@@ -186,7 +186,7 @@ abstract class BasePartnerQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "name", "mail", "web", "contact_person", "contactdata", "comments", "is_organization", "legacy_partner_id", "created_at", "updated_at" FROM "partner" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "name", "mail", "web", "contact_person", "contactdata", "comments", "is_organization", "created_at", "updated_at" FROM "partner" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -519,55 +519,13 @@ abstract class BasePartnerQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the legacy_partner_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByLegacyPartnerId(1234); // WHERE legacy_partner_id = 1234
-     * $query->filterByLegacyPartnerId(array(12, 34)); // WHERE legacy_partner_id IN (12, 34)
-     * $query->filterByLegacyPartnerId(array('min' => 12)); // WHERE legacy_partner_id >= 12
-     * $query->filterByLegacyPartnerId(array('max' => 12)); // WHERE legacy_partner_id <= 12
-     * </code>
-     *
-     * @param     mixed $legacyPartnerId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return PartnerQuery The current query, for fluid interface
-     */
-    public function filterByLegacyPartnerId($legacyPartnerId = null, $comparison = null)
-    {
-        if (is_array($legacyPartnerId)) {
-            $useMinMax = false;
-            if (isset($legacyPartnerId['min'])) {
-                $this->addUsingAlias(PartnerPeer::LEGACY_PARTNER_ID, $legacyPartnerId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($legacyPartnerId['max'])) {
-                $this->addUsingAlias(PartnerPeer::LEGACY_PARTNER_ID, $legacyPartnerId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(PartnerPeer::LEGACY_PARTNER_ID, $legacyPartnerId, $comparison);
-    }
-
-    /**
      * Filter the query on the created_at column
      *
      * Example usage:
      * <code>
      * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
      * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
-     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at < '2011-03-13'
      * </code>
      *
      * @param     mixed $createdAt The value to use as filter.
@@ -610,7 +568,7 @@ abstract class BasePartnerQuery extends ModelCriteria
      * <code>
      * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
      * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
-     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at < '2011-03-13'
      * </code>
      *
      * @param     mixed $updatedAt The value to use as filter.
@@ -752,7 +710,7 @@ abstract class BasePartnerQuery extends ModelCriteria
      *
      * @return PartnerQuery The current query, for fluid interface
      */
-    public function joinCopyLocation($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinCopyLocation($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('CopyLocation');
@@ -787,7 +745,7 @@ abstract class BasePartnerQuery extends ModelCriteria
      *
      * @return   \DTA\MetadataBundle\Model\Workflow\CopyLocationQuery A secondary query class using the current class as primary query
      */
-    public function useCopyLocationQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useCopyLocationQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinCopyLocation($relationAlias, $joinType)

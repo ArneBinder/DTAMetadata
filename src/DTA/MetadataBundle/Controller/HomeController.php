@@ -22,8 +22,20 @@ class HomeController extends ORMController {
     );
     
     public function indexAction(Request $request) {
-        
-        
+
+//        try {
+//            $title = new Model\Data\Title();
+//            $title->save();
+//            $fragment = new Model\Data\Titlefragment("Kurztitel", "Was ich werden wollte.");
+//            $fragment->setSortableRank(2);
+//            $fragment->setTitle($title);
+//            $publication = new Model\Data\Publication();
+//            $publication->setTitle($title)->save();
+//            
+//        } catch (\PropelException $exc) {
+//            echo $exc->getTraceAsString();
+//        }
+
         
 //                "DTA\\MetadataBundle\\Model\\$package\\" . $className,
 //        $rc = new \ReflectionClass('DTA\MetadataBundle\Model\Data\Publication');

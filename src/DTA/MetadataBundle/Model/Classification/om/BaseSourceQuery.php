@@ -12,38 +12,38 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
-use DTA\MetadataBundle\Model\Classification\Namefragmenttype;
-use DTA\MetadataBundle\Model\Classification\NamefragmenttypePeer;
-use DTA\MetadataBundle\Model\Classification\NamefragmenttypeQuery;
-use DTA\MetadataBundle\Model\Data\Namefragment;
+use DTA\MetadataBundle\Model\Classification\Source;
+use DTA\MetadataBundle\Model\Classification\SourcePeer;
+use DTA\MetadataBundle\Model\Classification\SourceQuery;
+use DTA\MetadataBundle\Model\Data\Publication;
 
 /**
- * @method NamefragmenttypeQuery orderById($order = Criteria::ASC) Order by the id column
- * @method NamefragmenttypeQuery orderByName($order = Criteria::ASC) Order by the name column
+ * @method SourceQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method SourceQuery orderByName($order = Criteria::ASC) Order by the name column
  *
- * @method NamefragmenttypeQuery groupById() Group by the id column
- * @method NamefragmenttypeQuery groupByName() Group by the name column
+ * @method SourceQuery groupById() Group by the id column
+ * @method SourceQuery groupByName() Group by the name column
  *
- * @method NamefragmenttypeQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
- * @method NamefragmenttypeQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
- * @method NamefragmenttypeQuery innerJoin($relation) Adds a INNER JOIN clause to the query
+ * @method SourceQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
+ * @method SourceQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
+ * @method SourceQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method NamefragmenttypeQuery leftJoinNamefragment($relationAlias = null) Adds a LEFT JOIN clause to the query using the Namefragment relation
- * @method NamefragmenttypeQuery rightJoinNamefragment($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Namefragment relation
- * @method NamefragmenttypeQuery innerJoinNamefragment($relationAlias = null) Adds a INNER JOIN clause to the query using the Namefragment relation
+ * @method SourceQuery leftJoinPublication($relationAlias = null) Adds a LEFT JOIN clause to the query using the Publication relation
+ * @method SourceQuery rightJoinPublication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Publication relation
+ * @method SourceQuery innerJoinPublication($relationAlias = null) Adds a INNER JOIN clause to the query using the Publication relation
  *
- * @method Namefragmenttype findOne(PropelPDO $con = null) Return the first Namefragmenttype matching the query
- * @method Namefragmenttype findOneOrCreate(PropelPDO $con = null) Return the first Namefragmenttype matching the query, or a new Namefragmenttype object populated from the query conditions when no match is found
+ * @method Source findOne(PropelPDO $con = null) Return the first Source matching the query
+ * @method Source findOneOrCreate(PropelPDO $con = null) Return the first Source matching the query, or a new Source object populated from the query conditions when no match is found
  *
- * @method Namefragmenttype findOneByName(string $name) Return the first Namefragmenttype filtered by the name column
+ * @method Source findOneByName(string $name) Return the first Source filtered by the name column
  *
- * @method array findById(int $id) Return Namefragmenttype objects filtered by the id column
- * @method array findByName(string $name) Return Namefragmenttype objects filtered by the name column
+ * @method array findById(int $id) Return Source objects filtered by the id column
+ * @method array findByName(string $name) Return Source objects filtered by the name column
  */
-abstract class BaseNamefragmenttypeQuery extends ModelCriteria
+abstract class BaseSourceQuery extends ModelCriteria
 {
     /**
-     * Initializes internal state of BaseNamefragmenttypeQuery object.
+     * Initializes internal state of BaseSourceQuery object.
      *
      * @param     string $dbName The dabase name
      * @param     string $modelName The phpName of a model, e.g. 'Book'
@@ -55,25 +55,25 @@ abstract class BaseNamefragmenttypeQuery extends ModelCriteria
             $dbName = 'dtametadata';
         }
         if (null === $modelName) {
-            $modelName = 'DTA\\MetadataBundle\\Model\\Classification\\Namefragmenttype';
+            $modelName = 'DTA\\MetadataBundle\\Model\\Classification\\Source';
         }
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
     /**
-     * Returns a new NamefragmenttypeQuery object.
+     * Returns a new SourceQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param   NamefragmenttypeQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   SourceQuery|Criteria $criteria Optional Criteria to build the query from
      *
-     * @return NamefragmenttypeQuery
+     * @return SourceQuery
      */
     public static function create($modelAlias = null, $criteria = null)
     {
-        if ($criteria instanceof NamefragmenttypeQuery) {
+        if ($criteria instanceof SourceQuery) {
             return $criteria;
         }
-        $query = new NamefragmenttypeQuery(null, null, $modelAlias);
+        $query = new SourceQuery(null, null, $modelAlias);
 
         if ($criteria instanceof Criteria) {
             $query->mergeWith($criteria);
@@ -94,19 +94,19 @@ abstract class BaseNamefragmenttypeQuery extends ModelCriteria
      * @param mixed $key Primary key to use for the query
      * @param     PropelPDO $con an optional connection object
      *
-     * @return   Namefragmenttype|Namefragmenttype[]|mixed the result, formatted by the current formatter
+     * @return   Source|Source[]|mixed the result, formatted by the current formatter
      */
     public function findPk($key, $con = null)
     {
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = NamefragmenttypePeer::getInstanceFromPool((string) $key))) && !$this->formatter) {
+        if ((null !== ($obj = SourcePeer::getInstanceFromPool((string) $key))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
-            $con = Propel::getConnection(NamefragmenttypePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(SourcePeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
         $this->basePreSelect($con);
         if ($this->formatter || $this->modelAlias || $this->with || $this->select
@@ -124,7 +124,7 @@ abstract class BaseNamefragmenttypeQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return                 Namefragmenttype A model object, or null if the key is not found
+     * @return                 Source A model object, or null if the key is not found
      * @throws PropelException
      */
      public function findOneById($key, $con = null)
@@ -139,12 +139,12 @@ abstract class BaseNamefragmenttypeQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return                 Namefragmenttype A model object, or null if the key is not found
+     * @return                 Source A model object, or null if the key is not found
      * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "name" FROM "namefragmenttype" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "name" FROM "source" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -155,9 +155,9 @@ abstract class BaseNamefragmenttypeQuery extends ModelCriteria
         }
         $obj = null;
         if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $obj = new Namefragmenttype();
+            $obj = new Source();
             $obj->hydrate($row);
-            NamefragmenttypePeer::addInstanceToPool($obj, (string) $key);
+            SourcePeer::addInstanceToPool($obj, (string) $key);
         }
         $stmt->closeCursor();
 
@@ -170,7 +170,7 @@ abstract class BaseNamefragmenttypeQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return Namefragmenttype|Namefragmenttype[]|mixed the result, formatted by the current formatter
+     * @return Source|Source[]|mixed the result, formatted by the current formatter
      */
     protected function findPkComplex($key, $con)
     {
@@ -191,7 +191,7 @@ abstract class BaseNamefragmenttypeQuery extends ModelCriteria
      * @param     array $keys Primary keys to use for the query
      * @param     PropelPDO $con an optional connection object
      *
-     * @return PropelObjectCollection|Namefragmenttype[]|mixed the list of results, formatted by the current formatter
+     * @return PropelObjectCollection|Source[]|mixed the list of results, formatted by the current formatter
      */
     public function findPks($keys, $con = null)
     {
@@ -212,12 +212,12 @@ abstract class BaseNamefragmenttypeQuery extends ModelCriteria
      *
      * @param     mixed $key Primary key to use for the query
      *
-     * @return NamefragmenttypeQuery The current query, for fluid interface
+     * @return SourceQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
 
-        return $this->addUsingAlias(NamefragmenttypePeer::ID, $key, Criteria::EQUAL);
+        return $this->addUsingAlias(SourcePeer::ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -225,12 +225,12 @@ abstract class BaseNamefragmenttypeQuery extends ModelCriteria
      *
      * @param     array $keys The list of primary key to use for the query
      *
-     * @return NamefragmenttypeQuery The current query, for fluid interface
+     * @return SourceQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
 
-        return $this->addUsingAlias(NamefragmenttypePeer::ID, $keys, Criteria::IN);
+        return $this->addUsingAlias(SourcePeer::ID, $keys, Criteria::IN);
     }
 
     /**
@@ -250,18 +250,18 @@ abstract class BaseNamefragmenttypeQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return NamefragmenttypeQuery The current query, for fluid interface
+     * @return SourceQuery The current query, for fluid interface
      */
     public function filterById($id = null, $comparison = null)
     {
         if (is_array($id)) {
             $useMinMax = false;
             if (isset($id['min'])) {
-                $this->addUsingAlias(NamefragmenttypePeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(SourcePeer::ID, $id['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($id['max'])) {
-                $this->addUsingAlias(NamefragmenttypePeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(SourcePeer::ID, $id['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -272,7 +272,7 @@ abstract class BaseNamefragmenttypeQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(NamefragmenttypePeer::ID, $id, $comparison);
+        return $this->addUsingAlias(SourcePeer::ID, $id, $comparison);
     }
 
     /**
@@ -288,7 +288,7 @@ abstract class BaseNamefragmenttypeQuery extends ModelCriteria
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return NamefragmenttypeQuery The current query, for fluid interface
+     * @return SourceQuery The current query, for fluid interface
      */
     public function filterByName($name = null, $comparison = null)
     {
@@ -301,45 +301,45 @@ abstract class BaseNamefragmenttypeQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(NamefragmenttypePeer::NAME, $name, $comparison);
+        return $this->addUsingAlias(SourcePeer::NAME, $name, $comparison);
     }
 
     /**
-     * Filter the query by a related Namefragment object
+     * Filter the query by a related Publication object
      *
-     * @param   Namefragment|PropelObjectCollection $namefragment  the related object to use as filter
+     * @param   Publication|PropelObjectCollection $publication  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 NamefragmenttypeQuery The current query, for fluid interface
+     * @return                 SourceQuery The current query, for fluid interface
      * @throws PropelException - if the provided filter is invalid.
      */
-    public function filterByNamefragment($namefragment, $comparison = null)
+    public function filterByPublication($publication, $comparison = null)
     {
-        if ($namefragment instanceof Namefragment) {
+        if ($publication instanceof Publication) {
             return $this
-                ->addUsingAlias(NamefragmenttypePeer::ID, $namefragment->getNamefragmenttypeid(), $comparison);
-        } elseif ($namefragment instanceof PropelObjectCollection) {
+                ->addUsingAlias(SourcePeer::ID, $publication->getSourceId(), $comparison);
+        } elseif ($publication instanceof PropelObjectCollection) {
             return $this
-                ->useNamefragmentQuery()
-                ->filterByPrimaryKeys($namefragment->getPrimaryKeys())
+                ->usePublicationQuery()
+                ->filterByPrimaryKeys($publication->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByNamefragment() only accepts arguments of type Namefragment or PropelCollection');
+            throw new PropelException('filterByPublication() only accepts arguments of type Publication or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Namefragment relation
+     * Adds a JOIN clause to the query using the Publication relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return NamefragmenttypeQuery The current query, for fluid interface
+     * @return SourceQuery The current query, for fluid interface
      */
-    public function joinNamefragment($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinPublication($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Namefragment');
+        $relationMap = $tableMap->getRelation('Publication');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -354,14 +354,14 @@ abstract class BaseNamefragmenttypeQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Namefragment');
+            $this->addJoinObject($join, 'Publication');
         }
 
         return $this;
     }
 
     /**
-     * Use the Namefragment relation Namefragment object
+     * Use the Publication relation Publication object
      *
      * @see       useQuery()
      *
@@ -369,26 +369,26 @@ abstract class BaseNamefragmenttypeQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \DTA\MetadataBundle\Model\Data\NamefragmentQuery A secondary query class using the current class as primary query
+     * @return   \DTA\MetadataBundle\Model\Data\PublicationQuery A secondary query class using the current class as primary query
      */
-    public function useNamefragmentQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function usePublicationQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
-            ->joinNamefragment($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Namefragment', '\DTA\MetadataBundle\Model\Data\NamefragmentQuery');
+            ->joinPublication($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Publication', '\DTA\MetadataBundle\Model\Data\PublicationQuery');
     }
 
     /**
      * Exclude object from result
      *
-     * @param   Namefragmenttype $namefragmenttype Object to remove from the list of results
+     * @param   Source $source Object to remove from the list of results
      *
-     * @return NamefragmenttypeQuery The current query, for fluid interface
+     * @return SourceQuery The current query, for fluid interface
      */
-    public function prune($namefragmenttype = null)
+    public function prune($source = null)
     {
-        if ($namefragmenttype) {
-            $this->addUsingAlias(NamefragmenttypePeer::ID, $namefragmenttype->getId(), Criteria::NOT_EQUAL);
+        if ($source) {
+            $this->addUsingAlias(SourcePeer::ID, $source->getId(), Criteria::NOT_EQUAL);
         }
 
         return $this;

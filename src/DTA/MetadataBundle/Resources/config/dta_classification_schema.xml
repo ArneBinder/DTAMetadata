@@ -18,19 +18,19 @@
     <!-- Verfügbare Arten von Titelfragmenten. Zum Beispiel Haupttitel, Untertitel, Kurztitel, etc. -->
     <table name="titlefragmenttype">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="name" type="LONGVARCHAR" required="true"/>
+                <column name="name" type="LONGVARCHAR" required="true"/>
     </table>
 
     <!-- Verfuegbare Arten von Namensfragmenten. Zum Beispiel Vorname, Nachname, Kuenstlername, etc. -->
     <table name="namefragmenttype">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="name" type="LONGVARCHAR" required="true"/>
+                <column name="name" type="LONGVARCHAR" required="true"/>
     </table>
     
     <!--Beziehungstypen zwischen Personen und Publikationen. Zum Beispiel Verleger, Drucker, Übersetzer oder Autor -->
     <table name="personrole" idMethod="native">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="name" type="LONGVARCHAR" required="true"/>
+                <column name="name" type="LONGVARCHAR" required="true"/>
     </table>
   
     <!--Korpora.--> 
@@ -42,7 +42,7 @@
     <!--Kategorien. Zum Beispiel Ratgeber, Zeitschrift, etc. -->
     <table name="category">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="name" type="LONGVARCHAR" required="true"/>
+                <column name="name" type="LONGVARCHAR" required="true"/>
         <column name="description" type="LONGVARCHAR" required="true"/>
         <column name="categorytype_id" type="INTEGER" required="true"/>
         <foreign-key foreignTable="categorytype"> <reference local="categorytype_id" foreign="id"/> </foreign-key>
@@ -50,7 +50,7 @@
     <!--Kategorientypen/Bereiche: Wissensbereich, Textsorte, Präsentationsform, Sitz im Leben-->
     <table name="categorytype">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="name" type="LONGVARCHAR" required="true"/>
+                <column name="name" type="LONGVARCHAR" required="true"/>
     </table>
     
     <!--Schlagwörter. Zum Beispiel Bürgerliche Revolution, Köln, etc. -->
@@ -61,6 +61,19 @@
     
     <!--Genres: Belletristik: Epik, Lyrik, Dramatik. Gebrauchsliteratur: Sach- und Fachliteratur. -->
     <table name="genre">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="name" type="LONGVARCHAR" required="true"/>
+<!--        <column name="childof" type="INTEGER"/>
+        <foreign-key foreignTable="genre"> <reference local="childof" foreign="id"/> </foreign-key>-->
+        <behavior name="table_row_view">
+            <parameter name="name" value="name"/>
+            <!--<parameter name="zugeordnet" value="accessor:getParent"/>-->
+        </behavior>
+
+    </table>
+    
+    <!--Equivalent to the book.source column (stored in the sources table).-->
+    <table name="source">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true"/>
 <!--        <column name="childof" type="INTEGER"/>

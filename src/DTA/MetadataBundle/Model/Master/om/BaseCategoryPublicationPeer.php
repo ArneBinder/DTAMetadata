@@ -28,7 +28,7 @@ abstract class BaseCategoryPublicationPeer
     const OM_CLASS = 'DTA\\MetadataBundle\\Model\\Master\\CategoryPublication';
 
     /** the related TableMap class for this table */
-    const TM_CLASS = 'CategoryPublicationTableMap';
+    const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Master\\map\\CategoryPublicationTableMap';
 
     /** The total number of columns. */
     const NUM_COLUMNS = 3;
@@ -39,20 +39,20 @@ abstract class BaseCategoryPublicationPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 3;
 
+    /** the column name for the id field */
+    const ID = 'category_publication.id';
+
     /** the column name for the category_id field */
     const CATEGORY_ID = 'category_publication.category_id';
 
     /** the column name for the publication_id field */
     const PUBLICATION_ID = 'category_publication.publication_id';
 
-    /** the column name for the id field */
-    const ID = 'category_publication.id';
-
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
 
     /**
-     * An identiy map to hold any loaded instances of CategoryPublication objects.
+     * An identity map to hold any loaded instances of CategoryPublication objects.
      * This must be public so that other peer classes can access this when hydrating from JOIN
      * queries.
      * @var        array CategoryPublication[]
@@ -67,11 +67,11 @@ abstract class BaseCategoryPublicationPeer
      * e.g. CategoryPublicationPeer::$fieldNames[CategoryPublicationPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('CategoryId', 'PublicationId', 'Id', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('categoryId', 'publicationId', 'id', ),
-        BasePeer::TYPE_COLNAME => array (CategoryPublicationPeer::CATEGORY_ID, CategoryPublicationPeer::PUBLICATION_ID, CategoryPublicationPeer::ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('CATEGORY_ID', 'PUBLICATION_ID', 'ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('category_id', 'publication_id', 'id', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'CategoryId', 'PublicationId', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'categoryId', 'publicationId', ),
+        BasePeer::TYPE_COLNAME => array (CategoryPublicationPeer::ID, CategoryPublicationPeer::CATEGORY_ID, CategoryPublicationPeer::PUBLICATION_ID, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'CATEGORY_ID', 'PUBLICATION_ID', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'category_id', 'publication_id', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
@@ -82,11 +82,11 @@ abstract class BaseCategoryPublicationPeer
      * e.g. CategoryPublicationPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('CategoryId' => 0, 'PublicationId' => 1, 'Id' => 2, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('categoryId' => 0, 'publicationId' => 1, 'id' => 2, ),
-        BasePeer::TYPE_COLNAME => array (CategoryPublicationPeer::CATEGORY_ID => 0, CategoryPublicationPeer::PUBLICATION_ID => 1, CategoryPublicationPeer::ID => 2, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('CATEGORY_ID' => 0, 'PUBLICATION_ID' => 1, 'ID' => 2, ),
-        BasePeer::TYPE_FIELDNAME => array ('category_id' => 0, 'publication_id' => 1, 'id' => 2, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CategoryId' => 1, 'PublicationId' => 2, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'categoryId' => 1, 'publicationId' => 2, ),
+        BasePeer::TYPE_COLNAME => array (CategoryPublicationPeer::ID => 0, CategoryPublicationPeer::CATEGORY_ID => 1, CategoryPublicationPeer::PUBLICATION_ID => 2, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'CATEGORY_ID' => 1, 'PUBLICATION_ID' => 2, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'category_id' => 1, 'publication_id' => 2, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
@@ -161,13 +161,13 @@ abstract class BaseCategoryPublicationPeer
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
+            $criteria->addSelectColumn(CategoryPublicationPeer::ID);
             $criteria->addSelectColumn(CategoryPublicationPeer::CATEGORY_ID);
             $criteria->addSelectColumn(CategoryPublicationPeer::PUBLICATION_ID);
-            $criteria->addSelectColumn(CategoryPublicationPeer::ID);
         } else {
+            $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.category_id');
             $criteria->addSelectColumn($alias . '.publication_id');
-            $criteria->addSelectColumn($alias . '.id');
         }
     }
 
@@ -220,7 +220,7 @@ abstract class BaseCategoryPublicationPeer
      *
      * @param      Criteria $criteria object used to create the SELECT statement.
      * @param      PropelPDO $con
-     * @return                 CategoryPublication
+     * @return CategoryPublication
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -287,7 +287,7 @@ abstract class BaseCategoryPublicationPeer
      * to the cache in order to ensure that the same objects are always returned by doSelect*()
      * and retrieveByPK*() calls.
      *
-     * @param      CategoryPublication $obj A CategoryPublication object.
+     * @param CategoryPublication $obj A CategoryPublication object.
      * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
     public static function addInstanceToPool($obj, $key = null)
@@ -337,7 +337,7 @@ abstract class BaseCategoryPublicationPeer
      * a multi-column primary key, a serialize()d version of the primary key will be returned.
      *
      * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-     * @return   CategoryPublication Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+     * @return CategoryPublication Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
      * @see        getPrimaryKeyHash()
      */
     public static function getInstanceFromPool($key)
@@ -358,10 +358,8 @@ abstract class BaseCategoryPublicationPeer
      */
     public static function clearInstancePool($and_clear_all_references = false)
     {
-      if ($and_clear_all_references)
-      {
-        foreach (CategoryPublicationPeer::$instances as $instance)
-        {
+      if ($and_clear_all_references) {
+        foreach (CategoryPublicationPeer::$instances as $instance) {
           $instance->clearAllReferences(true);
         }
       }
@@ -389,11 +387,11 @@ abstract class BaseCategoryPublicationPeer
     public static function getPrimaryKeyHashFromRow($row, $startcol = 0)
     {
         // If the PK cannot be derived from the row, return null.
-        if ($row[$startcol + 2] === null) {
+        if ($row[$startcol] === null) {
             return null;
         }
 
-        return (string) $row[$startcol + 2];
+        return (string) $row[$startcol];
     }
 
     /**
@@ -408,7 +406,7 @@ abstract class BaseCategoryPublicationPeer
     public static function getPrimaryKeyFromRow($row, $startcol = 0)
     {
 
-        return (int) $row[$startcol + 2];
+        return (int) $row[$startcol];
     }
 
     /**
@@ -1120,7 +1118,7 @@ abstract class BaseCategoryPublicationPeer
     {
       $dbMap = Propel::getDatabaseMap(BaseCategoryPublicationPeer::DATABASE_NAME);
       if (!$dbMap->hasTable(BaseCategoryPublicationPeer::TABLE_NAME)) {
-        $dbMap->addTableObject(new CategoryPublicationTableMap());
+        $dbMap->addTableObject(new \DTA\MetadataBundle\Model\Master\map\CategoryPublicationTableMap());
       }
     }
 
@@ -1170,7 +1168,7 @@ abstract class BaseCategoryPublicationPeer
             $con->beginTransaction();
             $pk = BasePeer::doInsert($criteria, $con);
             $con->commit();
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -1243,7 +1241,7 @@ abstract class BaseCategoryPublicationPeer
             $con->commit();
 
             return $affectedRows;
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -1302,7 +1300,7 @@ abstract class BaseCategoryPublicationPeer
             $con->commit();
 
             return $affectedRows;
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -1315,7 +1313,7 @@ abstract class BaseCategoryPublicationPeer
      *
      * NOTICE: This does not apply to primary or foreign keys for now.
      *
-     * @param      CategoryPublication $obj The object to validate.
+     * @param CategoryPublication $obj The object to validate.
      * @param      mixed $cols Column name or array of column names.
      *
      * @return mixed TRUE if all columns are valid or the error message of the first invalid column.
@@ -1348,7 +1346,7 @@ abstract class BaseCategoryPublicationPeer
     /**
      * Retrieve a single object by pkey.
      *
-     * @param      int $pk the primary key.
+     * @param int $pk the primary key.
      * @param      PropelPDO $con the connection to use
      * @return CategoryPublication
      */

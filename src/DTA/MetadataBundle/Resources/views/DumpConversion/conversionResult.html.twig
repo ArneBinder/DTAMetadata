@@ -7,12 +7,17 @@
 
 {% block core %}
 
+<h1> Errors </h1>
+
+{{dump(errors|default({}))}}
+
+
 <h1> Warnings </h1>
 
-{{dump(warnings)}}
+{{dump(warnings|default({}))}}
 
 <h1> Messages </h1>
 
-{{dump(messages)}}
+{{dump(messages|default({}))}}
 
 {% endblock %}

@@ -37,10 +37,16 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
     protected static $peer;
 
     /**
-     * The flag var to prevent infinit loop in deep copy
+     * The flag var to prevent infinite loop in deep copy
      * @var       boolean
      */
     protected $startCopy = false;
+
+    /**
+     * The value for the id field.
+     * @var        int
+     */
+    protected $id;
 
     /**
      * The value for the dta_user_id field.
@@ -59,12 +65,6 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
      * @var        string
      */
     protected $date;
-
-    /**
-     * The value for the id field.
-     * @var        int
-     */
-    protected $id;
 
     /**
      * @var        DtaUser
@@ -97,7 +97,18 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('DtaUserId', 'PublicationId', 'Date', 'Id', );	public   $tableRowViewAccessors = array('DtaUserId'=>'DtaUserId', 'PublicationId'=>'PublicationId', 'Date'=>'Date', 'Id'=>'Id', );	public static $queryConstructionString = NULL;
+    public static $tableRowViewCaptions = array('Id', 'DtaUserId', 'PublicationId', 'Date', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'DtaUserId'=>'DtaUserId', 'PublicationId'=>'PublicationId', 'Date'=>'Date', );	public static $queryConstructionString = NULL;
+    /**
+     * Get the [id] column value.
+     *
+     * @return int
+     */
+    public function getId()
+    {
+
+        return $this->id;
+    }
+
     /**
      * Get the [dta_user_id] column value.
      *
@@ -105,6 +116,7 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
      */
     public function getDtaUserId()
     {
+
         return $this->dta_user_id;
     }
 
@@ -115,6 +127,7 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
      */
     public function getPublicationId()
     {
+
         return $this->publication_id;
     }
 
@@ -154,19 +167,30 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
     }
 
     /**
-     * Get the [id] column value.
+     * Set the value of [id] column.
      *
-     * @return int
+     * @param  int $v new value
+     * @return RecentUse The current object (for fluent API support)
      */
-    public function getId()
+    public function setId($v)
     {
-        return $this->id;
-    }
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->id !== $v) {
+            $this->id = $v;
+            $this->modifiedColumns[] = RecentUsePeer::ID;
+        }
+
+
+        return $this;
+    } // setId()
 
     /**
      * Set the value of [dta_user_id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return RecentUse The current object (for fluent API support)
      */
     public function setDtaUserId($v)
@@ -191,7 +215,7 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
     /**
      * Set the value of [publication_id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return RecentUse The current object (for fluent API support)
      */
     public function setPublicationId($v)
@@ -237,27 +261,6 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
     } // setDate()
 
     /**
-     * Set the value of [id] column.
-     *
-     * @param int $v new value
-     * @return RecentUse The current object (for fluent API support)
-     */
-    public function setId($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->id !== $v) {
-            $this->id = $v;
-            $this->modifiedColumns[] = RecentUsePeer::ID;
-        }
-
-
-        return $this;
-    } // setId()
-
-    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -280,7 +283,7 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
      * more tables.
      *
      * @param array $row The row returned by PDOStatement->fetch(PDO::FETCH_NUM)
-     * @param int $startcol 0-based offset column which indicates which restultset column to start with.
+     * @param int $startcol 0-based offset column which indicates which resultset column to start with.
      * @param boolean $rehydrate Whether this object is being re-hydrated from the database.
      * @return int             next starting column
      * @throws PropelException - Any caught Exception will be rewrapped as a PropelException.
@@ -289,10 +292,10 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
     {
         try {
 
-            $this->dta_user_id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-            $this->publication_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-            $this->date = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-            $this->id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+            $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
+            $this->dta_user_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+            $this->publication_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+            $this->date = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -301,6 +304,7 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
+
             return $startcol + 4; // 4 = RecentUsePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -485,7 +489,7 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
             $this->alreadyInSave = true;
 
             // We call the save method on the following object(s) if they
-            // were passed to this object by their coresponding set
+            // were passed to this object by their corresponding set
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
@@ -550,6 +554,9 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
 
 
          // check the columns in natural order for more readable SQL queries
+        if ($this->isColumnModified(RecentUsePeer::ID)) {
+            $modifiedColumns[':p' . $index++]  = '"id"';
+        }
         if ($this->isColumnModified(RecentUsePeer::DTA_USER_ID)) {
             $modifiedColumns[':p' . $index++]  = '"dta_user_id"';
         }
@@ -558,9 +565,6 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
         }
         if ($this->isColumnModified(RecentUsePeer::DATE)) {
             $modifiedColumns[':p' . $index++]  = '"date"';
-        }
-        if ($this->isColumnModified(RecentUsePeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '"id"';
         }
 
         $sql = sprintf(
@@ -573,6 +577,9 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
+                    case '"id"':
+                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
+                        break;
                     case '"dta_user_id"':
                         $stmt->bindValue($identifier, $this->dta_user_id, PDO::PARAM_INT);
                         break;
@@ -581,9 +588,6 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
                         break;
                     case '"date"':
                         $stmt->bindValue($identifier, $this->date, PDO::PARAM_STR);
-                        break;
-                    case '"id"':
-                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -658,10 +662,10 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
      *
      * In addition to checking the current object, all related objects will
      * also be validated.  If all pass then <code>true</code> is returned; otherwise
-     * an aggreagated array of ValidationFailed objects will be returned.
+     * an aggregated array of ValidationFailed objects will be returned.
      *
      * @param array $columns Array of column names to validate.
-     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objets otherwise.
+     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objects otherwise.
      */
     protected function doValidate($columns = null)
     {
@@ -673,7 +677,7 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
 
 
             // We call the validate method on the following object(s) if they
-            // were passed to this object by their coresponding set
+            // were passed to this object by their corresponding set
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
@@ -731,16 +735,16 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
     {
         switch ($pos) {
             case 0:
-                return $this->getDtaUserId();
+                return $this->getId();
                 break;
             case 1:
-                return $this->getPublicationId();
+                return $this->getDtaUserId();
                 break;
             case 2:
-                return $this->getDate();
+                return $this->getPublicationId();
                 break;
             case 3:
-                return $this->getId();
+                return $this->getDate();
                 break;
             default:
                 return null;
@@ -771,11 +775,16 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
         $alreadyDumpedObjects['RecentUse'][$this->getPrimaryKey()] = true;
         $keys = RecentUsePeer::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getDtaUserId(),
-            $keys[1] => $this->getPublicationId(),
-            $keys[2] => $this->getDate(),
-            $keys[3] => $this->getId(),
+            $keys[0] => $this->getId(),
+            $keys[1] => $this->getDtaUserId(),
+            $keys[2] => $this->getPublicationId(),
+            $keys[3] => $this->getDate(),
         );
+        $virtualColumns = $this->virtualColumns;
+        foreach ($virtualColumns as $key => $virtualColumn) {
+            $result[$key] = $virtualColumn;
+        }
+
         if ($includeForeignObjects) {
             if (null !== $this->aDtaUser) {
                 $result['DtaUser'] = $this->aDtaUser->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
@@ -818,16 +827,16 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
     {
         switch ($pos) {
             case 0:
-                $this->setDtaUserId($value);
+                $this->setId($value);
                 break;
             case 1:
-                $this->setPublicationId($value);
+                $this->setDtaUserId($value);
                 break;
             case 2:
-                $this->setDate($value);
+                $this->setPublicationId($value);
                 break;
             case 3:
-                $this->setId($value);
+                $this->setDate($value);
                 break;
         } // switch()
     }
@@ -853,10 +862,10 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
     {
         $keys = RecentUsePeer::getFieldNames($keyType);
 
-        if (array_key_exists($keys[0], $arr)) $this->setDtaUserId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setPublicationId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setDate($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setId($arr[$keys[3]]);
+        if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
+        if (array_key_exists($keys[1], $arr)) $this->setDtaUserId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setPublicationId($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setDate($arr[$keys[3]]);
     }
 
     /**
@@ -868,10 +877,10 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
     {
         $criteria = new Criteria(RecentUsePeer::DATABASE_NAME);
 
+        if ($this->isColumnModified(RecentUsePeer::ID)) $criteria->add(RecentUsePeer::ID, $this->id);
         if ($this->isColumnModified(RecentUsePeer::DTA_USER_ID)) $criteria->add(RecentUsePeer::DTA_USER_ID, $this->dta_user_id);
         if ($this->isColumnModified(RecentUsePeer::PUBLICATION_ID)) $criteria->add(RecentUsePeer::PUBLICATION_ID, $this->publication_id);
         if ($this->isColumnModified(RecentUsePeer::DATE)) $criteria->add(RecentUsePeer::DATE, $this->date);
-        if ($this->isColumnModified(RecentUsePeer::ID)) $criteria->add(RecentUsePeer::ID, $this->id);
 
         return $criteria;
     }
@@ -999,7 +1008,7 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
     /**
      * Declares an association between this object and a DtaUser object.
      *
-     * @param             DtaUser $v
+     * @param                  DtaUser $v
      * @return RecentUse The current object (for fluent API support)
      * @throws PropelException
      */
@@ -1051,7 +1060,7 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
     /**
      * Declares an association between this object and a Publication object.
      *
-     * @param             Publication $v
+     * @param                  Publication $v
      * @return RecentUse The current object (for fluent API support)
      * @throws PropelException
      */
@@ -1105,10 +1114,10 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
      */
     public function clear()
     {
+        $this->id = null;
         $this->dta_user_id = null;
         $this->publication_id = null;
         $this->date = null;
-        $this->id = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
@@ -1123,7 +1132,7 @@ abstract class BaseRecentUse extends BaseObject implements Persistent, \DTA\Meta
      *
      * This method is a user-space workaround for PHP's inability to garbage collect
      * objects with circular references (even in PHP 5.3). This is currently necessary
-     * when using Propel in certain daemon or large-volumne/high-memory operations.
+     * when using Propel in certain daemon or large-volume/high-memory operations.
      *
      * @param boolean $deep Whether to also clear the references on all referrer objects.
      */

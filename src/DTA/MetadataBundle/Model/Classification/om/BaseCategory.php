@@ -39,7 +39,7 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
     protected static $peer;
 
     /**
-     * The flag var to prevent infinit loop in deep copy
+     * The flag var to prevent infinite loop in deep copy
      * @var       boolean
      */
     protected $startCopy = false;
@@ -125,6 +125,7 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
      */
     public function getId()
     {
+
         return $this->id;
     }
 
@@ -135,6 +136,7 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
      */
     public function getName()
     {
+
         return $this->name;
     }
 
@@ -145,6 +147,7 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
      */
     public function getDescription()
     {
+
         return $this->description;
     }
 
@@ -155,13 +158,14 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
      */
     public function getCategorytypeId()
     {
+
         return $this->categorytype_id;
     }
 
     /**
      * Set the value of [id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Category The current object (for fluent API support)
      */
     public function setId($v)
@@ -182,7 +186,7 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
     /**
      * Set the value of [name] column.
      *
-     * @param string $v new value
+     * @param  string $v new value
      * @return Category The current object (for fluent API support)
      */
     public function setName($v)
@@ -203,7 +207,7 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
     /**
      * Set the value of [description] column.
      *
-     * @param string $v new value
+     * @param  string $v new value
      * @return Category The current object (for fluent API support)
      */
     public function setDescription($v)
@@ -224,7 +228,7 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
     /**
      * Set the value of [categorytype_id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Category The current object (for fluent API support)
      */
     public function setCategorytypeId($v)
@@ -269,7 +273,7 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
      * more tables.
      *
      * @param array $row The row returned by PDOStatement->fetch(PDO::FETCH_NUM)
-     * @param int $startcol 0-based offset column which indicates which restultset column to start with.
+     * @param int $startcol 0-based offset column which indicates which resultset column to start with.
      * @param boolean $rehydrate Whether this object is being re-hydrated from the database.
      * @return int             next starting column
      * @throws PropelException - Any caught Exception will be rewrapped as a PropelException.
@@ -290,6 +294,7 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
+
             return $startcol + 4; // 4 = CategoryPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -473,7 +478,7 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
             $this->alreadyInSave = true;
 
             // We call the save method on the following object(s) if they
-            // were passed to this object by their coresponding set
+            // were passed to this object by their corresponding set
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
@@ -682,10 +687,10 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
      *
      * In addition to checking the current object, all related objects will
      * also be validated.  If all pass then <code>true</code> is returned; otherwise
-     * an aggreagated array of ValidationFailed objects will be returned.
+     * an aggregated array of ValidationFailed objects will be returned.
      *
      * @param array $columns Array of column names to validate.
-     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objets otherwise.
+     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objects otherwise.
      */
     protected function doValidate($columns = null)
     {
@@ -697,7 +702,7 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
 
 
             // We call the validate method on the following object(s) if they
-            // were passed to this object by their coresponding set
+            // were passed to this object by their corresponding set
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
@@ -802,6 +807,11 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
             $keys[2] => $this->getDescription(),
             $keys[3] => $this->getCategorytypeId(),
         );
+        $virtualColumns = $this->virtualColumns;
+        foreach ($virtualColumns as $key => $virtualColumn) {
+            $result[$key] = $virtualColumn;
+        }
+
         if ($includeForeignObjects) {
             if (null !== $this->aCategorytype) {
                 $result['Categorytype'] = $this->aCategorytype->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
@@ -1031,7 +1041,7 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
     /**
      * Declares an association between this object and a Categorytype object.
      *
-     * @param             Categorytype $v
+     * @param                  Categorytype $v
      * @return Category The current object (for fluent API support)
      * @throws PropelException
      */
@@ -1173,7 +1183,7 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
                     if (false !== $this->collCategoryPublicationsPartial && count($collCategoryPublications)) {
                       $this->initCategoryPublications(false);
 
-                      foreach($collCategoryPublications as $obj) {
+                      foreach ($collCategoryPublications as $obj) {
                         if (false == $this->collCategoryPublications->contains($obj)) {
                           $this->collCategoryPublications->append($obj);
                         }
@@ -1183,12 +1193,13 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
                     }
 
                     $collCategoryPublications->getInternalIterator()->rewind();
+
                     return $collCategoryPublications;
                 }
 
-                if($partial && $this->collCategoryPublications) {
-                    foreach($this->collCategoryPublications as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collCategoryPublications) {
+                    foreach ($this->collCategoryPublications as $obj) {
+                        if ($obj->isNew()) {
                             $collCategoryPublications[] = $obj;
                         }
                     }
@@ -1216,7 +1227,8 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
     {
         $categoryPublicationsToDelete = $this->getCategoryPublications(new Criteria(), $con)->diff($categoryPublications);
 
-        $this->categoryPublicationsScheduledForDeletion = unserialize(serialize($categoryPublicationsToDelete));
+
+        $this->categoryPublicationsScheduledForDeletion = $categoryPublicationsToDelete;
 
         foreach ($categoryPublicationsToDelete as $categoryPublicationRemoved) {
             $categoryPublicationRemoved->setCategory(null);
@@ -1250,7 +1262,7 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getCategoryPublications());
             }
             $query = CategoryPublicationQuery::create(null, $criteria);
@@ -1279,8 +1291,13 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
             $this->initCategoryPublications();
             $this->collCategoryPublicationsPartial = true;
         }
+
         if (!in_array($l, $this->collCategoryPublications->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddCategoryPublication($l);
+
+            if ($this->categoryPublicationsScheduledForDeletion and $this->categoryPublicationsScheduledForDeletion->contains($l)) {
+                $this->categoryPublicationsScheduledForDeletion->remove($this->categoryPublicationsScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -1419,7 +1436,7 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
     public function setPublications(PropelCollection $publications, PropelPDO $con = null)
     {
         $this->clearPublications();
-        $currentPublications = $this->getPublications();
+        $currentPublications = $this->getPublications(null, $con);
 
         $this->publicationsScheduledForDeletion = $currentPublications->diff($publications);
 
@@ -1476,10 +1493,14 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
         if ($this->collPublications === null) {
             $this->initPublications();
         }
+
         if (!$this->collPublications->contains($publication)) { // only add it if the **same** object is not already associated
             $this->doAddPublication($publication);
+            $this->collPublications[] = $publication;
 
-            $this->collPublications[]= $publication;
+            if ($this->publicationsScheduledForDeletion and $this->publicationsScheduledForDeletion->contains($publication)) {
+                $this->publicationsScheduledForDeletion->remove($this->publicationsScheduledForDeletion->search($publication));
+            }
         }
 
         return $this;
@@ -1488,11 +1509,18 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
     /**
      * @param	Publication $publication The publication object to add.
      */
-    protected function doAddPublication($publication)
+    protected function doAddPublication(Publication $publication)
     {
-        $categoryPublication = new CategoryPublication();
-        $categoryPublication->setPublication($publication);
-        $this->addCategoryPublication($categoryPublication);
+        // set the back reference to this object directly as using provided method either results
+        // in endless loop or in multiple relations
+        if (!$publication->getCategories()->contains($this)) {
+            $categoryPublication = new CategoryPublication();
+            $categoryPublication->setPublication($publication);
+            $this->addCategoryPublication($categoryPublication);
+
+            $foreignCollection = $publication->getCategories();
+            $foreignCollection[] = $this;
+        }
     }
 
     /**
@@ -1539,7 +1567,7 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
      *
      * This method is a user-space workaround for PHP's inability to garbage collect
      * objects with circular references (even in PHP 5.3). This is currently necessary
-     * when using Propel in certain daemon or large-volumne/high-memory operations.
+     * when using Propel in certain daemon or large-volume/high-memory operations.
      *
      * @param boolean $deep Whether to also clear the references on all referrer objects.
      */

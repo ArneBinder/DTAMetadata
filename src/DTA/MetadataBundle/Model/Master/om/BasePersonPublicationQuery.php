@@ -20,15 +20,15 @@ use DTA\MetadataBundle\Model\Master\PersonPublicationPeer;
 use DTA\MetadataBundle\Model\Master\PersonPublicationQuery;
 
 /**
+ * @method PersonPublicationQuery orderById($order = Criteria::ASC) Order by the id column
  * @method PersonPublicationQuery orderByPersonId($order = Criteria::ASC) Order by the person_id column
  * @method PersonPublicationQuery orderByPersonroleId($order = Criteria::ASC) Order by the personrole_id column
  * @method PersonPublicationQuery orderByPublicationId($order = Criteria::ASC) Order by the publication_id column
- * @method PersonPublicationQuery orderById($order = Criteria::ASC) Order by the id column
  *
+ * @method PersonPublicationQuery groupById() Group by the id column
  * @method PersonPublicationQuery groupByPersonId() Group by the person_id column
  * @method PersonPublicationQuery groupByPersonroleId() Group by the personrole_id column
  * @method PersonPublicationQuery groupByPublicationId() Group by the publication_id column
- * @method PersonPublicationQuery groupById() Group by the id column
  *
  * @method PersonPublicationQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method PersonPublicationQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -53,10 +53,10 @@ use DTA\MetadataBundle\Model\Master\PersonPublicationQuery;
  * @method PersonPublication findOneByPersonroleId(int $personrole_id) Return the first PersonPublication filtered by the personrole_id column
  * @method PersonPublication findOneByPublicationId(int $publication_id) Return the first PersonPublication filtered by the publication_id column
  *
+ * @method array findById(int $id) Return PersonPublication objects filtered by the id column
  * @method array findByPersonId(int $person_id) Return PersonPublication objects filtered by the person_id column
  * @method array findByPersonroleId(int $personrole_id) Return PersonPublication objects filtered by the personrole_id column
  * @method array findByPublicationId(int $publication_id) Return PersonPublication objects filtered by the publication_id column
- * @method array findById(int $id) Return PersonPublication objects filtered by the id column
  */
 abstract class BasePersonPublicationQuery extends ModelCriteria
 {
@@ -67,8 +67,14 @@ abstract class BasePersonPublicationQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Master\\PersonPublication', $modelAlias = null)
+    public function __construct($dbName = null, $modelName = null, $modelAlias = null)
     {
+        if (null === $dbName) {
+            $dbName = 'dtametadata';
+        }
+        if (null === $modelName) {
+            $modelName = 'DTA\\MetadataBundle\\Model\\Master\\PersonPublication';
+        }
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
@@ -85,10 +91,8 @@ abstract class BasePersonPublicationQuery extends ModelCriteria
         if ($criteria instanceof PersonPublicationQuery) {
             return $criteria;
         }
-        $query = new PersonPublicationQuery();
-        if (null !== $modelAlias) {
-            $query->setModelAlias($modelAlias);
-        }
+        $query = new PersonPublicationQuery(null, null, $modelAlias);
+
         if ($criteria instanceof Criteria) {
             $query->mergeWith($criteria);
         }
@@ -116,7 +120,7 @@ abstract class BasePersonPublicationQuery extends ModelCriteria
             return null;
         }
         if ((null !== ($obj = PersonPublicationPeer::getInstanceFromPool((string) $key))) && !$this->formatter) {
-            // the object is alredy in the instance pool
+            // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
@@ -158,7 +162,7 @@ abstract class BasePersonPublicationQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "person_id", "personrole_id", "publication_id", "id" FROM "person_publication" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "person_id", "personrole_id", "publication_id" FROM "person_publication" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -245,6 +249,48 @@ abstract class BasePersonPublicationQuery extends ModelCriteria
     {
 
         return $this->addUsingAlias(PersonPublicationPeer::ID, $keys, Criteria::IN);
+    }
+
+    /**
+     * Filter the query on the id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterById(1234); // WHERE id = 1234
+     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
+     * </code>
+     *
+     * @param     mixed $id The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return PersonPublicationQuery The current query, for fluid interface
+     */
+    public function filterById($id = null, $comparison = null)
+    {
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(PersonPublicationPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(PersonPublicationPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(PersonPublicationPeer::ID, $id, $comparison);
     }
 
     /**
@@ -377,48 +423,6 @@ abstract class BasePersonPublicationQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(PersonPublicationPeer::PUBLICATION_ID, $publicationId, $comparison);
-    }
-
-    /**
-     * Filter the query on the id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterById(1234); // WHERE id = 1234
-     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id >= 12
-     * $query->filterById(array('max' => 12)); // WHERE id <= 12
-     * </code>
-     *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return PersonPublicationQuery The current query, for fluid interface
-     */
-    public function filterById($id = null, $comparison = null)
-    {
-        if (is_array($id)) {
-            $useMinMax = false;
-            if (isset($id['min'])) {
-                $this->addUsingAlias(PersonPublicationPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($id['max'])) {
-                $this->addUsingAlias(PersonPublicationPeer::ID, $id['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(PersonPublicationPeer::ID, $id, $comparison);
     }
 
     /**

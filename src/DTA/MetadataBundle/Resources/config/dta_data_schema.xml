@@ -16,7 +16,10 @@
     
     <!-- The base class for all publications. -->
     <table name="publication">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        
+        <!-- TODO: enable autoincrement. During conversion, the ids are set as the ids of the legacy database.-->
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="false" required="true"/>
+        
         <column name="title_id" type="INTEGER" required="true"/>
         
         <!--Personalia werden ueber Fremdschluessel von der Personenseite dargestellt.-->
@@ -27,6 +30,7 @@
         <column name="publicationdate_id" description="Erscheinungsjahr" type="INTEGER"/>
         <column name="creationdate_id" description="Erscheinungsjahr der Erstausgabe" type="INTEGER"/>
         <column name="publishingcompany_id" description="Verlag" type="INTEGER"/>
+        <column name="source_id" description="Zur Sicherheit aus der alten DB übernommen" type="INTEGER"/>
         
         <!-- Bild- und Textquellen über die imageSource Tabelle dargestellt, da publication:imageSource eine 1:n Beziehung ist -->
 
@@ -53,13 +57,11 @@
         
         <column name="last_changed_by_user_id" type="INTEGER"/>
         
-        <column name="legacy_book_id" description="id_book des Datensatzes aus der alten Datenbank, der dem neuen Datensatz zugrundeliegt." type="INTEGER"/>
-        <unique> <unique-column name="legacy_book_id"/> </unique>
-        
         <!--Workflow-Aspekte -->        
         <!--<column name="status_id" type="INTEGER" required="true"/>-->
 
         <behavior name="table_row_view">
+            <!--<parameter name="Datenbank ID" value="id"/>-->
             <parameter name="Titel" value="accessor:getTitle"/>
             <parameter name="erster Autor" value="accessor:getFirstAuthor"/>
             <!--<parameter name="entstanden" value="accessor:getDatespecificationRelatedByCreationdateId"/>-->
@@ -68,13 +70,13 @@
             <!--<parameter name="embedcolumnsstatus" value="status"/>-->
             <parameter name="embedcolumnstitle" value="title"/>
             <parameter name="query" value="\DTA\MetadataBundle\Model\Data\PublicationQuery::create()
-                        ->leftJoinWith('Title')
-                        ->leftJoinWith('Title.Titlefragment')
-                        ->leftJoinWith('DatespecificationRelatedByPublicationdateId')
-                        ->leftJoinWith('PersonPublication')
-                        ->leftJoin('PersonPublication.Person')
-                        ->leftJoin('Person.Personalname')
-                        ->leftJoin('Personalname.Namefragment');" />
+                    ->leftJoinWith('Title')
+                    ->leftJoinWith('Title.Titlefragment')
+                    ->leftJoinWith('DatespecificationRelatedByPublicationdateId')
+                    ->leftJoinWith('PersonPublication')
+                    ->leftJoinWith('PersonPublication.Person')
+                    ->leftJoinWith('Person.Personalname')
+                    ->leftJoinWith('Personalname.Namefragment');" />
         </behavior>
         
         <behavior name="timestampable"/>
@@ -83,7 +85,7 @@
         </behavior>
         
         <foreign-key foreignTable="title"> <reference local="title_id" foreign="id"/> </foreign-key>
-        <!--<foreign-key foreignTable="title"> <reference local="title_id" foreign="id"/> </foreign-key>-->
+        <foreign-key foreignTable="source"> <reference local="source_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="publishingcompany"> <reference local="publishingcompany_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="place"> <reference local="place_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="datespecification"> <reference local="publicationdate_id" foreign="id"/> </foreign-key>
@@ -91,7 +93,7 @@
         <foreign-key foreignTable="dta_user" phpName="LastChangedByUser" refPhpName="LastChangedPublication"> <reference local="last_changed_by_user_id" foreign="id"/> </foreign-key>
     </table>
 
-                
+        
     <!-- Publication types. -->
 
     <!--                          -->

@@ -19,13 +19,13 @@ use DTA\MetadataBundle\Model\Master\CategoryPublicationPeer;
 use DTA\MetadataBundle\Model\Master\CategoryPublicationQuery;
 
 /**
+ * @method CategoryPublicationQuery orderById($order = Criteria::ASC) Order by the id column
  * @method CategoryPublicationQuery orderByCategoryId($order = Criteria::ASC) Order by the category_id column
  * @method CategoryPublicationQuery orderByPublicationId($order = Criteria::ASC) Order by the publication_id column
- * @method CategoryPublicationQuery orderById($order = Criteria::ASC) Order by the id column
  *
+ * @method CategoryPublicationQuery groupById() Group by the id column
  * @method CategoryPublicationQuery groupByCategoryId() Group by the category_id column
  * @method CategoryPublicationQuery groupByPublicationId() Group by the publication_id column
- * @method CategoryPublicationQuery groupById() Group by the id column
  *
  * @method CategoryPublicationQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method CategoryPublicationQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -45,9 +45,9 @@ use DTA\MetadataBundle\Model\Master\CategoryPublicationQuery;
  * @method CategoryPublication findOneByCategoryId(int $category_id) Return the first CategoryPublication filtered by the category_id column
  * @method CategoryPublication findOneByPublicationId(int $publication_id) Return the first CategoryPublication filtered by the publication_id column
  *
+ * @method array findById(int $id) Return CategoryPublication objects filtered by the id column
  * @method array findByCategoryId(int $category_id) Return CategoryPublication objects filtered by the category_id column
  * @method array findByPublicationId(int $publication_id) Return CategoryPublication objects filtered by the publication_id column
- * @method array findById(int $id) Return CategoryPublication objects filtered by the id column
  */
 abstract class BaseCategoryPublicationQuery extends ModelCriteria
 {
@@ -58,8 +58,14 @@ abstract class BaseCategoryPublicationQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Master\\CategoryPublication', $modelAlias = null)
+    public function __construct($dbName = null, $modelName = null, $modelAlias = null)
     {
+        if (null === $dbName) {
+            $dbName = 'dtametadata';
+        }
+        if (null === $modelName) {
+            $modelName = 'DTA\\MetadataBundle\\Model\\Master\\CategoryPublication';
+        }
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
@@ -76,10 +82,8 @@ abstract class BaseCategoryPublicationQuery extends ModelCriteria
         if ($criteria instanceof CategoryPublicationQuery) {
             return $criteria;
         }
-        $query = new CategoryPublicationQuery();
-        if (null !== $modelAlias) {
-            $query->setModelAlias($modelAlias);
-        }
+        $query = new CategoryPublicationQuery(null, null, $modelAlias);
+
         if ($criteria instanceof Criteria) {
             $query->mergeWith($criteria);
         }
@@ -107,7 +111,7 @@ abstract class BaseCategoryPublicationQuery extends ModelCriteria
             return null;
         }
         if ((null !== ($obj = CategoryPublicationPeer::getInstanceFromPool((string) $key))) && !$this->formatter) {
-            // the object is alredy in the instance pool
+            // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
@@ -149,7 +153,7 @@ abstract class BaseCategoryPublicationQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "category_id", "publication_id", "id" FROM "category_publication" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "category_id", "publication_id" FROM "category_publication" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -239,6 +243,48 @@ abstract class BaseCategoryPublicationQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterById(1234); // WHERE id = 1234
+     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
+     * </code>
+     *
+     * @param     mixed $id The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return CategoryPublicationQuery The current query, for fluid interface
+     */
+    public function filterById($id = null, $comparison = null)
+    {
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(CategoryPublicationPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(CategoryPublicationPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CategoryPublicationPeer::ID, $id, $comparison);
+    }
+
+    /**
      * Filter the query on the category_id column
      *
      * Example usage:
@@ -324,48 +370,6 @@ abstract class BaseCategoryPublicationQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CategoryPublicationPeer::PUBLICATION_ID, $publicationId, $comparison);
-    }
-
-    /**
-     * Filter the query on the id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterById(1234); // WHERE id = 1234
-     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id >= 12
-     * $query->filterById(array('max' => 12)); // WHERE id <= 12
-     * </code>
-     *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return CategoryPublicationQuery The current query, for fluid interface
-     */
-    public function filterById($id = null, $comparison = null)
-    {
-        if (is_array($id)) {
-            $useMinMax = false;
-            if (isset($id['min'])) {
-                $this->addUsingAlias(CategoryPublicationPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($id['max'])) {
-                $this->addUsingAlias(CategoryPublicationPeer::ID, $id['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(CategoryPublicationPeer::ID, $id, $comparison);
     }
 
     /**

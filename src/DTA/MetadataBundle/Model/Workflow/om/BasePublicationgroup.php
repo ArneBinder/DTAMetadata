@@ -39,7 +39,7 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
     protected static $peer;
 
     /**
-     * The flag var to prevent infinit loop in deep copy
+     * The flag var to prevent infinite loop in deep copy
      * @var       boolean
      */
     protected $startCopy = false;
@@ -55,12 +55,6 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
      * @var        string
      */
     protected $name;
-
-    /**
-     * The value for the legacy_group_id field.
-     * @var        int
-     */
-    protected $legacy_group_id;
 
     /**
      * @var        PropelObjectCollection|PublicationPublicationgroup[] Collection to store aggregation of PublicationPublicationgroup objects.
@@ -100,7 +94,7 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Id', 'Name', 'LegacyGroupId', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'Name'=>'Name', 'LegacyGroupId'=>'LegacyGroupId', );	public static $queryConstructionString = NULL;
+    public static $tableRowViewCaptions = array('Id', 'Name', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'Name'=>'Name', );	public static $queryConstructionString = NULL;
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -126,6 +120,7 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
      */
     public function getId()
     {
+
         return $this->id;
     }
 
@@ -136,23 +131,14 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
      */
     public function getName()
     {
-        return $this->name;
-    }
 
-    /**
-     * Get the [legacy_group_id] column value.
-     * id_group der alten Datenbank, die dem Datensatz zugrundeliegt.
-     * @return int
-     */
-    public function getLegacyGroupId()
-    {
-        return $this->legacy_group_id;
+        return $this->name;
     }
 
     /**
      * Set the value of [id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Publicationgroup The current object (for fluent API support)
      */
     public function setId($v)
@@ -173,7 +159,7 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
     /**
      * Set the value of [name] column.
      *
-     * @param string $v new value
+     * @param  string $v new value
      * @return Publicationgroup The current object (for fluent API support)
      */
     public function setName($v)
@@ -190,27 +176,6 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
 
         return $this;
     } // setName()
-
-    /**
-     * Set the value of [legacy_group_id] column.
-     * id_group der alten Datenbank, die dem Datensatz zugrundeliegt.
-     * @param int $v new value
-     * @return Publicationgroup The current object (for fluent API support)
-     */
-    public function setLegacyGroupId($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->legacy_group_id !== $v) {
-            $this->legacy_group_id = $v;
-            $this->modifiedColumns[] = PublicationgroupPeer::LEGACY_GROUP_ID;
-        }
-
-
-        return $this;
-    } // setLegacyGroupId()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -235,7 +200,7 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
      * more tables.
      *
      * @param array $row The row returned by PDOStatement->fetch(PDO::FETCH_NUM)
-     * @param int $startcol 0-based offset column which indicates which restultset column to start with.
+     * @param int $startcol 0-based offset column which indicates which resultset column to start with.
      * @param boolean $rehydrate Whether this object is being re-hydrated from the database.
      * @return int             next starting column
      * @throws PropelException - Any caught Exception will be rewrapped as a PropelException.
@@ -246,7 +211,6 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->name = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
-            $this->legacy_group_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -255,7 +219,8 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 3; // 3 = PublicationgroupPeer::NUM_HYDRATE_COLUMNS.
+
+            return $startcol + 2; // 2 = PublicationgroupPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Publicationgroup object", $e);
@@ -527,20 +492,6 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = PublicationgroupPeer::ID;
-        if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . PublicationgroupPeer::ID . ')');
-        }
-        if (null === $this->id) {
-            try {
-                $stmt = $con->query("SELECT nextval('publicationgroup_id_seq')");
-                $row = $stmt->fetch(PDO::FETCH_NUM);
-                $this->id = $row[0];
-            } catch (Exception $e) {
-                throw new PropelException('Unable to get sequence id.', $e);
-            }
-        }
-
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(PublicationgroupPeer::ID)) {
@@ -548,9 +499,6 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
         }
         if ($this->isColumnModified(PublicationgroupPeer::NAME)) {
             $modifiedColumns[':p' . $index++]  = '"name"';
-        }
-        if ($this->isColumnModified(PublicationgroupPeer::LEGACY_GROUP_ID)) {
-            $modifiedColumns[':p' . $index++]  = '"legacy_group_id"';
         }
 
         $sql = sprintf(
@@ -568,9 +516,6 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
                         break;
                     case '"name"':
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
-                        break;
-                    case '"legacy_group_id"':
-                        $stmt->bindValue($identifier, $this->legacy_group_id, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -645,10 +590,10 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
      *
      * In addition to checking the current object, all related objects will
      * also be validated.  If all pass then <code>true</code> is returned; otherwise
-     * an aggreagated array of ValidationFailed objects will be returned.
+     * an aggregated array of ValidationFailed objects will be returned.
      *
      * @param array $columns Array of column names to validate.
-     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objets otherwise.
+     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objects otherwise.
      */
     protected function doValidate($columns = null)
     {
@@ -721,9 +666,6 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
             case 1:
                 return $this->getName();
                 break;
-            case 2:
-                return $this->getLegacyGroupId();
-                break;
             default:
                 return null;
                 break;
@@ -755,8 +697,12 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getName(),
-            $keys[2] => $this->getLegacyGroupId(),
         );
+        $virtualColumns = $this->virtualColumns;
+        foreach ($virtualColumns as $key => $virtualColumn) {
+            $result[$key] = $virtualColumn;
+        }
+
         if ($includeForeignObjects) {
             if (null !== $this->collPublicationPublicationgroups) {
                 $result['PublicationPublicationgroups'] = $this->collPublicationPublicationgroups->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -804,9 +750,6 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
             case 1:
                 $this->setName($value);
                 break;
-            case 2:
-                $this->setLegacyGroupId($value);
-                break;
         } // switch()
     }
 
@@ -833,7 +776,6 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setLegacyGroupId($arr[$keys[2]]);
     }
 
     /**
@@ -847,7 +789,6 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
 
         if ($this->isColumnModified(PublicationgroupPeer::ID)) $criteria->add(PublicationgroupPeer::ID, $this->id);
         if ($this->isColumnModified(PublicationgroupPeer::NAME)) $criteria->add(PublicationgroupPeer::NAME, $this->name);
-        if ($this->isColumnModified(PublicationgroupPeer::LEGACY_GROUP_ID)) $criteria->add(PublicationgroupPeer::LEGACY_GROUP_ID, $this->legacy_group_id);
 
         return $criteria;
     }
@@ -912,7 +853,6 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setName($this->getName());
-        $copyObj->setLegacyGroupId($this->getLegacyGroupId());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1079,7 +1019,7 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
                     if (false !== $this->collPublicationPublicationgroupsPartial && count($collPublicationPublicationgroups)) {
                       $this->initPublicationPublicationgroups(false);
 
-                      foreach($collPublicationPublicationgroups as $obj) {
+                      foreach ($collPublicationPublicationgroups as $obj) {
                         if (false == $this->collPublicationPublicationgroups->contains($obj)) {
                           $this->collPublicationPublicationgroups->append($obj);
                         }
@@ -1089,12 +1029,13 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
                     }
 
                     $collPublicationPublicationgroups->getInternalIterator()->rewind();
+
                     return $collPublicationPublicationgroups;
                 }
 
-                if($partial && $this->collPublicationPublicationgroups) {
-                    foreach($this->collPublicationPublicationgroups as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collPublicationPublicationgroups) {
+                    foreach ($this->collPublicationPublicationgroups as $obj) {
+                        if ($obj->isNew()) {
                             $collPublicationPublicationgroups[] = $obj;
                         }
                     }
@@ -1122,7 +1063,8 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
     {
         $publicationPublicationgroupsToDelete = $this->getPublicationPublicationgroups(new Criteria(), $con)->diff($publicationPublicationgroups);
 
-        $this->publicationPublicationgroupsScheduledForDeletion = unserialize(serialize($publicationPublicationgroupsToDelete));
+
+        $this->publicationPublicationgroupsScheduledForDeletion = $publicationPublicationgroupsToDelete;
 
         foreach ($publicationPublicationgroupsToDelete as $publicationPublicationgroupRemoved) {
             $publicationPublicationgroupRemoved->setPublicationgroup(null);
@@ -1156,7 +1098,7 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getPublicationPublicationgroups());
             }
             $query = PublicationPublicationgroupQuery::create(null, $criteria);
@@ -1185,8 +1127,13 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
             $this->initPublicationPublicationgroups();
             $this->collPublicationPublicationgroupsPartial = true;
         }
+
         if (!in_array($l, $this->collPublicationPublicationgroups->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddPublicationPublicationgroup($l);
+
+            if ($this->publicationPublicationgroupsScheduledForDeletion and $this->publicationPublicationgroupsScheduledForDeletion->contains($l)) {
+                $this->publicationPublicationgroupsScheduledForDeletion->remove($this->publicationPublicationgroupsScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -1322,7 +1269,7 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
                     if (false !== $this->collTasksPartial && count($collTasks)) {
                       $this->initTasks(false);
 
-                      foreach($collTasks as $obj) {
+                      foreach ($collTasks as $obj) {
                         if (false == $this->collTasks->contains($obj)) {
                           $this->collTasks->append($obj);
                         }
@@ -1332,12 +1279,13 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
                     }
 
                     $collTasks->getInternalIterator()->rewind();
+
                     return $collTasks;
                 }
 
-                if($partial && $this->collTasks) {
-                    foreach($this->collTasks as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collTasks) {
+                    foreach ($this->collTasks as $obj) {
+                        if ($obj->isNew()) {
                             $collTasks[] = $obj;
                         }
                     }
@@ -1365,7 +1313,8 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
     {
         $tasksToDelete = $this->getTasks(new Criteria(), $con)->diff($tasks);
 
-        $this->tasksScheduledForDeletion = unserialize(serialize($tasksToDelete));
+
+        $this->tasksScheduledForDeletion = $tasksToDelete;
 
         foreach ($tasksToDelete as $taskRemoved) {
             $taskRemoved->setPublicationgroup(null);
@@ -1399,7 +1348,7 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getTasks());
             }
             $query = TaskQuery::create(null, $criteria);
@@ -1428,8 +1377,13 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
             $this->initTasks();
             $this->collTasksPartial = true;
         }
+
         if (!in_array($l, $this->collTasks->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddTask($l);
+
+            if ($this->tasksScheduledForDeletion and $this->tasksScheduledForDeletion->contains($l)) {
+                $this->tasksScheduledForDeletion->remove($this->tasksScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -1563,6 +1517,31 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
         return $this->getTasks($query, $con);
     }
 
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Publicationgroup is new, it will return
+     * an empty collection; or if this Publicationgroup has previously
+     * been saved, it will retrieve related Tasks from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Publicationgroup.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Task[] List of Task objects
+     */
+    public function getTasksJoinCopyLocation($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = TaskQuery::create(null, $criteria);
+        $query->joinWith('CopyLocation', $join_behavior);
+
+        return $this->getTasks($query, $con);
+    }
+
     /**
      * Clears out the collPublications collection
      *
@@ -1643,7 +1622,7 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
     public function setPublications(PropelCollection $publications, PropelPDO $con = null)
     {
         $this->clearPublications();
-        $currentPublications = $this->getPublications();
+        $currentPublications = $this->getPublications(null, $con);
 
         $this->publicationsScheduledForDeletion = $currentPublications->diff($publications);
 
@@ -1700,10 +1679,14 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
         if ($this->collPublications === null) {
             $this->initPublications();
         }
+
         if (!$this->collPublications->contains($publication)) { // only add it if the **same** object is not already associated
             $this->doAddPublication($publication);
+            $this->collPublications[] = $publication;
 
-            $this->collPublications[]= $publication;
+            if ($this->publicationsScheduledForDeletion and $this->publicationsScheduledForDeletion->contains($publication)) {
+                $this->publicationsScheduledForDeletion->remove($this->publicationsScheduledForDeletion->search($publication));
+            }
         }
 
         return $this;
@@ -1712,11 +1695,18 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
     /**
      * @param	Publication $publication The publication object to add.
      */
-    protected function doAddPublication($publication)
+    protected function doAddPublication(Publication $publication)
     {
-        $publicationPublicationgroup = new PublicationPublicationgroup();
-        $publicationPublicationgroup->setPublication($publication);
-        $this->addPublicationPublicationgroup($publicationPublicationgroup);
+        // set the back reference to this object directly as using provided method either results
+        // in endless loop or in multiple relations
+        if (!$publication->getPublicationgroups()->contains($this)) {
+            $publicationPublicationgroup = new PublicationPublicationgroup();
+            $publicationPublicationgroup->setPublication($publication);
+            $this->addPublicationPublicationgroup($publicationPublicationgroup);
+
+            $foreignCollection = $publication->getPublicationgroups();
+            $foreignCollection[] = $this;
+        }
     }
 
     /**
@@ -1747,7 +1737,6 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
     {
         $this->id = null;
         $this->name = null;
-        $this->legacy_group_id = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
@@ -1762,7 +1751,7 @@ abstract class BasePublicationgroup extends BaseObject implements Persistent, \D
      *
      * This method is a user-space workaround for PHP's inability to garbage collect
      * objects with circular references (even in PHP 5.3). This is currently necessary
-     * when using Propel in certain daemon or large-volumne/high-memory operations.
+     * when using Propel in certain daemon or large-volume/high-memory operations.
      *
      * @param boolean $deep Whether to also clear the references on all referrer objects.
      */

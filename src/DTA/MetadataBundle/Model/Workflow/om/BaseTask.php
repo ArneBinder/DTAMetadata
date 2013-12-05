@@ -17,6 +17,8 @@ use DTA\MetadataBundle\Model\Data\Publication;
 use DTA\MetadataBundle\Model\Data\PublicationQuery;
 use DTA\MetadataBundle\Model\Master\DtaUser;
 use DTA\MetadataBundle\Model\Master\DtaUserQuery;
+use DTA\MetadataBundle\Model\Workflow\CopyLocation;
+use DTA\MetadataBundle\Model\Workflow\CopyLocationQuery;
 use DTA\MetadataBundle\Model\Workflow\Partner;
 use DTA\MetadataBundle\Model\Workflow\PartnerQuery;
 use DTA\MetadataBundle\Model\Workflow\Publicationgroup;
@@ -43,7 +45,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     protected static $peer;
 
     /**
-     * The flag var to prevent infinit loop in deep copy
+     * The flag var to prevent infinite loop in deep copy
      * @var       boolean
      */
     protected $startCopy = false;
@@ -61,10 +63,10 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     protected $tasktype_id;
 
     /**
-     * The value for the done field.
+     * The value for the closed field.
      * @var        boolean
      */
-    protected $done;
+    protected $closed;
 
     /**
      * The value for the start_date field.
@@ -109,6 +111,12 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     protected $responsibleuser_id;
 
     /**
+     * The value for the copylocation_id field.
+     * @var        int
+     */
+    protected $copylocation_id;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -146,6 +154,11 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     protected $aDtaUser;
 
     /**
+     * @var        CopyLocation
+     */
+    protected $aCopyLocation;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      * @var        boolean
@@ -166,7 +179,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Typ', 'Zuordnung', 'Abgeschlossen', 'Start', 'Ende', 'Für', 'Verantwortlich', );	public   $tableRowViewAccessors = array('Typ'=>'accessor:getEmbeddedColumn1OfTasktype', 'Zuordnung'=>'accessor:getEmbeddedColumn2OfTasktype', 'Abgeschlossen'=>'Done', 'Start'=>'StartDate', 'Ende'=>'EndDate', 'Für'=>'accessor:getReferee', 'Verantwortlich'=>'accessor:getResponsibleUser', );	public static $queryConstructionString = NULL;
+    public static $tableRowViewCaptions = array('id', 'Typ', 'Zuordnung', 'Abgeschlossen', 'Start', 'Ende', 'Für', 'Verantwortlich', );	public   $tableRowViewAccessors = array('id'=>'accessor:getEmbeddedColumn1OfTasktype', 'Typ'=>'accessor:getEmbeddedColumn2OfTasktype', 'Zuordnung'=>'accessor:getEmbeddedColumn3OfTasktype', 'Abgeschlossen'=>'Closed', 'Start'=>'StartDate', 'Ende'=>'EndDate', 'Für'=>'accessor:getReferee', 'Verantwortlich'=>'accessor:getResponsibleUser', );	public static $queryConstructionString = "\DTA\MetadataBundle\Model\Workflow\TaskQuery::create()                     ->leftJoinWith('Publication')                     ->leftJoinWith('Publication.Title')                     ->leftJoinWith('Title.Titlefragment')                     ->leftJoinWith('Tasktype')                     ->leftJoinWith('DtaUser');";
     /**
      * Get the [id] column value.
      *
@@ -174,6 +187,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
      */
     public function getId()
     {
+
         return $this->id;
     }
 
@@ -184,17 +198,19 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
      */
     public function getTasktypeId()
     {
+
         return $this->tasktype_id;
     }
 
     /**
-     * Get the [done] column value.
+     * Get the [closed] column value.
      *
      * @return boolean
      */
-    public function getDone()
+    public function getClosed()
     {
-        return $this->done;
+
+        return $this->closed;
     }
 
     /**
@@ -274,6 +290,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
      */
     public function getComments()
     {
+
         return $this->comments;
     }
 
@@ -284,6 +301,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
      */
     public function getPublicationgroupId()
     {
+
         return $this->publicationgroup_id;
     }
 
@@ -294,6 +312,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
      */
     public function getPublicationId()
     {
+
         return $this->publication_id;
     }
 
@@ -304,6 +323,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
      */
     public function getPartnerId()
     {
+
         return $this->partner_id;
     }
 
@@ -314,7 +334,19 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
      */
     public function getResponsibleuserId()
     {
+
         return $this->responsibleuser_id;
+    }
+
+    /**
+     * Get the [copylocation_id] column value.
+     *
+     * @return int
+     */
+    public function getCopylocationId()
+    {
+
+        return $this->copylocation_id;
     }
 
     /**
@@ -390,7 +422,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     /**
      * Set the value of [id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Task The current object (for fluent API support)
      */
     public function setId($v)
@@ -411,7 +443,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     /**
      * Set the value of [tasktype_id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Task The current object (for fluent API support)
      */
     public function setTasktypeId($v)
@@ -434,7 +466,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     } // setTasktypeId()
 
     /**
-     * Sets the value of the [done] column.
+     * Sets the value of the [closed] column.
      * Non-boolean arguments are converted using the following rules:
      *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
      *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
@@ -443,7 +475,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
      * @param boolean|integer|string $v The new value
      * @return Task The current object (for fluent API support)
      */
-    public function setDone($v)
+    public function setClosed($v)
     {
         if ($v !== null) {
             if (is_string($v)) {
@@ -453,14 +485,14 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
             }
         }
 
-        if ($this->done !== $v) {
-            $this->done = $v;
-            $this->modifiedColumns[] = TaskPeer::DONE;
+        if ($this->closed !== $v) {
+            $this->closed = $v;
+            $this->modifiedColumns[] = TaskPeer::CLOSED;
         }
 
 
         return $this;
-    } // setDone()
+    } // setClosed()
 
     /**
      * Sets the value of [start_date] column to a normalized version of the date/time value specified.
@@ -511,7 +543,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     /**
      * Set the value of [comments] column.
      *
-     * @param string $v new value
+     * @param  string $v new value
      * @return Task The current object (for fluent API support)
      */
     public function setComments($v)
@@ -532,7 +564,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     /**
      * Set the value of [publicationgroup_id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Task The current object (for fluent API support)
      */
     public function setPublicationgroupId($v)
@@ -557,7 +589,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     /**
      * Set the value of [publication_id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Task The current object (for fluent API support)
      */
     public function setPublicationId($v)
@@ -582,7 +614,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     /**
      * Set the value of [partner_id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Task The current object (for fluent API support)
      */
     public function setPartnerId($v)
@@ -607,7 +639,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     /**
      * Set the value of [responsibleuser_id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Task The current object (for fluent API support)
      */
     public function setResponsibleuserId($v)
@@ -628,6 +660,31 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
 
         return $this;
     } // setResponsibleuserId()
+
+    /**
+     * Set the value of [copylocation_id] column.
+     *
+     * @param  int $v new value
+     * @return Task The current object (for fluent API support)
+     */
+    public function setCopylocationId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->copylocation_id !== $v) {
+            $this->copylocation_id = $v;
+            $this->modifiedColumns[] = TaskPeer::COPYLOCATION_ID;
+        }
+
+        if ($this->aCopyLocation !== null && $this->aCopyLocation->getId() !== $v) {
+            $this->aCopyLocation = null;
+        }
+
+
+        return $this;
+    } // setCopylocationId()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -698,7 +755,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
      * more tables.
      *
      * @param array $row The row returned by PDOStatement->fetch(PDO::FETCH_NUM)
-     * @param int $startcol 0-based offset column which indicates which restultset column to start with.
+     * @param int $startcol 0-based offset column which indicates which resultset column to start with.
      * @param boolean $rehydrate Whether this object is being re-hydrated from the database.
      * @return int             next starting column
      * @throws PropelException - Any caught Exception will be rewrapped as a PropelException.
@@ -709,7 +766,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->tasktype_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-            $this->done = ($row[$startcol + 2] !== null) ? (boolean) $row[$startcol + 2] : null;
+            $this->closed = ($row[$startcol + 2] !== null) ? (boolean) $row[$startcol + 2] : null;
             $this->start_date = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
             $this->end_date = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
             $this->comments = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
@@ -717,8 +774,9 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
             $this->publication_id = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
             $this->partner_id = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
             $this->responsibleuser_id = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
-            $this->created_at = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
-            $this->updated_at = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+            $this->copylocation_id = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
+            $this->created_at = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+            $this->updated_at = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -727,7 +785,8 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 12; // 12 = TaskPeer::NUM_HYDRATE_COLUMNS.
+
+            return $startcol + 13; // 13 = TaskPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Task object", $e);
@@ -764,6 +823,9 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
         }
         if ($this->aDtaUser !== null && $this->responsibleuser_id !== $this->aDtaUser->getId()) {
             $this->aDtaUser = null;
+        }
+        if ($this->aCopyLocation !== null && $this->copylocation_id !== $this->aCopyLocation->getId()) {
+            $this->aCopyLocation = null;
         }
     } // ensureConsistency
 
@@ -809,6 +871,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
             $this->aPublication = null;
             $this->aPartner = null;
             $this->aDtaUser = null;
+            $this->aCopyLocation = null;
         } // if (deep)
     }
 
@@ -934,7 +997,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
             $this->alreadyInSave = true;
 
             // We call the save method on the following object(s) if they
-            // were passed to this object by their coresponding set
+            // were passed to this object by their corresponding set
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
@@ -973,6 +1036,13 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
                 $this->setDtaUser($this->aDtaUser);
             }
 
+            if ($this->aCopyLocation !== null) {
+                if ($this->aCopyLocation->isModified() || $this->aCopyLocation->isNew()) {
+                    $affectedRows += $this->aCopyLocation->save($con);
+                }
+                $this->setCopyLocation($this->aCopyLocation);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -1004,20 +1074,6 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = TaskPeer::ID;
-        if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . TaskPeer::ID . ')');
-        }
-        if (null === $this->id) {
-            try {
-                $stmt = $con->query("SELECT nextval('task_id_seq')");
-                $row = $stmt->fetch(PDO::FETCH_NUM);
-                $this->id = $row[0];
-            } catch (Exception $e) {
-                throw new PropelException('Unable to get sequence id.', $e);
-            }
-        }
-
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(TaskPeer::ID)) {
@@ -1026,8 +1082,8 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
         if ($this->isColumnModified(TaskPeer::TASKTYPE_ID)) {
             $modifiedColumns[':p' . $index++]  = '"tasktype_id"';
         }
-        if ($this->isColumnModified(TaskPeer::DONE)) {
-            $modifiedColumns[':p' . $index++]  = '"done"';
+        if ($this->isColumnModified(TaskPeer::CLOSED)) {
+            $modifiedColumns[':p' . $index++]  = '"closed"';
         }
         if ($this->isColumnModified(TaskPeer::START_DATE)) {
             $modifiedColumns[':p' . $index++]  = '"start_date"';
@@ -1049,6 +1105,9 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
         }
         if ($this->isColumnModified(TaskPeer::RESPONSIBLEUSER_ID)) {
             $modifiedColumns[':p' . $index++]  = '"responsibleuser_id"';
+        }
+        if ($this->isColumnModified(TaskPeer::COPYLOCATION_ID)) {
+            $modifiedColumns[':p' . $index++]  = '"copylocation_id"';
         }
         if ($this->isColumnModified(TaskPeer::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '"created_at"';
@@ -1073,8 +1132,8 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
                     case '"tasktype_id"':
                         $stmt->bindValue($identifier, $this->tasktype_id, PDO::PARAM_INT);
                         break;
-                    case '"done"':
-                        $stmt->bindValue($identifier, $this->done, PDO::PARAM_BOOL);
+                    case '"closed"':
+                        $stmt->bindValue($identifier, $this->closed, PDO::PARAM_BOOL);
                         break;
                     case '"start_date"':
                         $stmt->bindValue($identifier, $this->start_date, PDO::PARAM_STR);
@@ -1096,6 +1155,9 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
                         break;
                     case '"responsibleuser_id"':
                         $stmt->bindValue($identifier, $this->responsibleuser_id, PDO::PARAM_INT);
+                        break;
+                    case '"copylocation_id"':
+                        $stmt->bindValue($identifier, $this->copylocation_id, PDO::PARAM_INT);
                         break;
                     case '"created_at"':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
@@ -1176,10 +1238,10 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
      *
      * In addition to checking the current object, all related objects will
      * also be validated.  If all pass then <code>true</code> is returned; otherwise
-     * an aggreagated array of ValidationFailed objects will be returned.
+     * an aggregated array of ValidationFailed objects will be returned.
      *
      * @param array $columns Array of column names to validate.
-     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objets otherwise.
+     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objects otherwise.
      */
     protected function doValidate($columns = null)
     {
@@ -1191,7 +1253,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
 
 
             // We call the validate method on the following object(s) if they
-            // were passed to this object by their coresponding set
+            // were passed to this object by their corresponding set
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
@@ -1222,6 +1284,12 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
             if ($this->aDtaUser !== null) {
                 if (!$this->aDtaUser->validate($columns)) {
                     $failureMap = array_merge($failureMap, $this->aDtaUser->getValidationFailures());
+                }
+            }
+
+            if ($this->aCopyLocation !== null) {
+                if (!$this->aCopyLocation->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aCopyLocation->getValidationFailures());
                 }
             }
 
@@ -1273,7 +1341,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
                 return $this->getTasktypeId();
                 break;
             case 2:
-                return $this->getDone();
+                return $this->getClosed();
                 break;
             case 3:
                 return $this->getStartDate();
@@ -1297,9 +1365,12 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
                 return $this->getResponsibleuserId();
                 break;
             case 10:
-                return $this->getCreatedAt();
+                return $this->getCopylocationId();
                 break;
             case 11:
+                return $this->getCreatedAt();
+                break;
+            case 12:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1333,7 +1404,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getTasktypeId(),
-            $keys[2] => $this->getDone(),
+            $keys[2] => $this->getClosed(),
             $keys[3] => $this->getStartDate(),
             $keys[4] => $this->getEndDate(),
             $keys[5] => $this->getComments(),
@@ -1341,9 +1412,15 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
             $keys[7] => $this->getPublicationId(),
             $keys[8] => $this->getPartnerId(),
             $keys[9] => $this->getResponsibleuserId(),
-            $keys[10] => $this->getCreatedAt(),
-            $keys[11] => $this->getUpdatedAt(),
+            $keys[10] => $this->getCopylocationId(),
+            $keys[11] => $this->getCreatedAt(),
+            $keys[12] => $this->getUpdatedAt(),
         );
+        $virtualColumns = $this->virtualColumns;
+        foreach ($virtualColumns as $key => $virtualColumn) {
+            $result[$key] = $virtualColumn;
+        }
+
         if ($includeForeignObjects) {
             if (null !== $this->aTasktype) {
                 $result['Tasktype'] = $this->aTasktype->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
@@ -1359,6 +1436,9 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
             }
             if (null !== $this->aDtaUser) {
                 $result['DtaUser'] = $this->aDtaUser->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aCopyLocation) {
+                $result['CopyLocation'] = $this->aCopyLocation->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1401,7 +1481,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
                 $this->setTasktypeId($value);
                 break;
             case 2:
-                $this->setDone($value);
+                $this->setClosed($value);
                 break;
             case 3:
                 $this->setStartDate($value);
@@ -1425,9 +1505,12 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
                 $this->setResponsibleuserId($value);
                 break;
             case 10:
-                $this->setCreatedAt($value);
+                $this->setCopylocationId($value);
                 break;
             case 11:
+                $this->setCreatedAt($value);
+                break;
+            case 12:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1456,7 +1539,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setTasktypeId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setDone($arr[$keys[2]]);
+        if (array_key_exists($keys[2], $arr)) $this->setClosed($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setStartDate($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setEndDate($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setComments($arr[$keys[5]]);
@@ -1464,8 +1547,9 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
         if (array_key_exists($keys[7], $arr)) $this->setPublicationId($arr[$keys[7]]);
         if (array_key_exists($keys[8], $arr)) $this->setPartnerId($arr[$keys[8]]);
         if (array_key_exists($keys[9], $arr)) $this->setResponsibleuserId($arr[$keys[9]]);
-        if (array_key_exists($keys[10], $arr)) $this->setCreatedAt($arr[$keys[10]]);
-        if (array_key_exists($keys[11], $arr)) $this->setUpdatedAt($arr[$keys[11]]);
+        if (array_key_exists($keys[10], $arr)) $this->setCopylocationId($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setCreatedAt($arr[$keys[11]]);
+        if (array_key_exists($keys[12], $arr)) $this->setUpdatedAt($arr[$keys[12]]);
     }
 
     /**
@@ -1479,7 +1563,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
 
         if ($this->isColumnModified(TaskPeer::ID)) $criteria->add(TaskPeer::ID, $this->id);
         if ($this->isColumnModified(TaskPeer::TASKTYPE_ID)) $criteria->add(TaskPeer::TASKTYPE_ID, $this->tasktype_id);
-        if ($this->isColumnModified(TaskPeer::DONE)) $criteria->add(TaskPeer::DONE, $this->done);
+        if ($this->isColumnModified(TaskPeer::CLOSED)) $criteria->add(TaskPeer::CLOSED, $this->closed);
         if ($this->isColumnModified(TaskPeer::START_DATE)) $criteria->add(TaskPeer::START_DATE, $this->start_date);
         if ($this->isColumnModified(TaskPeer::END_DATE)) $criteria->add(TaskPeer::END_DATE, $this->end_date);
         if ($this->isColumnModified(TaskPeer::COMMENTS)) $criteria->add(TaskPeer::COMMENTS, $this->comments);
@@ -1487,6 +1571,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
         if ($this->isColumnModified(TaskPeer::PUBLICATION_ID)) $criteria->add(TaskPeer::PUBLICATION_ID, $this->publication_id);
         if ($this->isColumnModified(TaskPeer::PARTNER_ID)) $criteria->add(TaskPeer::PARTNER_ID, $this->partner_id);
         if ($this->isColumnModified(TaskPeer::RESPONSIBLEUSER_ID)) $criteria->add(TaskPeer::RESPONSIBLEUSER_ID, $this->responsibleuser_id);
+        if ($this->isColumnModified(TaskPeer::COPYLOCATION_ID)) $criteria->add(TaskPeer::COPYLOCATION_ID, $this->copylocation_id);
         if ($this->isColumnModified(TaskPeer::CREATED_AT)) $criteria->add(TaskPeer::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(TaskPeer::UPDATED_AT)) $criteria->add(TaskPeer::UPDATED_AT, $this->updated_at);
 
@@ -1553,7 +1638,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setTasktypeId($this->getTasktypeId());
-        $copyObj->setDone($this->getDone());
+        $copyObj->setClosed($this->getClosed());
         $copyObj->setStartDate($this->getStartDate());
         $copyObj->setEndDate($this->getEndDate());
         $copyObj->setComments($this->getComments());
@@ -1561,6 +1646,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
         $copyObj->setPublicationId($this->getPublicationId());
         $copyObj->setPartnerId($this->getPartnerId());
         $copyObj->setResponsibleuserId($this->getResponsibleuserId());
+        $copyObj->setCopylocationId($this->getCopylocationId());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -1624,7 +1710,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     /**
      * Declares an association between this object and a Tasktype object.
      *
-     * @param             Tasktype $v
+     * @param                  Tasktype $v
      * @return Task The current object (for fluent API support)
      * @throws PropelException
      */
@@ -1676,7 +1762,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     /**
      * Declares an association between this object and a Publicationgroup object.
      *
-     * @param             Publicationgroup $v
+     * @param                  Publicationgroup $v
      * @return Task The current object (for fluent API support)
      * @throws PropelException
      */
@@ -1728,7 +1814,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     /**
      * Declares an association between this object and a Publication object.
      *
-     * @param             Publication $v
+     * @param                  Publication $v
      * @return Task The current object (for fluent API support)
      * @throws PropelException
      */
@@ -1780,7 +1866,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     /**
      * Declares an association between this object and a Partner object.
      *
-     * @param             Partner $v
+     * @param                  Partner $v
      * @return Task The current object (for fluent API support)
      * @throws PropelException
      */
@@ -1832,7 +1918,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     /**
      * Declares an association between this object and a DtaUser object.
      *
-     * @param             DtaUser $v
+     * @param                  DtaUser $v
      * @return Task The current object (for fluent API support)
      * @throws PropelException
      */
@@ -1882,13 +1968,65 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     }
 
     /**
+     * Declares an association between this object and a CopyLocation object.
+     *
+     * @param                  CopyLocation $v
+     * @return Task The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setCopyLocation(CopyLocation $v = null)
+    {
+        if ($v === null) {
+            $this->setCopylocationId(NULL);
+        } else {
+            $this->setCopylocationId($v->getId());
+        }
+
+        $this->aCopyLocation = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the CopyLocation object, it will not be re-added.
+        if ($v !== null) {
+            $v->addTask($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated CopyLocation object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return CopyLocation The associated CopyLocation object.
+     * @throws PropelException
+     */
+    public function getCopyLocation(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aCopyLocation === null && ($this->copylocation_id !== null) && $doQuery) {
+            $this->aCopyLocation = CopyLocationQuery::create()->findPk($this->copylocation_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCopyLocation->addTasks($this);
+             */
+        }
+
+        return $this->aCopyLocation;
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
     {
         $this->id = null;
         $this->tasktype_id = null;
-        $this->done = null;
+        $this->closed = null;
         $this->start_date = null;
         $this->end_date = null;
         $this->comments = null;
@@ -1896,6 +2034,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
         $this->publication_id = null;
         $this->partner_id = null;
         $this->responsibleuser_id = null;
+        $this->copylocation_id = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -1912,7 +2051,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
      *
      * This method is a user-space workaround for PHP's inability to garbage collect
      * objects with circular references (even in PHP 5.3). This is currently necessary
-     * when using Propel in certain daemon or large-volumne/high-memory operations.
+     * when using Propel in certain daemon or large-volume/high-memory operations.
      *
      * @param boolean $deep Whether to also clear the references on all referrer objects.
      */
@@ -1935,6 +2074,9 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
             if ($this->aDtaUser instanceof Persistent) {
               $this->aDtaUser->clearAllReferences($deep);
             }
+            if ($this->aCopyLocation instanceof Persistent) {
+              $this->aCopyLocation->clearAllReferences($deep);
+            }
 
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
@@ -1944,6 +2086,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
         $this->aPublication = null;
         $this->aPartner = null;
         $this->aDtaUser = null;
+        $this->aCopyLocation = null;
     }
 
     /**
@@ -2034,13 +2177,22 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     public function getEmbeddedColumn1OfTasktype(){
 
         $relatedEntity = $this->getTasktype();
-        return $relatedEntity->getAttributeByTableViewColumName("Typ");
+        return $relatedEntity->getAttributeByTableViewColumName("id");
 
     }    /**
      * Cascades the get to a related entity (possibly recursively)
      */
 
     public function getEmbeddedColumn2OfTasktype(){
+
+        $relatedEntity = $this->getTasktype();
+        return $relatedEntity->getAttributeByTableViewColumName("Typ");
+
+    }    /**
+     * Cascades the get to a related entity (possibly recursively)
+     */
+
+    public function getEmbeddedColumn3OfTasktype(){
 
         $relatedEntity = $this->getTasktype();
         return $relatedEntity->getAttributeByTableViewColumName("Zuordnung");

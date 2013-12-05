@@ -40,12 +40,10 @@ class TasktypeTableMap extends TableMap
         $this->setPhpName('Tasktype');
         $this->setClassname('DTA\\MetadataBundle\\Model\\Workflow\\Tasktype');
         $this->setPackage('src.DTA.MetadataBundle.Model.Workflow');
-        $this->setUseIdGenerator(true);
-        $this->setPrimaryKeyMethodInfo('tasktype_id_seq');
+        $this->setUseIdGenerator(false);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('name', 'Name', 'LONGVARCHAR', true, null, null);
-        $this->addColumn('legacy_tasktype_id', 'LegacyTasktypeId', 'INTEGER', false, null, null);
         $this->addColumn('tree_left', 'TreeLeft', 'INTEGER', false, null, null);
         $this->addColumn('tree_right', 'TreeRight', 'INTEGER', false, null, null);
         $this->addColumn('tree_level', 'TreeLevel', 'INTEGER', false, null, null);
@@ -78,6 +76,7 @@ class TasktypeTableMap extends TableMap
   'method_proxies' => 'false',
 ),
             'table_row_view' =>  array (
+  'id' => 'id',
   'Typ' => 'name',
   'Zuordnung' => 'accessor:getParent',
 ),

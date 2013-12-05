@@ -35,7 +35,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
     protected static $peer;
 
     /**
-     * The flag var to prevent infinit loop in deep copy
+     * The flag var to prevent infinite loop in deep copy
      * @var       boolean
      */
     protected $startCopy = false;
@@ -151,6 +151,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
      */
     public function getId()
     {
+
         return $this->id;
     }
 
@@ -161,6 +162,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
      */
     public function getName()
     {
+
         return $this->name;
     }
 
@@ -171,6 +173,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
      */
     public function getTitleId()
     {
+
         return $this->title_id;
     }
 
@@ -181,6 +184,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
      */
     public function getTitlefragmenttypeId()
     {
+
         return $this->titlefragmenttype_id;
     }
 
@@ -191,6 +195,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
      */
     public function getSortableRank()
     {
+
         return $this->sortable_rank;
     }
 
@@ -201,13 +206,14 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
      */
     public function getNameIsReconstructed()
     {
+
         return $this->name_is_reconstructed;
     }
 
     /**
      * Set the value of [id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Titlefragment The current object (for fluent API support)
      */
     public function setId($v)
@@ -228,7 +234,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
     /**
      * Set the value of [name] column.
      *
-     * @param string $v new value
+     * @param  string $v new value
      * @return Titlefragment The current object (for fluent API support)
      */
     public function setName($v)
@@ -249,7 +255,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
     /**
      * Set the value of [title_id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Titlefragment The current object (for fluent API support)
      */
     public function setTitleId($v)
@@ -260,7 +266,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
 
         if ($this->title_id !== $v) {
             // sortable behavior
-            $this->oldScope = $this->getTitleId();
+            $this->oldScope = $this->title_id;
 
             $this->title_id = $v;
             $this->modifiedColumns[] = TitlefragmentPeer::TITLE_ID;
@@ -277,7 +283,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
     /**
      * Set the value of [titlefragmenttype_id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Titlefragment The current object (for fluent API support)
      */
     public function setTitlefragmenttypeId($v)
@@ -302,7 +308,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
     /**
      * Set the value of [sortable_rank] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Titlefragment The current object (for fluent API support)
      */
     public function setSortableRank($v)
@@ -376,7 +382,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
      * more tables.
      *
      * @param array $row The row returned by PDOStatement->fetch(PDO::FETCH_NUM)
-     * @param int $startcol 0-based offset column which indicates which restultset column to start with.
+     * @param int $startcol 0-based offset column which indicates which resultset column to start with.
      * @param boolean $rehydrate Whether this object is being re-hydrated from the database.
      * @return int             next starting column
      * @throws PropelException - Any caught Exception will be rewrapped as a PropelException.
@@ -399,6 +405,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
+
             return $startcol + 6; // 6 = TitlefragmentPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -499,7 +506,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
             $ret = $this->preDelete($con);
             // sortable behavior
 
-            TitlefragmentPeer::shiftRank(-1, $this->getSortableRank() + 1, null, $this->getTitleId(), $con);
+            TitlefragmentPeer::shiftRank(-1, $this->getSortableRank() + 1, null, $this->getScopeValue(), $con);
             TitlefragmentPeer::clearInstancePool();
 
             if ($ret) {
@@ -550,7 +557,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
                 $ret = $ret && $this->preInsert($con);
                 // sortable behavior
                 if (!$this->isColumnModified(TitlefragmentPeer::RANK_COL)) {
-                    $this->setSortableRank(TitlefragmentQuery::create()->getMaxRank($this->getTitleId(), $con) + 1);
+                    $this->setSortableRank(TitlefragmentQuery::create()->getMaxRankArray($this->getScopeValue(), $con) + 1);
                 }
 
             } else {
@@ -558,8 +565,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
                 // sortable behavior
                 // if scope has changed and rank was not modified (if yes, assuming superior action)
                 // insert object to the end of new scope and cleanup old one
-                if ($this->isColumnModified(TitlefragmentPeer::SCOPE_COL) && !$this->isColumnModified(TitlefragmentPeer::RANK_COL)) {
-                    TitlefragmentPeer::shiftRank(-1, $this->getSortableRank() + 1, null, $this->oldScope, $con);
+                if (($this->isColumnModified(TitlefragmentPeer::TITLE_ID)) && !$this->isColumnModified(TitlefragmentPeer::RANK_COL)) { TitlefragmentPeer::shiftRank(-1, $this->getSortableRank() + 1, null, $this->oldScope, $con);
                     $this->insertAtBottom($con);
                 }
 
@@ -603,7 +609,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
             $this->alreadyInSave = true;
 
             // We call the save method on the following object(s) if they
-            // were passed to this object by their coresponding set
+            // were passed to this object by their corresponding set
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
@@ -788,10 +794,10 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
      *
      * In addition to checking the current object, all related objects will
      * also be validated.  If all pass then <code>true</code> is returned; otherwise
-     * an aggreagated array of ValidationFailed objects will be returned.
+     * an aggregated array of ValidationFailed objects will be returned.
      *
      * @param array $columns Array of column names to validate.
-     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objets otherwise.
+     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objects otherwise.
      */
     protected function doValidate($columns = null)
     {
@@ -803,7 +809,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
 
 
             // We call the validate method on the following object(s) if they
-            // were passed to this object by their coresponding set
+            // were passed to this object by their corresponding set
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
@@ -914,6 +920,11 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
             $keys[4] => $this->getSortableRank(),
             $keys[5] => $this->getNameIsReconstructed(),
         );
+        $virtualColumns = $this->virtualColumns;
+        foreach ($virtualColumns as $key => $virtualColumn) {
+            $result[$key] = $virtualColumn;
+        }
+
         if ($includeForeignObjects) {
             if (null !== $this->aTitle) {
                 $result['Title'] = $this->aTitle->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
@@ -1149,7 +1160,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
     /**
      * Declares an association between this object and a Title object.
      *
-     * @param             Title $v
+     * @param                  Title $v
      * @return Titlefragment The current object (for fluent API support)
      * @throws PropelException
      */
@@ -1201,7 +1212,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
     /**
      * Declares an association between this object and a Titlefragmenttype object.
      *
-     * @param             Titlefragmenttype $v
+     * @param                  Titlefragmenttype $v
      * @return Titlefragment The current object (for fluent API support)
      * @throws PropelException
      */
@@ -1276,7 +1287,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
      *
      * This method is a user-space workaround for PHP's inability to garbage collect
      * objects with circular references (even in PHP 5.3). This is currently necessary
-     * when using Propel in certain daemon or large-volumne/high-memory operations.
+     * when using Propel in certain daemon or large-volume/high-memory operations.
      *
      * @param boolean $deep Whether to also clear the references on all referrer objects.
      */
@@ -1345,22 +1356,30 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
     /**
      * Wrap the getter for scope value
      *
-     * @return    int
+     * @param boolean $returnNulls If true and all scope values are null, this will return null instead of a array full with nulls
+     *
+     * @return    mixed A array or a native type
      */
-    public function getScopeValue()
+    public function getScopeValue($returnNulls = true)
     {
-        return $this->title_id;
+
+
+        return $this->getTitleId();
+
     }
 
     /**
      * Wrap the setter for scope value
      *
-     * @param     int
+     * @param     mixed A array or a native type
      * @return    Titlefragment
      */
     public function setScopeValue($v)
     {
+
+
         return $this->setTitleId($v);
+
     }
 
     /**
@@ -1382,7 +1401,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
      */
     public function isLast(PropelPDO $con = null)
     {
-        return $this->getSortableRank() == TitlefragmentQuery::create()->getMaxRank($this->getTitleId(), $con);
+        return $this->getSortableRank() == TitlefragmentQuery::create()->getMaxRankArray($this->getScopeValue(), $con);
     }
 
     /**
@@ -1395,7 +1414,14 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
     public function getNext(PropelPDO $con = null)
     {
 
-        return TitlefragmentQuery::create()->findOneByRank($this->getSortableRank() + 1, $this->getTitleId(), $con);
+        $query = TitlefragmentQuery::create();
+
+        $scope = $this->getScopeValue();
+
+        $query->filterByRank($this->getSortableRank() + 1, $scope);
+
+
+        return $query->findOne($con);
     }
 
     /**
@@ -1408,7 +1434,14 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
     public function getPrevious(PropelPDO $con = null)
     {
 
-        return TitlefragmentQuery::create()->findOneByRank($this->getSortableRank() - 1, $this->getTitleId(), $con);
+        $query = TitlefragmentQuery::create();
+
+        $scope = $this->getScopeValue();
+
+        $query->filterByRank($this->getSortableRank() - 1, $scope);
+
+
+        return $query->findOne($con);
     }
 
     /**
@@ -1424,7 +1457,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
      */
     public function insertAtRank($rank, PropelPDO $con = null)
     {
-        $maxRank = TitlefragmentQuery::create()->getMaxRank($this->getTitleId(), $con);
+        $maxRank = TitlefragmentQuery::create()->getMaxRankArray($this->getScopeValue(), $con);
         if ($rank < 1 || $rank > $maxRank + 1) {
             throw new PropelException('Invalid rank ' . $rank);
         }
@@ -1434,7 +1467,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
             // Keep the list modification query for the save() transaction
             $this->sortableQueries []= array(
                 'callable'  => array(self::PEER, 'shiftRank'),
-                'arguments' => array(1, $rank, null, $this->getTitleId())
+                'arguments' => array(1, $rank, null, $this->getScopeValue())
             );
         }
 
@@ -1453,7 +1486,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
      */
     public function insertAtBottom(PropelPDO $con = null)
     {
-        $this->setSortableRank(TitlefragmentQuery::create()->getMaxRank($this->getTitleId(), $con) + 1);
+        $this->setSortableRank(TitlefragmentQuery::create()->getMaxRankArray($this->getScopeValue(), $con) + 1);
 
         return $this;
     }
@@ -1488,7 +1521,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
         if ($con === null) {
             $con = Propel::getConnection(TitlefragmentPeer::DATABASE_NAME);
         }
-        if ($newRank < 1 || $newRank > TitlefragmentQuery::create()->getMaxRank($this->getTitleId(), $con)) {
+        if ($newRank < 1 || $newRank > TitlefragmentQuery::create()->getMaxRankArray($this->getScopeValue(), $con)) {
             throw new PropelException('Invalid rank ' . $newRank);
         }
 
@@ -1501,7 +1534,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
         try {
             // shift the objects between the old and the new rank
             $delta = ($oldRank < $newRank) ? -1 : 1;
-            TitlefragmentPeer::shiftRank($delta, min($oldRank, $newRank), max($oldRank, $newRank), $this->getTitleId(), $con);
+            TitlefragmentPeer::shiftRank($delta, min($oldRank, $newRank), max($oldRank, $newRank), $this->getScopeValue(), $con);
 
             // move the object to its new rank
             $this->setSortableRank($newRank);
@@ -1533,11 +1566,11 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
         }
         $con->beginTransaction();
         try {
-            $oldScope = $this->getTitleId();
-            $newScope = $object->getTitleId();
+            $oldScope = $this->getScopeValue();
+            $newScope = $object->getScopeValue();
             if ($oldScope != $newScope) {
-                $this->setTitleId($newScope);
-                $object->setTitleId($oldScope);
+                $this->setScopeValue($newScope);
+                $object->setScopeValue($oldScope);
             }
             $oldRank = $this->getSortableRank();
             $newRank = $object->getSortableRank();
@@ -1643,7 +1676,7 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
         }
         $con->beginTransaction();
         try {
-            $bottom = TitlefragmentQuery::create()->getMaxRank($this->getTitleId(), $con);
+            $bottom = TitlefragmentQuery::create()->getMaxRankArray($this->getScopeValue(), $con);
             $res = $this->moveToRank($bottom, $con);
             $con->commit();
 
@@ -1665,12 +1698,12 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
     public function removeFromList(PropelPDO $con = null)
     {
         // check if object is already removed
-        if ($this->getTitleId() === null) {
+        if ($this->getScopeValue() === null) {
             throw new PropelException('Object is already removed (has null scope)');
         }
 
         // move the object to the end of null scope
-        $this->setTitleId(null);
+        $this->setScopeValue(null);
     //    $this->insertAtBottom($con);
 
         return $this;

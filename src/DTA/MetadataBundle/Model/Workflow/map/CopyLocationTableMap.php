@@ -40,12 +40,11 @@ class CopyLocationTableMap extends TableMap
         $this->setPhpName('CopyLocation');
         $this->setClassname('DTA\\MetadataBundle\\Model\\Workflow\\CopyLocation');
         $this->setPackage('src.DTA.MetadataBundle.Model.Workflow');
-        $this->setUseIdGenerator(true);
-        $this->setPrimaryKeyMethodInfo('copy_location_id_seq');
+        $this->setUseIdGenerator(false);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('publication_id', 'PublicationId', 'INTEGER', 'publication', 'id', true, null, null);
-        $this->addForeignKey('partner_id', 'PartnerId', 'INTEGER', 'partner', 'id', true, null, null);
+        $this->addForeignKey('partner_id', 'PartnerId', 'INTEGER', 'partner', 'id', false, null, null);
         $this->addColumn('catalogue_signature', 'CatalogueSignature', 'LONGVARCHAR', false, null, null);
         $this->addColumn('catalogue_internal', 'CatalogueInternal', 'LONGVARCHAR', false, null, null);
         $this->addColumn('catalogue_url', 'CatalogueUrl', 'LONGVARCHAR', false, null, null);
@@ -56,7 +55,6 @@ class CopyLocationTableMap extends TableMap
         $this->addColumn('imageurl', 'Imageurl', 'LONGVARCHAR', false, null, null);
         $this->addColumn('imageurn', 'Imageurn', 'LONGVARCHAR', false, null, null);
         $this->addForeignKey('license_id', 'LicenseId', 'INTEGER', 'license', 'id', false, null, null);
-        $this->addColumn('legacy_fundstellen_id', 'LegacyFundstellenId', 'INTEGER', false, null, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
@@ -70,6 +68,7 @@ class CopyLocationTableMap extends TableMap
         $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::MANY_TO_ONE, array('publication_id' => 'id', ), null, null);
         $this->addRelation('Partner', 'DTA\\MetadataBundle\\Model\\Workflow\\Partner', RelationMap::MANY_TO_ONE, array('partner_id' => 'id', ), null, null);
         $this->addRelation('License', 'DTA\\MetadataBundle\\Model\\Workflow\\License', RelationMap::MANY_TO_ONE, array('license_id' => 'id', ), null, null);
+        $this->addRelation('Task', 'DTA\\MetadataBundle\\Model\\Workflow\\Task', RelationMap::ONE_TO_MANY, array('id' => 'copylocation_id', ), null, null, 'Tasks');
     } // buildRelations()
 
     /**
@@ -87,9 +86,9 @@ class CopyLocationTableMap extends TableMap
   'disable_updated_at' => 'false',
 ),
             'table_row_view' =>  array (
-  'embedColumns1' => 'partner',
   'Signatur' => 'catalogue_signature',
   'embedColumns2' => 'publication',
+  'query' => '\\DTA\\MetadataBundle\\Model\\Workflow\\CopyLocationQuery::create()                     ->leftJoinWith(\'Publication\')                     ->leftJoinWith(\'Publication.Title\')                     ->leftJoinWith(\'Title.Titlefragment\')                     ->leftJoinWith(\'Publication.DatespecificationRelatedByPublicationdateId\')                     ->leftJoinWith(\'Publication.PersonPublication\')                     ->leftJoinWith(\'PersonPublication.Person\')                     ->leftJoinWith(\'Person.Personalname\')                     ->leftJoinWith(\'Personalname.Namefragment\');',
 ),
         );
     } // getBehaviors()

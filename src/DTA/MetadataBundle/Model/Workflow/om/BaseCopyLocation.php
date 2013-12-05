@@ -10,8 +10,10 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
+use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
+use \PropelObjectCollection;
 use \PropelPDO;
 use DTA\MetadataBundle\Model\Data\Publication;
 use DTA\MetadataBundle\Model\Data\PublicationQuery;
@@ -22,6 +24,8 @@ use DTA\MetadataBundle\Model\Workflow\License;
 use DTA\MetadataBundle\Model\Workflow\LicenseQuery;
 use DTA\MetadataBundle\Model\Workflow\Partner;
 use DTA\MetadataBundle\Model\Workflow\PartnerQuery;
+use DTA\MetadataBundle\Model\Workflow\Task;
+use DTA\MetadataBundle\Model\Workflow\TaskQuery;
 
 abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\MetadataBundle\Model\table_row_view\TableRowViewInterface
 {
@@ -39,7 +43,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     protected static $peer;
 
     /**
-     * The flag var to prevent infinit loop in deep copy
+     * The flag var to prevent infinite loop in deep copy
      * @var       boolean
      */
     protected $startCopy = false;
@@ -123,12 +127,6 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     protected $license_id;
 
     /**
-     * The value for the legacy_fundstellen_id field.
-     * @var        int
-     */
-    protected $legacy_fundstellen_id;
-
-    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -156,6 +154,12 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     protected $aLicense;
 
     /**
+     * @var        PropelObjectCollection|Task[] Collection to store aggregation of Task objects.
+     */
+    protected $collTasks;
+    protected $collTasksPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      * @var        boolean
@@ -176,7 +180,13 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Name', 'Ansprechpartner', 'Mail', 'Web', 'Signatur', 'Titel', 'erster Autor', 'Verlag', 'veröffentlicht', );	public   $tableRowViewAccessors = array('Name'=>'accessor:getEmbeddedColumn1OfPartner', 'Ansprechpartner'=>'accessor:getEmbeddedColumn2OfPartner', 'Mail'=>'accessor:getEmbeddedColumn3OfPartner', 'Web'=>'accessor:getEmbeddedColumn4OfPartner', 'Signatur'=>'CatalogueSignature', 'Titel'=>'accessor:getEmbeddedColumn1OfPublication', 'erster Autor'=>'accessor:getEmbeddedColumn2OfPublication', 'Verlag'=>'accessor:getEmbeddedColumn3OfPublication', 'veröffentlicht'=>'accessor:getEmbeddedColumn4OfPublication', );	public static $queryConstructionString = NULL;
+    public static $tableRowViewCaptions = array('Signatur', 'Titel', 'erster Autor', 'Verlag', 'veröffentlicht', );	public   $tableRowViewAccessors = array('Signatur'=>'CatalogueSignature', 'Titel'=>'accessor:getEmbeddedColumn1OfPublication', 'erster Autor'=>'accessor:getEmbeddedColumn2OfPublication', 'Verlag'=>'accessor:getEmbeddedColumn3OfPublication', 'veröffentlicht'=>'accessor:getEmbeddedColumn4OfPublication', );	public static $queryConstructionString = "\DTA\MetadataBundle\Model\Workflow\CopyLocationQuery::create()                     ->leftJoinWith('Publication')                     ->leftJoinWith('Publication.Title')                     ->leftJoinWith('Title.Titlefragment')                     ->leftJoinWith('Publication.DatespecificationRelatedByPublicationdateId')                     ->leftJoinWith('Publication.PersonPublication')                     ->leftJoinWith('PersonPublication.Person')                     ->leftJoinWith('Person.Personalname')                     ->leftJoinWith('Personalname.Namefragment');";
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $tasksScheduledForDeletion = null;
+
     /**
      * Get the [id] column value.
      *
@@ -184,6 +194,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
      */
     public function getId()
     {
+
         return $this->id;
     }
 
@@ -194,6 +205,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
      */
     public function getPublicationId()
     {
+
         return $this->publication_id;
     }
 
@@ -204,6 +216,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
      */
     public function getPartnerId()
     {
+
         return $this->partner_id;
     }
 
@@ -214,6 +227,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
      */
     public function getCatalogueSignature()
     {
+
         return $this->catalogue_signature;
     }
 
@@ -224,6 +238,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
      */
     public function getCatalogueInternal()
     {
+
         return $this->catalogue_internal;
     }
 
@@ -234,6 +249,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
      */
     public function getCatalogueUrl()
     {
+
         return $this->catalogue_url;
     }
 
@@ -244,6 +260,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
      */
     public function getNumfaksimiles()
     {
+
         return $this->numfaksimiles;
     }
 
@@ -254,6 +271,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
      */
     public function getCatalogueExtent()
     {
+
         return $this->catalogue_extent;
     }
 
@@ -264,6 +282,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
      */
     public function getAvailability()
     {
+
         return $this->availability;
     }
 
@@ -274,6 +293,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
      */
     public function getComments()
     {
+
         return $this->comments;
     }
 
@@ -284,6 +304,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
      */
     public function getImageurl()
     {
+
         return $this->imageurl;
     }
 
@@ -294,6 +315,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
      */
     public function getImageurn()
     {
+
         return $this->imageurn;
     }
 
@@ -304,17 +326,8 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
      */
     public function getLicenseId()
     {
-        return $this->license_id;
-    }
 
-    /**
-     * Get the [legacy_fundstellen_id] column value.
-     *
-     * @return int
-     */
-    public function getLegacyFundstellenId()
-    {
-        return $this->legacy_fundstellen_id;
+        return $this->license_id;
     }
 
     /**
@@ -390,7 +403,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     /**
      * Set the value of [id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return CopyLocation The current object (for fluent API support)
      */
     public function setId($v)
@@ -411,7 +424,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     /**
      * Set the value of [publication_id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return CopyLocation The current object (for fluent API support)
      */
     public function setPublicationId($v)
@@ -436,7 +449,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     /**
      * Set the value of [partner_id] column.
      * Anbieter Leitdruck
-     * @param int $v new value
+     * @param  int $v new value
      * @return CopyLocation The current object (for fluent API support)
      */
     public function setPartnerId($v)
@@ -461,7 +474,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     /**
      * Set the value of [catalogue_signature] column.
      *
-     * @param string $v new value
+     * @param  string $v new value
      * @return CopyLocation The current object (for fluent API support)
      */
     public function setCatalogueSignature($v)
@@ -482,7 +495,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     /**
      * Set the value of [catalogue_internal] column.
      *
-     * @param string $v new value
+     * @param  string $v new value
      * @return CopyLocation The current object (for fluent API support)
      */
     public function setCatalogueInternal($v)
@@ -503,7 +516,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     /**
      * Set the value of [catalogue_url] column.
      *
-     * @param string $v new value
+     * @param  string $v new value
      * @return CopyLocation The current object (for fluent API support)
      */
     public function setCatalogueUrl($v)
@@ -524,7 +537,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     /**
      * Set the value of [numfaksimiles] column.
      * Anzahl Faksimiles
-     * @param int $v new value
+     * @param  int $v new value
      * @return CopyLocation The current object (for fluent API support)
      */
     public function setNumfaksimiles($v)
@@ -545,7 +558,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     /**
      * Set the value of [catalogue_extent] column.
      * Umfang laut Katalog
-     * @param string $v new value
+     * @param  string $v new value
      * @return CopyLocation The current object (for fluent API support)
      */
     public function setCatalogueExtent($v)
@@ -595,7 +608,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     /**
      * Set the value of [comments] column.
      *
-     * @param string $v new value
+     * @param  string $v new value
      * @return CopyLocation The current object (for fluent API support)
      */
     public function setComments($v)
@@ -616,7 +629,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     /**
      * Set the value of [imageurl] column.
      * URL der Bilddigitalisate
-     * @param string $v new value
+     * @param  string $v new value
      * @return CopyLocation The current object (for fluent API support)
      */
     public function setImageurl($v)
@@ -637,7 +650,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     /**
      * Set the value of [imageurn] column.
      * URN der Bilddigitalisate
-     * @param string $v new value
+     * @param  string $v new value
      * @return CopyLocation The current object (for fluent API support)
      */
     public function setImageurn($v)
@@ -658,7 +671,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     /**
      * Set the value of [license_id] column.
      * Lizenz
-     * @param int $v new value
+     * @param  int $v new value
      * @return CopyLocation The current object (for fluent API support)
      */
     public function setLicenseId($v)
@@ -679,27 +692,6 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
 
         return $this;
     } // setLicenseId()
-
-    /**
-     * Set the value of [legacy_fundstellen_id] column.
-     *
-     * @param int $v new value
-     * @return CopyLocation The current object (for fluent API support)
-     */
-    public function setLegacyFundstellenId($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->legacy_fundstellen_id !== $v) {
-            $this->legacy_fundstellen_id = $v;
-            $this->modifiedColumns[] = CopyLocationPeer::LEGACY_FUNDSTELLEN_ID;
-        }
-
-
-        return $this;
-    } // setLegacyFundstellenId()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -770,7 +762,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
      * more tables.
      *
      * @param array $row The row returned by PDOStatement->fetch(PDO::FETCH_NUM)
-     * @param int $startcol 0-based offset column which indicates which restultset column to start with.
+     * @param int $startcol 0-based offset column which indicates which resultset column to start with.
      * @param boolean $rehydrate Whether this object is being re-hydrated from the database.
      * @return int             next starting column
      * @throws PropelException - Any caught Exception will be rewrapped as a PropelException.
@@ -792,9 +784,8 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
             $this->imageurl = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
             $this->imageurn = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
             $this->license_id = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
-            $this->legacy_fundstellen_id = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
-            $this->created_at = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
-            $this->updated_at = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+            $this->created_at = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+            $this->updated_at = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -803,7 +794,8 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 16; // 16 = CopyLocationPeer::NUM_HYDRATE_COLUMNS.
+
+            return $startcol + 15; // 15 = CopyLocationPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating CopyLocation object", $e);
@@ -877,6 +869,8 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
             $this->aPublication = null;
             $this->aPartner = null;
             $this->aLicense = null;
+            $this->collTasks = null;
+
         } // if (deep)
     }
 
@@ -1002,7 +996,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
             $this->alreadyInSave = true;
 
             // We call the save method on the following object(s) if they
-            // were passed to this object by their coresponding set
+            // were passed to this object by their corresponding set
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
@@ -1038,6 +1032,24 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
                 $this->resetModified();
             }
 
+            if ($this->tasksScheduledForDeletion !== null) {
+                if (!$this->tasksScheduledForDeletion->isEmpty()) {
+                    foreach ($this->tasksScheduledForDeletion as $task) {
+                        // need to save related object because we set the relation to null
+                        $task->save($con);
+                    }
+                    $this->tasksScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collTasks !== null) {
+                foreach ($this->collTasks as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             $this->alreadyInSave = false;
 
         }
@@ -1057,20 +1069,6 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     {
         $modifiedColumns = array();
         $index = 0;
-
-        $this->modifiedColumns[] = CopyLocationPeer::ID;
-        if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . CopyLocationPeer::ID . ')');
-        }
-        if (null === $this->id) {
-            try {
-                $stmt = $con->query("SELECT nextval('copy_location_id_seq')");
-                $row = $stmt->fetch(PDO::FETCH_NUM);
-                $this->id = $row[0];
-            } catch (Exception $e) {
-                throw new PropelException('Unable to get sequence id.', $e);
-            }
-        }
 
 
          // check the columns in natural order for more readable SQL queries
@@ -1112,9 +1110,6 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
         }
         if ($this->isColumnModified(CopyLocationPeer::LICENSE_ID)) {
             $modifiedColumns[':p' . $index++]  = '"license_id"';
-        }
-        if ($this->isColumnModified(CopyLocationPeer::LEGACY_FUNDSTELLEN_ID)) {
-            $modifiedColumns[':p' . $index++]  = '"legacy_fundstellen_id"';
         }
         if ($this->isColumnModified(CopyLocationPeer::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '"created_at"';
@@ -1171,9 +1166,6 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
                         break;
                     case '"license_id"':
                         $stmt->bindValue($identifier, $this->license_id, PDO::PARAM_INT);
-                        break;
-                    case '"legacy_fundstellen_id"':
-                        $stmt->bindValue($identifier, $this->legacy_fundstellen_id, PDO::PARAM_INT);
                         break;
                     case '"created_at"':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
@@ -1254,10 +1246,10 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
      *
      * In addition to checking the current object, all related objects will
      * also be validated.  If all pass then <code>true</code> is returned; otherwise
-     * an aggreagated array of ValidationFailed objects will be returned.
+     * an aggregated array of ValidationFailed objects will be returned.
      *
      * @param array $columns Array of column names to validate.
-     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objets otherwise.
+     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objects otherwise.
      */
     protected function doValidate($columns = null)
     {
@@ -1269,7 +1261,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
 
 
             // We call the validate method on the following object(s) if they
-            // were passed to this object by their coresponding set
+            // were passed to this object by their corresponding set
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
@@ -1296,6 +1288,14 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
                 $failureMap = array_merge($failureMap, $retval);
             }
 
+
+                if ($this->collTasks !== null) {
+                    foreach ($this->collTasks as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
 
 
             $this->alreadyInValidation = false;
@@ -1372,12 +1372,9 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
                 return $this->getLicenseId();
                 break;
             case 13:
-                return $this->getLegacyFundstellenId();
-                break;
-            case 14:
                 return $this->getCreatedAt();
                 break;
-            case 15:
+            case 14:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1422,10 +1419,14 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
             $keys[10] => $this->getImageurl(),
             $keys[11] => $this->getImageurn(),
             $keys[12] => $this->getLicenseId(),
-            $keys[13] => $this->getLegacyFundstellenId(),
-            $keys[14] => $this->getCreatedAt(),
-            $keys[15] => $this->getUpdatedAt(),
+            $keys[13] => $this->getCreatedAt(),
+            $keys[14] => $this->getUpdatedAt(),
         );
+        $virtualColumns = $this->virtualColumns;
+        foreach ($virtualColumns as $key => $virtualColumn) {
+            $result[$key] = $virtualColumn;
+        }
+
         if ($includeForeignObjects) {
             if (null !== $this->aPublication) {
                 $result['Publication'] = $this->aPublication->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
@@ -1435,6 +1436,9 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
             }
             if (null !== $this->aLicense) {
                 $result['License'] = $this->aLicense->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->collTasks) {
+                $result['Tasks'] = $this->collTasks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1510,12 +1514,9 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
                 $this->setLicenseId($value);
                 break;
             case 13:
-                $this->setLegacyFundstellenId($value);
-                break;
-            case 14:
                 $this->setCreatedAt($value);
                 break;
-            case 15:
+            case 14:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1555,9 +1556,8 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
         if (array_key_exists($keys[10], $arr)) $this->setImageurl($arr[$keys[10]]);
         if (array_key_exists($keys[11], $arr)) $this->setImageurn($arr[$keys[11]]);
         if (array_key_exists($keys[12], $arr)) $this->setLicenseId($arr[$keys[12]]);
-        if (array_key_exists($keys[13], $arr)) $this->setLegacyFundstellenId($arr[$keys[13]]);
-        if (array_key_exists($keys[14], $arr)) $this->setCreatedAt($arr[$keys[14]]);
-        if (array_key_exists($keys[15], $arr)) $this->setUpdatedAt($arr[$keys[15]]);
+        if (array_key_exists($keys[13], $arr)) $this->setCreatedAt($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setUpdatedAt($arr[$keys[14]]);
     }
 
     /**
@@ -1582,7 +1582,6 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
         if ($this->isColumnModified(CopyLocationPeer::IMAGEURL)) $criteria->add(CopyLocationPeer::IMAGEURL, $this->imageurl);
         if ($this->isColumnModified(CopyLocationPeer::IMAGEURN)) $criteria->add(CopyLocationPeer::IMAGEURN, $this->imageurn);
         if ($this->isColumnModified(CopyLocationPeer::LICENSE_ID)) $criteria->add(CopyLocationPeer::LICENSE_ID, $this->license_id);
-        if ($this->isColumnModified(CopyLocationPeer::LEGACY_FUNDSTELLEN_ID)) $criteria->add(CopyLocationPeer::LEGACY_FUNDSTELLEN_ID, $this->legacy_fundstellen_id);
         if ($this->isColumnModified(CopyLocationPeer::CREATED_AT)) $criteria->add(CopyLocationPeer::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(CopyLocationPeer::UPDATED_AT)) $criteria->add(CopyLocationPeer::UPDATED_AT, $this->updated_at);
 
@@ -1660,7 +1659,6 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
         $copyObj->setImageurl($this->getImageurl());
         $copyObj->setImageurn($this->getImageurn());
         $copyObj->setLicenseId($this->getLicenseId());
-        $copyObj->setLegacyFundstellenId($this->getLegacyFundstellenId());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -1670,6 +1668,12 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
             $copyObj->setNew(false);
             // store object hash to prevent cycle
             $this->startCopy = true;
+
+            foreach ($this->getTasks() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addTask($relObj->copy($deepCopy));
+                }
+            }
 
             //unflag object copy
             $this->startCopy = false;
@@ -1724,7 +1728,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     /**
      * Declares an association between this object and a Publication object.
      *
-     * @param             Publication $v
+     * @param                  Publication $v
      * @return CopyLocation The current object (for fluent API support)
      * @throws PropelException
      */
@@ -1776,7 +1780,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     /**
      * Declares an association between this object and a Partner object.
      *
-     * @param             Partner $v
+     * @param                  Partner $v
      * @return CopyLocation The current object (for fluent API support)
      * @throws PropelException
      */
@@ -1828,7 +1832,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     /**
      * Declares an association between this object and a License object.
      *
-     * @param             License $v
+     * @param                  License $v
      * @return CopyLocation The current object (for fluent API support)
      * @throws PropelException
      */
@@ -1877,6 +1881,372 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
         return $this->aLicense;
     }
 
+
+    /**
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
+     *
+     * @param string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('Task' == $relationName) {
+            $this->initTasks();
+        }
+    }
+
+    /**
+     * Clears out the collTasks collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return CopyLocation The current object (for fluent API support)
+     * @see        addTasks()
+     */
+    public function clearTasks()
+    {
+        $this->collTasks = null; // important to set this to null since that means it is uninitialized
+        $this->collTasksPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collTasks collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialTasks($v = true)
+    {
+        $this->collTasksPartial = $v;
+    }
+
+    /**
+     * Initializes the collTasks collection.
+     *
+     * By default this just sets the collTasks collection to an empty array (like clearcollTasks());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initTasks($overrideExisting = true)
+    {
+        if (null !== $this->collTasks && !$overrideExisting) {
+            return;
+        }
+        $this->collTasks = new PropelObjectCollection();
+        $this->collTasks->setModel('Task');
+    }
+
+    /**
+     * Gets an array of Task objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this CopyLocation is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Task[] List of Task objects
+     * @throws PropelException
+     */
+    public function getTasks($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collTasksPartial && !$this->isNew();
+        if (null === $this->collTasks || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collTasks) {
+                // return empty collection
+                $this->initTasks();
+            } else {
+                $collTasks = TaskQuery::create(null, $criteria)
+                    ->filterByCopyLocation($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collTasksPartial && count($collTasks)) {
+                      $this->initTasks(false);
+
+                      foreach ($collTasks as $obj) {
+                        if (false == $this->collTasks->contains($obj)) {
+                          $this->collTasks->append($obj);
+                        }
+                      }
+
+                      $this->collTasksPartial = true;
+                    }
+
+                    $collTasks->getInternalIterator()->rewind();
+
+                    return $collTasks;
+                }
+
+                if ($partial && $this->collTasks) {
+                    foreach ($this->collTasks as $obj) {
+                        if ($obj->isNew()) {
+                            $collTasks[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collTasks = $collTasks;
+                $this->collTasksPartial = false;
+            }
+        }
+
+        return $this->collTasks;
+    }
+
+    /**
+     * Sets a collection of Task objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $tasks A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return CopyLocation The current object (for fluent API support)
+     */
+    public function setTasks(PropelCollection $tasks, PropelPDO $con = null)
+    {
+        $tasksToDelete = $this->getTasks(new Criteria(), $con)->diff($tasks);
+
+
+        $this->tasksScheduledForDeletion = $tasksToDelete;
+
+        foreach ($tasksToDelete as $taskRemoved) {
+            $taskRemoved->setCopyLocation(null);
+        }
+
+        $this->collTasks = null;
+        foreach ($tasks as $task) {
+            $this->addTask($task);
+        }
+
+        $this->collTasks = $tasks;
+        $this->collTasksPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Task objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Task objects.
+     * @throws PropelException
+     */
+    public function countTasks(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collTasksPartial && !$this->isNew();
+        if (null === $this->collTasks || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collTasks) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getTasks());
+            }
+            $query = TaskQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByCopyLocation($this)
+                ->count($con);
+        }
+
+        return count($this->collTasks);
+    }
+
+    /**
+     * Method called to associate a Task object to this object
+     * through the Task foreign key attribute.
+     *
+     * @param    Task $l Task
+     * @return CopyLocation The current object (for fluent API support)
+     */
+    public function addTask(Task $l)
+    {
+        if ($this->collTasks === null) {
+            $this->initTasks();
+            $this->collTasksPartial = true;
+        }
+
+        if (!in_array($l, $this->collTasks->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddTask($l);
+
+            if ($this->tasksScheduledForDeletion and $this->tasksScheduledForDeletion->contains($l)) {
+                $this->tasksScheduledForDeletion->remove($this->tasksScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Task $task The task object to add.
+     */
+    protected function doAddTask($task)
+    {
+        $this->collTasks[]= $task;
+        $task->setCopyLocation($this);
+    }
+
+    /**
+     * @param	Task $task The task object to remove.
+     * @return CopyLocation The current object (for fluent API support)
+     */
+    public function removeTask($task)
+    {
+        if ($this->getTasks()->contains($task)) {
+            $this->collTasks->remove($this->collTasks->search($task));
+            if (null === $this->tasksScheduledForDeletion) {
+                $this->tasksScheduledForDeletion = clone $this->collTasks;
+                $this->tasksScheduledForDeletion->clear();
+            }
+            $this->tasksScheduledForDeletion[]= $task;
+            $task->setCopyLocation(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this CopyLocation is new, it will return
+     * an empty collection; or if this CopyLocation has previously
+     * been saved, it will retrieve related Tasks from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in CopyLocation.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Task[] List of Task objects
+     */
+    public function getTasksJoinTasktype($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = TaskQuery::create(null, $criteria);
+        $query->joinWith('Tasktype', $join_behavior);
+
+        return $this->getTasks($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this CopyLocation is new, it will return
+     * an empty collection; or if this CopyLocation has previously
+     * been saved, it will retrieve related Tasks from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in CopyLocation.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Task[] List of Task objects
+     */
+    public function getTasksJoinPublicationgroup($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = TaskQuery::create(null, $criteria);
+        $query->joinWith('Publicationgroup', $join_behavior);
+
+        return $this->getTasks($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this CopyLocation is new, it will return
+     * an empty collection; or if this CopyLocation has previously
+     * been saved, it will retrieve related Tasks from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in CopyLocation.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Task[] List of Task objects
+     */
+    public function getTasksJoinPublication($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = TaskQuery::create(null, $criteria);
+        $query->joinWith('Publication', $join_behavior);
+
+        return $this->getTasks($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this CopyLocation is new, it will return
+     * an empty collection; or if this CopyLocation has previously
+     * been saved, it will retrieve related Tasks from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in CopyLocation.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Task[] List of Task objects
+     */
+    public function getTasksJoinPartner($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = TaskQuery::create(null, $criteria);
+        $query->joinWith('Partner', $join_behavior);
+
+        return $this->getTasks($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this CopyLocation is new, it will return
+     * an empty collection; or if this CopyLocation has previously
+     * been saved, it will retrieve related Tasks from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in CopyLocation.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Task[] List of Task objects
+     */
+    public function getTasksJoinDtaUser($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = TaskQuery::create(null, $criteria);
+        $query->joinWith('DtaUser', $join_behavior);
+
+        return $this->getTasks($query, $con);
+    }
+
     /**
      * Clears the current object and sets all attributes to their default values
      */
@@ -1895,7 +2265,6 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
         $this->imageurl = null;
         $this->imageurn = null;
         $this->license_id = null;
-        $this->legacy_fundstellen_id = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -1912,7 +2281,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
      *
      * This method is a user-space workaround for PHP's inability to garbage collect
      * objects with circular references (even in PHP 5.3). This is currently necessary
-     * when using Propel in certain daemon or large-volumne/high-memory operations.
+     * when using Propel in certain daemon or large-volume/high-memory operations.
      *
      * @param boolean $deep Whether to also clear the references on all referrer objects.
      */
@@ -1920,6 +2289,11 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->collTasks) {
+                foreach ($this->collTasks as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->aPublication instanceof Persistent) {
               $this->aPublication->clearAllReferences($deep);
             }
@@ -1933,6 +2307,10 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
+        if ($this->collTasks instanceof PropelCollection) {
+            $this->collTasks->clearIterator();
+        }
+        $this->collTasks = null;
         $this->aPublication = null;
         $this->aPartner = null;
         $this->aLicense = null;
@@ -2020,42 +2398,6 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     }
 
     /**
-     * Cascades the get to a related entity (possibly recursively)
-     */
-
-    public function getEmbeddedColumn1OfPartner(){
-
-        $relatedEntity = $this->getPartner();
-        return $relatedEntity->getAttributeByTableViewColumName("Name");
-
-    }    /**
-     * Cascades the get to a related entity (possibly recursively)
-     */
-
-    public function getEmbeddedColumn2OfPartner(){
-
-        $relatedEntity = $this->getPartner();
-        return $relatedEntity->getAttributeByTableViewColumName("Ansprechpartner");
-
-    }    /**
-     * Cascades the get to a related entity (possibly recursively)
-     */
-
-    public function getEmbeddedColumn3OfPartner(){
-
-        $relatedEntity = $this->getPartner();
-        return $relatedEntity->getAttributeByTableViewColumName("Mail");
-
-    }    /**
-     * Cascades the get to a related entity (possibly recursively)
-     */
-
-    public function getEmbeddedColumn4OfPartner(){
-
-        $relatedEntity = $this->getPartner();
-        return $relatedEntity->getAttributeByTableViewColumName("Web");
-
-    }    /**
      * Cascades the get to a related entity (possibly recursively)
      */
 

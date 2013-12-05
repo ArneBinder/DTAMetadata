@@ -93,6 +93,19 @@ CREATE TABLE "genre"
 );
 
 -----------------------------------------------------------------------
+-- source
+-----------------------------------------------------------------------
+
+DROP TABLE IF EXISTS "source" CASCADE;
+
+CREATE TABLE "source"
+(
+    "id" serial NOT NULL,
+    "name" TEXT NOT NULL,
+    PRIMARY KEY ("id")
+);
+
+-----------------------------------------------------------------------
 -- publication
 -----------------------------------------------------------------------
 
@@ -100,13 +113,14 @@ DROP TABLE IF EXISTS "publication" CASCADE;
 
 CREATE TABLE "publication"
 (
-    "id" serial NOT NULL,
+    "id" INTEGER NOT NULL,
     "title_id" INTEGER NOT NULL,
     "firsteditionpublication_id" INTEGER,
     "place_id" INTEGER,
     "publicationdate_id" INTEGER,
     "creationdate_id" INTEGER,
     "publishingcompany_id" INTEGER,
+    "source_id" INTEGER,
     "partner_id" INTEGER,
     "editiondescription" TEXT,
     "digitaleditioneditor" TEXT,
@@ -120,12 +134,10 @@ CREATE TABLE "publication"
     "directoryname" TEXT,
     "wwwready" INTEGER,
     "last_changed_by_user_id" INTEGER,
-    "legacy_book_id" INTEGER,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
     "publishingcompany_id_is_reconstructed" BOOLEAN DEFAULT 'f',
-    PRIMARY KEY ("id"),
-    CONSTRAINT "publication_U_1" UNIQUE ("legacy_book_id")
+    PRIMARY KEY ("id")
 );
 
 COMMENT ON COLUMN "publication"."firsteditionpublication_id" IS 'Publikation, die die Informationen zur Erstauflage enthält';
@@ -137,6 +149,8 @@ COMMENT ON COLUMN "publication"."publicationdate_id" IS 'Erscheinungsjahr';
 COMMENT ON COLUMN "publication"."creationdate_id" IS 'Erscheinungsjahr der Erstausgabe';
 
 COMMENT ON COLUMN "publication"."publishingcompany_id" IS 'Verlag';
+
+COMMENT ON COLUMN "publication"."source_id" IS 'Zur Sicherheit aus der alten DB übernommen';
 
 COMMENT ON COLUMN "publication"."partner_id" IS 'akquiriert über';
 
@@ -153,8 +167,6 @@ COMMENT ON COLUMN "publication"."numpagesnumeric" IS 'Umfang (normiert)';
 COMMENT ON COLUMN "publication"."comment" IS 'Anmerkungen';
 
 COMMENT ON COLUMN "publication"."encoding_comment" IS 'Kommentar Encoding';
-
-COMMENT ON COLUMN "publication"."legacy_book_id" IS 'id_book des Datensatzes aus der alten Datenbank, der dem neuen Datensatz zugrundeliegt.';
 
 -----------------------------------------------------------------------
 -- publication_m
@@ -456,9 +468,9 @@ DROP TABLE IF EXISTS "language_publication" CASCADE;
 
 CREATE TABLE "language_publication"
 (
+    "id" serial NOT NULL,
     "language_id" INTEGER NOT NULL,
     "publication_id" INTEGER NOT NULL,
-    "id" serial NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -470,9 +482,9 @@ DROP TABLE IF EXISTS "genre_publication" CASCADE;
 
 CREATE TABLE "genre_publication"
 (
+    "id" serial NOT NULL,
     "genre_id" INTEGER NOT NULL,
     "publication_id" INTEGER NOT NULL,
-    "id" serial NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -484,9 +496,9 @@ DROP TABLE IF EXISTS "publication_tag" CASCADE;
 
 CREATE TABLE "publication_tag"
 (
+    "id" serial NOT NULL,
     "tag_id" INTEGER NOT NULL,
     "publication_id" INTEGER NOT NULL,
-    "id" serial NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -498,9 +510,9 @@ DROP TABLE IF EXISTS "category_publication" CASCADE;
 
 CREATE TABLE "category_publication"
 (
+    "id" serial NOT NULL,
     "category_id" INTEGER NOT NULL,
     "publication_id" INTEGER NOT NULL,
-    "id" serial NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -512,9 +524,9 @@ DROP TABLE IF EXISTS "font_publication" CASCADE;
 
 CREATE TABLE "font_publication"
 (
+    "id" serial NOT NULL,
     "font_id" INTEGER NOT NULL,
     "publication_id" INTEGER NOT NULL,
-    "id" serial NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -526,9 +538,9 @@ DROP TABLE IF EXISTS "publication_publicationgroup" CASCADE;
 
 CREATE TABLE "publication_publicationgroup"
 (
+    "id" serial NOT NULL,
     "publicationgroup_id" INTEGER NOT NULL,
     "publication_id" INTEGER NOT NULL,
-    "id" serial NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -540,10 +552,10 @@ DROP TABLE IF EXISTS "person_publication" CASCADE;
 
 CREATE TABLE "person_publication"
 (
+    "id" serial NOT NULL,
     "person_id" INTEGER NOT NULL,
     "personrole_id" INTEGER NOT NULL,
     "publication_id" INTEGER NOT NULL,
-    "id" serial NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -555,10 +567,10 @@ DROP TABLE IF EXISTS "recent_use" CASCADE;
 
 CREATE TABLE "recent_use"
 (
+    "id" serial NOT NULL,
     "dta_user_id" INTEGER NOT NULL,
     "publication_id" INTEGER NOT NULL,
     "date" TIMESTAMP NOT NULL,
-    "id" serial NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -570,17 +582,14 @@ DROP TABLE IF EXISTS "dta_user" CASCADE;
 
 CREATE TABLE "dta_user"
 (
+    "id" INTEGER NOT NULL,
     "username" TEXT,
     "password" VARCHAR(512),
     "salt" VARCHAR(512),
     "mail" TEXT,
     "admin" BOOLEAN DEFAULT 'f',
-    "legacy_user_id" INTEGER,
-    "id" serial NOT NULL,
     PRIMARY KEY ("id")
 );
-
-COMMENT ON COLUMN "dta_user"."legacy_user_id" IS 'id_user der alten Datenbank, die dem Datensatz zugrundeliegt.';
 
 -----------------------------------------------------------------------
 -- task
@@ -590,9 +599,9 @@ DROP TABLE IF EXISTS "task" CASCADE;
 
 CREATE TABLE "task"
 (
-    "id" serial NOT NULL,
+    "id" INTEGER NOT NULL,
     "tasktype_id" INTEGER NOT NULL,
-    "done" BOOLEAN,
+    "closed" BOOLEAN,
     "start_date" DATE,
     "end_date" DATE,
     "comments" TEXT,
@@ -600,6 +609,7 @@ CREATE TABLE "task"
     "publication_id" INTEGER,
     "partner_id" INTEGER,
     "responsibleuser_id" INTEGER,
+    "copylocation_id" INTEGER,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
@@ -613,9 +623,8 @@ DROP TABLE IF EXISTS "tasktype" CASCADE;
 
 CREATE TABLE "tasktype"
 (
-    "id" serial NOT NULL,
+    "id" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
-    "legacy_tasktype_id" INTEGER,
     "tree_left" INTEGER,
     "tree_right" INTEGER,
     "tree_level" INTEGER,
@@ -630,9 +639,9 @@ DROP TABLE IF EXISTS "copy_location" CASCADE;
 
 CREATE TABLE "copy_location"
 (
-    "id" serial NOT NULL,
+    "id" INTEGER NOT NULL,
     "publication_id" INTEGER NOT NULL,
-    "partner_id" INTEGER NOT NULL,
+    "partner_id" INTEGER,
     "catalogue_signature" TEXT,
     "catalogue_internal" TEXT,
     "catalogue_url" TEXT,
@@ -643,7 +652,6 @@ CREATE TABLE "copy_location"
     "imageurl" TEXT,
     "imageurn" TEXT,
     "license_id" INTEGER,
-    "legacy_fundstellen_id" INTEGER,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
@@ -669,7 +677,7 @@ DROP TABLE IF EXISTS "partner" CASCADE;
 
 CREATE TABLE "partner"
 (
-    "id" serial NOT NULL,
+    "id" INTEGER NOT NULL,
     "name" TEXT,
     "mail" TEXT,
     "web" TEXT,
@@ -677,15 +685,12 @@ CREATE TABLE "partner"
     "contactdata" TEXT,
     "comments" TEXT,
     "is_organization" BOOLEAN DEFAULT 'f',
-    "legacy_partner_id" INTEGER,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
 COMMENT ON COLUMN "partner"."contact_person" IS 'Ansprechpartner';
-
-COMMENT ON COLUMN "partner"."legacy_partner_id" IS 'partner.id_book_location des Datensatzes aus der alten Datenbank, der dem neuen Datensatz zugrundeliegt.';
 
 -----------------------------------------------------------------------
 -- imagesource
@@ -755,13 +760,10 @@ DROP TABLE IF EXISTS "publicationgroup" CASCADE;
 
 CREATE TABLE "publicationgroup"
 (
-    "id" serial NOT NULL,
+    "id" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
-    "legacy_group_id" INTEGER,
     PRIMARY KEY ("id")
 );
-
-COMMENT ON COLUMN "publicationgroup"."legacy_group_id" IS 'id_group der alten Datenbank, die dem Datensatz zugrundeliegt.';
 
 ALTER TABLE "category" ADD CONSTRAINT "category_FK_1"
     FOREIGN KEY ("categorytype_id")
@@ -772,22 +774,26 @@ ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_1"
     REFERENCES "title" ("id");
 
 ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_2"
+    FOREIGN KEY ("source_id")
+    REFERENCES "source" ("id");
+
+ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_3"
     FOREIGN KEY ("publishingcompany_id")
     REFERENCES "publishingcompany" ("id");
 
-ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_3"
+ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_4"
     FOREIGN KEY ("place_id")
     REFERENCES "place" ("id");
 
-ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_4"
+ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_5"
     FOREIGN KEY ("publicationdate_id")
     REFERENCES "datespecification" ("id");
 
-ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_5"
+ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_6"
     FOREIGN KEY ("creationdate_id")
     REFERENCES "datespecification" ("id");
 
-ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_6"
+ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_7"
     FOREIGN KEY ("last_changed_by_user_id")
     REFERENCES "dta_user" ("id");
 
@@ -953,6 +959,10 @@ ALTER TABLE "task" ADD CONSTRAINT "task_FK_4"
 ALTER TABLE "task" ADD CONSTRAINT "task_FK_5"
     FOREIGN KEY ("responsibleuser_id")
     REFERENCES "dta_user" ("id");
+
+ALTER TABLE "task" ADD CONSTRAINT "task_FK_6"
+    FOREIGN KEY ("copylocation_id")
+    REFERENCES "copy_location" ("id");
 
 ALTER TABLE "copy_location" ADD CONSTRAINT "copy_location_FK_1"
     FOREIGN KEY ("publication_id")

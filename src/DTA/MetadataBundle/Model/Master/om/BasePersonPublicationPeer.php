@@ -29,7 +29,7 @@ abstract class BasePersonPublicationPeer
     const OM_CLASS = 'DTA\\MetadataBundle\\Model\\Master\\PersonPublication';
 
     /** the related TableMap class for this table */
-    const TM_CLASS = 'PersonPublicationTableMap';
+    const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Master\\map\\PersonPublicationTableMap';
 
     /** The total number of columns. */
     const NUM_COLUMNS = 4;
@@ -40,6 +40,9 @@ abstract class BasePersonPublicationPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 4;
 
+    /** the column name for the id field */
+    const ID = 'person_publication.id';
+
     /** the column name for the person_id field */
     const PERSON_ID = 'person_publication.person_id';
 
@@ -49,14 +52,11 @@ abstract class BasePersonPublicationPeer
     /** the column name for the publication_id field */
     const PUBLICATION_ID = 'person_publication.publication_id';
 
-    /** the column name for the id field */
-    const ID = 'person_publication.id';
-
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
 
     /**
-     * An identiy map to hold any loaded instances of PersonPublication objects.
+     * An identity map to hold any loaded instances of PersonPublication objects.
      * This must be public so that other peer classes can access this when hydrating from JOIN
      * queries.
      * @var        array PersonPublication[]
@@ -71,11 +71,11 @@ abstract class BasePersonPublicationPeer
      * e.g. PersonPublicationPeer::$fieldNames[PersonPublicationPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('PersonId', 'PersonroleId', 'PublicationId', 'Id', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('personId', 'personroleId', 'publicationId', 'id', ),
-        BasePeer::TYPE_COLNAME => array (PersonPublicationPeer::PERSON_ID, PersonPublicationPeer::PERSONROLE_ID, PersonPublicationPeer::PUBLICATION_ID, PersonPublicationPeer::ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('PERSON_ID', 'PERSONROLE_ID', 'PUBLICATION_ID', 'ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('person_id', 'personrole_id', 'publication_id', 'id', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'PersonId', 'PersonroleId', 'PublicationId', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'personId', 'personroleId', 'publicationId', ),
+        BasePeer::TYPE_COLNAME => array (PersonPublicationPeer::ID, PersonPublicationPeer::PERSON_ID, PersonPublicationPeer::PERSONROLE_ID, PersonPublicationPeer::PUBLICATION_ID, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PERSON_ID', 'PERSONROLE_ID', 'PUBLICATION_ID', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'person_id', 'personrole_id', 'publication_id', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
@@ -86,11 +86,11 @@ abstract class BasePersonPublicationPeer
      * e.g. PersonPublicationPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('PersonId' => 0, 'PersonroleId' => 1, 'PublicationId' => 2, 'Id' => 3, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('personId' => 0, 'personroleId' => 1, 'publicationId' => 2, 'id' => 3, ),
-        BasePeer::TYPE_COLNAME => array (PersonPublicationPeer::PERSON_ID => 0, PersonPublicationPeer::PERSONROLE_ID => 1, PersonPublicationPeer::PUBLICATION_ID => 2, PersonPublicationPeer::ID => 3, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('PERSON_ID' => 0, 'PERSONROLE_ID' => 1, 'PUBLICATION_ID' => 2, 'ID' => 3, ),
-        BasePeer::TYPE_FIELDNAME => array ('person_id' => 0, 'personrole_id' => 1, 'publication_id' => 2, 'id' => 3, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PersonId' => 1, 'PersonroleId' => 2, 'PublicationId' => 3, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'personId' => 1, 'personroleId' => 2, 'publicationId' => 3, ),
+        BasePeer::TYPE_COLNAME => array (PersonPublicationPeer::ID => 0, PersonPublicationPeer::PERSON_ID => 1, PersonPublicationPeer::PERSONROLE_ID => 2, PersonPublicationPeer::PUBLICATION_ID => 3, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PERSON_ID' => 1, 'PERSONROLE_ID' => 2, 'PUBLICATION_ID' => 3, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'person_id' => 1, 'personrole_id' => 2, 'publication_id' => 3, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
@@ -165,15 +165,15 @@ abstract class BasePersonPublicationPeer
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
+            $criteria->addSelectColumn(PersonPublicationPeer::ID);
             $criteria->addSelectColumn(PersonPublicationPeer::PERSON_ID);
             $criteria->addSelectColumn(PersonPublicationPeer::PERSONROLE_ID);
             $criteria->addSelectColumn(PersonPublicationPeer::PUBLICATION_ID);
-            $criteria->addSelectColumn(PersonPublicationPeer::ID);
         } else {
+            $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.person_id');
             $criteria->addSelectColumn($alias . '.personrole_id');
             $criteria->addSelectColumn($alias . '.publication_id');
-            $criteria->addSelectColumn($alias . '.id');
         }
     }
 
@@ -226,7 +226,7 @@ abstract class BasePersonPublicationPeer
      *
      * @param      Criteria $criteria object used to create the SELECT statement.
      * @param      PropelPDO $con
-     * @return                 PersonPublication
+     * @return PersonPublication
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -293,7 +293,7 @@ abstract class BasePersonPublicationPeer
      * to the cache in order to ensure that the same objects are always returned by doSelect*()
      * and retrieveByPK*() calls.
      *
-     * @param      PersonPublication $obj A PersonPublication object.
+     * @param PersonPublication $obj A PersonPublication object.
      * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
     public static function addInstanceToPool($obj, $key = null)
@@ -343,7 +343,7 @@ abstract class BasePersonPublicationPeer
      * a multi-column primary key, a serialize()d version of the primary key will be returned.
      *
      * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-     * @return   PersonPublication Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+     * @return PersonPublication Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
      * @see        getPrimaryKeyHash()
      */
     public static function getInstanceFromPool($key)
@@ -364,10 +364,8 @@ abstract class BasePersonPublicationPeer
      */
     public static function clearInstancePool($and_clear_all_references = false)
     {
-      if ($and_clear_all_references)
-      {
-        foreach (PersonPublicationPeer::$instances as $instance)
-        {
+      if ($and_clear_all_references) {
+        foreach (PersonPublicationPeer::$instances as $instance) {
           $instance->clearAllReferences(true);
         }
       }
@@ -395,11 +393,11 @@ abstract class BasePersonPublicationPeer
     public static function getPrimaryKeyHashFromRow($row, $startcol = 0)
     {
         // If the PK cannot be derived from the row, return null.
-        if ($row[$startcol + 3] === null) {
+        if ($row[$startcol] === null) {
             return null;
         }
 
-        return (string) $row[$startcol + 3];
+        return (string) $row[$startcol];
     }
 
     /**
@@ -414,7 +412,7 @@ abstract class BasePersonPublicationPeer
     public static function getPrimaryKeyFromRow($row, $startcol = 0)
     {
 
-        return (int) $row[$startcol + 3];
+        return (int) $row[$startcol];
     }
 
     /**
@@ -1472,7 +1470,7 @@ abstract class BasePersonPublicationPeer
     {
       $dbMap = Propel::getDatabaseMap(BasePersonPublicationPeer::DATABASE_NAME);
       if (!$dbMap->hasTable(BasePersonPublicationPeer::TABLE_NAME)) {
-        $dbMap->addTableObject(new PersonPublicationTableMap());
+        $dbMap->addTableObject(new \DTA\MetadataBundle\Model\Master\map\PersonPublicationTableMap());
       }
     }
 
@@ -1522,7 +1520,7 @@ abstract class BasePersonPublicationPeer
             $con->beginTransaction();
             $pk = BasePeer::doInsert($criteria, $con);
             $con->commit();
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -1595,7 +1593,7 @@ abstract class BasePersonPublicationPeer
             $con->commit();
 
             return $affectedRows;
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -1654,7 +1652,7 @@ abstract class BasePersonPublicationPeer
             $con->commit();
 
             return $affectedRows;
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -1667,7 +1665,7 @@ abstract class BasePersonPublicationPeer
      *
      * NOTICE: This does not apply to primary or foreign keys for now.
      *
-     * @param      PersonPublication $obj The object to validate.
+     * @param PersonPublication $obj The object to validate.
      * @param      mixed $cols Column name or array of column names.
      *
      * @return mixed TRUE if all columns are valid or the error message of the first invalid column.
@@ -1700,7 +1698,7 @@ abstract class BasePersonPublicationPeer
     /**
      * Retrieve a single object by pkey.
      *
-     * @param      int $pk the primary key.
+     * @param int $pk the primary key.
      * @param      PropelPDO $con the connection to use
      * @return PersonPublication
      */

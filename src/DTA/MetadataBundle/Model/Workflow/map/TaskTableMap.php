@@ -40,12 +40,11 @@ class TaskTableMap extends TableMap
         $this->setPhpName('Task');
         $this->setClassname('DTA\\MetadataBundle\\Model\\Workflow\\Task');
         $this->setPackage('src.DTA.MetadataBundle.Model.Workflow');
-        $this->setUseIdGenerator(true);
-        $this->setPrimaryKeyMethodInfo('task_id_seq');
+        $this->setUseIdGenerator(false);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('tasktype_id', 'TasktypeId', 'INTEGER', 'tasktype', 'id', true, null, null);
-        $this->addColumn('done', 'Done', 'BOOLEAN', false, null, null);
+        $this->addColumn('closed', 'Closed', 'BOOLEAN', false, null, null);
         $this->addColumn('start_date', 'StartDate', 'DATE', false, null, null);
         $this->addColumn('end_date', 'EndDate', 'DATE', false, null, null);
         $this->addColumn('comments', 'Comments', 'LONGVARCHAR', false, null, null);
@@ -53,6 +52,7 @@ class TaskTableMap extends TableMap
         $this->addForeignKey('publication_id', 'PublicationId', 'INTEGER', 'publication', 'id', false, null, null);
         $this->addForeignKey('partner_id', 'PartnerId', 'INTEGER', 'partner', 'id', false, null, null);
         $this->addForeignKey('responsibleuser_id', 'ResponsibleuserId', 'INTEGER', 'dta_user', 'id', false, null, null);
+        $this->addForeignKey('copylocation_id', 'CopylocationId', 'INTEGER', 'copy_location', 'id', false, null, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
@@ -68,6 +68,7 @@ class TaskTableMap extends TableMap
         $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::MANY_TO_ONE, array('publication_id' => 'id', ), null, null);
         $this->addRelation('Partner', 'DTA\\MetadataBundle\\Model\\Workflow\\Partner', RelationMap::MANY_TO_ONE, array('partner_id' => 'id', ), null, null);
         $this->addRelation('DtaUser', 'DTA\\MetadataBundle\\Model\\Master\\DtaUser', RelationMap::MANY_TO_ONE, array('responsibleuser_id' => 'id', ), null, null);
+        $this->addRelation('CopyLocation', 'DTA\\MetadataBundle\\Model\\Workflow\\CopyLocation', RelationMap::MANY_TO_ONE, array('copylocation_id' => 'id', ), null, null);
     } // buildRelations()
 
     /**
@@ -86,11 +87,12 @@ class TaskTableMap extends TableMap
 ),
             'table_row_view' =>  array (
   'embedColumns1' => 'tasktype',
-  'Abgeschlossen' => 'done',
+  'Abgeschlossen' => 'closed',
   'Start' => 'start_date',
   'Ende' => 'end_date',
   'Für' => 'accessor:getReferee',
   'Verantwortlich' => 'accessor:getResponsibleUser',
+  'query' => '\\DTA\\MetadataBundle\\Model\\Workflow\\TaskQuery::create()                     ->leftJoinWith(\'Publication\')                     ->leftJoinWith(\'Publication.Title\')                     ->leftJoinWith(\'Title.Titlefragment\')                     ->leftJoinWith(\'Tasktype\')                     ->leftJoinWith(\'DtaUser\');',
 ),
         );
     } // getBehaviors()

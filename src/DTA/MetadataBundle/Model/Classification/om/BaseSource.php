@@ -9,29 +9,33 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
+use \PropelCollection;
 use \PropelException;
+use \PropelObjectCollection;
 use \PropelPDO;
-use DTA\MetadataBundle\Model\Classification\Corpus;
-use DTA\MetadataBundle\Model\Classification\CorpusPeer;
-use DTA\MetadataBundle\Model\Classification\CorpusQuery;
+use DTA\MetadataBundle\Model\Classification\Source;
+use DTA\MetadataBundle\Model\Classification\SourcePeer;
+use DTA\MetadataBundle\Model\Classification\SourceQuery;
+use DTA\MetadataBundle\Model\Data\Publication;
+use DTA\MetadataBundle\Model\Data\PublicationQuery;
 
-abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\MetadataBundle\Model\table_row_view\TableRowViewInterface
+abstract class BaseSource extends BaseObject implements Persistent, \DTA\MetadataBundle\Model\table_row_view\TableRowViewInterface
 {
     /**
      * Peer class name
      */
-    const PEER = 'DTA\\MetadataBundle\\Model\\Classification\\CorpusPeer';
+    const PEER = 'DTA\\MetadataBundle\\Model\\Classification\\SourcePeer';
 
     /**
      * The Peer class.
      * Instance provides a convenient way of calling static methods on a class
      * that calling code may not be able to identify.
-     * @var        CorpusPeer
+     * @var        SourcePeer
      */
     protected static $peer;
 
     /**
-     * The flag var to prevent infinit loop in deep copy
+     * The flag var to prevent infinite loop in deep copy
      * @var       boolean
      */
     protected $startCopy = false;
@@ -47,6 +51,12 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
      * @var        string
      */
     protected $name;
+
+    /**
+     * @var        PropelObjectCollection|Publication[] Collection to store aggregation of Publication objects.
+     */
+    protected $collPublications;
+    protected $collPublicationsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -69,7 +79,13 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Id', 'Name', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'Name'=>'Name', );
+    public static $tableRowViewCaptions = array('name', );	public   $tableRowViewAccessors = array('name'=>'Name', );	public static $queryConstructionString = NULL;
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $publicationsScheduledForDeletion = null;
+
     /**
      * Get the [id] column value.
      *
@@ -77,6 +93,7 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
      */
     public function getId()
     {
+
         return $this->id;
     }
 
@@ -87,14 +104,15 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
      */
     public function getName()
     {
+
         return $this->name;
     }
 
     /**
      * Set the value of [id] column.
      *
-     * @param int $v new value
-     * @return Corpus The current object (for fluent API support)
+     * @param  int $v new value
+     * @return Source The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -104,7 +122,7 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = CorpusPeer::ID;
+            $this->modifiedColumns[] = SourcePeer::ID;
         }
 
 
@@ -114,8 +132,8 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
     /**
      * Set the value of [name] column.
      *
-     * @param string $v new value
-     * @return Corpus The current object (for fluent API support)
+     * @param  string $v new value
+     * @return Source The current object (for fluent API support)
      */
     public function setName($v)
     {
@@ -125,7 +143,7 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
 
         if ($this->name !== $v) {
             $this->name = $v;
-            $this->modifiedColumns[] = CorpusPeer::NAME;
+            $this->modifiedColumns[] = SourcePeer::NAME;
         }
 
 
@@ -155,7 +173,7 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
      * more tables.
      *
      * @param array $row The row returned by PDOStatement->fetch(PDO::FETCH_NUM)
-     * @param int $startcol 0-based offset column which indicates which restultset column to start with.
+     * @param int $startcol 0-based offset column which indicates which resultset column to start with.
      * @param boolean $rehydrate Whether this object is being re-hydrated from the database.
      * @return int             next starting column
      * @throws PropelException - Any caught Exception will be rewrapped as a PropelException.
@@ -174,10 +192,11 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 2; // 2 = CorpusPeer::NUM_HYDRATE_COLUMNS.
+
+            return $startcol + 2; // 2 = SourcePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating Corpus object", $e);
+            throw new PropelException("Error populating Source object", $e);
         }
     }
 
@@ -220,13 +239,13 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(CorpusPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(SourcePeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $stmt = CorpusPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+        $stmt = SourcePeer::doSelectStmt($this->buildPkeyCriteria(), $con);
         $row = $stmt->fetch(PDO::FETCH_NUM);
         $stmt->closeCursor();
         if (!$row) {
@@ -235,6 +254,8 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
         $this->hydrate($row, 0, true); // rehydrate
 
         if ($deep) {  // also de-associate any related objects?
+
+            $this->collPublications = null;
 
         } // if (deep)
     }
@@ -256,12 +277,12 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(CorpusPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(SourcePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = CorpusQuery::create()
+            $deleteQuery = SourceQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -299,7 +320,7 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(CorpusPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(SourcePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         $con->beginTransaction();
@@ -319,7 +340,7 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                CorpusPeer::addInstanceToPool($this);
+                SourcePeer::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -360,6 +381,24 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
                 $this->resetModified();
             }
 
+            if ($this->publicationsScheduledForDeletion !== null) {
+                if (!$this->publicationsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->publicationsScheduledForDeletion as $publication) {
+                        // need to save related object because we set the relation to null
+                        $publication->save($con);
+                    }
+                    $this->publicationsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collPublications !== null) {
+                foreach ($this->collPublications as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             $this->alreadyInSave = false;
 
         }
@@ -380,13 +419,13 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = CorpusPeer::ID;
+        $this->modifiedColumns[] = SourcePeer::ID;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . CorpusPeer::ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . SourcePeer::ID . ')');
         }
         if (null === $this->id) {
             try {
-                $stmt = $con->query("SELECT nextval('corpus_id_seq')");
+                $stmt = $con->query("SELECT nextval('source_id_seq')");
                 $row = $stmt->fetch(PDO::FETCH_NUM);
                 $this->id = $row[0];
             } catch (Exception $e) {
@@ -396,15 +435,15 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
 
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(CorpusPeer::ID)) {
+        if ($this->isColumnModified(SourcePeer::ID)) {
             $modifiedColumns[':p' . $index++]  = '"id"';
         }
-        if ($this->isColumnModified(CorpusPeer::NAME)) {
+        if ($this->isColumnModified(SourcePeer::NAME)) {
             $modifiedColumns[':p' . $index++]  = '"name"';
         }
 
         $sql = sprintf(
-            'INSERT INTO "corpus" (%s) VALUES (%s)',
+            'INSERT INTO "source" (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -492,10 +531,10 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
      *
      * In addition to checking the current object, all related objects will
      * also be validated.  If all pass then <code>true</code> is returned; otherwise
-     * an aggreagated array of ValidationFailed objects will be returned.
+     * an aggregated array of ValidationFailed objects will be returned.
      *
      * @param array $columns Array of column names to validate.
-     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objets otherwise.
+     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objects otherwise.
      */
     protected function doValidate($columns = null)
     {
@@ -506,10 +545,18 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
             $failureMap = array();
 
 
-            if (($retval = CorpusPeer::doValidate($this, $columns)) !== true) {
+            if (($retval = SourcePeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
+
+                if ($this->collPublications !== null) {
+                    foreach ($this->collPublications as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
 
 
             $this->alreadyInValidation = false;
@@ -530,7 +577,7 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
      */
     public function getByName($name, $type = BasePeer::TYPE_PHPNAME)
     {
-        $pos = CorpusPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+        $pos = SourcePeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -569,20 +616,31 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
      *                    Defaults to BasePeer::TYPE_PHPNAME.
      * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to true.
      * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
+     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
-    public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array())
+    public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['Corpus'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['Source'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['Corpus'][$this->getPrimaryKey()] = true;
-        $keys = CorpusPeer::getFieldNames($keyType);
+        $alreadyDumpedObjects['Source'][$this->getPrimaryKey()] = true;
+        $keys = SourcePeer::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getName(),
         );
+        $virtualColumns = $this->virtualColumns;
+        foreach ($virtualColumns as $key => $virtualColumn) {
+            $result[$key] = $virtualColumn;
+        }
+
+        if ($includeForeignObjects) {
+            if (null !== $this->collPublications) {
+                $result['Publications'] = $this->collPublications->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+        }
 
         return $result;
     }
@@ -600,7 +658,7 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
      */
     public function setByName($name, $value, $type = BasePeer::TYPE_PHPNAME)
     {
-        $pos = CorpusPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+        $pos = SourcePeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 
         $this->setByPosition($pos, $value);
     }
@@ -644,7 +702,7 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
      */
     public function fromArray($arr, $keyType = BasePeer::TYPE_PHPNAME)
     {
-        $keys = CorpusPeer::getFieldNames($keyType);
+        $keys = SourcePeer::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
@@ -657,10 +715,10 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(CorpusPeer::DATABASE_NAME);
+        $criteria = new Criteria(SourcePeer::DATABASE_NAME);
 
-        if ($this->isColumnModified(CorpusPeer::ID)) $criteria->add(CorpusPeer::ID, $this->id);
-        if ($this->isColumnModified(CorpusPeer::NAME)) $criteria->add(CorpusPeer::NAME, $this->name);
+        if ($this->isColumnModified(SourcePeer::ID)) $criteria->add(SourcePeer::ID, $this->id);
+        if ($this->isColumnModified(SourcePeer::NAME)) $criteria->add(SourcePeer::NAME, $this->name);
 
         return $criteria;
     }
@@ -675,8 +733,8 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(CorpusPeer::DATABASE_NAME);
-        $criteria->add(CorpusPeer::ID, $this->id);
+        $criteria = new Criteria(SourcePeer::DATABASE_NAME);
+        $criteria->add(SourcePeer::ID, $this->id);
 
         return $criteria;
     }
@@ -717,7 +775,7 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param object $copyObj An object of Corpus (or compatible) type.
+     * @param object $copyObj An object of Source (or compatible) type.
      * @param boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
@@ -725,6 +783,24 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setName($this->getName());
+
+        if ($deepCopy && !$this->startCopy) {
+            // important: temporarily setNew(false) because this affects the behavior of
+            // the getter/setter methods for fkey referrer objects.
+            $copyObj->setNew(false);
+            // store object hash to prevent cycle
+            $this->startCopy = true;
+
+            foreach ($this->getPublications() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addPublication($relObj->copy($deepCopy));
+                }
+            }
+
+            //unflag object copy
+            $this->startCopy = false;
+        } // if ($deepCopy)
+
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -740,7 +816,7 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
      * objects.
      *
      * @param boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return Corpus Clone of current object.
+     * @return Source Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -760,15 +836,406 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
      * same instance for all member of this class. The method could therefore
      * be static, but this would prevent one from overriding the behavior.
      *
-     * @return CorpusPeer
+     * @return SourcePeer
      */
     public function getPeer()
     {
         if (self::$peer === null) {
-            self::$peer = new CorpusPeer();
+            self::$peer = new SourcePeer();
         }
 
         return self::$peer;
+    }
+
+
+    /**
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
+     *
+     * @param string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('Publication' == $relationName) {
+            $this->initPublications();
+        }
+    }
+
+    /**
+     * Clears out the collPublications collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Source The current object (for fluent API support)
+     * @see        addPublications()
+     */
+    public function clearPublications()
+    {
+        $this->collPublications = null; // important to set this to null since that means it is uninitialized
+        $this->collPublicationsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collPublications collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialPublications($v = true)
+    {
+        $this->collPublicationsPartial = $v;
+    }
+
+    /**
+     * Initializes the collPublications collection.
+     *
+     * By default this just sets the collPublications collection to an empty array (like clearcollPublications());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initPublications($overrideExisting = true)
+    {
+        if (null !== $this->collPublications && !$overrideExisting) {
+            return;
+        }
+        $this->collPublications = new PropelObjectCollection();
+        $this->collPublications->setModel('Publication');
+    }
+
+    /**
+     * Gets an array of Publication objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Source is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     * @throws PropelException
+     */
+    public function getPublications($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collPublicationsPartial && !$this->isNew();
+        if (null === $this->collPublications || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collPublications) {
+                // return empty collection
+                $this->initPublications();
+            } else {
+                $collPublications = PublicationQuery::create(null, $criteria)
+                    ->filterBySource($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collPublicationsPartial && count($collPublications)) {
+                      $this->initPublications(false);
+
+                      foreach ($collPublications as $obj) {
+                        if (false == $this->collPublications->contains($obj)) {
+                          $this->collPublications->append($obj);
+                        }
+                      }
+
+                      $this->collPublicationsPartial = true;
+                    }
+
+                    $collPublications->getInternalIterator()->rewind();
+
+                    return $collPublications;
+                }
+
+                if ($partial && $this->collPublications) {
+                    foreach ($this->collPublications as $obj) {
+                        if ($obj->isNew()) {
+                            $collPublications[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collPublications = $collPublications;
+                $this->collPublicationsPartial = false;
+            }
+        }
+
+        return $this->collPublications;
+    }
+
+    /**
+     * Sets a collection of Publication objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $publications A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Source The current object (for fluent API support)
+     */
+    public function setPublications(PropelCollection $publications, PropelPDO $con = null)
+    {
+        $publicationsToDelete = $this->getPublications(new Criteria(), $con)->diff($publications);
+
+
+        $this->publicationsScheduledForDeletion = $publicationsToDelete;
+
+        foreach ($publicationsToDelete as $publicationRemoved) {
+            $publicationRemoved->setSource(null);
+        }
+
+        $this->collPublications = null;
+        foreach ($publications as $publication) {
+            $this->addPublication($publication);
+        }
+
+        $this->collPublications = $publications;
+        $this->collPublicationsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Publication objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Publication objects.
+     * @throws PropelException
+     */
+    public function countPublications(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collPublicationsPartial && !$this->isNew();
+        if (null === $this->collPublications || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collPublications) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getPublications());
+            }
+            $query = PublicationQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterBySource($this)
+                ->count($con);
+        }
+
+        return count($this->collPublications);
+    }
+
+    /**
+     * Method called to associate a Publication object to this object
+     * through the Publication foreign key attribute.
+     *
+     * @param    Publication $l Publication
+     * @return Source The current object (for fluent API support)
+     */
+    public function addPublication(Publication $l)
+    {
+        if ($this->collPublications === null) {
+            $this->initPublications();
+            $this->collPublicationsPartial = true;
+        }
+
+        if (!in_array($l, $this->collPublications->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddPublication($l);
+
+            if ($this->publicationsScheduledForDeletion and $this->publicationsScheduledForDeletion->contains($l)) {
+                $this->publicationsScheduledForDeletion->remove($this->publicationsScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Publication $publication The publication object to add.
+     */
+    protected function doAddPublication($publication)
+    {
+        $this->collPublications[]= $publication;
+        $publication->setSource($this);
+    }
+
+    /**
+     * @param	Publication $publication The publication object to remove.
+     * @return Source The current object (for fluent API support)
+     */
+    public function removePublication($publication)
+    {
+        if ($this->getPublications()->contains($publication)) {
+            $this->collPublications->remove($this->collPublications->search($publication));
+            if (null === $this->publicationsScheduledForDeletion) {
+                $this->publicationsScheduledForDeletion = clone $this->collPublications;
+                $this->publicationsScheduledForDeletion->clear();
+            }
+            $this->publicationsScheduledForDeletion[]= $publication;
+            $publication->setSource(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Source is new, it will return
+     * an empty collection; or if this Source has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Source.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinTitle($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Title', $join_behavior);
+
+        return $this->getPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Source is new, it will return
+     * an empty collection; or if this Source has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Source.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinPublishingcompany($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Publishingcompany', $join_behavior);
+
+        return $this->getPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Source is new, it will return
+     * an empty collection; or if this Source has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Source.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinPlace($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('Place', $join_behavior);
+
+        return $this->getPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Source is new, it will return
+     * an empty collection; or if this Source has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Source.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinDatespecificationRelatedByPublicationdateId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('DatespecificationRelatedByPublicationdateId', $join_behavior);
+
+        return $this->getPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Source is new, it will return
+     * an empty collection; or if this Source has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Source.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinDatespecificationRelatedByCreationdateId($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('DatespecificationRelatedByCreationdateId', $join_behavior);
+
+        return $this->getPublications($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Source is new, it will return
+     * an empty collection; or if this Source has previously
+     * been saved, it will retrieve related Publications from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Source.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Publication[] List of Publication objects
+     */
+    public function getPublicationsJoinLastChangedByUser($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = PublicationQuery::create(null, $criteria);
+        $query->joinWith('LastChangedByUser', $join_behavior);
+
+        return $this->getPublications($query, $con);
     }
 
     /**
@@ -792,7 +1259,7 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
      *
      * This method is a user-space workaround for PHP's inability to garbage collect
      * objects with circular references (even in PHP 5.3). This is currently necessary
-     * when using Propel in certain daemon or large-volumne/high-memory operations.
+     * when using Propel in certain daemon or large-volume/high-memory operations.
      *
      * @param boolean $deep Whether to also clear the references on all referrer objects.
      */
@@ -800,10 +1267,19 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->collPublications) {
+                foreach ($this->collPublications as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
 
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
+        if ($this->collPublications instanceof PropelCollection) {
+            $this->collPublications->clearIterator();
+        }
+        $this->collPublications = null;
     }
 
     /**
@@ -813,7 +1289,7 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
      */
     public function __toString()
     {
-        return (string) $this->exportTo(CorpusPeer::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(SourcePeer::DEFAULT_STRING_FORMAT);
     }
 
     /**
@@ -854,6 +1330,22 @@ abstract class BaseCorpus extends BaseObject implements Persistent, \DTA\Metadat
             if( is_a($result, 'DateTime') )
                 $result = $result->format('d/m/Y');
             return $result;
+        }
+    }
+
+    /**
+     * @return The propel query object for retrieving the records.
+     */
+    public static function getRowViewQueryObject(){
+        $rc = new \ReflectionClass(get_called_class());
+        $queryConstructionString = $rc->getStaticPropertyValue("queryConstructionString");
+        if($queryConstructionString === NULL){
+            $classShortName = $rc->getShortName();
+            $package = \DTA\MetadataBundle\Controller\ORMController::getPackageName($rc->getName());
+            $queryClass = \DTA\MetadataBundle\Controller\ORMController::relatedClassNames($package, $classShortName)['query'];
+            return new $queryClass;
+        } else {
+            return eval('return '.$queryConstructionString);
         }
     }
 

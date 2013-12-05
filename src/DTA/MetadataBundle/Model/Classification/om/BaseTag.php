@@ -37,7 +37,7 @@ abstract class BaseTag extends BaseObject implements Persistent, \DTA\MetadataBu
     protected static $peer;
 
     /**
-     * The flag var to prevent infinit loop in deep copy
+     * The flag var to prevent infinite loop in deep copy
      * @var       boolean
      */
     protected $startCopy = false;
@@ -106,6 +106,7 @@ abstract class BaseTag extends BaseObject implements Persistent, \DTA\MetadataBu
      */
     public function getId()
     {
+
         return $this->id;
     }
 
@@ -116,13 +117,14 @@ abstract class BaseTag extends BaseObject implements Persistent, \DTA\MetadataBu
      */
     public function getName()
     {
+
         return $this->name;
     }
 
     /**
      * Set the value of [id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Tag The current object (for fluent API support)
      */
     public function setId($v)
@@ -143,7 +145,7 @@ abstract class BaseTag extends BaseObject implements Persistent, \DTA\MetadataBu
     /**
      * Set the value of [name] column.
      *
-     * @param string $v new value
+     * @param  string $v new value
      * @return Tag The current object (for fluent API support)
      */
     public function setName($v)
@@ -184,7 +186,7 @@ abstract class BaseTag extends BaseObject implements Persistent, \DTA\MetadataBu
      * more tables.
      *
      * @param array $row The row returned by PDOStatement->fetch(PDO::FETCH_NUM)
-     * @param int $startcol 0-based offset column which indicates which restultset column to start with.
+     * @param int $startcol 0-based offset column which indicates which resultset column to start with.
      * @param boolean $rehydrate Whether this object is being re-hydrated from the database.
      * @return int             next starting column
      * @throws PropelException - Any caught Exception will be rewrapped as a PropelException.
@@ -203,6 +205,7 @@ abstract class BaseTag extends BaseObject implements Persistent, \DTA\MetadataBu
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
+
             return $startcol + 2; // 2 = TagPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -567,10 +570,10 @@ abstract class BaseTag extends BaseObject implements Persistent, \DTA\MetadataBu
      *
      * In addition to checking the current object, all related objects will
      * also be validated.  If all pass then <code>true</code> is returned; otherwise
-     * an aggreagated array of ValidationFailed objects will be returned.
+     * an aggregated array of ValidationFailed objects will be returned.
      *
      * @param array $columns Array of column names to validate.
-     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objets otherwise.
+     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objects otherwise.
      */
     protected function doValidate($columns = null)
     {
@@ -667,6 +670,11 @@ abstract class BaseTag extends BaseObject implements Persistent, \DTA\MetadataBu
             $keys[0] => $this->getId(),
             $keys[1] => $this->getName(),
         );
+        $virtualColumns = $this->virtualColumns;
+        foreach ($virtualColumns as $key => $virtualColumn) {
+            $result[$key] = $virtualColumn;
+        }
+
         if ($includeForeignObjects) {
             if (null !== $this->collPublicationTags) {
                 $result['PublicationTags'] = $this->collPublicationTags->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -971,7 +979,7 @@ abstract class BaseTag extends BaseObject implements Persistent, \DTA\MetadataBu
                     if (false !== $this->collPublicationTagsPartial && count($collPublicationTags)) {
                       $this->initPublicationTags(false);
 
-                      foreach($collPublicationTags as $obj) {
+                      foreach ($collPublicationTags as $obj) {
                         if (false == $this->collPublicationTags->contains($obj)) {
                           $this->collPublicationTags->append($obj);
                         }
@@ -981,12 +989,13 @@ abstract class BaseTag extends BaseObject implements Persistent, \DTA\MetadataBu
                     }
 
                     $collPublicationTags->getInternalIterator()->rewind();
+
                     return $collPublicationTags;
                 }
 
-                if($partial && $this->collPublicationTags) {
-                    foreach($this->collPublicationTags as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collPublicationTags) {
+                    foreach ($this->collPublicationTags as $obj) {
+                        if ($obj->isNew()) {
                             $collPublicationTags[] = $obj;
                         }
                     }
@@ -1014,7 +1023,8 @@ abstract class BaseTag extends BaseObject implements Persistent, \DTA\MetadataBu
     {
         $publicationTagsToDelete = $this->getPublicationTags(new Criteria(), $con)->diff($publicationTags);
 
-        $this->publicationTagsScheduledForDeletion = unserialize(serialize($publicationTagsToDelete));
+
+        $this->publicationTagsScheduledForDeletion = $publicationTagsToDelete;
 
         foreach ($publicationTagsToDelete as $publicationTagRemoved) {
             $publicationTagRemoved->setTag(null);
@@ -1048,7 +1058,7 @@ abstract class BaseTag extends BaseObject implements Persistent, \DTA\MetadataBu
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getPublicationTags());
             }
             $query = PublicationTagQuery::create(null, $criteria);
@@ -1077,8 +1087,13 @@ abstract class BaseTag extends BaseObject implements Persistent, \DTA\MetadataBu
             $this->initPublicationTags();
             $this->collPublicationTagsPartial = true;
         }
+
         if (!in_array($l, $this->collPublicationTags->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddPublicationTag($l);
+
+            if ($this->publicationTagsScheduledForDeletion and $this->publicationTagsScheduledForDeletion->contains($l)) {
+                $this->publicationTagsScheduledForDeletion->remove($this->publicationTagsScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -1217,7 +1232,7 @@ abstract class BaseTag extends BaseObject implements Persistent, \DTA\MetadataBu
     public function setPublications(PropelCollection $publications, PropelPDO $con = null)
     {
         $this->clearPublications();
-        $currentPublications = $this->getPublications();
+        $currentPublications = $this->getPublications(null, $con);
 
         $this->publicationsScheduledForDeletion = $currentPublications->diff($publications);
 
@@ -1274,10 +1289,14 @@ abstract class BaseTag extends BaseObject implements Persistent, \DTA\MetadataBu
         if ($this->collPublications === null) {
             $this->initPublications();
         }
+
         if (!$this->collPublications->contains($publication)) { // only add it if the **same** object is not already associated
             $this->doAddPublication($publication);
+            $this->collPublications[] = $publication;
 
-            $this->collPublications[]= $publication;
+            if ($this->publicationsScheduledForDeletion and $this->publicationsScheduledForDeletion->contains($publication)) {
+                $this->publicationsScheduledForDeletion->remove($this->publicationsScheduledForDeletion->search($publication));
+            }
         }
 
         return $this;
@@ -1286,11 +1305,18 @@ abstract class BaseTag extends BaseObject implements Persistent, \DTA\MetadataBu
     /**
      * @param	Publication $publication The publication object to add.
      */
-    protected function doAddPublication($publication)
+    protected function doAddPublication(Publication $publication)
     {
-        $publicationTag = new PublicationTag();
-        $publicationTag->setPublication($publication);
-        $this->addPublicationTag($publicationTag);
+        // set the back reference to this object directly as using provided method either results
+        // in endless loop or in multiple relations
+        if (!$publication->getTags()->contains($this)) {
+            $publicationTag = new PublicationTag();
+            $publicationTag->setPublication($publication);
+            $this->addPublicationTag($publicationTag);
+
+            $foreignCollection = $publication->getTags();
+            $foreignCollection[] = $this;
+        }
     }
 
     /**
@@ -1335,7 +1361,7 @@ abstract class BaseTag extends BaseObject implements Persistent, \DTA\MetadataBu
      *
      * This method is a user-space workaround for PHP's inability to garbage collect
      * objects with circular references (even in PHP 5.3). This is currently necessary
-     * when using Propel in certain daemon or large-volumne/high-memory operations.
+     * when using Propel in certain daemon or large-volume/high-memory operations.
      *
      * @param boolean $deep Whether to also clear the references on all referrer objects.
      */

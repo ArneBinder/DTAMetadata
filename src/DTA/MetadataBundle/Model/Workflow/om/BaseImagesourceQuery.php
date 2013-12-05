@@ -57,8 +57,14 @@ abstract class BaseImagesourceQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Workflow\\Imagesource', $modelAlias = null)
+    public function __construct($dbName = null, $modelName = null, $modelAlias = null)
     {
+        if (null === $dbName) {
+            $dbName = 'dtametadata';
+        }
+        if (null === $modelName) {
+            $modelName = 'DTA\\MetadataBundle\\Model\\Workflow\\Imagesource';
+        }
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
@@ -75,10 +81,8 @@ abstract class BaseImagesourceQuery extends ModelCriteria
         if ($criteria instanceof ImagesourceQuery) {
             return $criteria;
         }
-        $query = new ImagesourceQuery();
-        if (null !== $modelAlias) {
-            $query->setModelAlias($modelAlias);
-        }
+        $query = new ImagesourceQuery(null, null, $modelAlias);
+
         if ($criteria instanceof Criteria) {
             $query->mergeWith($criteria);
         }
@@ -106,7 +110,7 @@ abstract class BaseImagesourceQuery extends ModelCriteria
             return null;
         }
         if ((null !== ($obj = ImagesourcePeer::getInstanceFromPool((string) $key))) && !$this->formatter) {
-            // the object is alredy in the instance pool
+            // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {

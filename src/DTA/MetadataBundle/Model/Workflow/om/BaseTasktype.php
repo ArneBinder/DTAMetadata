@@ -6,6 +6,7 @@ use \BaseObject;
 use \BasePeer;
 use \Criteria;
 use \Exception;
+use \NestedSetRecursiveIterator;
 use \PDO;
 use \Persistent;
 use \Propel;
@@ -35,7 +36,7 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
     protected static $peer;
 
     /**
-     * The flag var to prevent infinit loop in deep copy
+     * The flag var to prevent infinite loop in deep copy
      * @var       boolean
      */
     protected $startCopy = false;
@@ -51,12 +52,6 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
      * @var        string
      */
     protected $name;
-
-    /**
-     * The value for the legacy_tasktype_id field.
-     * @var        int
-     */
-    protected $legacy_tasktype_id;
 
     /**
      * The value for the tree_left field.
@@ -124,7 +119,7 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
 
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Typ', 'Zuordnung', );	public   $tableRowViewAccessors = array('Typ'=>'Name', 'Zuordnung'=>'accessor:getParent', );	public static $queryConstructionString = NULL;
+    public static $tableRowViewCaptions = array('id', 'Typ', 'Zuordnung', );	public   $tableRowViewAccessors = array('id'=>'Id', 'Typ'=>'Name', 'Zuordnung'=>'accessor:getParent', );	public static $queryConstructionString = NULL;
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -138,6 +133,7 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
      */
     public function getId()
     {
+
         return $this->id;
     }
 
@@ -148,17 +144,8 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
      */
     public function getName()
     {
-        return $this->name;
-    }
 
-    /**
-     * Get the [legacy_tasktype_id] column value.
-     *
-     * @return int
-     */
-    public function getLegacyTasktypeId()
-    {
-        return $this->legacy_tasktype_id;
+        return $this->name;
     }
 
     /**
@@ -168,6 +155,7 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
      */
     public function getTreeLeft()
     {
+
         return $this->tree_left;
     }
 
@@ -178,6 +166,7 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
      */
     public function getTreeRight()
     {
+
         return $this->tree_right;
     }
 
@@ -188,13 +177,14 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
      */
     public function getTreeLevel()
     {
+
         return $this->tree_level;
     }
 
     /**
      * Set the value of [id] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Tasktype The current object (for fluent API support)
      */
     public function setId($v)
@@ -215,7 +205,7 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
     /**
      * Set the value of [name] column.
      *
-     * @param string $v new value
+     * @param  string $v new value
      * @return Tasktype The current object (for fluent API support)
      */
     public function setName($v)
@@ -234,30 +224,9 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
     } // setName()
 
     /**
-     * Set the value of [legacy_tasktype_id] column.
-     *
-     * @param int $v new value
-     * @return Tasktype The current object (for fluent API support)
-     */
-    public function setLegacyTasktypeId($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->legacy_tasktype_id !== $v) {
-            $this->legacy_tasktype_id = $v;
-            $this->modifiedColumns[] = TasktypePeer::LEGACY_TASKTYPE_ID;
-        }
-
-
-        return $this;
-    } // setLegacyTasktypeId()
-
-    /**
      * Set the value of [tree_left] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Tasktype The current object (for fluent API support)
      */
     public function setTreeLeft($v)
@@ -278,7 +247,7 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
     /**
      * Set the value of [tree_right] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Tasktype The current object (for fluent API support)
      */
     public function setTreeRight($v)
@@ -299,7 +268,7 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
     /**
      * Set the value of [tree_level] column.
      *
-     * @param int $v new value
+     * @param  int $v new value
      * @return Tasktype The current object (for fluent API support)
      */
     public function setTreeLevel($v)
@@ -340,7 +309,7 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
      * more tables.
      *
      * @param array $row The row returned by PDOStatement->fetch(PDO::FETCH_NUM)
-     * @param int $startcol 0-based offset column which indicates which restultset column to start with.
+     * @param int $startcol 0-based offset column which indicates which resultset column to start with.
      * @param boolean $rehydrate Whether this object is being re-hydrated from the database.
      * @return int             next starting column
      * @throws PropelException - Any caught Exception will be rewrapped as a PropelException.
@@ -351,10 +320,9 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->name = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
-            $this->legacy_tasktype_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
-            $this->tree_left = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
-            $this->tree_right = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
-            $this->tree_level = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+            $this->tree_left = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+            $this->tree_right = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+            $this->tree_level = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -363,7 +331,8 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 6; // 6 = TasktypePeer::NUM_HYDRATE_COLUMNS.
+
+            return $startcol + 5; // 5 = TasktypePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Tasktype object", $e);
@@ -614,20 +583,6 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = TasktypePeer::ID;
-        if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . TasktypePeer::ID . ')');
-        }
-        if (null === $this->id) {
-            try {
-                $stmt = $con->query("SELECT nextval('tasktype_id_seq')");
-                $row = $stmt->fetch(PDO::FETCH_NUM);
-                $this->id = $row[0];
-            } catch (Exception $e) {
-                throw new PropelException('Unable to get sequence id.', $e);
-            }
-        }
-
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(TasktypePeer::ID)) {
@@ -635,9 +590,6 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
         }
         if ($this->isColumnModified(TasktypePeer::NAME)) {
             $modifiedColumns[':p' . $index++]  = '"name"';
-        }
-        if ($this->isColumnModified(TasktypePeer::LEGACY_TASKTYPE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '"legacy_tasktype_id"';
         }
         if ($this->isColumnModified(TasktypePeer::TREE_LEFT)) {
             $modifiedColumns[':p' . $index++]  = '"tree_left"';
@@ -664,9 +616,6 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
                         break;
                     case '"name"':
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
-                        break;
-                    case '"legacy_tasktype_id"':
-                        $stmt->bindValue($identifier, $this->legacy_tasktype_id, PDO::PARAM_INT);
                         break;
                     case '"tree_left"':
                         $stmt->bindValue($identifier, $this->tree_left, PDO::PARAM_INT);
@@ -750,10 +699,10 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
      *
      * In addition to checking the current object, all related objects will
      * also be validated.  If all pass then <code>true</code> is returned; otherwise
-     * an aggreagated array of ValidationFailed objects will be returned.
+     * an aggregated array of ValidationFailed objects will be returned.
      *
      * @param array $columns Array of column names to validate.
-     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objets otherwise.
+     * @return mixed <code>true</code> if all validations pass; array of <code>ValidationFailed</code> objects otherwise.
      */
     protected function doValidate($columns = null)
     {
@@ -819,15 +768,12 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
                 return $this->getName();
                 break;
             case 2:
-                return $this->getLegacyTasktypeId();
-                break;
-            case 3:
                 return $this->getTreeLeft();
                 break;
-            case 4:
+            case 3:
                 return $this->getTreeRight();
                 break;
-            case 5:
+            case 4:
                 return $this->getTreeLevel();
                 break;
             default:
@@ -861,11 +807,15 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getName(),
-            $keys[2] => $this->getLegacyTasktypeId(),
-            $keys[3] => $this->getTreeLeft(),
-            $keys[4] => $this->getTreeRight(),
-            $keys[5] => $this->getTreeLevel(),
+            $keys[2] => $this->getTreeLeft(),
+            $keys[3] => $this->getTreeRight(),
+            $keys[4] => $this->getTreeLevel(),
         );
+        $virtualColumns = $this->virtualColumns;
+        foreach ($virtualColumns as $key => $virtualColumn) {
+            $result[$key] = $virtualColumn;
+        }
+
         if ($includeForeignObjects) {
             if (null !== $this->collTasks) {
                 $result['Tasks'] = $this->collTasks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -911,15 +861,12 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
                 $this->setName($value);
                 break;
             case 2:
-                $this->setLegacyTasktypeId($value);
-                break;
-            case 3:
                 $this->setTreeLeft($value);
                 break;
-            case 4:
+            case 3:
                 $this->setTreeRight($value);
                 break;
-            case 5:
+            case 4:
                 $this->setTreeLevel($value);
                 break;
         } // switch()
@@ -948,10 +895,9 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setLegacyTasktypeId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setTreeLeft($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setTreeRight($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setTreeLevel($arr[$keys[5]]);
+        if (array_key_exists($keys[2], $arr)) $this->setTreeLeft($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setTreeRight($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setTreeLevel($arr[$keys[4]]);
     }
 
     /**
@@ -965,7 +911,6 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
 
         if ($this->isColumnModified(TasktypePeer::ID)) $criteria->add(TasktypePeer::ID, $this->id);
         if ($this->isColumnModified(TasktypePeer::NAME)) $criteria->add(TasktypePeer::NAME, $this->name);
-        if ($this->isColumnModified(TasktypePeer::LEGACY_TASKTYPE_ID)) $criteria->add(TasktypePeer::LEGACY_TASKTYPE_ID, $this->legacy_tasktype_id);
         if ($this->isColumnModified(TasktypePeer::TREE_LEFT)) $criteria->add(TasktypePeer::TREE_LEFT, $this->tree_left);
         if ($this->isColumnModified(TasktypePeer::TREE_RIGHT)) $criteria->add(TasktypePeer::TREE_RIGHT, $this->tree_right);
         if ($this->isColumnModified(TasktypePeer::TREE_LEVEL)) $criteria->add(TasktypePeer::TREE_LEVEL, $this->tree_level);
@@ -1033,7 +978,6 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setName($this->getName());
-        $copyObj->setLegacyTasktypeId($this->getLegacyTasktypeId());
         $copyObj->setTreeLeft($this->getTreeLeft());
         $copyObj->setTreeRight($this->getTreeRight());
         $copyObj->setTreeLevel($this->getTreeLevel());
@@ -1194,7 +1138,7 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
                     if (false !== $this->collTasksPartial && count($collTasks)) {
                       $this->initTasks(false);
 
-                      foreach($collTasks as $obj) {
+                      foreach ($collTasks as $obj) {
                         if (false == $this->collTasks->contains($obj)) {
                           $this->collTasks->append($obj);
                         }
@@ -1204,12 +1148,13 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
                     }
 
                     $collTasks->getInternalIterator()->rewind();
+
                     return $collTasks;
                 }
 
-                if($partial && $this->collTasks) {
-                    foreach($this->collTasks as $obj) {
-                        if($obj->isNew()) {
+                if ($partial && $this->collTasks) {
+                    foreach ($this->collTasks as $obj) {
+                        if ($obj->isNew()) {
                             $collTasks[] = $obj;
                         }
                     }
@@ -1237,7 +1182,8 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
     {
         $tasksToDelete = $this->getTasks(new Criteria(), $con)->diff($tasks);
 
-        $this->tasksScheduledForDeletion = unserialize(serialize($tasksToDelete));
+
+        $this->tasksScheduledForDeletion = $tasksToDelete;
 
         foreach ($tasksToDelete as $taskRemoved) {
             $taskRemoved->setTasktype(null);
@@ -1271,7 +1217,7 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
                 return 0;
             }
 
-            if($partial && !$criteria) {
+            if ($partial && !$criteria) {
                 return count($this->getTasks());
             }
             $query = TaskQuery::create(null, $criteria);
@@ -1300,8 +1246,13 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
             $this->initTasks();
             $this->collTasksPartial = true;
         }
+
         if (!in_array($l, $this->collTasks->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddTask($l);
+
+            if ($this->tasksScheduledForDeletion and $this->tasksScheduledForDeletion->contains($l)) {
+                $this->tasksScheduledForDeletion->remove($this->tasksScheduledForDeletion->search($l));
+            }
         }
 
         return $this;
@@ -1435,6 +1386,31 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
         return $this->getTasks($query, $con);
     }
 
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Tasktype is new, it will return
+     * an empty collection; or if this Tasktype has previously
+     * been saved, it will retrieve related Tasks from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Tasktype.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Task[] List of Task objects
+     */
+    public function getTasksJoinCopyLocation($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = TaskQuery::create(null, $criteria);
+        $query->joinWith('CopyLocation', $join_behavior);
+
+        return $this->getTasks($query, $con);
+    }
+
     /**
      * Clears the current object and sets all attributes to their default values
      */
@@ -1442,7 +1418,6 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
     {
         $this->id = null;
         $this->name = null;
-        $this->legacy_tasktype_id = null;
         $this->tree_left = null;
         $this->tree_right = null;
         $this->tree_level = null;
@@ -1460,7 +1435,7 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
      *
      * This method is a user-space workaround for PHP's inability to garbage collect
      * objects with circular references (even in PHP 5.3). This is currently necessary
-     * when using Propel in certain daemon or large-volumne/high-memory operations.
+     * when using Propel in certain daemon or large-volume/high-memory operations.
      *
      * @param boolean $deep Whether to also clear the references on all referrer objects.
      */
@@ -2270,7 +2245,7 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
 
 
 
-            if (!$preventDefault){
+            if (!$preventDefault) {
 
 
                 if ($left >= $destLeft) { // src was shifted too?
@@ -2294,7 +2269,7 @@ abstract class BaseTasktype extends BaseObject implements Persistent, \DTA\Metad
             TasktypePeer::updateLoadedNodes(null, $con);
 
             $con->commit();
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollback();
             throw $e;
         }

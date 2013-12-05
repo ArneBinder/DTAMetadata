@@ -7,7 +7,7 @@ use \TableMap;
 
 
 /**
- * This class defines the structure of the 'corpus' table.
+ * This class defines the structure of the 'source' table.
  *
  *
  *
@@ -18,13 +18,13 @@ use \TableMap;
  *
  * @package    propel.generator.src.DTA.MetadataBundle.Model.Classification.map
  */
-class CorpusTableMap extends TableMap
+class SourceTableMap extends TableMap
 {
 
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'src.DTA.MetadataBundle.Model.Classification.map.CorpusTableMap';
+    const CLASS_NAME = 'src.DTA.MetadataBundle.Model.Classification.map.SourceTableMap';
 
     /**
      * Initialize the table attributes, columns and validators
@@ -36,14 +36,14 @@ class CorpusTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('corpus');
-        $this->setPhpName('Corpus');
-        $this->setClassname('DTA\\MetadataBundle\\Model\\Classification\\Corpus');
+        $this->setName('source');
+        $this->setPhpName('Source');
+        $this->setClassname('DTA\\MetadataBundle\\Model\\Classification\\Source');
         $this->setPackage('src.DTA.MetadataBundle.Model.Classification');
         $this->setUseIdGenerator(true);
-        $this->setPrimaryKeyMethodInfo('corpus_id_seq');
+        $this->setPrimaryKeyMethodInfo('source_id_seq');
         // columns
-        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, 10, null);
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('name', 'Name', 'LONGVARCHAR', true, null, null);
         // validators
     } // initialize()
@@ -53,6 +53,7 @@ class CorpusTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::ONE_TO_MANY, array('id' => 'source_id', ), null, null, 'Publications');
     } // buildRelations()
 
     /**
@@ -65,10 +66,9 @@ class CorpusTableMap extends TableMap
     {
         return array(
             'table_row_view' =>  array (
-  'Id' => 'id',
-  'Name' => 'name',
+  'name' => 'name',
 ),
         );
     } // getBehaviors()
 
-} // CorpusTableMap
+} // SourceTableMap

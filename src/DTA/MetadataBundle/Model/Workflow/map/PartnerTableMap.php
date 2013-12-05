@@ -40,8 +40,7 @@ class PartnerTableMap extends TableMap
         $this->setPhpName('Partner');
         $this->setClassname('DTA\\MetadataBundle\\Model\\Workflow\\Partner');
         $this->setPackage('src.DTA.MetadataBundle.Model.Workflow');
-        $this->setUseIdGenerator(true);
-        $this->setPrimaryKeyMethodInfo('partner_id_seq');
+        $this->setUseIdGenerator(false);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('name', 'Name', 'LONGVARCHAR', false, null, null);
@@ -51,7 +50,6 @@ class PartnerTableMap extends TableMap
         $this->addColumn('contactdata', 'Contactdata', 'LONGVARCHAR', false, null, null);
         $this->addColumn('comments', 'Comments', 'LONGVARCHAR', false, null, null);
         $this->addColumn('is_organization', 'IsOrganization', 'BOOLEAN', false, null, false);
-        $this->addColumn('legacy_partner_id', 'LegacyPartnerId', 'INTEGER', false, null, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators

@@ -21,7 +21,9 @@ class TitlefragmentType extends BaseAbstractType {
             'class' => 'DTA\MetadataBundle\Model\Classification\Titlefragmenttype',
         ));
         
-        $builder->add('name', 'text');
+        $builder->add('name', 'textarea', array(
+            'attr' => array('style'=>"width: 80%;"),
+        ));
         $builder->add('NameIsReconstructed', 'checkbox', array(
             'required'=>false,
             'label'=>'ist aus anderen Quellen rekonstruiert'

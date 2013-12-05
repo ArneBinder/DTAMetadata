@@ -28,7 +28,7 @@ abstract class BasePublicationTagPeer
     const OM_CLASS = 'DTA\\MetadataBundle\\Model\\Master\\PublicationTag';
 
     /** the related TableMap class for this table */
-    const TM_CLASS = 'PublicationTagTableMap';
+    const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Master\\map\\PublicationTagTableMap';
 
     /** The total number of columns. */
     const NUM_COLUMNS = 3;
@@ -39,20 +39,20 @@ abstract class BasePublicationTagPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 3;
 
+    /** the column name for the id field */
+    const ID = 'publication_tag.id';
+
     /** the column name for the tag_id field */
     const TAG_ID = 'publication_tag.tag_id';
 
     /** the column name for the publication_id field */
     const PUBLICATION_ID = 'publication_tag.publication_id';
 
-    /** the column name for the id field */
-    const ID = 'publication_tag.id';
-
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
 
     /**
-     * An identiy map to hold any loaded instances of PublicationTag objects.
+     * An identity map to hold any loaded instances of PublicationTag objects.
      * This must be public so that other peer classes can access this when hydrating from JOIN
      * queries.
      * @var        array PublicationTag[]
@@ -67,11 +67,11 @@ abstract class BasePublicationTagPeer
      * e.g. PublicationTagPeer::$fieldNames[PublicationTagPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('TagId', 'PublicationId', 'Id', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('tagId', 'publicationId', 'id', ),
-        BasePeer::TYPE_COLNAME => array (PublicationTagPeer::TAG_ID, PublicationTagPeer::PUBLICATION_ID, PublicationTagPeer::ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('TAG_ID', 'PUBLICATION_ID', 'ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('tag_id', 'publication_id', 'id', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'TagId', 'PublicationId', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'tagId', 'publicationId', ),
+        BasePeer::TYPE_COLNAME => array (PublicationTagPeer::ID, PublicationTagPeer::TAG_ID, PublicationTagPeer::PUBLICATION_ID, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TAG_ID', 'PUBLICATION_ID', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'tag_id', 'publication_id', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
@@ -82,11 +82,11 @@ abstract class BasePublicationTagPeer
      * e.g. PublicationTagPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('TagId' => 0, 'PublicationId' => 1, 'Id' => 2, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('tagId' => 0, 'publicationId' => 1, 'id' => 2, ),
-        BasePeer::TYPE_COLNAME => array (PublicationTagPeer::TAG_ID => 0, PublicationTagPeer::PUBLICATION_ID => 1, PublicationTagPeer::ID => 2, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('TAG_ID' => 0, 'PUBLICATION_ID' => 1, 'ID' => 2, ),
-        BasePeer::TYPE_FIELDNAME => array ('tag_id' => 0, 'publication_id' => 1, 'id' => 2, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'TagId' => 1, 'PublicationId' => 2, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'tagId' => 1, 'publicationId' => 2, ),
+        BasePeer::TYPE_COLNAME => array (PublicationTagPeer::ID => 0, PublicationTagPeer::TAG_ID => 1, PublicationTagPeer::PUBLICATION_ID => 2, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TAG_ID' => 1, 'PUBLICATION_ID' => 2, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'tag_id' => 1, 'publication_id' => 2, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
@@ -161,13 +161,13 @@ abstract class BasePublicationTagPeer
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
+            $criteria->addSelectColumn(PublicationTagPeer::ID);
             $criteria->addSelectColumn(PublicationTagPeer::TAG_ID);
             $criteria->addSelectColumn(PublicationTagPeer::PUBLICATION_ID);
-            $criteria->addSelectColumn(PublicationTagPeer::ID);
         } else {
+            $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.tag_id');
             $criteria->addSelectColumn($alias . '.publication_id');
-            $criteria->addSelectColumn($alias . '.id');
         }
     }
 
@@ -220,7 +220,7 @@ abstract class BasePublicationTagPeer
      *
      * @param      Criteria $criteria object used to create the SELECT statement.
      * @param      PropelPDO $con
-     * @return                 PublicationTag
+     * @return PublicationTag
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -287,7 +287,7 @@ abstract class BasePublicationTagPeer
      * to the cache in order to ensure that the same objects are always returned by doSelect*()
      * and retrieveByPK*() calls.
      *
-     * @param      PublicationTag $obj A PublicationTag object.
+     * @param PublicationTag $obj A PublicationTag object.
      * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
     public static function addInstanceToPool($obj, $key = null)
@@ -337,7 +337,7 @@ abstract class BasePublicationTagPeer
      * a multi-column primary key, a serialize()d version of the primary key will be returned.
      *
      * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-     * @return   PublicationTag Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+     * @return PublicationTag Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
      * @see        getPrimaryKeyHash()
      */
     public static function getInstanceFromPool($key)
@@ -358,10 +358,8 @@ abstract class BasePublicationTagPeer
      */
     public static function clearInstancePool($and_clear_all_references = false)
     {
-      if ($and_clear_all_references)
-      {
-        foreach (PublicationTagPeer::$instances as $instance)
-        {
+      if ($and_clear_all_references) {
+        foreach (PublicationTagPeer::$instances as $instance) {
           $instance->clearAllReferences(true);
         }
       }
@@ -389,11 +387,11 @@ abstract class BasePublicationTagPeer
     public static function getPrimaryKeyHashFromRow($row, $startcol = 0)
     {
         // If the PK cannot be derived from the row, return null.
-        if ($row[$startcol + 2] === null) {
+        if ($row[$startcol] === null) {
             return null;
         }
 
-        return (string) $row[$startcol + 2];
+        return (string) $row[$startcol];
     }
 
     /**
@@ -408,7 +406,7 @@ abstract class BasePublicationTagPeer
     public static function getPrimaryKeyFromRow($row, $startcol = 0)
     {
 
-        return (int) $row[$startcol + 2];
+        return (int) $row[$startcol];
     }
 
     /**
@@ -1120,7 +1118,7 @@ abstract class BasePublicationTagPeer
     {
       $dbMap = Propel::getDatabaseMap(BasePublicationTagPeer::DATABASE_NAME);
       if (!$dbMap->hasTable(BasePublicationTagPeer::TABLE_NAME)) {
-        $dbMap->addTableObject(new PublicationTagTableMap());
+        $dbMap->addTableObject(new \DTA\MetadataBundle\Model\Master\map\PublicationTagTableMap());
       }
     }
 
@@ -1170,7 +1168,7 @@ abstract class BasePublicationTagPeer
             $con->beginTransaction();
             $pk = BasePeer::doInsert($criteria, $con);
             $con->commit();
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -1243,7 +1241,7 @@ abstract class BasePublicationTagPeer
             $con->commit();
 
             return $affectedRows;
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -1302,7 +1300,7 @@ abstract class BasePublicationTagPeer
             $con->commit();
 
             return $affectedRows;
-        } catch (PropelException $e) {
+        } catch (Exception $e) {
             $con->rollBack();
             throw $e;
         }
@@ -1315,7 +1313,7 @@ abstract class BasePublicationTagPeer
      *
      * NOTICE: This does not apply to primary or foreign keys for now.
      *
-     * @param      PublicationTag $obj The object to validate.
+     * @param PublicationTag $obj The object to validate.
      * @param      mixed $cols Column name or array of column names.
      *
      * @return mixed TRUE if all columns are valid or the error message of the first invalid column.
@@ -1348,7 +1346,7 @@ abstract class BasePublicationTagPeer
     /**
      * Retrieve a single object by pkey.
      *
-     * @param      int $pk the primary key.
+     * @param int $pk the primary key.
      * @param      PropelPDO $con the connection to use
      * @return PublicationTag
      */

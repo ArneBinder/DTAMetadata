@@ -18,6 +18,7 @@ use DTA\MetadataBundle\Model\Workflow\CopyLocationPeer;
 use DTA\MetadataBundle\Model\Workflow\CopyLocationQuery;
 use DTA\MetadataBundle\Model\Workflow\License;
 use DTA\MetadataBundle\Model\Workflow\Partner;
+use DTA\MetadataBundle\Model\Workflow\Task;
 
 /**
  * @method CopyLocationQuery orderById($order = Criteria::ASC) Order by the id column
@@ -33,7 +34,6 @@ use DTA\MetadataBundle\Model\Workflow\Partner;
  * @method CopyLocationQuery orderByImageurl($order = Criteria::ASC) Order by the imageurl column
  * @method CopyLocationQuery orderByImageurn($order = Criteria::ASC) Order by the imageurn column
  * @method CopyLocationQuery orderByLicenseId($order = Criteria::ASC) Order by the license_id column
- * @method CopyLocationQuery orderByLegacyFundstellenId($order = Criteria::ASC) Order by the legacy_fundstellen_id column
  * @method CopyLocationQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method CopyLocationQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -50,7 +50,6 @@ use DTA\MetadataBundle\Model\Workflow\Partner;
  * @method CopyLocationQuery groupByImageurl() Group by the imageurl column
  * @method CopyLocationQuery groupByImageurn() Group by the imageurn column
  * @method CopyLocationQuery groupByLicenseId() Group by the license_id column
- * @method CopyLocationQuery groupByLegacyFundstellenId() Group by the legacy_fundstellen_id column
  * @method CopyLocationQuery groupByCreatedAt() Group by the created_at column
  * @method CopyLocationQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -70,6 +69,10 @@ use DTA\MetadataBundle\Model\Workflow\Partner;
  * @method CopyLocationQuery rightJoinLicense($relationAlias = null) Adds a RIGHT JOIN clause to the query using the License relation
  * @method CopyLocationQuery innerJoinLicense($relationAlias = null) Adds a INNER JOIN clause to the query using the License relation
  *
+ * @method CopyLocationQuery leftJoinTask($relationAlias = null) Adds a LEFT JOIN clause to the query using the Task relation
+ * @method CopyLocationQuery rightJoinTask($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Task relation
+ * @method CopyLocationQuery innerJoinTask($relationAlias = null) Adds a INNER JOIN clause to the query using the Task relation
+ *
  * @method CopyLocation findOne(PropelPDO $con = null) Return the first CopyLocation matching the query
  * @method CopyLocation findOneOrCreate(PropelPDO $con = null) Return the first CopyLocation matching the query, or a new CopyLocation object populated from the query conditions when no match is found
  *
@@ -85,7 +88,6 @@ use DTA\MetadataBundle\Model\Workflow\Partner;
  * @method CopyLocation findOneByImageurl(string $imageurl) Return the first CopyLocation filtered by the imageurl column
  * @method CopyLocation findOneByImageurn(string $imageurn) Return the first CopyLocation filtered by the imageurn column
  * @method CopyLocation findOneByLicenseId(int $license_id) Return the first CopyLocation filtered by the license_id column
- * @method CopyLocation findOneByLegacyFundstellenId(int $legacy_fundstellen_id) Return the first CopyLocation filtered by the legacy_fundstellen_id column
  * @method CopyLocation findOneByCreatedAt(string $created_at) Return the first CopyLocation filtered by the created_at column
  * @method CopyLocation findOneByUpdatedAt(string $updated_at) Return the first CopyLocation filtered by the updated_at column
  *
@@ -102,7 +104,6 @@ use DTA\MetadataBundle\Model\Workflow\Partner;
  * @method array findByImageurl(string $imageurl) Return CopyLocation objects filtered by the imageurl column
  * @method array findByImageurn(string $imageurn) Return CopyLocation objects filtered by the imageurn column
  * @method array findByLicenseId(int $license_id) Return CopyLocation objects filtered by the license_id column
- * @method array findByLegacyFundstellenId(int $legacy_fundstellen_id) Return CopyLocation objects filtered by the legacy_fundstellen_id column
  * @method array findByCreatedAt(string $created_at) Return CopyLocation objects filtered by the created_at column
  * @method array findByUpdatedAt(string $updated_at) Return CopyLocation objects filtered by the updated_at column
  */
@@ -115,8 +116,14 @@ abstract class BaseCopyLocationQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Workflow\\CopyLocation', $modelAlias = null)
+    public function __construct($dbName = null, $modelName = null, $modelAlias = null)
     {
+        if (null === $dbName) {
+            $dbName = 'dtametadata';
+        }
+        if (null === $modelName) {
+            $modelName = 'DTA\\MetadataBundle\\Model\\Workflow\\CopyLocation';
+        }
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
@@ -133,10 +140,8 @@ abstract class BaseCopyLocationQuery extends ModelCriteria
         if ($criteria instanceof CopyLocationQuery) {
             return $criteria;
         }
-        $query = new CopyLocationQuery();
-        if (null !== $modelAlias) {
-            $query->setModelAlias($modelAlias);
-        }
+        $query = new CopyLocationQuery(null, null, $modelAlias);
+
         if ($criteria instanceof Criteria) {
             $query->mergeWith($criteria);
         }
@@ -164,7 +169,7 @@ abstract class BaseCopyLocationQuery extends ModelCriteria
             return null;
         }
         if ((null !== ($obj = CopyLocationPeer::getInstanceFromPool((string) $key))) && !$this->formatter) {
-            // the object is alredy in the instance pool
+            // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
@@ -206,7 +211,7 @@ abstract class BaseCopyLocationQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "publication_id", "partner_id", "catalogue_signature", "catalogue_internal", "catalogue_url", "numfaksimiles", "catalogue_extent", "availability", "comments", "imageurl", "imageurn", "license_id", "legacy_fundstellen_id", "created_at", "updated_at" FROM "copy_location" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "publication_id", "partner_id", "catalogue_signature", "catalogue_internal", "catalogue_url", "numfaksimiles", "catalogue_extent", "availability", "comments", "imageurl", "imageurn", "license_id", "created_at", "updated_at" FROM "copy_location" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -742,55 +747,13 @@ abstract class BaseCopyLocationQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the legacy_fundstellen_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByLegacyFundstellenId(1234); // WHERE legacy_fundstellen_id = 1234
-     * $query->filterByLegacyFundstellenId(array(12, 34)); // WHERE legacy_fundstellen_id IN (12, 34)
-     * $query->filterByLegacyFundstellenId(array('min' => 12)); // WHERE legacy_fundstellen_id >= 12
-     * $query->filterByLegacyFundstellenId(array('max' => 12)); // WHERE legacy_fundstellen_id <= 12
-     * </code>
-     *
-     * @param     mixed $legacyFundstellenId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return CopyLocationQuery The current query, for fluid interface
-     */
-    public function filterByLegacyFundstellenId($legacyFundstellenId = null, $comparison = null)
-    {
-        if (is_array($legacyFundstellenId)) {
-            $useMinMax = false;
-            if (isset($legacyFundstellenId['min'])) {
-                $this->addUsingAlias(CopyLocationPeer::LEGACY_FUNDSTELLEN_ID, $legacyFundstellenId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($legacyFundstellenId['max'])) {
-                $this->addUsingAlias(CopyLocationPeer::LEGACY_FUNDSTELLEN_ID, $legacyFundstellenId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(CopyLocationPeer::LEGACY_FUNDSTELLEN_ID, $legacyFundstellenId, $comparison);
-    }
-
-    /**
      * Filter the query on the created_at column
      *
      * Example usage:
      * <code>
      * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
      * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
-     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at < '2011-03-13'
      * </code>
      *
      * @param     mixed $createdAt The value to use as filter.
@@ -833,7 +796,7 @@ abstract class BaseCopyLocationQuery extends ModelCriteria
      * <code>
      * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
      * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
-     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at < '2011-03-13'
      * </code>
      *
      * @param     mixed $updatedAt The value to use as filter.
@@ -979,7 +942,7 @@ abstract class BaseCopyLocationQuery extends ModelCriteria
      *
      * @return CopyLocationQuery The current query, for fluid interface
      */
-    public function joinPartner($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinPartner($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Partner');
@@ -1014,7 +977,7 @@ abstract class BaseCopyLocationQuery extends ModelCriteria
      *
      * @return   \DTA\MetadataBundle\Model\Workflow\PartnerQuery A secondary query class using the current class as primary query
      */
-    public function usePartnerQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function usePartnerQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinPartner($relationAlias, $joinType)
@@ -1095,6 +1058,80 @@ abstract class BaseCopyLocationQuery extends ModelCriteria
         return $this
             ->joinLicense($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'License', '\DTA\MetadataBundle\Model\Workflow\LicenseQuery');
+    }
+
+    /**
+     * Filter the query by a related Task object
+     *
+     * @param   Task|PropelObjectCollection $task  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 CopyLocationQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByTask($task, $comparison = null)
+    {
+        if ($task instanceof Task) {
+            return $this
+                ->addUsingAlias(CopyLocationPeer::ID, $task->getCopylocationId(), $comparison);
+        } elseif ($task instanceof PropelObjectCollection) {
+            return $this
+                ->useTaskQuery()
+                ->filterByPrimaryKeys($task->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByTask() only accepts arguments of type Task or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Task relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return CopyLocationQuery The current query, for fluid interface
+     */
+    public function joinTask($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Task');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Task');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Task relation Task object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\Workflow\TaskQuery A secondary query class using the current class as primary query
+     */
+    public function useTaskQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinTask($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Task', '\DTA\MetadataBundle\Model\Workflow\TaskQuery');
     }
 
     /**

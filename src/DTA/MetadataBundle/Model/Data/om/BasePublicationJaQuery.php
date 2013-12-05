@@ -53,8 +53,14 @@ abstract class BasePublicationJaQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'dtametadata', $modelName = 'DTA\\MetadataBundle\\Model\\Data\\PublicationJa', $modelAlias = null)
+    public function __construct($dbName = null, $modelName = null, $modelAlias = null)
     {
+        if (null === $dbName) {
+            $dbName = 'dtametadata';
+        }
+        if (null === $modelName) {
+            $modelName = 'DTA\\MetadataBundle\\Model\\Data\\PublicationJa';
+        }
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
@@ -71,10 +77,8 @@ abstract class BasePublicationJaQuery extends ModelCriteria
         if ($criteria instanceof PublicationJaQuery) {
             return $criteria;
         }
-        $query = new PublicationJaQuery();
-        if (null !== $modelAlias) {
-            $query->setModelAlias($modelAlias);
-        }
+        $query = new PublicationJaQuery(null, null, $modelAlias);
+
         if ($criteria instanceof Criteria) {
             $query->mergeWith($criteria);
         }
@@ -102,7 +106,7 @@ abstract class BasePublicationJaQuery extends ModelCriteria
             return null;
         }
         if ((null !== ($obj = PublicationJaPeer::getInstanceFromPool((string) $key))) && !$this->formatter) {
-            // the object is alredy in the instance pool
+            // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {

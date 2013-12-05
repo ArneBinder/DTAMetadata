@@ -16,16 +16,17 @@ class DumpConversionController extends ORMController {
     /**
      * Configure
      */
-    private $username = 'root';
-    private $password = 'root'; //garamond4000
-    private $database = "dtadb";
-    private $dumpPath = '/Users/macbookdata/Dropbox/DTA/dumpConversion/dtadb_2013-09-29_07-10-01.sql';
+    private $username  = 'root';
+    private $password  = 'root'; //garamond4000
+    private $database  = "dtadb";
+    private $dumpPath  = '/Users/macbookdata/Dropbox/DTA/dumpConversion/dtadb_2013-09-29_07-10-01.sql';
     private $mysqlExec = '/Applications/MAMP/Library/bin/mysql'; // for importing the dump
-    private $phpExec = '/usr/local/php5/bin/php';
+    private $phpExec   = '/usr/local/php5/bin/php';
         
     /** Stores problematic actions taken in the conversion process. */
-    private $warnings;
     private $messages;
+    private $warnings;
+    private $errors;
     
     /**
      * @param type $username MySQL access parameters.
@@ -43,35 +44,47 @@ class DumpConversionController extends ORMController {
         }
     }
         
-    function convertAction() {
-        
-        // during conversion, a lot of memory is allocated
-        ini_set('memory_limit', '512M');
-        
-        // stores warning messages generated during the conversion
-        $this->warnings = array();
-        $this->messages = array();
+    function dropAndSetupTargetDB(){
         
         // import dump
         $importDumpCommand = "$this->mysqlExec -u $this->username -p$this->password dtadb < $this->dumpPath";
         $this->messages[] = array("import dump command: " => $importDumpCommand);
         system($importDumpCommand);
+        
+        // build current database schema
+        $result = system("$this->phpExec ../app/console propel:sql:build");
+        $this->messages[] = array("building database schema from xml model: " => $result );
+        
+        // import current database schema to target database (ERASES ALL DATA)
+        $result = system("$this->phpExec ../app/console propel:sql:insert --force");
+        $this->messages[] = array("resetting target database: " => $result);
+        
+        // loads fixtures (task types, name fragment types, etc.)
+        $result = system("$this->phpExec ../app/console propel:fixtures:load @DTAMetadataBundle");
+        $this->messages[] = array("loading database fixtures: " => $result);
+        
+    }
+    function convertAction() {
+        
+        // during conversion, a lot of memory is allocated
+        ini_set('memory_limit', '512M');
+        ini_set('max_execution_time', 300); //300 seconds = 5 minutes
+        //
+        // stores warning messages generated during the conversion
+        $this->warnings = array();
+        $this->messages = array();
+        $this->errors   = array();
+        
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // ERASE ALL DATA FROM THE WORKING (TARGET DATABASE) vvvvvv
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         
-        $result = system("$this->phpExec ../app/console propel:sql:build");
-        $this->messages[] = array("building database schema from xml model: " => $result );
-        
-        $result = system("$this->phpExec ../app/console propel:sql:insert --force");
-        $this->messages[] = array("resetting target database: " => $result);
-        
-        $result = system("$this->phpExec ../app/console propel:fixtures:load @DTAMetadataBundle");
-        $this->messages[] = array("loading database fixtures: " => $result);
+        $this->dropAndSetupTargetDB();
         
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // ERASE ALL DATA FROM THE WORKING (TARGET DATABASE) ^^^^^^^
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // 
         // connect to imported database
         $dbh = $this->connect();
             
@@ -86,20 +99,38 @@ class DumpConversionController extends ORMController {
         
         $this->convertPartners($dbh);
         
+        $this->convertCopyLocations($dbh);  // after publications and partners
+//        
+        $this->convertTasks($dbh);          // after copy locations
+//        
         $this->convertPublishingCompanies($dbh);
-        
+//        
         $this->convertPlaces($dbh);
-        
-        $this->convertAuthors($dbh);        // after publication because during merging duplicate persons, information is easiest retained by adding the merged person as author via the known legacy book id
-        
+//        
+        $this->convertAuthors($dbh);        // after publication because during merging duplicate persons, information is easiest retained by adding the merged person as author via the known publication id
+//        
         $this->convertSingleFieldPersons($dbh);
         
         return $this->renderWithDomainData('DTAMetadataBundle:DumpConversion:conversionResult.html.twig', array(
             'warnings' => $this->warnings,
             'messages' => $this->messages,
+            'errors'   => $this->errors,
         ));
     }
         
+    // parses date string in format 2007-12-11 17:39:30 to \DateTime objects
+    function parseSQLDate($dateString){
+        
+        if($dateString === NULL)
+            return NULL;
+        
+        $dateTime = date_parse($dateString);
+        $result = new \DateTime();
+        $result->setDate($dateTime['year'], $dateTime['month'], $dateTime['day']);
+        $result->setTime($dateTime['hour'], $dateTime['minute'], $dateTime['second']);
+        return $result;
+    }
+    
     /* ---------------------------------------------------------------------
      * partner
      * ------------------------------------------------------------------ */
@@ -107,7 +138,7 @@ class DumpConversionController extends ORMController {
         
         $rawData = "
             SELECT 
-                book.id_book as legacybookid
+                book.id_book as id
 
                 ,NULLIF(doi, '') as `doi`
                 ,NULLIF(umfang, '') as `numpages`
@@ -117,13 +148,15 @@ class DumpConversionController extends ORMController {
                 ,NULLIF(other_title, '') as `subtitle2`
                 ,NULLIF(short_title, '') as `shorttitle`
                 ,NULLIF(dta_auflage, '') as `printrun`
-                
+                ,FIND_IN_SET(source,'china,don,kt,n/a') as `source_id`
+
                 ,IF(LENGTH(`year`) < 3, NULL, `year`) as `year` -- to sort out a 0 entry
                 ,LOCATE('[', `year`) as `year_is_reconstructed`
 
                 ,CASE format
                     WHEN '' THEN NULL 
-                    WHEN '4º' THEN '4°' WHEN '8º' THEN '8°'		-- merge character based differences
+                    WHEN '4º' THEN '4°' 
+                    WHEN '8º' THEN '8°'		-- merge character based differences
                     ELSE format
                 END as `format`
     
@@ -131,7 +164,7 @@ class DumpConversionController extends ORMController {
                 ,special_comment as encoding_comment
                 
                 ,book.log_last_change
-                ,book.log_last_user
+                ,user.id_user as `updated_by`
 
                 ,NULLIF(dta_edition, '') as `edition`
                 ,availability                                   -- is 0 only for 16 publications
@@ -139,15 +172,16 @@ class DumpConversionController extends ORMController {
             FROM book 
                 LEFT JOIN metadaten ON book.id_book = metadaten.id_book 
                 LEFT JOIN sources   ON book.id_book = sources.id_book
+                LEFT JOIN user      ON book.log_last_user = user.id_user
             ;";
         
-        $publication;
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
             array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
     
             // title ------------------------------------------------------------------------------------
             $title = new Model\Data\Title();
+            
             // iterate over title columns and create titlefragments of the according type
             $titleColumns = array("title"=>"Haupttitel", "subtitle"=>"Untertitel", "subtitle2"=>"Untertitel", "shorttitle"=>"Kurztitel", "printrun"=>"Auflage");
             $titleFragmentIdx = 1;
@@ -159,6 +193,8 @@ class DumpConversionController extends ORMController {
                     $titleFragmentIdx++;
                 }
             }
+            if($titleFragmentIdx == 1) 
+                var_dump($row);
             
             // date ------------------------------------------------------------------------------------
             $publishedDate = NULL;
@@ -183,24 +219,10 @@ class DumpConversionController extends ORMController {
             $comment .= $row['dta_insert_date'] !== NULL ? "\ndta_insert_date: " . $row['dta_insert_date'] : "";
             $comment .= $row['availability'] == "0" ? "\nGilt als nicht verfügbar." : "";
 
-            // log data ------------------------------------------------------------------------------------
-            $lastChange = NULL;
-            if($row['log_last_change'] !== NULL){
-                $dateTime = date_parse($row['log_last_change']);
-                $lastChange = new \DateTime();
-                $lastChange->setDate($dateTime['year'], $dateTime['month'], $dateTime['day']);
-                $lastChange->setTime($dateTime['hour'], $dateTime['minute'], $dateTime['second']);
-            }
-            $lastUserId = NULL;
-            if($row['log_last_user'] !== NULL){
-                $lastUser = Model\Master\DtaUserQuery::create()
-                        ->findOneByLegacyUserId($row['log_last_user']);
-                $lastUserId = $lastUser !== NULL ? $lastUser->getId() : NULL;
-            }
-            
             // save ------------------------------------------------------------------------------------
             $publication = new Model\Data\Publication();
-            $publication->setLegacyBookId($row['legacybookid'])
+                
+            $publication->setId($row['id'])
                         ->setTitle($title)
                         ->setDatespecificationRelatedByPublicationdateId($publishedDate)
                         ->setNumpages($row['numpages'])
@@ -209,9 +231,13 @@ class DumpConversionController extends ORMController {
                         ->setEncodingComment($row['encoding_comment'])
                         ->setDoi($row['doi'])
                         ->setFormat($row['format'])
-                        ->setUpdatedAt($lastChange)
-                        ->setLastChangedByUserId($lastUserId)
+                        ->setSourceId($row['source_id'])
+                        ->setUpdatedAt($this->parseSQLDate($row['log_last_change']))
+                        ->setLastChangedByUserId($row['updated_by'])
                         ->save();
+                
+                
+
         }
     }
         
@@ -229,7 +255,7 @@ class DumpConversionController extends ORMController {
             array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
                         
             $partner = new Model\Workflow\Partner();
-            $partner->setLegacyPartnerId($row['id_book_locations'])
+            $partner->setId($row['id_book_locations'])
                     ->setName($row['name'])
                     ->setContactPerson($row['person'])
                     ->setMail($row['mail'])
@@ -238,6 +264,129 @@ class DumpConversionController extends ORMController {
                     ->setComments($row['comments']);
             $partner->save();
         }
+    }
+        
+      // after publications and partners
+    function convertCopyLocations($dbh){
+        
+        $rawData = "SELECT 
+                        id_Fundstellen as `copylocation_id`
+                        ,book.id_book as `publication_id`
+                        ,partner.id_book_locations as `partner_id`
+                        ,NULLIF(fundstellen.dta_insert_date, '0000-00-00 00:00:00') as `created_at`
+                        ,NULLIF(fundstellen.comments, '') as `comments`
+                        ,NULLIF(`accessible`, 2) as `accessible`      -- 2 is currently used for 'not clear'
+                        ,fundstellen.log_last_user as `updated_by`
+                        ,fundstellen.log_last_change as `updated_at`
+                        ,NULLIF(signatur, '') as `catalogue_signature`
+                        ,NULLIF(bib_id, '') as `catalogue_internal`
+                    FROM
+                        fundstellen 
+                        LEFT JOIN partner ON 
+                            fundstellen.id_book_locations = partner.id_book_locations
+                        LEFT JOIN book ON
+                            fundstellen.id_book = book.id_book;";
+            
+        foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+            // encode all data from the old database as UTF8
+            array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
+                        
+            if($row['publication_id'] === NULL){
+                $this->errors[] = array('message' => 'copy location refers to non-existing publication.');
+                continue;
+            }
+                
+            try {
+
+            $copyLocation = new Model\Workflow\CopyLocation();
+            $copyLocation->setId($row['copylocation_id'])
+                    ->setPublicationId($row['publication_id'])
+                    ->setPartnerId($row['partner_id'])
+                    ->setCreatedAt($row['created_at'])
+                    ->setComments($row['comments'])
+                    ->setAvailability($row['accessible'])
+                    ->setUpdatedAt($row['updated_at'])
+                    ->setCatalogueSignature($row['catalogue_signature'])
+                    ->setCatalogueInternal($row['catalogue_internal']);
+            $copyLocation->save();
+            
+            } catch (\PropelException $exc) {
+                $this->errors[] = array('message' => 'on inserting copy location');
+            }
+        }
+    }
+            
+    function convertTasks($dbh){
+        
+        $rawData = "SELECT 
+                        id_task as `task_id`
+                        ,IF(FIND_IN_SET(task_type,'5,10,20,30,31,40,45,50,55,58,59,60,65,70,75') = 0, null, task_type) as `task_type_id`
+                        ,book.id_book as `publication_id`
+                        ,partner.id_book_locations as `partner_id`
+                        ,fundstellen.id_Fundstellen as `copy_location_id`
+                        ,user.id_user as `user_id`
+                        ,NULLIF(starttime, '0000-00-00 00:00:00') as `start_date`
+                        ,NULLIF(endtime, '0000-00-00 00:00:00') as `end_date`
+                        ,open_tasks.comments
+                        ,closed
+                        ,NULLIF(createDate, '0000-00-00 00:00:00') as `created_at`
+                        ,NULLIF(open_tasks.log_last_change, '0000-00-00 00:00:00') as `updated_at`
+                    FROM
+                        open_tasks 
+                        LEFT JOIN book ON
+                                open_tasks.id_book = book.id_book
+                        LEFT JOIN user on
+                               open_tasks.id_user = user.id_user
+                        LEFT JOIN partner ON 
+                            open_tasks.id_book_locations = partner.id_book_locations
+                        LEFT JOIN fundstellen ON
+                            id_fundstelle = id_Fundstellen";
+            
+        foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+            // encode all data from the old database as UTF8
+            array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
+
+            if($row['publication_id'] === NULL){
+                $this->errors[] = array(
+                    'message' => 'Task verweist auf nicht-existente Publikation.',
+                    'action'  => 'Datensatz übersprungen',
+                    'task_id'     => $row['task_id']
+                    );
+                continue;
+            }
+            
+            if($row['task_type_id'] === NULL){
+                $this->warnings[] = array(
+                    'message' => "Task hat unbekannten Tasktyp.",
+                    'action'  => 'Datensatz übersprungen',
+                    'task_id'     => $row['task_id']
+                    );
+                continue;
+            }
+            
+            try {
+
+            $task = new Model\Workflow\Task();
+            
+            $task->setId($row['task_id'])
+                    ->setTasktypeId($row['task_type_id'])
+                    ->setPublicationId($row['publication_id'])
+                    ->setPartnerId($row['partner_id'])
+                    ->setCopylocationId($row['copy_location_id'])
+                    ->setResponsibleuserId($row['user_id'])
+                    ->setStartDate($this->parseSQLDate($row['start_date']))
+                    ->setEndDate($this->parseSQLDate($row['end_date']))
+                    ->setComments($row['comments'])
+                    ->setClosed($row['closed'])
+                    ->setCreatedAt($this->parseSQLDate($row['created_at']))
+                    ->setUpdatedAt($this->parseSQLDate($row['updated_at']));
+            $task->save();
+            
+            } catch (\PropelException $exc) {
+                $this->errors[] = array('error' => 'on insert task', 'row' => $row);
+            }
+        }
+        
     }
         
     /* ---------------------------------------------------------------------
@@ -333,7 +482,7 @@ class DumpConversionController extends ORMController {
             $user->setSalt(md5(rand(-1239432, 23429304)));
             $saltedPassword = $encoder->encodePassword('$dta010', $user->getSalt());
                 
-            $user->setLegacyUserId($row['id_user'])
+            $user->setId($row['id_user'])
                     ->setUsername($row['name'])
                     ->setMail($row['mail'])
                     ->setPassword($saltedPassword);
@@ -378,7 +527,7 @@ class DumpConversionController extends ORMController {
                     ORDER BY
                         lastname, 
                         firstname, 
-                        pnd DESC -- NULL pnds come second and the record with the not null pnd is used as base for the merge of subsequent persons with same name";
+                        pnd DESC -- NULL pnds come second and the record with a pnd is used as base for the merge of subsequent persons with same name";
                             
         $lastPerson = NULL;
         $lastFirstname = NULL;
@@ -389,32 +538,16 @@ class DumpConversionController extends ORMController {
             array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
 
             $publication = Model\Data\PublicationQuery::create()
-                        ->findOneByLegacyBookId($row['id_book']);
+                        ->findOneById($row['id_book']);
             $gndCollisions = NULL;
             
             // try to detect duplicates with duplicate gnds
             if ($row['pnd'] !== NULL) {
-
                 $gndCollisions = Model\Data\PersonQuery::create()
                         ->filterByGnd($row['pnd'])
                         ->find();
-
-                // if the gnd is already used by another person, this is for sure a duplicate
-                // GND is ensured to be unique, so this can be either 0 or 1
-//                if ($gndCollisions->count() == 1) {
-//                    $collision = $gndCollisions[0];
-//                    $this->warnings[] = array(
-//                        'message' => 'Personen-Duplikat: GND bereits vergeben.',
-//                        'action' => 'Datensatz übersprungen.',
-//                        'record' => $row,
-//                        'collision due to' => "ID: " . $collision->getId() . "; " . $collision->getRepresentativePersonalName());
-//                    continue;
-//                }
             }
             
-//            $p = new Model\Data\Publication();
-//            $p->getDatespecificationRelatedByCreationdateId()
-                
             // subsequent rows usually contain the same person but a different book
             // if the row refers to the same person
             if($lastPerson !== NULL 
@@ -439,7 +572,7 @@ class DumpConversionController extends ORMController {
                     $name->addNamefragment(new Model\Data\Namefragment('Vorname', $row['firstname']));
                 if ($row['lastname'] !== NULL)
                     $name->addNamefragment(new Model\Data\Namefragment('Nachname', $row['lastname']));
-
+                
                 $person = new Model\Data\Person();
                 $person->setGnd($row['pnd'])            // does nothing if pnd is NULL
                         ->addPersonalname($name)
@@ -448,6 +581,10 @@ class DumpConversionController extends ORMController {
                 $lastPerson = $person;
                 $lastFirstname = $row['firstname'];
                 $lastLastname  = $row['lastname'];
+                
+                $publication
+                    ->addPersonPublication(new Model\Master\PersonPublication($person->getId(), 'Autor'))
+                    ->save();
             }
                 
         }
