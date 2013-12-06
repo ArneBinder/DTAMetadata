@@ -29,19 +29,25 @@ abstract class BasePersonrolePeer
     const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Classification\\map\\PersonroleTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 2;
+    const NUM_COLUMNS = 4;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 2;
+    const NUM_HYDRATE_COLUMNS = 4;
 
     /** the column name for the id field */
     const ID = 'personrole.id';
 
     /** the column name for the name field */
     const NAME = 'personrole.name';
+
+    /** the column name for the created_at field */
+    const CREATED_AT = 'personrole.created_at';
+
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'personrole.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -62,12 +68,12 @@ abstract class BasePersonrolePeer
      * e.g. PersonrolePeer::$fieldNames[PersonrolePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', ),
-        BasePeer::TYPE_COLNAME => array (PersonrolePeer::ID, PersonrolePeer::NAME, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'name', ),
-        BasePeer::TYPE_NUM => array (0, 1, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (PersonrolePeer::ID, PersonrolePeer::NAME, PersonrolePeer::CREATED_AT, PersonrolePeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
     /**
@@ -77,12 +83,12 @@ abstract class BasePersonrolePeer
      * e.g. PersonrolePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, ),
-        BasePeer::TYPE_COLNAME => array (PersonrolePeer::ID => 0, PersonrolePeer::NAME => 1, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, ),
-        BasePeer::TYPE_NUM => array (0, 1, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
+        BasePeer::TYPE_COLNAME => array (PersonrolePeer::ID => 0, PersonrolePeer::NAME => 1, PersonrolePeer::CREATED_AT => 2, PersonrolePeer::UPDATED_AT => 3, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'created_at' => 2, 'updated_at' => 3, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
     /**
@@ -158,9 +164,13 @@ abstract class BasePersonrolePeer
         if (null === $alias) {
             $criteria->addSelectColumn(PersonrolePeer::ID);
             $criteria->addSelectColumn(PersonrolePeer::NAME);
+            $criteria->addSelectColumn(PersonrolePeer::CREATED_AT);
+            $criteria->addSelectColumn(PersonrolePeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.name');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

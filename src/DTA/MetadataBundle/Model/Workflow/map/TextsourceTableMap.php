@@ -49,6 +49,8 @@ class TextsourceTableMap extends TableMap
         $this->addColumn('texturl', 'Texturl', 'LONGVARCHAR', false, null, null);
         $this->addForeignKey('license_id', 'LicenseId', 'INTEGER', 'license', 'id', false, null, null);
         $this->addColumn('attribution', 'Attribution', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -71,6 +73,11 @@ class TextsourceTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
+),
             'table_row_view' =>  array (
   'Id' => 'id',
   'PublicationId' => 'publication_id',
@@ -78,6 +85,8 @@ class TextsourceTableMap extends TableMap
   'Texturl' => 'texturl',
   'LicenseId' => 'license_id',
   'Attribution' => 'attribution',
+  'CreatedAt' => 'created_at',
+  'UpdatedAt' => 'updated_at',
 ),
         );
     } // getBehaviors()

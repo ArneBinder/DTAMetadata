@@ -48,6 +48,8 @@ class DtaUserTableMap extends TableMap
         $this->addColumn('salt', 'Salt', 'VARCHAR', false, 512, null);
         $this->addColumn('mail', 'Mail', 'LONGVARCHAR', false, null, null);
         $this->addColumn('admin', 'Admin', 'BOOLEAN', false, null, false);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -70,6 +72,11 @@ class DtaUserTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
+),
             'table_row_view' =>  array (
   'id' => 'id',
   'benutzername' => 'username',

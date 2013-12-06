@@ -26,6 +26,8 @@ use DTA\MetadataBundle\Model\Workflow\Task;
  * @method DtaUserQuery orderBySalt($order = Criteria::ASC) Order by the salt column
  * @method DtaUserQuery orderByMail($order = Criteria::ASC) Order by the mail column
  * @method DtaUserQuery orderByAdmin($order = Criteria::ASC) Order by the admin column
+ * @method DtaUserQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method DtaUserQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method DtaUserQuery groupById() Group by the id column
  * @method DtaUserQuery groupByUsername() Group by the username column
@@ -33,6 +35,8 @@ use DTA\MetadataBundle\Model\Workflow\Task;
  * @method DtaUserQuery groupBySalt() Group by the salt column
  * @method DtaUserQuery groupByMail() Group by the mail column
  * @method DtaUserQuery groupByAdmin() Group by the admin column
+ * @method DtaUserQuery groupByCreatedAt() Group by the created_at column
+ * @method DtaUserQuery groupByUpdatedAt() Group by the updated_at column
  *
  * @method DtaUserQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method DtaUserQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -58,6 +62,8 @@ use DTA\MetadataBundle\Model\Workflow\Task;
  * @method DtaUser findOneBySalt(string $salt) Return the first DtaUser filtered by the salt column
  * @method DtaUser findOneByMail(string $mail) Return the first DtaUser filtered by the mail column
  * @method DtaUser findOneByAdmin(boolean $admin) Return the first DtaUser filtered by the admin column
+ * @method DtaUser findOneByCreatedAt(string $created_at) Return the first DtaUser filtered by the created_at column
+ * @method DtaUser findOneByUpdatedAt(string $updated_at) Return the first DtaUser filtered by the updated_at column
  *
  * @method array findById(int $id) Return DtaUser objects filtered by the id column
  * @method array findByUsername(string $username) Return DtaUser objects filtered by the username column
@@ -65,6 +71,8 @@ use DTA\MetadataBundle\Model\Workflow\Task;
  * @method array findBySalt(string $salt) Return DtaUser objects filtered by the salt column
  * @method array findByMail(string $mail) Return DtaUser objects filtered by the mail column
  * @method array findByAdmin(boolean $admin) Return DtaUser objects filtered by the admin column
+ * @method array findByCreatedAt(string $created_at) Return DtaUser objects filtered by the created_at column
+ * @method array findByUpdatedAt(string $updated_at) Return DtaUser objects filtered by the updated_at column
  */
 abstract class BaseDtaUserQuery extends ModelCriteria
 {
@@ -170,7 +178,7 @@ abstract class BaseDtaUserQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "username", "password", "salt", "mail", "admin" FROM "dta_user" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "username", "password", "salt", "mail", "admin", "created_at", "updated_at" FROM "dta_user" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -445,6 +453,92 @@ abstract class BaseDtaUserQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at < '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return DtaUserQuery The current query, for fluid interface
+     */
+    public function filterByCreatedAt($createdAt = null, $comparison = null)
+    {
+        if (is_array($createdAt)) {
+            $useMinMax = false;
+            if (isset($createdAt['min'])) {
+                $this->addUsingAlias(DtaUserPeer::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($createdAt['max'])) {
+                $this->addUsingAlias(DtaUserPeer::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(DtaUserPeer::CREATED_AT, $createdAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the updated_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at < '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return DtaUserQuery The current query, for fluid interface
+     */
+    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+    {
+        if (is_array($updatedAt)) {
+            $useMinMax = false;
+            if (isset($updatedAt['min'])) {
+                $this->addUsingAlias(DtaUserPeer::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($updatedAt['max'])) {
+                $this->addUsingAlias(DtaUserPeer::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(DtaUserPeer::UPDATED_AT, $updatedAt, $comparison);
+    }
+
+    /**
      * Filter the query by a related Publication object
      *
      * @param   Publication|PropelObjectCollection $publication  the related object to use as filter
@@ -682,4 +776,69 @@ abstract class BaseDtaUserQuery extends ModelCriteria
         return $this;
     }
 
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     DtaUserQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(DtaUserPeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     DtaUserQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(DtaUserPeer::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     DtaUserQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(DtaUserPeer::UPDATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     DtaUserQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(DtaUserPeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     DtaUserQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(DtaUserPeer::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     DtaUserQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(DtaUserPeer::CREATED_AT);
+    }
 }

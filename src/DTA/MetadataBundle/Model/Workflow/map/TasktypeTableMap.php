@@ -47,6 +47,8 @@ class TasktypeTableMap extends TableMap
         $this->addColumn('tree_left', 'TreeLeft', 'INTEGER', false, null, null);
         $this->addColumn('tree_right', 'TreeRight', 'INTEGER', false, null, null);
         $this->addColumn('tree_level', 'TreeLevel', 'INTEGER', false, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -79,6 +81,11 @@ class TasktypeTableMap extends TableMap
   'id' => 'id',
   'Typ' => 'name',
   'Zuordnung' => 'accessor:getParent',
+),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
 ),
         );
     } // getBehaviors()

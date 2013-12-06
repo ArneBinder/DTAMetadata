@@ -32,13 +32,13 @@ abstract class BaseTextsourcePeer
     const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Workflow\\map\\TextsourceTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 8;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 8;
 
     /** the column name for the id field */
     const ID = 'textsource.id';
@@ -57,6 +57,12 @@ abstract class BaseTextsourcePeer
 
     /** the column name for the attribution field */
     const ATTRIBUTION = 'textsource.attribution';
+
+    /** the column name for the created_at field */
+    const CREATED_AT = 'textsource.created_at';
+
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'textsource.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -77,12 +83,12 @@ abstract class BaseTextsourcePeer
      * e.g. TextsourcePeer::$fieldNames[TextsourcePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'PartnerId', 'Texturl', 'LicenseId', 'Attribution', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'partnerId', 'texturl', 'licenseId', 'attribution', ),
-        BasePeer::TYPE_COLNAME => array (TextsourcePeer::ID, TextsourcePeer::PUBLICATION_ID, TextsourcePeer::PARTNER_ID, TextsourcePeer::TEXTURL, TextsourcePeer::LICENSE_ID, TextsourcePeer::ATTRIBUTION, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'PARTNER_ID', 'TEXTURL', 'LICENSE_ID', 'ATTRIBUTION', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'partner_id', 'texturl', 'license_id', 'attribution', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'PartnerId', 'Texturl', 'LicenseId', 'Attribution', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'partnerId', 'texturl', 'licenseId', 'attribution', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (TextsourcePeer::ID, TextsourcePeer::PUBLICATION_ID, TextsourcePeer::PARTNER_ID, TextsourcePeer::TEXTURL, TextsourcePeer::LICENSE_ID, TextsourcePeer::ATTRIBUTION, TextsourcePeer::CREATED_AT, TextsourcePeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'PARTNER_ID', 'TEXTURL', 'LICENSE_ID', 'ATTRIBUTION', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'partner_id', 'texturl', 'license_id', 'attribution', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -92,12 +98,12 @@ abstract class BaseTextsourcePeer
      * e.g. TextsourcePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'PartnerId' => 2, 'Texturl' => 3, 'LicenseId' => 4, 'Attribution' => 5, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'partnerId' => 2, 'texturl' => 3, 'licenseId' => 4, 'attribution' => 5, ),
-        BasePeer::TYPE_COLNAME => array (TextsourcePeer::ID => 0, TextsourcePeer::PUBLICATION_ID => 1, TextsourcePeer::PARTNER_ID => 2, TextsourcePeer::TEXTURL => 3, TextsourcePeer::LICENSE_ID => 4, TextsourcePeer::ATTRIBUTION => 5, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'PARTNER_ID' => 2, 'TEXTURL' => 3, 'LICENSE_ID' => 4, 'ATTRIBUTION' => 5, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'partner_id' => 2, 'texturl' => 3, 'license_id' => 4, 'attribution' => 5, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'PartnerId' => 2, 'Texturl' => 3, 'LicenseId' => 4, 'Attribution' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'partnerId' => 2, 'texturl' => 3, 'licenseId' => 4, 'attribution' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
+        BasePeer::TYPE_COLNAME => array (TextsourcePeer::ID => 0, TextsourcePeer::PUBLICATION_ID => 1, TextsourcePeer::PARTNER_ID => 2, TextsourcePeer::TEXTURL => 3, TextsourcePeer::LICENSE_ID => 4, TextsourcePeer::ATTRIBUTION => 5, TextsourcePeer::CREATED_AT => 6, TextsourcePeer::UPDATED_AT => 7, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'PARTNER_ID' => 2, 'TEXTURL' => 3, 'LICENSE_ID' => 4, 'ATTRIBUTION' => 5, 'CREATED_AT' => 6, 'UPDATED_AT' => 7, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'partner_id' => 2, 'texturl' => 3, 'license_id' => 4, 'attribution' => 5, 'created_at' => 6, 'updated_at' => 7, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -177,6 +183,8 @@ abstract class BaseTextsourcePeer
             $criteria->addSelectColumn(TextsourcePeer::TEXTURL);
             $criteria->addSelectColumn(TextsourcePeer::LICENSE_ID);
             $criteria->addSelectColumn(TextsourcePeer::ATTRIBUTION);
+            $criteria->addSelectColumn(TextsourcePeer::CREATED_AT);
+            $criteria->addSelectColumn(TextsourcePeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.publication_id');
@@ -184,6 +192,8 @@ abstract class BaseTextsourcePeer
             $criteria->addSelectColumn($alias . '.texturl');
             $criteria->addSelectColumn($alias . '.license_id');
             $criteria->addSelectColumn($alias . '.attribution');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

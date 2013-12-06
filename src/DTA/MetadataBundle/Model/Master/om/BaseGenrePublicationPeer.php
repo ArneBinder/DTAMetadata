@@ -31,13 +31,13 @@ abstract class BaseGenrePublicationPeer
     const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Master\\map\\GenrePublicationTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 5;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 3;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /** the column name for the id field */
     const ID = 'genre_publication.id';
@@ -47,6 +47,12 @@ abstract class BaseGenrePublicationPeer
 
     /** the column name for the publication_id field */
     const PUBLICATION_ID = 'genre_publication.publication_id';
+
+    /** the column name for the created_at field */
+    const CREATED_AT = 'genre_publication.created_at';
+
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'genre_publication.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -67,12 +73,12 @@ abstract class BaseGenrePublicationPeer
      * e.g. GenrePublicationPeer::$fieldNames[GenrePublicationPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'GenreId', 'PublicationId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'genreId', 'publicationId', ),
-        BasePeer::TYPE_COLNAME => array (GenrePublicationPeer::ID, GenrePublicationPeer::GENRE_ID, GenrePublicationPeer::PUBLICATION_ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'GENRE_ID', 'PUBLICATION_ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'genre_id', 'publication_id', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'GenreId', 'PublicationId', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'genreId', 'publicationId', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (GenrePublicationPeer::ID, GenrePublicationPeer::GENRE_ID, GenrePublicationPeer::PUBLICATION_ID, GenrePublicationPeer::CREATED_AT, GenrePublicationPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'GENRE_ID', 'PUBLICATION_ID', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'genre_id', 'publication_id', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
     /**
@@ -82,12 +88,12 @@ abstract class BaseGenrePublicationPeer
      * e.g. GenrePublicationPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'GenreId' => 1, 'PublicationId' => 2, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'genreId' => 1, 'publicationId' => 2, ),
-        BasePeer::TYPE_COLNAME => array (GenrePublicationPeer::ID => 0, GenrePublicationPeer::GENRE_ID => 1, GenrePublicationPeer::PUBLICATION_ID => 2, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'GENRE_ID' => 1, 'PUBLICATION_ID' => 2, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'genre_id' => 1, 'publication_id' => 2, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'GenreId' => 1, 'PublicationId' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'genreId' => 1, 'publicationId' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        BasePeer::TYPE_COLNAME => array (GenrePublicationPeer::ID => 0, GenrePublicationPeer::GENRE_ID => 1, GenrePublicationPeer::PUBLICATION_ID => 2, GenrePublicationPeer::CREATED_AT => 3, GenrePublicationPeer::UPDATED_AT => 4, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'GENRE_ID' => 1, 'PUBLICATION_ID' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'genre_id' => 1, 'publication_id' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
     /**
@@ -164,10 +170,14 @@ abstract class BaseGenrePublicationPeer
             $criteria->addSelectColumn(GenrePublicationPeer::ID);
             $criteria->addSelectColumn(GenrePublicationPeer::GENRE_ID);
             $criteria->addSelectColumn(GenrePublicationPeer::PUBLICATION_ID);
+            $criteria->addSelectColumn(GenrePublicationPeer::CREATED_AT);
+            $criteria->addSelectColumn(GenrePublicationPeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.genre_id');
             $criteria->addSelectColumn($alias . '.publication_id');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

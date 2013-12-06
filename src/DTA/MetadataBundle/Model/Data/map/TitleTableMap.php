@@ -44,6 +44,8 @@ class TitleTableMap extends TableMap
         $this->setPrimaryKeyMethodInfo('title_id_seq');
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -68,6 +70,11 @@ class TitleTableMap extends TableMap
         return array(
             'table_row_view' =>  array (
   'titel' => 'accessor:__toString',
+),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
 ),
         );
     } // getBehaviors()

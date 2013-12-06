@@ -48,6 +48,8 @@ class LicenseTableMap extends TableMap
         $this->addColumn('url', 'Url', 'LONGVARCHAR', false, null, null);
         $this->addColumn('applicable_to_image', 'ApplicableToImage', 'BOOLEAN', true, null, false);
         $this->addColumn('applicable_to_text', 'ApplicableToText', 'BOOLEAN', true, null, false);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -72,6 +74,11 @@ class LicenseTableMap extends TableMap
             'table_row_view' =>  array (
   'Name' => 'name',
   'URL' => 'url',
+),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
 ),
         );
     } // getBehaviors()

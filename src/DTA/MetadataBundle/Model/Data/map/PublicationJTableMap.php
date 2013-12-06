@@ -46,6 +46,8 @@ class PublicationJTableMap extends TableMap
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('publication_id', 'PublicationId', 'INTEGER', 'publication', 'id', true, null, null);
         $this->addColumn('edition', 'Edition', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -68,6 +70,11 @@ class PublicationJTableMap extends TableMap
         return array(
             'table_row_view' =>  array (
   'embedcolumnspublication' => 'publication',
+),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
 ),
         );
     } // getBehaviors()

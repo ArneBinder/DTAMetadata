@@ -22,11 +22,15 @@ use DTA\MetadataBundle\Model\Data\PublicationDmQuery;
  * @method PublicationDmQuery orderByPublicationId($order = Criteria::ASC) Order by the publication_id column
  * @method PublicationDmQuery orderByTitleId($order = Criteria::ASC) Order by the title_id column
  * @method PublicationDmQuery orderByPages($order = Criteria::ASC) Order by the pages column
+ * @method PublicationDmQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method PublicationDmQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method PublicationDmQuery groupById() Group by the id column
  * @method PublicationDmQuery groupByPublicationId() Group by the publication_id column
  * @method PublicationDmQuery groupByTitleId() Group by the title_id column
  * @method PublicationDmQuery groupByPages() Group by the pages column
+ * @method PublicationDmQuery groupByCreatedAt() Group by the created_at column
+ * @method PublicationDmQuery groupByUpdatedAt() Group by the updated_at column
  *
  * @method PublicationDmQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method PublicationDmQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -42,11 +46,15 @@ use DTA\MetadataBundle\Model\Data\PublicationDmQuery;
  * @method PublicationDm findOneByPublicationId(int $publication_id) Return the first PublicationDm filtered by the publication_id column
  * @method PublicationDm findOneByTitleId(int $title_id) Return the first PublicationDm filtered by the title_id column
  * @method PublicationDm findOneByPages(string $pages) Return the first PublicationDm filtered by the pages column
+ * @method PublicationDm findOneByCreatedAt(string $created_at) Return the first PublicationDm filtered by the created_at column
+ * @method PublicationDm findOneByUpdatedAt(string $updated_at) Return the first PublicationDm filtered by the updated_at column
  *
  * @method array findById(int $id) Return PublicationDm objects filtered by the id column
  * @method array findByPublicationId(int $publication_id) Return PublicationDm objects filtered by the publication_id column
  * @method array findByTitleId(int $title_id) Return PublicationDm objects filtered by the title_id column
  * @method array findByPages(string $pages) Return PublicationDm objects filtered by the pages column
+ * @method array findByCreatedAt(string $created_at) Return PublicationDm objects filtered by the created_at column
+ * @method array findByUpdatedAt(string $updated_at) Return PublicationDm objects filtered by the updated_at column
  */
 abstract class BasePublicationDmQuery extends ModelCriteria
 {
@@ -152,7 +160,7 @@ abstract class BasePublicationDmQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "publication_id", "title_id", "pages" FROM "publication_dm" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "publication_id", "title_id", "pages", "created_at", "updated_at" FROM "publication_dm" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -399,6 +407,92 @@ abstract class BasePublicationDmQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at < '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return PublicationDmQuery The current query, for fluid interface
+     */
+    public function filterByCreatedAt($createdAt = null, $comparison = null)
+    {
+        if (is_array($createdAt)) {
+            $useMinMax = false;
+            if (isset($createdAt['min'])) {
+                $this->addUsingAlias(PublicationDmPeer::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($createdAt['max'])) {
+                $this->addUsingAlias(PublicationDmPeer::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(PublicationDmPeer::CREATED_AT, $createdAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the updated_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at < '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return PublicationDmQuery The current query, for fluid interface
+     */
+    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+    {
+        if (is_array($updatedAt)) {
+            $useMinMax = false;
+            if (isset($updatedAt['min'])) {
+                $this->addUsingAlias(PublicationDmPeer::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($updatedAt['max'])) {
+                $this->addUsingAlias(PublicationDmPeer::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(PublicationDmPeer::UPDATED_AT, $updatedAt, $comparison);
+    }
+
+    /**
      * Filter the query by a related Publication object
      *
      * @param   Publication|PropelObjectCollection $publication The related object(s) to use as filter
@@ -490,4 +584,69 @@ abstract class BasePublicationDmQuery extends ModelCriteria
         return $this;
     }
 
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     PublicationDmQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(PublicationDmPeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     PublicationDmQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(PublicationDmPeer::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     PublicationDmQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(PublicationDmPeer::UPDATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     PublicationDmQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(PublicationDmPeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     PublicationDmQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(PublicationDmPeer::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     PublicationDmQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(PublicationDmPeer::CREATED_AT);
+    }
 }

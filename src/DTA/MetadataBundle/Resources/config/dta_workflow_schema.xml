@@ -33,7 +33,7 @@
         <column name="partner_id" type="INTEGER"/>
         <column name="responsibleuser_id" type="INTEGER"/>
         <column name="copylocation_id" type="INTEGER"/>
-        
+        <column name="priority" description="Ein hoher Prioritätswert zeigt Dringlichkeit an." type="INTEGER"/>
         
         <foreign-key foreignTable="tasktype"> <reference local="tasktype_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="publicationgroup"> <reference local="publicationgroup_id" foreign="id"/> </foreign-key>

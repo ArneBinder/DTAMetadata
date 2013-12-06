@@ -34,6 +34,7 @@ use DTA\MetadataBundle\Model\Workflow\Tasktype;
  * @method TaskQuery orderByPartnerId($order = Criteria::ASC) Order by the partner_id column
  * @method TaskQuery orderByResponsibleuserId($order = Criteria::ASC) Order by the responsibleuser_id column
  * @method TaskQuery orderByCopylocationId($order = Criteria::ASC) Order by the copylocation_id column
+ * @method TaskQuery orderByPriority($order = Criteria::ASC) Order by the priority column
  * @method TaskQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method TaskQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -48,6 +49,7 @@ use DTA\MetadataBundle\Model\Workflow\Tasktype;
  * @method TaskQuery groupByPartnerId() Group by the partner_id column
  * @method TaskQuery groupByResponsibleuserId() Group by the responsibleuser_id column
  * @method TaskQuery groupByCopylocationId() Group by the copylocation_id column
+ * @method TaskQuery groupByPriority() Group by the priority column
  * @method TaskQuery groupByCreatedAt() Group by the created_at column
  * @method TaskQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -92,6 +94,7 @@ use DTA\MetadataBundle\Model\Workflow\Tasktype;
  * @method Task findOneByPartnerId(int $partner_id) Return the first Task filtered by the partner_id column
  * @method Task findOneByResponsibleuserId(int $responsibleuser_id) Return the first Task filtered by the responsibleuser_id column
  * @method Task findOneByCopylocationId(int $copylocation_id) Return the first Task filtered by the copylocation_id column
+ * @method Task findOneByPriority(int $priority) Return the first Task filtered by the priority column
  * @method Task findOneByCreatedAt(string $created_at) Return the first Task filtered by the created_at column
  * @method Task findOneByUpdatedAt(string $updated_at) Return the first Task filtered by the updated_at column
  *
@@ -106,6 +109,7 @@ use DTA\MetadataBundle\Model\Workflow\Tasktype;
  * @method array findByPartnerId(int $partner_id) Return Task objects filtered by the partner_id column
  * @method array findByResponsibleuserId(int $responsibleuser_id) Return Task objects filtered by the responsibleuser_id column
  * @method array findByCopylocationId(int $copylocation_id) Return Task objects filtered by the copylocation_id column
+ * @method array findByPriority(int $priority) Return Task objects filtered by the priority column
  * @method array findByCreatedAt(string $created_at) Return Task objects filtered by the created_at column
  * @method array findByUpdatedAt(string $updated_at) Return Task objects filtered by the updated_at column
  */
@@ -213,7 +217,7 @@ abstract class BaseTaskQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "tasktype_id", "closed", "start_date", "end_date", "comments", "publicationgroup_id", "publication_id", "partner_id", "responsibleuser_id", "copylocation_id", "created_at", "updated_at" FROM "task" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "tasktype_id", "closed", "start_date", "end_date", "comments", "publicationgroup_id", "publication_id", "partner_id", "responsibleuser_id", "copylocation_id", "priority", "created_at", "updated_at" FROM "task" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -748,6 +752,48 @@ abstract class BaseTaskQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(TaskPeer::COPYLOCATION_ID, $copylocationId, $comparison);
+    }
+
+    /**
+     * Filter the query on the priority column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPriority(1234); // WHERE priority = 1234
+     * $query->filterByPriority(array(12, 34)); // WHERE priority IN (12, 34)
+     * $query->filterByPriority(array('min' => 12)); // WHERE priority >= 12
+     * $query->filterByPriority(array('max' => 12)); // WHERE priority <= 12
+     * </code>
+     *
+     * @param     mixed $priority The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return TaskQuery The current query, for fluid interface
+     */
+    public function filterByPriority($priority = null, $comparison = null)
+    {
+        if (is_array($priority)) {
+            $useMinMax = false;
+            if (isset($priority['min'])) {
+                $this->addUsingAlias(TaskPeer::PRIORITY, $priority['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($priority['max'])) {
+                $this->addUsingAlias(TaskPeer::PRIORITY, $priority['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(TaskPeer::PRIORITY, $priority, $comparison);
     }
 
     /**

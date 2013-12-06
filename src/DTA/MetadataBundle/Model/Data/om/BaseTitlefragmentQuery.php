@@ -25,6 +25,8 @@ use DTA\MetadataBundle\Model\Data\TitlefragmentQuery;
  * @method TitlefragmentQuery orderByTitlefragmenttypeId($order = Criteria::ASC) Order by the titlefragmenttype_id column
  * @method TitlefragmentQuery orderBySortableRank($order = Criteria::ASC) Order by the sortable_rank column
  * @method TitlefragmentQuery orderByNameIsReconstructed($order = Criteria::ASC) Order by the name_is_reconstructed column
+ * @method TitlefragmentQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method TitlefragmentQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method TitlefragmentQuery groupById() Group by the id column
  * @method TitlefragmentQuery groupByName() Group by the name column
@@ -32,6 +34,8 @@ use DTA\MetadataBundle\Model\Data\TitlefragmentQuery;
  * @method TitlefragmentQuery groupByTitlefragmenttypeId() Group by the titlefragmenttype_id column
  * @method TitlefragmentQuery groupBySortableRank() Group by the sortable_rank column
  * @method TitlefragmentQuery groupByNameIsReconstructed() Group by the name_is_reconstructed column
+ * @method TitlefragmentQuery groupByCreatedAt() Group by the created_at column
+ * @method TitlefragmentQuery groupByUpdatedAt() Group by the updated_at column
  *
  * @method TitlefragmentQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method TitlefragmentQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -53,6 +57,8 @@ use DTA\MetadataBundle\Model\Data\TitlefragmentQuery;
  * @method Titlefragment findOneByTitlefragmenttypeId(int $titlefragmenttype_id) Return the first Titlefragment filtered by the titlefragmenttype_id column
  * @method Titlefragment findOneBySortableRank(int $sortable_rank) Return the first Titlefragment filtered by the sortable_rank column
  * @method Titlefragment findOneByNameIsReconstructed(boolean $name_is_reconstructed) Return the first Titlefragment filtered by the name_is_reconstructed column
+ * @method Titlefragment findOneByCreatedAt(string $created_at) Return the first Titlefragment filtered by the created_at column
+ * @method Titlefragment findOneByUpdatedAt(string $updated_at) Return the first Titlefragment filtered by the updated_at column
  *
  * @method array findById(int $id) Return Titlefragment objects filtered by the id column
  * @method array findByName(string $name) Return Titlefragment objects filtered by the name column
@@ -60,6 +66,8 @@ use DTA\MetadataBundle\Model\Data\TitlefragmentQuery;
  * @method array findByTitlefragmenttypeId(int $titlefragmenttype_id) Return Titlefragment objects filtered by the titlefragmenttype_id column
  * @method array findBySortableRank(int $sortable_rank) Return Titlefragment objects filtered by the sortable_rank column
  * @method array findByNameIsReconstructed(boolean $name_is_reconstructed) Return Titlefragment objects filtered by the name_is_reconstructed column
+ * @method array findByCreatedAt(string $created_at) Return Titlefragment objects filtered by the created_at column
+ * @method array findByUpdatedAt(string $updated_at) Return Titlefragment objects filtered by the updated_at column
  */
 abstract class BaseTitlefragmentQuery extends ModelCriteria
 {
@@ -165,7 +173,7 @@ abstract class BaseTitlefragmentQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "name", "title_id", "titlefragmenttype_id", "sortable_rank", "name_is_reconstructed" FROM "titlefragment" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "name", "title_id", "titlefragmenttype_id", "sortable_rank", "name_is_reconstructed", "created_at", "updated_at" FROM "titlefragment" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -480,6 +488,92 @@ abstract class BaseTitlefragmentQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(TitlefragmentPeer::NAME_IS_RECONSTRUCTED, $nameIsReconstructed, $comparison);
+    }
+
+    /**
+     * Filter the query on the created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at < '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return TitlefragmentQuery The current query, for fluid interface
+     */
+    public function filterByCreatedAt($createdAt = null, $comparison = null)
+    {
+        if (is_array($createdAt)) {
+            $useMinMax = false;
+            if (isset($createdAt['min'])) {
+                $this->addUsingAlias(TitlefragmentPeer::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($createdAt['max'])) {
+                $this->addUsingAlias(TitlefragmentPeer::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(TitlefragmentPeer::CREATED_AT, $createdAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the updated_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at < '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return TitlefragmentQuery The current query, for fluid interface
+     */
+    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+    {
+        if (is_array($updatedAt)) {
+            $useMinMax = false;
+            if (isset($updatedAt['min'])) {
+                $this->addUsingAlias(TitlefragmentPeer::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($updatedAt['max'])) {
+                $this->addUsingAlias(TitlefragmentPeer::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(TitlefragmentPeer::UPDATED_AT, $updatedAt, $comparison);
     }
 
     /**
@@ -825,4 +919,69 @@ abstract class BaseTitlefragmentQuery extends ModelCriteria
         }
     }
 
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     TitlefragmentQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(TitlefragmentPeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     TitlefragmentQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(TitlefragmentPeer::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     TitlefragmentQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(TitlefragmentPeer::UPDATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     TitlefragmentQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(TitlefragmentPeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     TitlefragmentQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(TitlefragmentPeer::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     TitlefragmentQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(TitlefragmentPeer::CREATED_AT);
+    }
 }

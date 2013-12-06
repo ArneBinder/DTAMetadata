@@ -30,16 +30,22 @@ abstract class BaseTitlePeer
     const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Data\\map\\TitleTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 1;
+    const NUM_COLUMNS = 3;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 1;
+    const NUM_HYDRATE_COLUMNS = 3;
 
     /** the column name for the id field */
     const ID = 'title.id';
+
+    /** the column name for the created_at field */
+    const CREATED_AT = 'title.created_at';
+
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'title.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -60,12 +66,12 @@ abstract class BaseTitlePeer
      * e.g. TitlePeer::$fieldNames[TitlePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', ),
-        BasePeer::TYPE_COLNAME => array (TitlePeer::ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', ),
-        BasePeer::TYPE_NUM => array (0, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (TitlePeer::ID, TitlePeer::CREATED_AT, TitlePeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
     /**
@@ -75,12 +81,12 @@ abstract class BaseTitlePeer
      * e.g. TitlePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, ),
-        BasePeer::TYPE_COLNAME => array (TitlePeer::ID => 0, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, ),
-        BasePeer::TYPE_NUM => array (0, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, ),
+        BasePeer::TYPE_COLNAME => array (TitlePeer::ID => 0, TitlePeer::CREATED_AT => 1, TitlePeer::UPDATED_AT => 2, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'CREATED_AT' => 1, 'UPDATED_AT' => 2, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'created_at' => 1, 'updated_at' => 2, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, )
     );
 
     /**
@@ -155,8 +161,12 @@ abstract class BaseTitlePeer
     {
         if (null === $alias) {
             $criteria->addSelectColumn(TitlePeer::ID);
+            $criteria->addSelectColumn(TitlePeer::CREATED_AT);
+            $criteria->addSelectColumn(TitlePeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

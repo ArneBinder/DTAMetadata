@@ -31,13 +31,13 @@ abstract class BaseFontPublicationPeer
     const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Master\\map\\FontPublicationTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 5;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 3;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /** the column name for the id field */
     const ID = 'font_publication.id';
@@ -47,6 +47,12 @@ abstract class BaseFontPublicationPeer
 
     /** the column name for the publication_id field */
     const PUBLICATION_ID = 'font_publication.publication_id';
+
+    /** the column name for the created_at field */
+    const CREATED_AT = 'font_publication.created_at';
+
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'font_publication.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -67,12 +73,12 @@ abstract class BaseFontPublicationPeer
      * e.g. FontPublicationPeer::$fieldNames[FontPublicationPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'FontId', 'PublicationId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'fontId', 'publicationId', ),
-        BasePeer::TYPE_COLNAME => array (FontPublicationPeer::ID, FontPublicationPeer::FONT_ID, FontPublicationPeer::PUBLICATION_ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'FONT_ID', 'PUBLICATION_ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'font_id', 'publication_id', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'FontId', 'PublicationId', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'fontId', 'publicationId', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (FontPublicationPeer::ID, FontPublicationPeer::FONT_ID, FontPublicationPeer::PUBLICATION_ID, FontPublicationPeer::CREATED_AT, FontPublicationPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'FONT_ID', 'PUBLICATION_ID', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'font_id', 'publication_id', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
     /**
@@ -82,12 +88,12 @@ abstract class BaseFontPublicationPeer
      * e.g. FontPublicationPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'FontId' => 1, 'PublicationId' => 2, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'fontId' => 1, 'publicationId' => 2, ),
-        BasePeer::TYPE_COLNAME => array (FontPublicationPeer::ID => 0, FontPublicationPeer::FONT_ID => 1, FontPublicationPeer::PUBLICATION_ID => 2, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'FONT_ID' => 1, 'PUBLICATION_ID' => 2, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'font_id' => 1, 'publication_id' => 2, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'FontId' => 1, 'PublicationId' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'fontId' => 1, 'publicationId' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        BasePeer::TYPE_COLNAME => array (FontPublicationPeer::ID => 0, FontPublicationPeer::FONT_ID => 1, FontPublicationPeer::PUBLICATION_ID => 2, FontPublicationPeer::CREATED_AT => 3, FontPublicationPeer::UPDATED_AT => 4, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'FONT_ID' => 1, 'PUBLICATION_ID' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'font_id' => 1, 'publication_id' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
     /**
@@ -164,10 +170,14 @@ abstract class BaseFontPublicationPeer
             $criteria->addSelectColumn(FontPublicationPeer::ID);
             $criteria->addSelectColumn(FontPublicationPeer::FONT_ID);
             $criteria->addSelectColumn(FontPublicationPeer::PUBLICATION_ID);
+            $criteria->addSelectColumn(FontPublicationPeer::CREATED_AT);
+            $criteria->addSelectColumn(FontPublicationPeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.font_id');
             $criteria->addSelectColumn($alias . '.publication_id');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

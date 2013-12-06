@@ -30,19 +30,25 @@ abstract class BasePublicationMPeer
     const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Data\\map\\PublicationMTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 2;
+    const NUM_COLUMNS = 4;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 2;
+    const NUM_HYDRATE_COLUMNS = 4;
 
     /** the column name for the id field */
     const ID = 'publication_m.id';
 
     /** the column name for the publication_id field */
     const PUBLICATION_ID = 'publication_m.publication_id';
+
+    /** the column name for the created_at field */
+    const CREATED_AT = 'publication_m.created_at';
+
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'publication_m.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -63,12 +69,12 @@ abstract class BasePublicationMPeer
      * e.g. PublicationMPeer::$fieldNames[PublicationMPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', ),
-        BasePeer::TYPE_COLNAME => array (PublicationMPeer::ID, PublicationMPeer::PUBLICATION_ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', ),
-        BasePeer::TYPE_NUM => array (0, 1, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (PublicationMPeer::ID, PublicationMPeer::PUBLICATION_ID, PublicationMPeer::CREATED_AT, PublicationMPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
     /**
@@ -78,12 +84,12 @@ abstract class BasePublicationMPeer
      * e.g. PublicationMPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, ),
-        BasePeer::TYPE_COLNAME => array (PublicationMPeer::ID => 0, PublicationMPeer::PUBLICATION_ID => 1, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, ),
-        BasePeer::TYPE_NUM => array (0, 1, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
+        BasePeer::TYPE_COLNAME => array (PublicationMPeer::ID => 0, PublicationMPeer::PUBLICATION_ID => 1, PublicationMPeer::CREATED_AT => 2, PublicationMPeer::UPDATED_AT => 3, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'created_at' => 2, 'updated_at' => 3, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
     /**
@@ -159,9 +165,13 @@ abstract class BasePublicationMPeer
         if (null === $alias) {
             $criteria->addSelectColumn(PublicationMPeer::ID);
             $criteria->addSelectColumn(PublicationMPeer::PUBLICATION_ID);
+            $criteria->addSelectColumn(PublicationMPeer::CREATED_AT);
+            $criteria->addSelectColumn(PublicationMPeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.publication_id');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

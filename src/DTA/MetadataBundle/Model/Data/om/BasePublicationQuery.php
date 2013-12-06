@@ -57,6 +57,11 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method PublicationQuery orderByCreationdateId($order = Criteria::ASC) Order by the creationdate_id column
  * @method PublicationQuery orderByPublishingcompanyId($order = Criteria::ASC) Order by the publishingcompany_id column
  * @method PublicationQuery orderBySourceId($order = Criteria::ASC) Order by the source_id column
+ * @method PublicationQuery orderByLegacygenre($order = Criteria::ASC) Order by the legacygenre column
+ * @method PublicationQuery orderByLegacysubgenre($order = Criteria::ASC) Order by the legacysubgenre column
+ * @method PublicationQuery orderByType($order = Criteria::ASC) Order by the type column
+ * @method PublicationQuery orderByDirname($order = Criteria::ASC) Order by the dirname column
+ * @method PublicationQuery orderByUsedcopylocationId($order = Criteria::ASC) Order by the usedcopylocation_id column
  * @method PublicationQuery orderByPartnerId($order = Criteria::ASC) Order by the partner_id column
  * @method PublicationQuery orderByEditiondescription($order = Criteria::ASC) Order by the editiondescription column
  * @method PublicationQuery orderByDigitaleditioneditor($order = Criteria::ASC) Order by the digitaleditioneditor column
@@ -70,9 +75,9 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method PublicationQuery orderByDirectoryname($order = Criteria::ASC) Order by the directoryname column
  * @method PublicationQuery orderByWwwready($order = Criteria::ASC) Order by the wwwready column
  * @method PublicationQuery orderByLastChangedByUserId($order = Criteria::ASC) Order by the last_changed_by_user_id column
+ * @method PublicationQuery orderByPublishingcompanyIdIsReconstructed($order = Criteria::ASC) Order by the publishingcompany_id_is_reconstructed column
  * @method PublicationQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method PublicationQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
- * @method PublicationQuery orderByPublishingcompanyIdIsReconstructed($order = Criteria::ASC) Order by the publishingcompany_id_is_reconstructed column
  *
  * @method PublicationQuery groupById() Group by the id column
  * @method PublicationQuery groupByTitleId() Group by the title_id column
@@ -82,6 +87,11 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method PublicationQuery groupByCreationdateId() Group by the creationdate_id column
  * @method PublicationQuery groupByPublishingcompanyId() Group by the publishingcompany_id column
  * @method PublicationQuery groupBySourceId() Group by the source_id column
+ * @method PublicationQuery groupByLegacygenre() Group by the legacygenre column
+ * @method PublicationQuery groupByLegacysubgenre() Group by the legacysubgenre column
+ * @method PublicationQuery groupByType() Group by the type column
+ * @method PublicationQuery groupByDirname() Group by the dirname column
+ * @method PublicationQuery groupByUsedcopylocationId() Group by the usedcopylocation_id column
  * @method PublicationQuery groupByPartnerId() Group by the partner_id column
  * @method PublicationQuery groupByEditiondescription() Group by the editiondescription column
  * @method PublicationQuery groupByDigitaleditioneditor() Group by the digitaleditioneditor column
@@ -95,9 +105,9 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method PublicationQuery groupByDirectoryname() Group by the directoryname column
  * @method PublicationQuery groupByWwwready() Group by the wwwready column
  * @method PublicationQuery groupByLastChangedByUserId() Group by the last_changed_by_user_id column
+ * @method PublicationQuery groupByPublishingcompanyIdIsReconstructed() Group by the publishingcompany_id_is_reconstructed column
  * @method PublicationQuery groupByCreatedAt() Group by the created_at column
  * @method PublicationQuery groupByUpdatedAt() Group by the updated_at column
- * @method PublicationQuery groupByPublishingcompanyIdIsReconstructed() Group by the publishingcompany_id_is_reconstructed column
  *
  * @method PublicationQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method PublicationQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -225,6 +235,11 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method Publication findOneByCreationdateId(int $creationdate_id) Return the first Publication filtered by the creationdate_id column
  * @method Publication findOneByPublishingcompanyId(int $publishingcompany_id) Return the first Publication filtered by the publishingcompany_id column
  * @method Publication findOneBySourceId(int $source_id) Return the first Publication filtered by the source_id column
+ * @method Publication findOneByLegacygenre(string $legacygenre) Return the first Publication filtered by the legacygenre column
+ * @method Publication findOneByLegacysubgenre(string $legacysubgenre) Return the first Publication filtered by the legacysubgenre column
+ * @method Publication findOneByType(string $type) Return the first Publication filtered by the type column
+ * @method Publication findOneByDirname(string $dirname) Return the first Publication filtered by the dirname column
+ * @method Publication findOneByUsedcopylocationId(int $usedcopylocation_id) Return the first Publication filtered by the usedcopylocation_id column
  * @method Publication findOneByPartnerId(int $partner_id) Return the first Publication filtered by the partner_id column
  * @method Publication findOneByEditiondescription(string $editiondescription) Return the first Publication filtered by the editiondescription column
  * @method Publication findOneByDigitaleditioneditor(string $digitaleditioneditor) Return the first Publication filtered by the digitaleditioneditor column
@@ -238,9 +253,9 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method Publication findOneByDirectoryname(string $directoryname) Return the first Publication filtered by the directoryname column
  * @method Publication findOneByWwwready(int $wwwready) Return the first Publication filtered by the wwwready column
  * @method Publication findOneByLastChangedByUserId(int $last_changed_by_user_id) Return the first Publication filtered by the last_changed_by_user_id column
+ * @method Publication findOneByPublishingcompanyIdIsReconstructed(boolean $publishingcompany_id_is_reconstructed) Return the first Publication filtered by the publishingcompany_id_is_reconstructed column
  * @method Publication findOneByCreatedAt(string $created_at) Return the first Publication filtered by the created_at column
  * @method Publication findOneByUpdatedAt(string $updated_at) Return the first Publication filtered by the updated_at column
- * @method Publication findOneByPublishingcompanyIdIsReconstructed(boolean $publishingcompany_id_is_reconstructed) Return the first Publication filtered by the publishingcompany_id_is_reconstructed column
  *
  * @method array findById(int $id) Return Publication objects filtered by the id column
  * @method array findByTitleId(int $title_id) Return Publication objects filtered by the title_id column
@@ -250,6 +265,11 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method array findByCreationdateId(int $creationdate_id) Return Publication objects filtered by the creationdate_id column
  * @method array findByPublishingcompanyId(int $publishingcompany_id) Return Publication objects filtered by the publishingcompany_id column
  * @method array findBySourceId(int $source_id) Return Publication objects filtered by the source_id column
+ * @method array findByLegacygenre(string $legacygenre) Return Publication objects filtered by the legacygenre column
+ * @method array findByLegacysubgenre(string $legacysubgenre) Return Publication objects filtered by the legacysubgenre column
+ * @method array findByType(string $type) Return Publication objects filtered by the type column
+ * @method array findByDirname(string $dirname) Return Publication objects filtered by the dirname column
+ * @method array findByUsedcopylocationId(int $usedcopylocation_id) Return Publication objects filtered by the usedcopylocation_id column
  * @method array findByPartnerId(int $partner_id) Return Publication objects filtered by the partner_id column
  * @method array findByEditiondescription(string $editiondescription) Return Publication objects filtered by the editiondescription column
  * @method array findByDigitaleditioneditor(string $digitaleditioneditor) Return Publication objects filtered by the digitaleditioneditor column
@@ -263,9 +283,9 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method array findByDirectoryname(string $directoryname) Return Publication objects filtered by the directoryname column
  * @method array findByWwwready(int $wwwready) Return Publication objects filtered by the wwwready column
  * @method array findByLastChangedByUserId(int $last_changed_by_user_id) Return Publication objects filtered by the last_changed_by_user_id column
+ * @method array findByPublishingcompanyIdIsReconstructed(boolean $publishingcompany_id_is_reconstructed) Return Publication objects filtered by the publishingcompany_id_is_reconstructed column
  * @method array findByCreatedAt(string $created_at) Return Publication objects filtered by the created_at column
  * @method array findByUpdatedAt(string $updated_at) Return Publication objects filtered by the updated_at column
- * @method array findByPublishingcompanyIdIsReconstructed(boolean $publishingcompany_id_is_reconstructed) Return Publication objects filtered by the publishingcompany_id_is_reconstructed column
  */
 abstract class BasePublicationQuery extends ModelCriteria
 {
@@ -371,7 +391,7 @@ abstract class BasePublicationQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "title_id", "firsteditionpublication_id", "place_id", "publicationdate_id", "creationdate_id", "publishingcompany_id", "source_id", "partner_id", "editiondescription", "digitaleditioneditor", "transcriptioncomment", "numpages", "numpagesnumeric", "comment", "encoding_comment", "doi", "format", "directoryname", "wwwready", "last_changed_by_user_id", "created_at", "updated_at", "publishingcompany_id_is_reconstructed" FROM "publication" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "title_id", "firsteditionpublication_id", "place_id", "publicationdate_id", "creationdate_id", "publishingcompany_id", "source_id", "legacygenre", "legacysubgenre", "type", "dirname", "usedcopylocation_id", "partner_id", "editiondescription", "digitaleditioneditor", "transcriptioncomment", "numpages", "numpagesnumeric", "comment", "encoding_comment", "doi", "format", "directoryname", "wwwready", "last_changed_by_user_id", "publishingcompany_id_is_reconstructed", "created_at", "updated_at" FROM "publication" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -809,6 +829,164 @@ abstract class BasePublicationQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the legacygenre column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByLegacygenre('fooValue');   // WHERE legacygenre = 'fooValue'
+     * $query->filterByLegacygenre('%fooValue%'); // WHERE legacygenre LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $legacygenre The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return PublicationQuery The current query, for fluid interface
+     */
+    public function filterByLegacygenre($legacygenre = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($legacygenre)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $legacygenre)) {
+                $legacygenre = str_replace('*', '%', $legacygenre);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(PublicationPeer::LEGACYGENRE, $legacygenre, $comparison);
+    }
+
+    /**
+     * Filter the query on the legacysubgenre column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByLegacysubgenre('fooValue');   // WHERE legacysubgenre = 'fooValue'
+     * $query->filterByLegacysubgenre('%fooValue%'); // WHERE legacysubgenre LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $legacysubgenre The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return PublicationQuery The current query, for fluid interface
+     */
+    public function filterByLegacysubgenre($legacysubgenre = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($legacysubgenre)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $legacysubgenre)) {
+                $legacysubgenre = str_replace('*', '%', $legacysubgenre);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(PublicationPeer::LEGACYSUBGENRE, $legacysubgenre, $comparison);
+    }
+
+    /**
+     * Filter the query on the type column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByType('fooValue');   // WHERE type = 'fooValue'
+     * $query->filterByType('%fooValue%'); // WHERE type LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $type The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return PublicationQuery The current query, for fluid interface
+     */
+    public function filterByType($type = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($type)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $type)) {
+                $type = str_replace('*', '%', $type);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(PublicationPeer::TYPE, $type, $comparison);
+    }
+
+    /**
+     * Filter the query on the dirname column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByDirname('fooValue');   // WHERE dirname = 'fooValue'
+     * $query->filterByDirname('%fooValue%'); // WHERE dirname LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $dirname The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return PublicationQuery The current query, for fluid interface
+     */
+    public function filterByDirname($dirname = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($dirname)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $dirname)) {
+                $dirname = str_replace('*', '%', $dirname);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(PublicationPeer::DIRNAME, $dirname, $comparison);
+    }
+
+    /**
+     * Filter the query on the usedcopylocation_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUsedcopylocationId(1234); // WHERE usedcopylocation_id = 1234
+     * $query->filterByUsedcopylocationId(array(12, 34)); // WHERE usedcopylocation_id IN (12, 34)
+     * $query->filterByUsedcopylocationId(array('min' => 12)); // WHERE usedcopylocation_id >= 12
+     * $query->filterByUsedcopylocationId(array('max' => 12)); // WHERE usedcopylocation_id <= 12
+     * </code>
+     *
+     * @param     mixed $usedcopylocationId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return PublicationQuery The current query, for fluid interface
+     */
+    public function filterByUsedcopylocationId($usedcopylocationId = null, $comparison = null)
+    {
+        if (is_array($usedcopylocationId)) {
+            $useMinMax = false;
+            if (isset($usedcopylocationId['min'])) {
+                $this->addUsingAlias(PublicationPeer::USEDCOPYLOCATION_ID, $usedcopylocationId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($usedcopylocationId['max'])) {
+                $this->addUsingAlias(PublicationPeer::USEDCOPYLOCATION_ID, $usedcopylocationId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(PublicationPeer::USEDCOPYLOCATION_ID, $usedcopylocationId, $comparison);
+    }
+
+    /**
      * Filter the query on the partner_id column
      *
      * Example usage:
@@ -1240,6 +1418,33 @@ abstract class BasePublicationQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the publishingcompany_id_is_reconstructed column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPublishingcompanyIdIsReconstructed(true); // WHERE publishingcompany_id_is_reconstructed = true
+     * $query->filterByPublishingcompanyIdIsReconstructed('yes'); // WHERE publishingcompany_id_is_reconstructed = true
+     * </code>
+     *
+     * @param     boolean|string $publishingcompanyIdIsReconstructed The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return PublicationQuery The current query, for fluid interface
+     */
+    public function filterByPublishingcompanyIdIsReconstructed($publishingcompanyIdIsReconstructed = null, $comparison = null)
+    {
+        if (is_string($publishingcompanyIdIsReconstructed)) {
+            $publishingcompanyIdIsReconstructed = in_array(strtolower($publishingcompanyIdIsReconstructed), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED, $publishingcompanyIdIsReconstructed, $comparison);
+    }
+
+    /**
      * Filter the query on the created_at column
      *
      * Example usage:
@@ -1323,33 +1528,6 @@ abstract class BasePublicationQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(PublicationPeer::UPDATED_AT, $updatedAt, $comparison);
-    }
-
-    /**
-     * Filter the query on the publishingcompany_id_is_reconstructed column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByPublishingcompanyIdIsReconstructed(true); // WHERE publishingcompany_id_is_reconstructed = true
-     * $query->filterByPublishingcompanyIdIsReconstructed('yes'); // WHERE publishingcompany_id_is_reconstructed = true
-     * </code>
-     *
-     * @param     boolean|string $publishingcompanyIdIsReconstructed The value to use as filter.
-     *              Non-boolean arguments are converted using the following rules:
-     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
-     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
-     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return PublicationQuery The current query, for fluid interface
-     */
-    public function filterByPublishingcompanyIdIsReconstructed($publishingcompanyIdIsReconstructed = null, $comparison = null)
-    {
-        if (is_string($publishingcompanyIdIsReconstructed)) {
-            $publishingcompanyIdIsReconstructed = in_array(strtolower($publishingcompanyIdIsReconstructed), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
-        }
-
-        return $this->addUsingAlias(PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED, $publishingcompanyIdIsReconstructed, $comparison);
     }
 
     /**

@@ -30,13 +30,13 @@ abstract class BasePublicationJPeer
     const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Data\\map\\PublicationJTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 5;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 3;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /** the column name for the id field */
     const ID = 'publication_j.id';
@@ -46,6 +46,12 @@ abstract class BasePublicationJPeer
 
     /** the column name for the edition field */
     const EDITION = 'publication_j.edition';
+
+    /** the column name for the created_at field */
+    const CREATED_AT = 'publication_j.created_at';
+
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'publication_j.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -66,12 +72,12 @@ abstract class BasePublicationJPeer
      * e.g. PublicationJPeer::$fieldNames[PublicationJPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'Edition', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'edition', ),
-        BasePeer::TYPE_COLNAME => array (PublicationJPeer::ID, PublicationJPeer::PUBLICATION_ID, PublicationJPeer::EDITION, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'EDITION', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'edition', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'Edition', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'edition', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (PublicationJPeer::ID, PublicationJPeer::PUBLICATION_ID, PublicationJPeer::EDITION, PublicationJPeer::CREATED_AT, PublicationJPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'EDITION', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'edition', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
     /**
@@ -81,12 +87,12 @@ abstract class BasePublicationJPeer
      * e.g. PublicationJPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'Edition' => 2, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'edition' => 2, ),
-        BasePeer::TYPE_COLNAME => array (PublicationJPeer::ID => 0, PublicationJPeer::PUBLICATION_ID => 1, PublicationJPeer::EDITION => 2, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'EDITION' => 2, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'edition' => 2, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'Edition' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'edition' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        BasePeer::TYPE_COLNAME => array (PublicationJPeer::ID => 0, PublicationJPeer::PUBLICATION_ID => 1, PublicationJPeer::EDITION => 2, PublicationJPeer::CREATED_AT => 3, PublicationJPeer::UPDATED_AT => 4, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'EDITION' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'edition' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
     /**
@@ -163,10 +169,14 @@ abstract class BasePublicationJPeer
             $criteria->addSelectColumn(PublicationJPeer::ID);
             $criteria->addSelectColumn(PublicationJPeer::PUBLICATION_ID);
             $criteria->addSelectColumn(PublicationJPeer::EDITION);
+            $criteria->addSelectColumn(PublicationJPeer::CREATED_AT);
+            $criteria->addSelectColumn(PublicationJPeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.publication_id');
             $criteria->addSelectColumn($alias . '.edition');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

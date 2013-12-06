@@ -47,6 +47,8 @@ class FontPublicationTableMap extends TableMap
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('font_id', 'FontId', 'INTEGER', 'font', 'id', true, null, null);
         $this->addForeignKey('publication_id', 'PublicationId', 'INTEGER', 'publication', 'id', true, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -68,10 +70,17 @@ class FontPublicationTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
+),
             'table_row_view' =>  array (
   'Id' => 'id',
   'FontId' => 'font_id',
   'PublicationId' => 'publication_id',
+  'CreatedAt' => 'created_at',
+  'UpdatedAt' => 'updated_at',
 ),
         );
     } // getBehaviors()

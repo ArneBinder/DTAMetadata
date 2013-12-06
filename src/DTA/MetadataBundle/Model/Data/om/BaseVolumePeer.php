@@ -30,13 +30,13 @@ abstract class BaseVolumePeer
     const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Data\\map\\VolumeTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 8;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 8;
 
     /** the column name for the id field */
     const ID = 'volume.id';
@@ -55,6 +55,12 @@ abstract class BaseVolumePeer
 
     /** the column name for the volumestotal field */
     const VOLUMESTOTAL = 'volume.volumestotal';
+
+    /** the column name for the created_at field */
+    const CREATED_AT = 'volume.created_at';
+
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'volume.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -75,12 +81,12 @@ abstract class BaseVolumePeer
      * e.g. VolumePeer::$fieldNames[VolumePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'ParentpublicationId', 'Volumedescription', 'Volumenumeric', 'Volumestotal', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'parentpublicationId', 'volumedescription', 'volumenumeric', 'volumestotal', ),
-        BasePeer::TYPE_COLNAME => array (VolumePeer::ID, VolumePeer::PUBLICATION_ID, VolumePeer::PARENTPUBLICATION_ID, VolumePeer::VOLUMEDESCRIPTION, VolumePeer::VOLUMENUMERIC, VolumePeer::VOLUMESTOTAL, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'PARENTPUBLICATION_ID', 'VOLUMEDESCRIPTION', 'VOLUMENUMERIC', 'VOLUMESTOTAL', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'parentpublication_id', 'volumedescription', 'volumenumeric', 'volumestotal', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'ParentpublicationId', 'Volumedescription', 'Volumenumeric', 'Volumestotal', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'parentpublicationId', 'volumedescription', 'volumenumeric', 'volumestotal', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (VolumePeer::ID, VolumePeer::PUBLICATION_ID, VolumePeer::PARENTPUBLICATION_ID, VolumePeer::VOLUMEDESCRIPTION, VolumePeer::VOLUMENUMERIC, VolumePeer::VOLUMESTOTAL, VolumePeer::CREATED_AT, VolumePeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'PARENTPUBLICATION_ID', 'VOLUMEDESCRIPTION', 'VOLUMENUMERIC', 'VOLUMESTOTAL', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'parentpublication_id', 'volumedescription', 'volumenumeric', 'volumestotal', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -90,12 +96,12 @@ abstract class BaseVolumePeer
      * e.g. VolumePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'ParentpublicationId' => 2, 'Volumedescription' => 3, 'Volumenumeric' => 4, 'Volumestotal' => 5, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'parentpublicationId' => 2, 'volumedescription' => 3, 'volumenumeric' => 4, 'volumestotal' => 5, ),
-        BasePeer::TYPE_COLNAME => array (VolumePeer::ID => 0, VolumePeer::PUBLICATION_ID => 1, VolumePeer::PARENTPUBLICATION_ID => 2, VolumePeer::VOLUMEDESCRIPTION => 3, VolumePeer::VOLUMENUMERIC => 4, VolumePeer::VOLUMESTOTAL => 5, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'PARENTPUBLICATION_ID' => 2, 'VOLUMEDESCRIPTION' => 3, 'VOLUMENUMERIC' => 4, 'VOLUMESTOTAL' => 5, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'parentpublication_id' => 2, 'volumedescription' => 3, 'volumenumeric' => 4, 'volumestotal' => 5, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'ParentpublicationId' => 2, 'Volumedescription' => 3, 'Volumenumeric' => 4, 'Volumestotal' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'parentpublicationId' => 2, 'volumedescription' => 3, 'volumenumeric' => 4, 'volumestotal' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
+        BasePeer::TYPE_COLNAME => array (VolumePeer::ID => 0, VolumePeer::PUBLICATION_ID => 1, VolumePeer::PARENTPUBLICATION_ID => 2, VolumePeer::VOLUMEDESCRIPTION => 3, VolumePeer::VOLUMENUMERIC => 4, VolumePeer::VOLUMESTOTAL => 5, VolumePeer::CREATED_AT => 6, VolumePeer::UPDATED_AT => 7, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'PARENTPUBLICATION_ID' => 2, 'VOLUMEDESCRIPTION' => 3, 'VOLUMENUMERIC' => 4, 'VOLUMESTOTAL' => 5, 'CREATED_AT' => 6, 'UPDATED_AT' => 7, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'parentpublication_id' => 2, 'volumedescription' => 3, 'volumenumeric' => 4, 'volumestotal' => 5, 'created_at' => 6, 'updated_at' => 7, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -175,6 +181,8 @@ abstract class BaseVolumePeer
             $criteria->addSelectColumn(VolumePeer::VOLUMEDESCRIPTION);
             $criteria->addSelectColumn(VolumePeer::VOLUMENUMERIC);
             $criteria->addSelectColumn(VolumePeer::VOLUMESTOTAL);
+            $criteria->addSelectColumn(VolumePeer::CREATED_AT);
+            $criteria->addSelectColumn(VolumePeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.publication_id');
@@ -182,6 +190,8 @@ abstract class BaseVolumePeer
             $criteria->addSelectColumn($alias . '.volumedescription');
             $criteria->addSelectColumn($alias . '.volumenumeric');
             $criteria->addSelectColumn($alias . '.volumestotal');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

@@ -29,13 +29,13 @@ abstract class BaseDatespecificationPeer
     const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Data\\map\\DatespecificationTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 6;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /** the column name for the id field */
     const ID = 'datespecification.id';
@@ -48,6 +48,12 @@ abstract class BaseDatespecificationPeer
 
     /** the column name for the year_is_reconstructed field */
     const YEAR_IS_RECONSTRUCTED = 'datespecification.year_is_reconstructed';
+
+    /** the column name for the created_at field */
+    const CREATED_AT = 'datespecification.created_at';
+
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'datespecification.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -68,12 +74,12 @@ abstract class BaseDatespecificationPeer
      * e.g. DatespecificationPeer::$fieldNames[DatespecificationPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Year', 'Comments', 'YearIsReconstructed', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'year', 'comments', 'yearIsReconstructed', ),
-        BasePeer::TYPE_COLNAME => array (DatespecificationPeer::ID, DatespecificationPeer::YEAR, DatespecificationPeer::COMMENTS, DatespecificationPeer::YEAR_IS_RECONSTRUCTED, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'YEAR', 'COMMENTS', 'YEAR_IS_RECONSTRUCTED', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'year', 'comments', 'year_is_reconstructed', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Year', 'Comments', 'YearIsReconstructed', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'year', 'comments', 'yearIsReconstructed', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (DatespecificationPeer::ID, DatespecificationPeer::YEAR, DatespecificationPeer::COMMENTS, DatespecificationPeer::YEAR_IS_RECONSTRUCTED, DatespecificationPeer::CREATED_AT, DatespecificationPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'YEAR', 'COMMENTS', 'YEAR_IS_RECONSTRUCTED', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'year', 'comments', 'year_is_reconstructed', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -83,12 +89,12 @@ abstract class BaseDatespecificationPeer
      * e.g. DatespecificationPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Year' => 1, 'Comments' => 2, 'YearIsReconstructed' => 3, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'year' => 1, 'comments' => 2, 'yearIsReconstructed' => 3, ),
-        BasePeer::TYPE_COLNAME => array (DatespecificationPeer::ID => 0, DatespecificationPeer::YEAR => 1, DatespecificationPeer::COMMENTS => 2, DatespecificationPeer::YEAR_IS_RECONSTRUCTED => 3, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'YEAR' => 1, 'COMMENTS' => 2, 'YEAR_IS_RECONSTRUCTED' => 3, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'year' => 1, 'comments' => 2, 'year_is_reconstructed' => 3, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Year' => 1, 'Comments' => 2, 'YearIsReconstructed' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'year' => 1, 'comments' => 2, 'yearIsReconstructed' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
+        BasePeer::TYPE_COLNAME => array (DatespecificationPeer::ID => 0, DatespecificationPeer::YEAR => 1, DatespecificationPeer::COMMENTS => 2, DatespecificationPeer::YEAR_IS_RECONSTRUCTED => 3, DatespecificationPeer::CREATED_AT => 4, DatespecificationPeer::UPDATED_AT => 5, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'YEAR' => 1, 'COMMENTS' => 2, 'YEAR_IS_RECONSTRUCTED' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'year' => 1, 'comments' => 2, 'year_is_reconstructed' => 3, 'created_at' => 4, 'updated_at' => 5, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -166,11 +172,15 @@ abstract class BaseDatespecificationPeer
             $criteria->addSelectColumn(DatespecificationPeer::YEAR);
             $criteria->addSelectColumn(DatespecificationPeer::COMMENTS);
             $criteria->addSelectColumn(DatespecificationPeer::YEAR_IS_RECONSTRUCTED);
+            $criteria->addSelectColumn(DatespecificationPeer::CREATED_AT);
+            $criteria->addSelectColumn(DatespecificationPeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.year');
             $criteria->addSelectColumn($alias . '.comments');
             $criteria->addSelectColumn($alias . '.year_is_reconstructed');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

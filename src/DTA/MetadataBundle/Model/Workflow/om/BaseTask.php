@@ -117,6 +117,12 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     protected $copylocation_id;
 
     /**
+     * The value for the priority field.
+     * @var        int
+     */
+    protected $priority;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -347,6 +353,17 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     {
 
         return $this->copylocation_id;
+    }
+
+    /**
+     * Get the [priority] column value.
+     * Ein hoher Prioritätswert zeigt Dringlichkeit an.
+     * @return int
+     */
+    public function getPriority()
+    {
+
+        return $this->priority;
     }
 
     /**
@@ -687,6 +704,27 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     } // setCopylocationId()
 
     /**
+     * Set the value of [priority] column.
+     * Ein hoher Prioritätswert zeigt Dringlichkeit an.
+     * @param  int $v new value
+     * @return Task The current object (for fluent API support)
+     */
+    public function setPriority($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->priority !== $v) {
+            $this->priority = $v;
+            $this->modifiedColumns[] = TaskPeer::PRIORITY;
+        }
+
+
+        return $this;
+    } // setPriority()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param mixed $v string, integer (timestamp), or DateTime value.
@@ -775,8 +813,9 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
             $this->partner_id = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
             $this->responsibleuser_id = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
             $this->copylocation_id = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
-            $this->created_at = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
-            $this->updated_at = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+            $this->priority = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
+            $this->created_at = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+            $this->updated_at = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -786,7 +825,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
             }
             $this->postHydrate($row, $startcol, $rehydrate);
 
-            return $startcol + 13; // 13 = TaskPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 14; // 14 = TaskPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Task object", $e);
@@ -1109,6 +1148,9 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
         if ($this->isColumnModified(TaskPeer::COPYLOCATION_ID)) {
             $modifiedColumns[':p' . $index++]  = '"copylocation_id"';
         }
+        if ($this->isColumnModified(TaskPeer::PRIORITY)) {
+            $modifiedColumns[':p' . $index++]  = '"priority"';
+        }
         if ($this->isColumnModified(TaskPeer::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '"created_at"';
         }
@@ -1158,6 +1200,9 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
                         break;
                     case '"copylocation_id"':
                         $stmt->bindValue($identifier, $this->copylocation_id, PDO::PARAM_INT);
+                        break;
+                    case '"priority"':
+                        $stmt->bindValue($identifier, $this->priority, PDO::PARAM_INT);
                         break;
                     case '"created_at"':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
@@ -1368,9 +1413,12 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
                 return $this->getCopylocationId();
                 break;
             case 11:
-                return $this->getCreatedAt();
+                return $this->getPriority();
                 break;
             case 12:
+                return $this->getCreatedAt();
+                break;
+            case 13:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1413,8 +1461,9 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
             $keys[8] => $this->getPartnerId(),
             $keys[9] => $this->getResponsibleuserId(),
             $keys[10] => $this->getCopylocationId(),
-            $keys[11] => $this->getCreatedAt(),
-            $keys[12] => $this->getUpdatedAt(),
+            $keys[11] => $this->getPriority(),
+            $keys[12] => $this->getCreatedAt(),
+            $keys[13] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1508,9 +1557,12 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
                 $this->setCopylocationId($value);
                 break;
             case 11:
-                $this->setCreatedAt($value);
+                $this->setPriority($value);
                 break;
             case 12:
+                $this->setCreatedAt($value);
+                break;
+            case 13:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1548,8 +1600,9 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
         if (array_key_exists($keys[8], $arr)) $this->setPartnerId($arr[$keys[8]]);
         if (array_key_exists($keys[9], $arr)) $this->setResponsibleuserId($arr[$keys[9]]);
         if (array_key_exists($keys[10], $arr)) $this->setCopylocationId($arr[$keys[10]]);
-        if (array_key_exists($keys[11], $arr)) $this->setCreatedAt($arr[$keys[11]]);
-        if (array_key_exists($keys[12], $arr)) $this->setUpdatedAt($arr[$keys[12]]);
+        if (array_key_exists($keys[11], $arr)) $this->setPriority($arr[$keys[11]]);
+        if (array_key_exists($keys[12], $arr)) $this->setCreatedAt($arr[$keys[12]]);
+        if (array_key_exists($keys[13], $arr)) $this->setUpdatedAt($arr[$keys[13]]);
     }
 
     /**
@@ -1572,6 +1625,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
         if ($this->isColumnModified(TaskPeer::PARTNER_ID)) $criteria->add(TaskPeer::PARTNER_ID, $this->partner_id);
         if ($this->isColumnModified(TaskPeer::RESPONSIBLEUSER_ID)) $criteria->add(TaskPeer::RESPONSIBLEUSER_ID, $this->responsibleuser_id);
         if ($this->isColumnModified(TaskPeer::COPYLOCATION_ID)) $criteria->add(TaskPeer::COPYLOCATION_ID, $this->copylocation_id);
+        if ($this->isColumnModified(TaskPeer::PRIORITY)) $criteria->add(TaskPeer::PRIORITY, $this->priority);
         if ($this->isColumnModified(TaskPeer::CREATED_AT)) $criteria->add(TaskPeer::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(TaskPeer::UPDATED_AT)) $criteria->add(TaskPeer::UPDATED_AT, $this->updated_at);
 
@@ -1647,6 +1701,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
         $copyObj->setPartnerId($this->getPartnerId());
         $copyObj->setResponsibleuserId($this->getResponsibleuserId());
         $copyObj->setCopylocationId($this->getCopylocationId());
+        $copyObj->setPriority($this->getPriority());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -2035,6 +2090,7 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
         $this->partner_id = null;
         $this->responsibleuser_id = null;
         $this->copylocation_id = null;
+        $this->priority = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -2107,20 +2163,6 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
-    }
-
-    // timestampable behavior
-
-    /**
-     * Mark the current object so that the update date doesn't get updated during next save
-     *
-     * @return     Task The current object (for fluent API support)
-     */
-    public function keepUpdateDateUnchanged()
-    {
-        $this->modifiedColumns[] = TaskPeer::UPDATED_AT;
-
-        return $this;
     }
 
     // table_row_view behavior
@@ -2198,4 +2240,18 @@ abstract class BaseTask extends BaseObject implements Persistent, \DTA\MetadataB
         return $relatedEntity->getAttributeByTableViewColumName("Zuordnung");
 
     }
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     Task The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = TaskPeer::UPDATED_AT;
+
+        return $this;
+    }
+
 }

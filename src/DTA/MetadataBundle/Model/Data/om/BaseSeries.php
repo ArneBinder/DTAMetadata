@@ -5,11 +5,13 @@ namespace DTA\MetadataBundle\Model\Data\om;
 use \BaseObject;
 use \BasePeer;
 use \Criteria;
+use \DateTime;
 use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
 use \PropelCollection;
+use \PropelDateTime;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
@@ -59,6 +61,18 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
     protected $title_id;
 
     /**
+     * The value for the created_at field.
+     * @var        string
+     */
+    protected $created_at;
+
+    /**
+     * The value for the updated_at field.
+     * @var        string
+     */
+    protected $updated_at;
+
+    /**
      * @var        Title
      */
     protected $aTitle;
@@ -102,7 +116,7 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Id', 'TitleId', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'TitleId'=>'TitleId', );	public static $queryConstructionString = NULL;
+    public static $tableRowViewCaptions = array('Id', 'TitleId', 'CreatedAt', 'UpdatedAt', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'TitleId'=>'TitleId', 'CreatedAt'=>'CreatedAt', 'UpdatedAt'=>'UpdatedAt', );	public static $queryConstructionString = NULL;
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -141,6 +155,76 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
     {
 
         return $this->title_id;
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [created_at] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getCreatedAt($format = null)
+    {
+        if ($this->created_at === null) {
+            return null;
+        }
+
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [updated_at] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getUpdatedAt($format = null)
+    {
+        if ($this->updated_at === null) {
+            return null;
+        }
+
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -190,6 +274,52 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
     } // setTitleId()
 
     /**
+     * Sets the value of [created_at] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return Series The current object (for fluent API support)
+     */
+    public function setCreatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->created_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->created_at !== null && $tmpDt = new DateTime($this->created_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->created_at = $newDateAsString;
+                $this->modifiedColumns[] = SeriesPeer::CREATED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setCreatedAt()
+
+    /**
+     * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return Series The current object (for fluent API support)
+     */
+    public function setUpdatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->updated_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->updated_at !== null && $tmpDt = new DateTime($this->updated_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->updated_at = $newDateAsString;
+                $this->modifiedColumns[] = SeriesPeer::UPDATED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setUpdatedAt()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -223,6 +353,8 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->title_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+            $this->created_at = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+            $this->updated_at = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -232,7 +364,7 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
             }
             $this->postHydrate($row, $startcol, $rehydrate);
 
-            return $startcol + 2; // 2 = SeriesPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 4; // 4 = SeriesPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Series object", $e);
@@ -376,8 +508,19 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+                if (!$this->isColumnModified(SeriesPeer::CREATED_AT)) {
+                    $this->setCreatedAt(time());
+                }
+                if (!$this->isColumnModified(SeriesPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(SeriesPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -533,6 +676,12 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
         if ($this->isColumnModified(SeriesPeer::TITLE_ID)) {
             $modifiedColumns[':p' . $index++]  = '"title_id"';
         }
+        if ($this->isColumnModified(SeriesPeer::CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '"created_at"';
+        }
+        if ($this->isColumnModified(SeriesPeer::UPDATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '"updated_at"';
+        }
 
         $sql = sprintf(
             'INSERT INTO "series" (%s) VALUES (%s)',
@@ -549,6 +698,12 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
                         break;
                     case '"title_id"':
                         $stmt->bindValue($identifier, $this->title_id, PDO::PARAM_INT);
+                        break;
+                    case '"created_at"':
+                        $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
+                        break;
+                    case '"updated_at"':
+                        $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -719,6 +874,12 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
             case 1:
                 return $this->getTitleId();
                 break;
+            case 2:
+                return $this->getCreatedAt();
+                break;
+            case 3:
+                return $this->getUpdatedAt();
+                break;
             default:
                 return null;
                 break;
@@ -750,6 +911,8 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getTitleId(),
+            $keys[2] => $this->getCreatedAt(),
+            $keys[3] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -809,6 +972,12 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
             case 1:
                 $this->setTitleId($value);
                 break;
+            case 2:
+                $this->setCreatedAt($value);
+                break;
+            case 3:
+                $this->setUpdatedAt($value);
+                break;
         } // switch()
     }
 
@@ -835,6 +1004,8 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setTitleId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setCreatedAt($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setUpdatedAt($arr[$keys[3]]);
     }
 
     /**
@@ -848,6 +1019,8 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
 
         if ($this->isColumnModified(SeriesPeer::ID)) $criteria->add(SeriesPeer::ID, $this->id);
         if ($this->isColumnModified(SeriesPeer::TITLE_ID)) $criteria->add(SeriesPeer::TITLE_ID, $this->title_id);
+        if ($this->isColumnModified(SeriesPeer::CREATED_AT)) $criteria->add(SeriesPeer::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(SeriesPeer::UPDATED_AT)) $criteria->add(SeriesPeer::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -912,6 +1085,8 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setTitleId($this->getTitleId());
+        $copyObj->setCreatedAt($this->getCreatedAt());
+        $copyObj->setUpdatedAt($this->getUpdatedAt());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1819,6 +1994,8 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
     {
         $this->id = null;
         $this->title_id = null;
+        $this->created_at = null;
+        $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
@@ -1896,6 +2073,20 @@ abstract class BaseSeries extends BaseObject implements Persistent, \DTA\Metadat
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     Series The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = SeriesPeer::UPDATED_AT;
+
+        return $this;
     }
 
     // table_row_view behavior

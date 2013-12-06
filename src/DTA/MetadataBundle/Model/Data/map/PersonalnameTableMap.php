@@ -46,6 +46,8 @@ class PersonalnameTableMap extends TableMap
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('person_id', 'PersonId', 'INTEGER', 'person', 'id', true, null, null);
         $this->addColumn('sortable_rank', 'SortableRank', 'INTEGER', false, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -76,6 +78,11 @@ class PersonalnameTableMap extends TableMap
   'name' => 'accessor:__toString',
   'zugeordnet (personen-id)' => 'person_id',
   'reihenfolge' => 'accessor:getSortableRank',
+),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
 ),
         );
     } // getBehaviors()

@@ -5,11 +5,13 @@ namespace DTA\MetadataBundle\Model\Classification\om;
 use \BaseObject;
 use \BasePeer;
 use \Criteria;
+use \DateTime;
 use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
 use \PropelCollection;
+use \PropelDateTime;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
@@ -69,6 +71,18 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
     protected $categorytype_id;
 
     /**
+     * The value for the created_at field.
+     * @var        string
+     */
+    protected $created_at;
+
+    /**
+     * The value for the updated_at field.
+     * @var        string
+     */
+    protected $updated_at;
+
+    /**
      * @var        Categorytype
      */
     protected $aCategorytype;
@@ -105,7 +119,7 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Id', 'Name', 'Description', 'CategorytypeId', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'Name'=>'Name', 'Description'=>'Description', 'CategorytypeId'=>'CategorytypeId', );	public static $queryConstructionString = NULL;
+    public static $tableRowViewCaptions = array('Id', 'Name', 'Description', 'CategorytypeId', 'CreatedAt', 'UpdatedAt', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'Name'=>'Name', 'Description'=>'Description', 'CategorytypeId'=>'CategorytypeId', 'CreatedAt'=>'CreatedAt', 'UpdatedAt'=>'UpdatedAt', );	public static $queryConstructionString = NULL;
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -160,6 +174,76 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
     {
 
         return $this->categorytype_id;
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [created_at] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getCreatedAt($format = null)
+    {
+        if ($this->created_at === null) {
+            return null;
+        }
+
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [updated_at] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getUpdatedAt($format = null)
+    {
+        if ($this->updated_at === null) {
+            return null;
+        }
+
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -251,6 +335,52 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
     } // setCategorytypeId()
 
     /**
+     * Sets the value of [created_at] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return Category The current object (for fluent API support)
+     */
+    public function setCreatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->created_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->created_at !== null && $tmpDt = new DateTime($this->created_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->created_at = $newDateAsString;
+                $this->modifiedColumns[] = CategoryPeer::CREATED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setCreatedAt()
+
+    /**
+     * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return Category The current object (for fluent API support)
+     */
+    public function setUpdatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->updated_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->updated_at !== null && $tmpDt = new DateTime($this->updated_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->updated_at = $newDateAsString;
+                $this->modifiedColumns[] = CategoryPeer::UPDATED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setUpdatedAt()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -286,6 +416,8 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
             $this->name = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
             $this->description = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
             $this->categorytype_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+            $this->created_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+            $this->updated_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -295,7 +427,7 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
             }
             $this->postHydrate($row, $startcol, $rehydrate);
 
-            return $startcol + 4; // 4 = CategoryPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = CategoryPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Category object", $e);
@@ -436,8 +568,19 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+                if (!$this->isColumnModified(CategoryPeer::CREATED_AT)) {
+                    $this->setCreatedAt(time());
+                }
+                if (!$this->isColumnModified(CategoryPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(CategoryPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -591,6 +734,12 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
         if ($this->isColumnModified(CategoryPeer::CATEGORYTYPE_ID)) {
             $modifiedColumns[':p' . $index++]  = '"categorytype_id"';
         }
+        if ($this->isColumnModified(CategoryPeer::CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '"created_at"';
+        }
+        if ($this->isColumnModified(CategoryPeer::UPDATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '"updated_at"';
+        }
 
         $sql = sprintf(
             'INSERT INTO "category" (%s) VALUES (%s)',
@@ -613,6 +762,12 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
                         break;
                     case '"categorytype_id"':
                         $stmt->bindValue($identifier, $this->categorytype_id, PDO::PARAM_INT);
+                        break;
+                    case '"created_at"':
+                        $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
+                        break;
+                    case '"updated_at"':
+                        $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -773,6 +928,12 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
             case 3:
                 return $this->getCategorytypeId();
                 break;
+            case 4:
+                return $this->getCreatedAt();
+                break;
+            case 5:
+                return $this->getUpdatedAt();
+                break;
             default:
                 return null;
                 break;
@@ -806,6 +967,8 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
             $keys[1] => $this->getName(),
             $keys[2] => $this->getDescription(),
             $keys[3] => $this->getCategorytypeId(),
+            $keys[4] => $this->getCreatedAt(),
+            $keys[5] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -865,6 +1028,12 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
             case 3:
                 $this->setCategorytypeId($value);
                 break;
+            case 4:
+                $this->setCreatedAt($value);
+                break;
+            case 5:
+                $this->setUpdatedAt($value);
+                break;
         } // switch()
     }
 
@@ -893,6 +1062,8 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
         if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setDescription($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setCategorytypeId($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
     }
 
     /**
@@ -908,6 +1079,8 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
         if ($this->isColumnModified(CategoryPeer::NAME)) $criteria->add(CategoryPeer::NAME, $this->name);
         if ($this->isColumnModified(CategoryPeer::DESCRIPTION)) $criteria->add(CategoryPeer::DESCRIPTION, $this->description);
         if ($this->isColumnModified(CategoryPeer::CATEGORYTYPE_ID)) $criteria->add(CategoryPeer::CATEGORYTYPE_ID, $this->categorytype_id);
+        if ($this->isColumnModified(CategoryPeer::CREATED_AT)) $criteria->add(CategoryPeer::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(CategoryPeer::UPDATED_AT)) $criteria->add(CategoryPeer::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -974,6 +1147,8 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
         $copyObj->setName($this->getName());
         $copyObj->setDescription($this->getDescription());
         $copyObj->setCategorytypeId($this->getCategorytypeId());
+        $copyObj->setCreatedAt($this->getCreatedAt());
+        $copyObj->setUpdatedAt($this->getUpdatedAt());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1553,6 +1728,8 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
         $this->name = null;
         $this->description = null;
         $this->categorytype_id = null;
+        $this->created_at = null;
+        $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
@@ -1621,6 +1798,20 @@ abstract class BaseCategory extends BaseObject implements Persistent, \DTA\Metad
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     Category The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = CategoryPeer::UPDATED_AT;
+
+        return $this;
     }
 
     // table_row_view behavior

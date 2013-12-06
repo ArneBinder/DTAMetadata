@@ -2336,20 +2336,6 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
         return $this->alreadyInSave;
     }
 
-    // timestampable behavior
-
-    /**
-     * Mark the current object so that the update date doesn't get updated during next save
-     *
-     * @return     CopyLocation The current object (for fluent API support)
-     */
-    public function keepUpdateDateUnchanged()
-    {
-        $this->modifiedColumns[] = CopyLocationPeer::UPDATED_AT;
-
-        return $this;
-    }
-
     // table_row_view behavior
     /**
      * To specify which columns are to be visible in the user display
@@ -2434,4 +2420,18 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
         return $relatedEntity->getAttributeByTableViewColumName("veröffentlicht");
 
     }
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     CopyLocation The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = CopyLocationPeer::UPDATED_AT;
+
+        return $this;
+    }
+
 }

@@ -31,13 +31,13 @@ abstract class BasePublicationMsPeer
     const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Data\\map\\PublicationMsTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 6;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /** the column name for the id field */
     const ID = 'publication_ms.id';
@@ -50,6 +50,12 @@ abstract class BasePublicationMsPeer
 
     /** the column name for the volumenumberinseries field */
     const VOLUMENUMBERINSERIES = 'publication_ms.volumenumberinseries';
+
+    /** the column name for the created_at field */
+    const CREATED_AT = 'publication_ms.created_at';
+
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'publication_ms.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -70,12 +76,12 @@ abstract class BasePublicationMsPeer
      * e.g. PublicationMsPeer::$fieldNames[PublicationMsPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'SeriesId', 'Volumenumberinseries', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'seriesId', 'volumenumberinseries', ),
-        BasePeer::TYPE_COLNAME => array (PublicationMsPeer::ID, PublicationMsPeer::PUBLICATION_ID, PublicationMsPeer::SERIES_ID, PublicationMsPeer::VOLUMENUMBERINSERIES, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'SERIES_ID', 'VOLUMENUMBERINSERIES', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'series_id', 'volumenumberinseries', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'SeriesId', 'Volumenumberinseries', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'seriesId', 'volumenumberinseries', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (PublicationMsPeer::ID, PublicationMsPeer::PUBLICATION_ID, PublicationMsPeer::SERIES_ID, PublicationMsPeer::VOLUMENUMBERINSERIES, PublicationMsPeer::CREATED_AT, PublicationMsPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'SERIES_ID', 'VOLUMENUMBERINSERIES', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'series_id', 'volumenumberinseries', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -85,12 +91,12 @@ abstract class BasePublicationMsPeer
      * e.g. PublicationMsPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'SeriesId' => 2, 'Volumenumberinseries' => 3, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'seriesId' => 2, 'volumenumberinseries' => 3, ),
-        BasePeer::TYPE_COLNAME => array (PublicationMsPeer::ID => 0, PublicationMsPeer::PUBLICATION_ID => 1, PublicationMsPeer::SERIES_ID => 2, PublicationMsPeer::VOLUMENUMBERINSERIES => 3, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'SERIES_ID' => 2, 'VOLUMENUMBERINSERIES' => 3, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'series_id' => 2, 'volumenumberinseries' => 3, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'SeriesId' => 2, 'Volumenumberinseries' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'seriesId' => 2, 'volumenumberinseries' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
+        BasePeer::TYPE_COLNAME => array (PublicationMsPeer::ID => 0, PublicationMsPeer::PUBLICATION_ID => 1, PublicationMsPeer::SERIES_ID => 2, PublicationMsPeer::VOLUMENUMBERINSERIES => 3, PublicationMsPeer::CREATED_AT => 4, PublicationMsPeer::UPDATED_AT => 5, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'SERIES_ID' => 2, 'VOLUMENUMBERINSERIES' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'series_id' => 2, 'volumenumberinseries' => 3, 'created_at' => 4, 'updated_at' => 5, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -168,11 +174,15 @@ abstract class BasePublicationMsPeer
             $criteria->addSelectColumn(PublicationMsPeer::PUBLICATION_ID);
             $criteria->addSelectColumn(PublicationMsPeer::SERIES_ID);
             $criteria->addSelectColumn(PublicationMsPeer::VOLUMENUMBERINSERIES);
+            $criteria->addSelectColumn(PublicationMsPeer::CREATED_AT);
+            $criteria->addSelectColumn(PublicationMsPeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.publication_id');
             $criteria->addSelectColumn($alias . '.series_id');
             $criteria->addSelectColumn($alias . '.volumenumberinseries');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

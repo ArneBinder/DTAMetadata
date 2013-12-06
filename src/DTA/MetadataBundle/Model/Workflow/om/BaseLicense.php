@@ -5,11 +5,13 @@ namespace DTA\MetadataBundle\Model\Workflow\om;
 use \BaseObject;
 use \BasePeer;
 use \Criteria;
+use \DateTime;
 use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
 use \PropelCollection;
+use \PropelDateTime;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
@@ -73,6 +75,18 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
      * @var        boolean
      */
     protected $applicable_to_text;
+
+    /**
+     * The value for the created_at field.
+     * @var        string
+     */
+    protected $created_at;
+
+    /**
+     * The value for the updated_at field.
+     * @var        string
+     */
+    protected $updated_at;
 
     /**
      * @var        PropelObjectCollection|CopyLocation[] Collection to store aggregation of CopyLocation objects.
@@ -198,6 +212,76 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
     }
 
     /**
+     * Get the [optionally formatted] temporal [created_at] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getCreatedAt($format = null)
+    {
+        if ($this->created_at === null) {
+            return null;
+        }
+
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [updated_at] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getUpdatedAt($format = null)
+    {
+        if ($this->updated_at === null) {
+            return null;
+        }
+
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
+    }
+
+    /**
      * Set the value of [id] column.
      *
      * @param  int $v new value
@@ -319,6 +403,52 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
     } // setApplicableToText()
 
     /**
+     * Sets the value of [created_at] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return License The current object (for fluent API support)
+     */
+    public function setCreatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->created_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->created_at !== null && $tmpDt = new DateTime($this->created_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->created_at = $newDateAsString;
+                $this->modifiedColumns[] = LicensePeer::CREATED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setCreatedAt()
+
+    /**
+     * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return License The current object (for fluent API support)
+     */
+    public function setUpdatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->updated_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->updated_at !== null && $tmpDt = new DateTime($this->updated_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->updated_at = $newDateAsString;
+                $this->modifiedColumns[] = LicensePeer::UPDATED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setUpdatedAt()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -363,6 +493,8 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
             $this->url = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
             $this->applicable_to_image = ($row[$startcol + 3] !== null) ? (boolean) $row[$startcol + 3] : null;
             $this->applicable_to_text = ($row[$startcol + 4] !== null) ? (boolean) $row[$startcol + 4] : null;
+            $this->created_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+            $this->updated_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -372,7 +504,7 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
             }
             $this->postHydrate($row, $startcol, $rehydrate);
 
-            return $startcol + 5; // 5 = LicensePeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 7; // 7 = LicensePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating License object", $e);
@@ -510,8 +642,19 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+                if (!$this->isColumnModified(LicensePeer::CREATED_AT)) {
+                    $this->setCreatedAt(time());
+                }
+                if (!$this->isColumnModified(LicensePeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(LicensePeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -649,6 +792,12 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
         if ($this->isColumnModified(LicensePeer::APPLICABLE_TO_TEXT)) {
             $modifiedColumns[':p' . $index++]  = '"applicable_to_text"';
         }
+        if ($this->isColumnModified(LicensePeer::CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '"created_at"';
+        }
+        if ($this->isColumnModified(LicensePeer::UPDATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '"updated_at"';
+        }
 
         $sql = sprintf(
             'INSERT INTO "license" (%s) VALUES (%s)',
@@ -674,6 +823,12 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
                         break;
                     case '"applicable_to_text"':
                         $stmt->bindValue($identifier, $this->applicable_to_text, PDO::PARAM_BOOL);
+                        break;
+                    case '"created_at"':
+                        $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
+                        break;
+                    case '"updated_at"':
+                        $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -833,6 +988,12 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
             case 4:
                 return $this->getApplicableToText();
                 break;
+            case 5:
+                return $this->getCreatedAt();
+                break;
+            case 6:
+                return $this->getUpdatedAt();
+                break;
             default:
                 return null;
                 break;
@@ -867,6 +1028,8 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
             $keys[2] => $this->getUrl(),
             $keys[3] => $this->getApplicableToImage(),
             $keys[4] => $this->getApplicableToText(),
+            $keys[5] => $this->getCreatedAt(),
+            $keys[6] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -929,6 +1092,12 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
             case 4:
                 $this->setApplicableToText($value);
                 break;
+            case 5:
+                $this->setCreatedAt($value);
+                break;
+            case 6:
+                $this->setUpdatedAt($value);
+                break;
         } // switch()
     }
 
@@ -958,6 +1127,8 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
         if (array_key_exists($keys[2], $arr)) $this->setUrl($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setApplicableToImage($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setApplicableToText($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
     }
 
     /**
@@ -974,6 +1145,8 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
         if ($this->isColumnModified(LicensePeer::URL)) $criteria->add(LicensePeer::URL, $this->url);
         if ($this->isColumnModified(LicensePeer::APPLICABLE_TO_IMAGE)) $criteria->add(LicensePeer::APPLICABLE_TO_IMAGE, $this->applicable_to_image);
         if ($this->isColumnModified(LicensePeer::APPLICABLE_TO_TEXT)) $criteria->add(LicensePeer::APPLICABLE_TO_TEXT, $this->applicable_to_text);
+        if ($this->isColumnModified(LicensePeer::CREATED_AT)) $criteria->add(LicensePeer::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(LicensePeer::UPDATED_AT)) $criteria->add(LicensePeer::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -1041,6 +1214,8 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
         $copyObj->setUrl($this->getUrl());
         $copyObj->setApplicableToImage($this->getApplicableToImage());
         $copyObj->setApplicableToText($this->getApplicableToText());
+        $copyObj->setCreatedAt($this->getCreatedAt());
+        $copyObj->setUpdatedAt($this->getUpdatedAt());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1690,6 +1865,8 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
         $this->url = null;
         $this->applicable_to_image = null;
         $this->applicable_to_text = null;
+        $this->created_at = null;
+        $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
@@ -1804,5 +1981,19 @@ abstract class BaseLicense extends BaseObject implements Persistent, \DTA\Metada
         }
     }
 
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     License The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = LicensePeer::UPDATED_AT;
+
+        return $this;
+    }
 
 }

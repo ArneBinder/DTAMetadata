@@ -53,6 +53,7 @@ class TaskTableMap extends TableMap
         $this->addForeignKey('partner_id', 'PartnerId', 'INTEGER', 'partner', 'id', false, null, null);
         $this->addForeignKey('responsibleuser_id', 'ResponsibleuserId', 'INTEGER', 'dta_user', 'id', false, null, null);
         $this->addForeignKey('copylocation_id', 'CopylocationId', 'INTEGER', 'copy_location', 'id', false, null, null);
+        $this->addColumn('priority', 'Priority', 'INTEGER', false, null, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
@@ -80,11 +81,6 @@ class TaskTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'timestampable' =>  array (
-  'create_column' => 'created_at',
-  'update_column' => 'updated_at',
-  'disable_updated_at' => 'false',
-),
             'table_row_view' =>  array (
   'embedColumns1' => 'tasktype',
   'Abgeschlossen' => 'closed',
@@ -93,6 +89,11 @@ class TaskTableMap extends TableMap
   'Für' => 'accessor:getReferee',
   'Verantwortlich' => 'accessor:getResponsibleUser',
   'query' => '\\DTA\\MetadataBundle\\Model\\Workflow\\TaskQuery::create()                     ->leftJoinWith(\'Publication\')                     ->leftJoinWith(\'Publication.Title\')                     ->leftJoinWith(\'Title.Titlefragment\')                     ->leftJoinWith(\'Tasktype\')                     ->leftJoinWith(\'DtaUser\');',
+),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
 ),
         );
     } // getBehaviors()

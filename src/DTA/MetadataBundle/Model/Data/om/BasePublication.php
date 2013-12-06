@@ -153,6 +153,36 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     protected $source_id;
 
     /**
+     * The value for the legacygenre field.
+     * @var        string
+     */
+    protected $legacygenre;
+
+    /**
+     * The value for the legacysubgenre field.
+     * @var        string
+     */
+    protected $legacysubgenre;
+
+    /**
+     * The value for the type field.
+     * @var        string
+     */
+    protected $type;
+
+    /**
+     * The value for the dirname field.
+     * @var        string
+     */
+    protected $dirname;
+
+    /**
+     * The value for the usedcopylocation_id field.
+     * @var        int
+     */
+    protected $usedcopylocation_id;
+
+    /**
      * The value for the partner_id field.
      * @var        int
      */
@@ -231,6 +261,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     protected $last_changed_by_user_id;
 
     /**
+     * The value for the publishingcompany_id_is_reconstructed field.
+     * Note: this column has a database default value of: false
+     * @var        boolean
+     */
+    protected $publishingcompany_id_is_reconstructed;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -241,13 +278,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      * @var        string
      */
     protected $updated_at;
-
-    /**
-     * The value for the publishingcompany_id_is_reconstructed field.
-     * Note: this column has a database default value of: false
-     * @var        boolean
-     */
-    protected $publishingcompany_id_is_reconstructed;
 
     /**
      * @var        Title
@@ -734,6 +764,61 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     }
 
     /**
+     * Get the [legacygenre] column value.
+     * Alt-Angabe zum Genre, zur Weiterverarbeitung bei Umstellung auf das neue Genre-System.
+     * @return string
+     */
+    public function getLegacygenre()
+    {
+
+        return $this->legacygenre;
+    }
+
+    /**
+     * Get the [legacysubgenre] column value.
+     * Alt-Angabe zum Untergenre.
+     * @return string
+     */
+    public function getLegacysubgenre()
+    {
+
+        return $this->legacysubgenre;
+    }
+
+    /**
+     * Get the [type] column value.
+     * Publikationstyp. Zur späteren Differenzierung über Publikationstypen.
+     * @return string
+     */
+    public function getType()
+    {
+
+        return $this->type;
+    }
+
+    /**
+     * Get the [dirname] column value.
+     * Textuelle ID (Kombination aus Autor, Titel, Jahr)
+     * @return string
+     */
+    public function getDirname()
+    {
+
+        return $this->dirname;
+    }
+
+    /**
+     * Get the [usedcopylocation_id] column value.
+     * Vermutlich der eingesetzte Nachweis. Entspricht dem alten metadaten.id_nachweis.
+     * @return int
+     */
+    public function getUsedcopylocationId()
+    {
+
+        return $this->usedcopylocation_id;
+    }
+
+    /**
      * Get the [partner_id] column value.
      * akquiriert über
      * @return int
@@ -877,6 +962,17 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     }
 
     /**
+     * Get the [publishingcompany_id_is_reconstructed] column value.
+     *
+     * @return boolean
+     */
+    public function getPublishingcompanyIdIsReconstructed()
+    {
+
+        return $this->publishingcompany_id_is_reconstructed;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -944,17 +1040,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
         return $dt->format($format);
 
-    }
-
-    /**
-     * Get the [publishingcompany_id_is_reconstructed] column value.
-     *
-     * @return boolean
-     */
-    public function getPublishingcompanyIdIsReconstructed()
-    {
-
-        return $this->publishingcompany_id_is_reconstructed;
     }
 
     /**
@@ -1148,6 +1233,111 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
         return $this;
     } // setSourceId()
+
+    /**
+     * Set the value of [legacygenre] column.
+     * Alt-Angabe zum Genre, zur Weiterverarbeitung bei Umstellung auf das neue Genre-System.
+     * @param  string $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setLegacygenre($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->legacygenre !== $v) {
+            $this->legacygenre = $v;
+            $this->modifiedColumns[] = PublicationPeer::LEGACYGENRE;
+        }
+
+
+        return $this;
+    } // setLegacygenre()
+
+    /**
+     * Set the value of [legacysubgenre] column.
+     * Alt-Angabe zum Untergenre.
+     * @param  string $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setLegacysubgenre($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->legacysubgenre !== $v) {
+            $this->legacysubgenre = $v;
+            $this->modifiedColumns[] = PublicationPeer::LEGACYSUBGENRE;
+        }
+
+
+        return $this;
+    } // setLegacysubgenre()
+
+    /**
+     * Set the value of [type] column.
+     * Publikationstyp. Zur späteren Differenzierung über Publikationstypen.
+     * @param  string $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setType($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->type !== $v) {
+            $this->type = $v;
+            $this->modifiedColumns[] = PublicationPeer::TYPE;
+        }
+
+
+        return $this;
+    } // setType()
+
+    /**
+     * Set the value of [dirname] column.
+     * Textuelle ID (Kombination aus Autor, Titel, Jahr)
+     * @param  string $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setDirname($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->dirname !== $v) {
+            $this->dirname = $v;
+            $this->modifiedColumns[] = PublicationPeer::DIRNAME;
+        }
+
+
+        return $this;
+    } // setDirname()
+
+    /**
+     * Set the value of [usedcopylocation_id] column.
+     * Vermutlich der eingesetzte Nachweis. Entspricht dem alten metadaten.id_nachweis.
+     * @param  int $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setUsedcopylocationId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->usedcopylocation_id !== $v) {
+            $this->usedcopylocation_id = $v;
+            $this->modifiedColumns[] = PublicationPeer::USEDCOPYLOCATION_ID;
+        }
+
+
+        return $this;
+    } // setUsedcopylocationId()
 
     /**
      * Set the value of [partner_id] column.
@@ -1427,6 +1617,35 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     } // setLastChangedByUserId()
 
     /**
+     * Sets the value of the [publishingcompany_id_is_reconstructed] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param boolean|integer|string $v The new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setPublishingcompanyIdIsReconstructed($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->publishingcompany_id_is_reconstructed !== $v) {
+            $this->publishingcompany_id_is_reconstructed = $v;
+            $this->modifiedColumns[] = PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED;
+        }
+
+
+        return $this;
+    } // setPublishingcompanyIdIsReconstructed()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param mixed $v string, integer (timestamp), or DateTime value.
@@ -1473,35 +1692,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     } // setUpdatedAt()
 
     /**
-     * Sets the value of the [publishingcompany_id_is_reconstructed] column.
-     * Non-boolean arguments are converted using the following rules:
-     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
-     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
-     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
-     *
-     * @param boolean|integer|string $v The new value
-     * @return Publication The current object (for fluent API support)
-     */
-    public function setPublishingcompanyIdIsReconstructed($v)
-    {
-        if ($v !== null) {
-            if (is_string($v)) {
-                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
-            } else {
-                $v = (boolean) $v;
-            }
-        }
-
-        if ($this->publishingcompany_id_is_reconstructed !== $v) {
-            $this->publishingcompany_id_is_reconstructed = $v;
-            $this->modifiedColumns[] = PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED;
-        }
-
-
-        return $this;
-    } // setPublishingcompanyIdIsReconstructed()
-
-    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -1545,22 +1735,27 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->creationdate_id = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
             $this->publishingcompany_id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
             $this->source_id = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-            $this->partner_id = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
-            $this->editiondescription = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-            $this->digitaleditioneditor = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
-            $this->transcriptioncomment = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
-            $this->numpages = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
-            $this->numpagesnumeric = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
-            $this->comment = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
-            $this->encoding_comment = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
-            $this->doi = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
-            $this->format = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
-            $this->directoryname = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
-            $this->wwwready = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
-            $this->last_changed_by_user_id = ($row[$startcol + 20] !== null) ? (int) $row[$startcol + 20] : null;
-            $this->created_at = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
-            $this->updated_at = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
-            $this->publishingcompany_id_is_reconstructed = ($row[$startcol + 23] !== null) ? (boolean) $row[$startcol + 23] : null;
+            $this->legacygenre = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+            $this->legacysubgenre = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
+            $this->type = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+            $this->dirname = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+            $this->usedcopylocation_id = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
+            $this->partner_id = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
+            $this->editiondescription = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
+            $this->digitaleditioneditor = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+            $this->transcriptioncomment = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
+            $this->numpages = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
+            $this->numpagesnumeric = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
+            $this->comment = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
+            $this->encoding_comment = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
+            $this->doi = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
+            $this->format = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
+            $this->directoryname = ($row[$startcol + 23] !== null) ? (string) $row[$startcol + 23] : null;
+            $this->wwwready = ($row[$startcol + 24] !== null) ? (int) $row[$startcol + 24] : null;
+            $this->last_changed_by_user_id = ($row[$startcol + 25] !== null) ? (int) $row[$startcol + 25] : null;
+            $this->publishingcompany_id_is_reconstructed = ($row[$startcol + 26] !== null) ? (boolean) $row[$startcol + 26] : null;
+            $this->created_at = ($row[$startcol + 27] !== null) ? (string) $row[$startcol + 27] : null;
+            $this->updated_at = ($row[$startcol + 28] !== null) ? (string) $row[$startcol + 28] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -1570,7 +1765,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             }
             $this->postHydrate($row, $startcol, $rehydrate);
 
-            return $startcol + 24; // 24 = PublicationPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 29; // 29 = PublicationPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Publication object", $e);
@@ -2457,6 +2652,21 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ($this->isColumnModified(PublicationPeer::SOURCE_ID)) {
             $modifiedColumns[':p' . $index++]  = '"source_id"';
         }
+        if ($this->isColumnModified(PublicationPeer::LEGACYGENRE)) {
+            $modifiedColumns[':p' . $index++]  = '"legacygenre"';
+        }
+        if ($this->isColumnModified(PublicationPeer::LEGACYSUBGENRE)) {
+            $modifiedColumns[':p' . $index++]  = '"legacysubgenre"';
+        }
+        if ($this->isColumnModified(PublicationPeer::TYPE)) {
+            $modifiedColumns[':p' . $index++]  = '"type"';
+        }
+        if ($this->isColumnModified(PublicationPeer::DIRNAME)) {
+            $modifiedColumns[':p' . $index++]  = '"dirname"';
+        }
+        if ($this->isColumnModified(PublicationPeer::USEDCOPYLOCATION_ID)) {
+            $modifiedColumns[':p' . $index++]  = '"usedcopylocation_id"';
+        }
         if ($this->isColumnModified(PublicationPeer::PARTNER_ID)) {
             $modifiedColumns[':p' . $index++]  = '"partner_id"';
         }
@@ -2496,14 +2706,14 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ($this->isColumnModified(PublicationPeer::LAST_CHANGED_BY_USER_ID)) {
             $modifiedColumns[':p' . $index++]  = '"last_changed_by_user_id"';
         }
+        if ($this->isColumnModified(PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED)) {
+            $modifiedColumns[':p' . $index++]  = '"publishingcompany_id_is_reconstructed"';
+        }
         if ($this->isColumnModified(PublicationPeer::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '"created_at"';
         }
         if ($this->isColumnModified(PublicationPeer::UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '"updated_at"';
-        }
-        if ($this->isColumnModified(PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED)) {
-            $modifiedColumns[':p' . $index++]  = '"publishingcompany_id_is_reconstructed"';
         }
 
         $sql = sprintf(
@@ -2539,6 +2749,21 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                         break;
                     case '"source_id"':
                         $stmt->bindValue($identifier, $this->source_id, PDO::PARAM_INT);
+                        break;
+                    case '"legacygenre"':
+                        $stmt->bindValue($identifier, $this->legacygenre, PDO::PARAM_STR);
+                        break;
+                    case '"legacysubgenre"':
+                        $stmt->bindValue($identifier, $this->legacysubgenre, PDO::PARAM_STR);
+                        break;
+                    case '"type"':
+                        $stmt->bindValue($identifier, $this->type, PDO::PARAM_STR);
+                        break;
+                    case '"dirname"':
+                        $stmt->bindValue($identifier, $this->dirname, PDO::PARAM_STR);
+                        break;
+                    case '"usedcopylocation_id"':
+                        $stmt->bindValue($identifier, $this->usedcopylocation_id, PDO::PARAM_INT);
                         break;
                     case '"partner_id"':
                         $stmt->bindValue($identifier, $this->partner_id, PDO::PARAM_INT);
@@ -2579,14 +2804,14 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                     case '"last_changed_by_user_id"':
                         $stmt->bindValue($identifier, $this->last_changed_by_user_id, PDO::PARAM_INT);
                         break;
+                    case '"publishingcompany_id_is_reconstructed"':
+                        $stmt->bindValue($identifier, $this->publishingcompany_id_is_reconstructed, PDO::PARAM_BOOL);
+                        break;
                     case '"created_at"':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
                         break;
                     case '"updated_at"':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
-                        break;
-                    case '"publishingcompany_id_is_reconstructed"':
-                        $stmt->bindValue($identifier, $this->publishingcompany_id_is_reconstructed, PDO::PARAM_BOOL);
                         break;
                 }
             }
@@ -2956,52 +3181,67 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return $this->getSourceId();
                 break;
             case 8:
-                return $this->getPartnerId();
+                return $this->getLegacygenre();
                 break;
             case 9:
-                return $this->getEditiondescription();
+                return $this->getLegacysubgenre();
                 break;
             case 10:
-                return $this->getDigitaleditioneditor();
+                return $this->getType();
                 break;
             case 11:
-                return $this->getTranscriptioncomment();
+                return $this->getDirname();
                 break;
             case 12:
-                return $this->getNumpages();
+                return $this->getUsedcopylocationId();
                 break;
             case 13:
-                return $this->getNumpagesnumeric();
+                return $this->getPartnerId();
                 break;
             case 14:
-                return $this->getComment();
+                return $this->getEditiondescription();
                 break;
             case 15:
-                return $this->getEncodingComment();
+                return $this->getDigitaleditioneditor();
                 break;
             case 16:
-                return $this->getDoi();
+                return $this->getTranscriptioncomment();
                 break;
             case 17:
-                return $this->getFormat();
+                return $this->getNumpages();
                 break;
             case 18:
-                return $this->getDirectoryname();
+                return $this->getNumpagesnumeric();
                 break;
             case 19:
-                return $this->getWwwready();
+                return $this->getComment();
                 break;
             case 20:
-                return $this->getLastChangedByUserId();
+                return $this->getEncodingComment();
                 break;
             case 21:
-                return $this->getCreatedAt();
+                return $this->getDoi();
                 break;
             case 22:
-                return $this->getUpdatedAt();
+                return $this->getFormat();
                 break;
             case 23:
+                return $this->getDirectoryname();
+                break;
+            case 24:
+                return $this->getWwwready();
+                break;
+            case 25:
+                return $this->getLastChangedByUserId();
+                break;
+            case 26:
                 return $this->getPublishingcompanyIdIsReconstructed();
+                break;
+            case 27:
+                return $this->getCreatedAt();
+                break;
+            case 28:
+                return $this->getUpdatedAt();
                 break;
             default:
                 return null;
@@ -3040,22 +3280,27 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $keys[5] => $this->getCreationdateId(),
             $keys[6] => $this->getPublishingcompanyId(),
             $keys[7] => $this->getSourceId(),
-            $keys[8] => $this->getPartnerId(),
-            $keys[9] => $this->getEditiondescription(),
-            $keys[10] => $this->getDigitaleditioneditor(),
-            $keys[11] => $this->getTranscriptioncomment(),
-            $keys[12] => $this->getNumpages(),
-            $keys[13] => $this->getNumpagesnumeric(),
-            $keys[14] => $this->getComment(),
-            $keys[15] => $this->getEncodingComment(),
-            $keys[16] => $this->getDoi(),
-            $keys[17] => $this->getFormat(),
-            $keys[18] => $this->getDirectoryname(),
-            $keys[19] => $this->getWwwready(),
-            $keys[20] => $this->getLastChangedByUserId(),
-            $keys[21] => $this->getCreatedAt(),
-            $keys[22] => $this->getUpdatedAt(),
-            $keys[23] => $this->getPublishingcompanyIdIsReconstructed(),
+            $keys[8] => $this->getLegacygenre(),
+            $keys[9] => $this->getLegacysubgenre(),
+            $keys[10] => $this->getType(),
+            $keys[11] => $this->getDirname(),
+            $keys[12] => $this->getUsedcopylocationId(),
+            $keys[13] => $this->getPartnerId(),
+            $keys[14] => $this->getEditiondescription(),
+            $keys[15] => $this->getDigitaleditioneditor(),
+            $keys[16] => $this->getTranscriptioncomment(),
+            $keys[17] => $this->getNumpages(),
+            $keys[18] => $this->getNumpagesnumeric(),
+            $keys[19] => $this->getComment(),
+            $keys[20] => $this->getEncodingComment(),
+            $keys[21] => $this->getDoi(),
+            $keys[22] => $this->getFormat(),
+            $keys[23] => $this->getDirectoryname(),
+            $keys[24] => $this->getWwwready(),
+            $keys[25] => $this->getLastChangedByUserId(),
+            $keys[26] => $this->getPublishingcompanyIdIsReconstructed(),
+            $keys[27] => $this->getCreatedAt(),
+            $keys[28] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -3206,52 +3451,67 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 $this->setSourceId($value);
                 break;
             case 8:
-                $this->setPartnerId($value);
+                $this->setLegacygenre($value);
                 break;
             case 9:
-                $this->setEditiondescription($value);
+                $this->setLegacysubgenre($value);
                 break;
             case 10:
-                $this->setDigitaleditioneditor($value);
+                $this->setType($value);
                 break;
             case 11:
-                $this->setTranscriptioncomment($value);
+                $this->setDirname($value);
                 break;
             case 12:
-                $this->setNumpages($value);
+                $this->setUsedcopylocationId($value);
                 break;
             case 13:
-                $this->setNumpagesnumeric($value);
+                $this->setPartnerId($value);
                 break;
             case 14:
-                $this->setComment($value);
+                $this->setEditiondescription($value);
                 break;
             case 15:
-                $this->setEncodingComment($value);
+                $this->setDigitaleditioneditor($value);
                 break;
             case 16:
-                $this->setDoi($value);
+                $this->setTranscriptioncomment($value);
                 break;
             case 17:
-                $this->setFormat($value);
+                $this->setNumpages($value);
                 break;
             case 18:
-                $this->setDirectoryname($value);
+                $this->setNumpagesnumeric($value);
                 break;
             case 19:
-                $this->setWwwready($value);
+                $this->setComment($value);
                 break;
             case 20:
-                $this->setLastChangedByUserId($value);
+                $this->setEncodingComment($value);
                 break;
             case 21:
-                $this->setCreatedAt($value);
+                $this->setDoi($value);
                 break;
             case 22:
-                $this->setUpdatedAt($value);
+                $this->setFormat($value);
                 break;
             case 23:
+                $this->setDirectoryname($value);
+                break;
+            case 24:
+                $this->setWwwready($value);
+                break;
+            case 25:
+                $this->setLastChangedByUserId($value);
+                break;
+            case 26:
                 $this->setPublishingcompanyIdIsReconstructed($value);
+                break;
+            case 27:
+                $this->setCreatedAt($value);
+                break;
+            case 28:
+                $this->setUpdatedAt($value);
                 break;
         } // switch()
     }
@@ -3285,22 +3545,27 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if (array_key_exists($keys[5], $arr)) $this->setCreationdateId($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setPublishingcompanyId($arr[$keys[6]]);
         if (array_key_exists($keys[7], $arr)) $this->setSourceId($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setPartnerId($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setEditiondescription($arr[$keys[9]]);
-        if (array_key_exists($keys[10], $arr)) $this->setDigitaleditioneditor($arr[$keys[10]]);
-        if (array_key_exists($keys[11], $arr)) $this->setTranscriptioncomment($arr[$keys[11]]);
-        if (array_key_exists($keys[12], $arr)) $this->setNumpages($arr[$keys[12]]);
-        if (array_key_exists($keys[13], $arr)) $this->setNumpagesnumeric($arr[$keys[13]]);
-        if (array_key_exists($keys[14], $arr)) $this->setComment($arr[$keys[14]]);
-        if (array_key_exists($keys[15], $arr)) $this->setEncodingComment($arr[$keys[15]]);
-        if (array_key_exists($keys[16], $arr)) $this->setDoi($arr[$keys[16]]);
-        if (array_key_exists($keys[17], $arr)) $this->setFormat($arr[$keys[17]]);
-        if (array_key_exists($keys[18], $arr)) $this->setDirectoryname($arr[$keys[18]]);
-        if (array_key_exists($keys[19], $arr)) $this->setWwwready($arr[$keys[19]]);
-        if (array_key_exists($keys[20], $arr)) $this->setLastChangedByUserId($arr[$keys[20]]);
-        if (array_key_exists($keys[21], $arr)) $this->setCreatedAt($arr[$keys[21]]);
-        if (array_key_exists($keys[22], $arr)) $this->setUpdatedAt($arr[$keys[22]]);
-        if (array_key_exists($keys[23], $arr)) $this->setPublishingcompanyIdIsReconstructed($arr[$keys[23]]);
+        if (array_key_exists($keys[8], $arr)) $this->setLegacygenre($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setLegacysubgenre($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setType($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setDirname($arr[$keys[11]]);
+        if (array_key_exists($keys[12], $arr)) $this->setUsedcopylocationId($arr[$keys[12]]);
+        if (array_key_exists($keys[13], $arr)) $this->setPartnerId($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setEditiondescription($arr[$keys[14]]);
+        if (array_key_exists($keys[15], $arr)) $this->setDigitaleditioneditor($arr[$keys[15]]);
+        if (array_key_exists($keys[16], $arr)) $this->setTranscriptioncomment($arr[$keys[16]]);
+        if (array_key_exists($keys[17], $arr)) $this->setNumpages($arr[$keys[17]]);
+        if (array_key_exists($keys[18], $arr)) $this->setNumpagesnumeric($arr[$keys[18]]);
+        if (array_key_exists($keys[19], $arr)) $this->setComment($arr[$keys[19]]);
+        if (array_key_exists($keys[20], $arr)) $this->setEncodingComment($arr[$keys[20]]);
+        if (array_key_exists($keys[21], $arr)) $this->setDoi($arr[$keys[21]]);
+        if (array_key_exists($keys[22], $arr)) $this->setFormat($arr[$keys[22]]);
+        if (array_key_exists($keys[23], $arr)) $this->setDirectoryname($arr[$keys[23]]);
+        if (array_key_exists($keys[24], $arr)) $this->setWwwready($arr[$keys[24]]);
+        if (array_key_exists($keys[25], $arr)) $this->setLastChangedByUserId($arr[$keys[25]]);
+        if (array_key_exists($keys[26], $arr)) $this->setPublishingcompanyIdIsReconstructed($arr[$keys[26]]);
+        if (array_key_exists($keys[27], $arr)) $this->setCreatedAt($arr[$keys[27]]);
+        if (array_key_exists($keys[28], $arr)) $this->setUpdatedAt($arr[$keys[28]]);
     }
 
     /**
@@ -3320,6 +3585,11 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ($this->isColumnModified(PublicationPeer::CREATIONDATE_ID)) $criteria->add(PublicationPeer::CREATIONDATE_ID, $this->creationdate_id);
         if ($this->isColumnModified(PublicationPeer::PUBLISHINGCOMPANY_ID)) $criteria->add(PublicationPeer::PUBLISHINGCOMPANY_ID, $this->publishingcompany_id);
         if ($this->isColumnModified(PublicationPeer::SOURCE_ID)) $criteria->add(PublicationPeer::SOURCE_ID, $this->source_id);
+        if ($this->isColumnModified(PublicationPeer::LEGACYGENRE)) $criteria->add(PublicationPeer::LEGACYGENRE, $this->legacygenre);
+        if ($this->isColumnModified(PublicationPeer::LEGACYSUBGENRE)) $criteria->add(PublicationPeer::LEGACYSUBGENRE, $this->legacysubgenre);
+        if ($this->isColumnModified(PublicationPeer::TYPE)) $criteria->add(PublicationPeer::TYPE, $this->type);
+        if ($this->isColumnModified(PublicationPeer::DIRNAME)) $criteria->add(PublicationPeer::DIRNAME, $this->dirname);
+        if ($this->isColumnModified(PublicationPeer::USEDCOPYLOCATION_ID)) $criteria->add(PublicationPeer::USEDCOPYLOCATION_ID, $this->usedcopylocation_id);
         if ($this->isColumnModified(PublicationPeer::PARTNER_ID)) $criteria->add(PublicationPeer::PARTNER_ID, $this->partner_id);
         if ($this->isColumnModified(PublicationPeer::EDITIONDESCRIPTION)) $criteria->add(PublicationPeer::EDITIONDESCRIPTION, $this->editiondescription);
         if ($this->isColumnModified(PublicationPeer::DIGITALEDITIONEDITOR)) $criteria->add(PublicationPeer::DIGITALEDITIONEDITOR, $this->digitaleditioneditor);
@@ -3333,9 +3603,9 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ($this->isColumnModified(PublicationPeer::DIRECTORYNAME)) $criteria->add(PublicationPeer::DIRECTORYNAME, $this->directoryname);
         if ($this->isColumnModified(PublicationPeer::WWWREADY)) $criteria->add(PublicationPeer::WWWREADY, $this->wwwready);
         if ($this->isColumnModified(PublicationPeer::LAST_CHANGED_BY_USER_ID)) $criteria->add(PublicationPeer::LAST_CHANGED_BY_USER_ID, $this->last_changed_by_user_id);
+        if ($this->isColumnModified(PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED)) $criteria->add(PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED, $this->publishingcompany_id_is_reconstructed);
         if ($this->isColumnModified(PublicationPeer::CREATED_AT)) $criteria->add(PublicationPeer::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(PublicationPeer::UPDATED_AT)) $criteria->add(PublicationPeer::UPDATED_AT, $this->updated_at);
-        if ($this->isColumnModified(PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED)) $criteria->add(PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED, $this->publishingcompany_id_is_reconstructed);
 
         return $criteria;
     }
@@ -3406,6 +3676,11 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         $copyObj->setCreationdateId($this->getCreationdateId());
         $copyObj->setPublishingcompanyId($this->getPublishingcompanyId());
         $copyObj->setSourceId($this->getSourceId());
+        $copyObj->setLegacygenre($this->getLegacygenre());
+        $copyObj->setLegacysubgenre($this->getLegacysubgenre());
+        $copyObj->setType($this->getType());
+        $copyObj->setDirname($this->getDirname());
+        $copyObj->setUsedcopylocationId($this->getUsedcopylocationId());
         $copyObj->setPartnerId($this->getPartnerId());
         $copyObj->setEditiondescription($this->getEditiondescription());
         $copyObj->setDigitaleditioneditor($this->getDigitaleditioneditor());
@@ -3419,9 +3694,9 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         $copyObj->setDirectoryname($this->getDirectoryname());
         $copyObj->setWwwready($this->getWwwready());
         $copyObj->setLastChangedByUserId($this->getLastChangedByUserId());
+        $copyObj->setPublishingcompanyIdIsReconstructed($this->getPublishingcompanyIdIsReconstructed());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
-        $copyObj->setPublishingcompanyIdIsReconstructed($this->getPublishingcompanyIdIsReconstructed());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -10437,6 +10712,11 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         $this->creationdate_id = null;
         $this->publishingcompany_id = null;
         $this->source_id = null;
+        $this->legacygenre = null;
+        $this->legacysubgenre = null;
+        $this->type = null;
+        $this->dirname = null;
+        $this->usedcopylocation_id = null;
         $this->partner_id = null;
         $this->editiondescription = null;
         $this->digitaleditioneditor = null;
@@ -10450,9 +10730,9 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         $this->directoryname = null;
         $this->wwwready = null;
         $this->last_changed_by_user_id = null;
+        $this->publishingcompany_id_is_reconstructed = null;
         $this->created_at = null;
         $this->updated_at = null;
-        $this->publishingcompany_id_is_reconstructed = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
@@ -10845,20 +11125,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             return "-";
         }
     }
-    // timestampable behavior
-
-    /**
-     * Mark the current object so that the update date doesn't get updated during next save
-     *
-     * @return     Publication The current object (for fluent API support)
-     */
-    public function keepUpdateDateUnchanged()
-    {
-        $this->modifiedColumns[] = PublicationPeer::UPDATED_AT;
-
-        return $this;
-    }
-
     // reconstructed_flaggable behavior
     /**
     * Returns all columns that can be flagged as reconstructed.
@@ -10899,4 +11165,18 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         }
         return $flaggedColumns;
     }
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     Publication The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = PublicationPeer::UPDATED_AT;
+
+        return $this;
+    }
+
 }

@@ -47,6 +47,8 @@ class ImagesourceTableMap extends TableMap
         $this->addForeignKey('publication_id', 'PublicationId', 'INTEGER', 'publication', 'id', true, null, null);
         $this->addColumn('faksimilerefrange', 'Faksimilerefrange', 'LONGVARCHAR', false, null, null);
         $this->addColumn('originalrefrange', 'Originalrefrange', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -67,11 +69,18 @@ class ImagesourceTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
+),
             'table_row_view' =>  array (
   'Id' => 'id',
   'PublicationId' => 'publication_id',
   'Faksimilerefrange' => 'faksimilerefrange',
   'Originalrefrange' => 'originalrefrange',
+  'CreatedAt' => 'created_at',
+  'UpdatedAt' => 'updated_at',
 ),
         );
     } // getBehaviors()

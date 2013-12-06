@@ -5,10 +5,12 @@ namespace DTA\MetadataBundle\Model\Workflow\om;
 use \BaseObject;
 use \BasePeer;
 use \Criteria;
+use \DateTime;
 use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
+use \PropelDateTime;
 use \PropelException;
 use \PropelPDO;
 use DTA\MetadataBundle\Model\Data\Publication;
@@ -79,6 +81,18 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
     protected $attribution;
 
     /**
+     * The value for the created_at field.
+     * @var        string
+     */
+    protected $created_at;
+
+    /**
+     * The value for the updated_at field.
+     * @var        string
+     */
+    protected $updated_at;
+
+    /**
      * @var        Publication
      */
     protected $aPublication;
@@ -114,7 +128,7 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Id', 'PublicationId', 'PartnerId', 'Texturl', 'LicenseId', 'Attribution', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'PublicationId'=>'PublicationId', 'PartnerId'=>'PartnerId', 'Texturl'=>'Texturl', 'LicenseId'=>'LicenseId', 'Attribution'=>'Attribution', );	public static $queryConstructionString = NULL;
+    public static $tableRowViewCaptions = array('Id', 'PublicationId', 'PartnerId', 'Texturl', 'LicenseId', 'Attribution', 'CreatedAt', 'UpdatedAt', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'PublicationId'=>'PublicationId', 'PartnerId'=>'PartnerId', 'Texturl'=>'Texturl', 'LicenseId'=>'LicenseId', 'Attribution'=>'Attribution', 'CreatedAt'=>'CreatedAt', 'UpdatedAt'=>'UpdatedAt', );	public static $queryConstructionString = NULL;
     /**
      * Get the [id] column value.
      *
@@ -179,6 +193,76 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
     {
 
         return $this->attribution;
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [created_at] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getCreatedAt($format = null)
+    {
+        if ($this->created_at === null) {
+            return null;
+        }
+
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [updated_at] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getUpdatedAt($format = null)
+    {
+        if ($this->updated_at === null) {
+            return null;
+        }
+
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -320,6 +404,52 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
     } // setAttribution()
 
     /**
+     * Sets the value of [created_at] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return Textsource The current object (for fluent API support)
+     */
+    public function setCreatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->created_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->created_at !== null && $tmpDt = new DateTime($this->created_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->created_at = $newDateAsString;
+                $this->modifiedColumns[] = TextsourcePeer::CREATED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setCreatedAt()
+
+    /**
+     * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return Textsource The current object (for fluent API support)
+     */
+    public function setUpdatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->updated_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->updated_at !== null && $tmpDt = new DateTime($this->updated_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->updated_at = $newDateAsString;
+                $this->modifiedColumns[] = TextsourcePeer::UPDATED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setUpdatedAt()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -357,6 +487,8 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
             $this->texturl = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
             $this->license_id = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
             $this->attribution = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+            $this->created_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+            $this->updated_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -366,7 +498,7 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
             }
             $this->postHydrate($row, $startcol, $rehydrate);
 
-            return $startcol + 6; // 6 = TextsourcePeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 8; // 8 = TextsourcePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Textsource object", $e);
@@ -512,8 +644,19 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+                if (!$this->isColumnModified(TextsourcePeer::CREATED_AT)) {
+                    $this->setCreatedAt(time());
+                }
+                if (!$this->isColumnModified(TextsourcePeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(TextsourcePeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -644,6 +787,12 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
         if ($this->isColumnModified(TextsourcePeer::ATTRIBUTION)) {
             $modifiedColumns[':p' . $index++]  = '"attribution"';
         }
+        if ($this->isColumnModified(TextsourcePeer::CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '"created_at"';
+        }
+        if ($this->isColumnModified(TextsourcePeer::UPDATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '"updated_at"';
+        }
 
         $sql = sprintf(
             'INSERT INTO "textsource" (%s) VALUES (%s)',
@@ -672,6 +821,12 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
                         break;
                     case '"attribution"':
                         $stmt->bindValue($identifier, $this->attribution, PDO::PARAM_STR);
+                        break;
+                    case '"created_at"':
+                        $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
+                        break;
+                    case '"updated_at"':
+                        $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -842,6 +997,12 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
             case 5:
                 return $this->getAttribution();
                 break;
+            case 6:
+                return $this->getCreatedAt();
+                break;
+            case 7:
+                return $this->getUpdatedAt();
+                break;
             default:
                 return null;
                 break;
@@ -877,6 +1038,8 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
             $keys[3] => $this->getTexturl(),
             $keys[4] => $this->getLicenseId(),
             $keys[5] => $this->getAttribution(),
+            $keys[6] => $this->getCreatedAt(),
+            $keys[7] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -945,6 +1108,12 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
             case 5:
                 $this->setAttribution($value);
                 break;
+            case 6:
+                $this->setCreatedAt($value);
+                break;
+            case 7:
+                $this->setUpdatedAt($value);
+                break;
         } // switch()
     }
 
@@ -975,6 +1144,8 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
         if (array_key_exists($keys[3], $arr)) $this->setTexturl($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setLicenseId($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setAttribution($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
     }
 
     /**
@@ -992,6 +1163,8 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
         if ($this->isColumnModified(TextsourcePeer::TEXTURL)) $criteria->add(TextsourcePeer::TEXTURL, $this->texturl);
         if ($this->isColumnModified(TextsourcePeer::LICENSE_ID)) $criteria->add(TextsourcePeer::LICENSE_ID, $this->license_id);
         if ($this->isColumnModified(TextsourcePeer::ATTRIBUTION)) $criteria->add(TextsourcePeer::ATTRIBUTION, $this->attribution);
+        if ($this->isColumnModified(TextsourcePeer::CREATED_AT)) $criteria->add(TextsourcePeer::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(TextsourcePeer::UPDATED_AT)) $criteria->add(TextsourcePeer::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -1060,6 +1233,8 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
         $copyObj->setTexturl($this->getTexturl());
         $copyObj->setLicenseId($this->getLicenseId());
         $copyObj->setAttribution($this->getAttribution());
+        $copyObj->setCreatedAt($this->getCreatedAt());
+        $copyObj->setUpdatedAt($this->getUpdatedAt());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1285,6 +1460,8 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
         $this->texturl = null;
         $this->license_id = null;
         $this->attribution = null;
+        $this->created_at = null;
+        $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->alreadyInClearAllReferencesDeep = false;
@@ -1343,6 +1520,20 @@ abstract class BaseTextsource extends BaseObject implements Persistent, \DTA\Met
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     Textsource The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = TextsourcePeer::UPDATED_AT;
+
+        return $this;
     }
 
     // table_row_view behavior

@@ -47,6 +47,8 @@ class PersonPublicationTableMap extends TableMap
         $this->addForeignKey('person_id', 'PersonId', 'INTEGER', 'person', 'id', true, null, null);
         $this->addForeignKey('personrole_id', 'PersonroleId', 'INTEGER', 'personrole', 'id', true, null, null);
         $this->addForeignKey('publication_id', 'PublicationId', 'INTEGER', 'publication', 'id', true, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -69,11 +71,18 @@ class PersonPublicationTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
+),
             'table_row_view' =>  array (
   'Id' => 'id',
   'PersonId' => 'person_id',
   'PersonroleId' => 'personrole_id',
   'PublicationId' => 'publication_id',
+  'CreatedAt' => 'created_at',
+  'UpdatedAt' => 'updated_at',
 ),
         );
     } // getBehaviors()

@@ -28,6 +28,9 @@ class DumpConversionController extends ORMController {
     private $warnings;
     private $errors;
     
+    /** Connection used in the target database. */
+    private $propelConnection;
+    
     /**
      * @param type $username MySQL access parameters.
      * @param type $password MySQL access parameters.
@@ -67,7 +70,7 @@ class DumpConversionController extends ORMController {
     function convertAction() {
         
         // during conversion, a lot of memory is allocated
-        ini_set('memory_limit', '512M');
+        ini_set('memory_limit', '600M');
         ini_set('max_execution_time', 300); //300 seconds = 5 minutes
         //
         // stores warning messages generated during the conversion
@@ -88,27 +91,43 @@ class DumpConversionController extends ORMController {
         // connect to imported database
         $dbh = $this->connect();
             
-        // remove some old records
+        // trim and NULL empty strings, remove some old records
         $this->cleanUpOldDatabase($dbh);
             
-        // convert single entities
+        
+        $this->propelConnection = \Propel::getConnection(Model\Master\DtaUserPeer::DATABASE_NAME);
+        $this->messages[] = array('message' => 'transaction begun on '.Model\Master\DtaUserPeer::DATABASE_NAME);
         
         $this->convertUsers($dbh);          // before publication because of last changed by user id
         
+        $this->convertFonts($dbh);          // before publication because of join with the 
+        
+        $this->propelConnection->beginTransaction();
         $this->convertPublications($dbh);
+        $this->propelConnection->commit();
         
+        $this->propelConnection->beginTransaction();
         $this->convertPartners($dbh);
+        $this->propelConnection->commit();
         
+        $this->propelConnection->beginTransaction();
         $this->convertCopyLocations($dbh);  // after publications and partners
-//        
+        $this->propelConnection->commit();
+        
+        $this->propelConnection->beginTransaction();
         $this->convertTasks($dbh);          // after copy locations
-//        
+        $this->propelConnection->commit();
+        
+        $this->propelConnection->beginTransaction();
         $this->convertPublishingCompanies($dbh);
-//        
+        $this->propelConnection->commit();
+
+        $this->propelConnection->beginTransaction();
         $this->convertPlaces($dbh);
-//        
+        $this->propelConnection->commit();
+        
         $this->convertAuthors($dbh);        // after publication because during merging duplicate persons, information is easiest retained by adding the merged person as author via the known publication id
-//        
+        
         $this->convertSingleFieldPersons($dbh);
         
         return $this->renderWithDomainData('DTAMetadataBundle:DumpConversion:conversionResult.html.twig', array(
@@ -131,6 +150,19 @@ class DumpConversionController extends ORMController {
         return $result;
     }
     
+    function convertFonts($dbh){
+        
+        
+//        
+//        $userData = array();
+//        foreach ($userList as $user) {
+//            $userData[] = '("' . $user['first_name'] . '", "' . $user['last_name'] . '")';
+//        }
+//        $query = 'INSERT INTO users (first_name,last_name) VALUES' . implode(',', $userData);
+//        mysql_query($query);
+                
+    }
+    
     /* ---------------------------------------------------------------------
      * partner
      * ------------------------------------------------------------------ */
@@ -140,15 +172,15 @@ class DumpConversionController extends ORMController {
             SELECT 
                 book.id_book as id
 
-                ,NULLIF(doi, '') as `doi`
-                ,NULLIF(umfang, '') as `numpages`
-                ,NULLIF(umfang_normiert, 0) as `numpages_numeric`
-                ,NULLIF(title, '') as `title`
-                ,NULLIF(subtitle, '') as `subtitle`
-                ,NULLIF(other_title, '') as `subtitle2`
-                ,NULLIF(short_title, '') as `shorttitle`
-                ,NULLIF(dta_auflage, '') as `printrun`
-                ,FIND_IN_SET(source,'china,don,kt,n/a') as `source_id`
+                ,doi as `doi`
+                ,umfang as `numpages`
+                ,umfang_normiert as `numpages_numeric`
+                ,title as `title`
+                ,subtitle as `subtitle`
+                ,other_title as `subtitle2`
+                ,short_title as `shorttitle`
+                ,dta_auflage as `printrun`
+                ,FIND_IN_SET(sources.source,'china,don,kt,n/a') as `source_id`
 
                 ,IF(LENGTH(`year`) < 3, NULL, `year`) as `year` -- to sort out a 0 entry
                 ,LOCATE('[', `year`) as `year_is_reconstructed`
@@ -160,19 +192,37 @@ class DumpConversionController extends ORMController {
                     ELSE format
                 END as `format`
     
-                ,dta_comments
+                ,dta_comments as `dta_comments`
                 ,special_comment as encoding_comment
+                ,metadaten.planung as `metadata_comment`
                 
                 ,book.log_last_change
                 ,user.id_user as `updated_by`
+                ,usecase as `usecase`
 
-                ,NULLIF(dta_edition, '') as `edition`
+                ,dta_edition as `edition`
                 ,availability                                   -- is 0 only for 16 publications
-                ,dta_insert_date                                -- is set for for approx. 40 publications
+                ,book.dta_insert_date                           -- is set for for approx. 40 publications
+                
+                ,dirname as `dirname`
+                
+                ,genre as `genre`
+                ,untergenre as `subgenre`
+                ,CASE type
+                    WHEN 'Reihe' THEN NULL
+                    WHEN 'X'     THEN NULL
+                    WHEN 'Zeitschrift' THEN 'J'
+                    ELSE type
+                END as `publication_type`
+                
+                ,fundstellen.id_Fundstellen as `used_copy_location`
+                ,NULLIF(startseite,0) as `first_text_page`
+                
             FROM book 
                 LEFT JOIN metadaten ON book.id_book = metadaten.id_book 
                 LEFT JOIN sources   ON book.id_book = sources.id_book
                 LEFT JOIN user      ON book.log_last_user = user.id_user
+                LEFT JOIN fundstellen ON id_nachweis = id_Fundstellen
             ;";
         
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
@@ -216,13 +266,15 @@ class DumpConversionController extends ORMController {
             // put some less frequent data (present only for few publications into the comment field
             $comment  = $row['dta_comments'];
             $comment .= $row['edition'] !== NULL ? "\nEdition: " . $row['edition'] : "";
-            $comment .= $row['dta_insert_date'] !== NULL ? "\ndta_insert_date: " . $row['dta_insert_date'] : "";
             $comment .= $row['availability'] == "0" ? "\nGilt als nicht verfügbar." : "";
-
+            $comment .= $row['usecase'] !== NULL ? '\nGrund der Korpuszugehörigkeit: ' . $row['usecase'] : "";
+            $comment .= $row['metadata_comment'] !== NULL ? '\nKommentar Planung/Metadaten: ' . $row['metadata_comment'] : "";
+            
             // save ------------------------------------------------------------------------------------
             $publication = new Model\Data\Publication();
                 
             $publication->setId($row['id'])
+                        ->setDirname($row['dirname'])
                         ->setTitle($title)
                         ->setDatespecificationRelatedByPublicationdateId($publishedDate)
                         ->setNumpages($row['numpages'])
@@ -232,9 +284,13 @@ class DumpConversionController extends ORMController {
                         ->setDoi($row['doi'])
                         ->setFormat($row['format'])
                         ->setSourceId($row['source_id'])
+                        ->setLegacygenre($row['genre'])
+                        ->setLegacysubgenre($row['subgenre'])
+                        ->setType($row['publication_type'])
+                        ->setCreatedAt($this->parseSQLDate($row['dta_insert_date']))
                         ->setUpdatedAt($this->parseSQLDate($row['log_last_change']))
                         ->setLastChangedByUserId($row['updated_by'])
-                        ->save();
+                        ->save($this->propelConnection);
                 
                 
 
@@ -262,7 +318,7 @@ class DumpConversionController extends ORMController {
                     ->setWeb($row['web'])
                     ->setContactdata('Telefon: ' . $row['phone1'] . "\nAdresse: " . $row['adress'])
                     ->setComments($row['comments']);
-            $partner->save();
+            $partner->save($this->propelConnection);
         }
     }
         
@@ -274,12 +330,12 @@ class DumpConversionController extends ORMController {
                         ,book.id_book as `publication_id`
                         ,partner.id_book_locations as `partner_id`
                         ,NULLIF(fundstellen.dta_insert_date, '0000-00-00 00:00:00') as `created_at`
-                        ,NULLIF(fundstellen.comments, '') as `comments`
+                        ,fundstellen.comments as `comments`
                         ,NULLIF(`accessible`, 2) as `accessible`      -- 2 is currently used for 'not clear'
                         ,fundstellen.log_last_user as `updated_by`
                         ,fundstellen.log_last_change as `updated_at`
-                        ,NULLIF(signatur, '') as `catalogue_signature`
-                        ,NULLIF(bib_id, '') as `catalogue_internal`
+                        ,signatur as `catalogue_signature`
+                        ,bib_id as `catalogue_internal`
                     FROM
                         fundstellen 
                         LEFT JOIN partner ON 
@@ -308,7 +364,7 @@ class DumpConversionController extends ORMController {
                     ->setUpdatedAt($row['updated_at'])
                     ->setCatalogueSignature($row['catalogue_signature'])
                     ->setCatalogueInternal($row['catalogue_internal']);
-            $copyLocation->save();
+            $copyLocation->save($this->propelConnection);
             
             } catch (\PropelException $exc) {
                 $this->errors[] = array('message' => 'on inserting copy location');
@@ -380,7 +436,7 @@ class DumpConversionController extends ORMController {
                     ->setClosed($row['closed'])
                     ->setCreatedAt($this->parseSQLDate($row['created_at']))
                     ->setUpdatedAt($this->parseSQLDate($row['updated_at']));
-            $task->save();
+            $task->save($this->propelConnection);
             
             } catch (\PropelException $exc) {
                 $this->errors[] = array('error' => 'on insert task', 'row' => $row);
@@ -408,7 +464,7 @@ class DumpConversionController extends ORMController {
                         
             $publishingCompany = new Model\Data\Publishingcompany();
             $publishingCompany->setName($row['publishing_company'])
-                    ->save();
+                    ->save($this->propelConnection);
         }
     }
     
@@ -420,12 +476,12 @@ class DumpConversionController extends ORMController {
         
         $rawData = "
                 SELECT DISTINCT
-                    CASE TRIM(location) 
+                    CASE location
                         WHEN 'Frankfurt a. M' THEN 'Frankfurt (Main)'
                         WHEN 'Freiburg i. Br.' THEN 'Freiburg (Breisgau)'
                         WHEN 'Halle a. S.' THEN 'Halle (Saale)'
                         WHEN 'Leipzig (fingierte Druckorte)' THEN 'Leipzig'
-                        ELSE TRIM(location)
+                        ELSE location
                     END as `location`
                 FROM
                     (SELECT DISTINCT 
@@ -450,7 +506,7 @@ class DumpConversionController extends ORMController {
                     location IS NOT NULL
                     AND LENGTH(location) > 0
                 ORDER BY 
-                    TRIM(location)";
+                    location";
                         
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
@@ -458,7 +514,7 @@ class DumpConversionController extends ORMController {
                         
             $place = new Model\Data\Place();
             $place->setName($row['location'])
-                    ->save();
+                    ->save($this->propelConnection);
         }
     }
     
@@ -469,11 +525,10 @@ class DumpConversionController extends ORMController {
     function convertUsers($dbh) {
         
         $rawData = "SELECT * FROM user";
-            
+        
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
             array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
-                        
                         
             $user = new Model\Master\DtaUser();
                 
@@ -487,8 +542,9 @@ class DumpConversionController extends ORMController {
                     ->setMail($row['mail'])
                     ->setPassword($saltedPassword);
                         
-            $user->save();
+            $user->save($this->propelConnection);
         }
+        
     }
         
     /* ---------------------------------------------------------------------
@@ -502,23 +558,23 @@ class DumpConversionController extends ORMController {
         // TODO: two rows have a autor1_spelling entry ("Lutz" and Friedrich "<II., Preußen, König>")
         $rawData = "SELECT  
                       id_book
-                      ,NULLIF(firstname, '') as firstname       -- NULLIF: replace empty strings with NULL
-                      ,NULLIF(lastname, '') as lastname
-                      ,NULLIF(pnd, '') as pnd
+                      ,firstname as firstname       -- NULLIF: replace empty strings with NULL
+                      ,lastname as lastname
+                      ,pnd as pnd
                     FROM (
                         SELECT 
                             id_book
-                            ,TRIM(autor1_prename) as firstname 
-                            ,TRIM(autor1_lastname) as lastname
-                            ,TRIM(autor1_pnd) as pnd 
+                            ,autor1_prename as firstname 
+                            ,autor1_lastname as lastname
+                            ,autor1_pnd as pnd 
                         FROM book
                         WHERE autor1_prename <> '' OR autor1_lastname <> '' OR autor1_pnd <> ''
                         UNION 
                         SELECT 
                             id_book
-                            ,TRIM(autor2_prename) as firstname
-                            ,TRIM(autor2_lastname) as lastname 
-                            ,TRIM(autor2_pnd) as pnd 
+                            ,autor2_prename as firstname
+                            ,autor2_lastname as lastname 
+                            ,autor2_pnd as pnd 
                         FROM book
                         WHERE autor2_prename <> '' OR autor2_lastname <> '' OR autor2_pnd <> ''
                     ) as names 
@@ -556,13 +612,13 @@ class DumpConversionController extends ORMController {
                 
                 $publication
                     ->addPersonPublication(new Model\Master\PersonPublication($lastPerson->getId(), 'Autor'))
-                    ->save();
+                    ->save($this->propelConnection);
                 
             } else if($gndCollisions !== NULL && $gndCollisions->count() == 1){
                 
                 $publication
                     ->addPersonPublication(new Model\Master\PersonPublication($gndCollisions[0]->getId(), 'Autor'))
-                    ->save();
+                    ->save($this->propelConnection);
                 
             } else {
                 
@@ -576,7 +632,7 @@ class DumpConversionController extends ORMController {
                 $person = new Model\Data\Person();
                 $person->setGnd($row['pnd'])            // does nothing if pnd is NULL
                         ->addPersonalname($name)
-                        ->save();
+                        ->save($this->propelConnection);
                 
                 $lastPerson = $person;
                 $lastFirstname = $row['firstname'];
@@ -584,7 +640,7 @@ class DumpConversionController extends ORMController {
                 
                 $publication
                     ->addPersonPublication(new Model\Master\PersonPublication($person->getId(), 'Autor'))
-                    ->save();
+                    ->save($this->propelConnection);
             }
                 
         }
@@ -601,7 +657,7 @@ class DumpConversionController extends ORMController {
         $rawData = "
             SELECT 
                 -- id_book,
-                TRIM(person) as person,
+                person as person,
                 LOCATE('#', person) as hash_position
                 ,LOCATE(',', person) as comma_position
                 ,LOCATE(' ', person) as space_position
@@ -682,16 +738,45 @@ class DumpConversionController extends ORMController {
             // create person
             $person->setGnd($gnd)
                     ->addPersonalname($name)
-                    ->save();
+                    ->save($this->propelConnection);
         }
     }
         
-    function cleanUpOldDatabase($dbh) {
+    function cleanUpOldDatabase(\PDO $dbh) {
         
         // remove unused tables
         $queries[] = "DROP table `dtadb`.`corpus_use`;
                       DROP table `dtadb`.`lastusergroups`;";
-                          
+        
+        
+        foreach ($dbh->query("SHOW tables") as $row) {
+            
+            $relation = $row["Tables_in_" . $this->database];
+            
+            $getTextColumns = "SHOW COLUMNS FROM $relation WHERE 
+                                `Type` LIKE 'varchar%' 
+                                OR `Type` = 'text'";
+            
+            $trimCommands = array();
+            
+            foreach ($dbh->query($getTextColumns) as $col) {
+                
+//                $fields[$relation][] = array($col["Field"], $col["Type"]);
+                $trimCommands[] = "$col[Field] = NULLIF(trim(CHAR(9) FROM trim($col[Field])),'')";
+            }
+            
+            if(count($trimCommands) > 0){
+                $updateQuery = "UPDATE $relation SET " . implode(",", $trimCommands);
+                $pdoStatement = $dbh->query($updateQuery);
+                $affectedRows = $pdoStatement !== false ? $pdoStatement->rowCount() : $dbh->errorInfo();
+
+                $this->messages[] = array(
+                    'message' => "All columns of table $relation trimmed. Empty strings are set to NULL.", 
+                    'affected rows' => $affectedRows,
+                    'query'=>$updateQuery);
+            }
+        }
+        
         // remove unused attributes
         $queries[] = "ALTER TABLE `dtadb`.`book` DROP COLUMN `dta_quelle`, DROP INDEX `Index_5` ;";
             

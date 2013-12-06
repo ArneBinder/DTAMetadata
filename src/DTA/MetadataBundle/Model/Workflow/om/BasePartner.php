@@ -2487,20 +2487,6 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
         return $this->alreadyInSave;
     }
 
-    // timestampable behavior
-
-    /**
-     * Mark the current object so that the update date doesn't get updated during next save
-     *
-     * @return     Partner The current object (for fluent API support)
-     */
-    public function keepUpdateDateUnchanged()
-    {
-        $this->modifiedColumns[] = PartnerPeer::UPDATED_AT;
-
-        return $this;
-    }
-
     // table_row_view behavior
     /**
      * To specify which columns are to be visible in the user display
@@ -2548,5 +2534,19 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
         }
     }
 
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     Partner The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = PartnerPeer::UPDATED_AT;
+
+        return $this;
+    }
 
 }

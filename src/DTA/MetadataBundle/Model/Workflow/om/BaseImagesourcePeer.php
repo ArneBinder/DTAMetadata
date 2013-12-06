@@ -30,13 +30,13 @@ abstract class BaseImagesourcePeer
     const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Workflow\\map\\ImagesourceTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 6;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /** the column name for the id field */
     const ID = 'imagesource.id';
@@ -49,6 +49,12 @@ abstract class BaseImagesourcePeer
 
     /** the column name for the originalrefrange field */
     const ORIGINALREFRANGE = 'imagesource.originalrefrange';
+
+    /** the column name for the created_at field */
+    const CREATED_AT = 'imagesource.created_at';
+
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'imagesource.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -69,12 +75,12 @@ abstract class BaseImagesourcePeer
      * e.g. ImagesourcePeer::$fieldNames[ImagesourcePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'Faksimilerefrange', 'Originalrefrange', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'faksimilerefrange', 'originalrefrange', ),
-        BasePeer::TYPE_COLNAME => array (ImagesourcePeer::ID, ImagesourcePeer::PUBLICATION_ID, ImagesourcePeer::FAKSIMILEREFRANGE, ImagesourcePeer::ORIGINALREFRANGE, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'FAKSIMILEREFRANGE', 'ORIGINALREFRANGE', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'faksimilerefrange', 'originalrefrange', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'Faksimilerefrange', 'Originalrefrange', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'faksimilerefrange', 'originalrefrange', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (ImagesourcePeer::ID, ImagesourcePeer::PUBLICATION_ID, ImagesourcePeer::FAKSIMILEREFRANGE, ImagesourcePeer::ORIGINALREFRANGE, ImagesourcePeer::CREATED_AT, ImagesourcePeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'FAKSIMILEREFRANGE', 'ORIGINALREFRANGE', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'faksimilerefrange', 'originalrefrange', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -84,12 +90,12 @@ abstract class BaseImagesourcePeer
      * e.g. ImagesourcePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'Faksimilerefrange' => 2, 'Originalrefrange' => 3, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'faksimilerefrange' => 2, 'originalrefrange' => 3, ),
-        BasePeer::TYPE_COLNAME => array (ImagesourcePeer::ID => 0, ImagesourcePeer::PUBLICATION_ID => 1, ImagesourcePeer::FAKSIMILEREFRANGE => 2, ImagesourcePeer::ORIGINALREFRANGE => 3, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'FAKSIMILEREFRANGE' => 2, 'ORIGINALREFRANGE' => 3, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'faksimilerefrange' => 2, 'originalrefrange' => 3, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'Faksimilerefrange' => 2, 'Originalrefrange' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'faksimilerefrange' => 2, 'originalrefrange' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
+        BasePeer::TYPE_COLNAME => array (ImagesourcePeer::ID => 0, ImagesourcePeer::PUBLICATION_ID => 1, ImagesourcePeer::FAKSIMILEREFRANGE => 2, ImagesourcePeer::ORIGINALREFRANGE => 3, ImagesourcePeer::CREATED_AT => 4, ImagesourcePeer::UPDATED_AT => 5, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'FAKSIMILEREFRANGE' => 2, 'ORIGINALREFRANGE' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'faksimilerefrange' => 2, 'originalrefrange' => 3, 'created_at' => 4, 'updated_at' => 5, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -167,11 +173,15 @@ abstract class BaseImagesourcePeer
             $criteria->addSelectColumn(ImagesourcePeer::PUBLICATION_ID);
             $criteria->addSelectColumn(ImagesourcePeer::FAKSIMILEREFRANGE);
             $criteria->addSelectColumn(ImagesourcePeer::ORIGINALREFRANGE);
+            $criteria->addSelectColumn(ImagesourcePeer::CREATED_AT);
+            $criteria->addSelectColumn(ImagesourcePeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.publication_id');
             $criteria->addSelectColumn($alias . '.faksimilerefrange');
             $criteria->addSelectColumn($alias . '.originalrefrange');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

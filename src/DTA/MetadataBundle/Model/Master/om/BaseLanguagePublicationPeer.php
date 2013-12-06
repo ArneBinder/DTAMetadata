@@ -31,13 +31,13 @@ abstract class BaseLanguagePublicationPeer
     const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Master\\map\\LanguagePublicationTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 5;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 3;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /** the column name for the id field */
     const ID = 'language_publication.id';
@@ -47,6 +47,12 @@ abstract class BaseLanguagePublicationPeer
 
     /** the column name for the publication_id field */
     const PUBLICATION_ID = 'language_publication.publication_id';
+
+    /** the column name for the created_at field */
+    const CREATED_AT = 'language_publication.created_at';
+
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'language_publication.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -67,12 +73,12 @@ abstract class BaseLanguagePublicationPeer
      * e.g. LanguagePublicationPeer::$fieldNames[LanguagePublicationPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'LanguageId', 'PublicationId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'languageId', 'publicationId', ),
-        BasePeer::TYPE_COLNAME => array (LanguagePublicationPeer::ID, LanguagePublicationPeer::LANGUAGE_ID, LanguagePublicationPeer::PUBLICATION_ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'LANGUAGE_ID', 'PUBLICATION_ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'language_id', 'publication_id', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'LanguageId', 'PublicationId', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'languageId', 'publicationId', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (LanguagePublicationPeer::ID, LanguagePublicationPeer::LANGUAGE_ID, LanguagePublicationPeer::PUBLICATION_ID, LanguagePublicationPeer::CREATED_AT, LanguagePublicationPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'LANGUAGE_ID', 'PUBLICATION_ID', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'language_id', 'publication_id', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
     /**
@@ -82,12 +88,12 @@ abstract class BaseLanguagePublicationPeer
      * e.g. LanguagePublicationPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'LanguageId' => 1, 'PublicationId' => 2, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'languageId' => 1, 'publicationId' => 2, ),
-        BasePeer::TYPE_COLNAME => array (LanguagePublicationPeer::ID => 0, LanguagePublicationPeer::LANGUAGE_ID => 1, LanguagePublicationPeer::PUBLICATION_ID => 2, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'LANGUAGE_ID' => 1, 'PUBLICATION_ID' => 2, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'language_id' => 1, 'publication_id' => 2, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'LanguageId' => 1, 'PublicationId' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'languageId' => 1, 'publicationId' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        BasePeer::TYPE_COLNAME => array (LanguagePublicationPeer::ID => 0, LanguagePublicationPeer::LANGUAGE_ID => 1, LanguagePublicationPeer::PUBLICATION_ID => 2, LanguagePublicationPeer::CREATED_AT => 3, LanguagePublicationPeer::UPDATED_AT => 4, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'LANGUAGE_ID' => 1, 'PUBLICATION_ID' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'language_id' => 1, 'publication_id' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
     /**
@@ -164,10 +170,14 @@ abstract class BaseLanguagePublicationPeer
             $criteria->addSelectColumn(LanguagePublicationPeer::ID);
             $criteria->addSelectColumn(LanguagePublicationPeer::LANGUAGE_ID);
             $criteria->addSelectColumn(LanguagePublicationPeer::PUBLICATION_ID);
+            $criteria->addSelectColumn(LanguagePublicationPeer::CREATED_AT);
+            $criteria->addSelectColumn(LanguagePublicationPeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.language_id');
             $criteria->addSelectColumn($alias . '.publication_id');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

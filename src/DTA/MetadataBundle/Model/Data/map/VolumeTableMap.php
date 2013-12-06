@@ -49,6 +49,8 @@ class VolumeTableMap extends TableMap
         $this->addColumn('volumedescription', 'Volumedescription', 'INTEGER', false, null, null);
         $this->addColumn('volumenumeric', 'Volumenumeric', 'INTEGER', false, null, null);
         $this->addColumn('volumestotal', 'Volumestotal', 'INTEGER', false, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -72,6 +74,11 @@ class VolumeTableMap extends TableMap
         return array(
             'table_row_view' =>  array (
   'embedcolumnspublication' => 'publication',
+),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
 ),
         );
     } // getBehaviors()

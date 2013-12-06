@@ -17,6 +17,7 @@ class HomeController extends ORMController {
 
     /** @inheritdoc */
     public $domainMenu = array(
+        array("caption" => "Offene Tasks", 'route' => 'home'),
         array("caption" => "Aktuell in Bearbeitung", 'route' => 'home'),
         array("caption" => "Zuletzt Angesehen", 'route' => 'home'),
     );

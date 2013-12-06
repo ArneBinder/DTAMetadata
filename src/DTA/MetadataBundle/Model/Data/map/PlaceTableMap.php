@@ -46,6 +46,8 @@ class PlaceTableMap extends TableMap
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('name', 'Name', 'LONGVARCHAR', true, null, null);
         $this->addColumn('gnd', 'Gnd', 'VARCHAR', false, 255, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
         $this->addValidator('gnd', 'unique', 'propel.validator.UniqueValidator', '', 'GND ist schon vergeben!');
     } // initialize()
@@ -67,10 +69,17 @@ class PlaceTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
+),
             'table_row_view' =>  array (
   'Id' => 'id',
   'Name' => 'name',
   'Gnd' => 'gnd',
+  'CreatedAt' => 'created_at',
+  'UpdatedAt' => 'updated_at',
 ),
         );
     } // getBehaviors()

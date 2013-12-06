@@ -47,6 +47,8 @@ class DatespecificationTableMap extends TableMap
         $this->addColumn('year', 'Year', 'INTEGER', false, null, null);
         $this->addColumn('comments', 'Comments', 'LONGVARCHAR', false, null, null);
         $this->addColumn('year_is_reconstructed', 'YearIsReconstructed', 'BOOLEAN', false, null, false);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -71,11 +73,18 @@ class DatespecificationTableMap extends TableMap
             'reconstructed_flaggable' =>  array (
   'column' => 'year',
 ),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
+),
             'table_row_view' =>  array (
   'Id' => 'id',
   'Year' => 'year',
   'Comments' => 'comments',
   'YearIsReconstructed' => 'year_is_reconstructed',
+  'CreatedAt' => 'created_at',
+  'UpdatedAt' => 'updated_at',
 ),
         );
     } // getBehaviors()

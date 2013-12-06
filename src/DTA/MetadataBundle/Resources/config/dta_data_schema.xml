@@ -36,8 +36,10 @@
         <column name="source_id" description="Zur Sicherheit aus der alten DB übernommen" type="INTEGER"/>
         
         <column name="legacygenre" description="Alt-Angabe zum Genre, zur Weiterverarbeitung bei Umstellung auf das neue Genre-System." type="LONGVARCHAR"/>
+        <column name="legacysubgenre" description="Alt-Angabe zum Untergenre." type="LONGVARCHAR"/>
         <column name="type" description="Publikationstyp. Zur späteren Differenzierung über Publikationstypen." type="LONGVARCHAR"/>
-        <column name="dirname" description="Publikationstyp. Zur späteren Differenzierung über Publikationstypen." type="LONGVARCHAR"/>
+        <column name="dirname" description="Textuelle ID (Kombination aus Autor, Titel, Jahr)" type="LONGVARCHAR"/>
+        <column name="usedcopylocation_id" description="Vermutlich der eingesetzte Nachweis. Entspricht dem alten metadaten.id_nachweis. " type="INTEGER"/>
         
         <!-- Bild- und Textquellen über die imageSource Tabelle dargestellt, da publication:imageSource eine 1:n Beziehung ist -->
 

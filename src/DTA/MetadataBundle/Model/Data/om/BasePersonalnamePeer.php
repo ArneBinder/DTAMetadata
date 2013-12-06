@@ -32,13 +32,13 @@ abstract class BasePersonalnamePeer
     const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Data\\map\\PersonalnameTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 5;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 3;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /** the column name for the id field */
     const ID = 'personalname.id';
@@ -48,6 +48,12 @@ abstract class BasePersonalnamePeer
 
     /** the column name for the sortable_rank field */
     const SORTABLE_RANK = 'personalname.sortable_rank';
+
+    /** the column name for the created_at field */
+    const CREATED_AT = 'personalname.created_at';
+
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'personalname.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -75,12 +81,12 @@ abstract class BasePersonalnamePeer
      * e.g. PersonalnamePeer::$fieldNames[PersonalnamePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'PersonId', 'SortableRank', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'personId', 'sortableRank', ),
-        BasePeer::TYPE_COLNAME => array (PersonalnamePeer::ID, PersonalnamePeer::PERSON_ID, PersonalnamePeer::SORTABLE_RANK, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PERSON_ID', 'SORTABLE_RANK', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'person_id', 'sortable_rank', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'PersonId', 'SortableRank', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'personId', 'sortableRank', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (PersonalnamePeer::ID, PersonalnamePeer::PERSON_ID, PersonalnamePeer::SORTABLE_RANK, PersonalnamePeer::CREATED_AT, PersonalnamePeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PERSON_ID', 'SORTABLE_RANK', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'person_id', 'sortable_rank', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
     /**
@@ -90,12 +96,12 @@ abstract class BasePersonalnamePeer
      * e.g. PersonalnamePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PersonId' => 1, 'SortableRank' => 2, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'personId' => 1, 'sortableRank' => 2, ),
-        BasePeer::TYPE_COLNAME => array (PersonalnamePeer::ID => 0, PersonalnamePeer::PERSON_ID => 1, PersonalnamePeer::SORTABLE_RANK => 2, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PERSON_ID' => 1, 'SORTABLE_RANK' => 2, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'person_id' => 1, 'sortable_rank' => 2, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PersonId' => 1, 'SortableRank' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'personId' => 1, 'sortableRank' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        BasePeer::TYPE_COLNAME => array (PersonalnamePeer::ID => 0, PersonalnamePeer::PERSON_ID => 1, PersonalnamePeer::SORTABLE_RANK => 2, PersonalnamePeer::CREATED_AT => 3, PersonalnamePeer::UPDATED_AT => 4, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PERSON_ID' => 1, 'SORTABLE_RANK' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'person_id' => 1, 'sortable_rank' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
     /**
@@ -172,10 +178,14 @@ abstract class BasePersonalnamePeer
             $criteria->addSelectColumn(PersonalnamePeer::ID);
             $criteria->addSelectColumn(PersonalnamePeer::PERSON_ID);
             $criteria->addSelectColumn(PersonalnamePeer::SORTABLE_RANK);
+            $criteria->addSelectColumn(PersonalnamePeer::CREATED_AT);
+            $criteria->addSelectColumn(PersonalnamePeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.person_id');
             $criteria->addSelectColumn($alias . '.sortable_rank');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

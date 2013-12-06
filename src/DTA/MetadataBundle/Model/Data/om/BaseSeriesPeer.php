@@ -30,19 +30,25 @@ abstract class BaseSeriesPeer
     const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Data\\map\\SeriesTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 2;
+    const NUM_COLUMNS = 4;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 2;
+    const NUM_HYDRATE_COLUMNS = 4;
 
     /** the column name for the id field */
     const ID = 'series.id';
 
     /** the column name for the title_id field */
     const TITLE_ID = 'series.title_id';
+
+    /** the column name for the created_at field */
+    const CREATED_AT = 'series.created_at';
+
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'series.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -63,12 +69,12 @@ abstract class BaseSeriesPeer
      * e.g. SeriesPeer::$fieldNames[SeriesPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'TitleId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'titleId', ),
-        BasePeer::TYPE_COLNAME => array (SeriesPeer::ID, SeriesPeer::TITLE_ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TITLE_ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'title_id', ),
-        BasePeer::TYPE_NUM => array (0, 1, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'TitleId', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'titleId', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (SeriesPeer::ID, SeriesPeer::TITLE_ID, SeriesPeer::CREATED_AT, SeriesPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TITLE_ID', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'title_id', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
     /**
@@ -78,12 +84,12 @@ abstract class BaseSeriesPeer
      * e.g. SeriesPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'TitleId' => 1, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'titleId' => 1, ),
-        BasePeer::TYPE_COLNAME => array (SeriesPeer::ID => 0, SeriesPeer::TITLE_ID => 1, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TITLE_ID' => 1, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'title_id' => 1, ),
-        BasePeer::TYPE_NUM => array (0, 1, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'TitleId' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'titleId' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
+        BasePeer::TYPE_COLNAME => array (SeriesPeer::ID => 0, SeriesPeer::TITLE_ID => 1, SeriesPeer::CREATED_AT => 2, SeriesPeer::UPDATED_AT => 3, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TITLE_ID' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'title_id' => 1, 'created_at' => 2, 'updated_at' => 3, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
     /**
@@ -159,9 +165,13 @@ abstract class BaseSeriesPeer
         if (null === $alias) {
             $criteria->addSelectColumn(SeriesPeer::ID);
             $criteria->addSelectColumn(SeriesPeer::TITLE_ID);
+            $criteria->addSelectColumn(SeriesPeer::CREATED_AT);
+            $criteria->addSelectColumn(SeriesPeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.title_id');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

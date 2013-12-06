@@ -24,12 +24,16 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method LicenseQuery orderByUrl($order = Criteria::ASC) Order by the url column
  * @method LicenseQuery orderByApplicableToImage($order = Criteria::ASC) Order by the applicable_to_image column
  * @method LicenseQuery orderByApplicableToText($order = Criteria::ASC) Order by the applicable_to_text column
+ * @method LicenseQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method LicenseQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method LicenseQuery groupById() Group by the id column
  * @method LicenseQuery groupByName() Group by the name column
  * @method LicenseQuery groupByUrl() Group by the url column
  * @method LicenseQuery groupByApplicableToImage() Group by the applicable_to_image column
  * @method LicenseQuery groupByApplicableToText() Group by the applicable_to_text column
+ * @method LicenseQuery groupByCreatedAt() Group by the created_at column
+ * @method LicenseQuery groupByUpdatedAt() Group by the updated_at column
  *
  * @method LicenseQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method LicenseQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -50,12 +54,16 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method License findOneByUrl(string $url) Return the first License filtered by the url column
  * @method License findOneByApplicableToImage(boolean $applicable_to_image) Return the first License filtered by the applicable_to_image column
  * @method License findOneByApplicableToText(boolean $applicable_to_text) Return the first License filtered by the applicable_to_text column
+ * @method License findOneByCreatedAt(string $created_at) Return the first License filtered by the created_at column
+ * @method License findOneByUpdatedAt(string $updated_at) Return the first License filtered by the updated_at column
  *
  * @method array findById(int $id) Return License objects filtered by the id column
  * @method array findByName(string $name) Return License objects filtered by the name column
  * @method array findByUrl(string $url) Return License objects filtered by the url column
  * @method array findByApplicableToImage(boolean $applicable_to_image) Return License objects filtered by the applicable_to_image column
  * @method array findByApplicableToText(boolean $applicable_to_text) Return License objects filtered by the applicable_to_text column
+ * @method array findByCreatedAt(string $created_at) Return License objects filtered by the created_at column
+ * @method array findByUpdatedAt(string $updated_at) Return License objects filtered by the updated_at column
  */
 abstract class BaseLicenseQuery extends ModelCriteria
 {
@@ -161,7 +169,7 @@ abstract class BaseLicenseQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "name", "url", "applicable_to_image", "applicable_to_text" FROM "license" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "name", "url", "applicable_to_image", "applicable_to_text", "created_at", "updated_at" FROM "license" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -405,6 +413,92 @@ abstract class BaseLicenseQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at < '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return LicenseQuery The current query, for fluid interface
+     */
+    public function filterByCreatedAt($createdAt = null, $comparison = null)
+    {
+        if (is_array($createdAt)) {
+            $useMinMax = false;
+            if (isset($createdAt['min'])) {
+                $this->addUsingAlias(LicensePeer::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($createdAt['max'])) {
+                $this->addUsingAlias(LicensePeer::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(LicensePeer::CREATED_AT, $createdAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the updated_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at < '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return LicenseQuery The current query, for fluid interface
+     */
+    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+    {
+        if (is_array($updatedAt)) {
+            $useMinMax = false;
+            if (isset($updatedAt['min'])) {
+                $this->addUsingAlias(LicensePeer::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($updatedAt['max'])) {
+                $this->addUsingAlias(LicensePeer::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(LicensePeer::UPDATED_AT, $updatedAt, $comparison);
+    }
+
+    /**
      * Filter the query by a related CopyLocation object
      *
      * @param   CopyLocation|PropelObjectCollection $copyLocation  the related object to use as filter
@@ -568,4 +662,69 @@ abstract class BaseLicenseQuery extends ModelCriteria
         return $this;
     }
 
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     LicenseQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(LicensePeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     LicenseQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(LicensePeer::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     LicenseQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(LicensePeer::UPDATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     LicenseQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(LicensePeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     LicenseQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(LicensePeer::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     LicenseQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(LicensePeer::CREATED_AT);
+    }
 }

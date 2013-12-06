@@ -9,15 +9,23 @@
 
 <h1> Errors </h1>
 
-{{dump(errors|default({}))}}
+{% for error in errors|default({}) %}
+    {% for key, value in error %}{{key}} => {{value}}<br/>{% endfor %}
+{% endfor %}
 
 
 <h1> Warnings </h1>
 
-{{dump(warnings|default({}))}}
+{% for warning in warnings|default({}) %}
+    {% for key, value in warning %}{{key}} => {{value}}<br/>{% endfor %}
+{% endfor %}
+
 
 <h1> Messages </h1>
 
-{{dump(messages|default({}))}}
+{% for message in messages|default({}) %}
+    {% for key, value in message %}{{key}} => {{value}}<br/>{% endfor %}
+{% endfor %}
+
 
 {% endblock %}

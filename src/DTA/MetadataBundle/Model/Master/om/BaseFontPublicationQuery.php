@@ -22,10 +22,14 @@ use DTA\MetadataBundle\Model\Master\FontPublicationQuery;
  * @method FontPublicationQuery orderById($order = Criteria::ASC) Order by the id column
  * @method FontPublicationQuery orderByFontId($order = Criteria::ASC) Order by the font_id column
  * @method FontPublicationQuery orderByPublicationId($order = Criteria::ASC) Order by the publication_id column
+ * @method FontPublicationQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method FontPublicationQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method FontPublicationQuery groupById() Group by the id column
  * @method FontPublicationQuery groupByFontId() Group by the font_id column
  * @method FontPublicationQuery groupByPublicationId() Group by the publication_id column
+ * @method FontPublicationQuery groupByCreatedAt() Group by the created_at column
+ * @method FontPublicationQuery groupByUpdatedAt() Group by the updated_at column
  *
  * @method FontPublicationQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method FontPublicationQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -44,10 +48,14 @@ use DTA\MetadataBundle\Model\Master\FontPublicationQuery;
  *
  * @method FontPublication findOneByFontId(int $font_id) Return the first FontPublication filtered by the font_id column
  * @method FontPublication findOneByPublicationId(int $publication_id) Return the first FontPublication filtered by the publication_id column
+ * @method FontPublication findOneByCreatedAt(string $created_at) Return the first FontPublication filtered by the created_at column
+ * @method FontPublication findOneByUpdatedAt(string $updated_at) Return the first FontPublication filtered by the updated_at column
  *
  * @method array findById(int $id) Return FontPublication objects filtered by the id column
  * @method array findByFontId(int $font_id) Return FontPublication objects filtered by the font_id column
  * @method array findByPublicationId(int $publication_id) Return FontPublication objects filtered by the publication_id column
+ * @method array findByCreatedAt(string $created_at) Return FontPublication objects filtered by the created_at column
+ * @method array findByUpdatedAt(string $updated_at) Return FontPublication objects filtered by the updated_at column
  */
 abstract class BaseFontPublicationQuery extends ModelCriteria
 {
@@ -153,7 +161,7 @@ abstract class BaseFontPublicationQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "font_id", "publication_id" FROM "font_publication" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "font_id", "publication_id", "created_at", "updated_at" FROM "font_publication" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -373,6 +381,92 @@ abstract class BaseFontPublicationQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at < '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return FontPublicationQuery The current query, for fluid interface
+     */
+    public function filterByCreatedAt($createdAt = null, $comparison = null)
+    {
+        if (is_array($createdAt)) {
+            $useMinMax = false;
+            if (isset($createdAt['min'])) {
+                $this->addUsingAlias(FontPublicationPeer::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($createdAt['max'])) {
+                $this->addUsingAlias(FontPublicationPeer::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(FontPublicationPeer::CREATED_AT, $createdAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the updated_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at < '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return FontPublicationQuery The current query, for fluid interface
+     */
+    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+    {
+        if (is_array($updatedAt)) {
+            $useMinMax = false;
+            if (isset($updatedAt['min'])) {
+                $this->addUsingAlias(FontPublicationPeer::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($updatedAt['max'])) {
+                $this->addUsingAlias(FontPublicationPeer::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(FontPublicationPeer::UPDATED_AT, $updatedAt, $comparison);
+    }
+
+    /**
      * Filter the query by a related Font object
      *
      * @param   Font|PropelObjectCollection $font The related object(s) to use as filter
@@ -540,4 +634,69 @@ abstract class BaseFontPublicationQuery extends ModelCriteria
         return $this;
     }
 
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     FontPublicationQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(FontPublicationPeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     FontPublicationQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(FontPublicationPeer::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     FontPublicationQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(FontPublicationPeer::UPDATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     FontPublicationQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(FontPublicationPeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     FontPublicationQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(FontPublicationPeer::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     FontPublicationQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(FontPublicationPeer::CREATED_AT);
+    }
 }

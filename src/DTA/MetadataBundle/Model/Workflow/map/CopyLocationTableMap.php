@@ -80,15 +80,15 @@ class CopyLocationTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'timestampable' =>  array (
-  'create_column' => 'created_at',
-  'update_column' => 'updated_at',
-  'disable_updated_at' => 'false',
-),
             'table_row_view' =>  array (
   'Signatur' => 'catalogue_signature',
   'embedColumns2' => 'publication',
   'query' => '\\DTA\\MetadataBundle\\Model\\Workflow\\CopyLocationQuery::create()                     ->leftJoinWith(\'Publication\')                     ->leftJoinWith(\'Publication.Title\')                     ->leftJoinWith(\'Title.Titlefragment\')                     ->leftJoinWith(\'Publication.DatespecificationRelatedByPublicationdateId\')                     ->leftJoinWith(\'Publication.PersonPublication\')                     ->leftJoinWith(\'PersonPublication.Person\')                     ->leftJoinWith(\'Person.Personalname\')                     ->leftJoinWith(\'Personalname.Namefragment\');',
+),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
 ),
         );
     } // getBehaviors()

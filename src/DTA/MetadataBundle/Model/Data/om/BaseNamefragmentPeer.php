@@ -32,13 +32,13 @@ abstract class BaseNamefragmentPeer
     const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Data\\map\\NamefragmentTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 5;
+    const NUM_COLUMNS = 7;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 5;
+    const NUM_HYDRATE_COLUMNS = 7;
 
     /** the column name for the id field */
     const ID = 'namefragment.id';
@@ -54,6 +54,12 @@ abstract class BaseNamefragmentPeer
 
     /** the column name for the sortable_rank field */
     const SORTABLE_RANK = 'namefragment.sortable_rank';
+
+    /** the column name for the created_at field */
+    const CREATED_AT = 'namefragment.created_at';
+
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'namefragment.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -86,12 +92,12 @@ abstract class BaseNamefragmentPeer
      * e.g. NamefragmentPeer::$fieldNames[NamefragmentPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'PersonalnameId', 'Name', 'Namefragmenttypeid', 'SortableRank', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'personalnameId', 'name', 'namefragmenttypeid', 'sortableRank', ),
-        BasePeer::TYPE_COLNAME => array (NamefragmentPeer::ID, NamefragmentPeer::PERSONALNAME_ID, NamefragmentPeer::NAME, NamefragmentPeer::NAMEFRAGMENTTYPEID, NamefragmentPeer::SORTABLE_RANK, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PERSONALNAME_ID', 'NAME', 'NAMEFRAGMENTTYPEID', 'SORTABLE_RANK', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'personalname_id', 'name', 'namefragmenttypeid', 'sortable_rank', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'PersonalnameId', 'Name', 'Namefragmenttypeid', 'SortableRank', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'personalnameId', 'name', 'namefragmenttypeid', 'sortableRank', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (NamefragmentPeer::ID, NamefragmentPeer::PERSONALNAME_ID, NamefragmentPeer::NAME, NamefragmentPeer::NAMEFRAGMENTTYPEID, NamefragmentPeer::SORTABLE_RANK, NamefragmentPeer::CREATED_AT, NamefragmentPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PERSONALNAME_ID', 'NAME', 'NAMEFRAGMENTTYPEID', 'SORTABLE_RANK', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'personalname_id', 'name', 'namefragmenttypeid', 'sortable_rank', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -101,12 +107,12 @@ abstract class BaseNamefragmentPeer
      * e.g. NamefragmentPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PersonalnameId' => 1, 'Name' => 2, 'Namefragmenttypeid' => 3, 'SortableRank' => 4, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'personalnameId' => 1, 'name' => 2, 'namefragmenttypeid' => 3, 'sortableRank' => 4, ),
-        BasePeer::TYPE_COLNAME => array (NamefragmentPeer::ID => 0, NamefragmentPeer::PERSONALNAME_ID => 1, NamefragmentPeer::NAME => 2, NamefragmentPeer::NAMEFRAGMENTTYPEID => 3, NamefragmentPeer::SORTABLE_RANK => 4, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PERSONALNAME_ID' => 1, 'NAME' => 2, 'NAMEFRAGMENTTYPEID' => 3, 'SORTABLE_RANK' => 4, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'personalname_id' => 1, 'name' => 2, 'namefragmenttypeid' => 3, 'sortable_rank' => 4, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PersonalnameId' => 1, 'Name' => 2, 'Namefragmenttypeid' => 3, 'SortableRank' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'personalnameId' => 1, 'name' => 2, 'namefragmenttypeid' => 3, 'sortableRank' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
+        BasePeer::TYPE_COLNAME => array (NamefragmentPeer::ID => 0, NamefragmentPeer::PERSONALNAME_ID => 1, NamefragmentPeer::NAME => 2, NamefragmentPeer::NAMEFRAGMENTTYPEID => 3, NamefragmentPeer::SORTABLE_RANK => 4, NamefragmentPeer::CREATED_AT => 5, NamefragmentPeer::UPDATED_AT => 6, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PERSONALNAME_ID' => 1, 'NAME' => 2, 'NAMEFRAGMENTTYPEID' => 3, 'SORTABLE_RANK' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'personalname_id' => 1, 'name' => 2, 'namefragmenttypeid' => 3, 'sortable_rank' => 4, 'created_at' => 5, 'updated_at' => 6, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -185,12 +191,16 @@ abstract class BaseNamefragmentPeer
             $criteria->addSelectColumn(NamefragmentPeer::NAME);
             $criteria->addSelectColumn(NamefragmentPeer::NAMEFRAGMENTTYPEID);
             $criteria->addSelectColumn(NamefragmentPeer::SORTABLE_RANK);
+            $criteria->addSelectColumn(NamefragmentPeer::CREATED_AT);
+            $criteria->addSelectColumn(NamefragmentPeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.personalname_id');
             $criteria->addSelectColumn($alias . '.name');
             $criteria->addSelectColumn($alias . '.namefragmenttypeid');
             $criteria->addSelectColumn($alias . '.sortable_rank');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

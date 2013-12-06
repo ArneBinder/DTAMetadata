@@ -50,6 +50,11 @@ class PublicationTableMap extends TableMap
         $this->addForeignKey('creationdate_id', 'CreationdateId', 'INTEGER', 'datespecification', 'id', false, null, null);
         $this->addForeignKey('publishingcompany_id', 'PublishingcompanyId', 'INTEGER', 'publishingcompany', 'id', false, null, null);
         $this->addForeignKey('source_id', 'SourceId', 'INTEGER', 'source', 'id', false, null, null);
+        $this->addColumn('legacygenre', 'Legacygenre', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('legacysubgenre', 'Legacysubgenre', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('type', 'Type', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('dirname', 'Dirname', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('usedcopylocation_id', 'UsedcopylocationId', 'INTEGER', false, null, null);
         $this->addColumn('partner_id', 'PartnerId', 'INTEGER', false, null, null);
         $this->addColumn('editiondescription', 'Editiondescription', 'LONGVARCHAR', false, null, null);
         $this->addColumn('digitaleditioneditor', 'Digitaleditioneditor', 'LONGVARCHAR', false, null, null);
@@ -63,9 +68,9 @@ class PublicationTableMap extends TableMap
         $this->addColumn('directoryname', 'Directoryname', 'LONGVARCHAR', false, null, null);
         $this->addColumn('wwwready', 'Wwwready', 'INTEGER', false, null, null);
         $this->addForeignKey('last_changed_by_user_id', 'LastChangedByUserId', 'INTEGER', 'dta_user', 'id', false, null, null);
+        $this->addColumn('publishingcompany_id_is_reconstructed', 'PublishingcompanyIdIsReconstructed', 'BOOLEAN', false, null, false);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('publishingcompany_id_is_reconstructed', 'PublishingcompanyIdIsReconstructed', 'BOOLEAN', false, null, false);
         // validators
     } // initialize()
 
@@ -127,13 +132,13 @@ class PublicationTableMap extends TableMap
   'embedcolumnstitle' => 'title',
   'query' => '\\DTA\\MetadataBundle\\Model\\Data\\PublicationQuery::create()                     ->leftJoinWith(\'Title\')                     ->leftJoinWith(\'Title.Titlefragment\')                     ->leftJoinWith(\'DatespecificationRelatedByPublicationdateId\')                     ->leftJoinWith(\'PersonPublication\')                     ->leftJoinWith(\'PersonPublication.Person\')                     ->leftJoinWith(\'Person.Personalname\')                     ->leftJoinWith(\'Personalname.Namefragment\');',
 ),
+            'reconstructed_flaggable' =>  array (
+  'column' => 'publishingcompany_id',
+),
             'timestampable' =>  array (
   'create_column' => 'created_at',
   'update_column' => 'updated_at',
   'disable_updated_at' => 'false',
-),
-            'reconstructed_flaggable' =>  array (
-  'column' => 'publishingcompany_id',
 ),
         );
     } // getBehaviors()

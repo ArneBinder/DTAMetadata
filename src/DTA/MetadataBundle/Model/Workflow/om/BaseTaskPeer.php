@@ -35,13 +35,13 @@ abstract class BaseTaskPeer
     const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Workflow\\map\\TaskTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 13;
+    const NUM_COLUMNS = 14;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 13;
+    const NUM_HYDRATE_COLUMNS = 14;
 
     /** the column name for the id field */
     const ID = 'task.id';
@@ -76,6 +76,9 @@ abstract class BaseTaskPeer
     /** the column name for the copylocation_id field */
     const COPYLOCATION_ID = 'task.copylocation_id';
 
+    /** the column name for the priority field */
+    const PRIORITY = 'task.priority';
+
     /** the column name for the created_at field */
     const CREATED_AT = 'task.created_at';
 
@@ -101,12 +104,12 @@ abstract class BaseTaskPeer
      * e.g. TaskPeer::$fieldNames[TaskPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'TasktypeId', 'Closed', 'StartDate', 'EndDate', 'Comments', 'PublicationgroupId', 'PublicationId', 'PartnerId', 'ResponsibleuserId', 'CopylocationId', 'CreatedAt', 'UpdatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'tasktypeId', 'closed', 'startDate', 'endDate', 'comments', 'publicationgroupId', 'publicationId', 'partnerId', 'responsibleuserId', 'copylocationId', 'createdAt', 'updatedAt', ),
-        BasePeer::TYPE_COLNAME => array (TaskPeer::ID, TaskPeer::TASKTYPE_ID, TaskPeer::CLOSED, TaskPeer::START_DATE, TaskPeer::END_DATE, TaskPeer::COMMENTS, TaskPeer::PUBLICATIONGROUP_ID, TaskPeer::PUBLICATION_ID, TaskPeer::PARTNER_ID, TaskPeer::RESPONSIBLEUSER_ID, TaskPeer::COPYLOCATION_ID, TaskPeer::CREATED_AT, TaskPeer::UPDATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TASKTYPE_ID', 'CLOSED', 'START_DATE', 'END_DATE', 'COMMENTS', 'PUBLICATIONGROUP_ID', 'PUBLICATION_ID', 'PARTNER_ID', 'RESPONSIBLEUSER_ID', 'COPYLOCATION_ID', 'CREATED_AT', 'UPDATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'tasktype_id', 'closed', 'start_date', 'end_date', 'comments', 'publicationgroup_id', 'publication_id', 'partner_id', 'responsibleuser_id', 'copylocation_id', 'created_at', 'updated_at', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'TasktypeId', 'Closed', 'StartDate', 'EndDate', 'Comments', 'PublicationgroupId', 'PublicationId', 'PartnerId', 'ResponsibleuserId', 'CopylocationId', 'Priority', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'tasktypeId', 'closed', 'startDate', 'endDate', 'comments', 'publicationgroupId', 'publicationId', 'partnerId', 'responsibleuserId', 'copylocationId', 'priority', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (TaskPeer::ID, TaskPeer::TASKTYPE_ID, TaskPeer::CLOSED, TaskPeer::START_DATE, TaskPeer::END_DATE, TaskPeer::COMMENTS, TaskPeer::PUBLICATIONGROUP_ID, TaskPeer::PUBLICATION_ID, TaskPeer::PARTNER_ID, TaskPeer::RESPONSIBLEUSER_ID, TaskPeer::COPYLOCATION_ID, TaskPeer::PRIORITY, TaskPeer::CREATED_AT, TaskPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TASKTYPE_ID', 'CLOSED', 'START_DATE', 'END_DATE', 'COMMENTS', 'PUBLICATIONGROUP_ID', 'PUBLICATION_ID', 'PARTNER_ID', 'RESPONSIBLEUSER_ID', 'COPYLOCATION_ID', 'PRIORITY', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'tasktype_id', 'closed', 'start_date', 'end_date', 'comments', 'publicationgroup_id', 'publication_id', 'partner_id', 'responsibleuser_id', 'copylocation_id', 'priority', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, )
     );
 
     /**
@@ -116,12 +119,12 @@ abstract class BaseTaskPeer
      * e.g. TaskPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'TasktypeId' => 1, 'Closed' => 2, 'StartDate' => 3, 'EndDate' => 4, 'Comments' => 5, 'PublicationgroupId' => 6, 'PublicationId' => 7, 'PartnerId' => 8, 'ResponsibleuserId' => 9, 'CopylocationId' => 10, 'CreatedAt' => 11, 'UpdatedAt' => 12, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'tasktypeId' => 1, 'closed' => 2, 'startDate' => 3, 'endDate' => 4, 'comments' => 5, 'publicationgroupId' => 6, 'publicationId' => 7, 'partnerId' => 8, 'responsibleuserId' => 9, 'copylocationId' => 10, 'createdAt' => 11, 'updatedAt' => 12, ),
-        BasePeer::TYPE_COLNAME => array (TaskPeer::ID => 0, TaskPeer::TASKTYPE_ID => 1, TaskPeer::CLOSED => 2, TaskPeer::START_DATE => 3, TaskPeer::END_DATE => 4, TaskPeer::COMMENTS => 5, TaskPeer::PUBLICATIONGROUP_ID => 6, TaskPeer::PUBLICATION_ID => 7, TaskPeer::PARTNER_ID => 8, TaskPeer::RESPONSIBLEUSER_ID => 9, TaskPeer::COPYLOCATION_ID => 10, TaskPeer::CREATED_AT => 11, TaskPeer::UPDATED_AT => 12, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TASKTYPE_ID' => 1, 'CLOSED' => 2, 'START_DATE' => 3, 'END_DATE' => 4, 'COMMENTS' => 5, 'PUBLICATIONGROUP_ID' => 6, 'PUBLICATION_ID' => 7, 'PARTNER_ID' => 8, 'RESPONSIBLEUSER_ID' => 9, 'COPYLOCATION_ID' => 10, 'CREATED_AT' => 11, 'UPDATED_AT' => 12, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'tasktype_id' => 1, 'closed' => 2, 'start_date' => 3, 'end_date' => 4, 'comments' => 5, 'publicationgroup_id' => 6, 'publication_id' => 7, 'partner_id' => 8, 'responsibleuser_id' => 9, 'copylocation_id' => 10, 'created_at' => 11, 'updated_at' => 12, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'TasktypeId' => 1, 'Closed' => 2, 'StartDate' => 3, 'EndDate' => 4, 'Comments' => 5, 'PublicationgroupId' => 6, 'PublicationId' => 7, 'PartnerId' => 8, 'ResponsibleuserId' => 9, 'CopylocationId' => 10, 'Priority' => 11, 'CreatedAt' => 12, 'UpdatedAt' => 13, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'tasktypeId' => 1, 'closed' => 2, 'startDate' => 3, 'endDate' => 4, 'comments' => 5, 'publicationgroupId' => 6, 'publicationId' => 7, 'partnerId' => 8, 'responsibleuserId' => 9, 'copylocationId' => 10, 'priority' => 11, 'createdAt' => 12, 'updatedAt' => 13, ),
+        BasePeer::TYPE_COLNAME => array (TaskPeer::ID => 0, TaskPeer::TASKTYPE_ID => 1, TaskPeer::CLOSED => 2, TaskPeer::START_DATE => 3, TaskPeer::END_DATE => 4, TaskPeer::COMMENTS => 5, TaskPeer::PUBLICATIONGROUP_ID => 6, TaskPeer::PUBLICATION_ID => 7, TaskPeer::PARTNER_ID => 8, TaskPeer::RESPONSIBLEUSER_ID => 9, TaskPeer::COPYLOCATION_ID => 10, TaskPeer::PRIORITY => 11, TaskPeer::CREATED_AT => 12, TaskPeer::UPDATED_AT => 13, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TASKTYPE_ID' => 1, 'CLOSED' => 2, 'START_DATE' => 3, 'END_DATE' => 4, 'COMMENTS' => 5, 'PUBLICATIONGROUP_ID' => 6, 'PUBLICATION_ID' => 7, 'PARTNER_ID' => 8, 'RESPONSIBLEUSER_ID' => 9, 'COPYLOCATION_ID' => 10, 'PRIORITY' => 11, 'CREATED_AT' => 12, 'UPDATED_AT' => 13, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'tasktype_id' => 1, 'closed' => 2, 'start_date' => 3, 'end_date' => 4, 'comments' => 5, 'publicationgroup_id' => 6, 'publication_id' => 7, 'partner_id' => 8, 'responsibleuser_id' => 9, 'copylocation_id' => 10, 'priority' => 11, 'created_at' => 12, 'updated_at' => 13, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, )
     );
 
     /**
@@ -206,6 +209,7 @@ abstract class BaseTaskPeer
             $criteria->addSelectColumn(TaskPeer::PARTNER_ID);
             $criteria->addSelectColumn(TaskPeer::RESPONSIBLEUSER_ID);
             $criteria->addSelectColumn(TaskPeer::COPYLOCATION_ID);
+            $criteria->addSelectColumn(TaskPeer::PRIORITY);
             $criteria->addSelectColumn(TaskPeer::CREATED_AT);
             $criteria->addSelectColumn(TaskPeer::UPDATED_AT);
         } else {
@@ -220,6 +224,7 @@ abstract class BaseTaskPeer
             $criteria->addSelectColumn($alias . '.partner_id');
             $criteria->addSelectColumn($alias . '.responsibleuser_id');
             $criteria->addSelectColumn($alias . '.copylocation_id');
+            $criteria->addSelectColumn($alias . '.priority');
             $criteria->addSelectColumn($alias . '.created_at');
             $criteria->addSelectColumn($alias . '.updated_at');
         }

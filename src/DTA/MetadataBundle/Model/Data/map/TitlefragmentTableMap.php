@@ -49,6 +49,8 @@ class TitlefragmentTableMap extends TableMap
         $this->addForeignKey('titlefragmenttype_id', 'TitlefragmenttypeId', 'INTEGER', 'titlefragmenttype', 'id', true, null, null);
         $this->addColumn('sortable_rank', 'SortableRank', 'INTEGER', false, null, null);
         $this->addColumn('name_is_reconstructed', 'NameIsReconstructed', 'BOOLEAN', false, null, false);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -78,6 +80,11 @@ class TitlefragmentTableMap extends TableMap
             'reconstructed_flaggable' =>  array (
   'column' => 'name',
 ),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
+),
             'table_row_view' =>  array (
   'Id' => 'id',
   'Name' => 'name',
@@ -85,6 +92,8 @@ class TitlefragmentTableMap extends TableMap
   'TitlefragmenttypeId' => 'titlefragmenttype_id',
   'SortableRank' => 'sortable_rank',
   'NameIsReconstructed' => 'name_is_reconstructed',
+  'CreatedAt' => 'created_at',
+  'UpdatedAt' => 'updated_at',
 ),
         );
     } // getBehaviors()

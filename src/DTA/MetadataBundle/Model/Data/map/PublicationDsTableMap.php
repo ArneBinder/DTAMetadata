@@ -47,6 +47,8 @@ class PublicationDsTableMap extends TableMap
         $this->addForeignKey('publication_id', 'PublicationId', 'INTEGER', 'publication', 'id', true, null, null);
         $this->addForeignKey('series_id', 'SeriesId', 'INTEGER', 'series', 'id', true, null, null);
         $this->addColumn('pages', 'Pages', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -70,6 +72,11 @@ class PublicationDsTableMap extends TableMap
         return array(
             'table_row_view' =>  array (
   'embedcolumnspublication' => 'publication',
+),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
 ),
         );
     } // getBehaviors()

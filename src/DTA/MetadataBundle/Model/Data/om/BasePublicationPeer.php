@@ -35,13 +35,13 @@ abstract class BasePublicationPeer
     const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Data\\map\\PublicationTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 24;
+    const NUM_COLUMNS = 29;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 24;
+    const NUM_HYDRATE_COLUMNS = 29;
 
     /** the column name for the id field */
     const ID = 'publication.id';
@@ -66,6 +66,21 @@ abstract class BasePublicationPeer
 
     /** the column name for the source_id field */
     const SOURCE_ID = 'publication.source_id';
+
+    /** the column name for the legacygenre field */
+    const LEGACYGENRE = 'publication.legacygenre';
+
+    /** the column name for the legacysubgenre field */
+    const LEGACYSUBGENRE = 'publication.legacysubgenre';
+
+    /** the column name for the type field */
+    const TYPE = 'publication.type';
+
+    /** the column name for the dirname field */
+    const DIRNAME = 'publication.dirname';
+
+    /** the column name for the usedcopylocation_id field */
+    const USEDCOPYLOCATION_ID = 'publication.usedcopylocation_id';
 
     /** the column name for the partner_id field */
     const PARTNER_ID = 'publication.partner_id';
@@ -106,14 +121,14 @@ abstract class BasePublicationPeer
     /** the column name for the last_changed_by_user_id field */
     const LAST_CHANGED_BY_USER_ID = 'publication.last_changed_by_user_id';
 
+    /** the column name for the publishingcompany_id_is_reconstructed field */
+    const PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED = 'publication.publishingcompany_id_is_reconstructed';
+
     /** the column name for the created_at field */
     const CREATED_AT = 'publication.created_at';
 
     /** the column name for the updated_at field */
     const UPDATED_AT = 'publication.updated_at';
-
-    /** the column name for the publishingcompany_id_is_reconstructed field */
-    const PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED = 'publication.publishingcompany_id_is_reconstructed';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -134,12 +149,12 @@ abstract class BasePublicationPeer
      * e.g. PublicationPeer::$fieldNames[PublicationPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'TitleId', 'FirsteditionpublicationId', 'PlaceId', 'PublicationdateId', 'CreationdateId', 'PublishingcompanyId', 'SourceId', 'PartnerId', 'Editiondescription', 'Digitaleditioneditor', 'Transcriptioncomment', 'Numpages', 'Numpagesnumeric', 'Comment', 'EncodingComment', 'Doi', 'Format', 'Directoryname', 'Wwwready', 'LastChangedByUserId', 'CreatedAt', 'UpdatedAt', 'PublishingcompanyIdIsReconstructed', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'titleId', 'firsteditionpublicationId', 'placeId', 'publicationdateId', 'creationdateId', 'publishingcompanyId', 'sourceId', 'partnerId', 'editiondescription', 'digitaleditioneditor', 'transcriptioncomment', 'numpages', 'numpagesnumeric', 'comment', 'encodingComment', 'doi', 'format', 'directoryname', 'wwwready', 'lastChangedByUserId', 'createdAt', 'updatedAt', 'publishingcompanyIdIsReconstructed', ),
-        BasePeer::TYPE_COLNAME => array (PublicationPeer::ID, PublicationPeer::TITLE_ID, PublicationPeer::FIRSTEDITIONPUBLICATION_ID, PublicationPeer::PLACE_ID, PublicationPeer::PUBLICATIONDATE_ID, PublicationPeer::CREATIONDATE_ID, PublicationPeer::PUBLISHINGCOMPANY_ID, PublicationPeer::SOURCE_ID, PublicationPeer::PARTNER_ID, PublicationPeer::EDITIONDESCRIPTION, PublicationPeer::DIGITALEDITIONEDITOR, PublicationPeer::TRANSCRIPTIONCOMMENT, PublicationPeer::NUMPAGES, PublicationPeer::NUMPAGESNUMERIC, PublicationPeer::COMMENT, PublicationPeer::ENCODING_COMMENT, PublicationPeer::DOI, PublicationPeer::FORMAT, PublicationPeer::DIRECTORYNAME, PublicationPeer::WWWREADY, PublicationPeer::LAST_CHANGED_BY_USER_ID, PublicationPeer::CREATED_AT, PublicationPeer::UPDATED_AT, PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TITLE_ID', 'FIRSTEDITIONPUBLICATION_ID', 'PLACE_ID', 'PUBLICATIONDATE_ID', 'CREATIONDATE_ID', 'PUBLISHINGCOMPANY_ID', 'SOURCE_ID', 'PARTNER_ID', 'EDITIONDESCRIPTION', 'DIGITALEDITIONEDITOR', 'TRANSCRIPTIONCOMMENT', 'NUMPAGES', 'NUMPAGESNUMERIC', 'COMMENT', 'ENCODING_COMMENT', 'DOI', 'FORMAT', 'DIRECTORYNAME', 'WWWREADY', 'LAST_CHANGED_BY_USER_ID', 'CREATED_AT', 'UPDATED_AT', 'PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'title_id', 'firsteditionpublication_id', 'place_id', 'publicationdate_id', 'creationdate_id', 'publishingcompany_id', 'source_id', 'partner_id', 'editiondescription', 'digitaleditioneditor', 'transcriptioncomment', 'numpages', 'numpagesnumeric', 'comment', 'encoding_comment', 'doi', 'format', 'directoryname', 'wwwready', 'last_changed_by_user_id', 'created_at', 'updated_at', 'publishingcompany_id_is_reconstructed', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'TitleId', 'FirsteditionpublicationId', 'PlaceId', 'PublicationdateId', 'CreationdateId', 'PublishingcompanyId', 'SourceId', 'Legacygenre', 'Legacysubgenre', 'Type', 'Dirname', 'UsedcopylocationId', 'PartnerId', 'Editiondescription', 'Digitaleditioneditor', 'Transcriptioncomment', 'Numpages', 'Numpagesnumeric', 'Comment', 'EncodingComment', 'Doi', 'Format', 'Directoryname', 'Wwwready', 'LastChangedByUserId', 'PublishingcompanyIdIsReconstructed', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'titleId', 'firsteditionpublicationId', 'placeId', 'publicationdateId', 'creationdateId', 'publishingcompanyId', 'sourceId', 'legacygenre', 'legacysubgenre', 'type', 'dirname', 'usedcopylocationId', 'partnerId', 'editiondescription', 'digitaleditioneditor', 'transcriptioncomment', 'numpages', 'numpagesnumeric', 'comment', 'encodingComment', 'doi', 'format', 'directoryname', 'wwwready', 'lastChangedByUserId', 'publishingcompanyIdIsReconstructed', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (PublicationPeer::ID, PublicationPeer::TITLE_ID, PublicationPeer::FIRSTEDITIONPUBLICATION_ID, PublicationPeer::PLACE_ID, PublicationPeer::PUBLICATIONDATE_ID, PublicationPeer::CREATIONDATE_ID, PublicationPeer::PUBLISHINGCOMPANY_ID, PublicationPeer::SOURCE_ID, PublicationPeer::LEGACYGENRE, PublicationPeer::LEGACYSUBGENRE, PublicationPeer::TYPE, PublicationPeer::DIRNAME, PublicationPeer::USEDCOPYLOCATION_ID, PublicationPeer::PARTNER_ID, PublicationPeer::EDITIONDESCRIPTION, PublicationPeer::DIGITALEDITIONEDITOR, PublicationPeer::TRANSCRIPTIONCOMMENT, PublicationPeer::NUMPAGES, PublicationPeer::NUMPAGESNUMERIC, PublicationPeer::COMMENT, PublicationPeer::ENCODING_COMMENT, PublicationPeer::DOI, PublicationPeer::FORMAT, PublicationPeer::DIRECTORYNAME, PublicationPeer::WWWREADY, PublicationPeer::LAST_CHANGED_BY_USER_ID, PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED, PublicationPeer::CREATED_AT, PublicationPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TITLE_ID', 'FIRSTEDITIONPUBLICATION_ID', 'PLACE_ID', 'PUBLICATIONDATE_ID', 'CREATIONDATE_ID', 'PUBLISHINGCOMPANY_ID', 'SOURCE_ID', 'LEGACYGENRE', 'LEGACYSUBGENRE', 'TYPE', 'DIRNAME', 'USEDCOPYLOCATION_ID', 'PARTNER_ID', 'EDITIONDESCRIPTION', 'DIGITALEDITIONEDITOR', 'TRANSCRIPTIONCOMMENT', 'NUMPAGES', 'NUMPAGESNUMERIC', 'COMMENT', 'ENCODING_COMMENT', 'DOI', 'FORMAT', 'DIRECTORYNAME', 'WWWREADY', 'LAST_CHANGED_BY_USER_ID', 'PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'title_id', 'firsteditionpublication_id', 'place_id', 'publicationdate_id', 'creationdate_id', 'publishingcompany_id', 'source_id', 'legacygenre', 'legacysubgenre', 'type', 'dirname', 'usedcopylocation_id', 'partner_id', 'editiondescription', 'digitaleditioneditor', 'transcriptioncomment', 'numpages', 'numpagesnumeric', 'comment', 'encoding_comment', 'doi', 'format', 'directoryname', 'wwwready', 'last_changed_by_user_id', 'publishingcompany_id_is_reconstructed', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, )
     );
 
     /**
@@ -149,12 +164,12 @@ abstract class BasePublicationPeer
      * e.g. PublicationPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'TitleId' => 1, 'FirsteditionpublicationId' => 2, 'PlaceId' => 3, 'PublicationdateId' => 4, 'CreationdateId' => 5, 'PublishingcompanyId' => 6, 'SourceId' => 7, 'PartnerId' => 8, 'Editiondescription' => 9, 'Digitaleditioneditor' => 10, 'Transcriptioncomment' => 11, 'Numpages' => 12, 'Numpagesnumeric' => 13, 'Comment' => 14, 'EncodingComment' => 15, 'Doi' => 16, 'Format' => 17, 'Directoryname' => 18, 'Wwwready' => 19, 'LastChangedByUserId' => 20, 'CreatedAt' => 21, 'UpdatedAt' => 22, 'PublishingcompanyIdIsReconstructed' => 23, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'titleId' => 1, 'firsteditionpublicationId' => 2, 'placeId' => 3, 'publicationdateId' => 4, 'creationdateId' => 5, 'publishingcompanyId' => 6, 'sourceId' => 7, 'partnerId' => 8, 'editiondescription' => 9, 'digitaleditioneditor' => 10, 'transcriptioncomment' => 11, 'numpages' => 12, 'numpagesnumeric' => 13, 'comment' => 14, 'encodingComment' => 15, 'doi' => 16, 'format' => 17, 'directoryname' => 18, 'wwwready' => 19, 'lastChangedByUserId' => 20, 'createdAt' => 21, 'updatedAt' => 22, 'publishingcompanyIdIsReconstructed' => 23, ),
-        BasePeer::TYPE_COLNAME => array (PublicationPeer::ID => 0, PublicationPeer::TITLE_ID => 1, PublicationPeer::FIRSTEDITIONPUBLICATION_ID => 2, PublicationPeer::PLACE_ID => 3, PublicationPeer::PUBLICATIONDATE_ID => 4, PublicationPeer::CREATIONDATE_ID => 5, PublicationPeer::PUBLISHINGCOMPANY_ID => 6, PublicationPeer::SOURCE_ID => 7, PublicationPeer::PARTNER_ID => 8, PublicationPeer::EDITIONDESCRIPTION => 9, PublicationPeer::DIGITALEDITIONEDITOR => 10, PublicationPeer::TRANSCRIPTIONCOMMENT => 11, PublicationPeer::NUMPAGES => 12, PublicationPeer::NUMPAGESNUMERIC => 13, PublicationPeer::COMMENT => 14, PublicationPeer::ENCODING_COMMENT => 15, PublicationPeer::DOI => 16, PublicationPeer::FORMAT => 17, PublicationPeer::DIRECTORYNAME => 18, PublicationPeer::WWWREADY => 19, PublicationPeer::LAST_CHANGED_BY_USER_ID => 20, PublicationPeer::CREATED_AT => 21, PublicationPeer::UPDATED_AT => 22, PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED => 23, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TITLE_ID' => 1, 'FIRSTEDITIONPUBLICATION_ID' => 2, 'PLACE_ID' => 3, 'PUBLICATIONDATE_ID' => 4, 'CREATIONDATE_ID' => 5, 'PUBLISHINGCOMPANY_ID' => 6, 'SOURCE_ID' => 7, 'PARTNER_ID' => 8, 'EDITIONDESCRIPTION' => 9, 'DIGITALEDITIONEDITOR' => 10, 'TRANSCRIPTIONCOMMENT' => 11, 'NUMPAGES' => 12, 'NUMPAGESNUMERIC' => 13, 'COMMENT' => 14, 'ENCODING_COMMENT' => 15, 'DOI' => 16, 'FORMAT' => 17, 'DIRECTORYNAME' => 18, 'WWWREADY' => 19, 'LAST_CHANGED_BY_USER_ID' => 20, 'CREATED_AT' => 21, 'UPDATED_AT' => 22, 'PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED' => 23, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'title_id' => 1, 'firsteditionpublication_id' => 2, 'place_id' => 3, 'publicationdate_id' => 4, 'creationdate_id' => 5, 'publishingcompany_id' => 6, 'source_id' => 7, 'partner_id' => 8, 'editiondescription' => 9, 'digitaleditioneditor' => 10, 'transcriptioncomment' => 11, 'numpages' => 12, 'numpagesnumeric' => 13, 'comment' => 14, 'encoding_comment' => 15, 'doi' => 16, 'format' => 17, 'directoryname' => 18, 'wwwready' => 19, 'last_changed_by_user_id' => 20, 'created_at' => 21, 'updated_at' => 22, 'publishingcompany_id_is_reconstructed' => 23, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'TitleId' => 1, 'FirsteditionpublicationId' => 2, 'PlaceId' => 3, 'PublicationdateId' => 4, 'CreationdateId' => 5, 'PublishingcompanyId' => 6, 'SourceId' => 7, 'Legacygenre' => 8, 'Legacysubgenre' => 9, 'Type' => 10, 'Dirname' => 11, 'UsedcopylocationId' => 12, 'PartnerId' => 13, 'Editiondescription' => 14, 'Digitaleditioneditor' => 15, 'Transcriptioncomment' => 16, 'Numpages' => 17, 'Numpagesnumeric' => 18, 'Comment' => 19, 'EncodingComment' => 20, 'Doi' => 21, 'Format' => 22, 'Directoryname' => 23, 'Wwwready' => 24, 'LastChangedByUserId' => 25, 'PublishingcompanyIdIsReconstructed' => 26, 'CreatedAt' => 27, 'UpdatedAt' => 28, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'titleId' => 1, 'firsteditionpublicationId' => 2, 'placeId' => 3, 'publicationdateId' => 4, 'creationdateId' => 5, 'publishingcompanyId' => 6, 'sourceId' => 7, 'legacygenre' => 8, 'legacysubgenre' => 9, 'type' => 10, 'dirname' => 11, 'usedcopylocationId' => 12, 'partnerId' => 13, 'editiondescription' => 14, 'digitaleditioneditor' => 15, 'transcriptioncomment' => 16, 'numpages' => 17, 'numpagesnumeric' => 18, 'comment' => 19, 'encodingComment' => 20, 'doi' => 21, 'format' => 22, 'directoryname' => 23, 'wwwready' => 24, 'lastChangedByUserId' => 25, 'publishingcompanyIdIsReconstructed' => 26, 'createdAt' => 27, 'updatedAt' => 28, ),
+        BasePeer::TYPE_COLNAME => array (PublicationPeer::ID => 0, PublicationPeer::TITLE_ID => 1, PublicationPeer::FIRSTEDITIONPUBLICATION_ID => 2, PublicationPeer::PLACE_ID => 3, PublicationPeer::PUBLICATIONDATE_ID => 4, PublicationPeer::CREATIONDATE_ID => 5, PublicationPeer::PUBLISHINGCOMPANY_ID => 6, PublicationPeer::SOURCE_ID => 7, PublicationPeer::LEGACYGENRE => 8, PublicationPeer::LEGACYSUBGENRE => 9, PublicationPeer::TYPE => 10, PublicationPeer::DIRNAME => 11, PublicationPeer::USEDCOPYLOCATION_ID => 12, PublicationPeer::PARTNER_ID => 13, PublicationPeer::EDITIONDESCRIPTION => 14, PublicationPeer::DIGITALEDITIONEDITOR => 15, PublicationPeer::TRANSCRIPTIONCOMMENT => 16, PublicationPeer::NUMPAGES => 17, PublicationPeer::NUMPAGESNUMERIC => 18, PublicationPeer::COMMENT => 19, PublicationPeer::ENCODING_COMMENT => 20, PublicationPeer::DOI => 21, PublicationPeer::FORMAT => 22, PublicationPeer::DIRECTORYNAME => 23, PublicationPeer::WWWREADY => 24, PublicationPeer::LAST_CHANGED_BY_USER_ID => 25, PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED => 26, PublicationPeer::CREATED_AT => 27, PublicationPeer::UPDATED_AT => 28, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TITLE_ID' => 1, 'FIRSTEDITIONPUBLICATION_ID' => 2, 'PLACE_ID' => 3, 'PUBLICATIONDATE_ID' => 4, 'CREATIONDATE_ID' => 5, 'PUBLISHINGCOMPANY_ID' => 6, 'SOURCE_ID' => 7, 'LEGACYGENRE' => 8, 'LEGACYSUBGENRE' => 9, 'TYPE' => 10, 'DIRNAME' => 11, 'USEDCOPYLOCATION_ID' => 12, 'PARTNER_ID' => 13, 'EDITIONDESCRIPTION' => 14, 'DIGITALEDITIONEDITOR' => 15, 'TRANSCRIPTIONCOMMENT' => 16, 'NUMPAGES' => 17, 'NUMPAGESNUMERIC' => 18, 'COMMENT' => 19, 'ENCODING_COMMENT' => 20, 'DOI' => 21, 'FORMAT' => 22, 'DIRECTORYNAME' => 23, 'WWWREADY' => 24, 'LAST_CHANGED_BY_USER_ID' => 25, 'PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED' => 26, 'CREATED_AT' => 27, 'UPDATED_AT' => 28, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'title_id' => 1, 'firsteditionpublication_id' => 2, 'place_id' => 3, 'publicationdate_id' => 4, 'creationdate_id' => 5, 'publishingcompany_id' => 6, 'source_id' => 7, 'legacygenre' => 8, 'legacysubgenre' => 9, 'type' => 10, 'dirname' => 11, 'usedcopylocation_id' => 12, 'partner_id' => 13, 'editiondescription' => 14, 'digitaleditioneditor' => 15, 'transcriptioncomment' => 16, 'numpages' => 17, 'numpagesnumeric' => 18, 'comment' => 19, 'encoding_comment' => 20, 'doi' => 21, 'format' => 22, 'directoryname' => 23, 'wwwready' => 24, 'last_changed_by_user_id' => 25, 'publishingcompany_id_is_reconstructed' => 26, 'created_at' => 27, 'updated_at' => 28, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, )
     );
 
     /**
@@ -236,6 +251,11 @@ abstract class BasePublicationPeer
             $criteria->addSelectColumn(PublicationPeer::CREATIONDATE_ID);
             $criteria->addSelectColumn(PublicationPeer::PUBLISHINGCOMPANY_ID);
             $criteria->addSelectColumn(PublicationPeer::SOURCE_ID);
+            $criteria->addSelectColumn(PublicationPeer::LEGACYGENRE);
+            $criteria->addSelectColumn(PublicationPeer::LEGACYSUBGENRE);
+            $criteria->addSelectColumn(PublicationPeer::TYPE);
+            $criteria->addSelectColumn(PublicationPeer::DIRNAME);
+            $criteria->addSelectColumn(PublicationPeer::USEDCOPYLOCATION_ID);
             $criteria->addSelectColumn(PublicationPeer::PARTNER_ID);
             $criteria->addSelectColumn(PublicationPeer::EDITIONDESCRIPTION);
             $criteria->addSelectColumn(PublicationPeer::DIGITALEDITIONEDITOR);
@@ -249,9 +269,9 @@ abstract class BasePublicationPeer
             $criteria->addSelectColumn(PublicationPeer::DIRECTORYNAME);
             $criteria->addSelectColumn(PublicationPeer::WWWREADY);
             $criteria->addSelectColumn(PublicationPeer::LAST_CHANGED_BY_USER_ID);
+            $criteria->addSelectColumn(PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED);
             $criteria->addSelectColumn(PublicationPeer::CREATED_AT);
             $criteria->addSelectColumn(PublicationPeer::UPDATED_AT);
-            $criteria->addSelectColumn(PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.title_id');
@@ -261,6 +281,11 @@ abstract class BasePublicationPeer
             $criteria->addSelectColumn($alias . '.creationdate_id');
             $criteria->addSelectColumn($alias . '.publishingcompany_id');
             $criteria->addSelectColumn($alias . '.source_id');
+            $criteria->addSelectColumn($alias . '.legacygenre');
+            $criteria->addSelectColumn($alias . '.legacysubgenre');
+            $criteria->addSelectColumn($alias . '.type');
+            $criteria->addSelectColumn($alias . '.dirname');
+            $criteria->addSelectColumn($alias . '.usedcopylocation_id');
             $criteria->addSelectColumn($alias . '.partner_id');
             $criteria->addSelectColumn($alias . '.editiondescription');
             $criteria->addSelectColumn($alias . '.digitaleditioneditor');
@@ -274,9 +299,9 @@ abstract class BasePublicationPeer
             $criteria->addSelectColumn($alias . '.directoryname');
             $criteria->addSelectColumn($alias . '.wwwready');
             $criteria->addSelectColumn($alias . '.last_changed_by_user_id');
+            $criteria->addSelectColumn($alias . '.publishingcompany_id_is_reconstructed');
             $criteria->addSelectColumn($alias . '.created_at');
             $criteria->addSelectColumn($alias . '.updated_at');
-            $criteria->addSelectColumn($alias . '.publishingcompany_id_is_reconstructed');
         }
     }
 

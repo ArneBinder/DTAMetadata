@@ -31,13 +31,13 @@ abstract class BasePublicationTagPeer
     const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Master\\map\\PublicationTagTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 5;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 3;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /** the column name for the id field */
     const ID = 'publication_tag.id';
@@ -47,6 +47,12 @@ abstract class BasePublicationTagPeer
 
     /** the column name for the publication_id field */
     const PUBLICATION_ID = 'publication_tag.publication_id';
+
+    /** the column name for the created_at field */
+    const CREATED_AT = 'publication_tag.created_at';
+
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'publication_tag.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -67,12 +73,12 @@ abstract class BasePublicationTagPeer
      * e.g. PublicationTagPeer::$fieldNames[PublicationTagPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'TagId', 'PublicationId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'tagId', 'publicationId', ),
-        BasePeer::TYPE_COLNAME => array (PublicationTagPeer::ID, PublicationTagPeer::TAG_ID, PublicationTagPeer::PUBLICATION_ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TAG_ID', 'PUBLICATION_ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'tag_id', 'publication_id', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'TagId', 'PublicationId', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'tagId', 'publicationId', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (PublicationTagPeer::ID, PublicationTagPeer::TAG_ID, PublicationTagPeer::PUBLICATION_ID, PublicationTagPeer::CREATED_AT, PublicationTagPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TAG_ID', 'PUBLICATION_ID', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'tag_id', 'publication_id', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
     /**
@@ -82,12 +88,12 @@ abstract class BasePublicationTagPeer
      * e.g. PublicationTagPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'TagId' => 1, 'PublicationId' => 2, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'tagId' => 1, 'publicationId' => 2, ),
-        BasePeer::TYPE_COLNAME => array (PublicationTagPeer::ID => 0, PublicationTagPeer::TAG_ID => 1, PublicationTagPeer::PUBLICATION_ID => 2, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TAG_ID' => 1, 'PUBLICATION_ID' => 2, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'tag_id' => 1, 'publication_id' => 2, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'TagId' => 1, 'PublicationId' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'tagId' => 1, 'publicationId' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        BasePeer::TYPE_COLNAME => array (PublicationTagPeer::ID => 0, PublicationTagPeer::TAG_ID => 1, PublicationTagPeer::PUBLICATION_ID => 2, PublicationTagPeer::CREATED_AT => 3, PublicationTagPeer::UPDATED_AT => 4, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TAG_ID' => 1, 'PUBLICATION_ID' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'tag_id' => 1, 'publication_id' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
     /**
@@ -164,10 +170,14 @@ abstract class BasePublicationTagPeer
             $criteria->addSelectColumn(PublicationTagPeer::ID);
             $criteria->addSelectColumn(PublicationTagPeer::TAG_ID);
             $criteria->addSelectColumn(PublicationTagPeer::PUBLICATION_ID);
+            $criteria->addSelectColumn(PublicationTagPeer::CREATED_AT);
+            $criteria->addSelectColumn(PublicationTagPeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.tag_id');
             $criteria->addSelectColumn($alias . '.publication_id');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

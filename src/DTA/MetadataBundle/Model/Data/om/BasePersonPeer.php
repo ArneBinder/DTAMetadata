@@ -30,19 +30,25 @@ abstract class BasePersonPeer
     const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Data\\map\\PersonTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 2;
+    const NUM_COLUMNS = 4;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 2;
+    const NUM_HYDRATE_COLUMNS = 4;
 
     /** the column name for the id field */
     const ID = 'person.id';
 
     /** the column name for the gnd field */
     const GND = 'person.gnd';
+
+    /** the column name for the created_at field */
+    const CREATED_AT = 'person.created_at';
+
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'person.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -63,12 +69,12 @@ abstract class BasePersonPeer
      * e.g. PersonPeer::$fieldNames[PersonPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Gnd', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'gnd', ),
-        BasePeer::TYPE_COLNAME => array (PersonPeer::ID, PersonPeer::GND, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'GND', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'gnd', ),
-        BasePeer::TYPE_NUM => array (0, 1, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Gnd', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'gnd', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (PersonPeer::ID, PersonPeer::GND, PersonPeer::CREATED_AT, PersonPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'GND', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'gnd', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
     /**
@@ -78,12 +84,12 @@ abstract class BasePersonPeer
      * e.g. PersonPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Gnd' => 1, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'gnd' => 1, ),
-        BasePeer::TYPE_COLNAME => array (PersonPeer::ID => 0, PersonPeer::GND => 1, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'GND' => 1, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'gnd' => 1, ),
-        BasePeer::TYPE_NUM => array (0, 1, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Gnd' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'gnd' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
+        BasePeer::TYPE_COLNAME => array (PersonPeer::ID => 0, PersonPeer::GND => 1, PersonPeer::CREATED_AT => 2, PersonPeer::UPDATED_AT => 3, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'GND' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'gnd' => 1, 'created_at' => 2, 'updated_at' => 3, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
     /**
@@ -159,9 +165,13 @@ abstract class BasePersonPeer
         if (null === $alias) {
             $criteria->addSelectColumn(PersonPeer::ID);
             $criteria->addSelectColumn(PersonPeer::GND);
+            $criteria->addSelectColumn(PersonPeer::CREATED_AT);
+            $criteria->addSelectColumn(PersonPeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.gnd');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

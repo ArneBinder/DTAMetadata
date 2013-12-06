@@ -29,13 +29,13 @@ abstract class BaseTasktypePeer
     const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Workflow\\map\\TasktypeTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 5;
+    const NUM_COLUMNS = 7;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 5;
+    const NUM_HYDRATE_COLUMNS = 7;
 
     /** the column name for the id field */
     const ID = 'tasktype.id';
@@ -51,6 +51,12 @@ abstract class BaseTasktypePeer
 
     /** the column name for the tree_level field */
     const TREE_LEVEL = 'tasktype.tree_level';
+
+    /** the column name for the created_at field */
+    const CREATED_AT = 'tasktype.created_at';
+
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'tasktype.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -88,12 +94,12 @@ abstract class BaseTasktypePeer
      * e.g. TasktypePeer::$fieldNames[TasktypePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'TreeLeft', 'TreeRight', 'TreeLevel', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'treeLeft', 'treeRight', 'treeLevel', ),
-        BasePeer::TYPE_COLNAME => array (TasktypePeer::ID, TasktypePeer::NAME, TasktypePeer::TREE_LEFT, TasktypePeer::TREE_RIGHT, TasktypePeer::TREE_LEVEL, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'TREE_LEFT', 'TREE_RIGHT', 'TREE_LEVEL', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'tree_left', 'tree_right', 'tree_level', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'TreeLeft', 'TreeRight', 'TreeLevel', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'treeLeft', 'treeRight', 'treeLevel', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (TasktypePeer::ID, TasktypePeer::NAME, TasktypePeer::TREE_LEFT, TasktypePeer::TREE_RIGHT, TasktypePeer::TREE_LEVEL, TasktypePeer::CREATED_AT, TasktypePeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'TREE_LEFT', 'TREE_RIGHT', 'TREE_LEVEL', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'tree_left', 'tree_right', 'tree_level', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -103,12 +109,12 @@ abstract class BaseTasktypePeer
      * e.g. TasktypePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'TreeLeft' => 2, 'TreeRight' => 3, 'TreeLevel' => 4, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'treeLeft' => 2, 'treeRight' => 3, 'treeLevel' => 4, ),
-        BasePeer::TYPE_COLNAME => array (TasktypePeer::ID => 0, TasktypePeer::NAME => 1, TasktypePeer::TREE_LEFT => 2, TasktypePeer::TREE_RIGHT => 3, TasktypePeer::TREE_LEVEL => 4, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'TREE_LEFT' => 2, 'TREE_RIGHT' => 3, 'TREE_LEVEL' => 4, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'tree_left' => 2, 'tree_right' => 3, 'tree_level' => 4, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'TreeLeft' => 2, 'TreeRight' => 3, 'TreeLevel' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'treeLeft' => 2, 'treeRight' => 3, 'treeLevel' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
+        BasePeer::TYPE_COLNAME => array (TasktypePeer::ID => 0, TasktypePeer::NAME => 1, TasktypePeer::TREE_LEFT => 2, TasktypePeer::TREE_RIGHT => 3, TasktypePeer::TREE_LEVEL => 4, TasktypePeer::CREATED_AT => 5, TasktypePeer::UPDATED_AT => 6, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'TREE_LEFT' => 2, 'TREE_RIGHT' => 3, 'TREE_LEVEL' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'tree_left' => 2, 'tree_right' => 3, 'tree_level' => 4, 'created_at' => 5, 'updated_at' => 6, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -187,12 +193,16 @@ abstract class BaseTasktypePeer
             $criteria->addSelectColumn(TasktypePeer::TREE_LEFT);
             $criteria->addSelectColumn(TasktypePeer::TREE_RIGHT);
             $criteria->addSelectColumn(TasktypePeer::TREE_LEVEL);
+            $criteria->addSelectColumn(TasktypePeer::CREATED_AT);
+            $criteria->addSelectColumn(TasktypePeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.name');
             $criteria->addSelectColumn($alias . '.tree_left');
             $criteria->addSelectColumn($alias . '.tree_right');
             $criteria->addSelectColumn($alias . '.tree_level');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

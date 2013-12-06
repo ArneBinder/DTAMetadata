@@ -9,6 +9,8 @@ CREATE TABLE "titlefragmenttype"
 (
     "id" serial NOT NULL,
     "name" TEXT NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -22,6 +24,8 @@ CREATE TABLE "namefragmenttype"
 (
     "id" serial NOT NULL,
     "name" TEXT NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -35,6 +39,8 @@ CREATE TABLE "personrole"
 (
     "id" serial NOT NULL,
     "name" TEXT NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -50,6 +56,8 @@ CREATE TABLE "category"
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "categorytype_id" INTEGER NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -63,6 +71,8 @@ CREATE TABLE "categorytype"
 (
     "id" serial NOT NULL,
     "name" TEXT NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -76,6 +86,8 @@ CREATE TABLE "tag"
 (
     "id" serial NOT NULL,
     "name" TEXT NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -89,6 +101,8 @@ CREATE TABLE "genre"
 (
     "id" serial NOT NULL,
     "name" TEXT NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -102,6 +116,8 @@ CREATE TABLE "source"
 (
     "id" serial NOT NULL,
     "name" TEXT NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -121,6 +137,11 @@ CREATE TABLE "publication"
     "creationdate_id" INTEGER,
     "publishingcompany_id" INTEGER,
     "source_id" INTEGER,
+    "legacygenre" TEXT,
+    "legacysubgenre" TEXT,
+    "type" TEXT,
+    "dirname" TEXT,
+    "usedcopylocation_id" INTEGER,
     "partner_id" INTEGER,
     "editiondescription" TEXT,
     "digitaleditioneditor" TEXT,
@@ -134,9 +155,9 @@ CREATE TABLE "publication"
     "directoryname" TEXT,
     "wwwready" INTEGER,
     "last_changed_by_user_id" INTEGER,
+    "publishingcompany_id_is_reconstructed" BOOLEAN DEFAULT 'f',
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
-    "publishingcompany_id_is_reconstructed" BOOLEAN DEFAULT 'f',
     PRIMARY KEY ("id")
 );
 
@@ -151,6 +172,16 @@ COMMENT ON COLUMN "publication"."creationdate_id" IS 'Erscheinungsjahr der Ersta
 COMMENT ON COLUMN "publication"."publishingcompany_id" IS 'Verlag';
 
 COMMENT ON COLUMN "publication"."source_id" IS 'Zur Sicherheit aus der alten DB übernommen';
+
+COMMENT ON COLUMN "publication"."legacygenre" IS 'Alt-Angabe zum Genre, zur Weiterverarbeitung bei Umstellung auf das neue Genre-System.';
+
+COMMENT ON COLUMN "publication"."legacysubgenre" IS 'Alt-Angabe zum Untergenre.';
+
+COMMENT ON COLUMN "publication"."type" IS 'Publikationstyp. Zur späteren Differenzierung über Publikationstypen.';
+
+COMMENT ON COLUMN "publication"."dirname" IS 'Textuelle ID (Kombination aus Autor, Titel, Jahr)';
+
+COMMENT ON COLUMN "publication"."usedcopylocation_id" IS 'Vermutlich der eingesetzte Nachweis. Entspricht dem alten metadaten.id_nachweis. ';
 
 COMMENT ON COLUMN "publication"."partner_id" IS 'akquiriert über';
 
@@ -178,6 +209,8 @@ CREATE TABLE "publication_m"
 (
     "id" serial NOT NULL,
     "publication_id" INTEGER NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -193,6 +226,8 @@ CREATE TABLE "publication_dm"
     "publication_id" INTEGER NOT NULL,
     "title_id" INTEGER NOT NULL,
     "pages" TEXT,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -212,6 +247,8 @@ CREATE TABLE "publication_ds"
     "publication_id" INTEGER NOT NULL,
     "series_id" INTEGER NOT NULL,
     "pages" TEXT,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -229,6 +266,8 @@ CREATE TABLE "publication_ms"
     "publication_id" INTEGER NOT NULL,
     "series_id" INTEGER NOT NULL,
     "volumenumberinseries" TEXT,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -245,6 +284,8 @@ CREATE TABLE "publication_ja"
     "id" serial NOT NULL,
     "publication_id" INTEGER NOT NULL,
     "parent" INTEGER NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -261,6 +302,8 @@ CREATE TABLE "publication_mms"
     "id" serial NOT NULL,
     "publication_id" INTEGER NOT NULL,
     "series_id" INTEGER NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -275,6 +318,8 @@ CREATE TABLE "publication_j"
     "id" serial NOT NULL,
     "publication_id" INTEGER NOT NULL,
     "edition" TEXT,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -294,6 +339,8 @@ CREATE TABLE "volume"
     "volumedescription" INTEGER,
     "volumenumeric" INTEGER,
     "volumestotal" INTEGER,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -313,6 +360,8 @@ CREATE TABLE "series"
 (
     "id" serial NOT NULL,
     "title_id" INTEGER NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -327,6 +376,8 @@ CREATE TABLE "publishingcompany"
     "id" serial NOT NULL,
     "name" TEXT NOT NULL,
     "gnd" VARCHAR(255),
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id"),
     CONSTRAINT "publishingcompany_U_1" UNIQUE ("gnd")
 );
@@ -342,6 +393,8 @@ CREATE TABLE "place"
     "id" serial NOT NULL,
     "name" TEXT NOT NULL,
     "gnd" VARCHAR(255),
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id"),
     CONSTRAINT "place_U_1" UNIQUE ("gnd")
 );
@@ -358,6 +411,8 @@ CREATE TABLE "datespecification"
     "year" INTEGER,
     "comments" TEXT,
     "year_is_reconstructed" BOOLEAN DEFAULT 'f',
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -372,6 +427,8 @@ CREATE TABLE "personalname"
     "id" serial NOT NULL,
     "person_id" INTEGER NOT NULL,
     "sortable_rank" INTEGER,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -388,6 +445,8 @@ CREATE TABLE "namefragment"
     "name" TEXT NOT NULL,
     "namefragmenttypeid" INTEGER NOT NULL,
     "sortable_rank" INTEGER,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -400,6 +459,8 @@ DROP TABLE IF EXISTS "title" CASCADE;
 CREATE TABLE "title"
 (
     "id" serial NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -417,6 +478,8 @@ CREATE TABLE "titlefragment"
     "titlefragmenttype_id" INTEGER NOT NULL,
     "sortable_rank" INTEGER,
     "name_is_reconstructed" BOOLEAN DEFAULT 'f',
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -430,6 +493,8 @@ CREATE TABLE "person"
 (
     "id" serial NOT NULL,
     "gnd" VARCHAR(255),
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id"),
     CONSTRAINT "person_U_1" UNIQUE ("gnd")
 );
@@ -444,6 +509,8 @@ CREATE TABLE "font"
 (
     "id" serial NOT NULL,
     "name" TEXT NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -457,6 +524,8 @@ CREATE TABLE "language"
 (
     "id" serial NOT NULL,
     "name" TEXT NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -471,6 +540,8 @@ CREATE TABLE "language_publication"
     "id" serial NOT NULL,
     "language_id" INTEGER NOT NULL,
     "publication_id" INTEGER NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -485,6 +556,8 @@ CREATE TABLE "genre_publication"
     "id" serial NOT NULL,
     "genre_id" INTEGER NOT NULL,
     "publication_id" INTEGER NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -499,6 +572,8 @@ CREATE TABLE "publication_tag"
     "id" serial NOT NULL,
     "tag_id" INTEGER NOT NULL,
     "publication_id" INTEGER NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -513,6 +588,8 @@ CREATE TABLE "category_publication"
     "id" serial NOT NULL,
     "category_id" INTEGER NOT NULL,
     "publication_id" INTEGER NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -527,6 +604,8 @@ CREATE TABLE "font_publication"
     "id" serial NOT NULL,
     "font_id" INTEGER NOT NULL,
     "publication_id" INTEGER NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -541,6 +620,8 @@ CREATE TABLE "publication_publicationgroup"
     "id" serial NOT NULL,
     "publicationgroup_id" INTEGER NOT NULL,
     "publication_id" INTEGER NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -556,6 +637,8 @@ CREATE TABLE "person_publication"
     "person_id" INTEGER NOT NULL,
     "personrole_id" INTEGER NOT NULL,
     "publication_id" INTEGER NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -571,6 +654,8 @@ CREATE TABLE "recent_use"
     "dta_user_id" INTEGER NOT NULL,
     "publication_id" INTEGER NOT NULL,
     "date" TIMESTAMP NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -588,6 +673,8 @@ CREATE TABLE "dta_user"
     "salt" VARCHAR(512),
     "mail" TEXT,
     "admin" BOOLEAN DEFAULT 'f',
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -610,10 +697,13 @@ CREATE TABLE "task"
     "partner_id" INTEGER,
     "responsibleuser_id" INTEGER,
     "copylocation_id" INTEGER,
+    "priority" INTEGER,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
+
+COMMENT ON COLUMN "task"."priority" IS 'Ein hoher Prioritätswert zeigt Dringlichkeit an.';
 
 -----------------------------------------------------------------------
 -- tasktype
@@ -628,6 +718,8 @@ CREATE TABLE "tasktype"
     "tree_left" INTEGER,
     "tree_right" INTEGER,
     "tree_level" INTEGER,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -704,6 +796,8 @@ CREATE TABLE "imagesource"
     "publication_id" INTEGER NOT NULL,
     "faksimilerefrange" TEXT,
     "originalrefrange" TEXT,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -725,6 +819,8 @@ CREATE TABLE "textsource"
     "texturl" TEXT,
     "license_id" INTEGER,
     "attribution" TEXT,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -749,6 +845,8 @@ CREATE TABLE "license"
     "url" TEXT,
     "applicable_to_image" BOOLEAN DEFAULT 'f' NOT NULL,
     "applicable_to_text" BOOLEAN DEFAULT 'f' NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
@@ -762,6 +860,8 @@ CREATE TABLE "publicationgroup"
 (
     "id" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 

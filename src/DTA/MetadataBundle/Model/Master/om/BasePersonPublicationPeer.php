@@ -32,13 +32,13 @@ abstract class BasePersonPublicationPeer
     const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Master\\map\\PersonPublicationTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 6;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /** the column name for the id field */
     const ID = 'person_publication.id';
@@ -51,6 +51,12 @@ abstract class BasePersonPublicationPeer
 
     /** the column name for the publication_id field */
     const PUBLICATION_ID = 'person_publication.publication_id';
+
+    /** the column name for the created_at field */
+    const CREATED_AT = 'person_publication.created_at';
+
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'person_publication.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -71,12 +77,12 @@ abstract class BasePersonPublicationPeer
      * e.g. PersonPublicationPeer::$fieldNames[PersonPublicationPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'PersonId', 'PersonroleId', 'PublicationId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'personId', 'personroleId', 'publicationId', ),
-        BasePeer::TYPE_COLNAME => array (PersonPublicationPeer::ID, PersonPublicationPeer::PERSON_ID, PersonPublicationPeer::PERSONROLE_ID, PersonPublicationPeer::PUBLICATION_ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PERSON_ID', 'PERSONROLE_ID', 'PUBLICATION_ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'person_id', 'personrole_id', 'publication_id', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'PersonId', 'PersonroleId', 'PublicationId', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'personId', 'personroleId', 'publicationId', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (PersonPublicationPeer::ID, PersonPublicationPeer::PERSON_ID, PersonPublicationPeer::PERSONROLE_ID, PersonPublicationPeer::PUBLICATION_ID, PersonPublicationPeer::CREATED_AT, PersonPublicationPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PERSON_ID', 'PERSONROLE_ID', 'PUBLICATION_ID', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'person_id', 'personrole_id', 'publication_id', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -86,12 +92,12 @@ abstract class BasePersonPublicationPeer
      * e.g. PersonPublicationPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PersonId' => 1, 'PersonroleId' => 2, 'PublicationId' => 3, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'personId' => 1, 'personroleId' => 2, 'publicationId' => 3, ),
-        BasePeer::TYPE_COLNAME => array (PersonPublicationPeer::ID => 0, PersonPublicationPeer::PERSON_ID => 1, PersonPublicationPeer::PERSONROLE_ID => 2, PersonPublicationPeer::PUBLICATION_ID => 3, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PERSON_ID' => 1, 'PERSONROLE_ID' => 2, 'PUBLICATION_ID' => 3, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'person_id' => 1, 'personrole_id' => 2, 'publication_id' => 3, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PersonId' => 1, 'PersonroleId' => 2, 'PublicationId' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'personId' => 1, 'personroleId' => 2, 'publicationId' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
+        BasePeer::TYPE_COLNAME => array (PersonPublicationPeer::ID => 0, PersonPublicationPeer::PERSON_ID => 1, PersonPublicationPeer::PERSONROLE_ID => 2, PersonPublicationPeer::PUBLICATION_ID => 3, PersonPublicationPeer::CREATED_AT => 4, PersonPublicationPeer::UPDATED_AT => 5, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PERSON_ID' => 1, 'PERSONROLE_ID' => 2, 'PUBLICATION_ID' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'person_id' => 1, 'personrole_id' => 2, 'publication_id' => 3, 'created_at' => 4, 'updated_at' => 5, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -169,11 +175,15 @@ abstract class BasePersonPublicationPeer
             $criteria->addSelectColumn(PersonPublicationPeer::PERSON_ID);
             $criteria->addSelectColumn(PersonPublicationPeer::PERSONROLE_ID);
             $criteria->addSelectColumn(PersonPublicationPeer::PUBLICATION_ID);
+            $criteria->addSelectColumn(PersonPublicationPeer::CREATED_AT);
+            $criteria->addSelectColumn(PersonPublicationPeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.person_id');
             $criteria->addSelectColumn($alias . '.personrole_id');
             $criteria->addSelectColumn($alias . '.publication_id');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

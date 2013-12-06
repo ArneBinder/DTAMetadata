@@ -21,10 +21,14 @@ use DTA\MetadataBundle\Model\Data\PublicationJQuery;
  * @method PublicationJQuery orderById($order = Criteria::ASC) Order by the id column
  * @method PublicationJQuery orderByPublicationId($order = Criteria::ASC) Order by the publication_id column
  * @method PublicationJQuery orderByEdition($order = Criteria::ASC) Order by the edition column
+ * @method PublicationJQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method PublicationJQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method PublicationJQuery groupById() Group by the id column
  * @method PublicationJQuery groupByPublicationId() Group by the publication_id column
  * @method PublicationJQuery groupByEdition() Group by the edition column
+ * @method PublicationJQuery groupByCreatedAt() Group by the created_at column
+ * @method PublicationJQuery groupByUpdatedAt() Group by the updated_at column
  *
  * @method PublicationJQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method PublicationJQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -39,10 +43,14 @@ use DTA\MetadataBundle\Model\Data\PublicationJQuery;
  *
  * @method PublicationJ findOneByPublicationId(int $publication_id) Return the first PublicationJ filtered by the publication_id column
  * @method PublicationJ findOneByEdition(string $edition) Return the first PublicationJ filtered by the edition column
+ * @method PublicationJ findOneByCreatedAt(string $created_at) Return the first PublicationJ filtered by the created_at column
+ * @method PublicationJ findOneByUpdatedAt(string $updated_at) Return the first PublicationJ filtered by the updated_at column
  *
  * @method array findById(int $id) Return PublicationJ objects filtered by the id column
  * @method array findByPublicationId(int $publication_id) Return PublicationJ objects filtered by the publication_id column
  * @method array findByEdition(string $edition) Return PublicationJ objects filtered by the edition column
+ * @method array findByCreatedAt(string $created_at) Return PublicationJ objects filtered by the created_at column
+ * @method array findByUpdatedAt(string $updated_at) Return PublicationJ objects filtered by the updated_at column
  */
 abstract class BasePublicationJQuery extends ModelCriteria
 {
@@ -148,7 +156,7 @@ abstract class BasePublicationJQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "publication_id", "edition" FROM "publication_j" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "publication_id", "edition", "created_at", "updated_at" FROM "publication_j" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -353,6 +361,92 @@ abstract class BasePublicationJQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at < '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return PublicationJQuery The current query, for fluid interface
+     */
+    public function filterByCreatedAt($createdAt = null, $comparison = null)
+    {
+        if (is_array($createdAt)) {
+            $useMinMax = false;
+            if (isset($createdAt['min'])) {
+                $this->addUsingAlias(PublicationJPeer::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($createdAt['max'])) {
+                $this->addUsingAlias(PublicationJPeer::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(PublicationJPeer::CREATED_AT, $createdAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the updated_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at < '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return PublicationJQuery The current query, for fluid interface
+     */
+    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+    {
+        if (is_array($updatedAt)) {
+            $useMinMax = false;
+            if (isset($updatedAt['min'])) {
+                $this->addUsingAlias(PublicationJPeer::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($updatedAt['max'])) {
+                $this->addUsingAlias(PublicationJPeer::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(PublicationJPeer::UPDATED_AT, $updatedAt, $comparison);
+    }
+
+    /**
      * Filter the query by a related Publication object
      *
      * @param   Publication|PropelObjectCollection $publication The related object(s) to use as filter
@@ -444,4 +538,69 @@ abstract class BasePublicationJQuery extends ModelCriteria
         return $this;
     }
 
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     PublicationJQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(PublicationJPeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     PublicationJQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(PublicationJPeer::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     PublicationJQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(PublicationJPeer::UPDATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     PublicationJQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(PublicationJPeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     PublicationJQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(PublicationJPeer::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     PublicationJQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(PublicationJPeer::CREATED_AT);
+    }
 }

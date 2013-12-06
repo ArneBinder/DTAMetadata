@@ -29,13 +29,13 @@ abstract class BasePublishingcompanyPeer
     const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Data\\map\\PublishingcompanyTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 5;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 3;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /** the column name for the id field */
     const ID = 'publishingcompany.id';
@@ -45,6 +45,12 @@ abstract class BasePublishingcompanyPeer
 
     /** the column name for the gnd field */
     const GND = 'publishingcompany.gnd';
+
+    /** the column name for the created_at field */
+    const CREATED_AT = 'publishingcompany.created_at';
+
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'publishingcompany.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -65,12 +71,12 @@ abstract class BasePublishingcompanyPeer
      * e.g. PublishingcompanyPeer::$fieldNames[PublishingcompanyPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'Gnd', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'gnd', ),
-        BasePeer::TYPE_COLNAME => array (PublishingcompanyPeer::ID, PublishingcompanyPeer::NAME, PublishingcompanyPeer::GND, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'GND', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'gnd', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'Gnd', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'gnd', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (PublishingcompanyPeer::ID, PublishingcompanyPeer::NAME, PublishingcompanyPeer::GND, PublishingcompanyPeer::CREATED_AT, PublishingcompanyPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'GND', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'gnd', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
     /**
@@ -80,12 +86,12 @@ abstract class BasePublishingcompanyPeer
      * e.g. PublishingcompanyPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'Gnd' => 2, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'gnd' => 2, ),
-        BasePeer::TYPE_COLNAME => array (PublishingcompanyPeer::ID => 0, PublishingcompanyPeer::NAME => 1, PublishingcompanyPeer::GND => 2, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'GND' => 2, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'gnd' => 2, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'Gnd' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'gnd' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        BasePeer::TYPE_COLNAME => array (PublishingcompanyPeer::ID => 0, PublishingcompanyPeer::NAME => 1, PublishingcompanyPeer::GND => 2, PublishingcompanyPeer::CREATED_AT => 3, PublishingcompanyPeer::UPDATED_AT => 4, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'GND' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'gnd' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
     /**
@@ -162,10 +168,14 @@ abstract class BasePublishingcompanyPeer
             $criteria->addSelectColumn(PublishingcompanyPeer::ID);
             $criteria->addSelectColumn(PublishingcompanyPeer::NAME);
             $criteria->addSelectColumn(PublishingcompanyPeer::GND);
+            $criteria->addSelectColumn(PublishingcompanyPeer::CREATED_AT);
+            $criteria->addSelectColumn(PublishingcompanyPeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.name');
             $criteria->addSelectColumn($alias . '.gnd');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 

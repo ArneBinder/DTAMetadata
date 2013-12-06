@@ -172,9 +172,9 @@ class ORMController extends DTADomainController {
             $obj = new $classNames['model'];
             
         } else {
-            
             // fetch the object from the database
-            $queryObject = $classNames['query']::create();
+            $queryObject = $classNames['model']::getRowViewQueryObject();
+//            $queryObject = $classNames['query']::create();
             $obj = $queryObject->findOneById($recordId);
             if( is_null($obj) ){
                 return array('transaction'=>'recordNotFound');

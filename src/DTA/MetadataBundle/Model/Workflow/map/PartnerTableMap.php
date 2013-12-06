@@ -74,16 +74,16 @@ class PartnerTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'timestampable' =>  array (
-  'create_column' => 'created_at',
-  'update_column' => 'updated_at',
-  'disable_updated_at' => 'false',
-),
             'table_row_view' =>  array (
   'Name' => 'name',
   'Ansprechpartner' => 'contact_person',
   'Mail' => 'mail',
   'Web' => 'web',
+),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
 ),
         );
     } // getBehaviors()
