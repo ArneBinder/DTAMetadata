@@ -63,7 +63,7 @@
         <!-- TODO: enable autoincrement. During conversion, the ids are set as the ids of the legacy database.-->
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="false" required="true"/>
         
-        <column name="name" type="LONGVARCHAR" required="true"/>
+        <column name="name" type="LONGVARCHAR" required="true" primaryString="true"/>
         
         <behavior name="nested_set"/>
         <behavior name="table_row_view">
@@ -124,7 +124,7 @@
         <!-- TODO: enable autoincrement. During conversion, the ids are set as the ids of the legacy database.-->
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="false" required="true"/>
         
-        <column name="name" type="LONGVARCHAR"/>
+        <column name="name" type="LONGVARCHAR" primaryString="true"/>
         <column name="mail" type="LONGVARCHAR"/>
         <column name="web" type="LONGVARCHAR"/>
         <column name="contact_person" description="Ansprechpartner" type="LONGVARCHAR"/>
@@ -181,7 +181,7 @@
         
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         
-        <column name="name" type="LONGVARCHAR" required="true"/>
+        <column name="name" type="LONGVARCHAR" required="true" primaryString="true"/>
         <column name="url" type="LONGVARCHAR"/>
         <!--Ob diese Lizenz auf Bilder anwendbar ist -->
         <column name="applicable_to_image" type="BOOLEAN" required="true" default="false"/>
@@ -198,7 +198,7 @@
         <!-- TODO: enable autoincrement. During conversion, the ids are set as the ids of the legacy database.-->
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="false" required="true"/>
         
-        <column name="name" type="LONGVARCHAR" required="true"/>
+        <column name="name" type="LONGVARCHAR" required="true" primaryString="true"/>
     </table>
     
 </database>

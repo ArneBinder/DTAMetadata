@@ -1995,11 +1995,11 @@ abstract class BaseDatespecification extends BaseObject implements Persistent, \
     /**
      * return the string representation of this object
      *
-     * @return string
+     * @return string The value of the 'year' column
      */
     public function __toString()
     {
-        return (string) $this->exportTo(DatespecificationPeer::DEFAULT_STRING_FORMAT);
+        return (string) $this->getYear();
     }
 
     /**

@@ -139,7 +139,7 @@ CREATE TABLE "publication"
     "source_id" INTEGER,
     "legacygenre" TEXT,
     "legacysubgenre" TEXT,
-    "type" TEXT,
+    "type" VARCHAR(255),
     "dirname" TEXT,
     "usedcopylocation_id" INTEGER,
     "partner_id" INTEGER,
@@ -155,6 +155,10 @@ CREATE TABLE "publication"
     "directoryname" TEXT,
     "wwwready" INTEGER,
     "last_changed_by_user_id" INTEGER,
+    "tree_id" INTEGER,
+    "tree_left" INTEGER,
+    "tree_right" INTEGER,
+    "tree_level" INTEGER,
     "publishingcompany_id_is_reconstructed" BOOLEAN DEFAULT 'f',
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
@@ -198,6 +202,12 @@ COMMENT ON COLUMN "publication"."numpagesnumeric" IS 'Umfang (normiert)';
 COMMENT ON COLUMN "publication"."comment" IS 'Anmerkungen';
 
 COMMENT ON COLUMN "publication"."encoding_comment" IS 'Kommentar Encoding';
+
+COMMENT ON COLUMN "publication"."tree_id" IS 'Publikationen können vertikal organisiert werden (Teil/Ganzes). Die id dient zur Unterscheidung der einzelnen Bäume.';
+
+CREATE INDEX "publication_I_1" ON "publication" ("tree_id");
+
+CREATE INDEX "publication_I_2" ON "publication" ("type");
 
 -----------------------------------------------------------------------
 -- publication_m
@@ -528,6 +538,27 @@ CREATE TABLE "language"
     "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
+
+-----------------------------------------------------------------------
+-- sequence_entry
+-----------------------------------------------------------------------
+
+DROP TABLE IF EXISTS "sequence_entry" CASCADE;
+
+CREATE TABLE "sequence_entry"
+(
+    "id" serial NOT NULL,
+    "publication_id" INTEGER NOT NULL,
+    "sequence_id" TEXT,
+    "sequence_name" TEXT,
+    "sequencetype" INT2 DEFAULT 0,
+    "sortable_rank" INTEGER,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
+    PRIMARY KEY ("id")
+);
+
+CREATE INDEX "sequence_entry_I_1" ON "sequence_entry" ("sequence_id");
 
 -----------------------------------------------------------------------
 -- language_publication
@@ -971,6 +1002,10 @@ ALTER TABLE "titlefragment" ADD CONSTRAINT "titlefragment_FK_1"
 ALTER TABLE "titlefragment" ADD CONSTRAINT "titlefragment_FK_2"
     FOREIGN KEY ("titlefragmenttype_id")
     REFERENCES "titlefragmenttype" ("id");
+
+ALTER TABLE "sequence_entry" ADD CONSTRAINT "sequence_entry_FK_1"
+    FOREIGN KEY ("publication_id")
+    REFERENCES "publication" ("id");
 
 ALTER TABLE "language_publication" ADD CONSTRAINT "language_publication_FK_1"
     FOREIGN KEY ("language_id")

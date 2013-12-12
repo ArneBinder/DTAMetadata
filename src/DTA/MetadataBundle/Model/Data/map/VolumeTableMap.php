@@ -45,7 +45,6 @@ class VolumeTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('publication_id', 'PublicationId', 'INTEGER', 'publication', 'id', true, null, null);
-        $this->addForeignKey('parentpublication_id', 'ParentpublicationId', 'INTEGER', 'publication', 'id', true, null, null);
         $this->addColumn('volumedescription', 'Volumedescription', 'INTEGER', false, null, null);
         $this->addColumn('volumenumeric', 'Volumenumeric', 'INTEGER', false, null, null);
         $this->addColumn('volumestotal', 'Volumestotal', 'INTEGER', false, null, null);
@@ -59,8 +58,7 @@ class VolumeTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('PublicationRelatedByPublicationId', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::MANY_TO_ONE, array('publication_id' => 'id', ), null, null);
-        $this->addRelation('PublicationRelatedByParentpublicationId', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::MANY_TO_ONE, array('parentpublication_id' => 'id', ), null, null);
+        $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::MANY_TO_ONE, array('publication_id' => 'id', ), null, null);
     } // buildRelations()
 
     /**

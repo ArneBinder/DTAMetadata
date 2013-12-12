@@ -44,6 +44,7 @@ class PartnerTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('name', 'Name', 'LONGVARCHAR', false, null, null);
+        $this->getColumn('name', false)->setPrimaryString(true);
         $this->addColumn('mail', 'Mail', 'LONGVARCHAR', false, null, null);
         $this->addColumn('web', 'Web', 'LONGVARCHAR', false, null, null);
         $this->addColumn('contact_person', 'ContactPerson', 'LONGVARCHAR', false, null, null);

@@ -43,6 +43,15 @@ class PublicationTableMap extends TableMap
         $this->setUseIdGenerator(false);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addColumn('type', 'Type', 'ENUM', false, null, null);
+        $this->getColumn('type', false)->setValueSet(array (
+  0 => 'BOOK',
+  1 => 'VOLUME',
+  2 => 'MULTIVOLUME',
+  3 => 'CHAPTER',
+  4 => 'JOURNAL',
+  5 => 'ARTICLE',
+));
         $this->addForeignKey('title_id', 'TitleId', 'INTEGER', 'title', 'id', true, null, null);
         $this->addColumn('firsteditionpublication_id', 'FirsteditionpublicationId', 'INTEGER', false, null, null);
         $this->addForeignKey('place_id', 'PlaceId', 'INTEGER', 'place', 'id', false, null, null);
@@ -52,7 +61,6 @@ class PublicationTableMap extends TableMap
         $this->addForeignKey('source_id', 'SourceId', 'INTEGER', 'source', 'id', false, null, null);
         $this->addColumn('legacygenre', 'Legacygenre', 'LONGVARCHAR', false, null, null);
         $this->addColumn('legacysubgenre', 'Legacysubgenre', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('type', 'Type', 'LONGVARCHAR', false, null, null);
         $this->addColumn('dirname', 'Dirname', 'LONGVARCHAR', false, null, null);
         $this->addColumn('usedcopylocation_id', 'UsedcopylocationId', 'INTEGER', false, null, null);
         $this->addColumn('partner_id', 'PartnerId', 'INTEGER', false, null, null);
@@ -68,6 +76,10 @@ class PublicationTableMap extends TableMap
         $this->addColumn('directoryname', 'Directoryname', 'LONGVARCHAR', false, null, null);
         $this->addColumn('wwwready', 'Wwwready', 'INTEGER', false, null, null);
         $this->addForeignKey('last_changed_by_user_id', 'LastChangedByUserId', 'INTEGER', 'dta_user', 'id', false, null, null);
+        $this->addColumn('tree_id', 'TreeId', 'INTEGER', false, null, null);
+        $this->addColumn('tree_left', 'TreeLeft', 'INTEGER', false, null, null);
+        $this->addColumn('tree_right', 'TreeRight', 'INTEGER', false, null, null);
+        $this->addColumn('tree_level', 'TreeLevel', 'INTEGER', false, null, null);
         $this->addColumn('publishingcompany_id_is_reconstructed', 'PublishingcompanyIdIsReconstructed', 'BOOLEAN', false, null, false);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
@@ -86,15 +98,10 @@ class PublicationTableMap extends TableMap
         $this->addRelation('DatespecificationRelatedByPublicationdateId', 'DTA\\MetadataBundle\\Model\\Data\\Datespecification', RelationMap::MANY_TO_ONE, array('publicationdate_id' => 'id', ), null, null);
         $this->addRelation('DatespecificationRelatedByCreationdateId', 'DTA\\MetadataBundle\\Model\\Data\\Datespecification', RelationMap::MANY_TO_ONE, array('creationdate_id' => 'id', ), null, null);
         $this->addRelation('LastChangedByUser', 'DTA\\MetadataBundle\\Model\\Master\\DtaUser', RelationMap::MANY_TO_ONE, array('last_changed_by_user_id' => 'id', ), null, null);
-        $this->addRelation('PublicationM', 'DTA\\MetadataBundle\\Model\\Data\\PublicationM', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationMs');
-        $this->addRelation('PublicationDm', 'DTA\\MetadataBundle\\Model\\Data\\PublicationDm', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationDms');
-        $this->addRelation('PublicationDs', 'DTA\\MetadataBundle\\Model\\Data\\PublicationDs', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationDss');
-        $this->addRelation('PublicationMs', 'DTA\\MetadataBundle\\Model\\Data\\PublicationMs', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationMss');
-        $this->addRelation('PublicationJa', 'DTA\\MetadataBundle\\Model\\Data\\PublicationJa', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationJas');
-        $this->addRelation('PublicationMms', 'DTA\\MetadataBundle\\Model\\Data\\PublicationMms', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationMmss');
-        $this->addRelation('PublicationJ', 'DTA\\MetadataBundle\\Model\\Data\\PublicationJ', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationJs');
-        $this->addRelation('VolumeRelatedByPublicationId', 'DTA\\MetadataBundle\\Model\\Data\\Volume', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'VolumesRelatedByPublicationId');
-        $this->addRelation('VolumeRelatedByParentpublicationId', 'DTA\\MetadataBundle\\Model\\Data\\Volume', RelationMap::ONE_TO_MANY, array('id' => 'parentpublication_id', ), null, null, 'VolumesRelatedByParentpublicationId');
+        $this->addRelation('Volume', 'DTA\\MetadataBundle\\Model\\Data\\Volume', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Volumes');
+        $this->addRelation('Chapter', 'DTA\\MetadataBundle\\Model\\Data\\Chapter', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Chapters');
+        $this->addRelation('Article', 'DTA\\MetadataBundle\\Model\\Data\\Article', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Articles');
+        $this->addRelation('SequenceEntry', 'DTA\\MetadataBundle\\Model\\Master\\SequenceEntry', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'SequenceEntries');
         $this->addRelation('LanguagePublication', 'DTA\\MetadataBundle\\Model\\Master\\LanguagePublication', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'LanguagePublications');
         $this->addRelation('GenrePublication', 'DTA\\MetadataBundle\\Model\\Master\\GenrePublication', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'GenrePublications');
         $this->addRelation('PublicationTag', 'DTA\\MetadataBundle\\Model\\Master\\PublicationTag', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'PublicationTags');
@@ -124,6 +131,14 @@ class PublicationTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
+            'nested_set' =>  array (
+  'left_column' => 'tree_left',
+  'right_column' => 'tree_right',
+  'level_column' => 'tree_level',
+  'use_scope' => 'tree_id',
+  'scope_column' => 'tree_id',
+  'method_proxies' => 'false',
+),
             'table_row_view' =>  array (
   'Titel' => 'accessor:getTitle',
   'erster Autor' => 'accessor:getFirstAuthor',

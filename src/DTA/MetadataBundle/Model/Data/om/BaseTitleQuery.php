@@ -13,11 +13,11 @@ use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
 use DTA\MetadataBundle\Model\Data\Publication;
-use DTA\MetadataBundle\Model\Data\Series;
 use DTA\MetadataBundle\Model\Data\Title;
 use DTA\MetadataBundle\Model\Data\TitlePeer;
 use DTA\MetadataBundle\Model\Data\TitleQuery;
 use DTA\MetadataBundle\Model\Data\Titlefragment;
+use DTA\MetadataBundle\Model\Master\SequenceEntry;
 
 /**
  * @method TitleQuery orderById($order = Criteria::ASC) Order by the id column
@@ -36,13 +36,13 @@ use DTA\MetadataBundle\Model\Data\Titlefragment;
  * @method TitleQuery rightJoinPublication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Publication relation
  * @method TitleQuery innerJoinPublication($relationAlias = null) Adds a INNER JOIN clause to the query using the Publication relation
  *
- * @method TitleQuery leftJoinSeries($relationAlias = null) Adds a LEFT JOIN clause to the query using the Series relation
- * @method TitleQuery rightJoinSeries($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Series relation
- * @method TitleQuery innerJoinSeries($relationAlias = null) Adds a INNER JOIN clause to the query using the Series relation
- *
  * @method TitleQuery leftJoinTitlefragment($relationAlias = null) Adds a LEFT JOIN clause to the query using the Titlefragment relation
  * @method TitleQuery rightJoinTitlefragment($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Titlefragment relation
  * @method TitleQuery innerJoinTitlefragment($relationAlias = null) Adds a INNER JOIN clause to the query using the Titlefragment relation
+ *
+ * @method TitleQuery leftJoinSequenceEntry($relationAlias = null) Adds a LEFT JOIN clause to the query using the SequenceEntry relation
+ * @method TitleQuery rightJoinSequenceEntry($relationAlias = null) Adds a RIGHT JOIN clause to the query using the SequenceEntry relation
+ * @method TitleQuery innerJoinSequenceEntry($relationAlias = null) Adds a INNER JOIN clause to the query using the SequenceEntry relation
  *
  * @method Title findOne(PropelPDO $con = null) Return the first Title matching the query
  * @method Title findOneOrCreate(PropelPDO $con = null) Return the first Title matching the query, or a new Title object populated from the query conditions when no match is found
@@ -450,80 +450,6 @@ abstract class BaseTitleQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Series object
-     *
-     * @param   Series|PropelObjectCollection $series  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 TitleQuery The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterBySeries($series, $comparison = null)
-    {
-        if ($series instanceof Series) {
-            return $this
-                ->addUsingAlias(TitlePeer::ID, $series->getTitleId(), $comparison);
-        } elseif ($series instanceof PropelObjectCollection) {
-            return $this
-                ->useSeriesQuery()
-                ->filterByPrimaryKeys($series->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterBySeries() only accepts arguments of type Series or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Series relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return TitleQuery The current query, for fluid interface
-     */
-    public function joinSeries($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Series');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Series');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Series relation Series object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \DTA\MetadataBundle\Model\Data\SeriesQuery A secondary query class using the current class as primary query
-     */
-    public function useSeriesQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinSeries($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Series', '\DTA\MetadataBundle\Model\Data\SeriesQuery');
-    }
-
-    /**
      * Filter the query by a related Titlefragment object
      *
      * @param   Titlefragment|PropelObjectCollection $titlefragment  the related object to use as filter
@@ -595,6 +521,80 @@ abstract class BaseTitleQuery extends ModelCriteria
         return $this
             ->joinTitlefragment($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Titlefragment', '\DTA\MetadataBundle\Model\Data\TitlefragmentQuery');
+    }
+
+    /**
+     * Filter the query by a related SequenceEntry object
+     *
+     * @param   SequenceEntry|PropelObjectCollection $sequenceEntry  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 TitleQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterBySequenceEntry($sequenceEntry, $comparison = null)
+    {
+        if ($sequenceEntry instanceof SequenceEntry) {
+            return $this
+                ->addUsingAlias(TitlePeer::ID, $sequenceEntry->getTitleId(), $comparison);
+        } elseif ($sequenceEntry instanceof PropelObjectCollection) {
+            return $this
+                ->useSequenceEntryQuery()
+                ->filterByPrimaryKeys($sequenceEntry->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterBySequenceEntry() only accepts arguments of type SequenceEntry or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the SequenceEntry relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return TitleQuery The current query, for fluid interface
+     */
+    public function joinSequenceEntry($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('SequenceEntry');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'SequenceEntry');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the SequenceEntry relation SequenceEntry object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\Master\SequenceEntryQuery A secondary query class using the current class as primary query
+     */
+    public function useSequenceEntryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinSequenceEntry($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'SequenceEntry', '\DTA\MetadataBundle\Model\Master\SequenceEntryQuery');
     }
 
     /**

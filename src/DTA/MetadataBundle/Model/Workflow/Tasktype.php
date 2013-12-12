@@ -19,8 +19,4 @@ class Tasktype extends BaseTasktype
         
         parent::save();
     }
-    
-    public function __toString(){
-        return $this->getName();
-    }
 }

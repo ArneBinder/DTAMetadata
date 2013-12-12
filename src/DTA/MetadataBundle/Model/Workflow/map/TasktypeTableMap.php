@@ -44,6 +44,7 @@ class TasktypeTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('name', 'Name', 'LONGVARCHAR', true, null, null);
+        $this->getColumn('name', false)->setPrimaryString(true);
         $this->addColumn('tree_left', 'TreeLeft', 'INTEGER', false, null, null);
         $this->addColumn('tree_right', 'TreeRight', 'INTEGER', false, null, null);
         $this->addColumn('tree_level', 'TreeLevel', 'INTEGER', false, null, null);

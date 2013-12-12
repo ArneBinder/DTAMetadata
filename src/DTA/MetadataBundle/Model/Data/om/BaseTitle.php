@@ -17,13 +17,13 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use DTA\MetadataBundle\Model\Data\Publication;
 use DTA\MetadataBundle\Model\Data\PublicationQuery;
-use DTA\MetadataBundle\Model\Data\Series;
-use DTA\MetadataBundle\Model\Data\SeriesQuery;
 use DTA\MetadataBundle\Model\Data\Title;
 use DTA\MetadataBundle\Model\Data\TitlePeer;
 use DTA\MetadataBundle\Model\Data\TitleQuery;
 use DTA\MetadataBundle\Model\Data\Titlefragment;
 use DTA\MetadataBundle\Model\Data\TitlefragmentQuery;
+use DTA\MetadataBundle\Model\Master\SequenceEntry;
+use DTA\MetadataBundle\Model\Master\SequenceEntryQuery;
 
 abstract class BaseTitle extends BaseObject implements Persistent, \DTA\MetadataBundle\Model\table_row_view\TableRowViewInterface
 {
@@ -71,16 +71,16 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
     protected $collPublicationsPartial;
 
     /**
-     * @var        PropelObjectCollection|Series[] Collection to store aggregation of Series objects.
-     */
-    protected $collSeries;
-    protected $collSeriesPartial;
-
-    /**
      * @var        PropelObjectCollection|Titlefragment[] Collection to store aggregation of Titlefragment objects.
      */
     protected $collTitlefragments;
     protected $collTitlefragmentsPartial;
+
+    /**
+     * @var        PropelObjectCollection|SequenceEntry[] Collection to store aggregation of SequenceEntry objects.
+     */
+    protected $collSequenceEntries;
+    protected $collSequenceEntriesPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -114,13 +114,13 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $seriesScheduledForDeletion = null;
+    protected $titlefragmentsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $titlefragmentsScheduledForDeletion = null;
+    protected $sequenceEntriesScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -378,9 +378,9 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
 
             $this->collPublications = null;
 
-            $this->collSeries = null;
-
             $this->collTitlefragments = null;
+
+            $this->collSequenceEntries = null;
 
         } // if (deep)
     }
@@ -534,23 +534,6 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
                 }
             }
 
-            if ($this->seriesScheduledForDeletion !== null) {
-                if (!$this->seriesScheduledForDeletion->isEmpty()) {
-                    SeriesQuery::create()
-                        ->filterByPrimaryKeys($this->seriesScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->seriesScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collSeries !== null) {
-                foreach ($this->collSeries as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             if ($this->titlefragmentsScheduledForDeletion !== null) {
                 if (!$this->titlefragmentsScheduledForDeletion->isEmpty()) {
                     TitlefragmentQuery::create()
@@ -562,6 +545,23 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
 
             if ($this->collTitlefragments !== null) {
                 foreach ($this->collTitlefragments as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->sequenceEntriesScheduledForDeletion !== null) {
+                if (!$this->sequenceEntriesScheduledForDeletion->isEmpty()) {
+                    SequenceEntryQuery::create()
+                        ->filterByPrimaryKeys($this->sequenceEntriesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->sequenceEntriesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collSequenceEntries !== null) {
+                foreach ($this->collSequenceEntries as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -733,16 +733,16 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
                     }
                 }
 
-                if ($this->collSeries !== null) {
-                    foreach ($this->collSeries as $referrerFK) {
+                if ($this->collTitlefragments !== null) {
+                    foreach ($this->collTitlefragments as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
                     }
                 }
 
-                if ($this->collTitlefragments !== null) {
-                    foreach ($this->collTitlefragments as $referrerFK) {
+                if ($this->collSequenceEntries !== null) {
+                    foreach ($this->collSequenceEntries as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -835,11 +835,11 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
             if (null !== $this->collPublications) {
                 $result['Publications'] = $this->collPublications->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collSeries) {
-                $result['Series'] = $this->collSeries->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
             if (null !== $this->collTitlefragments) {
                 $result['Titlefragments'] = $this->collTitlefragments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collSequenceEntries) {
+                $result['SequenceEntries'] = $this->collSequenceEntries->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1004,15 +1004,15 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
                 }
             }
 
-            foreach ($this->getSeries() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addSeries($relObj->copy($deepCopy));
-                }
-            }
-
             foreach ($this->getTitlefragments() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addTitlefragment($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getSequenceEntries() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addSequenceEntry($relObj->copy($deepCopy));
                 }
             }
 
@@ -1080,11 +1080,11 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
         if ('Publication' == $relationName) {
             $this->initPublications();
         }
-        if ('Series' == $relationName) {
-            $this->initSeries();
-        }
         if ('Titlefragment' == $relationName) {
             $this->initTitlefragments();
+        }
+        if ('SequenceEntry' == $relationName) {
+            $this->initSequenceEntries();
         }
     }
 
@@ -1464,231 +1464,6 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
     }
 
     /**
-     * Clears out the collSeries collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return Title The current object (for fluent API support)
-     * @see        addSeries()
-     */
-    public function clearSeries()
-    {
-        $this->collSeries = null; // important to set this to null since that means it is uninitialized
-        $this->collSeriesPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * reset is the collSeries collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialSeries($v = true)
-    {
-        $this->collSeriesPartial = $v;
-    }
-
-    /**
-     * Initializes the collSeries collection.
-     *
-     * By default this just sets the collSeries collection to an empty array (like clearcollSeries());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initSeries($overrideExisting = true)
-    {
-        if (null !== $this->collSeries && !$overrideExisting) {
-            return;
-        }
-        $this->collSeries = new PropelObjectCollection();
-        $this->collSeries->setModel('Series');
-    }
-
-    /**
-     * Gets an array of Series objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Title is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|Series[] List of Series objects
-     * @throws PropelException
-     */
-    public function getSeries($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collSeriesPartial && !$this->isNew();
-        if (null === $this->collSeries || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collSeries) {
-                // return empty collection
-                $this->initSeries();
-            } else {
-                $collSeries = SeriesQuery::create(null, $criteria)
-                    ->filterByTitle($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collSeriesPartial && count($collSeries)) {
-                      $this->initSeries(false);
-
-                      foreach ($collSeries as $obj) {
-                        if (false == $this->collSeries->contains($obj)) {
-                          $this->collSeries->append($obj);
-                        }
-                      }
-
-                      $this->collSeriesPartial = true;
-                    }
-
-                    $collSeries->getInternalIterator()->rewind();
-
-                    return $collSeries;
-                }
-
-                if ($partial && $this->collSeries) {
-                    foreach ($this->collSeries as $obj) {
-                        if ($obj->isNew()) {
-                            $collSeries[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collSeries = $collSeries;
-                $this->collSeriesPartial = false;
-            }
-        }
-
-        return $this->collSeries;
-    }
-
-    /**
-     * Sets a collection of Series objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $series A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     * @return Title The current object (for fluent API support)
-     */
-    public function setSeries(PropelCollection $series, PropelPDO $con = null)
-    {
-        $seriesToDelete = $this->getSeries(new Criteria(), $con)->diff($series);
-
-
-        $this->seriesScheduledForDeletion = $seriesToDelete;
-
-        foreach ($seriesToDelete as $seriesRemoved) {
-            $seriesRemoved->setTitle(null);
-        }
-
-        $this->collSeries = null;
-        foreach ($series as $series) {
-            $this->addSeries($series);
-        }
-
-        $this->collSeries = $series;
-        $this->collSeriesPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related Series objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related Series objects.
-     * @throws PropelException
-     */
-    public function countSeries(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collSeriesPartial && !$this->isNew();
-        if (null === $this->collSeries || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collSeries) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getSeries());
-            }
-            $query = SeriesQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByTitle($this)
-                ->count($con);
-        }
-
-        return count($this->collSeries);
-    }
-
-    /**
-     * Method called to associate a Series object to this object
-     * through the Series foreign key attribute.
-     *
-     * @param    Series $l Series
-     * @return Title The current object (for fluent API support)
-     */
-    public function addSeries(Series $l)
-    {
-        if ($this->collSeries === null) {
-            $this->initSeries();
-            $this->collSeriesPartial = true;
-        }
-
-        if (!in_array($l, $this->collSeries->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddSeries($l);
-
-            if ($this->seriesScheduledForDeletion and $this->seriesScheduledForDeletion->contains($l)) {
-                $this->seriesScheduledForDeletion->remove($this->seriesScheduledForDeletion->search($l));
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	Series $series The series object to add.
-     */
-    protected function doAddSeries($series)
-    {
-        $this->collSeries[]= $series;
-        $series->setTitle($this);
-    }
-
-    /**
-     * @param	Series $series The series object to remove.
-     * @return Title The current object (for fluent API support)
-     */
-    public function removeSeries($series)
-    {
-        if ($this->getSeries()->contains($series)) {
-            $this->collSeries->remove($this->collSeries->search($series));
-            if (null === $this->seriesScheduledForDeletion) {
-                $this->seriesScheduledForDeletion = clone $this->collSeries;
-                $this->seriesScheduledForDeletion->clear();
-            }
-            $this->seriesScheduledForDeletion[]= clone $series;
-            $series->setTitle(null);
-        }
-
-        return $this;
-    }
-
-    /**
      * Clears out the collTitlefragments collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -1939,6 +1714,256 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
     }
 
     /**
+     * Clears out the collSequenceEntries collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Title The current object (for fluent API support)
+     * @see        addSequenceEntries()
+     */
+    public function clearSequenceEntries()
+    {
+        $this->collSequenceEntries = null; // important to set this to null since that means it is uninitialized
+        $this->collSequenceEntriesPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collSequenceEntries collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialSequenceEntries($v = true)
+    {
+        $this->collSequenceEntriesPartial = $v;
+    }
+
+    /**
+     * Initializes the collSequenceEntries collection.
+     *
+     * By default this just sets the collSequenceEntries collection to an empty array (like clearcollSequenceEntries());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initSequenceEntries($overrideExisting = true)
+    {
+        if (null !== $this->collSequenceEntries && !$overrideExisting) {
+            return;
+        }
+        $this->collSequenceEntries = new PropelObjectCollection();
+        $this->collSequenceEntries->setModel('SequenceEntry');
+    }
+
+    /**
+     * Gets an array of SequenceEntry objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Title is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|SequenceEntry[] List of SequenceEntry objects
+     * @throws PropelException
+     */
+    public function getSequenceEntries($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collSequenceEntriesPartial && !$this->isNew();
+        if (null === $this->collSequenceEntries || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collSequenceEntries) {
+                // return empty collection
+                $this->initSequenceEntries();
+            } else {
+                $collSequenceEntries = SequenceEntryQuery::create(null, $criteria)
+                    ->filterByTitle($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collSequenceEntriesPartial && count($collSequenceEntries)) {
+                      $this->initSequenceEntries(false);
+
+                      foreach ($collSequenceEntries as $obj) {
+                        if (false == $this->collSequenceEntries->contains($obj)) {
+                          $this->collSequenceEntries->append($obj);
+                        }
+                      }
+
+                      $this->collSequenceEntriesPartial = true;
+                    }
+
+                    $collSequenceEntries->getInternalIterator()->rewind();
+
+                    return $collSequenceEntries;
+                }
+
+                if ($partial && $this->collSequenceEntries) {
+                    foreach ($this->collSequenceEntries as $obj) {
+                        if ($obj->isNew()) {
+                            $collSequenceEntries[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collSequenceEntries = $collSequenceEntries;
+                $this->collSequenceEntriesPartial = false;
+            }
+        }
+
+        return $this->collSequenceEntries;
+    }
+
+    /**
+     * Sets a collection of SequenceEntry objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $sequenceEntries A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Title The current object (for fluent API support)
+     */
+    public function setSequenceEntries(PropelCollection $sequenceEntries, PropelPDO $con = null)
+    {
+        $sequenceEntriesToDelete = $this->getSequenceEntries(new Criteria(), $con)->diff($sequenceEntries);
+
+
+        $this->sequenceEntriesScheduledForDeletion = $sequenceEntriesToDelete;
+
+        foreach ($sequenceEntriesToDelete as $sequenceEntryRemoved) {
+            $sequenceEntryRemoved->setTitle(null);
+        }
+
+        $this->collSequenceEntries = null;
+        foreach ($sequenceEntries as $sequenceEntry) {
+            $this->addSequenceEntry($sequenceEntry);
+        }
+
+        $this->collSequenceEntries = $sequenceEntries;
+        $this->collSequenceEntriesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related SequenceEntry objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related SequenceEntry objects.
+     * @throws PropelException
+     */
+    public function countSequenceEntries(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collSequenceEntriesPartial && !$this->isNew();
+        if (null === $this->collSequenceEntries || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collSequenceEntries) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getSequenceEntries());
+            }
+            $query = SequenceEntryQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByTitle($this)
+                ->count($con);
+        }
+
+        return count($this->collSequenceEntries);
+    }
+
+    /**
+     * Method called to associate a SequenceEntry object to this object
+     * through the SequenceEntry foreign key attribute.
+     *
+     * @param    SequenceEntry $l SequenceEntry
+     * @return Title The current object (for fluent API support)
+     */
+    public function addSequenceEntry(SequenceEntry $l)
+    {
+        if ($this->collSequenceEntries === null) {
+            $this->initSequenceEntries();
+            $this->collSequenceEntriesPartial = true;
+        }
+
+        if (!in_array($l, $this->collSequenceEntries->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddSequenceEntry($l);
+
+            if ($this->sequenceEntriesScheduledForDeletion and $this->sequenceEntriesScheduledForDeletion->contains($l)) {
+                $this->sequenceEntriesScheduledForDeletion->remove($this->sequenceEntriesScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	SequenceEntry $sequenceEntry The sequenceEntry object to add.
+     */
+    protected function doAddSequenceEntry($sequenceEntry)
+    {
+        $this->collSequenceEntries[]= $sequenceEntry;
+        $sequenceEntry->setTitle($this);
+    }
+
+    /**
+     * @param	SequenceEntry $sequenceEntry The sequenceEntry object to remove.
+     * @return Title The current object (for fluent API support)
+     */
+    public function removeSequenceEntry($sequenceEntry)
+    {
+        if ($this->getSequenceEntries()->contains($sequenceEntry)) {
+            $this->collSequenceEntries->remove($this->collSequenceEntries->search($sequenceEntry));
+            if (null === $this->sequenceEntriesScheduledForDeletion) {
+                $this->sequenceEntriesScheduledForDeletion = clone $this->collSequenceEntries;
+                $this->sequenceEntriesScheduledForDeletion->clear();
+            }
+            $this->sequenceEntriesScheduledForDeletion[]= clone $sequenceEntry;
+            $sequenceEntry->setTitle(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Title is new, it will return
+     * an empty collection; or if this Title has previously
+     * been saved, it will retrieve related SequenceEntries from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Title.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|SequenceEntry[] List of SequenceEntry objects
+     */
+    public function getSequenceEntriesJoinPublication($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = SequenceEntryQuery::create(null, $criteria);
+        $query->joinWith('Publication', $join_behavior);
+
+        return $this->getSequenceEntries($query, $con);
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -1973,13 +1998,13 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collSeries) {
-                foreach ($this->collSeries as $o) {
+            if ($this->collTitlefragments) {
+                foreach ($this->collTitlefragments as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collTitlefragments) {
-                foreach ($this->collTitlefragments as $o) {
+            if ($this->collSequenceEntries) {
+                foreach ($this->collSequenceEntries as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -1991,14 +2016,14 @@ abstract class BaseTitle extends BaseObject implements Persistent, \DTA\Metadata
             $this->collPublications->clearIterator();
         }
         $this->collPublications = null;
-        if ($this->collSeries instanceof PropelCollection) {
-            $this->collSeries->clearIterator();
-        }
-        $this->collSeries = null;
         if ($this->collTitlefragments instanceof PropelCollection) {
             $this->collTitlefragments->clearIterator();
         }
         $this->collTitlefragments = null;
+        if ($this->collSequenceEntries instanceof PropelCollection) {
+            $this->collSequenceEntries->clearIterator();
+        }
+        $this->collSequenceEntries = null;
     }
 
     /**

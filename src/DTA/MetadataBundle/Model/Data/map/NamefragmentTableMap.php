@@ -46,6 +46,7 @@ class NamefragmentTableMap extends TableMap
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('personalname_id', 'PersonalnameId', 'INTEGER', 'personalname', 'id', true, null, null);
         $this->addColumn('name', 'Name', 'LONGVARCHAR', true, null, null);
+        $this->getColumn('name', false)->setPrimaryString(true);
         $this->addForeignKey('namefragmenttypeid', 'Namefragmenttypeid', 'INTEGER', 'namefragmenttype', 'id', true, null, null);
         $this->addColumn('sortable_rank', 'SortableRank', 'INTEGER', false, null, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);

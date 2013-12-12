@@ -1489,11 +1489,11 @@ abstract class BaseTitlefragment extends BaseObject implements Persistent, \DTA\
     /**
      * return the string representation of this object
      *
-     * @return string
+     * @return string The value of the 'name' column
      */
     public function __toString()
     {
-        return (string) $this->exportTo(TitlefragmentPeer::DEFAULT_STRING_FORMAT);
+        return (string) $this->getName();
     }
 
     /**

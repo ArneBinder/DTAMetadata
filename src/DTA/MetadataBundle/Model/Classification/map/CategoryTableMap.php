@@ -45,6 +45,7 @@ class CategoryTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('name', 'Name', 'LONGVARCHAR', true, null, null);
+        $this->getColumn('name', false)->setPrimaryString(true);
         $this->addColumn('description', 'Description', 'LONGVARCHAR', true, null, null);
         $this->addForeignKey('categorytype_id', 'CategorytypeId', 'INTEGER', 'categorytype', 'id', true, null, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);

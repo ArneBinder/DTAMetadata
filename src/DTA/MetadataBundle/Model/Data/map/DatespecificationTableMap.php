@@ -45,6 +45,7 @@ class DatespecificationTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('year', 'Year', 'INTEGER', false, null, null);
+        $this->getColumn('year', false)->setPrimaryString(true);
         $this->addColumn('comments', 'Comments', 'LONGVARCHAR', false, null, null);
         $this->addColumn('year_is_reconstructed', 'YearIsReconstructed', 'BOOLEAN', false, null, false);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);

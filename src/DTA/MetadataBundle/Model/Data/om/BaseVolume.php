@@ -53,12 +53,6 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
     protected $publication_id;
 
     /**
-     * The value for the parentpublication_id field.
-     * @var        int
-     */
-    protected $parentpublication_id;
-
-    /**
      * The value for the volumedescription field.
      * @var        int
      */
@@ -91,12 +85,7 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
     /**
      * @var        Publication
      */
-    protected $aPublicationRelatedByPublicationId;
-
-    /**
-     * @var        Publication
-     */
-    protected $aPublicationRelatedByParentpublicationId;
+    protected $aPublication;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -140,17 +129,6 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
     {
 
         return $this->publication_id;
-    }
-
-    /**
-     * Get the [parentpublication_id] column value.
-     *
-     * @return int
-     */
-    public function getParentpublicationId()
-    {
-
-        return $this->parentpublication_id;
     }
 
     /**
@@ -294,38 +272,13 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
             $this->modifiedColumns[] = VolumePeer::PUBLICATION_ID;
         }
 
-        if ($this->aPublicationRelatedByPublicationId !== null && $this->aPublicationRelatedByPublicationId->getId() !== $v) {
-            $this->aPublicationRelatedByPublicationId = null;
+        if ($this->aPublication !== null && $this->aPublication->getId() !== $v) {
+            $this->aPublication = null;
         }
 
 
         return $this;
     } // setPublicationId()
-
-    /**
-     * Set the value of [parentpublication_id] column.
-     *
-     * @param  int $v new value
-     * @return Volume The current object (for fluent API support)
-     */
-    public function setParentpublicationId($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->parentpublication_id !== $v) {
-            $this->parentpublication_id = $v;
-            $this->modifiedColumns[] = VolumePeer::PARENTPUBLICATION_ID;
-        }
-
-        if ($this->aPublicationRelatedByParentpublicationId !== null && $this->aPublicationRelatedByParentpublicationId->getId() !== $v) {
-            $this->aPublicationRelatedByParentpublicationId = null;
-        }
-
-
-        return $this;
-    } // setParentpublicationId()
 
     /**
      * Set the value of [volumedescription] column.
@@ -470,12 +423,11 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->publication_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-            $this->parentpublication_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
-            $this->volumedescription = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
-            $this->volumenumeric = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
-            $this->volumestotal = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
-            $this->created_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
-            $this->updated_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+            $this->volumedescription = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+            $this->volumenumeric = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+            $this->volumestotal = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
+            $this->created_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+            $this->updated_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -485,7 +437,7 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
             }
             $this->postHydrate($row, $startcol, $rehydrate);
 
-            return $startcol + 8; // 8 = VolumePeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 7; // 7 = VolumePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Volume object", $e);
@@ -508,11 +460,8 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
     public function ensureConsistency()
     {
 
-        if ($this->aPublicationRelatedByPublicationId !== null && $this->publication_id !== $this->aPublicationRelatedByPublicationId->getId()) {
-            $this->aPublicationRelatedByPublicationId = null;
-        }
-        if ($this->aPublicationRelatedByParentpublicationId !== null && $this->parentpublication_id !== $this->aPublicationRelatedByParentpublicationId->getId()) {
-            $this->aPublicationRelatedByParentpublicationId = null;
+        if ($this->aPublication !== null && $this->publication_id !== $this->aPublication->getId()) {
+            $this->aPublication = null;
         }
     } // ensureConsistency
 
@@ -553,8 +502,7 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aPublicationRelatedByPublicationId = null;
-            $this->aPublicationRelatedByParentpublicationId = null;
+            $this->aPublication = null;
         } // if (deep)
     }
 
@@ -684,18 +632,11 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aPublicationRelatedByPublicationId !== null) {
-                if ($this->aPublicationRelatedByPublicationId->isModified() || $this->aPublicationRelatedByPublicationId->isNew()) {
-                    $affectedRows += $this->aPublicationRelatedByPublicationId->save($con);
+            if ($this->aPublication !== null) {
+                if ($this->aPublication->isModified() || $this->aPublication->isNew()) {
+                    $affectedRows += $this->aPublication->save($con);
                 }
-                $this->setPublicationRelatedByPublicationId($this->aPublicationRelatedByPublicationId);
-            }
-
-            if ($this->aPublicationRelatedByParentpublicationId !== null) {
-                if ($this->aPublicationRelatedByParentpublicationId->isModified() || $this->aPublicationRelatedByParentpublicationId->isNew()) {
-                    $affectedRows += $this->aPublicationRelatedByParentpublicationId->save($con);
-                }
-                $this->setPublicationRelatedByParentpublicationId($this->aPublicationRelatedByParentpublicationId);
+                $this->setPublication($this->aPublication);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -751,9 +692,6 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
         if ($this->isColumnModified(VolumePeer::PUBLICATION_ID)) {
             $modifiedColumns[':p' . $index++]  = '"publication_id"';
         }
-        if ($this->isColumnModified(VolumePeer::PARENTPUBLICATION_ID)) {
-            $modifiedColumns[':p' . $index++]  = '"parentpublication_id"';
-        }
         if ($this->isColumnModified(VolumePeer::VOLUMEDESCRIPTION)) {
             $modifiedColumns[':p' . $index++]  = '"volumedescription"';
         }
@@ -785,9 +723,6 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
                         break;
                     case '"publication_id"':
                         $stmt->bindValue($identifier, $this->publication_id, PDO::PARAM_INT);
-                        break;
-                    case '"parentpublication_id"':
-                        $stmt->bindValue($identifier, $this->parentpublication_id, PDO::PARAM_INT);
                         break;
                     case '"volumedescription"':
                         $stmt->bindValue($identifier, $this->volumedescription, PDO::PARAM_INT);
@@ -896,15 +831,9 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aPublicationRelatedByPublicationId !== null) {
-                if (!$this->aPublicationRelatedByPublicationId->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aPublicationRelatedByPublicationId->getValidationFailures());
-                }
-            }
-
-            if ($this->aPublicationRelatedByParentpublicationId !== null) {
-                if (!$this->aPublicationRelatedByParentpublicationId->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aPublicationRelatedByParentpublicationId->getValidationFailures());
+            if ($this->aPublication !== null) {
+                if (!$this->aPublication->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aPublication->getValidationFailures());
                 }
             }
 
@@ -956,21 +885,18 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
                 return $this->getPublicationId();
                 break;
             case 2:
-                return $this->getParentpublicationId();
-                break;
-            case 3:
                 return $this->getVolumedescription();
                 break;
-            case 4:
+            case 3:
                 return $this->getVolumenumeric();
                 break;
-            case 5:
+            case 4:
                 return $this->getVolumestotal();
                 break;
-            case 6:
+            case 5:
                 return $this->getCreatedAt();
                 break;
-            case 7:
+            case 6:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1004,12 +930,11 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getPublicationId(),
-            $keys[2] => $this->getParentpublicationId(),
-            $keys[3] => $this->getVolumedescription(),
-            $keys[4] => $this->getVolumenumeric(),
-            $keys[5] => $this->getVolumestotal(),
-            $keys[6] => $this->getCreatedAt(),
-            $keys[7] => $this->getUpdatedAt(),
+            $keys[2] => $this->getVolumedescription(),
+            $keys[3] => $this->getVolumenumeric(),
+            $keys[4] => $this->getVolumestotal(),
+            $keys[5] => $this->getCreatedAt(),
+            $keys[6] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1017,11 +942,8 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aPublicationRelatedByPublicationId) {
-                $result['PublicationRelatedByPublicationId'] = $this->aPublicationRelatedByPublicationId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->aPublicationRelatedByParentpublicationId) {
-                $result['PublicationRelatedByParentpublicationId'] = $this->aPublicationRelatedByParentpublicationId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aPublication) {
+                $result['Publication'] = $this->aPublication->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1064,21 +986,18 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
                 $this->setPublicationId($value);
                 break;
             case 2:
-                $this->setParentpublicationId($value);
-                break;
-            case 3:
                 $this->setVolumedescription($value);
                 break;
-            case 4:
+            case 3:
                 $this->setVolumenumeric($value);
                 break;
-            case 5:
+            case 4:
                 $this->setVolumestotal($value);
                 break;
-            case 6:
+            case 5:
                 $this->setCreatedAt($value);
                 break;
-            case 7:
+            case 6:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1107,12 +1026,11 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setPublicationId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setParentpublicationId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setVolumedescription($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setVolumenumeric($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setVolumestotal($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
+        if (array_key_exists($keys[2], $arr)) $this->setVolumedescription($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setVolumenumeric($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setVolumestotal($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
     }
 
     /**
@@ -1126,7 +1044,6 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
 
         if ($this->isColumnModified(VolumePeer::ID)) $criteria->add(VolumePeer::ID, $this->id);
         if ($this->isColumnModified(VolumePeer::PUBLICATION_ID)) $criteria->add(VolumePeer::PUBLICATION_ID, $this->publication_id);
-        if ($this->isColumnModified(VolumePeer::PARENTPUBLICATION_ID)) $criteria->add(VolumePeer::PARENTPUBLICATION_ID, $this->parentpublication_id);
         if ($this->isColumnModified(VolumePeer::VOLUMEDESCRIPTION)) $criteria->add(VolumePeer::VOLUMEDESCRIPTION, $this->volumedescription);
         if ($this->isColumnModified(VolumePeer::VOLUMENUMERIC)) $criteria->add(VolumePeer::VOLUMENUMERIC, $this->volumenumeric);
         if ($this->isColumnModified(VolumePeer::VOLUMESTOTAL)) $criteria->add(VolumePeer::VOLUMESTOTAL, $this->volumestotal);
@@ -1196,7 +1113,6 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setPublicationId($this->getPublicationId());
-        $copyObj->setParentpublicationId($this->getParentpublicationId());
         $copyObj->setVolumedescription($this->getVolumedescription());
         $copyObj->setVolumenumeric($this->getVolumenumeric());
         $copyObj->setVolumestotal($this->getVolumestotal());
@@ -1267,7 +1183,7 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
      * @return Volume The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setPublicationRelatedByPublicationId(Publication $v = null)
+    public function setPublication(Publication $v = null)
     {
         if ($v === null) {
             $this->setPublicationId(NULL);
@@ -1275,12 +1191,12 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
             $this->setPublicationId($v->getId());
         }
 
-        $this->aPublicationRelatedByPublicationId = $v;
+        $this->aPublication = $v;
 
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the Publication object, it will not be re-added.
         if ($v !== null) {
-            $v->addVolumeRelatedByPublicationId($this);
+            $v->addVolume($this);
         }
 
 
@@ -1296,72 +1212,20 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
      * @return Publication The associated Publication object.
      * @throws PropelException
      */
-    public function getPublicationRelatedByPublicationId(PropelPDO $con = null, $doQuery = true)
+    public function getPublication(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aPublicationRelatedByPublicationId === null && ($this->publication_id !== null) && $doQuery) {
-            $this->aPublicationRelatedByPublicationId = PublicationQuery::create()->findPk($this->publication_id, $con);
+        if ($this->aPublication === null && ($this->publication_id !== null) && $doQuery) {
+            $this->aPublication = PublicationQuery::create()->findPk($this->publication_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aPublicationRelatedByPublicationId->addVolumesRelatedByPublicationId($this);
+                $this->aPublication->addVolumes($this);
              */
         }
 
-        return $this->aPublicationRelatedByPublicationId;
-    }
-
-    /**
-     * Declares an association between this object and a Publication object.
-     *
-     * @param                  Publication $v
-     * @return Volume The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setPublicationRelatedByParentpublicationId(Publication $v = null)
-    {
-        if ($v === null) {
-            $this->setParentpublicationId(NULL);
-        } else {
-            $this->setParentpublicationId($v->getId());
-        }
-
-        $this->aPublicationRelatedByParentpublicationId = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Publication object, it will not be re-added.
-        if ($v !== null) {
-            $v->addVolumeRelatedByParentpublicationId($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated Publication object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @param $doQuery Executes a query to get the object if required
-     * @return Publication The associated Publication object.
-     * @throws PropelException
-     */
-    public function getPublicationRelatedByParentpublicationId(PropelPDO $con = null, $doQuery = true)
-    {
-        if ($this->aPublicationRelatedByParentpublicationId === null && ($this->parentpublication_id !== null) && $doQuery) {
-            $this->aPublicationRelatedByParentpublicationId = PublicationQuery::create()->findPk($this->parentpublication_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aPublicationRelatedByParentpublicationId->addVolumesRelatedByParentpublicationId($this);
-             */
-        }
-
-        return $this->aPublicationRelatedByParentpublicationId;
+        return $this->aPublication;
     }
 
     /**
@@ -1371,7 +1235,6 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
     {
         $this->id = null;
         $this->publication_id = null;
-        $this->parentpublication_id = null;
         $this->volumedescription = null;
         $this->volumenumeric = null;
         $this->volumestotal = null;
@@ -1399,18 +1262,14 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
-            if ($this->aPublicationRelatedByPublicationId instanceof Persistent) {
-              $this->aPublicationRelatedByPublicationId->clearAllReferences($deep);
-            }
-            if ($this->aPublicationRelatedByParentpublicationId instanceof Persistent) {
-              $this->aPublicationRelatedByParentpublicationId->clearAllReferences($deep);
+            if ($this->aPublication instanceof Persistent) {
+              $this->aPublication->clearAllReferences($deep);
             }
 
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
-        $this->aPublicationRelatedByPublicationId = null;
-        $this->aPublicationRelatedByParentpublicationId = null;
+        $this->aPublication = null;
     }
 
     /**

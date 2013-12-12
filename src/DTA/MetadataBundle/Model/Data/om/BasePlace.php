@@ -1518,11 +1518,11 @@ abstract class BasePlace extends BaseObject implements Persistent, \DTA\Metadata
     /**
      * return the string representation of this object
      *
-     * @return string
+     * @return string The value of the 'name' column
      */
     public function __toString()
     {
-        return (string) $this->exportTo(PlacePeer::DEFAULT_STRING_FORMAT);
+        return (string) $this->getName();
     }
 
     /**

@@ -45,6 +45,7 @@ class LicenseTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('name', 'Name', 'LONGVARCHAR', true, null, null);
+        $this->getColumn('name', false)->setPrimaryString(true);
         $this->addColumn('url', 'Url', 'LONGVARCHAR', false, null, null);
         $this->addColumn('applicable_to_image', 'ApplicableToImage', 'BOOLEAN', true, null, false);
         $this->addColumn('applicable_to_text', 'ApplicableToText', 'BOOLEAN', true, null, false);

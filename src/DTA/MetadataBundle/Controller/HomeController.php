@@ -24,6 +24,14 @@ class HomeController extends ORMController {
     
     public function indexAction(Request $request) {
 
+//        $s = new Model\Master\SequenceEntry();
+//        $s->setSequencetype(Model\Master\SequenceEntryPeer::SEQUENCETYPE_SERIES)
+//                ->setPublicationId(17001);
+//        $s->save();
+        
+//        $se = Model\Data\PublicationQuery::create()->findOneById(17000)->getSequenceEntries()->getFirst();
+//        $se2 = Model\Master\SequenceEntryQuery::create()->findList($se->getScopeValue());
+
 //        try {
 //            $title = new Model\Data\Title();
 //            $title->save();
@@ -66,6 +74,7 @@ class HomeController extends ORMController {
 //        Model\Data\PersonalnameQuery::create()->filterByNamefragment($personalName->getRepresentativePersonalName()->getNamefragments())->find();
         return $this->renderWithDomainData('DTAMetadataBundle:Home:index.html.twig', array(
             'testData' => 
+//            $se2
 //            $queryClass
 //            $queryConstructionString
              NULL

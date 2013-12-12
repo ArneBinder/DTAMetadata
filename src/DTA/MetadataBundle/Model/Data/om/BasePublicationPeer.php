@@ -35,16 +35,19 @@ abstract class BasePublicationPeer
     const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Data\\map\\PublicationTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 29;
+    const NUM_COLUMNS = 33;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 29;
+    const NUM_HYDRATE_COLUMNS = 33;
 
     /** the column name for the id field */
     const ID = 'publication.id';
+
+    /** the column name for the type field */
+    const TYPE = 'publication.type';
 
     /** the column name for the title_id field */
     const TITLE_ID = 'publication.title_id';
@@ -72,9 +75,6 @@ abstract class BasePublicationPeer
 
     /** the column name for the legacysubgenre field */
     const LEGACYSUBGENRE = 'publication.legacysubgenre';
-
-    /** the column name for the type field */
-    const TYPE = 'publication.type';
 
     /** the column name for the dirname field */
     const DIRNAME = 'publication.dirname';
@@ -121,6 +121,18 @@ abstract class BasePublicationPeer
     /** the column name for the last_changed_by_user_id field */
     const LAST_CHANGED_BY_USER_ID = 'publication.last_changed_by_user_id';
 
+    /** the column name for the tree_id field */
+    const TREE_ID = 'publication.tree_id';
+
+    /** the column name for the tree_left field */
+    const TREE_LEFT = 'publication.tree_left';
+
+    /** the column name for the tree_right field */
+    const TREE_RIGHT = 'publication.tree_right';
+
+    /** the column name for the tree_level field */
+    const TREE_LEVEL = 'publication.tree_level';
+
     /** the column name for the publishingcompany_id_is_reconstructed field */
     const PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED = 'publication.publishingcompany_id_is_reconstructed';
 
@@ -129,6 +141,14 @@ abstract class BasePublicationPeer
 
     /** the column name for the updated_at field */
     const UPDATED_AT = 'publication.updated_at';
+
+    /** The enumerated values for the type field */
+    const TYPE_BOOK = 'BOOK';
+    const TYPE_VOLUME = 'VOLUME';
+    const TYPE_MULTIVOLUME = 'MULTIVOLUME';
+    const TYPE_CHAPTER = 'CHAPTER';
+    const TYPE_JOURNAL = 'JOURNAL';
+    const TYPE_ARTICLE = 'ARTICLE';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -142,6 +162,23 @@ abstract class BasePublicationPeer
     public static $instances = array();
 
 
+    // nested_set behavior
+
+    /**
+     * Left column for the set
+     */
+    const LEFT_COL = 'publication.tree_left';
+
+    /**
+     * Right column for the set
+     */
+    const RIGHT_COL = 'publication.tree_right';
+
+    /**
+     * Level column for the set
+     */
+    const LEVEL_COL = 'publication.tree_level';
+
     /**
      * holds an array of fieldnames
      *
@@ -149,12 +186,12 @@ abstract class BasePublicationPeer
      * e.g. PublicationPeer::$fieldNames[PublicationPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'TitleId', 'FirsteditionpublicationId', 'PlaceId', 'PublicationdateId', 'CreationdateId', 'PublishingcompanyId', 'SourceId', 'Legacygenre', 'Legacysubgenre', 'Type', 'Dirname', 'UsedcopylocationId', 'PartnerId', 'Editiondescription', 'Digitaleditioneditor', 'Transcriptioncomment', 'Numpages', 'Numpagesnumeric', 'Comment', 'EncodingComment', 'Doi', 'Format', 'Directoryname', 'Wwwready', 'LastChangedByUserId', 'PublishingcompanyIdIsReconstructed', 'CreatedAt', 'UpdatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'titleId', 'firsteditionpublicationId', 'placeId', 'publicationdateId', 'creationdateId', 'publishingcompanyId', 'sourceId', 'legacygenre', 'legacysubgenre', 'type', 'dirname', 'usedcopylocationId', 'partnerId', 'editiondescription', 'digitaleditioneditor', 'transcriptioncomment', 'numpages', 'numpagesnumeric', 'comment', 'encodingComment', 'doi', 'format', 'directoryname', 'wwwready', 'lastChangedByUserId', 'publishingcompanyIdIsReconstructed', 'createdAt', 'updatedAt', ),
-        BasePeer::TYPE_COLNAME => array (PublicationPeer::ID, PublicationPeer::TITLE_ID, PublicationPeer::FIRSTEDITIONPUBLICATION_ID, PublicationPeer::PLACE_ID, PublicationPeer::PUBLICATIONDATE_ID, PublicationPeer::CREATIONDATE_ID, PublicationPeer::PUBLISHINGCOMPANY_ID, PublicationPeer::SOURCE_ID, PublicationPeer::LEGACYGENRE, PublicationPeer::LEGACYSUBGENRE, PublicationPeer::TYPE, PublicationPeer::DIRNAME, PublicationPeer::USEDCOPYLOCATION_ID, PublicationPeer::PARTNER_ID, PublicationPeer::EDITIONDESCRIPTION, PublicationPeer::DIGITALEDITIONEDITOR, PublicationPeer::TRANSCRIPTIONCOMMENT, PublicationPeer::NUMPAGES, PublicationPeer::NUMPAGESNUMERIC, PublicationPeer::COMMENT, PublicationPeer::ENCODING_COMMENT, PublicationPeer::DOI, PublicationPeer::FORMAT, PublicationPeer::DIRECTORYNAME, PublicationPeer::WWWREADY, PublicationPeer::LAST_CHANGED_BY_USER_ID, PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED, PublicationPeer::CREATED_AT, PublicationPeer::UPDATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TITLE_ID', 'FIRSTEDITIONPUBLICATION_ID', 'PLACE_ID', 'PUBLICATIONDATE_ID', 'CREATIONDATE_ID', 'PUBLISHINGCOMPANY_ID', 'SOURCE_ID', 'LEGACYGENRE', 'LEGACYSUBGENRE', 'TYPE', 'DIRNAME', 'USEDCOPYLOCATION_ID', 'PARTNER_ID', 'EDITIONDESCRIPTION', 'DIGITALEDITIONEDITOR', 'TRANSCRIPTIONCOMMENT', 'NUMPAGES', 'NUMPAGESNUMERIC', 'COMMENT', 'ENCODING_COMMENT', 'DOI', 'FORMAT', 'DIRECTORYNAME', 'WWWREADY', 'LAST_CHANGED_BY_USER_ID', 'PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED', 'CREATED_AT', 'UPDATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'title_id', 'firsteditionpublication_id', 'place_id', 'publicationdate_id', 'creationdate_id', 'publishingcompany_id', 'source_id', 'legacygenre', 'legacysubgenre', 'type', 'dirname', 'usedcopylocation_id', 'partner_id', 'editiondescription', 'digitaleditioneditor', 'transcriptioncomment', 'numpages', 'numpagesnumeric', 'comment', 'encoding_comment', 'doi', 'format', 'directoryname', 'wwwready', 'last_changed_by_user_id', 'publishingcompany_id_is_reconstructed', 'created_at', 'updated_at', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Type', 'TitleId', 'FirsteditionpublicationId', 'PlaceId', 'PublicationdateId', 'CreationdateId', 'PublishingcompanyId', 'SourceId', 'Legacygenre', 'Legacysubgenre', 'Dirname', 'UsedcopylocationId', 'PartnerId', 'Editiondescription', 'Digitaleditioneditor', 'Transcriptioncomment', 'Numpages', 'Numpagesnumeric', 'Comment', 'EncodingComment', 'Doi', 'Format', 'Directoryname', 'Wwwready', 'LastChangedByUserId', 'TreeId', 'TreeLeft', 'TreeRight', 'TreeLevel', 'PublishingcompanyIdIsReconstructed', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'type', 'titleId', 'firsteditionpublicationId', 'placeId', 'publicationdateId', 'creationdateId', 'publishingcompanyId', 'sourceId', 'legacygenre', 'legacysubgenre', 'dirname', 'usedcopylocationId', 'partnerId', 'editiondescription', 'digitaleditioneditor', 'transcriptioncomment', 'numpages', 'numpagesnumeric', 'comment', 'encodingComment', 'doi', 'format', 'directoryname', 'wwwready', 'lastChangedByUserId', 'treeId', 'treeLeft', 'treeRight', 'treeLevel', 'publishingcompanyIdIsReconstructed', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (PublicationPeer::ID, PublicationPeer::TYPE, PublicationPeer::TITLE_ID, PublicationPeer::FIRSTEDITIONPUBLICATION_ID, PublicationPeer::PLACE_ID, PublicationPeer::PUBLICATIONDATE_ID, PublicationPeer::CREATIONDATE_ID, PublicationPeer::PUBLISHINGCOMPANY_ID, PublicationPeer::SOURCE_ID, PublicationPeer::LEGACYGENRE, PublicationPeer::LEGACYSUBGENRE, PublicationPeer::DIRNAME, PublicationPeer::USEDCOPYLOCATION_ID, PublicationPeer::PARTNER_ID, PublicationPeer::EDITIONDESCRIPTION, PublicationPeer::DIGITALEDITIONEDITOR, PublicationPeer::TRANSCRIPTIONCOMMENT, PublicationPeer::NUMPAGES, PublicationPeer::NUMPAGESNUMERIC, PublicationPeer::COMMENT, PublicationPeer::ENCODING_COMMENT, PublicationPeer::DOI, PublicationPeer::FORMAT, PublicationPeer::DIRECTORYNAME, PublicationPeer::WWWREADY, PublicationPeer::LAST_CHANGED_BY_USER_ID, PublicationPeer::TREE_ID, PublicationPeer::TREE_LEFT, PublicationPeer::TREE_RIGHT, PublicationPeer::TREE_LEVEL, PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED, PublicationPeer::CREATED_AT, PublicationPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TYPE', 'TITLE_ID', 'FIRSTEDITIONPUBLICATION_ID', 'PLACE_ID', 'PUBLICATIONDATE_ID', 'CREATIONDATE_ID', 'PUBLISHINGCOMPANY_ID', 'SOURCE_ID', 'LEGACYGENRE', 'LEGACYSUBGENRE', 'DIRNAME', 'USEDCOPYLOCATION_ID', 'PARTNER_ID', 'EDITIONDESCRIPTION', 'DIGITALEDITIONEDITOR', 'TRANSCRIPTIONCOMMENT', 'NUMPAGES', 'NUMPAGESNUMERIC', 'COMMENT', 'ENCODING_COMMENT', 'DOI', 'FORMAT', 'DIRECTORYNAME', 'WWWREADY', 'LAST_CHANGED_BY_USER_ID', 'TREE_ID', 'TREE_LEFT', 'TREE_RIGHT', 'TREE_LEVEL', 'PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'type', 'title_id', 'firsteditionpublication_id', 'place_id', 'publicationdate_id', 'creationdate_id', 'publishingcompany_id', 'source_id', 'legacygenre', 'legacysubgenre', 'dirname', 'usedcopylocation_id', 'partner_id', 'editiondescription', 'digitaleditioneditor', 'transcriptioncomment', 'numpages', 'numpagesnumeric', 'comment', 'encoding_comment', 'doi', 'format', 'directoryname', 'wwwready', 'last_changed_by_user_id', 'tree_id', 'tree_left', 'tree_right', 'tree_level', 'publishingcompany_id_is_reconstructed', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, )
     );
 
     /**
@@ -164,12 +201,24 @@ abstract class BasePublicationPeer
      * e.g. PublicationPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'TitleId' => 1, 'FirsteditionpublicationId' => 2, 'PlaceId' => 3, 'PublicationdateId' => 4, 'CreationdateId' => 5, 'PublishingcompanyId' => 6, 'SourceId' => 7, 'Legacygenre' => 8, 'Legacysubgenre' => 9, 'Type' => 10, 'Dirname' => 11, 'UsedcopylocationId' => 12, 'PartnerId' => 13, 'Editiondescription' => 14, 'Digitaleditioneditor' => 15, 'Transcriptioncomment' => 16, 'Numpages' => 17, 'Numpagesnumeric' => 18, 'Comment' => 19, 'EncodingComment' => 20, 'Doi' => 21, 'Format' => 22, 'Directoryname' => 23, 'Wwwready' => 24, 'LastChangedByUserId' => 25, 'PublishingcompanyIdIsReconstructed' => 26, 'CreatedAt' => 27, 'UpdatedAt' => 28, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'titleId' => 1, 'firsteditionpublicationId' => 2, 'placeId' => 3, 'publicationdateId' => 4, 'creationdateId' => 5, 'publishingcompanyId' => 6, 'sourceId' => 7, 'legacygenre' => 8, 'legacysubgenre' => 9, 'type' => 10, 'dirname' => 11, 'usedcopylocationId' => 12, 'partnerId' => 13, 'editiondescription' => 14, 'digitaleditioneditor' => 15, 'transcriptioncomment' => 16, 'numpages' => 17, 'numpagesnumeric' => 18, 'comment' => 19, 'encodingComment' => 20, 'doi' => 21, 'format' => 22, 'directoryname' => 23, 'wwwready' => 24, 'lastChangedByUserId' => 25, 'publishingcompanyIdIsReconstructed' => 26, 'createdAt' => 27, 'updatedAt' => 28, ),
-        BasePeer::TYPE_COLNAME => array (PublicationPeer::ID => 0, PublicationPeer::TITLE_ID => 1, PublicationPeer::FIRSTEDITIONPUBLICATION_ID => 2, PublicationPeer::PLACE_ID => 3, PublicationPeer::PUBLICATIONDATE_ID => 4, PublicationPeer::CREATIONDATE_ID => 5, PublicationPeer::PUBLISHINGCOMPANY_ID => 6, PublicationPeer::SOURCE_ID => 7, PublicationPeer::LEGACYGENRE => 8, PublicationPeer::LEGACYSUBGENRE => 9, PublicationPeer::TYPE => 10, PublicationPeer::DIRNAME => 11, PublicationPeer::USEDCOPYLOCATION_ID => 12, PublicationPeer::PARTNER_ID => 13, PublicationPeer::EDITIONDESCRIPTION => 14, PublicationPeer::DIGITALEDITIONEDITOR => 15, PublicationPeer::TRANSCRIPTIONCOMMENT => 16, PublicationPeer::NUMPAGES => 17, PublicationPeer::NUMPAGESNUMERIC => 18, PublicationPeer::COMMENT => 19, PublicationPeer::ENCODING_COMMENT => 20, PublicationPeer::DOI => 21, PublicationPeer::FORMAT => 22, PublicationPeer::DIRECTORYNAME => 23, PublicationPeer::WWWREADY => 24, PublicationPeer::LAST_CHANGED_BY_USER_ID => 25, PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED => 26, PublicationPeer::CREATED_AT => 27, PublicationPeer::UPDATED_AT => 28, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TITLE_ID' => 1, 'FIRSTEDITIONPUBLICATION_ID' => 2, 'PLACE_ID' => 3, 'PUBLICATIONDATE_ID' => 4, 'CREATIONDATE_ID' => 5, 'PUBLISHINGCOMPANY_ID' => 6, 'SOURCE_ID' => 7, 'LEGACYGENRE' => 8, 'LEGACYSUBGENRE' => 9, 'TYPE' => 10, 'DIRNAME' => 11, 'USEDCOPYLOCATION_ID' => 12, 'PARTNER_ID' => 13, 'EDITIONDESCRIPTION' => 14, 'DIGITALEDITIONEDITOR' => 15, 'TRANSCRIPTIONCOMMENT' => 16, 'NUMPAGES' => 17, 'NUMPAGESNUMERIC' => 18, 'COMMENT' => 19, 'ENCODING_COMMENT' => 20, 'DOI' => 21, 'FORMAT' => 22, 'DIRECTORYNAME' => 23, 'WWWREADY' => 24, 'LAST_CHANGED_BY_USER_ID' => 25, 'PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED' => 26, 'CREATED_AT' => 27, 'UPDATED_AT' => 28, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'title_id' => 1, 'firsteditionpublication_id' => 2, 'place_id' => 3, 'publicationdate_id' => 4, 'creationdate_id' => 5, 'publishingcompany_id' => 6, 'source_id' => 7, 'legacygenre' => 8, 'legacysubgenre' => 9, 'type' => 10, 'dirname' => 11, 'usedcopylocation_id' => 12, 'partner_id' => 13, 'editiondescription' => 14, 'digitaleditioneditor' => 15, 'transcriptioncomment' => 16, 'numpages' => 17, 'numpagesnumeric' => 18, 'comment' => 19, 'encoding_comment' => 20, 'doi' => 21, 'format' => 22, 'directoryname' => 23, 'wwwready' => 24, 'last_changed_by_user_id' => 25, 'publishingcompany_id_is_reconstructed' => 26, 'created_at' => 27, 'updated_at' => 28, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Type' => 1, 'TitleId' => 2, 'FirsteditionpublicationId' => 3, 'PlaceId' => 4, 'PublicationdateId' => 5, 'CreationdateId' => 6, 'PublishingcompanyId' => 7, 'SourceId' => 8, 'Legacygenre' => 9, 'Legacysubgenre' => 10, 'Dirname' => 11, 'UsedcopylocationId' => 12, 'PartnerId' => 13, 'Editiondescription' => 14, 'Digitaleditioneditor' => 15, 'Transcriptioncomment' => 16, 'Numpages' => 17, 'Numpagesnumeric' => 18, 'Comment' => 19, 'EncodingComment' => 20, 'Doi' => 21, 'Format' => 22, 'Directoryname' => 23, 'Wwwready' => 24, 'LastChangedByUserId' => 25, 'TreeId' => 26, 'TreeLeft' => 27, 'TreeRight' => 28, 'TreeLevel' => 29, 'PublishingcompanyIdIsReconstructed' => 30, 'CreatedAt' => 31, 'UpdatedAt' => 32, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'type' => 1, 'titleId' => 2, 'firsteditionpublicationId' => 3, 'placeId' => 4, 'publicationdateId' => 5, 'creationdateId' => 6, 'publishingcompanyId' => 7, 'sourceId' => 8, 'legacygenre' => 9, 'legacysubgenre' => 10, 'dirname' => 11, 'usedcopylocationId' => 12, 'partnerId' => 13, 'editiondescription' => 14, 'digitaleditioneditor' => 15, 'transcriptioncomment' => 16, 'numpages' => 17, 'numpagesnumeric' => 18, 'comment' => 19, 'encodingComment' => 20, 'doi' => 21, 'format' => 22, 'directoryname' => 23, 'wwwready' => 24, 'lastChangedByUserId' => 25, 'treeId' => 26, 'treeLeft' => 27, 'treeRight' => 28, 'treeLevel' => 29, 'publishingcompanyIdIsReconstructed' => 30, 'createdAt' => 31, 'updatedAt' => 32, ),
+        BasePeer::TYPE_COLNAME => array (PublicationPeer::ID => 0, PublicationPeer::TYPE => 1, PublicationPeer::TITLE_ID => 2, PublicationPeer::FIRSTEDITIONPUBLICATION_ID => 3, PublicationPeer::PLACE_ID => 4, PublicationPeer::PUBLICATIONDATE_ID => 5, PublicationPeer::CREATIONDATE_ID => 6, PublicationPeer::PUBLISHINGCOMPANY_ID => 7, PublicationPeer::SOURCE_ID => 8, PublicationPeer::LEGACYGENRE => 9, PublicationPeer::LEGACYSUBGENRE => 10, PublicationPeer::DIRNAME => 11, PublicationPeer::USEDCOPYLOCATION_ID => 12, PublicationPeer::PARTNER_ID => 13, PublicationPeer::EDITIONDESCRIPTION => 14, PublicationPeer::DIGITALEDITIONEDITOR => 15, PublicationPeer::TRANSCRIPTIONCOMMENT => 16, PublicationPeer::NUMPAGES => 17, PublicationPeer::NUMPAGESNUMERIC => 18, PublicationPeer::COMMENT => 19, PublicationPeer::ENCODING_COMMENT => 20, PublicationPeer::DOI => 21, PublicationPeer::FORMAT => 22, PublicationPeer::DIRECTORYNAME => 23, PublicationPeer::WWWREADY => 24, PublicationPeer::LAST_CHANGED_BY_USER_ID => 25, PublicationPeer::TREE_ID => 26, PublicationPeer::TREE_LEFT => 27, PublicationPeer::TREE_RIGHT => 28, PublicationPeer::TREE_LEVEL => 29, PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED => 30, PublicationPeer::CREATED_AT => 31, PublicationPeer::UPDATED_AT => 32, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TYPE' => 1, 'TITLE_ID' => 2, 'FIRSTEDITIONPUBLICATION_ID' => 3, 'PLACE_ID' => 4, 'PUBLICATIONDATE_ID' => 5, 'CREATIONDATE_ID' => 6, 'PUBLISHINGCOMPANY_ID' => 7, 'SOURCE_ID' => 8, 'LEGACYGENRE' => 9, 'LEGACYSUBGENRE' => 10, 'DIRNAME' => 11, 'USEDCOPYLOCATION_ID' => 12, 'PARTNER_ID' => 13, 'EDITIONDESCRIPTION' => 14, 'DIGITALEDITIONEDITOR' => 15, 'TRANSCRIPTIONCOMMENT' => 16, 'NUMPAGES' => 17, 'NUMPAGESNUMERIC' => 18, 'COMMENT' => 19, 'ENCODING_COMMENT' => 20, 'DOI' => 21, 'FORMAT' => 22, 'DIRECTORYNAME' => 23, 'WWWREADY' => 24, 'LAST_CHANGED_BY_USER_ID' => 25, 'TREE_ID' => 26, 'TREE_LEFT' => 27, 'TREE_RIGHT' => 28, 'TREE_LEVEL' => 29, 'PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED' => 30, 'CREATED_AT' => 31, 'UPDATED_AT' => 32, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'type' => 1, 'title_id' => 2, 'firsteditionpublication_id' => 3, 'place_id' => 4, 'publicationdate_id' => 5, 'creationdate_id' => 6, 'publishingcompany_id' => 7, 'source_id' => 8, 'legacygenre' => 9, 'legacysubgenre' => 10, 'dirname' => 11, 'usedcopylocation_id' => 12, 'partner_id' => 13, 'editiondescription' => 14, 'digitaleditioneditor' => 15, 'transcriptioncomment' => 16, 'numpages' => 17, 'numpagesnumeric' => 18, 'comment' => 19, 'encoding_comment' => 20, 'doi' => 21, 'format' => 22, 'directoryname' => 23, 'wwwready' => 24, 'last_changed_by_user_id' => 25, 'tree_id' => 26, 'tree_left' => 27, 'tree_right' => 28, 'tree_level' => 29, 'publishingcompany_id_is_reconstructed' => 30, 'created_at' => 31, 'updated_at' => 32, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, )
+    );
+
+    /** The enumerated values for this table */
+    protected static $enumValueSets = array(
+        PublicationPeer::TYPE => array(
+            PublicationPeer::TYPE_BOOK,
+            PublicationPeer::TYPE_VOLUME,
+            PublicationPeer::TYPE_MULTIVOLUME,
+            PublicationPeer::TYPE_CHAPTER,
+            PublicationPeer::TYPE_JOURNAL,
+            PublicationPeer::TYPE_ARTICLE,
+        ),
     );
 
     /**
@@ -212,6 +261,51 @@ abstract class BasePublicationPeer
     }
 
     /**
+     * Gets the list of values for all ENUM columns
+     * @return array
+     */
+    public static function getValueSets()
+    {
+      return PublicationPeer::$enumValueSets;
+    }
+
+    /**
+     * Gets the list of values for an ENUM column
+     *
+     * @param string $colname The ENUM column name.
+     *
+     * @return array list of possible values for the column
+     */
+    public static function getValueSet($colname)
+    {
+        $valueSets = PublicationPeer::getValueSets();
+
+        if (!isset($valueSets[$colname])) {
+            throw new PropelException(sprintf('Column "%s" has no ValueSet.', $colname));
+        }
+
+        return $valueSets[$colname];
+    }
+
+    /**
+     * Gets the SQL value for the ENUM column value
+     *
+     * @param string $colname ENUM column name.
+     * @param string $enumVal ENUM value.
+     *
+     * @return int SQL value
+     */
+    public static function getSqlValueForEnum($colname, $enumVal)
+    {
+        $values = PublicationPeer::getValueSet($colname);
+        if (!in_array($enumVal, $values)) {
+            throw new PropelException(sprintf('Value "%s" is not accepted in this enumerated column', $colname));
+        }
+
+        return array_search($enumVal, $values);
+    }
+
+    /**
      * Convenience method which changes table.column to alias.column.
      *
      * Using this method you can maintain SQL abstraction while using column aliases.
@@ -244,6 +338,7 @@ abstract class BasePublicationPeer
     {
         if (null === $alias) {
             $criteria->addSelectColumn(PublicationPeer::ID);
+            $criteria->addSelectColumn(PublicationPeer::TYPE);
             $criteria->addSelectColumn(PublicationPeer::TITLE_ID);
             $criteria->addSelectColumn(PublicationPeer::FIRSTEDITIONPUBLICATION_ID);
             $criteria->addSelectColumn(PublicationPeer::PLACE_ID);
@@ -253,7 +348,6 @@ abstract class BasePublicationPeer
             $criteria->addSelectColumn(PublicationPeer::SOURCE_ID);
             $criteria->addSelectColumn(PublicationPeer::LEGACYGENRE);
             $criteria->addSelectColumn(PublicationPeer::LEGACYSUBGENRE);
-            $criteria->addSelectColumn(PublicationPeer::TYPE);
             $criteria->addSelectColumn(PublicationPeer::DIRNAME);
             $criteria->addSelectColumn(PublicationPeer::USEDCOPYLOCATION_ID);
             $criteria->addSelectColumn(PublicationPeer::PARTNER_ID);
@@ -269,11 +363,16 @@ abstract class BasePublicationPeer
             $criteria->addSelectColumn(PublicationPeer::DIRECTORYNAME);
             $criteria->addSelectColumn(PublicationPeer::WWWREADY);
             $criteria->addSelectColumn(PublicationPeer::LAST_CHANGED_BY_USER_ID);
+            $criteria->addSelectColumn(PublicationPeer::TREE_ID);
+            $criteria->addSelectColumn(PublicationPeer::TREE_LEFT);
+            $criteria->addSelectColumn(PublicationPeer::TREE_RIGHT);
+            $criteria->addSelectColumn(PublicationPeer::TREE_LEVEL);
             $criteria->addSelectColumn(PublicationPeer::PUBLISHINGCOMPANY_ID_IS_RECONSTRUCTED);
             $criteria->addSelectColumn(PublicationPeer::CREATED_AT);
             $criteria->addSelectColumn(PublicationPeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.type');
             $criteria->addSelectColumn($alias . '.title_id');
             $criteria->addSelectColumn($alias . '.firsteditionpublication_id');
             $criteria->addSelectColumn($alias . '.place_id');
@@ -283,7 +382,6 @@ abstract class BasePublicationPeer
             $criteria->addSelectColumn($alias . '.source_id');
             $criteria->addSelectColumn($alias . '.legacygenre');
             $criteria->addSelectColumn($alias . '.legacysubgenre');
-            $criteria->addSelectColumn($alias . '.type');
             $criteria->addSelectColumn($alias . '.dirname');
             $criteria->addSelectColumn($alias . '.usedcopylocation_id');
             $criteria->addSelectColumn($alias . '.partner_id');
@@ -299,6 +397,10 @@ abstract class BasePublicationPeer
             $criteria->addSelectColumn($alias . '.directoryname');
             $criteria->addSelectColumn($alias . '.wwwready');
             $criteria->addSelectColumn($alias . '.last_changed_by_user_id');
+            $criteria->addSelectColumn($alias . '.tree_id');
+            $criteria->addSelectColumn($alias . '.tree_left');
+            $criteria->addSelectColumn($alias . '.tree_right');
+            $criteria->addSelectColumn($alias . '.tree_level');
             $criteria->addSelectColumn($alias . '.publishingcompany_id_is_reconstructed');
             $criteria->addSelectColumn($alias . '.created_at');
             $criteria->addSelectColumn($alias . '.updated_at');
@@ -600,6 +702,17 @@ abstract class BasePublicationPeer
         }
 
         return array($obj, $col);
+    }
+
+    /**
+     * Gets the SQL value for Type ENUM value
+     *
+     * @param  string $enumVal ENUM value to get SQL value for
+     * @return int SQL value
+     */
+    public static function getTypeSqlValue($enumVal)
+    {
+        return PublicationPeer::getSqlValueForEnum(PublicationPeer::TYPE, $enumVal);
     }
 
 
@@ -3722,6 +3835,253 @@ abstract class BasePublicationPeer
         }
 
         return $objs;
+    }
+
+    // nested_set behavior
+
+    /**
+     * Returns the root node for a given scope
+     *
+     * @param      PropelPDO $con	Connection to use.
+     * @return     Publication			Propel object for root node
+     */
+    public static function retrieveRoot(PropelPDO $con = null)
+    {
+        $c = new Criteria(PublicationPeer::DATABASE_NAME);
+        $c->add(PublicationPeer::LEFT_COL, 1, Criteria::EQUAL);
+
+        return PublicationPeer::doSelectOne($c, $con);
+    }
+
+    /**
+     * Returns the whole tree node for a given scope
+     *
+     * @param      Criteria $criteria	Optional Criteria to filter the query
+     * @param      PropelPDO $con	Connection to use.
+     * @return     Publication			Propel object for root node
+     */
+    public static function retrieveTree(Criteria $criteria = null, PropelPDO $con = null)
+    {
+        if ($criteria === null) {
+            $criteria = new Criteria(PublicationPeer::DATABASE_NAME);
+        }
+        $criteria->addAscendingOrderByColumn(PublicationPeer::LEFT_COL);
+
+        return PublicationPeer::doSelect($criteria, $con);
+    }
+
+    /**
+     * Tests if node is valid
+     *
+     * @param      Publication $node	Propel object for src node
+     * @return     bool
+     */
+    public static function isValid(Publication $node = null)
+    {
+        if (is_object($node) && $node->getRightValue() > $node->getLeftValue()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Delete an entire tree
+     *
+     * @param      PropelPDO $con	Connection to use.
+     *
+     * @return     int  The number of deleted nodes
+     */
+    public static function deleteTree(PropelPDO $con = null)
+    {
+
+        return PublicationPeer::doDeleteAll($con);
+    }
+
+    /**
+     * Adds $delta to all L and R values that are >= $first and <= $last.
+     * '$delta' can also be negative.
+     *
+     * @param      int $delta		Value to be shifted by, can be negative
+     * @param      int $first		First node to be shifted
+     * @param      int $last			Last node to be shifted (optional)
+     * @param      PropelPDO $con		Connection to use.
+     */
+    public static function shiftRLValues($delta, $first, $last = null, PropelPDO $con = null)
+    {
+        if ($con === null) {
+            $con = Propel::getConnection(PublicationPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+        }
+
+        // Shift left column values
+        $whereCriteria = new Criteria(PublicationPeer::DATABASE_NAME);
+        $criterion = $whereCriteria->getNewCriterion(PublicationPeer::LEFT_COL, $first, Criteria::GREATER_EQUAL);
+        if (null !== $last) {
+            $criterion->addAnd($whereCriteria->getNewCriterion(PublicationPeer::LEFT_COL, $last, Criteria::LESS_EQUAL));
+        }
+        $whereCriteria->add($criterion);
+
+        $valuesCriteria = new Criteria(PublicationPeer::DATABASE_NAME);
+        $valuesCriteria->add(PublicationPeer::LEFT_COL, array('raw' => PublicationPeer::LEFT_COL . ' + ?', 'value' => $delta), Criteria::CUSTOM_EQUAL);
+
+        BasePeer::doUpdate($whereCriteria, $valuesCriteria, $con);
+
+        // Shift right column values
+        $whereCriteria = new Criteria(PublicationPeer::DATABASE_NAME);
+        $criterion = $whereCriteria->getNewCriterion(PublicationPeer::RIGHT_COL, $first, Criteria::GREATER_EQUAL);
+        if (null !== $last) {
+            $criterion->addAnd($whereCriteria->getNewCriterion(PublicationPeer::RIGHT_COL, $last, Criteria::LESS_EQUAL));
+        }
+        $whereCriteria->add($criterion);
+
+        $valuesCriteria = new Criteria(PublicationPeer::DATABASE_NAME);
+        $valuesCriteria->add(PublicationPeer::RIGHT_COL, array('raw' => PublicationPeer::RIGHT_COL . ' + ?', 'value' => $delta), Criteria::CUSTOM_EQUAL);
+
+        BasePeer::doUpdate($whereCriteria, $valuesCriteria, $con);
+    }
+
+    /**
+     * Adds $delta to level for nodes having left value >= $first and right value <= $last.
+     * '$delta' can also be negative.
+     *
+     * @param      int $delta		Value to be shifted by, can be negative
+     * @param      int $first		First node to be shifted
+     * @param      int $last			Last node to be shifted
+     * @param      PropelPDO $con		Connection to use.
+     */
+    public static function shiftLevel($delta, $first, $last, PropelPDO $con = null)
+    {
+        if ($con === null) {
+            $con = Propel::getConnection(PublicationPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+        }
+
+        $whereCriteria = new Criteria(PublicationPeer::DATABASE_NAME);
+        $whereCriteria->add(PublicationPeer::LEFT_COL, $first, Criteria::GREATER_EQUAL);
+        $whereCriteria->add(PublicationPeer::RIGHT_COL, $last, Criteria::LESS_EQUAL);
+
+        $valuesCriteria = new Criteria(PublicationPeer::DATABASE_NAME);
+        $valuesCriteria->add(PublicationPeer::LEVEL_COL, array('raw' => PublicationPeer::LEVEL_COL . ' + ?', 'value' => $delta), Criteria::CUSTOM_EQUAL);
+
+        BasePeer::doUpdate($whereCriteria, $valuesCriteria, $con);
+    }
+
+    /**
+     * Reload all already loaded nodes to sync them with updated db
+     *
+     * @param      Publication $prune		Object to prune from the update
+     * @param      PropelPDO $con		Connection to use.
+     */
+    public static function updateLoadedNodes($prune = null, PropelPDO $con = null)
+    {
+        if (Propel::isInstancePoolingEnabled()) {
+            $keys = array();
+            foreach (PublicationPeer::$instances as $obj) {
+                if (!$prune || !$prune->equals($obj)) {
+                    $keys[] = $obj->getPrimaryKey();
+                }
+            }
+
+            if (!empty($keys)) {
+                // We don't need to alter the object instance pool; we're just modifying these ones
+                // already in the pool.
+                $criteria = new Criteria(PublicationPeer::DATABASE_NAME);
+                $criteria->add(PublicationPeer::ID, $keys, Criteria::IN);
+                $stmt = PublicationPeer::doSelectStmt($criteria, $con);
+                while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+                    $key = PublicationPeer::getPrimaryKeyHashFromRow($row, 0);
+                    if (null !== ($object = PublicationPeer::getInstanceFromPool($key))) {
+                        $object->setLeftValue($row[27]);
+                        $object->setRightValue($row[28]);
+                        $object->setLevel($row[29]);
+                        $object->clearNestedSetChildren();
+                    }
+                }
+                $stmt->closeCursor();
+            }
+        }
+    }
+
+    /**
+     * Update the tree to allow insertion of a leaf at the specified position
+     *
+     * @param      int $left	left column value
+     * @param      mixed $prune	Object to prune from the shift
+     * @param      PropelPDO $con	Connection to use.
+     */
+    public static function makeRoomForLeaf($left, $prune = null, PropelPDO $con = null)
+    {
+        // Update database nodes
+        PublicationPeer::shiftRLValues(2, $left, null, $con);
+
+        // Update all loaded nodes
+        PublicationPeer::updateLoadedNodes($prune, $con);
+    }
+
+    /**
+     * Update the tree to allow insertion of a leaf at the specified position
+     *
+     * @param      PropelPDO $con	Connection to use.
+     */
+    public static function fixLevels(PropelPDO $con = null)
+    {
+        $c = new Criteria();
+        $c->addAscendingOrderByColumn(PublicationPeer::LEFT_COL);
+        $stmt = PublicationPeer::doSelectStmt($c, $con);
+
+        // set the class once to avoid overhead in the loop
+        $cls = PublicationPeer::getOMClass(false);
+        $level = null;
+        // iterate over the statement
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+
+            // hydrate object
+            $key = PublicationPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null === ($obj = PublicationPeer::getInstanceFromPool($key))) {
+                $obj = new $cls();
+                $obj->hydrate($row);
+                PublicationPeer::addInstanceToPool($obj, $key);
+            }
+
+            // compute level
+            // Algorithm shamelessly stolen from sfPropelActAsNestedSetBehaviorPlugin
+            // Probably authored by Tristan Rivoallan
+            if ($level === null) {
+                $level = 0;
+                $i = 0;
+                $prev = array($obj->getRightValue());
+            } else {
+                while ($obj->getRightValue() > $prev[$i]) {
+                    $i--;
+                }
+                $level = ++$i;
+                $prev[$i] = $obj->getRightValue();
+            }
+
+            // update level in node if necessary
+            if ($obj->getLevel() !== $level) {
+                $obj->setLevel($level);
+                $obj->save($con);
+            }
+        }
+        $stmt->closeCursor();
+    }
+
+    /**
+     * Updates all scope values for items that has negative left (<=0) values.
+     *
+     * @param      mixed     $scope
+     * @param      PropelPDO $con	Connection to use.
+     */
+    public static function setNegativeScope($scope, PropelPDO $con = null)
+    {
+        //adjust scope value to $scope
+        $whereCriteria = new Criteria(PublicationPeer::DATABASE_NAME);
+        $whereCriteria->add(PublicationPeer::LEFT_COL, 0, Criteria::LESS_EQUAL);
+
+        $valuesCriteria = new Criteria(PublicationPeer::DATABASE_NAME);
+        $valuesCriteria->add(PublicationPeer::SCOPE_COL, $scope, Criteria::EQUAL);
+
+        BasePeer::doUpdate($whereCriteria, $valuesCriteria, $con);
     }
 
 } // BasePublicationPeer

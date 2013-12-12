@@ -55,8 +55,8 @@ class TitleTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Publication', 'DTA\\MetadataBundle\\Model\\Data\\Publication', RelationMap::ONE_TO_MANY, array('id' => 'title_id', ), null, null, 'Publications');
-        $this->addRelation('Series', 'DTA\\MetadataBundle\\Model\\Data\\Series', RelationMap::ONE_TO_MANY, array('id' => 'title_id', ), null, null, 'Series');
         $this->addRelation('Titlefragment', 'DTA\\MetadataBundle\\Model\\Data\\Titlefragment', RelationMap::ONE_TO_MANY, array('id' => 'title_id', ), 'CASCADE', null, 'Titlefragments');
+        $this->addRelation('SequenceEntry', 'DTA\\MetadataBundle\\Model\\Master\\SequenceEntry', RelationMap::ONE_TO_MANY, array('id' => 'title_id', ), null, null, 'SequenceEntries');
     } // buildRelations()
 
     /**
