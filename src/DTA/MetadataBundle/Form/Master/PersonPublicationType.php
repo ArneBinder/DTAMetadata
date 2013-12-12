@@ -39,7 +39,7 @@ class PersonPublicationType extends BaseAbstractType
 
         // display the work selection input only if the work id was not specified (e.g. via the embedding work form)
         if($options['isPublicationSelectable'] === true){
-            $builder->add('work', new \DTA\MetadataBundle\Form\DerivedType\SelectOrAddType(), array(
+            $builder->add('publication', new \DTA\MetadataBundle\Form\DerivedType\SelectOrAddType(), array(
                 'class' => '\DTA\MetadataBundle\Model\Data\Publication',
                 'property' => 'SelectBoxString',
                 'searchable' => true,

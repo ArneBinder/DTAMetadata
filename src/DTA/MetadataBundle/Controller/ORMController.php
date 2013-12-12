@@ -197,10 +197,12 @@ class ORMController extends DTADomainController {
 
                     // user defined pre save logic closure.
                     if(is_object($preSaveLogic) && ($preSaveLogic instanceof Closure)){
+                        echo "executing pre-save logic";
                         $preSaveLogic();
                     }
                     
-                    $this->saveRecursively($form);
+//                    $this->saveRecursively($form);
+                    $obj->save();
                     
                     // return edited/created entity ID as transaction success receipt
                     return array(

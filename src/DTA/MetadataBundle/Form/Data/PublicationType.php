@@ -33,14 +33,14 @@ class PublicationType extends BaseAbstractType
             'inlineLabel' => false,
             'sortable' => false,
             'label' => 'Werkbezogene Personalia',
-            'options' => array('isPublicationSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
+//            'options' => array('isPublicationSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
         ));
         $builder->add('CategoryPublications', new DynamicCollectionType(), array(
             'type' => new Master\CategoryPublicationType(),
             'inlineLabel' => false,
             'sortable' => false,
             'label' => 'Kategorien',
-            'options' => array('isPublicationSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
+//            'options' => array('isPublicationSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
         ));
         
         
@@ -100,7 +100,7 @@ class PublicationType extends BaseAbstractType
         $builder->add('PersonPublications', new DynamicCollectionType(), array(
             'type' => new Master\PersonPublicationType(),
             'inlineLabel' => false,
-            'sortable' => false,
+            'sortable' => true,
             'label' => 'Publikationsbezogene Personalia',
             'options' => array('isPublicationSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
         ));
@@ -169,6 +169,14 @@ class PublicationType extends BaseAbstractType
         
         $builder->add('comment', 'textarea', array(
             'required' => false,
+        ));
+        
+        $builder->add('Tasks', new DynamicCollectionType(), array(
+            'type' => new Workflow\TaskType(),
+            'inlineLabel' => false,
+            'sortable' => false,
+            'label' => 'Tasks',
+//            'options' => array('isPublicationSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
         ));
         
     }

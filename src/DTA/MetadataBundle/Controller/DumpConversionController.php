@@ -748,14 +748,14 @@ class DumpConversionController extends ORMController {
         $queries[] = "DROP table `dtadb`.`corpus_use`;
                       DROP table `dtadb`.`lastusergroups`;";
         
-        
+        // trim all text columns and set empty strings to NULL
         foreach ($dbh->query("SHOW tables") as $row) {
             
             $relation = $row["Tables_in_" . $this->database];
             
             $getTextColumns = "SHOW COLUMNS FROM $relation WHERE 
-                                `Type` LIKE 'varchar%' 
-                                OR `Type` = 'text'";
+                                `Type` LIKE 'varchar%' -- varchars of any length 
+                                OR `Type` LIKE '%text' -- text and mediumtext";
             
             $trimCommands = array();
             

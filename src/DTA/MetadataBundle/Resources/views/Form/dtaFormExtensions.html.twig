@@ -74,7 +74,7 @@
                                 attr|merge({'class':'selectOrAdd select searchable'}) : 
                                 attr|merge({'class':'selectOrAdd select'}) %}
     {{ form_widget(form, {'attr':attr}) }} 
-    {{ form_errors(form) }} 
+    
 
     {# this specifies whether the widget allows to add a new entity to the database. #}
     {% if selectOrAddConfiguration.addButton %}
@@ -91,6 +91,6 @@
         <input type="hidden" name="modalRetrieveUrl"  class="selectOrAdd" 
                value="{{ path(selectOrAddConfiguration.modalRetrievePathParameters.package~'_ajaxModalForm', selectOrAddConfiguration.modalRetrievePathParameters|merge({'modalId':modalId }) ) }}"/>
     {% endif %}
-
+    {{ form_rest(form) }}
 
 {% endblock selectOrAdd_widget %}

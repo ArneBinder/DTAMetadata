@@ -18,10 +18,12 @@ class TaskType extends BaseAbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('tasktype', new \DTA\MetadataBundle\Form\DerivedType\SelectOrAddType(), array(
+            'addButton'  => false,
             'class' => '\DTA\MetadataBundle\Model\Workflow\Tasktype',
             'property' => 'name',
+            'required' => true
         ));
-        $builder->add('start_date', null, array('years'=>array('2013','2014','2015'),'widget' => 'choice'));
+        $builder->add('start_date'); // , null, array('years'=>array('2013','2014','2015'),'widget' => 'choice')
         $builder->add('end_date');
         $builder->add('comments');
         $builder->add('DTAUser', 'model', array(
@@ -34,7 +36,7 @@ class TaskType extends BaseAbstractType
             'class' => 'DTA\MetadataBundle\Model\Workflow\Partner',
             'label' => 'Partner'
         ));
-        $builder->add('done', null, array(
+        $builder->add('closed', null, array(
             'label' => 'Abgeschlossen',
             'attr' => array('expanded'=>true),
         ));

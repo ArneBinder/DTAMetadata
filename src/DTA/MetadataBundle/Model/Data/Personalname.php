@@ -55,5 +55,17 @@ class Personalname extends BasePersonalname
             return $result;
         }
     }
+    
+    /** This is required since otherwise, modifying title fragments won't affect isModified() at all! */
+    public function isModified()
+    {
+        $modified = !empty($this->modifiedColumns);
+        if( ! $modified ){
+            foreach (parent::getNamefragments() as $nf) {
+                if($nf->isModified()) return true;
+            }
+        }
+        return false;
+    }
  
 }

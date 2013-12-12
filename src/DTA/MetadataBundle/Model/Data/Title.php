@@ -30,4 +30,16 @@ class Title extends BaseTitle
 //        $fragmentStrings = array_map(function($el){return "<span title='select'> $el </span>";}, $fragmentStrings);
         return implode(" ~ ", $fragmentStrings);
     }
+    
+    /** This is required since otherwise, modifying title fragments won't affect isModified() at all! */
+    public function isModified()
+    {
+        $modified = !empty($this->modifiedColumns);
+        if( ! $modified ){
+            foreach (parent::getTitlefragments() as $tf) {
+                if($tf->isModified()) return true;
+            }
+        }
+        return false;
+    }
 }

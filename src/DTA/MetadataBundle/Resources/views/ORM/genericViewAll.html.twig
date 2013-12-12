@@ -49,7 +49,6 @@
                 {% set cellContent = datum.getAttributeByTableViewColumName(col)%}
                 {# turn the column content into a link if it is in the linkColumn (see above) #}
                 {% set linkMarkup  = loop.index == linkColumn ? 
-                    "<span class='glyphicon glyphicon-edit'></span>" ~
                     "<a name='" ~ package ~ "/" ~ className ~ "/" ~ recordId ~ "' href='" ~ editLoc ~ "'>" : "" %}
                 {% set linkMarkupEnd = loop.index == linkColumn ? 
                     "</a>" : "" %}

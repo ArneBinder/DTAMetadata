@@ -13,13 +13,16 @@
 
 {% block publication_row %}
     {{ form_row(form, {'inlineLabel':false, 'hideLabel': true}) }}
+    {{ form_rest(form) }}
 {% endblock %}
 {% block work_row %}    
     {{ form_row(form, {'inlineLabel':false, 'hideLabel':false }) }}
+    {{ form_rest(form) }}
 {% endblock %}
 
 {% block _partner_isOrganization_row %}
     {{ form_row(form, {'expanded':true}) }}
+    {{ form_rest(form) }}
 {% endblock %}
 
 {% block imagesource_row %}
@@ -68,6 +71,7 @@
             'hideCancelButton': true,
        })
     }}
+    {{ form_rest(form) }}
 
     </div>
 {% endblock %}
@@ -78,6 +82,7 @@
         {{ form_row(form.texturl) }}
         {{ form_row(form.attribution) }}
         {{ form_row(form.license) }}
+        {{ form_rest(form) }}
     </div>
 {% endblock %}
 
@@ -117,7 +122,7 @@
                     'hideCancelButton': true,
                })
             }}
-    
+    {{ form_rest(form) }}
     {{ dta.endLabelledContent() }}
 
 {% endblock %}
@@ -126,6 +131,7 @@
 
 {% block title_row %}
     {{ form_row(form, {'inlineLabel':false,'hideLabel':false}) }}
+    {{ form_rest(form) }}
 {% endblock %}
 
 {% block titlefragment_row %}
@@ -138,6 +144,10 @@
     </div>
 {% endblock %}
 
+{% block task_row %}
+    {{ form_row(form, {'inlineLabel':true, 'hideLabel':true}) }}
+{% endblock %}
+
 {# --------------------- Personal Name --------------------- #}
 
 {% block person_row %}
@@ -148,6 +158,7 @@
 
 {% block personalname_row %}
     {{ form_row(form, {'inlineLabel':true, 'hideLabel':true }) }}
+    {{ form_rest(form) }}
 {% endblock %}
 
 {% block namefragment_row %}
@@ -164,6 +175,7 @@
     <div class="dynamic-collection-deletable">
         {{ form_row(form.personrole, {'inlineLabel':true,'hideLabel':true}) }}
         {{ form_row(form.person, {'hideLabel':true,'inlineLabel':true}) }}
+        {{ form_rest(form) }}
     </div>
 {% endblock %}
 
@@ -171,35 +183,41 @@
   <div class="dynamic-collection-deletable">
     {{ form_row(form.personrole, {'inlineLabel':true,'hideLabel':true}) }}
     {{ form_row(form.person, {'hideLabel':true,'inlineLabel':true}) }}
+    {{ form_rest(form) }}
   </div>
 {% endblock %}
 
 {% block categorywork_row %}
     <div class="dynamic-collection-deletable">
         {{ form_row(form, {'inlineLabel':true, 'hideLabel':true, 'inlineChildren': true}) }}
+        {{ form_rest(form) }}
     </div>
 {% endblock %}
 
 {% block category_row %}
     <div class="dynamic-collection-deletable">
         {{ form_row(form, {'inlineLabel':true, 'hideLabel':true, 'inlineChildren': true}) }}
+        {{ form_rest(form) }}
     </div>
 {% endblock %}
 
 {% block languagework_row %}
     <div class="form-inline">
         {{ form_widget(form.language)}}
+        {{ form_rest(form) }}
     </div>
 {% endblock %}
 
 {% block genrework_row %}
     <div class="form-inline">
         {{ form_widget(form.genre)}}
+        {{ form_rest(form) }}
     </div>
 {% endblock %}
 
 {% block worktag_row %}
     <div class="form-inline">
         {{ form_widget(form.tag)}}
+        {{ form_rest(form) }}
     </div>
 {% endblock %}
