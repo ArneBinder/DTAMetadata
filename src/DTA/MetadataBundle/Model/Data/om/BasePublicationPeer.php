@@ -183,6 +183,11 @@ abstract class BasePublicationPeer
     const LEVEL_COL = 'publication.tree_level';
 
     /**
+     * Scope column for the set
+     */
+    const SCOPE_COL = 'publication.tree_id';
+
+    /**
      * holds an array of fieldnames
      *
      * first dimension keys are the type constants
@@ -3845,15 +3850,33 @@ abstract class BasePublicationPeer
     // nested_set behavior
 
     /**
-     * Returns the root node for a given scope
+     * Returns the root nodes for the tree
      *
      * @param      PropelPDO $con	Connection to use.
      * @return     Publication			Propel object for root node
      */
-    public static function retrieveRoot(PropelPDO $con = null)
+    public static function retrieveRoots(Criteria $criteria = null, PropelPDO $con = null)
+    {
+        if ($criteria === null) {
+            $criteria = new Criteria(PublicationPeer::DATABASE_NAME);
+        }
+        $criteria->add(PublicationPeer::LEFT_COL, 1, Criteria::EQUAL);
+
+        return PublicationPeer::doSelect($criteria, $con);
+    }
+
+    /**
+     * Returns the root node for a given scope
+     *
+     * @param      int $scope		Scope to determine which root node to return
+     * @param      PropelPDO $con	Connection to use.
+     * @return     Publication			Propel object for root node
+     */
+    public static function retrieveRoot($scope = null, PropelPDO $con = null)
     {
         $c = new Criteria(PublicationPeer::DATABASE_NAME);
         $c->add(PublicationPeer::LEFT_COL, 1, Criteria::EQUAL);
+        $c->add(PublicationPeer::SCOPE_COL, $scope, Criteria::EQUAL);
 
         return PublicationPeer::doSelectOne($c, $con);
     }
@@ -3861,16 +3884,18 @@ abstract class BasePublicationPeer
     /**
      * Returns the whole tree node for a given scope
      *
+     * @param      int $scope		Scope to determine which root node to return
      * @param      Criteria $criteria	Optional Criteria to filter the query
      * @param      PropelPDO $con	Connection to use.
      * @return     Publication			Propel object for root node
      */
-    public static function retrieveTree(Criteria $criteria = null, PropelPDO $con = null)
+    public static function retrieveTree($scope = null, Criteria $criteria = null, PropelPDO $con = null)
     {
         if ($criteria === null) {
             $criteria = new Criteria(PublicationPeer::DATABASE_NAME);
         }
         $criteria->addAscendingOrderByColumn(PublicationPeer::LEFT_COL);
+        $criteria->add(PublicationPeer::SCOPE_COL, $scope, Criteria::EQUAL);
 
         return PublicationPeer::doSelect($criteria, $con);
     }
@@ -3893,14 +3918,17 @@ abstract class BasePublicationPeer
     /**
      * Delete an entire tree
      *
+     * @param      int $scope		Scope to determine which tree to delete
      * @param      PropelPDO $con	Connection to use.
      *
      * @return     int  The number of deleted nodes
      */
-    public static function deleteTree(PropelPDO $con = null)
+    public static function deleteTree($scope = null, PropelPDO $con = null)
     {
+        $c = new Criteria(PublicationPeer::DATABASE_NAME);
+        $c->add(PublicationPeer::SCOPE_COL, $scope, Criteria::EQUAL);
 
-        return PublicationPeer::doDeleteAll($con);
+        return PublicationPeer::doDelete($c, $con);
     }
 
     /**
@@ -3910,9 +3938,10 @@ abstract class BasePublicationPeer
      * @param      int $delta		Value to be shifted by, can be negative
      * @param      int $first		First node to be shifted
      * @param      int $last			Last node to be shifted (optional)
+     * @param      int $scope		Scope to use for the shift
      * @param      PropelPDO $con		Connection to use.
      */
-    public static function shiftRLValues($delta, $first, $last = null, PropelPDO $con = null)
+    public static function shiftRLValues($delta, $first, $last = null, $scope = null, PropelPDO $con = null)
     {
         if ($con === null) {
             $con = Propel::getConnection(PublicationPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
@@ -3925,6 +3954,7 @@ abstract class BasePublicationPeer
             $criterion->addAnd($whereCriteria->getNewCriterion(PublicationPeer::LEFT_COL, $last, Criteria::LESS_EQUAL));
         }
         $whereCriteria->add($criterion);
+        $whereCriteria->add(PublicationPeer::SCOPE_COL, $scope, Criteria::EQUAL);
 
         $valuesCriteria = new Criteria(PublicationPeer::DATABASE_NAME);
         $valuesCriteria->add(PublicationPeer::LEFT_COL, array('raw' => PublicationPeer::LEFT_COL . ' + ?', 'value' => $delta), Criteria::CUSTOM_EQUAL);
@@ -3938,6 +3968,7 @@ abstract class BasePublicationPeer
             $criterion->addAnd($whereCriteria->getNewCriterion(PublicationPeer::RIGHT_COL, $last, Criteria::LESS_EQUAL));
         }
         $whereCriteria->add($criterion);
+        $whereCriteria->add(PublicationPeer::SCOPE_COL, $scope, Criteria::EQUAL);
 
         $valuesCriteria = new Criteria(PublicationPeer::DATABASE_NAME);
         $valuesCriteria->add(PublicationPeer::RIGHT_COL, array('raw' => PublicationPeer::RIGHT_COL . ' + ?', 'value' => $delta), Criteria::CUSTOM_EQUAL);
@@ -3952,9 +3983,10 @@ abstract class BasePublicationPeer
      * @param      int $delta		Value to be shifted by, can be negative
      * @param      int $first		First node to be shifted
      * @param      int $last			Last node to be shifted
+     * @param      int $scope		Scope to use for the shift
      * @param      PropelPDO $con		Connection to use.
      */
-    public static function shiftLevel($delta, $first, $last, PropelPDO $con = null)
+    public static function shiftLevel($delta, $first, $last, $scope = null, PropelPDO $con = null)
     {
         if ($con === null) {
             $con = Propel::getConnection(PublicationPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
@@ -3963,6 +3995,7 @@ abstract class BasePublicationPeer
         $whereCriteria = new Criteria(PublicationPeer::DATABASE_NAME);
         $whereCriteria->add(PublicationPeer::LEFT_COL, $first, Criteria::GREATER_EQUAL);
         $whereCriteria->add(PublicationPeer::RIGHT_COL, $last, Criteria::LESS_EQUAL);
+        $whereCriteria->add(PublicationPeer::SCOPE_COL, $scope, Criteria::EQUAL);
 
         $valuesCriteria = new Criteria(PublicationPeer::DATABASE_NAME);
         $valuesCriteria->add(PublicationPeer::LEVEL_COL, array('raw' => PublicationPeer::LEVEL_COL . ' + ?', 'value' => $delta), Criteria::CUSTOM_EQUAL);
@@ -3995,6 +4028,7 @@ abstract class BasePublicationPeer
                 while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
                     $key = PublicationPeer::getPrimaryKeyHashFromRow($row, 0);
                     if (null !== ($object = PublicationPeer::getInstanceFromPool($key))) {
+                        $object->setScopeValue($row[27]);
                         $object->setLeftValue($row[28]);
                         $object->setRightValue($row[29]);
                         $object->setLevel($row[30]);
@@ -4010,13 +4044,14 @@ abstract class BasePublicationPeer
      * Update the tree to allow insertion of a leaf at the specified position
      *
      * @param      int $left	left column value
+     * @param      integer $scope	scope column value
      * @param      mixed $prune	Object to prune from the shift
      * @param      PropelPDO $con	Connection to use.
      */
-    public static function makeRoomForLeaf($left, $prune = null, PropelPDO $con = null)
+    public static function makeRoomForLeaf($left, $scope, $prune = null, PropelPDO $con = null)
     {
         // Update database nodes
-        PublicationPeer::shiftRLValues(2, $left, null, $con);
+        PublicationPeer::shiftRLValues(2, $left, null, $scope, $con);
 
         // Update all loaded nodes
         PublicationPeer::updateLoadedNodes($prune, $con);
@@ -4025,11 +4060,13 @@ abstract class BasePublicationPeer
     /**
      * Update the tree to allow insertion of a leaf at the specified position
      *
+     * @param      integer $scope	scope column value
      * @param      PropelPDO $con	Connection to use.
      */
-    public static function fixLevels(PropelPDO $con = null)
+    public static function fixLevels($scope, PropelPDO $con = null)
     {
         $c = new Criteria();
+        $c->add(PublicationPeer::SCOPE_COL, $scope, Criteria::EQUAL);
         $c->addAscendingOrderByColumn(PublicationPeer::LEFT_COL);
         $stmt = PublicationPeer::doSelectStmt($c, $con);
 

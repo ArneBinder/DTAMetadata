@@ -683,7 +683,7 @@ CREATE TABLE "copy_location"
     "catalogue_url" TEXT,
     "numfaksimiles" INTEGER,
     "catalogue_extent" TEXT,
-    "availability" BOOLEAN,
+    "available" BOOLEAN,
     "comments" TEXT,
     "imageurl" TEXT,
     "imageurn" TEXT,

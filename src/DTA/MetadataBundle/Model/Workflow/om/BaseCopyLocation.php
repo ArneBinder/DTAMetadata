@@ -97,10 +97,10 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     protected $catalogue_extent;
 
     /**
-     * The value for the availability field.
+     * The value for the available field.
      * @var        boolean
      */
-    protected $availability;
+    protected $available;
 
     /**
      * The value for the comments field.
@@ -180,7 +180,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Signatur', 'Titel', 'erster Autor', 'Typ', 'Verlag', 'veröffentlicht', );	public   $tableRowViewAccessors = array('Signatur'=>'CatalogueSignature', 'Titel'=>'accessor:getEmbeddedColumn1OfPublication', 'erster Autor'=>'accessor:getEmbeddedColumn2OfPublication', 'Typ'=>'accessor:getEmbeddedColumn3OfPublication', 'Verlag'=>'accessor:getEmbeddedColumn4OfPublication', 'veröffentlicht'=>'accessor:getEmbeddedColumn5OfPublication', );	public static $queryConstructionString = "\DTA\MetadataBundle\Model\Workflow\CopyLocationQuery::create()                     ->leftJoinWith('Publication')                     ->leftJoinWith('Publication.Title')                     ->leftJoinWith('Title.Titlefragment')                     ->leftJoinWith('Publication.DatespecificationRelatedByPublicationdateId')                     ->leftJoinWith('Publication.PersonPublication')                     ->leftJoinWith('PersonPublication.Person')                     ->leftJoinWith('Person.Personalname')                     ->leftJoinWith('Personalname.Namefragment');";
+    public static $tableRowViewCaptions = array('Signatur', 'Titel', 'erster Autor', 'veröffentlicht', 'Verlag', 'Typ', );	public   $tableRowViewAccessors = array('Signatur'=>'CatalogueSignature', 'Titel'=>'accessor:getEmbeddedColumn1OfPublication', 'erster Autor'=>'accessor:getEmbeddedColumn2OfPublication', 'veröffentlicht'=>'accessor:getEmbeddedColumn3OfPublication', 'Verlag'=>'accessor:getEmbeddedColumn4OfPublication', 'Typ'=>'accessor:getEmbeddedColumn5OfPublication', );	public static $queryConstructionString = "\DTA\MetadataBundle\Model\Workflow\CopyLocationQuery::create()                     ->leftJoinWith('Publication')                     ->leftJoinWith('Publication.Title')                     ->leftJoinWith('Title.Titlefragment')                     ->leftJoinWith('Publication.DatespecificationRelatedByPublicationdateId')                     ->leftJoinWith('Publication.PersonPublication')                     ->leftJoinWith('PersonPublication.Person')                     ->leftJoinWith('Person.Personalname')                     ->leftJoinWith('Personalname.Namefragment');";
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -276,14 +276,14 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     }
 
     /**
-     * Get the [availability] column value.
+     * Get the [available] column value.
      *
      * @return boolean
      */
-    public function getAvailability()
+    public function getAvailable()
     {
 
-        return $this->availability;
+        return $this->available;
     }
 
     /**
@@ -577,7 +577,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     } // setCatalogueExtent()
 
     /**
-     * Sets the value of the [availability] column.
+     * Sets the value of the [available] column.
      * Non-boolean arguments are converted using the following rules:
      *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
      *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
@@ -586,7 +586,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
      * @param boolean|integer|string $v The new value
      * @return CopyLocation The current object (for fluent API support)
      */
-    public function setAvailability($v)
+    public function setAvailable($v)
     {
         if ($v !== null) {
             if (is_string($v)) {
@@ -596,14 +596,14 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
             }
         }
 
-        if ($this->availability !== $v) {
-            $this->availability = $v;
-            $this->modifiedColumns[] = CopyLocationPeer::AVAILABILITY;
+        if ($this->available !== $v) {
+            $this->available = $v;
+            $this->modifiedColumns[] = CopyLocationPeer::AVAILABLE;
         }
 
 
         return $this;
-    } // setAvailability()
+    } // setAvailable()
 
     /**
      * Set the value of [comments] column.
@@ -779,7 +779,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
             $this->catalogue_url = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
             $this->numfaksimiles = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
             $this->catalogue_extent = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
-            $this->availability = ($row[$startcol + 8] !== null) ? (boolean) $row[$startcol + 8] : null;
+            $this->available = ($row[$startcol + 8] !== null) ? (boolean) $row[$startcol + 8] : null;
             $this->comments = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
             $this->imageurl = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
             $this->imageurn = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
@@ -1096,8 +1096,8 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
         if ($this->isColumnModified(CopyLocationPeer::CATALOGUE_EXTENT)) {
             $modifiedColumns[':p' . $index++]  = '"catalogue_extent"';
         }
-        if ($this->isColumnModified(CopyLocationPeer::AVAILABILITY)) {
-            $modifiedColumns[':p' . $index++]  = '"availability"';
+        if ($this->isColumnModified(CopyLocationPeer::AVAILABLE)) {
+            $modifiedColumns[':p' . $index++]  = '"available"';
         }
         if ($this->isColumnModified(CopyLocationPeer::COMMENTS)) {
             $modifiedColumns[':p' . $index++]  = '"comments"';
@@ -1152,8 +1152,8 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
                     case '"catalogue_extent"':
                         $stmt->bindValue($identifier, $this->catalogue_extent, PDO::PARAM_STR);
                         break;
-                    case '"availability"':
-                        $stmt->bindValue($identifier, $this->availability, PDO::PARAM_BOOL);
+                    case '"available"':
+                        $stmt->bindValue($identifier, $this->available, PDO::PARAM_BOOL);
                         break;
                     case '"comments"':
                         $stmt->bindValue($identifier, $this->comments, PDO::PARAM_STR);
@@ -1357,7 +1357,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
                 return $this->getCatalogueExtent();
                 break;
             case 8:
-                return $this->getAvailability();
+                return $this->getAvailable();
                 break;
             case 9:
                 return $this->getComments();
@@ -1414,7 +1414,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
             $keys[5] => $this->getCatalogueUrl(),
             $keys[6] => $this->getNumfaksimiles(),
             $keys[7] => $this->getCatalogueExtent(),
-            $keys[8] => $this->getAvailability(),
+            $keys[8] => $this->getAvailable(),
             $keys[9] => $this->getComments(),
             $keys[10] => $this->getImageurl(),
             $keys[11] => $this->getImageurn(),
@@ -1499,7 +1499,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
                 $this->setCatalogueExtent($value);
                 break;
             case 8:
-                $this->setAvailability($value);
+                $this->setAvailable($value);
                 break;
             case 9:
                 $this->setComments($value);
@@ -1551,7 +1551,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
         if (array_key_exists($keys[5], $arr)) $this->setCatalogueUrl($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setNumfaksimiles($arr[$keys[6]]);
         if (array_key_exists($keys[7], $arr)) $this->setCatalogueExtent($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setAvailability($arr[$keys[8]]);
+        if (array_key_exists($keys[8], $arr)) $this->setAvailable($arr[$keys[8]]);
         if (array_key_exists($keys[9], $arr)) $this->setComments($arr[$keys[9]]);
         if (array_key_exists($keys[10], $arr)) $this->setImageurl($arr[$keys[10]]);
         if (array_key_exists($keys[11], $arr)) $this->setImageurn($arr[$keys[11]]);
@@ -1577,7 +1577,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
         if ($this->isColumnModified(CopyLocationPeer::CATALOGUE_URL)) $criteria->add(CopyLocationPeer::CATALOGUE_URL, $this->catalogue_url);
         if ($this->isColumnModified(CopyLocationPeer::NUMFAKSIMILES)) $criteria->add(CopyLocationPeer::NUMFAKSIMILES, $this->numfaksimiles);
         if ($this->isColumnModified(CopyLocationPeer::CATALOGUE_EXTENT)) $criteria->add(CopyLocationPeer::CATALOGUE_EXTENT, $this->catalogue_extent);
-        if ($this->isColumnModified(CopyLocationPeer::AVAILABILITY)) $criteria->add(CopyLocationPeer::AVAILABILITY, $this->availability);
+        if ($this->isColumnModified(CopyLocationPeer::AVAILABLE)) $criteria->add(CopyLocationPeer::AVAILABLE, $this->available);
         if ($this->isColumnModified(CopyLocationPeer::COMMENTS)) $criteria->add(CopyLocationPeer::COMMENTS, $this->comments);
         if ($this->isColumnModified(CopyLocationPeer::IMAGEURL)) $criteria->add(CopyLocationPeer::IMAGEURL, $this->imageurl);
         if ($this->isColumnModified(CopyLocationPeer::IMAGEURN)) $criteria->add(CopyLocationPeer::IMAGEURN, $this->imageurn);
@@ -1654,7 +1654,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
         $copyObj->setCatalogueUrl($this->getCatalogueUrl());
         $copyObj->setNumfaksimiles($this->getNumfaksimiles());
         $copyObj->setCatalogueExtent($this->getCatalogueExtent());
-        $copyObj->setAvailability($this->getAvailability());
+        $copyObj->setAvailable($this->getAvailable());
         $copyObj->setComments($this->getComments());
         $copyObj->setImageurl($this->getImageurl());
         $copyObj->setImageurn($this->getImageurn());
@@ -2260,7 +2260,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
         $this->catalogue_url = null;
         $this->numfaksimiles = null;
         $this->catalogue_extent = null;
-        $this->availability = null;
+        $this->available = null;
         $this->comments = null;
         $this->imageurl = null;
         $this->imageurn = null;
@@ -2408,7 +2408,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     public function getEmbeddedColumn3OfPublication(){
 
         $relatedEntity = $this->getPublication();
-        return $relatedEntity->getAttributeByTableViewColumName("Typ");
+        return $relatedEntity->getAttributeByTableViewColumName("veröffentlicht");
 
     }    /**
      * Cascades the get to a related entity (possibly recursively)
@@ -2426,7 +2426,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     public function getEmbeddedColumn5OfPublication(){
 
         $relatedEntity = $this->getPublication();
-        return $relatedEntity->getAttributeByTableViewColumName("veröffentlicht");
+        return $relatedEntity->getAttributeByTableViewColumName("Typ");
 
     }
     // timestampable behavior

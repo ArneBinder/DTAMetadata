@@ -50,7 +50,7 @@ class CopyLocationTableMap extends TableMap
         $this->addColumn('catalogue_url', 'CatalogueUrl', 'LONGVARCHAR', false, null, null);
         $this->addColumn('numfaksimiles', 'Numfaksimiles', 'INTEGER', false, null, null);
         $this->addColumn('catalogue_extent', 'CatalogueExtent', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('availability', 'Availability', 'BOOLEAN', false, null, null);
+        $this->addColumn('available', 'Available', 'BOOLEAN', false, null, null);
         $this->addColumn('comments', 'Comments', 'LONGVARCHAR', false, null, null);
         $this->addColumn('imageurl', 'Imageurl', 'LONGVARCHAR', false, null, null);
         $this->addColumn('imageurn', 'Imageurn', 'LONGVARCHAR', false, null, null);

@@ -96,12 +96,12 @@
                 
                 $('.table.fullyFeatured').dataTable( {
                     
-                    "aLengthMenu": [
+                    "bSort":false // disables sorting completely
+                    ,aaSorting:[]
+                    ,"aLengthMenu": [
                         [10, 50, 100, -1],
                         [10, 50, 100, "All"] ]
-                    //,"bsort":false // disables sorting completely
-                    ,aaSorting:[]
-                    ,"iDisplayLength" : 10
+                    ,"iDisplayLength" : 50
                     ,"sPaginationType": "full_numbers"
                     ,"oTableTools": {
                             "aButtons": [

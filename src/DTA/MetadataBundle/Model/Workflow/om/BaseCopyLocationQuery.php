@@ -29,7 +29,7 @@ use DTA\MetadataBundle\Model\Workflow\Task;
  * @method CopyLocationQuery orderByCatalogueUrl($order = Criteria::ASC) Order by the catalogue_url column
  * @method CopyLocationQuery orderByNumfaksimiles($order = Criteria::ASC) Order by the numfaksimiles column
  * @method CopyLocationQuery orderByCatalogueExtent($order = Criteria::ASC) Order by the catalogue_extent column
- * @method CopyLocationQuery orderByAvailability($order = Criteria::ASC) Order by the availability column
+ * @method CopyLocationQuery orderByAvailable($order = Criteria::ASC) Order by the available column
  * @method CopyLocationQuery orderByComments($order = Criteria::ASC) Order by the comments column
  * @method CopyLocationQuery orderByImageurl($order = Criteria::ASC) Order by the imageurl column
  * @method CopyLocationQuery orderByImageurn($order = Criteria::ASC) Order by the imageurn column
@@ -45,7 +45,7 @@ use DTA\MetadataBundle\Model\Workflow\Task;
  * @method CopyLocationQuery groupByCatalogueUrl() Group by the catalogue_url column
  * @method CopyLocationQuery groupByNumfaksimiles() Group by the numfaksimiles column
  * @method CopyLocationQuery groupByCatalogueExtent() Group by the catalogue_extent column
- * @method CopyLocationQuery groupByAvailability() Group by the availability column
+ * @method CopyLocationQuery groupByAvailable() Group by the available column
  * @method CopyLocationQuery groupByComments() Group by the comments column
  * @method CopyLocationQuery groupByImageurl() Group by the imageurl column
  * @method CopyLocationQuery groupByImageurn() Group by the imageurn column
@@ -83,7 +83,7 @@ use DTA\MetadataBundle\Model\Workflow\Task;
  * @method CopyLocation findOneByCatalogueUrl(string $catalogue_url) Return the first CopyLocation filtered by the catalogue_url column
  * @method CopyLocation findOneByNumfaksimiles(int $numfaksimiles) Return the first CopyLocation filtered by the numfaksimiles column
  * @method CopyLocation findOneByCatalogueExtent(string $catalogue_extent) Return the first CopyLocation filtered by the catalogue_extent column
- * @method CopyLocation findOneByAvailability(boolean $availability) Return the first CopyLocation filtered by the availability column
+ * @method CopyLocation findOneByAvailable(boolean $available) Return the first CopyLocation filtered by the available column
  * @method CopyLocation findOneByComments(string $comments) Return the first CopyLocation filtered by the comments column
  * @method CopyLocation findOneByImageurl(string $imageurl) Return the first CopyLocation filtered by the imageurl column
  * @method CopyLocation findOneByImageurn(string $imageurn) Return the first CopyLocation filtered by the imageurn column
@@ -99,7 +99,7 @@ use DTA\MetadataBundle\Model\Workflow\Task;
  * @method array findByCatalogueUrl(string $catalogue_url) Return CopyLocation objects filtered by the catalogue_url column
  * @method array findByNumfaksimiles(int $numfaksimiles) Return CopyLocation objects filtered by the numfaksimiles column
  * @method array findByCatalogueExtent(string $catalogue_extent) Return CopyLocation objects filtered by the catalogue_extent column
- * @method array findByAvailability(boolean $availability) Return CopyLocation objects filtered by the availability column
+ * @method array findByAvailable(boolean $available) Return CopyLocation objects filtered by the available column
  * @method array findByComments(string $comments) Return CopyLocation objects filtered by the comments column
  * @method array findByImageurl(string $imageurl) Return CopyLocation objects filtered by the imageurl column
  * @method array findByImageurn(string $imageurn) Return CopyLocation objects filtered by the imageurn column
@@ -211,7 +211,7 @@ abstract class BaseCopyLocationQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "publication_id", "partner_id", "catalogue_signature", "catalogue_internal", "catalogue_url", "numfaksimiles", "catalogue_extent", "availability", "comments", "imageurl", "imageurn", "license_id", "created_at", "updated_at" FROM "copy_location" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "publication_id", "partner_id", "catalogue_signature", "catalogue_internal", "catalogue_url", "numfaksimiles", "catalogue_extent", "available", "comments", "imageurl", "imageurn", "license_id", "created_at", "updated_at" FROM "copy_location" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -589,15 +589,15 @@ abstract class BaseCopyLocationQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the availability column
+     * Filter the query on the available column
      *
      * Example usage:
      * <code>
-     * $query->filterByAvailability(true); // WHERE availability = true
-     * $query->filterByAvailability('yes'); // WHERE availability = true
+     * $query->filterByAvailable(true); // WHERE available = true
+     * $query->filterByAvailable('yes'); // WHERE available = true
      * </code>
      *
-     * @param     boolean|string $availability The value to use as filter.
+     * @param     boolean|string $available The value to use as filter.
      *              Non-boolean arguments are converted using the following rules:
      *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
      *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
@@ -606,13 +606,13 @@ abstract class BaseCopyLocationQuery extends ModelCriteria
      *
      * @return CopyLocationQuery The current query, for fluid interface
      */
-    public function filterByAvailability($availability = null, $comparison = null)
+    public function filterByAvailable($available = null, $comparison = null)
     {
-        if (is_string($availability)) {
-            $availability = in_array(strtolower($availability), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        if (is_string($available)) {
+            $available = in_array(strtolower($available), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
         }
 
-        return $this->addUsingAlias(CopyLocationPeer::AVAILABILITY, $availability, $comparison);
+        return $this->addUsingAlias(CopyLocationPeer::AVAILABLE, $available, $comparison);
     }
 
     /**

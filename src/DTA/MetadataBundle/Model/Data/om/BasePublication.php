@@ -513,7 +513,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Titel', 'erster Autor', 'Typ', 'Verlag', 'veröffentlicht', );	public   $tableRowViewAccessors = array('Titel'=>'accessor:getTitle', 'erster Autor'=>'accessor:getFirstAuthor', 'Typ'=>'Type', 'Verlag'=>'accessor:getPublishingCompany', 'veröffentlicht'=>'accessor:getDatespecificationRelatedByPublicationdateId', );	public static $queryConstructionString = "\DTA\MetadataBundle\Model\Data\PublicationQuery::create()                     ->leftJoinWith('Title')                     ->leftJoinWith('Title.Titlefragment')                     ->leftJoinWith('DatespecificationRelatedByPublicationdateId')                     ->leftJoinWith('PersonPublication')                     ->leftJoinWith('PersonPublication.Person')                     ->leftJoinWith('Person.Personalname')                     ->leftJoinWith('Personalname.Namefragment');";
+    public static $tableRowViewCaptions = array('Titel', 'erster Autor', 'veröffentlicht', 'Verlag', 'Typ', );	public   $tableRowViewAccessors = array('Titel'=>'accessor:getTitleString', 'erster Autor'=>'accessor:getFirstAuthor', 'veröffentlicht'=>'accessor:getDatespecificationRelatedByPublicationdateId', 'Verlag'=>'accessor:getPublishingCompany', 'Typ'=>'Type', );	public static $queryConstructionString = "\DTA\MetadataBundle\Model\Data\PublicationQuery::create()                     ->leftJoinWith('Title')                     ->leftJoinWith('Title.Titlefragment')                     ->leftJoinWith('DatespecificationRelatedByPublicationdateId')                     ->leftJoinWith('PersonPublication')                     ->leftJoinWith('PersonPublication.Person')                     ->leftJoinWith('Person.Personalname')                     ->leftJoinWith('Personalname.Namefragment');";
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -2101,7 +2101,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $ret = $this->preDelete($con);
             // nested_set behavior
             if ($this->isRoot()) {
-                throw new PropelException('Deletion of a root node is disabled for nested sets. Use PublicationPeer::deleteTree() instead to delete an entire tree');
+                throw new PropelException('Deletion of a root node is disabled for nested sets. Use PublicationPeer::deleteTree($scope) instead to delete an entire tree');
             }
 
             if ($this->isInTree()) {
@@ -2114,7 +2114,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 // nested_set behavior
                 if ($this->isInTree()) {
                     // fill up the room that was used by the node
-                    PublicationPeer::shiftRLValues(-2, $this->getRightValue() + 1, null, $con);
+                    PublicationPeer::shiftRLValues(-2, $this->getRightValue() + 1, null, $this->getScopeValue(), $con);
                 }
 
                 $con->commit();
@@ -2161,9 +2161,10 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 // check if no other root exist in, the tree
                 $nbRoots = PublicationQuery::create()
                     ->addUsingAlias(PublicationPeer::LEFT_COL, 1, Criteria::EQUAL)
+                    ->addUsingAlias(PublicationPeer::SCOPE_COL, $this->getScopeValue(), Criteria::EQUAL)
                     ->count($con);
                 if ($nbRoots > 0) {
-                        throw new PropelException('A root node already exists in this tree. To allow multiple root nodes, add the `use_scope` parameter in the nested_set behavior tag.');
+                        throw new PropelException(sprintf('A root node already exists in this tree with scope "%s".', $this->getScopeValue()));
                 }
             }
             $this->processNestedSetQueries($con);
@@ -10278,6 +10279,17 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     }
 
     /**
+     * Proxy getter method for the scope value of the nested set model.
+     * It provides a generic way to get the value, whatever the actual column name is.
+     *
+     * @return     int The nested set scope value
+     */
+    public function getScopeValue()
+    {
+        return $this->tree_id;
+    }
+
+    /**
      * Proxy setter method for the left value of the nested set model.
      * It provides a generic way to set the value, whatever the actual column name is.
      *
@@ -10311,6 +10323,18 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     public function setLevel($v)
     {
         return $this->setTreeLevel($v);
+    }
+
+    /**
+     * Proxy setter method for the scope value of the nested set model.
+     * It provides a generic way to set the value, whatever the actual column name is.
+     *
+     * @param      int $v The nested set scope value
+     * @return     Publication The current object (for fluent API support)
+     */
+    public function setScopeValue($v)
+    {
+        return $this->setTreeId($v);
     }
 
     /**
@@ -10370,6 +10394,9 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function isDescendantOf($parent)
     {
+        if ($this->getScopeValue() !== $parent->getScopeValue()) {
+            return false; //since the `this` and $parent are in different scopes, there's no way that `this` is be a descendant of $parent.
+        }
 
         return $this->isInTree() && $this->getLeftValue() > $parent->getLeftValue() && $this->getRightValue() < $parent->getRightValue();
     }
@@ -10444,6 +10471,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
         return PublicationQuery::create()
             ->filterByTreeRight($this->getLeftValue() - 1)
+            ->inTree($this->getScopeValue())
             ->count($con) > 0;
     }
 
@@ -10457,6 +10485,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     {
         return PublicationQuery::create()
             ->filterByTreeRight($this->getLeftValue() - 1)
+            ->inTree($this->getScopeValue())
             ->findOne($con);
     }
 
@@ -10474,6 +10503,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
         return PublicationQuery::create()
             ->filterByTreeLeft($this->getRightValue() + 1)
+            ->inTree($this->getScopeValue())
             ->count($con) > 0;
     }
 
@@ -10487,6 +10517,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     {
         return PublicationQuery::create()
             ->filterByTreeLeft($this->getRightValue() + 1)
+            ->inTree($this->getScopeValue())
             ->findOne($con);
     }
 
@@ -10769,13 +10800,15 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         $this->setLeftValue($left);
         $this->setRightValue($left + 1);
         $this->setLevel($parent->getLevel() + 1);
+        $scope = $parent->getScopeValue();
+        $this->setScopeValue($scope);
         // update the children collection of the parent
         $parent->addNestedSetChild($this);
 
         // Keep the tree modification query for the save() transaction
         $this->nestedSetQueries []= array(
             'callable'  => array('\\DTA\MetadataBundle\Model\Data\\PublicationPeer', 'makeRoomForLeaf'),
-            'arguments' => array($left, $this->isNew() ? null : $this)
+            'arguments' => array($left, $scope, $this->isNew() ? null : $this)
         );
 
         return $this;
@@ -10800,13 +10833,15 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         $this->setLeftValue($left);
         $this->setRightValue($left + 1);
         $this->setLevel($parent->getLevel() + 1);
+        $scope = $parent->getScopeValue();
+        $this->setScopeValue($scope);
         // update the children collection of the parent
         $parent->addNestedSetChild($this);
 
         // Keep the tree modification query for the save() transaction
         $this->nestedSetQueries []= array(
             'callable'  => array('\\DTA\MetadataBundle\Model\Data\\PublicationPeer', 'makeRoomForLeaf'),
-            'arguments' => array($left, $this->isNew() ? null : $this)
+            'arguments' => array($left, $scope, $this->isNew() ? null : $this)
         );
 
         return $this;
@@ -10831,10 +10866,12 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         $this->setLeftValue($left);
         $this->setRightValue($left + 1);
         $this->setLevel($sibling->getLevel());
+        $scope = $sibling->getScopeValue();
+        $this->setScopeValue($scope);
         // Keep the tree modification query for the save() transaction
         $this->nestedSetQueries []= array(
             'callable'  => array('\\DTA\MetadataBundle\Model\Data\\PublicationPeer', 'makeRoomForLeaf'),
-            'arguments' => array($left, $this->isNew() ? null : $this)
+            'arguments' => array($left, $scope, $this->isNew() ? null : $this)
         );
 
         return $this;
@@ -10859,10 +10896,12 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         $this->setLeftValue($left);
         $this->setRightValue($left + 1);
         $this->setLevel($sibling->getLevel());
+        $scope = $sibling->getScopeValue();
+        $this->setScopeValue($scope);
         // Keep the tree modification query for the save() transaction
         $this->nestedSetQueries []= array(
             'callable'  => array('\\DTA\MetadataBundle\Model\Data\\PublicationPeer', 'makeRoomForLeaf'),
-            'arguments' => array($left, $this->isNew() ? null : $this)
+            'arguments' => array($left, $scope, $this->isNew() ? null : $this)
         );
 
         return $this;
@@ -10886,7 +10925,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             throw new PropelException('Cannot move a node as child of one of its subtree nodes.');
         }
 
-        $this->moveSubtreeTo($parent->getLeftValue() + 1, $parent->getLevel() - $this->getLevel() + 1, $con);
+        $this->moveSubtreeTo($parent->getLeftValue() + 1, $parent->getLevel() - $this->getLevel() + 1, $parent->getScopeValue(), $con);
 
         return $this;
     }
@@ -10909,7 +10948,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             throw new PropelException('Cannot move a node as child of one of its subtree nodes.');
         }
 
-        $this->moveSubtreeTo($parent->getRightValue(), $parent->getLevel() - $this->getLevel() + 1, $con);
+        $this->moveSubtreeTo($parent->getRightValue(), $parent->getLevel() - $this->getLevel() + 1, $parent->getScopeValue(), $con);
 
         return $this;
     }
@@ -10935,7 +10974,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             throw new PropelException('Cannot move a node as sibling of one of its subtree nodes.');
         }
 
-        $this->moveSubtreeTo($sibling->getLeftValue(), $sibling->getLevel() - $this->getLevel(), $con);
+        $this->moveSubtreeTo($sibling->getLeftValue(), $sibling->getLevel() - $this->getLevel(), $sibling->getScopeValue(), $con);
 
         return $this;
     }
@@ -10961,7 +11000,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             throw new PropelException('Cannot move a node as sibling of one of its subtree nodes.');
         }
 
-        $this->moveSubtreeTo($sibling->getRightValue() + 1, $sibling->getLevel() - $this->getLevel(), $con);
+        $this->moveSubtreeTo($sibling->getRightValue() + 1, $sibling->getLevel() - $this->getLevel(), $sibling->getScopeValue(), $con);
 
         return $this;
     }
@@ -10973,11 +11012,16 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      * @param      int	$levelDelta Delta to add to the levels
      * @param      PropelPDO $con		Connection to use.
      */
-    protected function moveSubtreeTo($destLeft, $levelDelta, PropelPDO $con = null)
+    protected function moveSubtreeTo($destLeft, $levelDelta, $targetScope = null, PropelPDO $con = null)
     {
         $preventDefault = false;
         $left  = $this->getLeftValue();
         $right = $this->getRightValue();
+        $scope = $this->getScopeValue();
+
+        if ($targetScope === null) {
+            $targetScope = $scope;
+        }
 
 
         $treeSize = $right - $left +1;
@@ -10990,8 +11034,27 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         try {
 
             // make room next to the target for the subtree
-            PublicationPeer::shiftRLValues($treeSize, $destLeft, null, $con);
+            PublicationPeer::shiftRLValues($treeSize, $destLeft, null, $targetScope, $con);
 
+
+
+            if ($targetScope != $scope) {
+
+                //move subtree to < 0, so the items are out of scope.
+                PublicationPeer::shiftRLValues(-$right, $left, $right, $scope, $con);
+
+                //update scopes
+                PublicationPeer::setNegativeScope($targetScope, $con);
+
+                //update levels
+                PublicationPeer::shiftLevel($levelDelta, $left - $right, 0, $targetScope, $con);
+
+                //move the subtree to the target
+                PublicationPeer::shiftRLValues(($right - $left) + $destLeft, $left - $right, 0, $targetScope, $con);
+
+
+                $preventDefault = true;
+            }
 
 
             if (!$preventDefault) {
@@ -11004,15 +11067,15 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
                 if ($levelDelta) {
                     // update the levels of the subtree
-                    PublicationPeer::shiftLevel($levelDelta, $left, $right, $con);
+                    PublicationPeer::shiftLevel($levelDelta, $left, $right, $scope, $con);
                 }
 
                 // move the subtree to the target
-                PublicationPeer::shiftRLValues($destLeft - $left, $left, $right, $con);
+                PublicationPeer::shiftRLValues($destLeft - $left, $left, $right, $scope, $con);
             }
 
             // remove the empty room at the previous location of the subtree
-            PublicationPeer::shiftRLValues(-$treeSize, $right + 1, null, $con);
+            PublicationPeer::shiftRLValues(-$treeSize, $right + 1, null, $scope, $con);
 
             // update all loaded nodes
             PublicationPeer::updateLoadedNodes(null, $con);
@@ -11044,6 +11107,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         }
         $left = $this->getLeftValue();
         $right = $this->getRightValue();
+        $scope = $this->getScopeValue();
         $con->beginTransaction();
         try {
             // delete descendant nodes (will empty the instance pool)
@@ -11052,7 +11116,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 ->delete($con);
 
             // fill up the room that was used by descendants
-            PublicationPeer::shiftRLValues($left - $right + 1, $right, null, $con);
+            PublicationPeer::shiftRLValues($left - $right + 1, $right, null, $scope, $con);
 
             // fix the right value for the current node, which is now a leaf
             $this->setRightValue($left + 1);
@@ -11123,31 +11187,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         }
     }
 
-    /**
-     * Selects one of many related entities
-     */
 
-    public function getRepresentativeTitle(){
-
-        if ($this->countTitles() > 0) {
-
-            $pn = $this->getTitles();
-
-            // sort by rank if available
-            $rc = new \ReflectionClass(new Title());
-            if ( $rc->hasMethod('getSortableRank')) {
-                $pn->uasort(function($a, $b) {
-                            return $a->getSortableRank() - $b->getSortableRank();
-                        });
-            }
-
-            $pn = $pn->toKeyValue();
-            return array_shift($pn);
-
-        } else {
-            return "-";
-        }
-    }
     // reconstructed_flaggable behavior
     /**
     * Returns all columns that can be flagged as reconstructed.

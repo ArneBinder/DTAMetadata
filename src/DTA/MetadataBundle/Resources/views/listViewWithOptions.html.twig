@@ -33,7 +33,7 @@
 
     {% block preTable %}
     
-        <h3> {{ title|default('Listenansicht') }} </h3>
+        <h3> {{ title|default('Listenansicht')|trans }} </h3>
     
     {% endblock preTable %}
     
@@ -50,7 +50,7 @@
         <tbody>
         {% block tableBody %}
             {% for row in rows %}
-                <tr>
+                <tr data="{{row.controlsLink|default('')}}">
                 {% for acc in accessors %}
                     <td>
                         {{ attribute(row,acc)|raw }}
@@ -63,33 +63,25 @@
     </table>
     
 </div>
-<div class="well col-md-3">
-    <p>Optionen zur Auswahl</p>
+<div class="well col-md-3" id="publicationOptions" style="margin-top:-24px;">
 </div>
 {% endblock core %}
 
+{% block additionalJS %}
 
-{# full width button to add entities 
-                <tr> <td colspan="20">
-                    <a class="btn btn-mini listView-add-button" href="{{ path(package~'_genericNew', {'package':package, 'className':className}) }}">
-                        <i class="icon-pencil"></i>
-                        {{ className|trans~"listView.add.row.buttonSuffix"|trans }}
-                    </a>
-            </td></tr> #}
+var optionsPanel;
 
-{#
-<div class="span4 dta-data-filter-box">
-
-    <h3>Suchoptionen</h3>
+$(document).ready(function() {
     
-    <div class="sidebar-nav well">
-        <ul class="nav nav-list">
-            {% for col in columns %}
-                {% if col != '#' and col|capitalize != 'Id'|capitalize %}
-                <li><i class="icon-chevron-right" onmouseover="$(this).toggleClass('icon-chevron-right').toggleClass('icon-chevron-down')"></i>{{ col|trans }}</li>
-                {% endif %}
-            {% endfor %}
-        </ul>
-    </div><!--/.well -->
-</div><!--/span-->
-#}
+    optionsPanel = $('#publicationOptions');
+    
+    // make table rows clickable
+    var rows = $('table.table tr').slice(1);   // skip table head
+    rows.on("click", function(){
+        var controlsUrl = $(this).attr('data');
+        $.get(controlsUrl, function(data){optionsPanel.html(data);});
+    });
+});
+
+{% endblock additionalJS %}
+

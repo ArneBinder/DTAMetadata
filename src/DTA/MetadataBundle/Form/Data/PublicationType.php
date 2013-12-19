@@ -27,6 +27,9 @@ class PublicationType extends BaseAbstractType
     {
         
         $builder->add('title', new TitleType());
+        $builder->add('dirname','text',array(
+            'required' => false
+        ));
         
         $builder->add('PersonPublications', new DynamicCollectionType(), array(
             'type' => new Master\PersonPublicationType(),

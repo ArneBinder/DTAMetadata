@@ -92,7 +92,7 @@
         <column description="Umfang laut Katalog" name="catalogue_extent" type="LONGVARCHAR"/>
         
         <!--1: verfügbar, 0: nicht verfügbar, NULL: ungeklärt-->
-        <column name="availability" type="BOOLEAN"/>
+        <column name="available" type="BOOLEAN"/>
         <column name="comments" type="LONGVARCHAR"/>
         <column description="URL der Bilddigitalisate" name="imageurl" type="LONGVARCHAR"/>
         <column description="URN der Bilddigitalisate" name="imageurn" type="LONGVARCHAR"/>

@@ -85,6 +85,11 @@ dataDomain:
   path: /Data/
   defaults: { _controller: DTAMetadataBundle:DataDomain:index }
 
+# displayed content in the right side bar of the list view (data overview and task/copy location edit options)
+publicationControls:
+  path: /Data/publicationControls/{publicationId}
+  defaults: { _controller: DTAMetadataBundle:DataDomain:publicationControls}
+  
 viewPublicationsByType:
   path: /Data/viewPublicationsByType/{publicationType}
   defaults: { _controller: DTAMetadataBundle:DataDomain:viewPublicationsByType}

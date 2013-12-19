@@ -73,15 +73,26 @@ class DataDomainController extends ORMController {
         ));
     }
     
+    public function publicationControlsAction($publicationId) {
+        
+        $publication = Model\Data\Publication::getRowViewQueryObject()->findOneById($publicationId);
+        
+        return $this->render('DTAMetadataBundle:Package_Data:publicationControls.html.twig', array(
+            'publication' => $publication,
+        ));
+        
+    }
+    
     public function viewPersonsByRoleAction($personRoleId) {
         
         $role = Model\Classification\PersonroleQuery::create()
                 ->findOneById($personRoleId);
         
         $rows = array();//new \ArrayObject();
-        
         $personPublications = Model\Master\PersonPublicationQuery::create()
                 ->filterByPersonroleId($personRoleId)
+                ->usePublicationQuery()
+                    ->filterByType(Model\Data\PublicationPeer::TYPE_VOLUME, \Criteria::NOT_EQUAL)->endUse()
                 ->leftJoinWith('Person')
                 ->leftJoinWith('Person.Personalname')
                 ->leftJoinWith('Personalname.Namefragment')
@@ -89,27 +100,26 @@ class DataDomainController extends ORMController {
                 ->leftJoinWith('Publication.Title')
                 ->leftJoinWith('Title.Titlefragment')
                 ->find();
+        
         foreach ($personPublications as $pp) {
 
-            // the concrete publication object (PublicationM, PublicationJ, etc.) for which the publication provides the basic data fields
-            $wrapper = $pp->getPublication();//->getWrapperPublication();
-//            $wrapperClassName = $pp->getPublication()->getWrapperPublicationClass();
             // generate a link to the publication 
             $linkTarget = $this->generateUrl("Data_genericCreateOrEdit", array(
                     'className'=> 'Publication', //$wrapperClassName,
-                    'recordId'=>$wrapper->getId()
+                    'recordId'=>$pp->getPublication()->getId()
                 )
             );
 
             $linkTo = function($href,$title){return '<a href="'.$href.'">'.$title.'</a>';};
             $rows[] = array(
                 'repName' => $pp->getPerson()->getRepresentativePersonalname()->__toString(),
-                'context' => $linkTo($linkTarget, $pp->getPublication()->getTitle())
+                'context' => $linkTo($linkTarget, $pp->getPublication()->getTitle()),
+                'publicationType' => $pp->getPublication()->getType(),
             );
         }
         
-        $columns = array('Name', 'Publikation/Werk');
-        $accessors = array('repName', 'context');
+        $columns = array('Name', 'Publikation','Publikationstyp');
+        $accessors = array('repName', 'context', 'publicationType');
         $compareRow = function($a, $b){ return strcmp($a['repName'],$b['repName']); };
         // doesn't noticeably impact performance, but is maybe unnecessary if the javascript sorts the table anyways
         uasort($rows, $compareRow);
@@ -153,6 +163,7 @@ class DataDomainController extends ORMController {
             $rows[] = array(
                 'context' => $linkTo($linkTarget, $pub->getTitleString()),
                 'repName' => $pub->getFirstAuthor(),
+                'controlsLink' => $this->generateUrl("publicationControls", array('publicationId'=>$pub->getId()))
             );
         }
         
@@ -160,7 +171,7 @@ class DataDomainController extends ORMController {
         $accessors = array('context', 'repName');
 //        $compareRow = function($a, $b){ return strcmp($a['context'],$b['context']); };
 //        uasort($rows, $compareRow);
-        return $this->renderWithDomainData('DTAMetadataBundle::listView.html.twig', array(
+        return $this->renderWithDomainData('DTAMetadataBundle::listViewWithOptions.html.twig', array(
             'rows' => $rows,
             'columns' => $columns,
             'accessors' => $accessors,

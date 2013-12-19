@@ -77,20 +77,19 @@
         <!--<column name="status_id" type="INTEGER" required="true"/>-->
 
         <behavior name="nested_set">
-            <parameter name="use_scope" value="tree_id" />
+            <parameter name="use_scope" value="true" />
             <parameter name="scope_column" value="tree_id" />
         </behavior>
             
         <behavior name="table_row_view">
             <!--<parameter name="Datenbank ID" value="id"/>-->
-            <parameter name="Titel" value="accessor:getTitle"/>
+            <parameter name="Titel" value="accessor:getTitleString"/>
             <parameter name="erster Autor" value="accessor:getFirstAuthor"/>
-            <parameter name="Typ" value="type"/>
             <!--<parameter name="entstanden" value="accessor:getDatespecificationRelatedByCreationdateId"/>-->
-            <parameter name="Verlag" value="accessor:getPublishingCompany"/>
             <parameter name="veröffentlicht" value="accessor:getDatespecificationRelatedByPublicationdateId"/>
+            <parameter name="Verlag" value="accessor:getPublishingCompany"/>
             <!--<parameter name="embedcolumnsstatus" value="status"/>-->
-            <parameter name="embedcolumnstitle" value="title"/>
+            <parameter name="Typ" value="type"/>
             <parameter name="query" value="\DTA\MetadataBundle\Model\Data\PublicationQuery::create()
                     ->leftJoinWith('Title')
                     ->leftJoinWith('Title.Titlefragment')

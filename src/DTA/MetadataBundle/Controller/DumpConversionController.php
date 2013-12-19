@@ -322,6 +322,7 @@ class DumpConversionController extends ORMController {
             
             // save ------------------------------------------------------------------------------------
             
+            // basic publication data 
             $publication = new Model\Data\Publication();
             $publication->setId($row['id'])
                         ->setDirname($row['dirname'])
@@ -344,19 +345,17 @@ class DumpConversionController extends ORMController {
             // if this row corresponds to a volume of a multi-volume publication
             if(array_key_exists($row['title'].$row['autor1_lastname'], $multiVolumes)){
                 
-                $this->warnings[] = array('array key exists'=>$row['title'].$row['autor1_lastname']);
-                
                 // the parent publication (a multi-volume) to which the volume shall be added
                 $multiVolume = $multiVolumes[$row['title'].$row['autor1_lastname']]['multiVolume'];
                 
                 // create the multi-volume if it doesn't already exist
                 if($multiVolume === NULL){
                     
-                    $this->warnings[] = array('multi volume is null'=>$row['title'].$row['autor1_lastname']);
-                    
                     // create a new publication for the multi-volume
                     $basePublication = new Model\Data\Publication();
                     $basePublication->setId($this->publicationIdCounter++)
+                                    ->setTreeId($this->publicationIdCounter-1)
+                                    ->makeRoot()
                                     ->setType(Model\Data\PublicationPeer::TYPE_MULTIVOLUME)
                                     ->setTitle($title);
                     
@@ -383,8 +382,12 @@ class DumpConversionController extends ORMController {
                 );
                 
                 // link the volume to its containing multi-volume
-                $publication->setParent($multiVolume->getPublication())
-                            ->setType(Model\Data\PublicationPeer::TYPE_VOLUME);
+                
+                $publication->setTreeId($this->publicationIdCounter-1)
+//                        ->setParent($multiVolume->getPublication())
+                            ->insertAsLastChildOf($multiVolume->getPublication())
+                            ->setType(Model\Data\PublicationPeer::TYPE_VOLUME)
+                            ->save($this->propelConnection);
                 
                 $volume = new Model\Data\Volume();
                 $volume->setVolumeDescription($row['volume_description'])
@@ -393,6 +396,24 @@ class DumpConversionController extends ORMController {
                        ->save($this->propelConnection);
             } else {
                 // for non volumes, just save a basic publication
+                switch($row['publication_type']){
+                    case "M":
+                        $publication->setType (Model\Data\PublicationPeer::TYPE_BOOK);
+                        break;
+                    case "DM":
+                        $publication->setType (Model\Data\PublicationPeer::TYPE_CHAPTER);
+                        break;
+                    case "J":
+                        $publication->setType (Model\Data\PublicationPeer::TYPE_JOURNAL);
+                        break;
+                    case "JA":
+                        $publication->setType (Model\Data\PublicationPeer::TYPE_ARTICLE);
+                        break;
+                    default:
+                        $publication->setType (Model\Data\PublicationPeer::TYPE_BOOK);
+                        break;
+                }
+                
                 $publication->save($this->propelConnection);
                 
             }
@@ -467,7 +488,7 @@ class DumpConversionController extends ORMController {
                     ->setPartnerId($row['partner_id'])
                     ->setCreatedAt($row['created_at'])
                     ->setComments($row['comments'])
-                    ->setAvailability($row['accessible'])
+                    ->setAvailable($row['accessible'])
                     ->setUpdatedAt($row['updated_at'])
                     ->setCatalogueSignature($row['catalogue_signature'])
                     ->setCatalogueInternal($row['catalogue_internal']);

@@ -7,10 +7,17 @@ use DTA\MetadataBundle\Model;
 
 class Publication extends BasePublication
 {
-    // the concrete publication object (PublicationM, PublicationJ, etc.) for which this provides the basic data fields
-    private $wrapperPublication = null;
-    // only the class name (NO full qualification with namespaces, e.g. PublicationM)
-    private $wrapperPublicationClass = "";
+    // doesn't work!
+//    public function __construct(){
+//        
+//        parent::__construct();
+//        if($this->dirname === NULL){
+//            
+//            $this->dirname = "autor_wort_jahr";
+//            
+//        }
+//        
+//    }
     
     /**
      * Retrieves the publication object (volume, chapter, article) which uses this object.
@@ -18,11 +25,11 @@ class Publication extends BasePublication
     public function getSpecialization(){
         switch($this->getType()){
             case PublicationPeer::TYPE_ARTICLE:
-                return $this->getArticles()->pop();
+                return $this->getArticles()->getFirst();
             case PublicationPeer::TYPE_CHAPTER:
-                return $this->getChapters()->pop();
+                return $this->getChapters()->getFirst();
             case PublicationPeer::TYPE_VOLUME:
-                return $this->getVolumes()->pop();
+                return $this->getVolumes()->getFirst();
             default:
                 return $this;   
         }
@@ -63,4 +70,25 @@ class Publication extends BasePublication
         return $result;
         
     }
+    
+    /** Returns all tasks that are closed or open respectively. */
+    public function getTasksByClosed($closed){
+        
+        return Model\Workflow\TaskQuery::create()
+                ->filterByPublicationId($this->id)
+                ->filterByClosed($closed)
+                ->orderByTasktypeId()
+                ->find();
+        
+    }
+    
+//    public function getCopyLocations(){
+//        
+//        return Model\Workflow\CopyLocationQuery::create()
+//                ->filterByPublicationId($this->id)
+//                ->orderByPartnerId()
+//                ->find();
+//        
+//    }
+    
 }

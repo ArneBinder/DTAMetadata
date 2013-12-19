@@ -64,8 +64,8 @@ abstract class BaseCopyLocationPeer
     /** the column name for the catalogue_extent field */
     const CATALOGUE_EXTENT = 'copy_location.catalogue_extent';
 
-    /** the column name for the availability field */
-    const AVAILABILITY = 'copy_location.availability';
+    /** the column name for the available field */
+    const AVAILABLE = 'copy_location.available';
 
     /** the column name for the comments field */
     const COMMENTS = 'copy_location.comments';
@@ -104,11 +104,11 @@ abstract class BaseCopyLocationPeer
      * e.g. CopyLocationPeer::$fieldNames[CopyLocationPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'PartnerId', 'CatalogueSignature', 'CatalogueInternal', 'CatalogueUrl', 'Numfaksimiles', 'CatalogueExtent', 'Availability', 'Comments', 'Imageurl', 'Imageurn', 'LicenseId', 'CreatedAt', 'UpdatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'partnerId', 'catalogueSignature', 'catalogueInternal', 'catalogueUrl', 'numfaksimiles', 'catalogueExtent', 'availability', 'comments', 'imageurl', 'imageurn', 'licenseId', 'createdAt', 'updatedAt', ),
-        BasePeer::TYPE_COLNAME => array (CopyLocationPeer::ID, CopyLocationPeer::PUBLICATION_ID, CopyLocationPeer::PARTNER_ID, CopyLocationPeer::CATALOGUE_SIGNATURE, CopyLocationPeer::CATALOGUE_INTERNAL, CopyLocationPeer::CATALOGUE_URL, CopyLocationPeer::NUMFAKSIMILES, CopyLocationPeer::CATALOGUE_EXTENT, CopyLocationPeer::AVAILABILITY, CopyLocationPeer::COMMENTS, CopyLocationPeer::IMAGEURL, CopyLocationPeer::IMAGEURN, CopyLocationPeer::LICENSE_ID, CopyLocationPeer::CREATED_AT, CopyLocationPeer::UPDATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'PARTNER_ID', 'CATALOGUE_SIGNATURE', 'CATALOGUE_INTERNAL', 'CATALOGUE_URL', 'NUMFAKSIMILES', 'CATALOGUE_EXTENT', 'AVAILABILITY', 'COMMENTS', 'IMAGEURL', 'IMAGEURN', 'LICENSE_ID', 'CREATED_AT', 'UPDATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'partner_id', 'catalogue_signature', 'catalogue_internal', 'catalogue_url', 'numfaksimiles', 'catalogue_extent', 'availability', 'comments', 'imageurl', 'imageurn', 'license_id', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'PartnerId', 'CatalogueSignature', 'CatalogueInternal', 'CatalogueUrl', 'Numfaksimiles', 'CatalogueExtent', 'Available', 'Comments', 'Imageurl', 'Imageurn', 'LicenseId', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'partnerId', 'catalogueSignature', 'catalogueInternal', 'catalogueUrl', 'numfaksimiles', 'catalogueExtent', 'available', 'comments', 'imageurl', 'imageurn', 'licenseId', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (CopyLocationPeer::ID, CopyLocationPeer::PUBLICATION_ID, CopyLocationPeer::PARTNER_ID, CopyLocationPeer::CATALOGUE_SIGNATURE, CopyLocationPeer::CATALOGUE_INTERNAL, CopyLocationPeer::CATALOGUE_URL, CopyLocationPeer::NUMFAKSIMILES, CopyLocationPeer::CATALOGUE_EXTENT, CopyLocationPeer::AVAILABLE, CopyLocationPeer::COMMENTS, CopyLocationPeer::IMAGEURL, CopyLocationPeer::IMAGEURN, CopyLocationPeer::LICENSE_ID, CopyLocationPeer::CREATED_AT, CopyLocationPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'PARTNER_ID', 'CATALOGUE_SIGNATURE', 'CATALOGUE_INTERNAL', 'CATALOGUE_URL', 'NUMFAKSIMILES', 'CATALOGUE_EXTENT', 'AVAILABLE', 'COMMENTS', 'IMAGEURL', 'IMAGEURN', 'LICENSE_ID', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'partner_id', 'catalogue_signature', 'catalogue_internal', 'catalogue_url', 'numfaksimiles', 'catalogue_extent', 'available', 'comments', 'imageurl', 'imageurn', 'license_id', 'created_at', 'updated_at', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, )
     );
 
@@ -119,11 +119,11 @@ abstract class BaseCopyLocationPeer
      * e.g. CopyLocationPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'PartnerId' => 2, 'CatalogueSignature' => 3, 'CatalogueInternal' => 4, 'CatalogueUrl' => 5, 'Numfaksimiles' => 6, 'CatalogueExtent' => 7, 'Availability' => 8, 'Comments' => 9, 'Imageurl' => 10, 'Imageurn' => 11, 'LicenseId' => 12, 'CreatedAt' => 13, 'UpdatedAt' => 14, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'partnerId' => 2, 'catalogueSignature' => 3, 'catalogueInternal' => 4, 'catalogueUrl' => 5, 'numfaksimiles' => 6, 'catalogueExtent' => 7, 'availability' => 8, 'comments' => 9, 'imageurl' => 10, 'imageurn' => 11, 'licenseId' => 12, 'createdAt' => 13, 'updatedAt' => 14, ),
-        BasePeer::TYPE_COLNAME => array (CopyLocationPeer::ID => 0, CopyLocationPeer::PUBLICATION_ID => 1, CopyLocationPeer::PARTNER_ID => 2, CopyLocationPeer::CATALOGUE_SIGNATURE => 3, CopyLocationPeer::CATALOGUE_INTERNAL => 4, CopyLocationPeer::CATALOGUE_URL => 5, CopyLocationPeer::NUMFAKSIMILES => 6, CopyLocationPeer::CATALOGUE_EXTENT => 7, CopyLocationPeer::AVAILABILITY => 8, CopyLocationPeer::COMMENTS => 9, CopyLocationPeer::IMAGEURL => 10, CopyLocationPeer::IMAGEURN => 11, CopyLocationPeer::LICENSE_ID => 12, CopyLocationPeer::CREATED_AT => 13, CopyLocationPeer::UPDATED_AT => 14, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'PARTNER_ID' => 2, 'CATALOGUE_SIGNATURE' => 3, 'CATALOGUE_INTERNAL' => 4, 'CATALOGUE_URL' => 5, 'NUMFAKSIMILES' => 6, 'CATALOGUE_EXTENT' => 7, 'AVAILABILITY' => 8, 'COMMENTS' => 9, 'IMAGEURL' => 10, 'IMAGEURN' => 11, 'LICENSE_ID' => 12, 'CREATED_AT' => 13, 'UPDATED_AT' => 14, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'partner_id' => 2, 'catalogue_signature' => 3, 'catalogue_internal' => 4, 'catalogue_url' => 5, 'numfaksimiles' => 6, 'catalogue_extent' => 7, 'availability' => 8, 'comments' => 9, 'imageurl' => 10, 'imageurn' => 11, 'license_id' => 12, 'created_at' => 13, 'updated_at' => 14, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'PartnerId' => 2, 'CatalogueSignature' => 3, 'CatalogueInternal' => 4, 'CatalogueUrl' => 5, 'Numfaksimiles' => 6, 'CatalogueExtent' => 7, 'Available' => 8, 'Comments' => 9, 'Imageurl' => 10, 'Imageurn' => 11, 'LicenseId' => 12, 'CreatedAt' => 13, 'UpdatedAt' => 14, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'partnerId' => 2, 'catalogueSignature' => 3, 'catalogueInternal' => 4, 'catalogueUrl' => 5, 'numfaksimiles' => 6, 'catalogueExtent' => 7, 'available' => 8, 'comments' => 9, 'imageurl' => 10, 'imageurn' => 11, 'licenseId' => 12, 'createdAt' => 13, 'updatedAt' => 14, ),
+        BasePeer::TYPE_COLNAME => array (CopyLocationPeer::ID => 0, CopyLocationPeer::PUBLICATION_ID => 1, CopyLocationPeer::PARTNER_ID => 2, CopyLocationPeer::CATALOGUE_SIGNATURE => 3, CopyLocationPeer::CATALOGUE_INTERNAL => 4, CopyLocationPeer::CATALOGUE_URL => 5, CopyLocationPeer::NUMFAKSIMILES => 6, CopyLocationPeer::CATALOGUE_EXTENT => 7, CopyLocationPeer::AVAILABLE => 8, CopyLocationPeer::COMMENTS => 9, CopyLocationPeer::IMAGEURL => 10, CopyLocationPeer::IMAGEURN => 11, CopyLocationPeer::LICENSE_ID => 12, CopyLocationPeer::CREATED_AT => 13, CopyLocationPeer::UPDATED_AT => 14, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'PARTNER_ID' => 2, 'CATALOGUE_SIGNATURE' => 3, 'CATALOGUE_INTERNAL' => 4, 'CATALOGUE_URL' => 5, 'NUMFAKSIMILES' => 6, 'CATALOGUE_EXTENT' => 7, 'AVAILABLE' => 8, 'COMMENTS' => 9, 'IMAGEURL' => 10, 'IMAGEURN' => 11, 'LICENSE_ID' => 12, 'CREATED_AT' => 13, 'UPDATED_AT' => 14, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'partner_id' => 2, 'catalogue_signature' => 3, 'catalogue_internal' => 4, 'catalogue_url' => 5, 'numfaksimiles' => 6, 'catalogue_extent' => 7, 'available' => 8, 'comments' => 9, 'imageurl' => 10, 'imageurn' => 11, 'license_id' => 12, 'created_at' => 13, 'updated_at' => 14, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, )
     );
 
@@ -206,7 +206,7 @@ abstract class BaseCopyLocationPeer
             $criteria->addSelectColumn(CopyLocationPeer::CATALOGUE_URL);
             $criteria->addSelectColumn(CopyLocationPeer::NUMFAKSIMILES);
             $criteria->addSelectColumn(CopyLocationPeer::CATALOGUE_EXTENT);
-            $criteria->addSelectColumn(CopyLocationPeer::AVAILABILITY);
+            $criteria->addSelectColumn(CopyLocationPeer::AVAILABLE);
             $criteria->addSelectColumn(CopyLocationPeer::COMMENTS);
             $criteria->addSelectColumn(CopyLocationPeer::IMAGEURL);
             $criteria->addSelectColumn(CopyLocationPeer::IMAGEURN);
@@ -222,7 +222,7 @@ abstract class BaseCopyLocationPeer
             $criteria->addSelectColumn($alias . '.catalogue_url');
             $criteria->addSelectColumn($alias . '.numfaksimiles');
             $criteria->addSelectColumn($alias . '.catalogue_extent');
-            $criteria->addSelectColumn($alias . '.availability');
+            $criteria->addSelectColumn($alias . '.available');
             $criteria->addSelectColumn($alias . '.comments');
             $criteria->addSelectColumn($alias . '.imageurl');
             $criteria->addSelectColumn($alias . '.imageurn');

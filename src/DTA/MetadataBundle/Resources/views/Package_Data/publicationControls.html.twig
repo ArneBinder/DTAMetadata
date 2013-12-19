@@ -1,0 +1,70 @@
+
+<table>
+  <thead>
+    <tr>
+      <th colspan="2" >{{publication.getTitleString}}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Autor</td>
+      <td>{{publication.getFirstAuthor}}</td>
+    </tr>
+    {% if publication.getDatespecificationRelatedByCreationdateId is not null %}
+    <tr>
+      <td>Entstanden</td>
+      <td>{{publication.getDatespecificationRelatedByCreationdateId}}</td>
+    </tr>
+    {% endif %}
+    <tr>
+      <td>Veröffentlicht</td>
+      <td>{{publication.getDatespecificationRelatedByPublicationdateId}}</td>
+    </tr>
+    {% if publication.getType == "VOLUME" %}
+    {% set volume = publication.getSpecialization %}
+    <tr>
+      <td>Band</td>
+      <td>
+        {{ volume.volumeNumeric }} von {{volume.volumesTotal}} <br/>
+        {{ volume.volumeNumeric>1?'vorheriger':''}}
+        {{ volume.volumeNumeric<volume.volumesTotal?'nächster':''}}</td>
+    </tr>
+    {% endif %}
+  </tbody>
+</table>
+
+<a href="#" class="btn btn-default disabled">Vollanzeige</a> 
+<a href="{{path('Data_genericCreateOrEdit', {'className':'Publication','recordId':publication.id})}}" class="btn btn-default">Editieren</a> 
+<br/>
+
+{% set openTasks = publication.getTasksByClosed(false) %}
+{% if openTasks|length > 0 %}
+    <h4>Offene Tasks</h4>
+{% for task in openTasks %}
+    {{task.tasktype}} <br/>
+{% endfor %}
+{% endif %}
+
+{% set closedTasks = publication.getTasksByClosed(true) %}
+{% if closedTasks|length > 0 %}
+    <h4>Geschlossene Tasks</h4>
+{% for task in closedTasks %}
+    {{task.tasktype}} <br/>
+{% endfor %}
+{% endif %}
+
+{# old format: CoordinateMerge_Don	12.03.2010	12.03.2010 #}
+
+{% set copyLocations = publication.getCopyLocations %}
+{% if copyLocations|length > 0 %}
+<h4>Nachweise</h4>
+{% for copyLocation in copyLocations %}
+    {% set tagImageUrl = copyLocation.available ? asset('img/tag_green.png') : asset('img/tag_red.png') %}
+    {% set editCopyLocationURL = path('Workflow_genericCreateOrEdit', {'className':'CopyLocation','recordId':copyLocation.id}) %}
+    <img src="{{tagImageUrl}}"/> 
+    <a href="{{editCopyLocationURL}}">
+        {{ copyLocation.partner is null ? copyLocation.CatalogueSignature : copyLocation.partner }} 
+    </a><br/>
+{% endfor %}
+{% endif %}
+Zeige Übersicht

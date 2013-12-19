@@ -3637,6 +3637,28 @@ abstract class BasePublicationQuery extends ModelCriteria
     // nested_set behavior
 
     /**
+     * Filter the query to restrict the result to root objects
+     *
+     * @return    PublicationQuery The current query, for fluid interface
+     */
+    public function treeRoots()
+    {
+        return $this->addUsingAlias(PublicationPeer::LEFT_COL, 1, Criteria::EQUAL);
+    }
+
+    /**
+     * Returns the objects in a certain tree, from the tree scope
+     *
+     * @param     int $scope		Scope to determine which objects node to return
+     *
+     * @return    PublicationQuery The current query, for fluid interface
+     */
+    public function inTree($scope = null)
+    {
+        return $this->addUsingAlias(PublicationPeer::SCOPE_COL, $scope, Criteria::EQUAL);
+    }
+
+    /**
      * Filter the query to restrict the result to descendants of an object
      *
      * @param     Publication $publication The object to use for descendant search
@@ -3646,6 +3668,7 @@ abstract class BasePublicationQuery extends ModelCriteria
     public function descendantsOf($publication)
     {
         return $this
+            ->inTree($publication->getScopeValue())
             ->addUsingAlias(PublicationPeer::LEFT_COL, $publication->getLeftValue(), Criteria::GREATER_THAN)
             ->addUsingAlias(PublicationPeer::LEFT_COL, $publication->getRightValue(), Criteria::LESS_THAN);
     }
@@ -3661,6 +3684,7 @@ abstract class BasePublicationQuery extends ModelCriteria
     public function branchOf($publication)
     {
         return $this
+            ->inTree($publication->getScopeValue())
             ->addUsingAlias(PublicationPeer::LEFT_COL, $publication->getLeftValue(), Criteria::GREATER_EQUAL)
             ->addUsingAlias(PublicationPeer::LEFT_COL, $publication->getRightValue(), Criteria::LESS_EQUAL);
     }
@@ -3710,6 +3734,7 @@ abstract class BasePublicationQuery extends ModelCriteria
     public function ancestorsOf($publication)
     {
         return $this
+            ->inTree($publication->getScopeValue())
             ->addUsingAlias(PublicationPeer::LEFT_COL, $publication->getLeftValue(), Criteria::LESS_THAN)
             ->addUsingAlias(PublicationPeer::RIGHT_COL, $publication->getRightValue(), Criteria::GREATER_THAN);
     }
@@ -3725,6 +3750,7 @@ abstract class BasePublicationQuery extends ModelCriteria
     public function rootsOf($publication)
     {
         return $this
+            ->inTree($publication->getScopeValue())
             ->addUsingAlias(PublicationPeer::LEFT_COL, $publication->getLeftValue(), Criteria::LESS_EQUAL)
             ->addUsingAlias(PublicationPeer::RIGHT_COL, $publication->getRightValue(), Criteria::GREATER_EQUAL);
     }
@@ -3766,29 +3792,47 @@ abstract class BasePublicationQuery extends ModelCriteria
     }
 
     /**
-     * Returns the root node for the tree
+     * Returns a root node for the tree
      *
+     * @param      int $scope		Scope to determine which root node to return
      * @param      PropelPDO $con	Connection to use.
      *
      * @return     Publication The tree root object
      */
-    public function findRoot($con = null)
+    public function findRoot($scope = null, $con = null)
     {
         return $this
             ->addUsingAlias(PublicationPeer::LEFT_COL, 1, Criteria::EQUAL)
+            ->inTree($scope)
             ->findOne($con);
     }
 
     /**
-     * Returns the tree of objects
+     * Returns the root objects for all trees.
      *
+     * @param      PropelPDO $con	Connection to use.
+     *
+     * @return    mixed the list of results, formatted by the current formatter
+     */
+    public function findRoots($con = null)
+    {
+        return $this
+            ->treeRoots()
+            ->find($con);
+    }
+
+    /**
+     * Returns a tree of objects
+     *
+     * @param      int $scope		Scope to determine which tree node to return
      * @param      PropelPDO $con	Connection to use.
      *
      * @return     mixed the list of results, formatted by the current formatter
      */
-    public function findTree($con = null)
+    public function findTree($scope = null, $con = null)
     {
         return $this
+            ->inTree($scope)
             ->orderByBranch()
             ->find($con);
     }
