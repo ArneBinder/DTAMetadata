@@ -26,6 +26,7 @@
         
         <column name="type" description="Publikationstyp. Zur Auflösung des dynamischen Typs (ein Volume bettet ein Publication objekt ein, mit nichts als dem Publikationsobjekt in der Hand, lässt sich das zugehörige speziellere objekt aber nur durch ausprobieren aller objektarten herausfinden.)" 
                 type="ENUM" valueSet="BOOK,VOLUME,MULTIVOLUME,CHAPTER,JOURNAL,ARTICLE" />
+        <column name="legacytype" description="Altes Publikationstypen-Kürzel (J, JA, M, MM, MMS, etc.)" type="LONGVARCHAR" />
         
         <column name="title_id" type="INTEGER" required="true"/>
         
@@ -84,6 +85,7 @@
             <!--<parameter name="Datenbank ID" value="id"/>-->
             <parameter name="Titel" value="accessor:getTitle"/>
             <parameter name="erster Autor" value="accessor:getFirstAuthor"/>
+            <parameter name="Typ" value="type"/>
             <!--<parameter name="entstanden" value="accessor:getDatespecificationRelatedByCreationdateId"/>-->
             <parameter name="Verlag" value="accessor:getPublishingCompany"/>
             <parameter name="veröffentlicht" value="accessor:getDatespecificationRelatedByPublicationdateId"/>
@@ -118,6 +120,21 @@
 
     <!-- Publication types. -->
 
+    <!--MULTI-VOLUME               
+        Mehrbändiges Werk.
+        Zur Abbildung der Publikationstypen MM und MMS.
+    -->
+    <table name="multi_volume">
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="publication_id" type="INTEGER" required="true"/>
+        
+        <column name="volumes_total" description="Anzahl Bände (gesamt)" type="INTEGER"/>
+        
+        <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>
+        
+        <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
+    </table> 
+    
     <!--VOLUME               
         Buch, das zu einem mehrbändigen Werk gehört. 
         Zur Abbildung der Publikationstypen MM und MMS.
@@ -126,10 +143,8 @@
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="publication_id" type="INTEGER" required="true"/>
         
-        <column name="volumedescription" description="Bezeichnung des Bandes (alphanumerisch)" type="INTEGER"/>
-        <column name="volumenumeric" description="Bezeichnung des Bandes (numerisch)" type="INTEGER"/>
-        <column name="volumestotal" description="Anzahl Bände (gesamt)" type="INTEGER"/>
-        
+        <column name="volume_description" description="Bezeichnung des Bandes (alphanumerisch)" type="LONGVARCHAR"/>
+        <column name="volume_numeric" description="Bezeichnung des Bandes (numerisch)" type="INTEGER"/>
         
         <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>
         

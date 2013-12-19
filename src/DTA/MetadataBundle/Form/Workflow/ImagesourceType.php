@@ -22,6 +22,7 @@ class ImagesourceType extends BaseAbstractType
             'property' => 'Name',
             'label' => 'Anbieter Leitdruck',
             'searchable' => true,
+            'query' => \DTA\MetadataBundle\Model\Workflow\Partner::getRowViewQueryObject()
         ));
         $builder->add('cataloguesignature', 'text', array('required'=>false));
         $builder->add('catalogueurl', 'text', array('required'=>false));

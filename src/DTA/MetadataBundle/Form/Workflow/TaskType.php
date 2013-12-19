@@ -34,7 +34,8 @@ class TaskType extends BaseAbstractType
         $builder->add('Partner', 'model', array(
             'property' => 'name',
             'class' => 'DTA\MetadataBundle\Model\Workflow\Partner',
-            'label' => 'Partner'
+            'label' => 'Partner',
+            'query' => \DTA\MetadataBundle\Model\Workflow\Partner::getRowViewQueryObject()
         ));
         $builder->add('closed', null, array(
             'label' => 'Abgeschlossen',

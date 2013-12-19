@@ -13,24 +13,24 @@ use \Propel;
 use \PropelDateTime;
 use \PropelException;
 use \PropelPDO;
+use DTA\MetadataBundle\Model\Data\MultiVolume;
+use DTA\MetadataBundle\Model\Data\MultiVolumePeer;
+use DTA\MetadataBundle\Model\Data\MultiVolumeQuery;
 use DTA\MetadataBundle\Model\Data\Publication;
 use DTA\MetadataBundle\Model\Data\PublicationQuery;
-use DTA\MetadataBundle\Model\Data\Volume;
-use DTA\MetadataBundle\Model\Data\VolumePeer;
-use DTA\MetadataBundle\Model\Data\VolumeQuery;
 
-abstract class BaseVolume extends BaseObject implements Persistent, \DTA\MetadataBundle\Model\table_row_view\TableRowViewInterface
+abstract class BaseMultiVolume extends BaseObject implements Persistent, \DTA\MetadataBundle\Model\table_row_view\TableRowViewInterface
 {
     /**
      * Peer class name
      */
-    const PEER = 'DTA\\MetadataBundle\\Model\\Data\\VolumePeer';
+    const PEER = 'DTA\\MetadataBundle\\Model\\Data\\MultiVolumePeer';
 
     /**
      * The Peer class.
      * Instance provides a convenient way of calling static methods on a class
      * that calling code may not be able to identify.
-     * @var        VolumePeer
+     * @var        MultiVolumePeer
      */
     protected static $peer;
 
@@ -53,16 +53,10 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
     protected $publication_id;
 
     /**
-     * The value for the volume_description field.
-     * @var        string
-     */
-    protected $volume_description;
-
-    /**
-     * The value for the volume_numeric field.
+     * The value for the volumes_total field.
      * @var        int
      */
-    protected $volume_numeric;
+    protected $volumes_total;
 
     /**
      * The value for the created_at field.
@@ -126,25 +120,14 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
     }
 
     /**
-     * Get the [volume_description] column value.
-     * Bezeichnung des Bandes (alphanumerisch)
-     * @return string
-     */
-    public function getVolumeDescription()
-    {
-
-        return $this->volume_description;
-    }
-
-    /**
-     * Get the [volume_numeric] column value.
-     * Bezeichnung des Bandes (numerisch)
+     * Get the [volumes_total] column value.
+     * Anzahl Bände (gesamt)
      * @return int
      */
-    public function getVolumeNumeric()
+    public function getVolumesTotal()
     {
 
-        return $this->volume_numeric;
+        return $this->volumes_total;
     }
 
     /**
@@ -221,7 +204,7 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
      * Set the value of [id] column.
      *
      * @param  int $v new value
-     * @return Volume The current object (for fluent API support)
+     * @return MultiVolume The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -231,7 +214,7 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = VolumePeer::ID;
+            $this->modifiedColumns[] = MultiVolumePeer::ID;
         }
 
 
@@ -242,7 +225,7 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
      * Set the value of [publication_id] column.
      *
      * @param  int $v new value
-     * @return Volume The current object (for fluent API support)
+     * @return MultiVolume The current object (for fluent API support)
      */
     public function setPublicationId($v)
     {
@@ -252,7 +235,7 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
 
         if ($this->publication_id !== $v) {
             $this->publication_id = $v;
-            $this->modifiedColumns[] = VolumePeer::PUBLICATION_ID;
+            $this->modifiedColumns[] = MultiVolumePeer::PUBLICATION_ID;
         }
 
         if ($this->aPublication !== null && $this->aPublication->getId() !== $v) {
@@ -264,53 +247,32 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
     } // setPublicationId()
 
     /**
-     * Set the value of [volume_description] column.
-     * Bezeichnung des Bandes (alphanumerisch)
-     * @param  string $v new value
-     * @return Volume The current object (for fluent API support)
-     */
-    public function setVolumeDescription($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (string) $v;
-        }
-
-        if ($this->volume_description !== $v) {
-            $this->volume_description = $v;
-            $this->modifiedColumns[] = VolumePeer::VOLUME_DESCRIPTION;
-        }
-
-
-        return $this;
-    } // setVolumeDescription()
-
-    /**
-     * Set the value of [volume_numeric] column.
-     * Bezeichnung des Bandes (numerisch)
+     * Set the value of [volumes_total] column.
+     * Anzahl Bände (gesamt)
      * @param  int $v new value
-     * @return Volume The current object (for fluent API support)
+     * @return MultiVolume The current object (for fluent API support)
      */
-    public function setVolumeNumeric($v)
+    public function setVolumesTotal($v)
     {
         if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
-        if ($this->volume_numeric !== $v) {
-            $this->volume_numeric = $v;
-            $this->modifiedColumns[] = VolumePeer::VOLUME_NUMERIC;
+        if ($this->volumes_total !== $v) {
+            $this->volumes_total = $v;
+            $this->modifiedColumns[] = MultiVolumePeer::VOLUMES_TOTAL;
         }
 
 
         return $this;
-    } // setVolumeNumeric()
+    } // setVolumesTotal()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param mixed $v string, integer (timestamp), or DateTime value.
      *               Empty strings are treated as null.
-     * @return Volume The current object (for fluent API support)
+     * @return MultiVolume The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -320,7 +282,7 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
             $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
             if ($currentDateAsString !== $newDateAsString) {
                 $this->created_at = $newDateAsString;
-                $this->modifiedColumns[] = VolumePeer::CREATED_AT;
+                $this->modifiedColumns[] = MultiVolumePeer::CREATED_AT;
             }
         } // if either are not null
 
@@ -333,7 +295,7 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
      *
      * @param mixed $v string, integer (timestamp), or DateTime value.
      *               Empty strings are treated as null.
-     * @return Volume The current object (for fluent API support)
+     * @return MultiVolume The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -343,7 +305,7 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
             $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
             if ($currentDateAsString !== $newDateAsString) {
                 $this->updated_at = $newDateAsString;
-                $this->modifiedColumns[] = VolumePeer::UPDATED_AT;
+                $this->modifiedColumns[] = MultiVolumePeer::UPDATED_AT;
             }
         } // if either are not null
 
@@ -385,10 +347,9 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->publication_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-            $this->volume_description = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-            $this->volume_numeric = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
-            $this->created_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-            $this->updated_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+            $this->volumes_total = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+            $this->created_at = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+            $this->updated_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -398,10 +359,10 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
             }
             $this->postHydrate($row, $startcol, $rehydrate);
 
-            return $startcol + 6; // 6 = VolumePeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = MultiVolumePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating Volume object", $e);
+            throw new PropelException("Error populating MultiVolume object", $e);
         }
     }
 
@@ -447,13 +408,13 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(VolumePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(MultiVolumePeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $stmt = VolumePeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+        $stmt = MultiVolumePeer::doSelectStmt($this->buildPkeyCriteria(), $con);
         $row = $stmt->fetch(PDO::FETCH_NUM);
         $stmt->closeCursor();
         if (!$row) {
@@ -484,12 +445,12 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(VolumePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(MultiVolumePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = VolumeQuery::create()
+            $deleteQuery = MultiVolumeQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -527,7 +488,7 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(VolumePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(MultiVolumePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         $con->beginTransaction();
@@ -537,16 +498,16 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
-                if (!$this->isColumnModified(VolumePeer::CREATED_AT)) {
+                if (!$this->isColumnModified(MultiVolumePeer::CREATED_AT)) {
                     $this->setCreatedAt(time());
                 }
-                if (!$this->isColumnModified(VolumePeer::UPDATED_AT)) {
+                if (!$this->isColumnModified(MultiVolumePeer::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             } else {
                 $ret = $ret && $this->preUpdate($con);
                 // timestampable behavior
-                if ($this->isModified() && !$this->isColumnModified(VolumePeer::UPDATED_AT)) {
+                if ($this->isModified() && !$this->isColumnModified(MultiVolumePeer::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             }
@@ -558,7 +519,7 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                VolumePeer::addInstanceToPool($this);
+                MultiVolumePeer::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -631,13 +592,13 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = VolumePeer::ID;
+        $this->modifiedColumns[] = MultiVolumePeer::ID;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . VolumePeer::ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . MultiVolumePeer::ID . ')');
         }
         if (null === $this->id) {
             try {
-                $stmt = $con->query("SELECT nextval('volume_id_seq')");
+                $stmt = $con->query("SELECT nextval('multi_volume_id_seq')");
                 $row = $stmt->fetch(PDO::FETCH_NUM);
                 $this->id = $row[0];
             } catch (Exception $e) {
@@ -647,27 +608,24 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
 
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(VolumePeer::ID)) {
+        if ($this->isColumnModified(MultiVolumePeer::ID)) {
             $modifiedColumns[':p' . $index++]  = '"id"';
         }
-        if ($this->isColumnModified(VolumePeer::PUBLICATION_ID)) {
+        if ($this->isColumnModified(MultiVolumePeer::PUBLICATION_ID)) {
             $modifiedColumns[':p' . $index++]  = '"publication_id"';
         }
-        if ($this->isColumnModified(VolumePeer::VOLUME_DESCRIPTION)) {
-            $modifiedColumns[':p' . $index++]  = '"volume_description"';
+        if ($this->isColumnModified(MultiVolumePeer::VOLUMES_TOTAL)) {
+            $modifiedColumns[':p' . $index++]  = '"volumes_total"';
         }
-        if ($this->isColumnModified(VolumePeer::VOLUME_NUMERIC)) {
-            $modifiedColumns[':p' . $index++]  = '"volume_numeric"';
-        }
-        if ($this->isColumnModified(VolumePeer::CREATED_AT)) {
+        if ($this->isColumnModified(MultiVolumePeer::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '"created_at"';
         }
-        if ($this->isColumnModified(VolumePeer::UPDATED_AT)) {
+        if ($this->isColumnModified(MultiVolumePeer::UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '"updated_at"';
         }
 
         $sql = sprintf(
-            'INSERT INTO "volume" (%s) VALUES (%s)',
+            'INSERT INTO "multi_volume" (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -682,11 +640,8 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
                     case '"publication_id"':
                         $stmt->bindValue($identifier, $this->publication_id, PDO::PARAM_INT);
                         break;
-                    case '"volume_description"':
-                        $stmt->bindValue($identifier, $this->volume_description, PDO::PARAM_STR);
-                        break;
-                    case '"volume_numeric"':
-                        $stmt->bindValue($identifier, $this->volume_numeric, PDO::PARAM_INT);
+                    case '"volumes_total"':
+                        $stmt->bindValue($identifier, $this->volumes_total, PDO::PARAM_INT);
                         break;
                     case '"created_at"':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
@@ -793,7 +748,7 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
             }
 
 
-            if (($retval = VolumePeer::doValidate($this, $columns)) !== true) {
+            if (($retval = MultiVolumePeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
@@ -817,7 +772,7 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
      */
     public function getByName($name, $type = BasePeer::TYPE_PHPNAME)
     {
-        $pos = VolumePeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+        $pos = MultiVolumePeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -840,15 +795,12 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
                 return $this->getPublicationId();
                 break;
             case 2:
-                return $this->getVolumeDescription();
+                return $this->getVolumesTotal();
                 break;
             case 3:
-                return $this->getVolumeNumeric();
-                break;
-            case 4:
                 return $this->getCreatedAt();
                 break;
-            case 5:
+            case 4:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -874,18 +826,17 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
      */
     public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['Volume'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['MultiVolume'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['Volume'][$this->getPrimaryKey()] = true;
-        $keys = VolumePeer::getFieldNames($keyType);
+        $alreadyDumpedObjects['MultiVolume'][$this->getPrimaryKey()] = true;
+        $keys = MultiVolumePeer::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getPublicationId(),
-            $keys[2] => $this->getVolumeDescription(),
-            $keys[3] => $this->getVolumeNumeric(),
-            $keys[4] => $this->getCreatedAt(),
-            $keys[5] => $this->getUpdatedAt(),
+            $keys[2] => $this->getVolumesTotal(),
+            $keys[3] => $this->getCreatedAt(),
+            $keys[4] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -914,7 +865,7 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
      */
     public function setByName($name, $value, $type = BasePeer::TYPE_PHPNAME)
     {
-        $pos = VolumePeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+        $pos = MultiVolumePeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 
         $this->setByPosition($pos, $value);
     }
@@ -937,15 +888,12 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
                 $this->setPublicationId($value);
                 break;
             case 2:
-                $this->setVolumeDescription($value);
+                $this->setVolumesTotal($value);
                 break;
             case 3:
-                $this->setVolumeNumeric($value);
-                break;
-            case 4:
                 $this->setCreatedAt($value);
                 break;
-            case 5:
+            case 4:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -970,14 +918,13 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
      */
     public function fromArray($arr, $keyType = BasePeer::TYPE_PHPNAME)
     {
-        $keys = VolumePeer::getFieldNames($keyType);
+        $keys = MultiVolumePeer::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setPublicationId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setVolumeDescription($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setVolumeNumeric($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[2], $arr)) $this->setVolumesTotal($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
     }
 
     /**
@@ -987,14 +934,13 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(VolumePeer::DATABASE_NAME);
+        $criteria = new Criteria(MultiVolumePeer::DATABASE_NAME);
 
-        if ($this->isColumnModified(VolumePeer::ID)) $criteria->add(VolumePeer::ID, $this->id);
-        if ($this->isColumnModified(VolumePeer::PUBLICATION_ID)) $criteria->add(VolumePeer::PUBLICATION_ID, $this->publication_id);
-        if ($this->isColumnModified(VolumePeer::VOLUME_DESCRIPTION)) $criteria->add(VolumePeer::VOLUME_DESCRIPTION, $this->volume_description);
-        if ($this->isColumnModified(VolumePeer::VOLUME_NUMERIC)) $criteria->add(VolumePeer::VOLUME_NUMERIC, $this->volume_numeric);
-        if ($this->isColumnModified(VolumePeer::CREATED_AT)) $criteria->add(VolumePeer::CREATED_AT, $this->created_at);
-        if ($this->isColumnModified(VolumePeer::UPDATED_AT)) $criteria->add(VolumePeer::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(MultiVolumePeer::ID)) $criteria->add(MultiVolumePeer::ID, $this->id);
+        if ($this->isColumnModified(MultiVolumePeer::PUBLICATION_ID)) $criteria->add(MultiVolumePeer::PUBLICATION_ID, $this->publication_id);
+        if ($this->isColumnModified(MultiVolumePeer::VOLUMES_TOTAL)) $criteria->add(MultiVolumePeer::VOLUMES_TOTAL, $this->volumes_total);
+        if ($this->isColumnModified(MultiVolumePeer::CREATED_AT)) $criteria->add(MultiVolumePeer::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(MultiVolumePeer::UPDATED_AT)) $criteria->add(MultiVolumePeer::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -1009,8 +955,8 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(VolumePeer::DATABASE_NAME);
-        $criteria->add(VolumePeer::ID, $this->id);
+        $criteria = new Criteria(MultiVolumePeer::DATABASE_NAME);
+        $criteria->add(MultiVolumePeer::ID, $this->id);
 
         return $criteria;
     }
@@ -1051,7 +997,7 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param object $copyObj An object of Volume (or compatible) type.
+     * @param object $copyObj An object of MultiVolume (or compatible) type.
      * @param boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
@@ -1059,8 +1005,7 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setPublicationId($this->getPublicationId());
-        $copyObj->setVolumeDescription($this->getVolumeDescription());
-        $copyObj->setVolumeNumeric($this->getVolumeNumeric());
+        $copyObj->setVolumesTotal($this->getVolumesTotal());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -1090,7 +1035,7 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
      * objects.
      *
      * @param boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return Volume Clone of current object.
+     * @return MultiVolume Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1110,12 +1055,12 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
      * same instance for all member of this class. The method could therefore
      * be static, but this would prevent one from overriding the behavior.
      *
-     * @return VolumePeer
+     * @return MultiVolumePeer
      */
     public function getPeer()
     {
         if (self::$peer === null) {
-            self::$peer = new VolumePeer();
+            self::$peer = new MultiVolumePeer();
         }
 
         return self::$peer;
@@ -1125,7 +1070,7 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
      * Declares an association between this object and a Publication object.
      *
      * @param                  Publication $v
-     * @return Volume The current object (for fluent API support)
+     * @return MultiVolume The current object (for fluent API support)
      * @throws PropelException
      */
     public function setPublication(Publication $v = null)
@@ -1141,7 +1086,7 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the Publication object, it will not be re-added.
         if ($v !== null) {
-            $v->addVolume($this);
+            $v->addMultiVolume($this);
         }
 
 
@@ -1166,7 +1111,7 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aPublication->addVolumes($this);
+                $this->aPublication->addMultiVolumes($this);
              */
         }
 
@@ -1180,8 +1125,7 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
     {
         $this->id = null;
         $this->publication_id = null;
-        $this->volume_description = null;
-        $this->volume_numeric = null;
+        $this->volumes_total = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -1223,7 +1167,7 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
      */
     public function __toString()
     {
-        return (string) $this->exportTo(VolumePeer::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(MultiVolumePeer::DEFAULT_STRING_FORMAT);
     }
 
     /**
@@ -1313,11 +1257,11 @@ abstract class BaseVolume extends BaseObject implements Persistent, \DTA\Metadat
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     Volume The current object (for fluent API support)
+     * @return     MultiVolume The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = VolumePeer::UPDATED_AT;
+        $this->modifiedColumns[] = MultiVolumePeer::UPDATED_AT;
 
         return $this;
     }

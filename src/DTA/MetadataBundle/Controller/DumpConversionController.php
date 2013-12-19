@@ -28,8 +28,14 @@ class DumpConversionController extends ORMController {
     private $warnings;
     private $errors;
     
-    /** Connection used in the target database. */
+    /** Connection used in the target database, can be used to wrap multiple queries in a single transaction for a small speedup. */
     private $propelConnection;
+    
+    /** For convenience, old Ids are retained whereever possible in the new database. 
+     * This requires auto-increment to be off for some id columns and this counter can be used to get a free publication ID, since 
+     * publication Ids in the old databse start somewhere from 16000 upwards.
+     */
+    private $publicationIdCounter = 1;
     
     /**
      * @param type $username MySQL access parameters.
@@ -100,7 +106,7 @@ class DumpConversionController extends ORMController {
         
         $this->convertUsers($dbh);          // before publication because of last changed by user id
         
-        $this->convertFonts($dbh);          // before publication because of join with the 
+//        $this->convertFonts($dbh);          // before publication because of join with the 
         
         $this->propelConnection->beginTransaction();
         $this->convertPublications($dbh);
@@ -151,7 +157,7 @@ class DumpConversionController extends ORMController {
     }
     
     function convertFonts($dbh){
-        
+        throwException(new \Exception("Font conversion not implemented yet."));
         
 //        
 //        $userData = array();
@@ -163,18 +169,53 @@ class DumpConversionController extends ORMController {
                 
     }
     
-    /* ---------------------------------------------------------------------
-     * partner
-     * ------------------------------------------------------------------ */
+    /** Returns an array of multi-volumed publications according to the criteria of the old system:
+     *  The title and first authors last name match.
+     *  Returns an array structured like this: array(
+     *  [title concatenated with autor1_lastname] =>
+     * array(
+     *      'title' => [title],
+     *      'author_lastname' => [autor1_lastname],
+     *      'volumes_present' => [count(*)],
+     *      'multiVolume'     => null
+     * )
+     */
+    function findMultiVolumes($dbh) {
+        
+        $rawData = "
+            SELECT 
+                title
+                ,autor1_lastname
+                ,count(*) as `count` 
+            FROM book 
+            GROUP BY title, autor1_lastname
+            HAVING `count` > 1
+            ;";
+        
+        $multiVolumes = array();
+        foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+            // encode all data from the old database as UTF8
+            array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
+            
+            $multiVolumes[$row['title'].$row['autor1_lastname']] = array(
+                'title'=>$row['title'],
+                'author_lastname'=>$row['autor1_lastname'],
+                'volumes_present'=>$row['count'],
+                'multiVolume'=>NULL,
+            );
+            
+        }
+        
+        return $multiVolumes;
+    }
+    
+    
     function convertPublications($dbh) {
         
         $rawData = "
             SELECT 
                 book.id_book as id
 
-                ,doi as `doi`
-                ,umfang as `numpages`
-                ,umfang_normiert as `numpages_numeric`
                 ,title as `title`
                 ,subtitle as `subtitle`
                 ,other_title as `subtitle2`
@@ -196,14 +237,6 @@ class DumpConversionController extends ORMController {
                 ,special_comment as encoding_comment
                 ,metadaten.planung as `metadata_comment`
                 
-                ,book.log_last_change
-                ,user.id_user as `updated_by`
-                ,usecase as `usecase`
-
-                ,dta_edition as `edition`
-                ,availability                                   -- is 0 only for 16 publications
-                ,book.dta_insert_date                           -- is set for for approx. 40 publications
-                
                 ,dirname as `dirname`
                 
                 ,genre as `genre`
@@ -215,6 +248,22 @@ class DumpConversionController extends ORMController {
                     ELSE type
                 END as `publication_type`
                 
+                ,NULLIF(band_zaehlung, 0) as `volume_numeric`
+                ,NULLIF(band_anzahl, 0) as `volumes_total`
+                ,band_alphanum as `volume_description`
+                ,autor1_lastname    -- to detect multi-volume publications, the author name and title need to match
+                
+                ,doi as `doi`
+                ,umfang as `numpages`
+                ,umfang_normiert as `numpages_numeric`
+                ,book.log_last_change
+                ,user.id_user as `updated_by`
+                ,usecase as `usecase`
+
+                ,dta_edition as `edition`
+                ,availability                                   -- is 0 only for 16 publications
+                ,book.dta_insert_date                           -- is set for for approx. 40 publications
+                
                 ,fundstellen.id_Fundstellen as `used_copy_location`
                 ,NULLIF(startseite,0) as `first_text_page`
                 
@@ -224,6 +273,8 @@ class DumpConversionController extends ORMController {
                 LEFT JOIN user      ON book.log_last_user = user.id_user
                 LEFT JOIN fundstellen ON id_nachweis = id_Fundstellen
             ;";
+        
+        $multiVolumes = $this->findMultiVolumes($dbh);
         
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
@@ -243,8 +294,7 @@ class DumpConversionController extends ORMController {
                     $titleFragmentIdx++;
                 }
             }
-            if($titleFragmentIdx == 1) 
-                var_dump($row);
+            if($titleFragmentIdx == 1) $this->errors[] = array('message'=>'Keine Titelangabe gefunden für','book.id_book'=>$row['id']);
             
             // date ------------------------------------------------------------------------------------
             $publishedDate = NULL;
@@ -271,8 +321,8 @@ class DumpConversionController extends ORMController {
             $comment .= $row['metadata_comment'] !== NULL ? '\nKommentar Planung/Metadaten: ' . $row['metadata_comment'] : "";
             
             // save ------------------------------------------------------------------------------------
+            
             $publication = new Model\Data\Publication();
-                
             $publication->setId($row['id'])
                         ->setDirname($row['dirname'])
                         ->setTitle($title)
@@ -286,15 +336,69 @@ class DumpConversionController extends ORMController {
                         ->setSourceId($row['source_id'])
                         ->setLegacygenre($row['genre'])
                         ->setLegacysubgenre($row['subgenre'])
-                        ->setType($row['publication_type'])
+                        ->setLegacytype($row['publication_type'])
                         ->setCreatedAt($this->parseSQLDate($row['dta_insert_date']))
                         ->setUpdatedAt($this->parseSQLDate($row['log_last_change']))
-                        ->setLastChangedByUserId($row['updated_by'])
-                        ->save($this->propelConnection);
+                        ->setLastChangedByUserId($row['updated_by']);
+            
+            // if this row corresponds to a volume of a multi-volume publication
+            if(array_key_exists($row['title'].$row['autor1_lastname'], $multiVolumes)){
                 
+                $this->warnings[] = array('array key exists'=>$row['title'].$row['autor1_lastname']);
                 
-
-        }
+                // the parent publication (a multi-volume) to which the volume shall be added
+                $multiVolume = $multiVolumes[$row['title'].$row['autor1_lastname']]['multiVolume'];
+                
+                // create the multi-volume if it doesn't already exist
+                if($multiVolume === NULL){
+                    
+                    $this->warnings[] = array('multi volume is null'=>$row['title'].$row['autor1_lastname']);
+                    
+                    // create a new publication for the multi-volume
+                    $basePublication = new Model\Data\Publication();
+                    $basePublication->setId($this->publicationIdCounter++)
+                                    ->setType(Model\Data\PublicationPeer::TYPE_MULTIVOLUME)
+                                    ->setTitle($title);
+                    
+                    // create the multi-volume
+                    $multiVolume = new Model\Data\MultiVolume();
+                    $multiVolume->setPublication($basePublication)
+                                ->setVolumesTotal($row['volumes_total'])
+                                ->save($this->propelConnection);
+                    
+                    // make the multi-volume accessible to upcoming volumes of this work
+                    $multiVolumes[$row['title'].$row['autor1_lastname']]['multiVolume'] = $multiVolume;
+                    
+                }
+                
+                // check if the specified number of volumes matches the actual number of volumes in the database
+                if($multiVolumes[$row['title'].$row['autor1_lastname']]['volumes_present'] != $row['volumes_total'])
+                    $this->warnings[] = array(
+                        'message'=>'Angabe der Gesamtzahl Bände weicht von den tatsächlich in der Datenbank vorhandenen Bänden ab.'
+                        ,'Titel'=>$row['title']
+                        ,'Autor'=>$row['autor1_lastname']
+                        ,'book.id_book'=>$row['id']
+                        ,'In der Datenbank vorhanden'=>$multiVolumes[$row['title'].$row['autor1_lastname']]['volumes_present']
+                        ,'Ausgegeben'=>$row['volumes_total']
+                );
+                
+                // link the volume to its containing multi-volume
+                $publication->setParent($multiVolume->getPublication())
+                            ->setType(Model\Data\PublicationPeer::TYPE_VOLUME);
+                
+                $volume = new Model\Data\Volume();
+                $volume->setVolumeDescription($row['volume_description'])
+                       ->setVolumeNumeric($row['volume_numeric'])
+                       ->setPublication($publication)
+                       ->save($this->propelConnection);
+            } else {
+                // for non volumes, just save a basic publication
+                $publication->save($this->propelConnection);
+                
+            }
+        
+            
+        }// end for book rows
     }
         
         
@@ -348,7 +452,10 @@ class DumpConversionController extends ORMController {
             array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
                         
             if($row['publication_id'] === NULL){
-                $this->errors[] = array('message' => 'copy location refers to non-existing publication.');
+                $this->errors[] = array(
+                    'message' => 'Fundstelle verweist auf nicht-existierende Publikation.'
+                    ,'action' => 'Fundstelle nicht übernommen.'
+                );
                 continue;
             }
                 
@@ -717,7 +824,7 @@ class DumpConversionController extends ORMController {
                     $this->warnings[] = array(
                         'message' => 'Personen-Duplikat: GND bereits vergeben.',
                         'action' => 'Datensatz übersprungen.',
-                        'record' => $row,
+                        'book.id_book' => $row['person'],
                         'collision due to' => "ID: " . $collision->getId() . "; " . $collision->getRepresentativePersonalName());
                 }
                 continue;

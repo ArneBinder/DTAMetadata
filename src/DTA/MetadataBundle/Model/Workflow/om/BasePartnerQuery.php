@@ -13,6 +13,7 @@ use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
 use DTA\MetadataBundle\Model\Workflow\CopyLocation;
+use DTA\MetadataBundle\Model\Workflow\Imagesource;
 use DTA\MetadataBundle\Model\Workflow\Partner;
 use DTA\MetadataBundle\Model\Workflow\PartnerPeer;
 use DTA\MetadataBundle\Model\Workflow\PartnerQuery;
@@ -53,6 +54,10 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method PartnerQuery leftJoinCopyLocation($relationAlias = null) Adds a LEFT JOIN clause to the query using the CopyLocation relation
  * @method PartnerQuery rightJoinCopyLocation($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CopyLocation relation
  * @method PartnerQuery innerJoinCopyLocation($relationAlias = null) Adds a INNER JOIN clause to the query using the CopyLocation relation
+ *
+ * @method PartnerQuery leftJoinImagesource($relationAlias = null) Adds a LEFT JOIN clause to the query using the Imagesource relation
+ * @method PartnerQuery rightJoinImagesource($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Imagesource relation
+ * @method PartnerQuery innerJoinImagesource($relationAlias = null) Adds a INNER JOIN clause to the query using the Imagesource relation
  *
  * @method PartnerQuery leftJoinTextsource($relationAlias = null) Adds a LEFT JOIN clause to the query using the Textsource relation
  * @method PartnerQuery rightJoinTextsource($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Textsource relation
@@ -750,6 +755,80 @@ abstract class BasePartnerQuery extends ModelCriteria
         return $this
             ->joinCopyLocation($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'CopyLocation', '\DTA\MetadataBundle\Model\Workflow\CopyLocationQuery');
+    }
+
+    /**
+     * Filter the query by a related Imagesource object
+     *
+     * @param   Imagesource|PropelObjectCollection $imagesource  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 PartnerQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByImagesource($imagesource, $comparison = null)
+    {
+        if ($imagesource instanceof Imagesource) {
+            return $this
+                ->addUsingAlias(PartnerPeer::ID, $imagesource->getPartnerId(), $comparison);
+        } elseif ($imagesource instanceof PropelObjectCollection) {
+            return $this
+                ->useImagesourceQuery()
+                ->filterByPrimaryKeys($imagesource->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByImagesource() only accepts arguments of type Imagesource or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Imagesource relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return PartnerQuery The current query, for fluid interface
+     */
+    public function joinImagesource($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Imagesource');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Imagesource');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Imagesource relation Imagesource object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\Workflow\ImagesourceQuery A secondary query class using the current class as primary query
+     */
+    public function useImagesourceQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinImagesource($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Imagesource', '\DTA\MetadataBundle\Model\Workflow\ImagesourceQuery');
     }
 
     /**

@@ -17,6 +17,8 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use DTA\MetadataBundle\Model\Workflow\CopyLocation;
 use DTA\MetadataBundle\Model\Workflow\CopyLocationQuery;
+use DTA\MetadataBundle\Model\Workflow\Imagesource;
+use DTA\MetadataBundle\Model\Workflow\ImagesourceQuery;
 use DTA\MetadataBundle\Model\Workflow\Partner;
 use DTA\MetadataBundle\Model\Workflow\PartnerPeer;
 use DTA\MetadataBundle\Model\Workflow\PartnerQuery;
@@ -120,6 +122,12 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     protected $collCopyLocationsPartial;
 
     /**
+     * @var        PropelObjectCollection|Imagesource[] Collection to store aggregation of Imagesource objects.
+     */
+    protected $collImagesources;
+    protected $collImagesourcesPartial;
+
+    /**
      * @var        PropelObjectCollection|Textsource[] Collection to store aggregation of Textsource objects.
      */
     protected $collTextsources;
@@ -158,6 +166,12 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
      * @var		PropelObjectCollection
      */
     protected $copyLocationsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $imagesourcesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -687,6 +701,8 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
 
             $this->collCopyLocations = null;
 
+            $this->collImagesources = null;
+
             $this->collTextsources = null;
 
         } // if (deep)
@@ -854,6 +870,24 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
 
             if ($this->collCopyLocations !== null) {
                 foreach ($this->collCopyLocations as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->imagesourcesScheduledForDeletion !== null) {
+                if (!$this->imagesourcesScheduledForDeletion->isEmpty()) {
+                    foreach ($this->imagesourcesScheduledForDeletion as $imagesource) {
+                        // need to save related object because we set the relation to null
+                        $imagesource->save($con);
+                    }
+                    $this->imagesourcesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collImagesources !== null) {
+                foreach ($this->collImagesources as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1079,6 +1113,14 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
                     }
                 }
 
+                if ($this->collImagesources !== null) {
+                    foreach ($this->collImagesources as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
                 if ($this->collTextsources !== null) {
                     foreach ($this->collTextsources as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -1203,6 +1245,9 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
             }
             if (null !== $this->collCopyLocations) {
                 $result['CopyLocations'] = $this->collCopyLocations->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collImagesources) {
+                $result['Imagesources'] = $this->collImagesources->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collTextsources) {
                 $result['Textsources'] = $this->collTextsources->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1418,6 +1463,12 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
                 }
             }
 
+            foreach ($this->getImagesources() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addImagesource($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getTextsources() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addTextsource($relObj->copy($deepCopy));
@@ -1490,6 +1541,9 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
         }
         if ('CopyLocation' == $relationName) {
             $this->initCopyLocations();
+        }
+        if ('Imagesource' == $relationName) {
+            $this->initImagesources();
         }
         if ('Textsource' == $relationName) {
             $this->initTextsources();
@@ -2122,6 +2176,256 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
     }
 
     /**
+     * Clears out the collImagesources collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Partner The current object (for fluent API support)
+     * @see        addImagesources()
+     */
+    public function clearImagesources()
+    {
+        $this->collImagesources = null; // important to set this to null since that means it is uninitialized
+        $this->collImagesourcesPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collImagesources collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialImagesources($v = true)
+    {
+        $this->collImagesourcesPartial = $v;
+    }
+
+    /**
+     * Initializes the collImagesources collection.
+     *
+     * By default this just sets the collImagesources collection to an empty array (like clearcollImagesources());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initImagesources($overrideExisting = true)
+    {
+        if (null !== $this->collImagesources && !$overrideExisting) {
+            return;
+        }
+        $this->collImagesources = new PropelObjectCollection();
+        $this->collImagesources->setModel('Imagesource');
+    }
+
+    /**
+     * Gets an array of Imagesource objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Partner is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Imagesource[] List of Imagesource objects
+     * @throws PropelException
+     */
+    public function getImagesources($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collImagesourcesPartial && !$this->isNew();
+        if (null === $this->collImagesources || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collImagesources) {
+                // return empty collection
+                $this->initImagesources();
+            } else {
+                $collImagesources = ImagesourceQuery::create(null, $criteria)
+                    ->filterByPartner($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collImagesourcesPartial && count($collImagesources)) {
+                      $this->initImagesources(false);
+
+                      foreach ($collImagesources as $obj) {
+                        if (false == $this->collImagesources->contains($obj)) {
+                          $this->collImagesources->append($obj);
+                        }
+                      }
+
+                      $this->collImagesourcesPartial = true;
+                    }
+
+                    $collImagesources->getInternalIterator()->rewind();
+
+                    return $collImagesources;
+                }
+
+                if ($partial && $this->collImagesources) {
+                    foreach ($this->collImagesources as $obj) {
+                        if ($obj->isNew()) {
+                            $collImagesources[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collImagesources = $collImagesources;
+                $this->collImagesourcesPartial = false;
+            }
+        }
+
+        return $this->collImagesources;
+    }
+
+    /**
+     * Sets a collection of Imagesource objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $imagesources A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Partner The current object (for fluent API support)
+     */
+    public function setImagesources(PropelCollection $imagesources, PropelPDO $con = null)
+    {
+        $imagesourcesToDelete = $this->getImagesources(new Criteria(), $con)->diff($imagesources);
+
+
+        $this->imagesourcesScheduledForDeletion = $imagesourcesToDelete;
+
+        foreach ($imagesourcesToDelete as $imagesourceRemoved) {
+            $imagesourceRemoved->setPartner(null);
+        }
+
+        $this->collImagesources = null;
+        foreach ($imagesources as $imagesource) {
+            $this->addImagesource($imagesource);
+        }
+
+        $this->collImagesources = $imagesources;
+        $this->collImagesourcesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Imagesource objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Imagesource objects.
+     * @throws PropelException
+     */
+    public function countImagesources(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collImagesourcesPartial && !$this->isNew();
+        if (null === $this->collImagesources || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collImagesources) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getImagesources());
+            }
+            $query = ImagesourceQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPartner($this)
+                ->count($con);
+        }
+
+        return count($this->collImagesources);
+    }
+
+    /**
+     * Method called to associate a Imagesource object to this object
+     * through the Imagesource foreign key attribute.
+     *
+     * @param    Imagesource $l Imagesource
+     * @return Partner The current object (for fluent API support)
+     */
+    public function addImagesource(Imagesource $l)
+    {
+        if ($this->collImagesources === null) {
+            $this->initImagesources();
+            $this->collImagesourcesPartial = true;
+        }
+
+        if (!in_array($l, $this->collImagesources->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddImagesource($l);
+
+            if ($this->imagesourcesScheduledForDeletion and $this->imagesourcesScheduledForDeletion->contains($l)) {
+                $this->imagesourcesScheduledForDeletion->remove($this->imagesourcesScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Imagesource $imagesource The imagesource object to add.
+     */
+    protected function doAddImagesource($imagesource)
+    {
+        $this->collImagesources[]= $imagesource;
+        $imagesource->setPartner($this);
+    }
+
+    /**
+     * @param	Imagesource $imagesource The imagesource object to remove.
+     * @return Partner The current object (for fluent API support)
+     */
+    public function removeImagesource($imagesource)
+    {
+        if ($this->getImagesources()->contains($imagesource)) {
+            $this->collImagesources->remove($this->collImagesources->search($imagesource));
+            if (null === $this->imagesourcesScheduledForDeletion) {
+                $this->imagesourcesScheduledForDeletion = clone $this->collImagesources;
+                $this->imagesourcesScheduledForDeletion->clear();
+            }
+            $this->imagesourcesScheduledForDeletion[]= $imagesource;
+            $imagesource->setPartner(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Partner is new, it will return
+     * an empty collection; or if this Partner has previously
+     * been saved, it will retrieve related Imagesources from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Partner.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Imagesource[] List of Imagesource objects
+     */
+    public function getImagesourcesJoinPublication($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = ImagesourceQuery::create(null, $criteria);
+        $query->joinWith('Publication', $join_behavior);
+
+        return $this->getImagesources($query, $con);
+    }
+
+    /**
      * Clears out the collTextsources collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -2444,6 +2748,11 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collImagesources) {
+                foreach ($this->collImagesources as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collTextsources) {
                 foreach ($this->collTextsources as $o) {
                     $o->clearAllReferences($deep);
@@ -2461,6 +2770,10 @@ abstract class BasePartner extends BaseObject implements Persistent, \DTA\Metada
             $this->collCopyLocations->clearIterator();
         }
         $this->collCopyLocations = null;
+        if ($this->collImagesources instanceof PropelCollection) {
+            $this->collImagesources->clearIterator();
+        }
+        $this->collImagesources = null;
         if ($this->collTextsources instanceof PropelCollection) {
             $this->collTextsources->clearIterator();
         }

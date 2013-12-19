@@ -130,6 +130,8 @@ DROP TABLE IF EXISTS "publication" CASCADE;
 CREATE TABLE "publication"
 (
     "id" INTEGER NOT NULL,
+    "type" INT2,
+    "legacytype" TEXT,
     "title_id" INTEGER NOT NULL,
     "firsteditionpublication_id" INTEGER,
     "place_id" INTEGER,
@@ -139,7 +141,6 @@ CREATE TABLE "publication"
     "source_id" INTEGER,
     "legacygenre" TEXT,
     "legacysubgenre" TEXT,
-    "type" VARCHAR(255),
     "dirname" TEXT,
     "usedcopylocation_id" INTEGER,
     "partner_id" INTEGER,
@@ -165,6 +166,10 @@ CREATE TABLE "publication"
     PRIMARY KEY ("id")
 );
 
+COMMENT ON COLUMN "publication"."type" IS 'Publikationstyp. Zur Auflösung des dynamischen Typs (ein Volume bettet ein Publication objekt ein, mit nichts als dem Publikationsobjekt in der Hand, lässt sich das zugehörige speziellere objekt aber nur durch ausprobieren aller objektarten herausfinden.)';
+
+COMMENT ON COLUMN "publication"."legacytype" IS 'Altes Publikationstypen-Kürzel (J, JA, M, MM, MMS, etc.)';
+
 COMMENT ON COLUMN "publication"."firsteditionpublication_id" IS 'Publikation, die die Informationen zur Erstauflage enthält';
 
 COMMENT ON COLUMN "publication"."place_id" IS 'Druckort';
@@ -180,8 +185,6 @@ COMMENT ON COLUMN "publication"."source_id" IS 'Zur Sicherheit aus der alten DB 
 COMMENT ON COLUMN "publication"."legacygenre" IS 'Alt-Angabe zum Genre, zur Weiterverarbeitung bei Umstellung auf das neue Genre-System.';
 
 COMMENT ON COLUMN "publication"."legacysubgenre" IS 'Alt-Angabe zum Untergenre.';
-
-COMMENT ON COLUMN "publication"."type" IS 'Publikationstyp. Zur späteren Differenzierung über Publikationstypen.';
 
 COMMENT ON COLUMN "publication"."dirname" IS 'Textuelle ID (Kombination aus Autor, Titel, Jahr)';
 
@@ -210,130 +213,22 @@ CREATE INDEX "publication_I_1" ON "publication" ("tree_id");
 CREATE INDEX "publication_I_2" ON "publication" ("type");
 
 -----------------------------------------------------------------------
--- publication_m
+-- multi_volume
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "publication_m" CASCADE;
+DROP TABLE IF EXISTS "multi_volume" CASCADE;
 
-CREATE TABLE "publication_m"
+CREATE TABLE "multi_volume"
 (
     "id" serial NOT NULL,
     "publication_id" INTEGER NOT NULL,
+    "volumes_total" INTEGER,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
------------------------------------------------------------------------
--- publication_dm
------------------------------------------------------------------------
-
-DROP TABLE IF EXISTS "publication_dm" CASCADE;
-
-CREATE TABLE "publication_dm"
-(
-    "id" serial NOT NULL,
-    "publication_id" INTEGER NOT NULL,
-    "title_id" INTEGER NOT NULL,
-    "pages" TEXT,
-    "created_at" TIMESTAMP,
-    "updated_at" TIMESTAMP,
-    PRIMARY KEY ("id")
-);
-
-COMMENT ON COLUMN "publication_dm"."title_id" IS 'Titel des übergeordneten Werkes';
-
-COMMENT ON COLUMN "publication_dm"."pages" IS 'Seitenangabe';
-
------------------------------------------------------------------------
--- publication_ds
------------------------------------------------------------------------
-
-DROP TABLE IF EXISTS "publication_ds" CASCADE;
-
-CREATE TABLE "publication_ds"
-(
-    "id" serial NOT NULL,
-    "publication_id" INTEGER NOT NULL,
-    "series_id" INTEGER NOT NULL,
-    "pages" TEXT,
-    "created_at" TIMESTAMP,
-    "updated_at" TIMESTAMP,
-    PRIMARY KEY ("id")
-);
-
-COMMENT ON COLUMN "publication_ds"."pages" IS 'Seitenangabe';
-
------------------------------------------------------------------------
--- publication_ms
------------------------------------------------------------------------
-
-DROP TABLE IF EXISTS "publication_ms" CASCADE;
-
-CREATE TABLE "publication_ms"
-(
-    "id" serial NOT NULL,
-    "publication_id" INTEGER NOT NULL,
-    "series_id" INTEGER NOT NULL,
-    "volumenumberinseries" TEXT,
-    "created_at" TIMESTAMP,
-    "updated_at" TIMESTAMP,
-    PRIMARY KEY ("id")
-);
-
-COMMENT ON COLUMN "publication_ms"."volumenumberinseries" IS 'Nummer des Bandes innerhalb der Reihe';
-
------------------------------------------------------------------------
--- publication_ja
------------------------------------------------------------------------
-
-DROP TABLE IF EXISTS "publication_ja" CASCADE;
-
-CREATE TABLE "publication_ja"
-(
-    "id" serial NOT NULL,
-    "publication_id" INTEGER NOT NULL,
-    "parent" INTEGER NOT NULL,
-    "created_at" TIMESTAMP,
-    "updated_at" TIMESTAMP,
-    PRIMARY KEY ("id")
-);
-
-COMMENT ON COLUMN "publication_ja"."parent" IS 'Zeitschrift, in der erschienen';
-
------------------------------------------------------------------------
--- publication_mms
------------------------------------------------------------------------
-
-DROP TABLE IF EXISTS "publication_mms" CASCADE;
-
-CREATE TABLE "publication_mms"
-(
-    "id" serial NOT NULL,
-    "publication_id" INTEGER NOT NULL,
-    "series_id" INTEGER NOT NULL,
-    "created_at" TIMESTAMP,
-    "updated_at" TIMESTAMP,
-    PRIMARY KEY ("id")
-);
-
------------------------------------------------------------------------
--- publication_j
------------------------------------------------------------------------
-
-DROP TABLE IF EXISTS "publication_j" CASCADE;
-
-CREATE TABLE "publication_j"
-(
-    "id" serial NOT NULL,
-    "publication_id" INTEGER NOT NULL,
-    "edition" TEXT,
-    "created_at" TIMESTAMP,
-    "updated_at" TIMESTAMP,
-    PRIMARY KEY ("id")
-);
-
-COMMENT ON COLUMN "publication_j"."edition" IS 'Ausgabe';
+COMMENT ON COLUMN "multi_volume"."volumes_total" IS 'Anzahl Bände (gesamt)';
 
 -----------------------------------------------------------------------
 -- volume
@@ -345,35 +240,52 @@ CREATE TABLE "volume"
 (
     "id" serial NOT NULL,
     "publication_id" INTEGER NOT NULL,
-    "parentpublication_id" INTEGER NOT NULL,
-    "volumedescription" INTEGER,
-    "volumenumeric" INTEGER,
-    "volumestotal" INTEGER,
+    "volume_description" TEXT,
+    "volume_numeric" INTEGER,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
-COMMENT ON COLUMN "volume"."volumedescription" IS 'Bezeichnung des Bandes (alphanumerisch)';
+COMMENT ON COLUMN "volume"."volume_description" IS 'Bezeichnung des Bandes (alphanumerisch)';
 
-COMMENT ON COLUMN "volume"."volumenumeric" IS 'Bezeichnung des Bandes (numerisch)';
-
-COMMENT ON COLUMN "volume"."volumestotal" IS 'Anzahl Bände (gesamt)';
+COMMENT ON COLUMN "volume"."volume_numeric" IS 'Bezeichnung des Bandes (numerisch)';
 
 -----------------------------------------------------------------------
--- series
+-- chapter
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "series" CASCADE;
+DROP TABLE IF EXISTS "chapter" CASCADE;
 
-CREATE TABLE "series"
+CREATE TABLE "chapter"
 (
     "id" serial NOT NULL,
-    "title_id" INTEGER NOT NULL,
+    "publication_id" INTEGER NOT NULL,
+    "pages" TEXT,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
+
+COMMENT ON COLUMN "chapter"."pages" IS 'Seitenangabe';
+
+-----------------------------------------------------------------------
+-- article
+-----------------------------------------------------------------------
+
+DROP TABLE IF EXISTS "article" CASCADE;
+
+CREATE TABLE "article"
+(
+    "id" serial NOT NULL,
+    "publication_id" INTEGER NOT NULL,
+    "pages" TEXT,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
+    PRIMARY KEY ("id")
+);
+
+COMMENT ON COLUMN "article"."pages" IS 'Seitenangabe';
 
 -----------------------------------------------------------------------
 -- publishingcompany
@@ -551,7 +463,8 @@ CREATE TABLE "sequence_entry"
     "publication_id" INTEGER NOT NULL,
     "sequence_id" TEXT,
     "sequence_name" TEXT,
-    "sequencetype" INT2 DEFAULT 0,
+    "sequence_type" INT2 DEFAULT 0,
+    "title_id" INTEGER NOT NULL,
     "sortable_rank" INTEGER,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
@@ -825,6 +738,7 @@ CREATE TABLE "imagesource"
 (
     "id" serial NOT NULL,
     "publication_id" INTEGER NOT NULL,
+    "partner_id" INTEGER,
     "faksimilerefrange" TEXT,
     "originalrefrange" TEXT,
     "created_at" TIMESTAMP,
@@ -928,43 +842,7 @@ ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_7"
     FOREIGN KEY ("last_changed_by_user_id")
     REFERENCES "dta_user" ("id");
 
-ALTER TABLE "publication_m" ADD CONSTRAINT "publication_m_FK_1"
-    FOREIGN KEY ("publication_id")
-    REFERENCES "publication" ("id");
-
-ALTER TABLE "publication_dm" ADD CONSTRAINT "publication_dm_FK_1"
-    FOREIGN KEY ("publication_id")
-    REFERENCES "publication" ("id");
-
-ALTER TABLE "publication_ds" ADD CONSTRAINT "publication_ds_FK_1"
-    FOREIGN KEY ("publication_id")
-    REFERENCES "publication" ("id");
-
-ALTER TABLE "publication_ds" ADD CONSTRAINT "publication_ds_FK_2"
-    FOREIGN KEY ("series_id")
-    REFERENCES "series" ("id");
-
-ALTER TABLE "publication_ms" ADD CONSTRAINT "publication_ms_FK_1"
-    FOREIGN KEY ("publication_id")
-    REFERENCES "publication" ("id");
-
-ALTER TABLE "publication_ms" ADD CONSTRAINT "publication_ms_FK_2"
-    FOREIGN KEY ("series_id")
-    REFERENCES "series" ("id");
-
-ALTER TABLE "publication_ja" ADD CONSTRAINT "publication_ja_FK_1"
-    FOREIGN KEY ("publication_id")
-    REFERENCES "publication" ("id");
-
-ALTER TABLE "publication_mms" ADD CONSTRAINT "publication_mms_FK_1"
-    FOREIGN KEY ("publication_id")
-    REFERENCES "publication" ("id");
-
-ALTER TABLE "publication_mms" ADD CONSTRAINT "publication_mms_FK_2"
-    FOREIGN KEY ("series_id")
-    REFERENCES "series" ("id");
-
-ALTER TABLE "publication_j" ADD CONSTRAINT "publication_j_FK_1"
+ALTER TABLE "multi_volume" ADD CONSTRAINT "multi_volume_FK_1"
     FOREIGN KEY ("publication_id")
     REFERENCES "publication" ("id");
 
@@ -972,13 +850,13 @@ ALTER TABLE "volume" ADD CONSTRAINT "volume_FK_1"
     FOREIGN KEY ("publication_id")
     REFERENCES "publication" ("id");
 
-ALTER TABLE "volume" ADD CONSTRAINT "volume_FK_2"
-    FOREIGN KEY ("parentpublication_id")
+ALTER TABLE "chapter" ADD CONSTRAINT "chapter_FK_1"
+    FOREIGN KEY ("publication_id")
     REFERENCES "publication" ("id");
 
-ALTER TABLE "series" ADD CONSTRAINT "series_FK_1"
-    FOREIGN KEY ("title_id")
-    REFERENCES "title" ("id");
+ALTER TABLE "article" ADD CONSTRAINT "article_FK_1"
+    FOREIGN KEY ("publication_id")
+    REFERENCES "publication" ("id");
 
 ALTER TABLE "personalname" ADD CONSTRAINT "personalname_FK_1"
     FOREIGN KEY ("person_id")
@@ -1006,6 +884,10 @@ ALTER TABLE "titlefragment" ADD CONSTRAINT "titlefragment_FK_2"
 ALTER TABLE "sequence_entry" ADD CONSTRAINT "sequence_entry_FK_1"
     FOREIGN KEY ("publication_id")
     REFERENCES "publication" ("id");
+
+ALTER TABLE "sequence_entry" ADD CONSTRAINT "sequence_entry_FK_2"
+    FOREIGN KEY ("title_id")
+    REFERENCES "title" ("id");
 
 ALTER TABLE "language_publication" ADD CONSTRAINT "language_publication_FK_1"
     FOREIGN KEY ("language_id")
@@ -1114,6 +996,11 @@ ALTER TABLE "copy_location" ADD CONSTRAINT "copy_location_FK_3"
 ALTER TABLE "imagesource" ADD CONSTRAINT "imagesource_FK_1"
     FOREIGN KEY ("publication_id")
     REFERENCES "publication" ("id");
+
+ALTER TABLE "imagesource" ADD CONSTRAINT "imagesource_FK_2"
+    FOREIGN KEY ("partner_id")
+    REFERENCES "partner" ("id")
+    ON DELETE SET NULL;
 
 ALTER TABLE "textsource" ADD CONSTRAINT "textsource_FK_1"
     FOREIGN KEY ("publication_id")

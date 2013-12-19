@@ -9,6 +9,7 @@ use \PDOStatement;
 use \Propel;
 use \PropelException;
 use \PropelPDO;
+use DTA\MetadataBundle\Model\Workflow\ImagesourcePeer;
 use DTA\MetadataBundle\Model\Workflow\Partner;
 use DTA\MetadataBundle\Model\Workflow\PartnerPeer;
 use DTA\MetadataBundle\Model\Workflow\TextsourcePeer;
@@ -406,6 +407,9 @@ abstract class BasePartnerPeer
      */
     public static function clearRelatedInstancePool()
     {
+        // Invalidate objects in ImagesourcePeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        ImagesourcePeer::clearInstancePool();
         // Invalidate objects in TextsourcePeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         TextsourcePeer::clearInstancePool();

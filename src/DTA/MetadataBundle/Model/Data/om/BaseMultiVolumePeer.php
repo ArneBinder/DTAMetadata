@@ -9,61 +9,58 @@ use \PDOStatement;
 use \Propel;
 use \PropelException;
 use \PropelPDO;
+use DTA\MetadataBundle\Model\Data\MultiVolume;
+use DTA\MetadataBundle\Model\Data\MultiVolumePeer;
 use DTA\MetadataBundle\Model\Data\PublicationPeer;
-use DTA\MetadataBundle\Model\Data\Volume;
-use DTA\MetadataBundle\Model\Data\VolumePeer;
-use DTA\MetadataBundle\Model\Data\map\VolumeTableMap;
+use DTA\MetadataBundle\Model\Data\map\MultiVolumeTableMap;
 
-abstract class BaseVolumePeer
+abstract class BaseMultiVolumePeer
 {
 
     /** the default database name for this class */
     const DATABASE_NAME = 'dtametadata';
 
     /** the table name for this class */
-    const TABLE_NAME = 'volume';
+    const TABLE_NAME = 'multi_volume';
 
     /** the related Propel class for this table */
-    const OM_CLASS = 'DTA\\MetadataBundle\\Model\\Data\\Volume';
+    const OM_CLASS = 'DTA\\MetadataBundle\\Model\\Data\\MultiVolume';
 
     /** the related TableMap class for this table */
-    const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Data\\map\\VolumeTableMap';
+    const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Data\\map\\MultiVolumeTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 5;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /** the column name for the id field */
-    const ID = 'volume.id';
+    const ID = 'multi_volume.id';
 
     /** the column name for the publication_id field */
-    const PUBLICATION_ID = 'volume.publication_id';
+    const PUBLICATION_ID = 'multi_volume.publication_id';
 
-    /** the column name for the volume_description field */
-    const VOLUME_DESCRIPTION = 'volume.volume_description';
-
-    /** the column name for the volume_numeric field */
-    const VOLUME_NUMERIC = 'volume.volume_numeric';
+    /** the column name for the volumes_total field */
+    const VOLUMES_TOTAL = 'multi_volume.volumes_total';
 
     /** the column name for the created_at field */
-    const CREATED_AT = 'volume.created_at';
+    const CREATED_AT = 'multi_volume.created_at';
 
     /** the column name for the updated_at field */
-    const UPDATED_AT = 'volume.updated_at';
+    const UPDATED_AT = 'multi_volume.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
 
     /**
-     * An identity map to hold any loaded instances of Volume objects.
+     * An identity map to hold any loaded instances of MultiVolume objects.
      * This must be public so that other peer classes can access this when hydrating from JOIN
      * queries.
-     * @var        array Volume[]
+     * @var        array MultiVolume[]
      */
     public static $instances = array();
 
@@ -72,30 +69,30 @@ abstract class BaseVolumePeer
      * holds an array of fieldnames
      *
      * first dimension keys are the type constants
-     * e.g. VolumePeer::$fieldNames[VolumePeer::TYPE_PHPNAME][0] = 'Id'
+     * e.g. MultiVolumePeer::$fieldNames[MultiVolumePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'VolumeDescription', 'VolumeNumeric', 'CreatedAt', 'UpdatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'volumeDescription', 'volumeNumeric', 'createdAt', 'updatedAt', ),
-        BasePeer::TYPE_COLNAME => array (VolumePeer::ID, VolumePeer::PUBLICATION_ID, VolumePeer::VOLUME_DESCRIPTION, VolumePeer::VOLUME_NUMERIC, VolumePeer::CREATED_AT, VolumePeer::UPDATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'VOLUME_DESCRIPTION', 'VOLUME_NUMERIC', 'CREATED_AT', 'UPDATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'volume_description', 'volume_numeric', 'created_at', 'updated_at', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'VolumesTotal', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'volumesTotal', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (MultiVolumePeer::ID, MultiVolumePeer::PUBLICATION_ID, MultiVolumePeer::VOLUMES_TOTAL, MultiVolumePeer::CREATED_AT, MultiVolumePeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'VOLUMES_TOTAL', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'volumes_total', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
     /**
      * holds an array of keys for quick access to the fieldnames array
      *
      * first dimension keys are the type constants
-     * e.g. VolumePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
+     * e.g. MultiVolumePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'VolumeDescription' => 2, 'VolumeNumeric' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'volumeDescription' => 2, 'volumeNumeric' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
-        BasePeer::TYPE_COLNAME => array (VolumePeer::ID => 0, VolumePeer::PUBLICATION_ID => 1, VolumePeer::VOLUME_DESCRIPTION => 2, VolumePeer::VOLUME_NUMERIC => 3, VolumePeer::CREATED_AT => 4, VolumePeer::UPDATED_AT => 5, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'VOLUME_DESCRIPTION' => 2, 'VOLUME_NUMERIC' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'volume_description' => 2, 'volume_numeric' => 3, 'created_at' => 4, 'updated_at' => 5, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'VolumesTotal' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'volumesTotal' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        BasePeer::TYPE_COLNAME => array (MultiVolumePeer::ID => 0, MultiVolumePeer::PUBLICATION_ID => 1, MultiVolumePeer::VOLUMES_TOTAL => 2, MultiVolumePeer::CREATED_AT => 3, MultiVolumePeer::UPDATED_AT => 4, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'VOLUMES_TOTAL' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'volumes_total' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
     /**
@@ -110,10 +107,10 @@ abstract class BaseVolumePeer
      */
     public static function translateFieldName($name, $fromType, $toType)
     {
-        $toNames = VolumePeer::getFieldNames($toType);
-        $key = isset(VolumePeer::$fieldKeys[$fromType][$name]) ? VolumePeer::$fieldKeys[$fromType][$name] : null;
+        $toNames = MultiVolumePeer::getFieldNames($toType);
+        $key = isset(MultiVolumePeer::$fieldKeys[$fromType][$name]) ? MultiVolumePeer::$fieldKeys[$fromType][$name] : null;
         if ($key === null) {
-            throw new PropelException("'$name' could not be found in the field names of type '$fromType'. These are: " . print_r(VolumePeer::$fieldKeys[$fromType], true));
+            throw new PropelException("'$name' could not be found in the field names of type '$fromType'. These are: " . print_r(MultiVolumePeer::$fieldKeys[$fromType], true));
         }
 
         return $toNames[$key];
@@ -130,11 +127,11 @@ abstract class BaseVolumePeer
      */
     public static function getFieldNames($type = BasePeer::TYPE_PHPNAME)
     {
-        if (!array_key_exists($type, VolumePeer::$fieldNames)) {
+        if (!array_key_exists($type, MultiVolumePeer::$fieldNames)) {
             throw new PropelException('Method getFieldNames() expects the parameter $type to be one of the class constants BasePeer::TYPE_PHPNAME, BasePeer::TYPE_STUDLYPHPNAME, BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM. ' . $type . ' was given.');
         }
 
-        return VolumePeer::$fieldNames[$type];
+        return MultiVolumePeer::$fieldNames[$type];
     }
 
     /**
@@ -146,12 +143,12 @@ abstract class BaseVolumePeer
      *		$c->addJoin(TablePeer::alias("alias1", TablePeer::PRIMARY_KEY_COLUMN), TablePeer::PRIMARY_KEY_COLUMN);
      * </code>
      * @param      string $alias The alias for the current table.
-     * @param      string $column The column name for current table. (i.e. VolumePeer::COLUMN_NAME).
+     * @param      string $column The column name for current table. (i.e. MultiVolumePeer::COLUMN_NAME).
      * @return string
      */
     public static function alias($alias, $column)
     {
-        return str_replace(VolumePeer::TABLE_NAME.'.', $alias.'.', $column);
+        return str_replace(MultiVolumePeer::TABLE_NAME.'.', $alias.'.', $column);
     }
 
     /**
@@ -169,17 +166,15 @@ abstract class BaseVolumePeer
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(VolumePeer::ID);
-            $criteria->addSelectColumn(VolumePeer::PUBLICATION_ID);
-            $criteria->addSelectColumn(VolumePeer::VOLUME_DESCRIPTION);
-            $criteria->addSelectColumn(VolumePeer::VOLUME_NUMERIC);
-            $criteria->addSelectColumn(VolumePeer::CREATED_AT);
-            $criteria->addSelectColumn(VolumePeer::UPDATED_AT);
+            $criteria->addSelectColumn(MultiVolumePeer::ID);
+            $criteria->addSelectColumn(MultiVolumePeer::PUBLICATION_ID);
+            $criteria->addSelectColumn(MultiVolumePeer::VOLUMES_TOTAL);
+            $criteria->addSelectColumn(MultiVolumePeer::CREATED_AT);
+            $criteria->addSelectColumn(MultiVolumePeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.publication_id');
-            $criteria->addSelectColumn($alias . '.volume_description');
-            $criteria->addSelectColumn($alias . '.volume_numeric');
+            $criteria->addSelectColumn($alias . '.volumes_total');
             $criteria->addSelectColumn($alias . '.created_at');
             $criteria->addSelectColumn($alias . '.updated_at');
         }
@@ -201,21 +196,21 @@ abstract class BaseVolumePeer
         // We need to set the primary table name, since in the case that there are no WHERE columns
         // it will be impossible for the BasePeer::createSelectSql() method to determine which
         // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(VolumePeer::TABLE_NAME);
+        $criteria->setPrimaryTableName(MultiVolumePeer::TABLE_NAME);
 
         if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
             $criteria->setDistinct();
         }
 
         if (!$criteria->hasSelectClause()) {
-            VolumePeer::addSelectColumns($criteria);
+            MultiVolumePeer::addSelectColumns($criteria);
         }
 
         $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
-        $criteria->setDbName(VolumePeer::DATABASE_NAME); // Set the correct dbName
+        $criteria->setDbName(MultiVolumePeer::DATABASE_NAME); // Set the correct dbName
 
         if ($con === null) {
-            $con = Propel::getConnection(VolumePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(MultiVolumePeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
         // BasePeer returns a PDOStatement
         $stmt = BasePeer::doCount($criteria, $con);
@@ -234,7 +229,7 @@ abstract class BaseVolumePeer
      *
      * @param      Criteria $criteria object used to create the SELECT statement.
      * @param      PropelPDO $con
-     * @return Volume
+     * @return MultiVolume
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -242,7 +237,7 @@ abstract class BaseVolumePeer
     {
         $critcopy = clone $criteria;
         $critcopy->setLimit(1);
-        $objects = VolumePeer::doSelect($critcopy, $con);
+        $objects = MultiVolumePeer::doSelect($critcopy, $con);
         if ($objects) {
             return $objects[0];
         }
@@ -260,7 +255,7 @@ abstract class BaseVolumePeer
      */
     public static function doSelect(Criteria $criteria, PropelPDO $con = null)
     {
-        return VolumePeer::populateObjects(VolumePeer::doSelectStmt($criteria, $con));
+        return MultiVolumePeer::populateObjects(MultiVolumePeer::doSelectStmt($criteria, $con));
     }
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
@@ -278,16 +273,16 @@ abstract class BaseVolumePeer
     public static function doSelectStmt(Criteria $criteria, PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(VolumePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(MultiVolumePeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
         if (!$criteria->hasSelectClause()) {
             $criteria = clone $criteria;
-            VolumePeer::addSelectColumns($criteria);
+            MultiVolumePeer::addSelectColumns($criteria);
         }
 
         // Set the correct dbName
-        $criteria->setDbName(VolumePeer::DATABASE_NAME);
+        $criteria->setDbName(MultiVolumePeer::DATABASE_NAME);
 
         // BasePeer returns a PDOStatement
         return BasePeer::doSelect($criteria, $con);
@@ -301,7 +296,7 @@ abstract class BaseVolumePeer
      * to the cache in order to ensure that the same objects are always returned by doSelect*()
      * and retrieveByPK*() calls.
      *
-     * @param Volume $obj A Volume object.
+     * @param MultiVolume $obj A MultiVolume object.
      * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
     public static function addInstanceToPool($obj, $key = null)
@@ -310,7 +305,7 @@ abstract class BaseVolumePeer
             if ($key === null) {
                 $key = (string) $obj->getId();
             } // if key === null
-            VolumePeer::$instances[$key] = $obj;
+            MultiVolumePeer::$instances[$key] = $obj;
         }
     }
 
@@ -322,7 +317,7 @@ abstract class BaseVolumePeer
      * methods in your stub classes -- you may need to explicitly remove objects
      * from the cache in order to prevent returning objects that no longer exist.
      *
-     * @param      mixed $value A Volume object or a primary key value.
+     * @param      mixed $value A MultiVolume object or a primary key value.
      *
      * @return void
      * @throws PropelException - if the value is invalid.
@@ -330,17 +325,17 @@ abstract class BaseVolumePeer
     public static function removeInstanceFromPool($value)
     {
         if (Propel::isInstancePoolingEnabled() && $value !== null) {
-            if (is_object($value) && $value instanceof Volume) {
+            if (is_object($value) && $value instanceof MultiVolume) {
                 $key = (string) $value->getId();
             } elseif (is_scalar($value)) {
                 // assume we've been passed a primary key
                 $key = (string) $value;
             } else {
-                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or Volume object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
+                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or MultiVolume object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
                 throw $e;
             }
 
-            unset(VolumePeer::$instances[$key]);
+            unset(MultiVolumePeer::$instances[$key]);
         }
     } // removeInstanceFromPool()
 
@@ -351,14 +346,14 @@ abstract class BaseVolumePeer
      * a multi-column primary key, a serialize()d version of the primary key will be returned.
      *
      * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-     * @return Volume Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+     * @return MultiVolume Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
      * @see        getPrimaryKeyHash()
      */
     public static function getInstanceFromPool($key)
     {
         if (Propel::isInstancePoolingEnabled()) {
-            if (isset(VolumePeer::$instances[$key])) {
-                return VolumePeer::$instances[$key];
+            if (isset(MultiVolumePeer::$instances[$key])) {
+                return MultiVolumePeer::$instances[$key];
             }
         }
 
@@ -373,15 +368,15 @@ abstract class BaseVolumePeer
     public static function clearInstancePool($and_clear_all_references = false)
     {
       if ($and_clear_all_references) {
-        foreach (VolumePeer::$instances as $instance) {
+        foreach (MultiVolumePeer::$instances as $instance) {
           $instance->clearAllReferences(true);
         }
       }
-        VolumePeer::$instances = array();
+        MultiVolumePeer::$instances = array();
     }
 
     /**
-     * Method to invalidate the instance pool of all tables related to volume
+     * Method to invalidate the instance pool of all tables related to multi_volume
      * by a foreign key with ON DELETE CASCADE
      */
     public static function clearRelatedInstancePool()
@@ -435,11 +430,11 @@ abstract class BaseVolumePeer
         $results = array();
 
         // set the class once to avoid overhead in the loop
-        $cls = VolumePeer::getOMClass();
+        $cls = MultiVolumePeer::getOMClass();
         // populate the object(s)
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key = VolumePeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj = VolumePeer::getInstanceFromPool($key))) {
+            $key = MultiVolumePeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj = MultiVolumePeer::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -448,7 +443,7 @@ abstract class BaseVolumePeer
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                VolumePeer::addInstanceToPool($obj, $key);
+                MultiVolumePeer::addInstanceToPool($obj, $key);
             } // if key exists
         }
         $stmt->closeCursor();
@@ -462,21 +457,21 @@ abstract class BaseVolumePeer
      * @param      int $startcol The 0-based offset for reading from the resultset row.
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
-     * @return array (Volume object, last column rank)
+     * @return array (MultiVolume object, last column rank)
      */
     public static function populateObject($row, $startcol = 0)
     {
-        $key = VolumePeer::getPrimaryKeyHashFromRow($row, $startcol);
-        if (null !== ($obj = VolumePeer::getInstanceFromPool($key))) {
+        $key = MultiVolumePeer::getPrimaryKeyHashFromRow($row, $startcol);
+        if (null !== ($obj = MultiVolumePeer::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $startcol, true); // rehydrate
-            $col = $startcol + VolumePeer::NUM_HYDRATE_COLUMNS;
+            $col = $startcol + MultiVolumePeer::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = VolumePeer::OM_CLASS;
+            $cls = MultiVolumePeer::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $startcol);
-            VolumePeer::addInstanceToPool($obj, $key);
+            MultiVolumePeer::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -500,26 +495,26 @@ abstract class BaseVolumePeer
         // We need to set the primary table name, since in the case that there are no WHERE columns
         // it will be impossible for the BasePeer::createSelectSql() method to determine which
         // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(VolumePeer::TABLE_NAME);
+        $criteria->setPrimaryTableName(MultiVolumePeer::TABLE_NAME);
 
         if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
             $criteria->setDistinct();
         }
 
         if (!$criteria->hasSelectClause()) {
-            VolumePeer::addSelectColumns($criteria);
+            MultiVolumePeer::addSelectColumns($criteria);
         }
 
         $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
 
         // Set the correct dbName
-        $criteria->setDbName(VolumePeer::DATABASE_NAME);
+        $criteria->setDbName(MultiVolumePeer::DATABASE_NAME);
 
         if ($con === null) {
-            $con = Propel::getConnection(VolumePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(MultiVolumePeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(VolumePeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
+        $criteria->addJoin(MultiVolumePeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -535,11 +530,11 @@ abstract class BaseVolumePeer
 
 
     /**
-     * Selects a collection of Volume objects pre-filled with their Publication objects.
+     * Selects a collection of MultiVolume objects pre-filled with their Publication objects.
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of Volume objects.
+     * @return array           Array of MultiVolume objects.
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -549,31 +544,31 @@ abstract class BaseVolumePeer
 
         // Set the correct dbName if it has not been overridden
         if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(VolumePeer::DATABASE_NAME);
+            $criteria->setDbName(MultiVolumePeer::DATABASE_NAME);
         }
 
-        VolumePeer::addSelectColumns($criteria);
-        $startcol = VolumePeer::NUM_HYDRATE_COLUMNS;
+        MultiVolumePeer::addSelectColumns($criteria);
+        $startcol = MultiVolumePeer::NUM_HYDRATE_COLUMNS;
         PublicationPeer::addSelectColumns($criteria);
 
-        $criteria->addJoin(VolumePeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
+        $criteria->addJoin(MultiVolumePeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
 
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = VolumePeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = VolumePeer::getInstanceFromPool($key1))) {
+            $key1 = MultiVolumePeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = MultiVolumePeer::getInstanceFromPool($key1))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj1->hydrate($row, 0, true); // rehydrate
             } else {
 
-                $cls = VolumePeer::getOMClass();
+                $cls = MultiVolumePeer::getOMClass();
 
                 $obj1 = new $cls();
                 $obj1->hydrate($row);
-                VolumePeer::addInstanceToPool($obj1, $key1);
+                MultiVolumePeer::addInstanceToPool($obj1, $key1);
             } // if $obj1 already loaded
 
             $key2 = PublicationPeer::getPrimaryKeyHashFromRow($row, $startcol);
@@ -588,8 +583,8 @@ abstract class BaseVolumePeer
                     PublicationPeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 already loaded
 
-                // Add the $obj1 (Volume) to $obj2 (Publication)
-                $obj2->addVolume($obj1);
+                // Add the $obj1 (MultiVolume) to $obj2 (Publication)
+                $obj2->addMultiVolume($obj1);
 
             } // if joined row was not null
 
@@ -618,26 +613,26 @@ abstract class BaseVolumePeer
         // We need to set the primary table name, since in the case that there are no WHERE columns
         // it will be impossible for the BasePeer::createSelectSql() method to determine which
         // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(VolumePeer::TABLE_NAME);
+        $criteria->setPrimaryTableName(MultiVolumePeer::TABLE_NAME);
 
         if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
             $criteria->setDistinct();
         }
 
         if (!$criteria->hasSelectClause()) {
-            VolumePeer::addSelectColumns($criteria);
+            MultiVolumePeer::addSelectColumns($criteria);
         }
 
         $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
 
         // Set the correct dbName
-        $criteria->setDbName(VolumePeer::DATABASE_NAME);
+        $criteria->setDbName(MultiVolumePeer::DATABASE_NAME);
 
         if ($con === null) {
-            $con = Propel::getConnection(VolumePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(MultiVolumePeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(VolumePeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
+        $criteria->addJoin(MultiVolumePeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -652,12 +647,12 @@ abstract class BaseVolumePeer
     }
 
     /**
-     * Selects a collection of Volume objects pre-filled with all related objects.
+     * Selects a collection of MultiVolume objects pre-filled with all related objects.
      *
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of Volume objects.
+     * @return array           Array of MultiVolume objects.
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -667,32 +662,32 @@ abstract class BaseVolumePeer
 
         // Set the correct dbName if it has not been overridden
         if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(VolumePeer::DATABASE_NAME);
+            $criteria->setDbName(MultiVolumePeer::DATABASE_NAME);
         }
 
-        VolumePeer::addSelectColumns($criteria);
-        $startcol2 = VolumePeer::NUM_HYDRATE_COLUMNS;
+        MultiVolumePeer::addSelectColumns($criteria);
+        $startcol2 = MultiVolumePeer::NUM_HYDRATE_COLUMNS;
 
         PublicationPeer::addSelectColumns($criteria);
         $startcol3 = $startcol2 + PublicationPeer::NUM_HYDRATE_COLUMNS;
 
-        $criteria->addJoin(VolumePeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
+        $criteria->addJoin(MultiVolumePeer::PUBLICATION_ID, PublicationPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
 
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = VolumePeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = VolumePeer::getInstanceFromPool($key1))) {
+            $key1 = MultiVolumePeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = MultiVolumePeer::getInstanceFromPool($key1))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj1->hydrate($row, 0, true); // rehydrate
             } else {
-                $cls = VolumePeer::getOMClass();
+                $cls = MultiVolumePeer::getOMClass();
 
                 $obj1 = new $cls();
                 $obj1->hydrate($row);
-                VolumePeer::addInstanceToPool($obj1, $key1);
+                MultiVolumePeer::addInstanceToPool($obj1, $key1);
             } // if obj1 already loaded
 
             // Add objects for joined Publication rows
@@ -709,8 +704,8 @@ abstract class BaseVolumePeer
                     PublicationPeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 loaded
 
-                // Add the $obj1 (Volume) to the collection in $obj2 (Publication)
-                $obj2->addVolume($obj1);
+                // Add the $obj1 (MultiVolume) to the collection in $obj2 (Publication)
+                $obj2->addMultiVolume($obj1);
             } // if joined row not null
 
             $results[] = $obj1;
@@ -729,7 +724,7 @@ abstract class BaseVolumePeer
      */
     public static function getTableMap()
     {
-        return Propel::getDatabaseMap(VolumePeer::DATABASE_NAME)->getTable(VolumePeer::TABLE_NAME);
+        return Propel::getDatabaseMap(MultiVolumePeer::DATABASE_NAME)->getTable(MultiVolumePeer::TABLE_NAME);
     }
 
     /**
@@ -737,9 +732,9 @@ abstract class BaseVolumePeer
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getDatabaseMap(BaseVolumePeer::DATABASE_NAME);
-      if (!$dbMap->hasTable(BaseVolumePeer::TABLE_NAME)) {
-        $dbMap->addTableObject(new \DTA\MetadataBundle\Model\Data\map\VolumeTableMap());
+      $dbMap = Propel::getDatabaseMap(BaseMultiVolumePeer::DATABASE_NAME);
+      if (!$dbMap->hasTable(BaseMultiVolumePeer::TABLE_NAME)) {
+        $dbMap->addTableObject(new \DTA\MetadataBundle\Model\Data\map\MultiVolumeTableMap());
       }
     }
 
@@ -751,13 +746,13 @@ abstract class BaseVolumePeer
      */
     public static function getOMClass($row = 0, $colnum = 0)
     {
-        return VolumePeer::OM_CLASS;
+        return MultiVolumePeer::OM_CLASS;
     }
 
     /**
-     * Performs an INSERT on the database, given a Volume or Criteria object.
+     * Performs an INSERT on the database, given a MultiVolume or Criteria object.
      *
-     * @param      mixed $values Criteria or Volume object containing data that is used to create the INSERT statement.
+     * @param      mixed $values Criteria or MultiVolume object containing data that is used to create the INSERT statement.
      * @param      PropelPDO $con the PropelPDO connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -766,22 +761,22 @@ abstract class BaseVolumePeer
     public static function doInsert($values, PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(VolumePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(MultiVolumePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         if ($values instanceof Criteria) {
             $criteria = clone $values; // rename for clarity
         } else {
-            $criteria = $values->buildCriteria(); // build Criteria from Volume object
+            $criteria = $values->buildCriteria(); // build Criteria from MultiVolume object
         }
 
-        if ($criteria->containsKey(VolumePeer::ID) && $criteria->keyContainsValue(VolumePeer::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.VolumePeer::ID.')');
+        if ($criteria->containsKey(MultiVolumePeer::ID) && $criteria->keyContainsValue(MultiVolumePeer::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.MultiVolumePeer::ID.')');
         }
 
 
         // Set the correct dbName
-        $criteria->setDbName(VolumePeer::DATABASE_NAME);
+        $criteria->setDbName(MultiVolumePeer::DATABASE_NAME);
 
         try {
             // use transaction because $criteria could contain info
@@ -798,9 +793,9 @@ abstract class BaseVolumePeer
     }
 
     /**
-     * Performs an UPDATE on the database, given a Volume or Criteria object.
+     * Performs an UPDATE on the database, given a MultiVolume or Criteria object.
      *
-     * @param      mixed $values Criteria or Volume object containing data that is used to create the UPDATE statement.
+     * @param      mixed $values Criteria or MultiVolume object containing data that is used to create the UPDATE statement.
      * @param      PropelPDO $con The connection to use (specify PropelPDO connection object to exert more control over transactions).
      * @return int             The number of affected rows (if supported by underlying database driver).
      * @throws PropelException Any exceptions caught during processing will be
@@ -809,35 +804,35 @@ abstract class BaseVolumePeer
     public static function doUpdate($values, PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(VolumePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(MultiVolumePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
-        $selectCriteria = new Criteria(VolumePeer::DATABASE_NAME);
+        $selectCriteria = new Criteria(MultiVolumePeer::DATABASE_NAME);
 
         if ($values instanceof Criteria) {
             $criteria = clone $values; // rename for clarity
 
-            $comparison = $criteria->getComparison(VolumePeer::ID);
-            $value = $criteria->remove(VolumePeer::ID);
+            $comparison = $criteria->getComparison(MultiVolumePeer::ID);
+            $value = $criteria->remove(MultiVolumePeer::ID);
             if ($value) {
-                $selectCriteria->add(VolumePeer::ID, $value, $comparison);
+                $selectCriteria->add(MultiVolumePeer::ID, $value, $comparison);
             } else {
-                $selectCriteria->setPrimaryTableName(VolumePeer::TABLE_NAME);
+                $selectCriteria->setPrimaryTableName(MultiVolumePeer::TABLE_NAME);
             }
 
-        } else { // $values is Volume object
+        } else { // $values is MultiVolume object
             $criteria = $values->buildCriteria(); // gets full criteria
             $selectCriteria = $values->buildPkeyCriteria(); // gets criteria w/ primary key(s)
         }
 
         // set the correct dbName
-        $criteria->setDbName(VolumePeer::DATABASE_NAME);
+        $criteria->setDbName(MultiVolumePeer::DATABASE_NAME);
 
         return BasePeer::doUpdate($selectCriteria, $criteria, $con);
     }
 
     /**
-     * Deletes all rows from the volume table.
+     * Deletes all rows from the multi_volume table.
      *
      * @param      PropelPDO $con the connection to use
      * @return int             The number of affected rows (if supported by underlying database driver).
@@ -846,19 +841,19 @@ abstract class BaseVolumePeer
     public static function doDeleteAll(PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(VolumePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(MultiVolumePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
         $affectedRows = 0; // initialize var to track total num of affected rows
         try {
             // use transaction because $criteria could contain info
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
-            $affectedRows += BasePeer::doDeleteAll(VolumePeer::TABLE_NAME, $con, VolumePeer::DATABASE_NAME);
+            $affectedRows += BasePeer::doDeleteAll(MultiVolumePeer::TABLE_NAME, $con, MultiVolumePeer::DATABASE_NAME);
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
             // instances get re-added by the select statement contained therein).
-            VolumePeer::clearInstancePool();
-            VolumePeer::clearRelatedInstancePool();
+            MultiVolumePeer::clearInstancePool();
+            MultiVolumePeer::clearRelatedInstancePool();
             $con->commit();
 
             return $affectedRows;
@@ -869,9 +864,9 @@ abstract class BaseVolumePeer
     }
 
     /**
-     * Performs a DELETE on the database, given a Volume or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a MultiVolume or Criteria object OR a primary key value.
      *
-     * @param      mixed $values Criteria or Volume object or primary key or array of primary keys
+     * @param      mixed $values Criteria or MultiVolume object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param      PropelPDO $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -882,32 +877,32 @@ abstract class BaseVolumePeer
      public static function doDelete($values, PropelPDO $con = null)
      {
         if ($con === null) {
-            $con = Propel::getConnection(VolumePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(MultiVolumePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         if ($values instanceof Criteria) {
             // invalidate the cache for all objects of this type, since we have no
             // way of knowing (without running a query) what objects should be invalidated
             // from the cache based on this Criteria.
-            VolumePeer::clearInstancePool();
+            MultiVolumePeer::clearInstancePool();
             // rename for clarity
             $criteria = clone $values;
-        } elseif ($values instanceof Volume) { // it's a model object
+        } elseif ($values instanceof MultiVolume) { // it's a model object
             // invalidate the cache for this single object
-            VolumePeer::removeInstanceFromPool($values);
+            MultiVolumePeer::removeInstanceFromPool($values);
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(VolumePeer::DATABASE_NAME);
-            $criteria->add(VolumePeer::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(MultiVolumePeer::DATABASE_NAME);
+            $criteria->add(MultiVolumePeer::ID, (array) $values, Criteria::IN);
             // invalidate the cache for this object(s)
             foreach ((array) $values as $singleval) {
-                VolumePeer::removeInstanceFromPool($singleval);
+                MultiVolumePeer::removeInstanceFromPool($singleval);
             }
         }
 
         // Set the correct dbName
-        $criteria->setDbName(VolumePeer::DATABASE_NAME);
+        $criteria->setDbName(MultiVolumePeer::DATABASE_NAME);
 
         $affectedRows = 0; // initialize var to track total num of affected rows
 
@@ -917,7 +912,7 @@ abstract class BaseVolumePeer
             $con->beginTransaction();
 
             $affectedRows += BasePeer::doDelete($criteria, $con);
-            VolumePeer::clearRelatedInstancePool();
+            MultiVolumePeer::clearRelatedInstancePool();
             $con->commit();
 
             return $affectedRows;
@@ -928,13 +923,13 @@ abstract class BaseVolumePeer
     }
 
     /**
-     * Validates all modified columns of given Volume object.
+     * Validates all modified columns of given MultiVolume object.
      * If parameter $columns is either a single column name or an array of column names
      * than only those columns are validated.
      *
      * NOTICE: This does not apply to primary or foreign keys for now.
      *
-     * @param Volume $obj The object to validate.
+     * @param MultiVolume $obj The object to validate.
      * @param      mixed $cols Column name or array of column names.
      *
      * @return mixed TRUE if all columns are valid or the error message of the first invalid column.
@@ -944,8 +939,8 @@ abstract class BaseVolumePeer
         $columns = array();
 
         if ($cols) {
-            $dbMap = Propel::getDatabaseMap(VolumePeer::DATABASE_NAME);
-            $tableMap = $dbMap->getTable(VolumePeer::TABLE_NAME);
+            $dbMap = Propel::getDatabaseMap(MultiVolumePeer::DATABASE_NAME);
+            $tableMap = $dbMap->getTable(MultiVolumePeer::TABLE_NAME);
 
             if (! is_array($cols)) {
                 $cols = array($cols);
@@ -961,7 +956,7 @@ abstract class BaseVolumePeer
 
         }
 
-        return BasePeer::doValidate(VolumePeer::DATABASE_NAME, VolumePeer::TABLE_NAME, $columns);
+        return BasePeer::doValidate(MultiVolumePeer::DATABASE_NAME, MultiVolumePeer::TABLE_NAME, $columns);
     }
 
     /**
@@ -969,23 +964,23 @@ abstract class BaseVolumePeer
      *
      * @param int $pk the primary key.
      * @param      PropelPDO $con the connection to use
-     * @return Volume
+     * @return MultiVolume
      */
     public static function retrieveByPK($pk, PropelPDO $con = null)
     {
 
-        if (null !== ($obj = VolumePeer::getInstanceFromPool((string) $pk))) {
+        if (null !== ($obj = MultiVolumePeer::getInstanceFromPool((string) $pk))) {
             return $obj;
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(VolumePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(MultiVolumePeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria = new Criteria(VolumePeer::DATABASE_NAME);
-        $criteria->add(VolumePeer::ID, $pk);
+        $criteria = new Criteria(MultiVolumePeer::DATABASE_NAME);
+        $criteria->add(MultiVolumePeer::ID, $pk);
 
-        $v = VolumePeer::doSelect($criteria, $con);
+        $v = MultiVolumePeer::doSelect($criteria, $con);
 
         return !empty($v) > 0 ? $v[0] : null;
     }
@@ -995,31 +990,31 @@ abstract class BaseVolumePeer
      *
      * @param      array $pks List of primary keys
      * @param      PropelPDO $con the connection to use
-     * @return Volume[]
+     * @return MultiVolume[]
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
     public static function retrieveByPKs($pks, PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(VolumePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(MultiVolumePeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
         $objs = null;
         if (empty($pks)) {
             $objs = array();
         } else {
-            $criteria = new Criteria(VolumePeer::DATABASE_NAME);
-            $criteria->add(VolumePeer::ID, $pks, Criteria::IN);
-            $objs = VolumePeer::doSelect($criteria, $con);
+            $criteria = new Criteria(MultiVolumePeer::DATABASE_NAME);
+            $criteria->add(MultiVolumePeer::ID, $pks, Criteria::IN);
+            $objs = MultiVolumePeer::doSelect($criteria, $con);
         }
 
         return $objs;
     }
 
-} // BaseVolumePeer
+} // BaseMultiVolumePeer
 
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-BaseVolumePeer::buildTableMap();
+BaseMultiVolumePeer::buildTableMap();
 

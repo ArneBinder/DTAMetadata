@@ -85,6 +85,11 @@ dataDomain:
   path: /Data/
   defaults: { _controller: DTAMetadataBundle:DataDomain:index }
 
+viewPublicationsByType:
+  path: /Data/viewPublicationsByType/{publicationType}
+  defaults: { _controller: DTAMetadataBundle:DataDomain:viewPublicationsByType}
+
+
 viewPersonsByRole:
   path: /Data/viewPersonsByRole/{personRoleId}
   defaults: { _controller: DTAMetadataBundle:DataDomain:viewPersonsByRole }

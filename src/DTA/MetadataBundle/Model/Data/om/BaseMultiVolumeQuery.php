@@ -12,54 +12,50 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use DTA\MetadataBundle\Model\Data\MultiVolume;
+use DTA\MetadataBundle\Model\Data\MultiVolumePeer;
+use DTA\MetadataBundle\Model\Data\MultiVolumeQuery;
 use DTA\MetadataBundle\Model\Data\Publication;
-use DTA\MetadataBundle\Model\Data\Volume;
-use DTA\MetadataBundle\Model\Data\VolumePeer;
-use DTA\MetadataBundle\Model\Data\VolumeQuery;
 
 /**
- * @method VolumeQuery orderById($order = Criteria::ASC) Order by the id column
- * @method VolumeQuery orderByPublicationId($order = Criteria::ASC) Order by the publication_id column
- * @method VolumeQuery orderByVolumeDescription($order = Criteria::ASC) Order by the volume_description column
- * @method VolumeQuery orderByVolumeNumeric($order = Criteria::ASC) Order by the volume_numeric column
- * @method VolumeQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
- * @method VolumeQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
+ * @method MultiVolumeQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method MultiVolumeQuery orderByPublicationId($order = Criteria::ASC) Order by the publication_id column
+ * @method MultiVolumeQuery orderByVolumesTotal($order = Criteria::ASC) Order by the volumes_total column
+ * @method MultiVolumeQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method MultiVolumeQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
- * @method VolumeQuery groupById() Group by the id column
- * @method VolumeQuery groupByPublicationId() Group by the publication_id column
- * @method VolumeQuery groupByVolumeDescription() Group by the volume_description column
- * @method VolumeQuery groupByVolumeNumeric() Group by the volume_numeric column
- * @method VolumeQuery groupByCreatedAt() Group by the created_at column
- * @method VolumeQuery groupByUpdatedAt() Group by the updated_at column
+ * @method MultiVolumeQuery groupById() Group by the id column
+ * @method MultiVolumeQuery groupByPublicationId() Group by the publication_id column
+ * @method MultiVolumeQuery groupByVolumesTotal() Group by the volumes_total column
+ * @method MultiVolumeQuery groupByCreatedAt() Group by the created_at column
+ * @method MultiVolumeQuery groupByUpdatedAt() Group by the updated_at column
  *
- * @method VolumeQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
- * @method VolumeQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
- * @method VolumeQuery innerJoin($relation) Adds a INNER JOIN clause to the query
+ * @method MultiVolumeQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
+ * @method MultiVolumeQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
+ * @method MultiVolumeQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method VolumeQuery leftJoinPublication($relationAlias = null) Adds a LEFT JOIN clause to the query using the Publication relation
- * @method VolumeQuery rightJoinPublication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Publication relation
- * @method VolumeQuery innerJoinPublication($relationAlias = null) Adds a INNER JOIN clause to the query using the Publication relation
+ * @method MultiVolumeQuery leftJoinPublication($relationAlias = null) Adds a LEFT JOIN clause to the query using the Publication relation
+ * @method MultiVolumeQuery rightJoinPublication($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Publication relation
+ * @method MultiVolumeQuery innerJoinPublication($relationAlias = null) Adds a INNER JOIN clause to the query using the Publication relation
  *
- * @method Volume findOne(PropelPDO $con = null) Return the first Volume matching the query
- * @method Volume findOneOrCreate(PropelPDO $con = null) Return the first Volume matching the query, or a new Volume object populated from the query conditions when no match is found
+ * @method MultiVolume findOne(PropelPDO $con = null) Return the first MultiVolume matching the query
+ * @method MultiVolume findOneOrCreate(PropelPDO $con = null) Return the first MultiVolume matching the query, or a new MultiVolume object populated from the query conditions when no match is found
  *
- * @method Volume findOneByPublicationId(int $publication_id) Return the first Volume filtered by the publication_id column
- * @method Volume findOneByVolumeDescription(string $volume_description) Return the first Volume filtered by the volume_description column
- * @method Volume findOneByVolumeNumeric(int $volume_numeric) Return the first Volume filtered by the volume_numeric column
- * @method Volume findOneByCreatedAt(string $created_at) Return the first Volume filtered by the created_at column
- * @method Volume findOneByUpdatedAt(string $updated_at) Return the first Volume filtered by the updated_at column
+ * @method MultiVolume findOneByPublicationId(int $publication_id) Return the first MultiVolume filtered by the publication_id column
+ * @method MultiVolume findOneByVolumesTotal(int $volumes_total) Return the first MultiVolume filtered by the volumes_total column
+ * @method MultiVolume findOneByCreatedAt(string $created_at) Return the first MultiVolume filtered by the created_at column
+ * @method MultiVolume findOneByUpdatedAt(string $updated_at) Return the first MultiVolume filtered by the updated_at column
  *
- * @method array findById(int $id) Return Volume objects filtered by the id column
- * @method array findByPublicationId(int $publication_id) Return Volume objects filtered by the publication_id column
- * @method array findByVolumeDescription(string $volume_description) Return Volume objects filtered by the volume_description column
- * @method array findByVolumeNumeric(int $volume_numeric) Return Volume objects filtered by the volume_numeric column
- * @method array findByCreatedAt(string $created_at) Return Volume objects filtered by the created_at column
- * @method array findByUpdatedAt(string $updated_at) Return Volume objects filtered by the updated_at column
+ * @method array findById(int $id) Return MultiVolume objects filtered by the id column
+ * @method array findByPublicationId(int $publication_id) Return MultiVolume objects filtered by the publication_id column
+ * @method array findByVolumesTotal(int $volumes_total) Return MultiVolume objects filtered by the volumes_total column
+ * @method array findByCreatedAt(string $created_at) Return MultiVolume objects filtered by the created_at column
+ * @method array findByUpdatedAt(string $updated_at) Return MultiVolume objects filtered by the updated_at column
  */
-abstract class BaseVolumeQuery extends ModelCriteria
+abstract class BaseMultiVolumeQuery extends ModelCriteria
 {
     /**
-     * Initializes internal state of BaseVolumeQuery object.
+     * Initializes internal state of BaseMultiVolumeQuery object.
      *
      * @param     string $dbName The dabase name
      * @param     string $modelName The phpName of a model, e.g. 'Book'
@@ -71,25 +67,25 @@ abstract class BaseVolumeQuery extends ModelCriteria
             $dbName = 'dtametadata';
         }
         if (null === $modelName) {
-            $modelName = 'DTA\\MetadataBundle\\Model\\Data\\Volume';
+            $modelName = 'DTA\\MetadataBundle\\Model\\Data\\MultiVolume';
         }
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
     /**
-     * Returns a new VolumeQuery object.
+     * Returns a new MultiVolumeQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param   VolumeQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   MultiVolumeQuery|Criteria $criteria Optional Criteria to build the query from
      *
-     * @return VolumeQuery
+     * @return MultiVolumeQuery
      */
     public static function create($modelAlias = null, $criteria = null)
     {
-        if ($criteria instanceof VolumeQuery) {
+        if ($criteria instanceof MultiVolumeQuery) {
             return $criteria;
         }
-        $query = new VolumeQuery(null, null, $modelAlias);
+        $query = new MultiVolumeQuery(null, null, $modelAlias);
 
         if ($criteria instanceof Criteria) {
             $query->mergeWith($criteria);
@@ -110,19 +106,19 @@ abstract class BaseVolumeQuery extends ModelCriteria
      * @param mixed $key Primary key to use for the query
      * @param     PropelPDO $con an optional connection object
      *
-     * @return   Volume|Volume[]|mixed the result, formatted by the current formatter
+     * @return   MultiVolume|MultiVolume[]|mixed the result, formatted by the current formatter
      */
     public function findPk($key, $con = null)
     {
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = VolumePeer::getInstanceFromPool((string) $key))) && !$this->formatter) {
+        if ((null !== ($obj = MultiVolumePeer::getInstanceFromPool((string) $key))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
-            $con = Propel::getConnection(VolumePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(MultiVolumePeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
         $this->basePreSelect($con);
         if ($this->formatter || $this->modelAlias || $this->with || $this->select
@@ -140,7 +136,7 @@ abstract class BaseVolumeQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return                 Volume A model object, or null if the key is not found
+     * @return                 MultiVolume A model object, or null if the key is not found
      * @throws PropelException
      */
      public function findOneById($key, $con = null)
@@ -155,12 +151,12 @@ abstract class BaseVolumeQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return                 Volume A model object, or null if the key is not found
+     * @return                 MultiVolume A model object, or null if the key is not found
      * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "publication_id", "volume_description", "volume_numeric", "created_at", "updated_at" FROM "volume" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "publication_id", "volumes_total", "created_at", "updated_at" FROM "multi_volume" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -171,9 +167,9 @@ abstract class BaseVolumeQuery extends ModelCriteria
         }
         $obj = null;
         if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $obj = new Volume();
+            $obj = new MultiVolume();
             $obj->hydrate($row);
-            VolumePeer::addInstanceToPool($obj, (string) $key);
+            MultiVolumePeer::addInstanceToPool($obj, (string) $key);
         }
         $stmt->closeCursor();
 
@@ -186,7 +182,7 @@ abstract class BaseVolumeQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return Volume|Volume[]|mixed the result, formatted by the current formatter
+     * @return MultiVolume|MultiVolume[]|mixed the result, formatted by the current formatter
      */
     protected function findPkComplex($key, $con)
     {
@@ -207,7 +203,7 @@ abstract class BaseVolumeQuery extends ModelCriteria
      * @param     array $keys Primary keys to use for the query
      * @param     PropelPDO $con an optional connection object
      *
-     * @return PropelObjectCollection|Volume[]|mixed the list of results, formatted by the current formatter
+     * @return PropelObjectCollection|MultiVolume[]|mixed the list of results, formatted by the current formatter
      */
     public function findPks($keys, $con = null)
     {
@@ -228,12 +224,12 @@ abstract class BaseVolumeQuery extends ModelCriteria
      *
      * @param     mixed $key Primary key to use for the query
      *
-     * @return VolumeQuery The current query, for fluid interface
+     * @return MultiVolumeQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
 
-        return $this->addUsingAlias(VolumePeer::ID, $key, Criteria::EQUAL);
+        return $this->addUsingAlias(MultiVolumePeer::ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -241,12 +237,12 @@ abstract class BaseVolumeQuery extends ModelCriteria
      *
      * @param     array $keys The list of primary key to use for the query
      *
-     * @return VolumeQuery The current query, for fluid interface
+     * @return MultiVolumeQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
 
-        return $this->addUsingAlias(VolumePeer::ID, $keys, Criteria::IN);
+        return $this->addUsingAlias(MultiVolumePeer::ID, $keys, Criteria::IN);
     }
 
     /**
@@ -266,18 +262,18 @@ abstract class BaseVolumeQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return VolumeQuery The current query, for fluid interface
+     * @return MultiVolumeQuery The current query, for fluid interface
      */
     public function filterById($id = null, $comparison = null)
     {
         if (is_array($id)) {
             $useMinMax = false;
             if (isset($id['min'])) {
-                $this->addUsingAlias(VolumePeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(MultiVolumePeer::ID, $id['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($id['max'])) {
-                $this->addUsingAlias(VolumePeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(MultiVolumePeer::ID, $id['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -288,7 +284,7 @@ abstract class BaseVolumeQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(VolumePeer::ID, $id, $comparison);
+        return $this->addUsingAlias(MultiVolumePeer::ID, $id, $comparison);
     }
 
     /**
@@ -310,18 +306,18 @@ abstract class BaseVolumeQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return VolumeQuery The current query, for fluid interface
+     * @return MultiVolumeQuery The current query, for fluid interface
      */
     public function filterByPublicationId($publicationId = null, $comparison = null)
     {
         if (is_array($publicationId)) {
             $useMinMax = false;
             if (isset($publicationId['min'])) {
-                $this->addUsingAlias(VolumePeer::PUBLICATION_ID, $publicationId['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(MultiVolumePeer::PUBLICATION_ID, $publicationId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($publicationId['max'])) {
-                $this->addUsingAlias(VolumePeer::PUBLICATION_ID, $publicationId['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(MultiVolumePeer::PUBLICATION_ID, $publicationId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -332,67 +328,38 @@ abstract class BaseVolumeQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(VolumePeer::PUBLICATION_ID, $publicationId, $comparison);
+        return $this->addUsingAlias(MultiVolumePeer::PUBLICATION_ID, $publicationId, $comparison);
     }
 
     /**
-     * Filter the query on the volume_description column
+     * Filter the query on the volumes_total column
      *
      * Example usage:
      * <code>
-     * $query->filterByVolumeDescription('fooValue');   // WHERE volume_description = 'fooValue'
-     * $query->filterByVolumeDescription('%fooValue%'); // WHERE volume_description LIKE '%fooValue%'
+     * $query->filterByVolumesTotal(1234); // WHERE volumes_total = 1234
+     * $query->filterByVolumesTotal(array(12, 34)); // WHERE volumes_total IN (12, 34)
+     * $query->filterByVolumesTotal(array('min' => 12)); // WHERE volumes_total >= 12
+     * $query->filterByVolumesTotal(array('max' => 12)); // WHERE volumes_total <= 12
      * </code>
      *
-     * @param     string $volumeDescription The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return VolumeQuery The current query, for fluid interface
-     */
-    public function filterByVolumeDescription($volumeDescription = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($volumeDescription)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $volumeDescription)) {
-                $volumeDescription = str_replace('*', '%', $volumeDescription);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(VolumePeer::VOLUME_DESCRIPTION, $volumeDescription, $comparison);
-    }
-
-    /**
-     * Filter the query on the volume_numeric column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByVolumeNumeric(1234); // WHERE volume_numeric = 1234
-     * $query->filterByVolumeNumeric(array(12, 34)); // WHERE volume_numeric IN (12, 34)
-     * $query->filterByVolumeNumeric(array('min' => 12)); // WHERE volume_numeric >= 12
-     * $query->filterByVolumeNumeric(array('max' => 12)); // WHERE volume_numeric <= 12
-     * </code>
-     *
-     * @param     mixed $volumeNumeric The value to use as filter.
+     * @param     mixed $volumesTotal The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return VolumeQuery The current query, for fluid interface
+     * @return MultiVolumeQuery The current query, for fluid interface
      */
-    public function filterByVolumeNumeric($volumeNumeric = null, $comparison = null)
+    public function filterByVolumesTotal($volumesTotal = null, $comparison = null)
     {
-        if (is_array($volumeNumeric)) {
+        if (is_array($volumesTotal)) {
             $useMinMax = false;
-            if (isset($volumeNumeric['min'])) {
-                $this->addUsingAlias(VolumePeer::VOLUME_NUMERIC, $volumeNumeric['min'], Criteria::GREATER_EQUAL);
+            if (isset($volumesTotal['min'])) {
+                $this->addUsingAlias(MultiVolumePeer::VOLUMES_TOTAL, $volumesTotal['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($volumeNumeric['max'])) {
-                $this->addUsingAlias(VolumePeer::VOLUME_NUMERIC, $volumeNumeric['max'], Criteria::LESS_EQUAL);
+            if (isset($volumesTotal['max'])) {
+                $this->addUsingAlias(MultiVolumePeer::VOLUMES_TOTAL, $volumesTotal['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -403,7 +370,7 @@ abstract class BaseVolumeQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(VolumePeer::VOLUME_NUMERIC, $volumeNumeric, $comparison);
+        return $this->addUsingAlias(MultiVolumePeer::VOLUMES_TOTAL, $volumesTotal, $comparison);
     }
 
     /**
@@ -424,18 +391,18 @@ abstract class BaseVolumeQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return VolumeQuery The current query, for fluid interface
+     * @return MultiVolumeQuery The current query, for fluid interface
      */
     public function filterByCreatedAt($createdAt = null, $comparison = null)
     {
         if (is_array($createdAt)) {
             $useMinMax = false;
             if (isset($createdAt['min'])) {
-                $this->addUsingAlias(VolumePeer::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(MultiVolumePeer::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($createdAt['max'])) {
-                $this->addUsingAlias(VolumePeer::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(MultiVolumePeer::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -446,7 +413,7 @@ abstract class BaseVolumeQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(VolumePeer::CREATED_AT, $createdAt, $comparison);
+        return $this->addUsingAlias(MultiVolumePeer::CREATED_AT, $createdAt, $comparison);
     }
 
     /**
@@ -467,18 +434,18 @@ abstract class BaseVolumeQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return VolumeQuery The current query, for fluid interface
+     * @return MultiVolumeQuery The current query, for fluid interface
      */
     public function filterByUpdatedAt($updatedAt = null, $comparison = null)
     {
         if (is_array($updatedAt)) {
             $useMinMax = false;
             if (isset($updatedAt['min'])) {
-                $this->addUsingAlias(VolumePeer::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(MultiVolumePeer::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($updatedAt['max'])) {
-                $this->addUsingAlias(VolumePeer::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(MultiVolumePeer::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -489,7 +456,7 @@ abstract class BaseVolumeQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(VolumePeer::UPDATED_AT, $updatedAt, $comparison);
+        return $this->addUsingAlias(MultiVolumePeer::UPDATED_AT, $updatedAt, $comparison);
     }
 
     /**
@@ -498,21 +465,21 @@ abstract class BaseVolumeQuery extends ModelCriteria
      * @param   Publication|PropelObjectCollection $publication The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return                 VolumeQuery The current query, for fluid interface
+     * @return                 MultiVolumeQuery The current query, for fluid interface
      * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByPublication($publication, $comparison = null)
     {
         if ($publication instanceof Publication) {
             return $this
-                ->addUsingAlias(VolumePeer::PUBLICATION_ID, $publication->getId(), $comparison);
+                ->addUsingAlias(MultiVolumePeer::PUBLICATION_ID, $publication->getId(), $comparison);
         } elseif ($publication instanceof PropelObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(VolumePeer::PUBLICATION_ID, $publication->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(MultiVolumePeer::PUBLICATION_ID, $publication->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByPublication() only accepts arguments of type Publication or PropelCollection');
         }
@@ -524,7 +491,7 @@ abstract class BaseVolumeQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return VolumeQuery The current query, for fluid interface
+     * @return MultiVolumeQuery The current query, for fluid interface
      */
     public function joinPublication($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -571,14 +538,14 @@ abstract class BaseVolumeQuery extends ModelCriteria
     /**
      * Exclude object from result
      *
-     * @param   Volume $volume Object to remove from the list of results
+     * @param   MultiVolume $multiVolume Object to remove from the list of results
      *
-     * @return VolumeQuery The current query, for fluid interface
+     * @return MultiVolumeQuery The current query, for fluid interface
      */
-    public function prune($volume = null)
+    public function prune($multiVolume = null)
     {
-        if ($volume) {
-            $this->addUsingAlias(VolumePeer::ID, $volume->getId(), Criteria::NOT_EQUAL);
+        if ($multiVolume) {
+            $this->addUsingAlias(MultiVolumePeer::ID, $multiVolume->getId(), Criteria::NOT_EQUAL);
         }
 
         return $this;
@@ -591,31 +558,31 @@ abstract class BaseVolumeQuery extends ModelCriteria
      *
      * @param      int $nbDays Maximum age of the latest update in days
      *
-     * @return     VolumeQuery The current query, for fluid interface
+     * @return     MultiVolumeQuery The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
-        return $this->addUsingAlias(VolumePeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+        return $this->addUsingAlias(MultiVolumePeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
 
     /**
      * Order by update date desc
      *
-     * @return     VolumeQuery The current query, for fluid interface
+     * @return     MultiVolumeQuery The current query, for fluid interface
      */
     public function lastUpdatedFirst()
     {
-        return $this->addDescendingOrderByColumn(VolumePeer::UPDATED_AT);
+        return $this->addDescendingOrderByColumn(MultiVolumePeer::UPDATED_AT);
     }
 
     /**
      * Order by update date asc
      *
-     * @return     VolumeQuery The current query, for fluid interface
+     * @return     MultiVolumeQuery The current query, for fluid interface
      */
     public function firstUpdatedFirst()
     {
-        return $this->addAscendingOrderByColumn(VolumePeer::UPDATED_AT);
+        return $this->addAscendingOrderByColumn(MultiVolumePeer::UPDATED_AT);
     }
 
     /**
@@ -623,30 +590,30 @@ abstract class BaseVolumeQuery extends ModelCriteria
      *
      * @param      int $nbDays Maximum age of in days
      *
-     * @return     VolumeQuery The current query, for fluid interface
+     * @return     MultiVolumeQuery The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
-        return $this->addUsingAlias(VolumePeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+        return $this->addUsingAlias(MultiVolumePeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
 
     /**
      * Order by create date desc
      *
-     * @return     VolumeQuery The current query, for fluid interface
+     * @return     MultiVolumeQuery The current query, for fluid interface
      */
     public function lastCreatedFirst()
     {
-        return $this->addDescendingOrderByColumn(VolumePeer::CREATED_AT);
+        return $this->addDescendingOrderByColumn(MultiVolumePeer::CREATED_AT);
     }
 
     /**
      * Order by create date asc
      *
-     * @return     VolumeQuery The current query, for fluid interface
+     * @return     MultiVolumeQuery The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {
-        return $this->addAscendingOrderByColumn(VolumePeer::CREATED_AT);
+        return $this->addAscendingOrderByColumn(MultiVolumePeer::CREATED_AT);
     }
 }

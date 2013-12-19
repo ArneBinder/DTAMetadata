@@ -45,9 +45,8 @@ class VolumeTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('publication_id', 'PublicationId', 'INTEGER', 'publication', 'id', true, null, null);
-        $this->addColumn('volumedescription', 'Volumedescription', 'INTEGER', false, null, null);
-        $this->addColumn('volumenumeric', 'Volumenumeric', 'INTEGER', false, null, null);
-        $this->addColumn('volumestotal', 'Volumestotal', 'INTEGER', false, null, null);
+        $this->addColumn('volume_description', 'VolumeDescription', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('volume_numeric', 'VolumeNumeric', 'INTEGER', false, null, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators

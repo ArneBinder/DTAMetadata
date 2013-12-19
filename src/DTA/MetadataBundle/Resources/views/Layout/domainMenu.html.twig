@@ -52,7 +52,7 @@
             <li class="dropdown {{ isInSubMenu ? "active" : ""}}"> 
                 
                 <a data-toggle="dropdown" class="dropdown-toggle" href="#"> 
-                    {{ item.caption}}
+                    {{ item.caption|trans}}
                     <b class="caret"></b>
                 </a>
                 
@@ -66,7 +66,7 @@
                     {# If the menu element is a model class, add view and create options #}
                     <li>
                         <a href="{{ path(package~'_genericViewAll', {'package':package, 'className':child.modelClass}) }}">
-                            {{ child.caption|default(child.modelClass|trans)}} 
+                            {{ child.caption|default(child.modelClass|trans)|trans}} 
                             {#<span class="glyphicon glyphicon-plus pull-right"></span>
                             <span class="glyphicon glyphicon-list pull-right"></span>#}
                         </a>
@@ -77,7 +77,7 @@
                     </p>#}
                     </li>
                     {% else %}
-                    <li><a href="{{ path(child.route, child.parameters|default({})) }}">{{ child.caption }}</a></li>
+                    <li><a href="{{ path(child.route, child.parameters|default({})) }}">{{ child.caption|trans }}</a></li>
                     {% endif %}
                 {% endfor %}
                 </ul>
@@ -89,7 +89,7 @@
                 {% set active = highlightItem == item.modelClass ? "active" : ""%}
                 <li class="{{active}}">
                     <a href="{{ path(package~'_genericViewAll', {'package':package, 'className':item.modelClass}) }}"> 
-                           {{ item.caption }} 
+                           {{ item.caption|trans }} 
                      </a>
                 </li>
             {# The menu element is a simple link #}

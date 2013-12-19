@@ -49,4 +49,18 @@ class Publication extends BasePublication
         if(count($personalNames) == 0 ) return NULL;
         return $personalNames[0];
     }
+    
+    /** Returns a single string combining all title fragments and a volume description. */
+    public function getTitleString(){
+    
+        $title = $this->getTitle();
+        $result = $title !== NULL ? $title->__toString() : "";
+        if($this->getType() === PublicationPeer::TYPE_VOLUME ){
+            $volumes = $this->getVolumes();
+            $result .= $volumes->count() > 0 ? " (" . $volumes[0]->getVolumeNumeric() . ") " . $volumes[0]->getVolumeDescription() : "";
+        }
+        
+        return $result;
+        
+    }
 }

@@ -147,12 +147,14 @@
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         
         <column name="publication_id" type="INTEGER" required="true"/>
+       <column name="partner_id" type="INTEGER"/>
        
         <!--Bilddigitalisate können teilweise aus anderen Quellen kommen.-->
         <column description="Referenzierte Faksimileseitenzahlen" name="faksimilerefrange" type="LONGVARCHAR"/>
         <column description="Referenzierte Originalseitenzahlen" name="originalrefrange" type="LONGVARCHAR"/>
 
         <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="partner" onDelete="setnull"> <reference local="partner_id" foreign="id"/> </foreign-key>
     </table>
     
     <!--Quellenangabe fuer Textdigitalisate-->

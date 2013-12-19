@@ -22,6 +22,7 @@ class TextsourceType extends BaseAbstractType
             'property' => 'Name',
             'label' => 'Anbieter Textdigitalisate',
             'searchable' => true,
+            'query' => \DTA\MetadataBundle\Model\Workflow\Partner::getRowViewQueryObject()
         ));
         $builder->add('texturl', 'text', array('required'=>false));
         $builder->add('attribution', 'text', array('required'=>false));

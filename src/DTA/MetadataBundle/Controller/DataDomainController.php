@@ -16,9 +16,6 @@ class DataDomainController extends ORMController {
      * from the database in the __construct() method.
      */
     public $domainMenu = array(
-//        'work' => array(
-//            "caption" => "Werke",
-//            "modelClass" => "Work"),
         'publication' => array(
             "caption" => "Publikationen", 
             "children"=>array(
@@ -58,11 +55,13 @@ class DataDomainController extends ORMController {
 
         // render different publication types
         // see dta_data_schema for explanations on the single types.
-        $publicationTypes = array(
-            "PublicationM","PublicationDm","PublicationMm","PublicationDs",
-            "PublicationMs","PublicationJa","PublicationMms","PublicationJ");
-        foreach( $publicationTypes as $pt ){
-            $this->domainMenu['publication']['children'][] = array("caption" => "", "modelClass" => $pt);
+        $publicationTypes = Model\Data\om\BasePublicationPeer::getValueSet(Model\Data\PublicationPeer::TYPE);
+        foreach( $publicationTypes as $pt => $type){
+            $this->domainMenu['publication']['children'][] = array(
+                "caption" => $type, 
+                "route" => 'viewPublicationsByType',
+                "parameters" => array('publicationType'=>$type),
+            );
         }
         
     }
@@ -73,16 +72,6 @@ class DataDomainController extends ORMController {
             // get_declared_classes()
         ));
     }
-
-//    public function lexicographicalComparison($s1, $s2){
-//        for($i = 0; $i < max(array(count($s1),count($s2))); $i++){
-//            if(ord($s1[$i]) > ord($s2[$i]))
-//                return 1;
-//            elseif(ord($s1[$i]) < ord($s2[$i]))
-//                return -1;
-//        }
-//        return 0;
-//    }
     
     public function viewPersonsByRoleAction($personRoleId) {
         
@@ -122,6 +111,7 @@ class DataDomainController extends ORMController {
         $columns = array('Name', 'Publikation/Werk');
         $accessors = array('repName', 'context');
         $compareRow = function($a, $b){ return strcmp($a['repName'],$b['repName']); };
+        // doesn't noticeably impact performance, but is maybe unnecessary if the javascript sorts the table anyways
         uasort($rows, $compareRow);
         return $this->renderWithDomainData('DTAMetadataBundle::listView.html.twig', array(
             'rows' => $rows,
@@ -130,5 +120,62 @@ class DataDomainController extends ORMController {
             'title' => $role->getName()
         ));
     }
+
+    public function viewPublicationsByTypeAction($publicationType) {
+        
+        $rows = array();
+        
+        $publications = Model\Data\PublicationQuery::create()
+                ->filterByType($publicationType)
+                ->leftJoinWith('PersonPublication')
+                ->leftJoinWith('PersonPublication.Person')
+                ->leftJoinWith('Person.Personalname')
+                ->leftJoinWith('Personalname.Namefragment')
+                ->leftJoinWith('Namefragment.Namefragmenttype')
+                ->leftJoinWith('Title')
+                ->leftJoinWith('Title.Titlefragment')
+                ->leftJoinWith('Volume')
+                ->orderBy('Titlefragment.TitlefragmenttypeId', 'asc')
+                ->orderBy('Titlefragment.Name', 'asc')
+                ->orderBy('Title.Id', 'asc')
+                ->orderBy('Volume.VolumeNumeric', 'asc')
+                ->find();
+        
+        foreach ($publications as $pub) {
+
+            $linkTarget = $this->generateUrl("Data_genericCreateOrEdit", array(
+                    'className'=> 'Publication', 
+                    'recordId'=>$pub->getId()
+                )
+            );
+
+            $linkTo = function($href,$title){return '<a href="'.$href.'">'.$title.'</a>';};
+            $rows[] = array(
+                'context' => $linkTo($linkTarget, $pub->getTitleString()),
+                'repName' => $pub->getFirstAuthor(),
+            );
+        }
+        
+        $columns = array('Titel', 'Erster Autor');
+        $accessors = array('context', 'repName');
+//        $compareRow = function($a, $b){ return strcmp($a['context'],$b['context']); };
+//        uasort($rows, $compareRow);
+        return $this->renderWithDomainData('DTAMetadataBundle::listView.html.twig', array(
+            'rows' => $rows,
+            'columns' => $columns,
+            'accessors' => $accessors,
+            'title' => $publicationType
+        ));
+    }
+
+    //    public function lexicographicalComparison($s1, $s2){
+//        for($i = 0; $i < max(array(count($s1),count($s2))); $i++){
+//            if(ord($s1[$i]) > ord($s2[$i]))
+//                return 1;
+//            elseif(ord($s1[$i]) < ord($s2[$i]))
+//                return -1;
+//        }
+//        return 0;
+//    }
     
 }

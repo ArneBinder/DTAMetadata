@@ -180,7 +180,7 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Signatur', 'Titel', 'erster Autor', 'Verlag', 'veröffentlicht', );	public   $tableRowViewAccessors = array('Signatur'=>'CatalogueSignature', 'Titel'=>'accessor:getEmbeddedColumn1OfPublication', 'erster Autor'=>'accessor:getEmbeddedColumn2OfPublication', 'Verlag'=>'accessor:getEmbeddedColumn3OfPublication', 'veröffentlicht'=>'accessor:getEmbeddedColumn4OfPublication', );	public static $queryConstructionString = "\DTA\MetadataBundle\Model\Workflow\CopyLocationQuery::create()                     ->leftJoinWith('Publication')                     ->leftJoinWith('Publication.Title')                     ->leftJoinWith('Title.Titlefragment')                     ->leftJoinWith('Publication.DatespecificationRelatedByPublicationdateId')                     ->leftJoinWith('Publication.PersonPublication')                     ->leftJoinWith('PersonPublication.Person')                     ->leftJoinWith('Person.Personalname')                     ->leftJoinWith('Personalname.Namefragment');";
+    public static $tableRowViewCaptions = array('Signatur', 'Titel', 'erster Autor', 'Typ', 'Verlag', 'veröffentlicht', );	public   $tableRowViewAccessors = array('Signatur'=>'CatalogueSignature', 'Titel'=>'accessor:getEmbeddedColumn1OfPublication', 'erster Autor'=>'accessor:getEmbeddedColumn2OfPublication', 'Typ'=>'accessor:getEmbeddedColumn3OfPublication', 'Verlag'=>'accessor:getEmbeddedColumn4OfPublication', 'veröffentlicht'=>'accessor:getEmbeddedColumn5OfPublication', );	public static $queryConstructionString = "\DTA\MetadataBundle\Model\Workflow\CopyLocationQuery::create()                     ->leftJoinWith('Publication')                     ->leftJoinWith('Publication.Title')                     ->leftJoinWith('Title.Titlefragment')                     ->leftJoinWith('Publication.DatespecificationRelatedByPublicationdateId')                     ->leftJoinWith('Publication.PersonPublication')                     ->leftJoinWith('PersonPublication.Person')                     ->leftJoinWith('Person.Personalname')                     ->leftJoinWith('Personalname.Namefragment');";
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -2408,13 +2408,22 @@ abstract class BaseCopyLocation extends BaseObject implements Persistent, \DTA\M
     public function getEmbeddedColumn3OfPublication(){
 
         $relatedEntity = $this->getPublication();
-        return $relatedEntity->getAttributeByTableViewColumName("Verlag");
+        return $relatedEntity->getAttributeByTableViewColumName("Typ");
 
     }    /**
      * Cascades the get to a related entity (possibly recursively)
      */
 
     public function getEmbeddedColumn4OfPublication(){
+
+        $relatedEntity = $this->getPublication();
+        return $relatedEntity->getAttributeByTableViewColumName("Verlag");
+
+    }    /**
+     * Cascades the get to a related entity (possibly recursively)
+     */
+
+    public function getEmbeddedColumn5OfPublication(){
 
         $relatedEntity = $this->getPublication();
         return $relatedEntity->getAttributeByTableViewColumName("veröffentlicht");

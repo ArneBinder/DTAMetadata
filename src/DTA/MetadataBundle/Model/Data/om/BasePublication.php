@@ -34,6 +34,8 @@ use DTA\MetadataBundle\Model\Data\Font;
 use DTA\MetadataBundle\Model\Data\FontQuery;
 use DTA\MetadataBundle\Model\Data\Language;
 use DTA\MetadataBundle\Model\Data\LanguageQuery;
+use DTA\MetadataBundle\Model\Data\MultiVolume;
+use DTA\MetadataBundle\Model\Data\MultiVolumeQuery;
 use DTA\MetadataBundle\Model\Data\Place;
 use DTA\MetadataBundle\Model\Data\PlaceQuery;
 use DTA\MetadataBundle\Model\Data\Publication;
@@ -108,6 +110,12 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      * @var        int
      */
     protected $type;
+
+    /**
+     * The value for the legacytype field.
+     * @var        string
+     */
+    protected $legacytype;
 
     /**
      * The value for the title_id field.
@@ -332,6 +340,12 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     protected $aLastChangedByUser;
 
     /**
+     * @var        PropelObjectCollection|MultiVolume[] Collection to store aggregation of MultiVolume objects.
+     */
+    protected $collMultiVolumes;
+    protected $collMultiVolumesPartial;
+
+    /**
      * @var        PropelObjectCollection|Volume[] Collection to store aggregation of Volume objects.
      */
     protected $collVolumes;
@@ -499,7 +513,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Titel', 'erster Autor', 'Verlag', 'veröffentlicht', );	public   $tableRowViewAccessors = array('Titel'=>'accessor:getTitle', 'erster Autor'=>'accessor:getFirstAuthor', 'Verlag'=>'accessor:getPublishingCompany', 'veröffentlicht'=>'accessor:getDatespecificationRelatedByPublicationdateId', );	public static $queryConstructionString = "\DTA\MetadataBundle\Model\Data\PublicationQuery::create()                     ->leftJoinWith('Title')                     ->leftJoinWith('Title.Titlefragment')                     ->leftJoinWith('DatespecificationRelatedByPublicationdateId')                     ->leftJoinWith('PersonPublication')                     ->leftJoinWith('PersonPublication.Person')                     ->leftJoinWith('Person.Personalname')                     ->leftJoinWith('Personalname.Namefragment');";
+    public static $tableRowViewCaptions = array('Titel', 'erster Autor', 'Typ', 'Verlag', 'veröffentlicht', );	public   $tableRowViewAccessors = array('Titel'=>'accessor:getTitle', 'erster Autor'=>'accessor:getFirstAuthor', 'Typ'=>'Type', 'Verlag'=>'accessor:getPublishingCompany', 'veröffentlicht'=>'accessor:getDatespecificationRelatedByPublicationdateId', );	public static $queryConstructionString = "\DTA\MetadataBundle\Model\Data\PublicationQuery::create()                     ->leftJoinWith('Title')                     ->leftJoinWith('Title.Titlefragment')                     ->leftJoinWith('DatespecificationRelatedByPublicationdateId')                     ->leftJoinWith('PersonPublication')                     ->leftJoinWith('PersonPublication.Person')                     ->leftJoinWith('Person.Personalname')                     ->leftJoinWith('Personalname.Namefragment');";
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -535,6 +549,12 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      * @var		PropelObjectCollection
      */
     protected $publicationgroupsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $multiVolumesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -681,6 +701,17 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         }
 
         return $valueSet[$this->type];
+    }
+
+    /**
+     * Get the [legacytype] column value.
+     * Altes Publikationstypen-Kürzel (J, JA, M, MM, MMS, etc.)
+     * @return string
+     */
+    public function getLegacytype()
+    {
+
+        return $this->legacytype;
     }
 
     /**
@@ -1118,6 +1149,27 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
         return $this;
     } // setType()
+
+    /**
+     * Set the value of [legacytype] column.
+     * Altes Publikationstypen-Kürzel (J, JA, M, MM, MMS, etc.)
+     * @param  string $v new value
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setLegacytype($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (string) $v;
+        }
+
+        if ($this->legacytype !== $v) {
+            $this->legacytype = $v;
+            $this->modifiedColumns[] = PublicationPeer::LEGACYTYPE;
+        }
+
+
+        return $this;
+    } // setLegacytype()
 
     /**
      * Set the value of [title_id] column.
@@ -1848,37 +1900,38 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->type = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-            $this->title_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
-            $this->firsteditionpublication_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
-            $this->place_id = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
-            $this->publicationdate_id = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
-            $this->creationdate_id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
-            $this->publishingcompany_id = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-            $this->source_id = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
-            $this->legacygenre = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
-            $this->legacysubgenre = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
-            $this->dirname = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
-            $this->usedcopylocation_id = ($row[$startcol + 12] !== null) ? (int) $row[$startcol + 12] : null;
-            $this->partner_id = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
-            $this->editiondescription = ($row[$startcol + 14] !== null) ? (string) $row[$startcol + 14] : null;
-            $this->digitaleditioneditor = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
-            $this->transcriptioncomment = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
-            $this->numpages = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
-            $this->numpagesnumeric = ($row[$startcol + 18] !== null) ? (int) $row[$startcol + 18] : null;
-            $this->comment = ($row[$startcol + 19] !== null) ? (string) $row[$startcol + 19] : null;
-            $this->encoding_comment = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
-            $this->doi = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
-            $this->format = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
-            $this->directoryname = ($row[$startcol + 23] !== null) ? (string) $row[$startcol + 23] : null;
-            $this->wwwready = ($row[$startcol + 24] !== null) ? (int) $row[$startcol + 24] : null;
-            $this->last_changed_by_user_id = ($row[$startcol + 25] !== null) ? (int) $row[$startcol + 25] : null;
-            $this->tree_id = ($row[$startcol + 26] !== null) ? (int) $row[$startcol + 26] : null;
-            $this->tree_left = ($row[$startcol + 27] !== null) ? (int) $row[$startcol + 27] : null;
-            $this->tree_right = ($row[$startcol + 28] !== null) ? (int) $row[$startcol + 28] : null;
-            $this->tree_level = ($row[$startcol + 29] !== null) ? (int) $row[$startcol + 29] : null;
-            $this->publishingcompany_id_is_reconstructed = ($row[$startcol + 30] !== null) ? (boolean) $row[$startcol + 30] : null;
-            $this->created_at = ($row[$startcol + 31] !== null) ? (string) $row[$startcol + 31] : null;
-            $this->updated_at = ($row[$startcol + 32] !== null) ? (string) $row[$startcol + 32] : null;
+            $this->legacytype = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+            $this->title_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+            $this->firsteditionpublication_id = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
+            $this->place_id = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+            $this->publicationdate_id = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
+            $this->creationdate_id = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
+            $this->publishingcompany_id = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+            $this->source_id = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
+            $this->legacygenre = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
+            $this->legacysubgenre = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+            $this->dirname = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
+            $this->usedcopylocation_id = ($row[$startcol + 13] !== null) ? (int) $row[$startcol + 13] : null;
+            $this->partner_id = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
+            $this->editiondescription = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+            $this->digitaleditioneditor = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
+            $this->transcriptioncomment = ($row[$startcol + 17] !== null) ? (string) $row[$startcol + 17] : null;
+            $this->numpages = ($row[$startcol + 18] !== null) ? (string) $row[$startcol + 18] : null;
+            $this->numpagesnumeric = ($row[$startcol + 19] !== null) ? (int) $row[$startcol + 19] : null;
+            $this->comment = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
+            $this->encoding_comment = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
+            $this->doi = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
+            $this->format = ($row[$startcol + 23] !== null) ? (string) $row[$startcol + 23] : null;
+            $this->directoryname = ($row[$startcol + 24] !== null) ? (string) $row[$startcol + 24] : null;
+            $this->wwwready = ($row[$startcol + 25] !== null) ? (int) $row[$startcol + 25] : null;
+            $this->last_changed_by_user_id = ($row[$startcol + 26] !== null) ? (int) $row[$startcol + 26] : null;
+            $this->tree_id = ($row[$startcol + 27] !== null) ? (int) $row[$startcol + 27] : null;
+            $this->tree_left = ($row[$startcol + 28] !== null) ? (int) $row[$startcol + 28] : null;
+            $this->tree_right = ($row[$startcol + 29] !== null) ? (int) $row[$startcol + 29] : null;
+            $this->tree_level = ($row[$startcol + 30] !== null) ? (int) $row[$startcol + 30] : null;
+            $this->publishingcompany_id_is_reconstructed = ($row[$startcol + 31] !== null) ? (boolean) $row[$startcol + 31] : null;
+            $this->created_at = ($row[$startcol + 32] !== null) ? (string) $row[$startcol + 32] : null;
+            $this->updated_at = ($row[$startcol + 33] !== null) ? (string) $row[$startcol + 33] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -1888,7 +1941,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             }
             $this->postHydrate($row, $startcol, $rehydrate);
 
-            return $startcol + 33; // 33 = PublicationPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 34; // 34 = PublicationPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Publication object", $e);
@@ -1978,6 +2031,8 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->aDatespecificationRelatedByPublicationdateId = null;
             $this->aDatespecificationRelatedByCreationdateId = null;
             $this->aLastChangedByUser = null;
+            $this->collMultiVolumes = null;
+
             $this->collVolumes = null;
 
             $this->collChapters = null;
@@ -2387,6 +2442,23 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 }
             }
 
+            if ($this->multiVolumesScheduledForDeletion !== null) {
+                if (!$this->multiVolumesScheduledForDeletion->isEmpty()) {
+                    MultiVolumeQuery::create()
+                        ->filterByPrimaryKeys($this->multiVolumesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->multiVolumesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collMultiVolumes !== null) {
+                foreach ($this->collMultiVolumes as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             if ($this->volumesScheduledForDeletion !== null) {
                 if (!$this->volumesScheduledForDeletion->isEmpty()) {
                     VolumeQuery::create()
@@ -2688,6 +2760,9 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ($this->isColumnModified(PublicationPeer::TYPE)) {
             $modifiedColumns[':p' . $index++]  = '"type"';
         }
+        if ($this->isColumnModified(PublicationPeer::LEGACYTYPE)) {
+            $modifiedColumns[':p' . $index++]  = '"legacytype"';
+        }
         if ($this->isColumnModified(PublicationPeer::TITLE_ID)) {
             $modifiedColumns[':p' . $index++]  = '"title_id"';
         }
@@ -2797,6 +2872,9 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                         break;
                     case '"type"':
                         $stmt->bindValue($identifier, $this->type, PDO::PARAM_INT);
+                        break;
+                    case '"legacytype"':
+                        $stmt->bindValue($identifier, $this->legacytype, PDO::PARAM_STR);
                         break;
                     case '"title_id"':
                         $stmt->bindValue($identifier, $this->title_id, PDO::PARAM_INT);
@@ -3031,6 +3109,14 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             }
 
 
+                if ($this->collMultiVolumes !== null) {
+                    foreach ($this->collMultiVolumes as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
                 if ($this->collVolumes !== null) {
                     foreach ($this->collVolumes as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -3201,96 +3287,99 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 return $this->getType();
                 break;
             case 2:
-                return $this->getTitleId();
+                return $this->getLegacytype();
                 break;
             case 3:
-                return $this->getFirsteditionpublicationId();
+                return $this->getTitleId();
                 break;
             case 4:
-                return $this->getPlaceId();
+                return $this->getFirsteditionpublicationId();
                 break;
             case 5:
-                return $this->getPublicationdateId();
+                return $this->getPlaceId();
                 break;
             case 6:
-                return $this->getCreationdateId();
+                return $this->getPublicationdateId();
                 break;
             case 7:
-                return $this->getPublishingcompanyId();
+                return $this->getCreationdateId();
                 break;
             case 8:
-                return $this->getSourceId();
+                return $this->getPublishingcompanyId();
                 break;
             case 9:
-                return $this->getLegacygenre();
+                return $this->getSourceId();
                 break;
             case 10:
-                return $this->getLegacysubgenre();
+                return $this->getLegacygenre();
                 break;
             case 11:
-                return $this->getDirname();
+                return $this->getLegacysubgenre();
                 break;
             case 12:
-                return $this->getUsedcopylocationId();
+                return $this->getDirname();
                 break;
             case 13:
-                return $this->getPartnerId();
+                return $this->getUsedcopylocationId();
                 break;
             case 14:
-                return $this->getEditiondescription();
+                return $this->getPartnerId();
                 break;
             case 15:
-                return $this->getDigitaleditioneditor();
+                return $this->getEditiondescription();
                 break;
             case 16:
-                return $this->getTranscriptioncomment();
+                return $this->getDigitaleditioneditor();
                 break;
             case 17:
-                return $this->getNumpages();
+                return $this->getTranscriptioncomment();
                 break;
             case 18:
-                return $this->getNumpagesnumeric();
+                return $this->getNumpages();
                 break;
             case 19:
-                return $this->getComment();
+                return $this->getNumpagesnumeric();
                 break;
             case 20:
-                return $this->getEncodingComment();
+                return $this->getComment();
                 break;
             case 21:
-                return $this->getDoi();
+                return $this->getEncodingComment();
                 break;
             case 22:
-                return $this->getFormat();
+                return $this->getDoi();
                 break;
             case 23:
-                return $this->getDirectoryname();
+                return $this->getFormat();
                 break;
             case 24:
-                return $this->getWwwready();
+                return $this->getDirectoryname();
                 break;
             case 25:
-                return $this->getLastChangedByUserId();
+                return $this->getWwwready();
                 break;
             case 26:
-                return $this->getTreeId();
+                return $this->getLastChangedByUserId();
                 break;
             case 27:
-                return $this->getTreeLeft();
+                return $this->getTreeId();
                 break;
             case 28:
-                return $this->getTreeRight();
+                return $this->getTreeLeft();
                 break;
             case 29:
-                return $this->getTreeLevel();
+                return $this->getTreeRight();
                 break;
             case 30:
-                return $this->getPublishingcompanyIdIsReconstructed();
+                return $this->getTreeLevel();
                 break;
             case 31:
-                return $this->getCreatedAt();
+                return $this->getPublishingcompanyIdIsReconstructed();
                 break;
             case 32:
+                return $this->getCreatedAt();
+                break;
+            case 33:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -3324,37 +3413,38 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getType(),
-            $keys[2] => $this->getTitleId(),
-            $keys[3] => $this->getFirsteditionpublicationId(),
-            $keys[4] => $this->getPlaceId(),
-            $keys[5] => $this->getPublicationdateId(),
-            $keys[6] => $this->getCreationdateId(),
-            $keys[7] => $this->getPublishingcompanyId(),
-            $keys[8] => $this->getSourceId(),
-            $keys[9] => $this->getLegacygenre(),
-            $keys[10] => $this->getLegacysubgenre(),
-            $keys[11] => $this->getDirname(),
-            $keys[12] => $this->getUsedcopylocationId(),
-            $keys[13] => $this->getPartnerId(),
-            $keys[14] => $this->getEditiondescription(),
-            $keys[15] => $this->getDigitaleditioneditor(),
-            $keys[16] => $this->getTranscriptioncomment(),
-            $keys[17] => $this->getNumpages(),
-            $keys[18] => $this->getNumpagesnumeric(),
-            $keys[19] => $this->getComment(),
-            $keys[20] => $this->getEncodingComment(),
-            $keys[21] => $this->getDoi(),
-            $keys[22] => $this->getFormat(),
-            $keys[23] => $this->getDirectoryname(),
-            $keys[24] => $this->getWwwready(),
-            $keys[25] => $this->getLastChangedByUserId(),
-            $keys[26] => $this->getTreeId(),
-            $keys[27] => $this->getTreeLeft(),
-            $keys[28] => $this->getTreeRight(),
-            $keys[29] => $this->getTreeLevel(),
-            $keys[30] => $this->getPublishingcompanyIdIsReconstructed(),
-            $keys[31] => $this->getCreatedAt(),
-            $keys[32] => $this->getUpdatedAt(),
+            $keys[2] => $this->getLegacytype(),
+            $keys[3] => $this->getTitleId(),
+            $keys[4] => $this->getFirsteditionpublicationId(),
+            $keys[5] => $this->getPlaceId(),
+            $keys[6] => $this->getPublicationdateId(),
+            $keys[7] => $this->getCreationdateId(),
+            $keys[8] => $this->getPublishingcompanyId(),
+            $keys[9] => $this->getSourceId(),
+            $keys[10] => $this->getLegacygenre(),
+            $keys[11] => $this->getLegacysubgenre(),
+            $keys[12] => $this->getDirname(),
+            $keys[13] => $this->getUsedcopylocationId(),
+            $keys[14] => $this->getPartnerId(),
+            $keys[15] => $this->getEditiondescription(),
+            $keys[16] => $this->getDigitaleditioneditor(),
+            $keys[17] => $this->getTranscriptioncomment(),
+            $keys[18] => $this->getNumpages(),
+            $keys[19] => $this->getNumpagesnumeric(),
+            $keys[20] => $this->getComment(),
+            $keys[21] => $this->getEncodingComment(),
+            $keys[22] => $this->getDoi(),
+            $keys[23] => $this->getFormat(),
+            $keys[24] => $this->getDirectoryname(),
+            $keys[25] => $this->getWwwready(),
+            $keys[26] => $this->getLastChangedByUserId(),
+            $keys[27] => $this->getTreeId(),
+            $keys[28] => $this->getTreeLeft(),
+            $keys[29] => $this->getTreeRight(),
+            $keys[30] => $this->getTreeLevel(),
+            $keys[31] => $this->getPublishingcompanyIdIsReconstructed(),
+            $keys[32] => $this->getCreatedAt(),
+            $keys[33] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -3382,6 +3472,9 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             }
             if (null !== $this->aLastChangedByUser) {
                 $result['LastChangedByUser'] = $this->aLastChangedByUser->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->collMultiVolumes) {
+                $result['MultiVolumes'] = $this->collMultiVolumes->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collVolumes) {
                 $result['Volumes'] = $this->collVolumes->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -3476,96 +3569,99 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 $this->setType($value);
                 break;
             case 2:
-                $this->setTitleId($value);
+                $this->setLegacytype($value);
                 break;
             case 3:
-                $this->setFirsteditionpublicationId($value);
+                $this->setTitleId($value);
                 break;
             case 4:
-                $this->setPlaceId($value);
+                $this->setFirsteditionpublicationId($value);
                 break;
             case 5:
-                $this->setPublicationdateId($value);
+                $this->setPlaceId($value);
                 break;
             case 6:
-                $this->setCreationdateId($value);
+                $this->setPublicationdateId($value);
                 break;
             case 7:
-                $this->setPublishingcompanyId($value);
+                $this->setCreationdateId($value);
                 break;
             case 8:
-                $this->setSourceId($value);
+                $this->setPublishingcompanyId($value);
                 break;
             case 9:
-                $this->setLegacygenre($value);
+                $this->setSourceId($value);
                 break;
             case 10:
-                $this->setLegacysubgenre($value);
+                $this->setLegacygenre($value);
                 break;
             case 11:
-                $this->setDirname($value);
+                $this->setLegacysubgenre($value);
                 break;
             case 12:
-                $this->setUsedcopylocationId($value);
+                $this->setDirname($value);
                 break;
             case 13:
-                $this->setPartnerId($value);
+                $this->setUsedcopylocationId($value);
                 break;
             case 14:
-                $this->setEditiondescription($value);
+                $this->setPartnerId($value);
                 break;
             case 15:
-                $this->setDigitaleditioneditor($value);
+                $this->setEditiondescription($value);
                 break;
             case 16:
-                $this->setTranscriptioncomment($value);
+                $this->setDigitaleditioneditor($value);
                 break;
             case 17:
-                $this->setNumpages($value);
+                $this->setTranscriptioncomment($value);
                 break;
             case 18:
-                $this->setNumpagesnumeric($value);
+                $this->setNumpages($value);
                 break;
             case 19:
-                $this->setComment($value);
+                $this->setNumpagesnumeric($value);
                 break;
             case 20:
-                $this->setEncodingComment($value);
+                $this->setComment($value);
                 break;
             case 21:
-                $this->setDoi($value);
+                $this->setEncodingComment($value);
                 break;
             case 22:
-                $this->setFormat($value);
+                $this->setDoi($value);
                 break;
             case 23:
-                $this->setDirectoryname($value);
+                $this->setFormat($value);
                 break;
             case 24:
-                $this->setWwwready($value);
+                $this->setDirectoryname($value);
                 break;
             case 25:
-                $this->setLastChangedByUserId($value);
+                $this->setWwwready($value);
                 break;
             case 26:
-                $this->setTreeId($value);
+                $this->setLastChangedByUserId($value);
                 break;
             case 27:
-                $this->setTreeLeft($value);
+                $this->setTreeId($value);
                 break;
             case 28:
-                $this->setTreeRight($value);
+                $this->setTreeLeft($value);
                 break;
             case 29:
-                $this->setTreeLevel($value);
+                $this->setTreeRight($value);
                 break;
             case 30:
-                $this->setPublishingcompanyIdIsReconstructed($value);
+                $this->setTreeLevel($value);
                 break;
             case 31:
-                $this->setCreatedAt($value);
+                $this->setPublishingcompanyIdIsReconstructed($value);
                 break;
             case 32:
+                $this->setCreatedAt($value);
+                break;
+            case 33:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -3594,37 +3690,38 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setType($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setTitleId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setFirsteditionpublicationId($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setPlaceId($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setPublicationdateId($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setCreationdateId($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setPublishingcompanyId($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setSourceId($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setLegacygenre($arr[$keys[9]]);
-        if (array_key_exists($keys[10], $arr)) $this->setLegacysubgenre($arr[$keys[10]]);
-        if (array_key_exists($keys[11], $arr)) $this->setDirname($arr[$keys[11]]);
-        if (array_key_exists($keys[12], $arr)) $this->setUsedcopylocationId($arr[$keys[12]]);
-        if (array_key_exists($keys[13], $arr)) $this->setPartnerId($arr[$keys[13]]);
-        if (array_key_exists($keys[14], $arr)) $this->setEditiondescription($arr[$keys[14]]);
-        if (array_key_exists($keys[15], $arr)) $this->setDigitaleditioneditor($arr[$keys[15]]);
-        if (array_key_exists($keys[16], $arr)) $this->setTranscriptioncomment($arr[$keys[16]]);
-        if (array_key_exists($keys[17], $arr)) $this->setNumpages($arr[$keys[17]]);
-        if (array_key_exists($keys[18], $arr)) $this->setNumpagesnumeric($arr[$keys[18]]);
-        if (array_key_exists($keys[19], $arr)) $this->setComment($arr[$keys[19]]);
-        if (array_key_exists($keys[20], $arr)) $this->setEncodingComment($arr[$keys[20]]);
-        if (array_key_exists($keys[21], $arr)) $this->setDoi($arr[$keys[21]]);
-        if (array_key_exists($keys[22], $arr)) $this->setFormat($arr[$keys[22]]);
-        if (array_key_exists($keys[23], $arr)) $this->setDirectoryname($arr[$keys[23]]);
-        if (array_key_exists($keys[24], $arr)) $this->setWwwready($arr[$keys[24]]);
-        if (array_key_exists($keys[25], $arr)) $this->setLastChangedByUserId($arr[$keys[25]]);
-        if (array_key_exists($keys[26], $arr)) $this->setTreeId($arr[$keys[26]]);
-        if (array_key_exists($keys[27], $arr)) $this->setTreeLeft($arr[$keys[27]]);
-        if (array_key_exists($keys[28], $arr)) $this->setTreeRight($arr[$keys[28]]);
-        if (array_key_exists($keys[29], $arr)) $this->setTreeLevel($arr[$keys[29]]);
-        if (array_key_exists($keys[30], $arr)) $this->setPublishingcompanyIdIsReconstructed($arr[$keys[30]]);
-        if (array_key_exists($keys[31], $arr)) $this->setCreatedAt($arr[$keys[31]]);
-        if (array_key_exists($keys[32], $arr)) $this->setUpdatedAt($arr[$keys[32]]);
+        if (array_key_exists($keys[2], $arr)) $this->setLegacytype($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setTitleId($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setFirsteditionpublicationId($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setPlaceId($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setPublicationdateId($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setCreationdateId($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setPublishingcompanyId($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setSourceId($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setLegacygenre($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setLegacysubgenre($arr[$keys[11]]);
+        if (array_key_exists($keys[12], $arr)) $this->setDirname($arr[$keys[12]]);
+        if (array_key_exists($keys[13], $arr)) $this->setUsedcopylocationId($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setPartnerId($arr[$keys[14]]);
+        if (array_key_exists($keys[15], $arr)) $this->setEditiondescription($arr[$keys[15]]);
+        if (array_key_exists($keys[16], $arr)) $this->setDigitaleditioneditor($arr[$keys[16]]);
+        if (array_key_exists($keys[17], $arr)) $this->setTranscriptioncomment($arr[$keys[17]]);
+        if (array_key_exists($keys[18], $arr)) $this->setNumpages($arr[$keys[18]]);
+        if (array_key_exists($keys[19], $arr)) $this->setNumpagesnumeric($arr[$keys[19]]);
+        if (array_key_exists($keys[20], $arr)) $this->setComment($arr[$keys[20]]);
+        if (array_key_exists($keys[21], $arr)) $this->setEncodingComment($arr[$keys[21]]);
+        if (array_key_exists($keys[22], $arr)) $this->setDoi($arr[$keys[22]]);
+        if (array_key_exists($keys[23], $arr)) $this->setFormat($arr[$keys[23]]);
+        if (array_key_exists($keys[24], $arr)) $this->setDirectoryname($arr[$keys[24]]);
+        if (array_key_exists($keys[25], $arr)) $this->setWwwready($arr[$keys[25]]);
+        if (array_key_exists($keys[26], $arr)) $this->setLastChangedByUserId($arr[$keys[26]]);
+        if (array_key_exists($keys[27], $arr)) $this->setTreeId($arr[$keys[27]]);
+        if (array_key_exists($keys[28], $arr)) $this->setTreeLeft($arr[$keys[28]]);
+        if (array_key_exists($keys[29], $arr)) $this->setTreeRight($arr[$keys[29]]);
+        if (array_key_exists($keys[30], $arr)) $this->setTreeLevel($arr[$keys[30]]);
+        if (array_key_exists($keys[31], $arr)) $this->setPublishingcompanyIdIsReconstructed($arr[$keys[31]]);
+        if (array_key_exists($keys[32], $arr)) $this->setCreatedAt($arr[$keys[32]]);
+        if (array_key_exists($keys[33], $arr)) $this->setUpdatedAt($arr[$keys[33]]);
     }
 
     /**
@@ -3638,6 +3735,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
         if ($this->isColumnModified(PublicationPeer::ID)) $criteria->add(PublicationPeer::ID, $this->id);
         if ($this->isColumnModified(PublicationPeer::TYPE)) $criteria->add(PublicationPeer::TYPE, $this->type);
+        if ($this->isColumnModified(PublicationPeer::LEGACYTYPE)) $criteria->add(PublicationPeer::LEGACYTYPE, $this->legacytype);
         if ($this->isColumnModified(PublicationPeer::TITLE_ID)) $criteria->add(PublicationPeer::TITLE_ID, $this->title_id);
         if ($this->isColumnModified(PublicationPeer::FIRSTEDITIONPUBLICATION_ID)) $criteria->add(PublicationPeer::FIRSTEDITIONPUBLICATION_ID, $this->firsteditionpublication_id);
         if ($this->isColumnModified(PublicationPeer::PLACE_ID)) $criteria->add(PublicationPeer::PLACE_ID, $this->place_id);
@@ -3733,6 +3831,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setType($this->getType());
+        $copyObj->setLegacytype($this->getLegacytype());
         $copyObj->setTitleId($this->getTitleId());
         $copyObj->setFirsteditionpublicationId($this->getFirsteditionpublicationId());
         $copyObj->setPlaceId($this->getPlaceId());
@@ -3771,6 +3870,12 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $copyObj->setNew(false);
             // store object hash to prevent cycle
             $this->startCopy = true;
+
+            foreach ($this->getMultiVolumes() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addMultiVolume($relObj->copy($deepCopy));
+                }
+            }
 
             foreach ($this->getVolumes() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
@@ -4293,6 +4398,9 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function initRelation($relationName)
     {
+        if ('MultiVolume' == $relationName) {
+            $this->initMultiVolumes();
+        }
         if ('Volume' == $relationName) {
             $this->initVolumes();
         }
@@ -4341,6 +4449,231 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         if ('Textsource' == $relationName) {
             $this->initTextsources();
         }
+    }
+
+    /**
+     * Clears out the collMultiVolumes collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Publication The current object (for fluent API support)
+     * @see        addMultiVolumes()
+     */
+    public function clearMultiVolumes()
+    {
+        $this->collMultiVolumes = null; // important to set this to null since that means it is uninitialized
+        $this->collMultiVolumesPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collMultiVolumes collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialMultiVolumes($v = true)
+    {
+        $this->collMultiVolumesPartial = $v;
+    }
+
+    /**
+     * Initializes the collMultiVolumes collection.
+     *
+     * By default this just sets the collMultiVolumes collection to an empty array (like clearcollMultiVolumes());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initMultiVolumes($overrideExisting = true)
+    {
+        if (null !== $this->collMultiVolumes && !$overrideExisting) {
+            return;
+        }
+        $this->collMultiVolumes = new PropelObjectCollection();
+        $this->collMultiVolumes->setModel('MultiVolume');
+    }
+
+    /**
+     * Gets an array of MultiVolume objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Publication is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|MultiVolume[] List of MultiVolume objects
+     * @throws PropelException
+     */
+    public function getMultiVolumes($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collMultiVolumesPartial && !$this->isNew();
+        if (null === $this->collMultiVolumes || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collMultiVolumes) {
+                // return empty collection
+                $this->initMultiVolumes();
+            } else {
+                $collMultiVolumes = MultiVolumeQuery::create(null, $criteria)
+                    ->filterByPublication($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collMultiVolumesPartial && count($collMultiVolumes)) {
+                      $this->initMultiVolumes(false);
+
+                      foreach ($collMultiVolumes as $obj) {
+                        if (false == $this->collMultiVolumes->contains($obj)) {
+                          $this->collMultiVolumes->append($obj);
+                        }
+                      }
+
+                      $this->collMultiVolumesPartial = true;
+                    }
+
+                    $collMultiVolumes->getInternalIterator()->rewind();
+
+                    return $collMultiVolumes;
+                }
+
+                if ($partial && $this->collMultiVolumes) {
+                    foreach ($this->collMultiVolumes as $obj) {
+                        if ($obj->isNew()) {
+                            $collMultiVolumes[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collMultiVolumes = $collMultiVolumes;
+                $this->collMultiVolumesPartial = false;
+            }
+        }
+
+        return $this->collMultiVolumes;
+    }
+
+    /**
+     * Sets a collection of MultiVolume objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $multiVolumes A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Publication The current object (for fluent API support)
+     */
+    public function setMultiVolumes(PropelCollection $multiVolumes, PropelPDO $con = null)
+    {
+        $multiVolumesToDelete = $this->getMultiVolumes(new Criteria(), $con)->diff($multiVolumes);
+
+
+        $this->multiVolumesScheduledForDeletion = $multiVolumesToDelete;
+
+        foreach ($multiVolumesToDelete as $multiVolumeRemoved) {
+            $multiVolumeRemoved->setPublication(null);
+        }
+
+        $this->collMultiVolumes = null;
+        foreach ($multiVolumes as $multiVolume) {
+            $this->addMultiVolume($multiVolume);
+        }
+
+        $this->collMultiVolumes = $multiVolumes;
+        $this->collMultiVolumesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related MultiVolume objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related MultiVolume objects.
+     * @throws PropelException
+     */
+    public function countMultiVolumes(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collMultiVolumesPartial && !$this->isNew();
+        if (null === $this->collMultiVolumes || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collMultiVolumes) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getMultiVolumes());
+            }
+            $query = MultiVolumeQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByPublication($this)
+                ->count($con);
+        }
+
+        return count($this->collMultiVolumes);
+    }
+
+    /**
+     * Method called to associate a MultiVolume object to this object
+     * through the MultiVolume foreign key attribute.
+     *
+     * @param    MultiVolume $l MultiVolume
+     * @return Publication The current object (for fluent API support)
+     */
+    public function addMultiVolume(MultiVolume $l)
+    {
+        if ($this->collMultiVolumes === null) {
+            $this->initMultiVolumes();
+            $this->collMultiVolumesPartial = true;
+        }
+
+        if (!in_array($l, $this->collMultiVolumes->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddMultiVolume($l);
+
+            if ($this->multiVolumesScheduledForDeletion and $this->multiVolumesScheduledForDeletion->contains($l)) {
+                $this->multiVolumesScheduledForDeletion->remove($this->multiVolumesScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	MultiVolume $multiVolume The multiVolume object to add.
+     */
+    protected function doAddMultiVolume($multiVolume)
+    {
+        $this->collMultiVolumes[]= $multiVolume;
+        $multiVolume->setPublication($this);
+    }
+
+    /**
+     * @param	MultiVolume $multiVolume The multiVolume object to remove.
+     * @return Publication The current object (for fluent API support)
+     */
+    public function removeMultiVolume($multiVolume)
+    {
+        if ($this->getMultiVolumes()->contains($multiVolume)) {
+            $this->collMultiVolumes->remove($this->collMultiVolumes->search($multiVolume));
+            if (null === $this->multiVolumesScheduledForDeletion) {
+                $this->multiVolumesScheduledForDeletion = clone $this->collMultiVolumes;
+                $this->multiVolumesScheduledForDeletion->clear();
+            }
+            $this->multiVolumesScheduledForDeletion[]= clone $multiVolume;
+            $multiVolume->setPublication(null);
+        }
+
+        return $this;
     }
 
     /**
@@ -8143,6 +8476,31 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         return $this;
     }
 
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Publication is new, it will return
+     * an empty collection; or if this Publication has previously
+     * been saved, it will retrieve related Imagesources from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Publication.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Imagesource[] List of Imagesource objects
+     */
+    public function getImagesourcesJoinPartner($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = ImagesourceQuery::create(null, $criteria);
+        $query->joinWith('Partner', $join_behavior);
+
+        return $this->getImagesources($query, $con);
+    }
+
     /**
      * Clears out the collTextsources collection
      *
@@ -9553,6 +9911,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     {
         $this->id = null;
         $this->type = null;
+        $this->legacytype = null;
         $this->title_id = null;
         $this->firsteditionpublication_id = null;
         $this->place_id = null;
@@ -9607,6 +9966,11 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->collMultiVolumes) {
+                foreach ($this->collMultiVolumes as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collVolumes) {
                 foreach ($this->collVolumes as $o) {
                     $o->clearAllReferences($deep);
@@ -9745,6 +10109,10 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         // nested_set behavior
         $this->collNestedSetChildren = null;
         $this->aNestedSetParent = null;
+        if ($this->collMultiVolumes instanceof PropelCollection) {
+            $this->collMultiVolumes->clearIterator();
+        }
+        $this->collMultiVolumes = null;
         if ($this->collVolumes instanceof PropelCollection) {
             $this->collVolumes->clearIterator();
         }

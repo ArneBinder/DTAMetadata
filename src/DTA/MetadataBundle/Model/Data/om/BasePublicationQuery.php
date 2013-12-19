@@ -21,6 +21,7 @@ use DTA\MetadataBundle\Model\Data\Chapter;
 use DTA\MetadataBundle\Model\Data\Datespecification;
 use DTA\MetadataBundle\Model\Data\Font;
 use DTA\MetadataBundle\Model\Data\Language;
+use DTA\MetadataBundle\Model\Data\MultiVolume;
 use DTA\MetadataBundle\Model\Data\Place;
 use DTA\MetadataBundle\Model\Data\Publication;
 use DTA\MetadataBundle\Model\Data\PublicationPeer;
@@ -47,6 +48,7 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
 /**
  * @method PublicationQuery orderById($order = Criteria::ASC) Order by the id column
  * @method PublicationQuery orderByType($order = Criteria::ASC) Order by the type column
+ * @method PublicationQuery orderByLegacytype($order = Criteria::ASC) Order by the legacytype column
  * @method PublicationQuery orderByTitleId($order = Criteria::ASC) Order by the title_id column
  * @method PublicationQuery orderByFirsteditionpublicationId($order = Criteria::ASC) Order by the firsteditionpublication_id column
  * @method PublicationQuery orderByPlaceId($order = Criteria::ASC) Order by the place_id column
@@ -81,6 +83,7 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  *
  * @method PublicationQuery groupById() Group by the id column
  * @method PublicationQuery groupByType() Group by the type column
+ * @method PublicationQuery groupByLegacytype() Group by the legacytype column
  * @method PublicationQuery groupByTitleId() Group by the title_id column
  * @method PublicationQuery groupByFirsteditionpublicationId() Group by the firsteditionpublication_id column
  * @method PublicationQuery groupByPlaceId() Group by the place_id column
@@ -144,6 +147,10 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method PublicationQuery leftJoinLastChangedByUser($relationAlias = null) Adds a LEFT JOIN clause to the query using the LastChangedByUser relation
  * @method PublicationQuery rightJoinLastChangedByUser($relationAlias = null) Adds a RIGHT JOIN clause to the query using the LastChangedByUser relation
  * @method PublicationQuery innerJoinLastChangedByUser($relationAlias = null) Adds a INNER JOIN clause to the query using the LastChangedByUser relation
+ *
+ * @method PublicationQuery leftJoinMultiVolume($relationAlias = null) Adds a LEFT JOIN clause to the query using the MultiVolume relation
+ * @method PublicationQuery rightJoinMultiVolume($relationAlias = null) Adds a RIGHT JOIN clause to the query using the MultiVolume relation
+ * @method PublicationQuery innerJoinMultiVolume($relationAlias = null) Adds a INNER JOIN clause to the query using the MultiVolume relation
  *
  * @method PublicationQuery leftJoinVolume($relationAlias = null) Adds a LEFT JOIN clause to the query using the Volume relation
  * @method PublicationQuery rightJoinVolume($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Volume relation
@@ -213,6 +220,7 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  * @method Publication findOneOrCreate(PropelPDO $con = null) Return the first Publication matching the query, or a new Publication object populated from the query conditions when no match is found
  *
  * @method Publication findOneByType(int $type) Return the first Publication filtered by the type column
+ * @method Publication findOneByLegacytype(string $legacytype) Return the first Publication filtered by the legacytype column
  * @method Publication findOneByTitleId(int $title_id) Return the first Publication filtered by the title_id column
  * @method Publication findOneByFirsteditionpublicationId(int $firsteditionpublication_id) Return the first Publication filtered by the firsteditionpublication_id column
  * @method Publication findOneByPlaceId(int $place_id) Return the first Publication filtered by the place_id column
@@ -247,6 +255,7 @@ use DTA\MetadataBundle\Model\Workflow\Textsource;
  *
  * @method array findById(int $id) Return Publication objects filtered by the id column
  * @method array findByType(int $type) Return Publication objects filtered by the type column
+ * @method array findByLegacytype(string $legacytype) Return Publication objects filtered by the legacytype column
  * @method array findByTitleId(int $title_id) Return Publication objects filtered by the title_id column
  * @method array findByFirsteditionpublicationId(int $firsteditionpublication_id) Return Publication objects filtered by the firsteditionpublication_id column
  * @method array findByPlaceId(int $place_id) Return Publication objects filtered by the place_id column
@@ -383,7 +392,7 @@ abstract class BasePublicationQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "type", "title_id", "firsteditionpublication_id", "place_id", "publicationdate_id", "creationdate_id", "publishingcompany_id", "source_id", "legacygenre", "legacysubgenre", "dirname", "usedcopylocation_id", "partner_id", "editiondescription", "digitaleditioneditor", "transcriptioncomment", "numpages", "numpagesnumeric", "comment", "encoding_comment", "doi", "format", "directoryname", "wwwready", "last_changed_by_user_id", "tree_id", "tree_left", "tree_right", "tree_level", "publishingcompany_id_is_reconstructed", "created_at", "updated_at" FROM "publication" WHERE "id" = :p0';
+        $sql = 'SELECT "id", "type", "legacytype", "title_id", "firsteditionpublication_id", "place_id", "publicationdate_id", "creationdate_id", "publishingcompany_id", "source_id", "legacygenre", "legacysubgenre", "dirname", "usedcopylocation_id", "partner_id", "editiondescription", "digitaleditioneditor", "transcriptioncomment", "numpages", "numpagesnumeric", "comment", "encoding_comment", "doi", "format", "directoryname", "wwwready", "last_changed_by_user_id", "tree_id", "tree_left", "tree_right", "tree_level", "publishingcompany_id_is_reconstructed", "created_at", "updated_at" FROM "publication" WHERE "id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -539,6 +548,35 @@ abstract class BasePublicationQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(PublicationPeer::TYPE, $type, $comparison);
+    }
+
+    /**
+     * Filter the query on the legacytype column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByLegacytype('fooValue');   // WHERE legacytype = 'fooValue'
+     * $query->filterByLegacytype('%fooValue%'); // WHERE legacytype LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $legacytype The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return PublicationQuery The current query, for fluid interface
+     */
+    public function filterByLegacytype($legacytype = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($legacytype)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $legacytype)) {
+                $legacytype = str_replace('*', '%', $legacytype);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(PublicationPeer::LEGACYTYPE, $legacytype, $comparison);
     }
 
     /**
@@ -2218,6 +2256,80 @@ abstract class BasePublicationQuery extends ModelCriteria
         return $this
             ->joinLastChangedByUser($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'LastChangedByUser', '\DTA\MetadataBundle\Model\Master\DtaUserQuery');
+    }
+
+    /**
+     * Filter the query by a related MultiVolume object
+     *
+     * @param   MultiVolume|PropelObjectCollection $multiVolume  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 PublicationQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterByMultiVolume($multiVolume, $comparison = null)
+    {
+        if ($multiVolume instanceof MultiVolume) {
+            return $this
+                ->addUsingAlias(PublicationPeer::ID, $multiVolume->getPublicationId(), $comparison);
+        } elseif ($multiVolume instanceof PropelObjectCollection) {
+            return $this
+                ->useMultiVolumeQuery()
+                ->filterByPrimaryKeys($multiVolume->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByMultiVolume() only accepts arguments of type MultiVolume or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the MultiVolume relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return PublicationQuery The current query, for fluid interface
+     */
+    public function joinMultiVolume($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('MultiVolume');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'MultiVolume');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the MultiVolume relation MultiVolume object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \DTA\MetadataBundle\Model\Data\MultiVolumeQuery A secondary query class using the current class as primary query
+     */
+    public function useMultiVolumeQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinMultiVolume($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'MultiVolume', '\DTA\MetadataBundle\Model\Data\MultiVolumeQuery');
     }
 
     /**

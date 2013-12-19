@@ -18,6 +18,8 @@ use DTA\MetadataBundle\Model\Data\PublicationQuery;
 use DTA\MetadataBundle\Model\Workflow\Imagesource;
 use DTA\MetadataBundle\Model\Workflow\ImagesourcePeer;
 use DTA\MetadataBundle\Model\Workflow\ImagesourceQuery;
+use DTA\MetadataBundle\Model\Workflow\Partner;
+use DTA\MetadataBundle\Model\Workflow\PartnerQuery;
 
 abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\MetadataBundle\Model\table_row_view\TableRowViewInterface
 {
@@ -53,6 +55,12 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
     protected $publication_id;
 
     /**
+     * The value for the partner_id field.
+     * @var        int
+     */
+    protected $partner_id;
+
+    /**
      * The value for the faksimilerefrange field.
      * @var        string
      */
@@ -82,6 +90,11 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
     protected $aPublication;
 
     /**
+     * @var        Partner
+     */
+    protected $aPartner;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      * @var        boolean
@@ -102,7 +115,7 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
     protected $alreadyInClearAllReferencesDeep = false;
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Id', 'PublicationId', 'Faksimilerefrange', 'Originalrefrange', 'CreatedAt', 'UpdatedAt', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'PublicationId'=>'PublicationId', 'Faksimilerefrange'=>'Faksimilerefrange', 'Originalrefrange'=>'Originalrefrange', 'CreatedAt'=>'CreatedAt', 'UpdatedAt'=>'UpdatedAt', );	public static $queryConstructionString = NULL;
+    public static $tableRowViewCaptions = array('Id', 'PublicationId', 'PartnerId', 'Faksimilerefrange', 'Originalrefrange', 'CreatedAt', 'UpdatedAt', );	public   $tableRowViewAccessors = array('Id'=>'Id', 'PublicationId'=>'PublicationId', 'PartnerId'=>'PartnerId', 'Faksimilerefrange'=>'Faksimilerefrange', 'Originalrefrange'=>'Originalrefrange', 'CreatedAt'=>'CreatedAt', 'UpdatedAt'=>'UpdatedAt', );	public static $queryConstructionString = NULL;
     /**
      * Get the [id] column value.
      *
@@ -123,6 +136,17 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
     {
 
         return $this->publication_id;
+    }
+
+    /**
+     * Get the [partner_id] column value.
+     *
+     * @return int
+     */
+    public function getPartnerId()
+    {
+
+        return $this->partner_id;
     }
 
     /**
@@ -264,6 +288,31 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
     } // setPublicationId()
 
     /**
+     * Set the value of [partner_id] column.
+     *
+     * @param  int $v new value
+     * @return Imagesource The current object (for fluent API support)
+     */
+    public function setPartnerId($v)
+    {
+        if ($v !== null && is_numeric($v)) {
+            $v = (int) $v;
+        }
+
+        if ($this->partner_id !== $v) {
+            $this->partner_id = $v;
+            $this->modifiedColumns[] = ImagesourcePeer::PARTNER_ID;
+        }
+
+        if ($this->aPartner !== null && $this->aPartner->getId() !== $v) {
+            $this->aPartner = null;
+        }
+
+
+        return $this;
+    } // setPartnerId()
+
+    /**
      * Set the value of [faksimilerefrange] column.
      * Referenzierte Faksimileseitenzahlen
      * @param  string $v new value
@@ -385,10 +434,11 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->publication_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-            $this->faksimilerefrange = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-            $this->originalrefrange = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-            $this->created_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
-            $this->updated_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+            $this->partner_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+            $this->faksimilerefrange = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+            $this->originalrefrange = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+            $this->created_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+            $this->updated_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -398,7 +448,7 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
             }
             $this->postHydrate($row, $startcol, $rehydrate);
 
-            return $startcol + 6; // 6 = ImagesourcePeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 7; // 7 = ImagesourcePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Imagesource object", $e);
@@ -423,6 +473,9 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
 
         if ($this->aPublication !== null && $this->publication_id !== $this->aPublication->getId()) {
             $this->aPublication = null;
+        }
+        if ($this->aPartner !== null && $this->partner_id !== $this->aPartner->getId()) {
+            $this->aPartner = null;
         }
     } // ensureConsistency
 
@@ -464,6 +517,7 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
         if ($deep) {  // also de-associate any related objects?
 
             $this->aPublication = null;
+            $this->aPartner = null;
         } // if (deep)
     }
 
@@ -600,6 +654,13 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
                 $this->setPublication($this->aPublication);
             }
 
+            if ($this->aPartner !== null) {
+                if ($this->aPartner->isModified() || $this->aPartner->isNew()) {
+                    $affectedRows += $this->aPartner->save($con);
+                }
+                $this->setPartner($this->aPartner);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -653,6 +714,9 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
         if ($this->isColumnModified(ImagesourcePeer::PUBLICATION_ID)) {
             $modifiedColumns[':p' . $index++]  = '"publication_id"';
         }
+        if ($this->isColumnModified(ImagesourcePeer::PARTNER_ID)) {
+            $modifiedColumns[':p' . $index++]  = '"partner_id"';
+        }
         if ($this->isColumnModified(ImagesourcePeer::FAKSIMILEREFRANGE)) {
             $modifiedColumns[':p' . $index++]  = '"faksimilerefrange"';
         }
@@ -681,6 +745,9 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
                         break;
                     case '"publication_id"':
                         $stmt->bindValue($identifier, $this->publication_id, PDO::PARAM_INT);
+                        break;
+                    case '"partner_id"':
+                        $stmt->bindValue($identifier, $this->partner_id, PDO::PARAM_INT);
                         break;
                     case '"faksimilerefrange"':
                         $stmt->bindValue($identifier, $this->faksimilerefrange, PDO::PARAM_STR);
@@ -792,6 +859,12 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
                 }
             }
 
+            if ($this->aPartner !== null) {
+                if (!$this->aPartner->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aPartner->getValidationFailures());
+                }
+            }
+
 
             if (($retval = ImagesourcePeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
@@ -840,15 +913,18 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
                 return $this->getPublicationId();
                 break;
             case 2:
-                return $this->getFaksimilerefrange();
+                return $this->getPartnerId();
                 break;
             case 3:
-                return $this->getOriginalrefrange();
+                return $this->getFaksimilerefrange();
                 break;
             case 4:
-                return $this->getCreatedAt();
+                return $this->getOriginalrefrange();
                 break;
             case 5:
+                return $this->getCreatedAt();
+                break;
+            case 6:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -882,10 +958,11 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getPublicationId(),
-            $keys[2] => $this->getFaksimilerefrange(),
-            $keys[3] => $this->getOriginalrefrange(),
-            $keys[4] => $this->getCreatedAt(),
-            $keys[5] => $this->getUpdatedAt(),
+            $keys[2] => $this->getPartnerId(),
+            $keys[3] => $this->getFaksimilerefrange(),
+            $keys[4] => $this->getOriginalrefrange(),
+            $keys[5] => $this->getCreatedAt(),
+            $keys[6] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -895,6 +972,9 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
         if ($includeForeignObjects) {
             if (null !== $this->aPublication) {
                 $result['Publication'] = $this->aPublication->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aPartner) {
+                $result['Partner'] = $this->aPartner->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -937,15 +1017,18 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
                 $this->setPublicationId($value);
                 break;
             case 2:
-                $this->setFaksimilerefrange($value);
+                $this->setPartnerId($value);
                 break;
             case 3:
-                $this->setOriginalrefrange($value);
+                $this->setFaksimilerefrange($value);
                 break;
             case 4:
-                $this->setCreatedAt($value);
+                $this->setOriginalrefrange($value);
                 break;
             case 5:
+                $this->setCreatedAt($value);
+                break;
+            case 6:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -974,10 +1057,11 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setPublicationId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setFaksimilerefrange($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setOriginalrefrange($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[2], $arr)) $this->setPartnerId($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setFaksimilerefrange($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setOriginalrefrange($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
     }
 
     /**
@@ -991,6 +1075,7 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
 
         if ($this->isColumnModified(ImagesourcePeer::ID)) $criteria->add(ImagesourcePeer::ID, $this->id);
         if ($this->isColumnModified(ImagesourcePeer::PUBLICATION_ID)) $criteria->add(ImagesourcePeer::PUBLICATION_ID, $this->publication_id);
+        if ($this->isColumnModified(ImagesourcePeer::PARTNER_ID)) $criteria->add(ImagesourcePeer::PARTNER_ID, $this->partner_id);
         if ($this->isColumnModified(ImagesourcePeer::FAKSIMILEREFRANGE)) $criteria->add(ImagesourcePeer::FAKSIMILEREFRANGE, $this->faksimilerefrange);
         if ($this->isColumnModified(ImagesourcePeer::ORIGINALREFRANGE)) $criteria->add(ImagesourcePeer::ORIGINALREFRANGE, $this->originalrefrange);
         if ($this->isColumnModified(ImagesourcePeer::CREATED_AT)) $criteria->add(ImagesourcePeer::CREATED_AT, $this->created_at);
@@ -1059,6 +1144,7 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setPublicationId($this->getPublicationId());
+        $copyObj->setPartnerId($this->getPartnerId());
         $copyObj->setFaksimilerefrange($this->getFaksimilerefrange());
         $copyObj->setOriginalrefrange($this->getOriginalrefrange());
         $copyObj->setCreatedAt($this->getCreatedAt());
@@ -1174,12 +1260,65 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
     }
 
     /**
+     * Declares an association between this object and a Partner object.
+     *
+     * @param                  Partner $v
+     * @return Imagesource The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setPartner(Partner $v = null)
+    {
+        if ($v === null) {
+            $this->setPartnerId(NULL);
+        } else {
+            $this->setPartnerId($v->getId());
+        }
+
+        $this->aPartner = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Partner object, it will not be re-added.
+        if ($v !== null) {
+            $v->addImagesource($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Partner object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
+     * @return Partner The associated Partner object.
+     * @throws PropelException
+     */
+    public function getPartner(PropelPDO $con = null, $doQuery = true)
+    {
+        if ($this->aPartner === null && ($this->partner_id !== null) && $doQuery) {
+            $this->aPartner = PartnerQuery::create()->findPk($this->partner_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aPartner->addImagesources($this);
+             */
+        }
+
+        return $this->aPartner;
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
     {
         $this->id = null;
         $this->publication_id = null;
+        $this->partner_id = null;
         $this->faksimilerefrange = null;
         $this->originalrefrange = null;
         $this->created_at = null;
@@ -1209,11 +1348,15 @@ abstract class BaseImagesource extends BaseObject implements Persistent, \DTA\Me
             if ($this->aPublication instanceof Persistent) {
               $this->aPublication->clearAllReferences($deep);
             }
+            if ($this->aPartner instanceof Persistent) {
+              $this->aPartner->clearAllReferences($deep);
+            }
 
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         $this->aPublication = null;
+        $this->aPartner = null;
     }
 
     /**

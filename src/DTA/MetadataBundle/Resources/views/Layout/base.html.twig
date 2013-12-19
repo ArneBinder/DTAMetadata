@@ -32,7 +32,7 @@
             --------------------------------------------- #}
                 
             {# fluid: Allow stacking of sidebar and main content if too few space is available #}
-            <div class="row-fluid" id="core" style="padding: 0 0px">
+            <div class="row" id="core" style="padding: 0 0px">
                 {% block core %}
                 {% endblock %}
             </div><!--/row-->
@@ -63,7 +63,7 @@
                 // confirm functionality
                 $('a.confirmClick').on('click', confirmCriticalAction);
 
-                $
+                
 
                 // ------------------------------------------------------
                 // DataTables plugin setup
@@ -95,23 +95,25 @@
                 } );
                 
                 $('.table.fullyFeatured').dataTable( {
-		"aLengthMenu": [
-                    [10, 50, 100, -1],
-                    [10, 50, 100, "All"] ]
-
-                 ,"iDisplayLength" : 10
-                ,"sPaginationType": "full_numbers"
-		,"oTableTools": {
-			"aButtons": [
-				"copy"
-				,"print"
-				/*,{
-					"sExtends":    "collection"
-					,"sButtonText": 'Save <span class="caret" />'
-                                        ,"aButtons":    [ "csv", "xls", "pdf" ]
-				}*/
-			]
-		}
+                    
+                    "aLengthMenu": [
+                        [10, 50, 100, -1],
+                        [10, 50, 100, "All"] ]
+                    //,"bsort":false // disables sorting completely
+                    ,aaSorting:[]
+                    ,"iDisplayLength" : 10
+                    ,"sPaginationType": "full_numbers"
+                    ,"oTableTools": {
+                            "aButtons": [
+                                    "copy"
+                                    ,"print"
+                                    /*,{
+                                            "sExtends":    "collection"
+                                            ,"sButtonText": 'Save <span class="caret" />'
+                                            ,"aButtons":    [ "csv", "xls", "pdf" ]
+                                    }*/
+                            ]
+                    }
                 } );
 
     

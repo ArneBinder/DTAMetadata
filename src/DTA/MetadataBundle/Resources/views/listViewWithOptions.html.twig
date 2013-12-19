@@ -29,11 +29,11 @@
 {% block core %}
 
 {# dta-data-listing: The sidebar is overflown if the table is too wide, so add scrollbars. #}
-<div class="span12 dta-data-listing">
+<div class="col-md-9 dta-data-listing">
 
     {% block preTable %}
     
-        <h3> {{ title|default('Listenansicht')|trans }} </h3>
+        <h3> {{ title|default('Listenansicht') }} </h3>
     
     {% endblock preTable %}
     
@@ -63,7 +63,9 @@
     </table>
     
 </div>
-
+<div class="well col-md-3">
+    <p>Optionen zur Auswahl</p>
+</div>
 {% endblock core %}
 
 

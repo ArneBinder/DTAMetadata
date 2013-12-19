@@ -52,6 +52,7 @@ class PublicationTableMap extends TableMap
   4 => 'JOURNAL',
   5 => 'ARTICLE',
 ));
+        $this->addColumn('legacytype', 'Legacytype', 'LONGVARCHAR', false, null, null);
         $this->addForeignKey('title_id', 'TitleId', 'INTEGER', 'title', 'id', true, null, null);
         $this->addColumn('firsteditionpublication_id', 'FirsteditionpublicationId', 'INTEGER', false, null, null);
         $this->addForeignKey('place_id', 'PlaceId', 'INTEGER', 'place', 'id', false, null, null);
@@ -98,6 +99,7 @@ class PublicationTableMap extends TableMap
         $this->addRelation('DatespecificationRelatedByPublicationdateId', 'DTA\\MetadataBundle\\Model\\Data\\Datespecification', RelationMap::MANY_TO_ONE, array('publicationdate_id' => 'id', ), null, null);
         $this->addRelation('DatespecificationRelatedByCreationdateId', 'DTA\\MetadataBundle\\Model\\Data\\Datespecification', RelationMap::MANY_TO_ONE, array('creationdate_id' => 'id', ), null, null);
         $this->addRelation('LastChangedByUser', 'DTA\\MetadataBundle\\Model\\Master\\DtaUser', RelationMap::MANY_TO_ONE, array('last_changed_by_user_id' => 'id', ), null, null);
+        $this->addRelation('MultiVolume', 'DTA\\MetadataBundle\\Model\\Data\\MultiVolume', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'MultiVolumes');
         $this->addRelation('Volume', 'DTA\\MetadataBundle\\Model\\Data\\Volume', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Volumes');
         $this->addRelation('Chapter', 'DTA\\MetadataBundle\\Model\\Data\\Chapter', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Chapters');
         $this->addRelation('Article', 'DTA\\MetadataBundle\\Model\\Data\\Article', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Articles');
@@ -142,6 +144,7 @@ class PublicationTableMap extends TableMap
             'table_row_view' =>  array (
   'Titel' => 'accessor:getTitle',
   'erster Autor' => 'accessor:getFirstAuthor',
+  'Typ' => 'type',
   'Verlag' => 'accessor:getPublishingCompany',
   'veröffentlicht' => 'accessor:getDatespecificationRelatedByPublicationdateId',
   'embedcolumnstitle' => 'title',

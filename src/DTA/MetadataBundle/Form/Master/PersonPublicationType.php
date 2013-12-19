@@ -31,6 +31,7 @@ class PersonPublicationType extends BaseAbstractType
             'class' => '\DTA\MetadataBundle\Model\Data\Person',
             'property' => 'SelectBoxString',        // actually, this is thought for attributes, but if the attribute isn't found, the getter function is tried.
             'searchable' => true,
+            'query' => \DTA\MetadataBundle\Model\Data\Person::getRowViewQueryObject()
         ));
         $builder->add('personrole', 'model', array(
             'class' => '\DTA\MetadataBundle\Model\Classification\Personrole',
