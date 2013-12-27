@@ -20,19 +20,13 @@ class Publication extends BasePublication
 //    }
     
     /**
-     * Retrieves the publication object (volume, chapter, article) which uses this object.
+     * Retrieves the publication object (volume, chapter, article) which uses this object as core publication.
      */
     public function getSpecialization(){
-        switch($this->getType()){
-            case PublicationPeer::TYPE_ARTICLE:
-                return $this->getArticles()->getFirst();
-            case PublicationPeer::TYPE_CHAPTER:
-                return $this->getChapters()->getFirst();
-            case PublicationPeer::TYPE_VOLUME:
-                return $this->getVolumes()->getFirst();
-            default:
-                return $this;   
-        }
+        // e.g. type = VOLUME, becomes Volume
+        $publicationType = ucwords(strtolower($this->getType()));
+        $getter = 'get'.$publicationType;
+        return $this->$getter();
     }
     
     /**
@@ -40,7 +34,7 @@ class Publication extends BasePublication
      * @return string
      */
     public function getSelectBoxString(){
-        return $this->getTitle();
+        return $this->getShortTitle();
     }
     
     /**
@@ -58,17 +52,17 @@ class Publication extends BasePublication
     }
     
     /** Returns a single string combining all title fragments and a volume description. */
-    public function getTitleString(){
+    public function getTitleString($withVolumeInformation = true){
     
         $title = $this->getTitle();
         $result = $title !== NULL ? $title->__toString() : "";
-        if($this->getType() === PublicationPeer::TYPE_VOLUME ){
-            $volumes = $this->getVolumes();
-            $result .= $volumes->count() > 0 ? " (" . $volumes[0]->getVolumeNumeric() . ") " . $volumes[0]->getVolumeDescription() : "";
+        if($withVolumeInformation && $this->getType() === PublicationPeer::TYPE_VOLUME ){
+            $volume = $this->getVolume(); 
+            if($volume === NULL) throw new Exception("No volume entity related to volume publication ".$this->getId());
+            $result .= $volume->getVolumeSummary();
         }
         
         return $result;
-        
     }
     
     /** Returns all tasks that are closed or open respectively. */
@@ -77,18 +71,26 @@ class Publication extends BasePublication
         return Model\Workflow\TaskQuery::create()
                 ->filterByPublicationId($this->id)
                 ->filterByClosed($closed)
-                ->orderByTasktypeId()
+                ->useTasktypeQuery()->orderByTreeLeft()->endUse()
+//                ->orderByTasktypeId()
                 ->find();
         
     }
     
-//    public function getCopyLocations(){
-//        
-//        return Model\Workflow\CopyLocationQuery::create()
-//                ->filterByPublicationId($this->id)
-//                ->orderByPartnerId()
-//                ->find();
-//        
-//    }
+    /** Returns a short title, suitable for displaying an overview. */
+    public function getShortTitle(){
+        
+        $titleFragments = $this->getTitle()->getTitleFragments();
+        // check if the title has a shortTitle fragment
+        foreach ($titleFragments as $tf ){
+            /* @var $tf Titlefragment */
+            if($tf->getTitlefragmenttype()->getName() == "Kurztitel")
+                return $tf->getName();
+        }
+        
+        // no short title available
+        return $this->getTitleString(false);
+        
+    }
     
 }

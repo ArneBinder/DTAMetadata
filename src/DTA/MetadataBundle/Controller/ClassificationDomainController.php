@@ -15,10 +15,10 @@ class ClassificationDomainController extends ORMController {
 //            "children" => array(
 //                array('caption' => "DTA", 'route' => 'home'),
 //                array('caption' => "DWDS", 'route' => 'home'))),
+        array("caption" => "Publikationsgruppen", 'route' => 'home'),
         array("caption" => "Genres", "modelClass" => 'Genre'),
         array("caption" => "Kategorien", "modelClass" => 'Category'),
         array("caption" => "Schlagworte", "modelClass" => 'Tag'),
-        array("caption" => "Publikationsgruppen", 'route' => 'home'),
     );
 
     public function indexAction() {

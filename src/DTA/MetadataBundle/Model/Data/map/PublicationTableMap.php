@@ -51,6 +51,7 @@ class PublicationTableMap extends TableMap
   3 => 'CHAPTER',
   4 => 'JOURNAL',
   5 => 'ARTICLE',
+  6 => 'ANOTHERPUB',
 ));
         $this->addColumn('legacytype', 'Legacytype', 'LONGVARCHAR', false, null, null);
         $this->addForeignKey('title_id', 'TitleId', 'INTEGER', 'title', 'id', true, null, null);
@@ -99,10 +100,10 @@ class PublicationTableMap extends TableMap
         $this->addRelation('DatespecificationRelatedByPublicationdateId', 'DTA\\MetadataBundle\\Model\\Data\\Datespecification', RelationMap::MANY_TO_ONE, array('publicationdate_id' => 'id', ), null, null);
         $this->addRelation('DatespecificationRelatedByCreationdateId', 'DTA\\MetadataBundle\\Model\\Data\\Datespecification', RelationMap::MANY_TO_ONE, array('creationdate_id' => 'id', ), null, null);
         $this->addRelation('LastChangedByUser', 'DTA\\MetadataBundle\\Model\\Master\\DtaUser', RelationMap::MANY_TO_ONE, array('last_changed_by_user_id' => 'id', ), null, null);
-        $this->addRelation('MultiVolume', 'DTA\\MetadataBundle\\Model\\Data\\MultiVolume', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'MultiVolumes');
-        $this->addRelation('Volume', 'DTA\\MetadataBundle\\Model\\Data\\Volume', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Volumes');
-        $this->addRelation('Chapter', 'DTA\\MetadataBundle\\Model\\Data\\Chapter', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Chapters');
-        $this->addRelation('Article', 'DTA\\MetadataBundle\\Model\\Data\\Article', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'Articles');
+        $this->addRelation('MultiVolume', 'DTA\\MetadataBundle\\Model\\Data\\MultiVolume', RelationMap::ONE_TO_ONE, array('id' => 'publication_id', ), null, null);
+        $this->addRelation('Volume', 'DTA\\MetadataBundle\\Model\\Data\\Volume', RelationMap::ONE_TO_ONE, array('id' => 'publication_id', ), null, null);
+        $this->addRelation('Chapter', 'DTA\\MetadataBundle\\Model\\Data\\Chapter', RelationMap::ONE_TO_ONE, array('id' => 'publication_id', ), null, null);
+        $this->addRelation('Article', 'DTA\\MetadataBundle\\Model\\Data\\Article', RelationMap::ONE_TO_ONE, array('id' => 'publication_id', ), null, null);
         $this->addRelation('SequenceEntry', 'DTA\\MetadataBundle\\Model\\Master\\SequenceEntry', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'SequenceEntries');
         $this->addRelation('LanguagePublication', 'DTA\\MetadataBundle\\Model\\Master\\LanguagePublication', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'LanguagePublications');
         $this->addRelation('GenrePublication', 'DTA\\MetadataBundle\\Model\\Master\\GenrePublication', RelationMap::ONE_TO_MANY, array('id' => 'publication_id', ), null, null, 'GenrePublications');
@@ -147,7 +148,7 @@ class PublicationTableMap extends TableMap
   'veröffentlicht' => 'accessor:getDatespecificationRelatedByPublicationdateId',
   'Verlag' => 'accessor:getPublishingCompany',
   'Typ' => 'type',
-  'query' => '\\DTA\\MetadataBundle\\Model\\Data\\PublicationQuery::create()                     ->leftJoinWith(\'Title\')                     ->leftJoinWith(\'Title.Titlefragment\')                     ->leftJoinWith(\'DatespecificationRelatedByPublicationdateId\')                     ->leftJoinWith(\'PersonPublication\')                     ->leftJoinWith(\'PersonPublication.Person\')                     ->leftJoinWith(\'Person.Personalname\')                     ->leftJoinWith(\'Personalname.Namefragment\');',
+  'query' => '\\DTA\\MetadataBundle\\Model\\Data\\PublicationQuery::create()                     ->leftJoinWith(\'Title\')                     ->leftJoinWith(\'Title.Titlefragment\')                     ->leftJoinWith(\'DatespecificationRelatedByPublicationdateId\')                     ->leftJoinWith(\'PersonPublication\')                     ->leftJoinWith(\'PersonPublication.Person\')                     ->leftJoinWith(\'Person.Personalname\')                     ->leftJoinWith(\'Personalname.Namefragment\')                     ->leftJoinWith(\'Volume\')                     ->orderBy(\'Titlefragment.TitlefragmenttypeId\', \'asc\')                     ->orderBy(\'Titlefragment.Name\', \'asc\')                     ->orderBy(\'Title.Id\', \'asc\')                     ->orderBy(\'Volume.VolumeNumeric\', \'asc\');',
 ),
             'reconstructed_flaggable' =>  array (
   'column' => 'publishingcompany_id',

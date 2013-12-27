@@ -41,12 +41,6 @@ abstract class BaseArticle extends BaseObject implements Persistent, \DTA\Metada
     protected $startCopy = false;
 
     /**
-     * The value for the id field.
-     * @var        int
-     */
-    protected $id;
-
-    /**
      * The value for the publication_id field.
      * @var        int
      */
@@ -97,17 +91,6 @@ abstract class BaseArticle extends BaseObject implements Persistent, \DTA\Metada
 
     // table_row_view behavior
     public static $tableRowViewCaptions = array();	public   $tableRowViewAccessors = array();	public static $queryConstructionString = NULL;
-    /**
-     * Get the [id] column value.
-     *
-     * @return int
-     */
-    public function getId()
-    {
-
-        return $this->id;
-    }
-
     /**
      * Get the [publication_id] column value.
      *
@@ -199,27 +182,6 @@ abstract class BaseArticle extends BaseObject implements Persistent, \DTA\Metada
         return $dt->format($format);
 
     }
-
-    /**
-     * Set the value of [id] column.
-     *
-     * @param  int $v new value
-     * @return Article The current object (for fluent API support)
-     */
-    public function setId($v)
-    {
-        if ($v !== null && is_numeric($v)) {
-            $v = (int) $v;
-        }
-
-        if ($this->id !== $v) {
-            $this->id = $v;
-            $this->modifiedColumns[] = ArticlePeer::ID;
-        }
-
-
-        return $this;
-    } // setId()
 
     /**
      * Set the value of [publication_id] column.
@@ -345,11 +307,10 @@ abstract class BaseArticle extends BaseObject implements Persistent, \DTA\Metada
     {
         try {
 
-            $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
-            $this->publication_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
-            $this->pages = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-            $this->created_at = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-            $this->updated_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+            $this->publication_id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
+            $this->pages = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
+            $this->created_at = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+            $this->updated_at = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -359,7 +320,7 @@ abstract class BaseArticle extends BaseObject implements Persistent, \DTA\Metada
             }
             $this->postHydrate($row, $startcol, $rehydrate);
 
-            return $startcol + 5; // 5 = ArticlePeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 4; // 4 = ArticlePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Article object", $e);
@@ -592,25 +553,8 @@ abstract class BaseArticle extends BaseObject implements Persistent, \DTA\Metada
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = ArticlePeer::ID;
-        if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . ArticlePeer::ID . ')');
-        }
-        if (null === $this->id) {
-            try {
-                $stmt = $con->query("SELECT nextval('article_id_seq')");
-                $row = $stmt->fetch(PDO::FETCH_NUM);
-                $this->id = $row[0];
-            } catch (Exception $e) {
-                throw new PropelException('Unable to get sequence id.', $e);
-            }
-        }
-
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(ArticlePeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '"id"';
-        }
         if ($this->isColumnModified(ArticlePeer::PUBLICATION_ID)) {
             $modifiedColumns[':p' . $index++]  = '"publication_id"';
         }
@@ -634,9 +578,6 @@ abstract class BaseArticle extends BaseObject implements Persistent, \DTA\Metada
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '"id"':
-                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
-                        break;
                     case '"publication_id"':
                         $stmt->bindValue($identifier, $this->publication_id, PDO::PARAM_INT);
                         break;
@@ -789,18 +730,15 @@ abstract class BaseArticle extends BaseObject implements Persistent, \DTA\Metada
     {
         switch ($pos) {
             case 0:
-                return $this->getId();
-                break;
-            case 1:
                 return $this->getPublicationId();
                 break;
-            case 2:
+            case 1:
                 return $this->getPages();
                 break;
-            case 3:
+            case 2:
                 return $this->getCreatedAt();
                 break;
-            case 4:
+            case 3:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -832,11 +770,10 @@ abstract class BaseArticle extends BaseObject implements Persistent, \DTA\Metada
         $alreadyDumpedObjects['Article'][$this->getPrimaryKey()] = true;
         $keys = ArticlePeer::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getId(),
-            $keys[1] => $this->getPublicationId(),
-            $keys[2] => $this->getPages(),
-            $keys[3] => $this->getCreatedAt(),
-            $keys[4] => $this->getUpdatedAt(),
+            $keys[0] => $this->getPublicationId(),
+            $keys[1] => $this->getPages(),
+            $keys[2] => $this->getCreatedAt(),
+            $keys[3] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -882,18 +819,15 @@ abstract class BaseArticle extends BaseObject implements Persistent, \DTA\Metada
     {
         switch ($pos) {
             case 0:
-                $this->setId($value);
-                break;
-            case 1:
                 $this->setPublicationId($value);
                 break;
-            case 2:
+            case 1:
                 $this->setPages($value);
                 break;
-            case 3:
+            case 2:
                 $this->setCreatedAt($value);
                 break;
-            case 4:
+            case 3:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -920,11 +854,10 @@ abstract class BaseArticle extends BaseObject implements Persistent, \DTA\Metada
     {
         $keys = ArticlePeer::getFieldNames($keyType);
 
-        if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setPublicationId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setPages($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
+        if (array_key_exists($keys[0], $arr)) $this->setPublicationId($arr[$keys[0]]);
+        if (array_key_exists($keys[1], $arr)) $this->setPages($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setCreatedAt($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setUpdatedAt($arr[$keys[3]]);
     }
 
     /**
@@ -936,7 +869,6 @@ abstract class BaseArticle extends BaseObject implements Persistent, \DTA\Metada
     {
         $criteria = new Criteria(ArticlePeer::DATABASE_NAME);
 
-        if ($this->isColumnModified(ArticlePeer::ID)) $criteria->add(ArticlePeer::ID, $this->id);
         if ($this->isColumnModified(ArticlePeer::PUBLICATION_ID)) $criteria->add(ArticlePeer::PUBLICATION_ID, $this->publication_id);
         if ($this->isColumnModified(ArticlePeer::PAGES)) $criteria->add(ArticlePeer::PAGES, $this->pages);
         if ($this->isColumnModified(ArticlePeer::CREATED_AT)) $criteria->add(ArticlePeer::CREATED_AT, $this->created_at);
@@ -956,7 +888,7 @@ abstract class BaseArticle extends BaseObject implements Persistent, \DTA\Metada
     public function buildPkeyCriteria()
     {
         $criteria = new Criteria(ArticlePeer::DATABASE_NAME);
-        $criteria->add(ArticlePeer::ID, $this->id);
+        $criteria->add(ArticlePeer::PUBLICATION_ID, $this->publication_id);
 
         return $criteria;
     }
@@ -967,18 +899,18 @@ abstract class BaseArticle extends BaseObject implements Persistent, \DTA\Metada
      */
     public function getPrimaryKey()
     {
-        return $this->getId();
+        return $this->getPublicationId();
     }
 
     /**
-     * Generic method to set the primary key (id column).
+     * Generic method to set the primary key (publication_id column).
      *
      * @param  int $key Primary key.
      * @return void
      */
     public function setPrimaryKey($key)
     {
-        $this->setId($key);
+        $this->setPublicationId($key);
     }
 
     /**
@@ -988,7 +920,7 @@ abstract class BaseArticle extends BaseObject implements Persistent, \DTA\Metada
     public function isPrimaryKeyNull()
     {
 
-        return null === $this->getId();
+        return null === $this->getPublicationId();
     }
 
     /**
@@ -1004,7 +936,6 @@ abstract class BaseArticle extends BaseObject implements Persistent, \DTA\Metada
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setPublicationId($this->getPublicationId());
         $copyObj->setPages($this->getPages());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
@@ -1016,13 +947,18 @@ abstract class BaseArticle extends BaseObject implements Persistent, \DTA\Metada
             // store object hash to prevent cycle
             $this->startCopy = true;
 
+            $relObj = $this->getPublication();
+            if ($relObj) {
+                $copyObj->setPublication($relObj->copy($deepCopy));
+            }
+
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
 
         if ($makeNew) {
             $copyObj->setNew(true);
-            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
+            $copyObj->setPublicationId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1083,10 +1019,9 @@ abstract class BaseArticle extends BaseObject implements Persistent, \DTA\Metada
 
         $this->aPublication = $v;
 
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Publication object, it will not be re-added.
+        // Add binding for other direction of this 1:1 relationship.
         if ($v !== null) {
-            $v->addArticle($this);
+            $v->setArticle($this);
         }
 
 
@@ -1106,13 +1041,8 @@ abstract class BaseArticle extends BaseObject implements Persistent, \DTA\Metada
     {
         if ($this->aPublication === null && ($this->publication_id !== null) && $doQuery) {
             $this->aPublication = PublicationQuery::create()->findPk($this->publication_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aPublication->addArticles($this);
-             */
+            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
+            $this->aPublication->setArticle($this);
         }
 
         return $this->aPublication;
@@ -1123,7 +1053,6 @@ abstract class BaseArticle extends BaseObject implements Persistent, \DTA\Metada
      */
     public function clear()
     {
-        $this->id = null;
         $this->publication_id = null;
         $this->pages = null;
         $this->created_at = null;

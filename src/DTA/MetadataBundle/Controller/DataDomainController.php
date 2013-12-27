@@ -82,6 +82,42 @@ class DataDomainController extends ORMController {
         ));
         
     }
+
+    /** Render list of all publications with publication options panel. */
+    public function viewPublicationsAction(){
+        
+        $records = Model\Data\Publication::getRowViewQueryObject()->find();
+        
+        $columns = Model\Data\Publication::getTableViewColumnNames();
+        
+        $rows = array();
+        foreach ($records as $pub) {
+
+            $linkTarget = $this->generateUrl("Data_genericCreateOrEdit", array(
+                    'className'=> 'Publication', 
+                    'recordId'=>$pub->getId()
+                )
+            );
+
+            $linkTo = function($href,$title){return '<a href="'.$href.'">'.$title.'</a>';};
+            $row = array();
+            foreach ($columns as $col) {
+                $row[$col] = $pub->getAttributeByTableViewColumName($col);
+            }
+            $row['id'] = $pub->getId();
+            $rows[] = $row;
+        }
+        
+        return $this->renderWithDomainData("DTAMetadataBundle::listViewWithOptions.html.twig", array(
+                    'title' => 'Publikationen',
+                    'columns' => Model\Data\Publication::getTableViewColumnNames(),
+                    'rows' => $rows,
+                    'updatedObjectId' => 0,
+                    'accessors' => $columns,
+                    'optionsLinkTemplate' => $this->generateUrl("publicationControls", array('publicationId'=>'__id__'))
+                ));
+        
+    }
     
     public function viewPersonsByRoleAction($personRoleId) {
         
@@ -135,20 +171,9 @@ class DataDomainController extends ORMController {
         
         $rows = array();
         
-        $publications = Model\Data\PublicationQuery::create()
+        $publications = 
+                Model\Data\Publication::getRowViewQueryObject()
                 ->filterByType($publicationType)
-                ->leftJoinWith('PersonPublication')
-                ->leftJoinWith('PersonPublication.Person')
-                ->leftJoinWith('Person.Personalname')
-                ->leftJoinWith('Personalname.Namefragment')
-                ->leftJoinWith('Namefragment.Namefragmenttype')
-                ->leftJoinWith('Title')
-                ->leftJoinWith('Title.Titlefragment')
-                ->leftJoinWith('Volume')
-                ->orderBy('Titlefragment.TitlefragmenttypeId', 'asc')
-                ->orderBy('Titlefragment.Name', 'asc')
-                ->orderBy('Title.Id', 'asc')
-                ->orderBy('Volume.VolumeNumeric', 'asc')
                 ->find();
         
         foreach ($publications as $pub) {
@@ -163,7 +188,7 @@ class DataDomainController extends ORMController {
             $rows[] = array(
                 'context' => $linkTo($linkTarget, $pub->getTitleString()),
                 'repName' => $pub->getFirstAuthor(),
-                'controlsLink' => $this->generateUrl("publicationControls", array('publicationId'=>$pub->getId()))
+                'id'      => $pub->getId()
             );
         }
         
@@ -175,7 +200,8 @@ class DataDomainController extends ORMController {
             'rows' => $rows,
             'columns' => $columns,
             'accessors' => $accessors,
-            'title' => $publicationType
+            'title' => $publicationType,
+            'optionsLinkTemplate' => $this->generateUrl("publicationControls", array('publicationId'=>'__id__')),
         ));
     }
 

@@ -94,15 +94,26 @@
                         }
                 } );
                 
+                
+                var paginationControlsHeight = 45;
+                var tableHeaderHeight = $('thead').first().outerHeight();
+                var tableTop = $('.table.fullyFeatured').offset().top;
+                var tableHeight = $(window).innerHeight() - tableTop - tableHeaderHeight - paginationControlsHeight;
+                
                 $('.table.fullyFeatured').dataTable( {
                     
-                    "bSort":false // disables sorting completely
+                    //"bSort":false // disables sorting completely
+                    bSortClasses: false
                     ,aaSorting:[]
                     ,"aLengthMenu": [
                         [10, 50, 100, -1],
                         [10, 50, 100, "All"] ]
-                    ,"iDisplayLength" : 50
+                    //,"iDisplayLength" : 50
+                    ,"sDom": 'rt<"bottom"iflp>'
+                    ,"sScrollY": tableHeight+"px"
+                    ,"bPaginate": false
                     ,"sPaginationType": "full_numbers"
+                    ,"oLanguage": { "sUrl": "{{asset('js/DataTables-1.9.4/dataTablesGermanTranslation.json')}}" }
                     ,"oTableTools": {
                             "aButtons": [
                                     "copy"

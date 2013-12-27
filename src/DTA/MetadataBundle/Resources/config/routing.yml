@@ -89,7 +89,12 @@ dataDomain:
 publicationControls:
   path: /Data/publicationControls/{publicationId}
   defaults: { _controller: DTAMetadataBundle:DataDomain:publicationControls}
-  
+
+viewPublications:
+  path: /Data/showAll/Publication
+  defaults: { _controller: DTAMetadataBundle:DataDomain:viewPublications}
+
+
 viewPublicationsByType:
   path: /Data/viewPublicationsByType/{publicationType}
   defaults: { _controller: DTAMetadataBundle:DataDomain:viewPublicationsByType}

@@ -30,16 +30,13 @@ abstract class BaseVolumePeer
     const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Data\\map\\VolumeTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 5;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 6;
-
-    /** the column name for the id field */
-    const ID = 'volume.id';
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /** the column name for the publication_id field */
     const PUBLICATION_ID = 'volume.publication_id';
@@ -75,12 +72,12 @@ abstract class BaseVolumePeer
      * e.g. VolumePeer::$fieldNames[VolumePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'VolumeDescription', 'VolumeNumeric', 'CreatedAt', 'UpdatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'volumeDescription', 'volumeNumeric', 'createdAt', 'updatedAt', ),
-        BasePeer::TYPE_COLNAME => array (VolumePeer::ID, VolumePeer::PUBLICATION_ID, VolumePeer::VOLUME_DESCRIPTION, VolumePeer::VOLUME_NUMERIC, VolumePeer::CREATED_AT, VolumePeer::UPDATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'VOLUME_DESCRIPTION', 'VOLUME_NUMERIC', 'CREATED_AT', 'UPDATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'volume_description', 'volume_numeric', 'created_at', 'updated_at', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+        BasePeer::TYPE_PHPNAME => array ('PublicationId', 'VolumeDescription', 'VolumeNumeric', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('publicationId', 'volumeDescription', 'volumeNumeric', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (VolumePeer::PUBLICATION_ID, VolumePeer::VOLUME_DESCRIPTION, VolumePeer::VOLUME_NUMERIC, VolumePeer::CREATED_AT, VolumePeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('PUBLICATION_ID', 'VOLUME_DESCRIPTION', 'VOLUME_NUMERIC', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('publication_id', 'volume_description', 'volume_numeric', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
     /**
@@ -90,12 +87,12 @@ abstract class BaseVolumePeer
      * e.g. VolumePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'VolumeDescription' => 2, 'VolumeNumeric' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'volumeDescription' => 2, 'volumeNumeric' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
-        BasePeer::TYPE_COLNAME => array (VolumePeer::ID => 0, VolumePeer::PUBLICATION_ID => 1, VolumePeer::VOLUME_DESCRIPTION => 2, VolumePeer::VOLUME_NUMERIC => 3, VolumePeer::CREATED_AT => 4, VolumePeer::UPDATED_AT => 5, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'VOLUME_DESCRIPTION' => 2, 'VOLUME_NUMERIC' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'volume_description' => 2, 'volume_numeric' => 3, 'created_at' => 4, 'updated_at' => 5, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+        BasePeer::TYPE_PHPNAME => array ('PublicationId' => 0, 'VolumeDescription' => 1, 'VolumeNumeric' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('publicationId' => 0, 'volumeDescription' => 1, 'volumeNumeric' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        BasePeer::TYPE_COLNAME => array (VolumePeer::PUBLICATION_ID => 0, VolumePeer::VOLUME_DESCRIPTION => 1, VolumePeer::VOLUME_NUMERIC => 2, VolumePeer::CREATED_AT => 3, VolumePeer::UPDATED_AT => 4, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('PUBLICATION_ID' => 0, 'VOLUME_DESCRIPTION' => 1, 'VOLUME_NUMERIC' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
+        BasePeer::TYPE_FIELDNAME => array ('publication_id' => 0, 'volume_description' => 1, 'volume_numeric' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
     /**
@@ -169,14 +166,12 @@ abstract class BaseVolumePeer
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(VolumePeer::ID);
             $criteria->addSelectColumn(VolumePeer::PUBLICATION_ID);
             $criteria->addSelectColumn(VolumePeer::VOLUME_DESCRIPTION);
             $criteria->addSelectColumn(VolumePeer::VOLUME_NUMERIC);
             $criteria->addSelectColumn(VolumePeer::CREATED_AT);
             $criteria->addSelectColumn(VolumePeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.publication_id');
             $criteria->addSelectColumn($alias . '.volume_description');
             $criteria->addSelectColumn($alias . '.volume_numeric');
@@ -308,7 +303,7 @@ abstract class BaseVolumePeer
     {
         if (Propel::isInstancePoolingEnabled()) {
             if ($key === null) {
-                $key = (string) $obj->getId();
+                $key = (string) $obj->getPublicationId();
             } // if key === null
             VolumePeer::$instances[$key] = $obj;
         }
@@ -331,7 +326,7 @@ abstract class BaseVolumePeer
     {
         if (Propel::isInstancePoolingEnabled() && $value !== null) {
             if (is_object($value) && $value instanceof Volume) {
-                $key = (string) $value->getId();
+                $key = (string) $value->getPublicationId();
             } elseif (is_scalar($value)) {
                 // assume we've been passed a primary key
                 $key = (string) $value;
@@ -589,7 +584,8 @@ abstract class BaseVolumePeer
                 } // if obj2 already loaded
 
                 // Add the $obj1 (Volume) to $obj2 (Publication)
-                $obj2->addVolume($obj1);
+                // one to one relationship
+                $obj1->setPublication($obj2);
 
             } // if joined row was not null
 
@@ -710,7 +706,7 @@ abstract class BaseVolumePeer
                 } // if obj2 loaded
 
                 // Add the $obj1 (Volume) to the collection in $obj2 (Publication)
-                $obj2->addVolume($obj1);
+                $obj1->setPublication($obj2);
             } // if joined row not null
 
             $results[] = $obj1;
@@ -775,10 +771,6 @@ abstract class BaseVolumePeer
             $criteria = $values->buildCriteria(); // build Criteria from Volume object
         }
 
-        if ($criteria->containsKey(VolumePeer::ID) && $criteria->keyContainsValue(VolumePeer::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.VolumePeer::ID.')');
-        }
-
 
         // Set the correct dbName
         $criteria->setDbName(VolumePeer::DATABASE_NAME);
@@ -817,10 +809,10 @@ abstract class BaseVolumePeer
         if ($values instanceof Criteria) {
             $criteria = clone $values; // rename for clarity
 
-            $comparison = $criteria->getComparison(VolumePeer::ID);
-            $value = $criteria->remove(VolumePeer::ID);
+            $comparison = $criteria->getComparison(VolumePeer::PUBLICATION_ID);
+            $value = $criteria->remove(VolumePeer::PUBLICATION_ID);
             if ($value) {
-                $selectCriteria->add(VolumePeer::ID, $value, $comparison);
+                $selectCriteria->add(VolumePeer::PUBLICATION_ID, $value, $comparison);
             } else {
                 $selectCriteria->setPrimaryTableName(VolumePeer::TABLE_NAME);
             }
@@ -899,7 +891,7 @@ abstract class BaseVolumePeer
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(VolumePeer::DATABASE_NAME);
-            $criteria->add(VolumePeer::ID, (array) $values, Criteria::IN);
+            $criteria->add(VolumePeer::PUBLICATION_ID, (array) $values, Criteria::IN);
             // invalidate the cache for this object(s)
             foreach ((array) $values as $singleval) {
                 VolumePeer::removeInstanceFromPool($singleval);
@@ -983,7 +975,7 @@ abstract class BaseVolumePeer
         }
 
         $criteria = new Criteria(VolumePeer::DATABASE_NAME);
-        $criteria->add(VolumePeer::ID, $pk);
+        $criteria->add(VolumePeer::PUBLICATION_ID, $pk);
 
         $v = VolumePeer::doSelect($criteria, $con);
 
@@ -1010,7 +1002,7 @@ abstract class BaseVolumePeer
             $objs = array();
         } else {
             $criteria = new Criteria(VolumePeer::DATABASE_NAME);
-            $criteria->add(VolumePeer::ID, $pks, Criteria::IN);
+            $criteria->add(VolumePeer::PUBLICATION_ID, $pks, Criteria::IN);
             $objs = VolumePeer::doSelect($criteria, $con);
         }
 

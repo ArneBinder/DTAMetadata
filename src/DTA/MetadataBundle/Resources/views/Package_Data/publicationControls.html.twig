@@ -2,7 +2,7 @@
 <table>
   <thead>
     <tr>
-      <th colspan="2" >{{publication.getTitleString}}</th>
+      <th colspan="2" >{{publication.getShortTitle}}</th>
     </tr>
   </thead>
   <tbody>
@@ -25,32 +25,42 @@
     <tr>
       <td>Band</td>
       <td>
-        {{ volume.volumeNumeric }} von {{volume.volumesTotal}} <br/>
-        {{ volume.volumeNumeric>1?'vorheriger':''}}
-        {{ volume.volumeNumeric<volume.volumesTotal?'nächster':''}}</td>
+        
+        {% if volume.publication.hasPrevSibling %} 
+            <a data="{{volume.publication.getPrevSibling.id}}" href="#" onclick="recordClicked.call(this);">
+                <img class="arrow-icon" src="{{asset('img/glyphicons_210_left_arrow.png')}}"/>
+            </a>
+        {% endif %}
+
+        {{ volume.volumeNumeric }} von {{volume.numberOfRealVolumes}}
+          
+        {% if volume.publication.hasNextSibling %}
+            <a data="{{volume.publication.getNextSibling.id}}" href="#" onclick="recordClicked.call(this);">
+                <img class="arrow-icon" src="{{asset('img/glyphicons_211_right_arrow.png')}}"/>
+            </a>
+        {% endif %} 
+        <br/>
+        Zeige alle Bände
+        
+      </td>
     </tr>
     {% endif %}
   </tbody>
 </table>
 
-<a href="#" class="btn btn-default disabled">Vollanzeige</a> 
-<a href="{{path('Data_genericCreateOrEdit', {'className':'Publication','recordId':publication.id})}}" class="btn btn-default">Editieren</a> 
-<br/>
+<div style="margin-top:10px">
+<a href="#" class="btn btn-default disabled btn-sm">Vollanzeige</a> 
+<a href="{{path('Data_genericCreateOrEdit', {'className':'Publication','recordId':publication.id})}}" class="btn btn-default btn-sm">Editieren</a> 
+</div>
 
-{% set openTasks = publication.getTasksByClosed(false) %}
-{% if openTasks|length > 0 %}
+{% if publication.getTasksByClosed(false)|length > 0 %}
     <h4>Offene Tasks</h4>
-{% for task in openTasks %}
-    {{task.tasktype}} <br/>
-{% endfor %}
+    {% include 'DTAMetadataBundle:Package_Workflow:taskListForPublication.html.twig' with {'tasks': publication.getTasksByClosed(false)} %}
 {% endif %}
 
-{% set closedTasks = publication.getTasksByClosed(true) %}
-{% if closedTasks|length > 0 %}
+{% if publication.getTasksByClosed(true)|length > 0 %}
     <h4>Geschlossene Tasks</h4>
-{% for task in closedTasks %}
-    {{task.tasktype}} <br/>
-{% endfor %}
+    {% include 'DTAMetadataBundle:Package_Workflow:taskListForPublication.html.twig' with {'tasks': publication.getTasksByClosed(true)} %}
 {% endif %}
 
 {# old format: CoordinateMerge_Don	12.03.2010	12.03.2010 #}

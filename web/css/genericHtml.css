@@ -92,3 +92,8 @@ fieldset legend{
     border: 0;
     margin-bottom: 0;
 }
+
+.arrow-icon{
+    width: 11px;
+    vertical-align: baseline;
+}

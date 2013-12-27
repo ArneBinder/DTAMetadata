@@ -1,0 +1,16 @@
+{% set lastGroup = null %}
+{% for task in tasks %}
+    {# tasks are expected to be ordered by their treeLeft attribute (or, equivalently, by their parent workflows) #}
+    {% if task.tasktype.parent != lastGroup %}
+        <span style="font-weight:bold;"> {{ task.tasktype.parent }}</span> <br/>
+        {% set lastGroup = task.tasktype.parent %}
+        {% set prevSibling = null %}
+    {% endif %}
+    
+    {% if task.tasktype.getPrevSibling != prevSibling %}
+        <span style="color:red; font-style:italic">Fehlt: {{ task.tasktype.getPrevSibling }}</span> <br/>
+    {% endif %}
+    {{task.tasktype}} <br/>
+    {% set prevSibling = task.tasktype %}
+    
+{% endfor %}

@@ -97,7 +97,12 @@
                     ->leftJoinWith('PersonPublication')
                     ->leftJoinWith('PersonPublication.Person')
                     ->leftJoinWith('Person.Personalname')
-                    ->leftJoinWith('Personalname.Namefragment');" />
+                    ->leftJoinWith('Personalname.Namefragment')
+                    ->leftJoinWith('Volume')
+                    ->orderBy('Titlefragment.TitlefragmenttypeId', 'asc')
+                    ->orderBy('Titlefragment.Name', 'asc')
+                    ->orderBy('Title.Id', 'asc')
+                    ->orderBy('Volume.VolumeNumeric', 'asc');" />
         </behavior>
         
         <behavior name="reconstructed_flaggable">
@@ -124,8 +129,8 @@
         Zur Abbildung der Publikationstypen MM und MMS.
     -->
     <table name="multi_volume">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="publication_id" type="INTEGER" required="true"/>
+        <!--<column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>-->
+        <column name="publication_id" primaryKey="true" type="INTEGER" required="true"/>
         
         <column name="volumes_total" description="Anzahl Bände (gesamt)" type="INTEGER"/>
         
@@ -139,8 +144,8 @@
         Zur Abbildung der Publikationstypen MM und MMS.
     -->
     <table name="volume">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="publication_id" type="INTEGER" required="true"/>
+        <!--<column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>-->
+        <column name="publication_id" primaryKey="true" type="INTEGER" required="true"/>
         
         <column name="volume_description" description="Bezeichnung des Bandes (alphanumerisch)" type="LONGVARCHAR"/>
         <column name="volume_numeric" description="Bezeichnung des Bandes (numerisch)" type="INTEGER"/>
@@ -155,8 +160,8 @@
         Zur Abbildung des Publikationstyps DS.
     -->
     <table name="chapter">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="publication_id" type="INTEGER" required="true"/>
+        <!--<column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>-->
+        <column name="publication_id" primaryKey="true" type="INTEGER" required="true"/>
         
         <column name="pages" description="Seitenangabe" type="LONGVARCHAR"/>
         
@@ -170,8 +175,8 @@
         Zur Abbildung des Publikationstyps JA.
     -->
     <table name="article">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="publication_id" type="INTEGER" required="true"/>
+        <!--<column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>-->
+        <column name="publication_id" primaryKey="true" type="INTEGER" required="true"/>
         
         <column name="pages" description="Seitenangabe" type="LONGVARCHAR"/>
         

@@ -7,7 +7,7 @@ return array(
     'Category' => 'Kategorie',
     'CategoryWork' => 'Kategorie',
     'Corpus' => 'Korpus',
-    'CopyLocation' => 'Bezugsquelle',
+    'CopyLocation' => 'Fundstelle',
     'Datespecification' => 'Datumsangabe',
     'DtaUser' => 'Benutzer',
     'Font' => 'Schriftart',
@@ -44,6 +44,7 @@ return array(
     'Directoryname' => 'Verzeichnisname',
     'Comments' => 'Kommentare',
     'Id' => '#',
+    'id' => '#',
     'Username' => 'Benutzername',
     
         // date specification

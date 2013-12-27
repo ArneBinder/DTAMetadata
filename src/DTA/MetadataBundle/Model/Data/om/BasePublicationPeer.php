@@ -152,6 +152,7 @@ abstract class BasePublicationPeer
     const TYPE_CHAPTER = 'CHAPTER';
     const TYPE_JOURNAL = 'JOURNAL';
     const TYPE_ARTICLE = 'ARTICLE';
+    const TYPE_ANOTHERPUB = 'ANOTHERPUB';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -226,6 +227,7 @@ abstract class BasePublicationPeer
             PublicationPeer::TYPE_CHAPTER,
             PublicationPeer::TYPE_JOURNAL,
             PublicationPeer::TYPE_ARTICLE,
+            PublicationPeer::TYPE_ANOTHERPUB,
         ),
     );
 

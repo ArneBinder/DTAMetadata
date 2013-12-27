@@ -37,7 +37,6 @@
     
     {% endblock preTable %}
     
-        
         {% block tableHead %}
         <table class="table fullyFeatured table-striped table-hover" {# style="table-layout: fixed" #} > {# further bootstrap table classes: table-hover #}
         <thead>
@@ -48,40 +47,55 @@
         {% endblock tableHead %}
         
         <tbody>
+        {% spaceless %}
         {% block tableBody %}
             {% for row in rows %}
-                <tr data="{{row.controlsLink|default('')}}">
+                <tr data="{{attribute(row,'id')|default('')}}">
                 {% for acc in accessors %}
-                    <td>
-                        {{ attribute(row,acc)|raw }}
-                    </td>
+                    <td>{{ attribute(row,acc)|raw }}</td>
                 {% endfor %}
                 </tr>
             {% endfor %}
         {% endblock tableBody %}
         </tbody>
-    </table>
-    
+        </table>
+        {% endspaceless %}
 </div>
-<div class="well col-md-3" id="publicationOptions" style="margin-top:-24px;">
+<div class="well col-md-3" id="publicationOptions" style="margin-top:-4px;">
 </div>
 {% endblock core %}
 
 {% block additionalJS %}
 
 var optionsPanel;
+var linkTemplate = "{{optionsLinkTemplate}}";
+
+// updates the option panel to show the options for the record with the selected id
+function updateOptionsPanel(id){
+    
+    var controlsUrl = linkTemplate.replace("__id__", id);
+    
+    $.get(controlsUrl, function(data){
+        optionsPanel.html(data);
+        optionsPanel.show();
+    }); 
+}
+
+function recordClicked(){
+console.log($(this));
+    var id = $(this).attr('data');
+    updateOptionsPanel(id);
+}
 
 $(document).ready(function() {
     
     optionsPanel = $('#publicationOptions');
+    optionsPanel.hide();
     
     // make table rows clickable
     var rows = $('table.table tr').slice(1);   // skip table head
-    rows.on("click", function(){
-        var controlsUrl = $(this).attr('data');
-        $.get(controlsUrl, function(data){optionsPanel.html(data);});
-    });
-});
+    rows.on("click", recordClicked);
+}); // document ready
 
 {% endblock additionalJS %}
 

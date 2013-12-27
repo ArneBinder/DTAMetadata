@@ -18,14 +18,12 @@ use DTA\MetadataBundle\Model\Data\VolumePeer;
 use DTA\MetadataBundle\Model\Data\VolumeQuery;
 
 /**
- * @method VolumeQuery orderById($order = Criteria::ASC) Order by the id column
  * @method VolumeQuery orderByPublicationId($order = Criteria::ASC) Order by the publication_id column
  * @method VolumeQuery orderByVolumeDescription($order = Criteria::ASC) Order by the volume_description column
  * @method VolumeQuery orderByVolumeNumeric($order = Criteria::ASC) Order by the volume_numeric column
  * @method VolumeQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method VolumeQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
- * @method VolumeQuery groupById() Group by the id column
  * @method VolumeQuery groupByPublicationId() Group by the publication_id column
  * @method VolumeQuery groupByVolumeDescription() Group by the volume_description column
  * @method VolumeQuery groupByVolumeNumeric() Group by the volume_numeric column
@@ -43,13 +41,11 @@ use DTA\MetadataBundle\Model\Data\VolumeQuery;
  * @method Volume findOne(PropelPDO $con = null) Return the first Volume matching the query
  * @method Volume findOneOrCreate(PropelPDO $con = null) Return the first Volume matching the query, or a new Volume object populated from the query conditions when no match is found
  *
- * @method Volume findOneByPublicationId(int $publication_id) Return the first Volume filtered by the publication_id column
  * @method Volume findOneByVolumeDescription(string $volume_description) Return the first Volume filtered by the volume_description column
  * @method Volume findOneByVolumeNumeric(int $volume_numeric) Return the first Volume filtered by the volume_numeric column
  * @method Volume findOneByCreatedAt(string $created_at) Return the first Volume filtered by the created_at column
  * @method Volume findOneByUpdatedAt(string $updated_at) Return the first Volume filtered by the updated_at column
  *
- * @method array findById(int $id) Return Volume objects filtered by the id column
  * @method array findByPublicationId(int $publication_id) Return Volume objects filtered by the publication_id column
  * @method array findByVolumeDescription(string $volume_description) Return Volume objects filtered by the volume_description column
  * @method array findByVolumeNumeric(int $volume_numeric) Return Volume objects filtered by the volume_numeric column
@@ -143,7 +139,7 @@ abstract class BaseVolumeQuery extends ModelCriteria
      * @return                 Volume A model object, or null if the key is not found
      * @throws PropelException
      */
-     public function findOneById($key, $con = null)
+     public function findOneByPublicationId($key, $con = null)
      {
         return $this->findPk($key, $con);
      }
@@ -160,7 +156,7 @@ abstract class BaseVolumeQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "publication_id", "volume_description", "volume_numeric", "created_at", "updated_at" FROM "volume" WHERE "id" = :p0';
+        $sql = 'SELECT "publication_id", "volume_description", "volume_numeric", "created_at", "updated_at" FROM "volume" WHERE "publication_id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -233,7 +229,7 @@ abstract class BaseVolumeQuery extends ModelCriteria
     public function filterByPrimaryKey($key)
     {
 
-        return $this->addUsingAlias(VolumePeer::ID, $key, Criteria::EQUAL);
+        return $this->addUsingAlias(VolumePeer::PUBLICATION_ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -246,49 +242,7 @@ abstract class BaseVolumeQuery extends ModelCriteria
     public function filterByPrimaryKeys($keys)
     {
 
-        return $this->addUsingAlias(VolumePeer::ID, $keys, Criteria::IN);
-    }
-
-    /**
-     * Filter the query on the id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterById(1234); // WHERE id = 1234
-     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id >= 12
-     * $query->filterById(array('max' => 12)); // WHERE id <= 12
-     * </code>
-     *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return VolumeQuery The current query, for fluid interface
-     */
-    public function filterById($id = null, $comparison = null)
-    {
-        if (is_array($id)) {
-            $useMinMax = false;
-            if (isset($id['min'])) {
-                $this->addUsingAlias(VolumePeer::ID, $id['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($id['max'])) {
-                $this->addUsingAlias(VolumePeer::ID, $id['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(VolumePeer::ID, $id, $comparison);
+        return $this->addUsingAlias(VolumePeer::PUBLICATION_ID, $keys, Criteria::IN);
     }
 
     /**
@@ -578,7 +532,7 @@ abstract class BaseVolumeQuery extends ModelCriteria
     public function prune($volume = null)
     {
         if ($volume) {
-            $this->addUsingAlias(VolumePeer::ID, $volume->getId(), Criteria::NOT_EQUAL);
+            $this->addUsingAlias(VolumePeer::PUBLICATION_ID, $volume->getPublicationId(), Criteria::NOT_EQUAL);
         }
 
         return $this;

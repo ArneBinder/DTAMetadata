@@ -340,28 +340,24 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     protected $aLastChangedByUser;
 
     /**
-     * @var        PropelObjectCollection|MultiVolume[] Collection to store aggregation of MultiVolume objects.
+     * @var        MultiVolume one-to-one related MultiVolume object
      */
-    protected $collMultiVolumes;
-    protected $collMultiVolumesPartial;
+    protected $singleMultiVolume;
 
     /**
-     * @var        PropelObjectCollection|Volume[] Collection to store aggregation of Volume objects.
+     * @var        Volume one-to-one related Volume object
      */
-    protected $collVolumes;
-    protected $collVolumesPartial;
+    protected $singleVolume;
 
     /**
-     * @var        PropelObjectCollection|Chapter[] Collection to store aggregation of Chapter objects.
+     * @var        Chapter one-to-one related Chapter object
      */
-    protected $collChapters;
-    protected $collChaptersPartial;
+    protected $singleChapter;
 
     /**
-     * @var        PropelObjectCollection|Article[] Collection to store aggregation of Article objects.
+     * @var        Article one-to-one related Article object
      */
-    protected $collArticles;
-    protected $collArticlesPartial;
+    protected $singleArticle;
 
     /**
      * @var        PropelObjectCollection|SequenceEntry[] Collection to store aggregation of SequenceEntry objects.
@@ -513,7 +509,7 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
 
 
     // table_row_view behavior
-    public static $tableRowViewCaptions = array('Titel', 'erster Autor', 'veröffentlicht', 'Verlag', 'Typ', );	public   $tableRowViewAccessors = array('Titel'=>'accessor:getTitleString', 'erster Autor'=>'accessor:getFirstAuthor', 'veröffentlicht'=>'accessor:getDatespecificationRelatedByPublicationdateId', 'Verlag'=>'accessor:getPublishingCompany', 'Typ'=>'Type', );	public static $queryConstructionString = "\DTA\MetadataBundle\Model\Data\PublicationQuery::create()                     ->leftJoinWith('Title')                     ->leftJoinWith('Title.Titlefragment')                     ->leftJoinWith('DatespecificationRelatedByPublicationdateId')                     ->leftJoinWith('PersonPublication')                     ->leftJoinWith('PersonPublication.Person')                     ->leftJoinWith('Person.Personalname')                     ->leftJoinWith('Personalname.Namefragment');";
+    public static $tableRowViewCaptions = array('Titel', 'erster Autor', 'veröffentlicht', 'Verlag', 'Typ', );	public   $tableRowViewAccessors = array('Titel'=>'accessor:getTitleString', 'erster Autor'=>'accessor:getFirstAuthor', 'veröffentlicht'=>'accessor:getDatespecificationRelatedByPublicationdateId', 'Verlag'=>'accessor:getPublishingCompany', 'Typ'=>'Type', );	public static $queryConstructionString = "\DTA\MetadataBundle\Model\Data\PublicationQuery::create()                     ->leftJoinWith('Title')                     ->leftJoinWith('Title.Titlefragment')                     ->leftJoinWith('DatespecificationRelatedByPublicationdateId')                     ->leftJoinWith('PersonPublication')                     ->leftJoinWith('PersonPublication.Person')                     ->leftJoinWith('Person.Personalname')                     ->leftJoinWith('Personalname.Namefragment')                     ->leftJoinWith('Volume')                     ->orderBy('Titlefragment.TitlefragmenttypeId', 'asc')                     ->orderBy('Titlefragment.Name', 'asc')                     ->orderBy('Title.Id', 'asc')                     ->orderBy('Volume.VolumeNumeric', 'asc');";
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -549,30 +545,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      * @var		PropelObjectCollection
      */
     protected $publicationgroupsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $multiVolumesScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $volumesScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $chaptersScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $articlesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -2031,13 +2003,13 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             $this->aDatespecificationRelatedByPublicationdateId = null;
             $this->aDatespecificationRelatedByCreationdateId = null;
             $this->aLastChangedByUser = null;
-            $this->collMultiVolumes = null;
+            $this->singleMultiVolume = null;
 
-            $this->collVolumes = null;
+            $this->singleVolume = null;
 
-            $this->collChapters = null;
+            $this->singleChapter = null;
 
-            $this->collArticles = null;
+            $this->singleArticle = null;
 
             $this->collSequenceEntries = null;
 
@@ -2443,71 +2415,27 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
                 }
             }
 
-            if ($this->multiVolumesScheduledForDeletion !== null) {
-                if (!$this->multiVolumesScheduledForDeletion->isEmpty()) {
-                    MultiVolumeQuery::create()
-                        ->filterByPrimaryKeys($this->multiVolumesScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->multiVolumesScheduledForDeletion = null;
+            if ($this->singleMultiVolume !== null) {
+                if (!$this->singleMultiVolume->isDeleted() && ($this->singleMultiVolume->isNew() || $this->singleMultiVolume->isModified())) {
+                        $affectedRows += $this->singleMultiVolume->save($con);
                 }
             }
 
-            if ($this->collMultiVolumes !== null) {
-                foreach ($this->collMultiVolumes as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
+            if ($this->singleVolume !== null) {
+                if (!$this->singleVolume->isDeleted() && ($this->singleVolume->isNew() || $this->singleVolume->isModified())) {
+                        $affectedRows += $this->singleVolume->save($con);
                 }
             }
 
-            if ($this->volumesScheduledForDeletion !== null) {
-                if (!$this->volumesScheduledForDeletion->isEmpty()) {
-                    VolumeQuery::create()
-                        ->filterByPrimaryKeys($this->volumesScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->volumesScheduledForDeletion = null;
+            if ($this->singleChapter !== null) {
+                if (!$this->singleChapter->isDeleted() && ($this->singleChapter->isNew() || $this->singleChapter->isModified())) {
+                        $affectedRows += $this->singleChapter->save($con);
                 }
             }
 
-            if ($this->collVolumes !== null) {
-                foreach ($this->collVolumes as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
-            if ($this->chaptersScheduledForDeletion !== null) {
-                if (!$this->chaptersScheduledForDeletion->isEmpty()) {
-                    ChapterQuery::create()
-                        ->filterByPrimaryKeys($this->chaptersScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->chaptersScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collChapters !== null) {
-                foreach ($this->collChapters as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
-            if ($this->articlesScheduledForDeletion !== null) {
-                if (!$this->articlesScheduledForDeletion->isEmpty()) {
-                    ArticleQuery::create()
-                        ->filterByPrimaryKeys($this->articlesScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->articlesScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collArticles !== null) {
-                foreach ($this->collArticles as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
+            if ($this->singleArticle !== null) {
+                if (!$this->singleArticle->isDeleted() && ($this->singleArticle->isNew() || $this->singleArticle->isModified())) {
+                        $affectedRows += $this->singleArticle->save($con);
                 }
             }
 
@@ -3110,35 +3038,27 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             }
 
 
-                if ($this->collMultiVolumes !== null) {
-                    foreach ($this->collMultiVolumes as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
+                if ($this->singleMultiVolume !== null) {
+                    if (!$this->singleMultiVolume->validate($columns)) {
+                        $failureMap = array_merge($failureMap, $this->singleMultiVolume->getValidationFailures());
                     }
                 }
 
-                if ($this->collVolumes !== null) {
-                    foreach ($this->collVolumes as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
+                if ($this->singleVolume !== null) {
+                    if (!$this->singleVolume->validate($columns)) {
+                        $failureMap = array_merge($failureMap, $this->singleVolume->getValidationFailures());
                     }
                 }
 
-                if ($this->collChapters !== null) {
-                    foreach ($this->collChapters as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
+                if ($this->singleChapter !== null) {
+                    if (!$this->singleChapter->validate($columns)) {
+                        $failureMap = array_merge($failureMap, $this->singleChapter->getValidationFailures());
                     }
                 }
 
-                if ($this->collArticles !== null) {
-                    foreach ($this->collArticles as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
+                if ($this->singleArticle !== null) {
+                    if (!$this->singleArticle->validate($columns)) {
+                        $failureMap = array_merge($failureMap, $this->singleArticle->getValidationFailures());
                     }
                 }
 
@@ -3474,17 +3394,17 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             if (null !== $this->aLastChangedByUser) {
                 $result['LastChangedByUser'] = $this->aLastChangedByUser->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->collMultiVolumes) {
-                $result['MultiVolumes'] = $this->collMultiVolumes->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->singleMultiVolume) {
+                $result['MultiVolume'] = $this->singleMultiVolume->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
             }
-            if (null !== $this->collVolumes) {
-                $result['Volumes'] = $this->collVolumes->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->singleVolume) {
+                $result['Volume'] = $this->singleVolume->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
             }
-            if (null !== $this->collChapters) {
-                $result['Chapters'] = $this->collChapters->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->singleChapter) {
+                $result['Chapter'] = $this->singleChapter->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
             }
-            if (null !== $this->collArticles) {
-                $result['Articles'] = $this->collArticles->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->singleArticle) {
+                $result['Article'] = $this->singleArticle->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
             }
             if (null !== $this->collSequenceEntries) {
                 $result['SequenceEntries'] = $this->collSequenceEntries->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -3872,28 +3792,24 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getMultiVolumes() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addMultiVolume($relObj->copy($deepCopy));
-                }
+            $relObj = $this->getMultiVolume();
+            if ($relObj) {
+                $copyObj->setMultiVolume($relObj->copy($deepCopy));
             }
 
-            foreach ($this->getVolumes() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addVolume($relObj->copy($deepCopy));
-                }
+            $relObj = $this->getVolume();
+            if ($relObj) {
+                $copyObj->setVolume($relObj->copy($deepCopy));
             }
 
-            foreach ($this->getChapters() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addChapter($relObj->copy($deepCopy));
-                }
+            $relObj = $this->getChapter();
+            if ($relObj) {
+                $copyObj->setChapter($relObj->copy($deepCopy));
             }
 
-            foreach ($this->getArticles() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addArticle($relObj->copy($deepCopy));
-                }
+            $relObj = $this->getArticle();
+            if ($relObj) {
+                $copyObj->setArticle($relObj->copy($deepCopy));
             }
 
             foreach ($this->getSequenceEntries() as $relObj) {
@@ -4399,18 +4315,6 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
      */
     public function initRelation($relationName)
     {
-        if ('MultiVolume' == $relationName) {
-            $this->initMultiVolumes();
-        }
-        if ('Volume' == $relationName) {
-            $this->initVolumes();
-        }
-        if ('Chapter' == $relationName) {
-            $this->initChapters();
-        }
-        if ('Article' == $relationName) {
-            $this->initArticles();
-        }
         if ('SequenceEntry' == $relationName) {
             $this->initSequenceEntries();
         }
@@ -4453,900 +4357,144 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     }
 
     /**
-     * Clears out the collMultiVolumes collection
+     * Gets a single MultiVolume object, which is related to this object by a one-to-one relationship.
      *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return Publication The current object (for fluent API support)
-     * @see        addMultiVolumes()
-     */
-    public function clearMultiVolumes()
-    {
-        $this->collMultiVolumes = null; // important to set this to null since that means it is uninitialized
-        $this->collMultiVolumesPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * reset is the collMultiVolumes collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialMultiVolumes($v = true)
-    {
-        $this->collMultiVolumesPartial = $v;
-    }
-
-    /**
-     * Initializes the collMultiVolumes collection.
-     *
-     * By default this just sets the collMultiVolumes collection to an empty array (like clearcollMultiVolumes());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initMultiVolumes($overrideExisting = true)
-    {
-        if (null !== $this->collMultiVolumes && !$overrideExisting) {
-            return;
-        }
-        $this->collMultiVolumes = new PropelObjectCollection();
-        $this->collMultiVolumes->setModel('MultiVolume');
-    }
-
-    /**
-     * Gets an array of MultiVolume objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Publication is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|MultiVolume[] List of MultiVolume objects
+     * @return MultiVolume
      * @throws PropelException
      */
-    public function getMultiVolumes($criteria = null, PropelPDO $con = null)
+    public function getMultiVolume(PropelPDO $con = null)
     {
-        $partial = $this->collMultiVolumesPartial && !$this->isNew();
-        if (null === $this->collMultiVolumes || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collMultiVolumes) {
-                // return empty collection
-                $this->initMultiVolumes();
-            } else {
-                $collMultiVolumes = MultiVolumeQuery::create(null, $criteria)
-                    ->filterByPublication($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collMultiVolumesPartial && count($collMultiVolumes)) {
-                      $this->initMultiVolumes(false);
 
-                      foreach ($collMultiVolumes as $obj) {
-                        if (false == $this->collMultiVolumes->contains($obj)) {
-                          $this->collMultiVolumes->append($obj);
-                        }
-                      }
-
-                      $this->collMultiVolumesPartial = true;
-                    }
-
-                    $collMultiVolumes->getInternalIterator()->rewind();
-
-                    return $collMultiVolumes;
-                }
-
-                if ($partial && $this->collMultiVolumes) {
-                    foreach ($this->collMultiVolumes as $obj) {
-                        if ($obj->isNew()) {
-                            $collMultiVolumes[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collMultiVolumes = $collMultiVolumes;
-                $this->collMultiVolumesPartial = false;
-            }
+        if ($this->singleMultiVolume === null && !$this->isNew()) {
+            $this->singleMultiVolume = MultiVolumeQuery::create()->findPk($this->getPrimaryKey(), $con);
         }
 
-        return $this->collMultiVolumes;
+        return $this->singleMultiVolume;
     }
 
     /**
-     * Sets a collection of MultiVolume objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
+     * Sets a single MultiVolume object as related to this object by a one-to-one relationship.
      *
-     * @param PropelCollection $multiVolumes A Propel collection.
-     * @param PropelPDO $con Optional connection object
+     * @param                  MultiVolume $v MultiVolume
      * @return Publication The current object (for fluent API support)
-     */
-    public function setMultiVolumes(PropelCollection $multiVolumes, PropelPDO $con = null)
-    {
-        $multiVolumesToDelete = $this->getMultiVolumes(new Criteria(), $con)->diff($multiVolumes);
-
-
-        $this->multiVolumesScheduledForDeletion = $multiVolumesToDelete;
-
-        foreach ($multiVolumesToDelete as $multiVolumeRemoved) {
-            $multiVolumeRemoved->setPublication(null);
-        }
-
-        $this->collMultiVolumes = null;
-        foreach ($multiVolumes as $multiVolume) {
-            $this->addMultiVolume($multiVolume);
-        }
-
-        $this->collMultiVolumes = $multiVolumes;
-        $this->collMultiVolumesPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related MultiVolume objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related MultiVolume objects.
      * @throws PropelException
      */
-    public function countMultiVolumes(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function setMultiVolume(MultiVolume $v = null)
     {
-        $partial = $this->collMultiVolumesPartial && !$this->isNew();
-        if (null === $this->collMultiVolumes || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collMultiVolumes) {
-                return 0;
-            }
+        $this->singleMultiVolume = $v;
 
-            if ($partial && !$criteria) {
-                return count($this->getMultiVolumes());
-            }
-            $query = MultiVolumeQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByPublication($this)
-                ->count($con);
-        }
-
-        return count($this->collMultiVolumes);
-    }
-
-    /**
-     * Method called to associate a MultiVolume object to this object
-     * through the MultiVolume foreign key attribute.
-     *
-     * @param    MultiVolume $l MultiVolume
-     * @return Publication The current object (for fluent API support)
-     */
-    public function addMultiVolume(MultiVolume $l)
-    {
-        if ($this->collMultiVolumes === null) {
-            $this->initMultiVolumes();
-            $this->collMultiVolumesPartial = true;
-        }
-
-        if (!in_array($l, $this->collMultiVolumes->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddMultiVolume($l);
-
-            if ($this->multiVolumesScheduledForDeletion and $this->multiVolumesScheduledForDeletion->contains($l)) {
-                $this->multiVolumesScheduledForDeletion->remove($this->multiVolumesScheduledForDeletion->search($l));
-            }
+        // Make sure that that the passed-in MultiVolume isn't already associated with this object
+        if ($v !== null && $v->getPublication(null, false) === null) {
+            $v->setPublication($this);
         }
 
         return $this;
     }
 
     /**
-     * @param	MultiVolume $multiVolume The multiVolume object to add.
-     */
-    protected function doAddMultiVolume($multiVolume)
-    {
-        $this->collMultiVolumes[]= $multiVolume;
-        $multiVolume->setPublication($this);
-    }
-
-    /**
-     * @param	MultiVolume $multiVolume The multiVolume object to remove.
-     * @return Publication The current object (for fluent API support)
-     */
-    public function removeMultiVolume($multiVolume)
-    {
-        if ($this->getMultiVolumes()->contains($multiVolume)) {
-            $this->collMultiVolumes->remove($this->collMultiVolumes->search($multiVolume));
-            if (null === $this->multiVolumesScheduledForDeletion) {
-                $this->multiVolumesScheduledForDeletion = clone $this->collMultiVolumes;
-                $this->multiVolumesScheduledForDeletion->clear();
-            }
-            $this->multiVolumesScheduledForDeletion[]= clone $multiVolume;
-            $multiVolume->setPublication(null);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Clears out the collVolumes collection
+     * Gets a single Volume object, which is related to this object by a one-to-one relationship.
      *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return Publication The current object (for fluent API support)
-     * @see        addVolumes()
-     */
-    public function clearVolumes()
-    {
-        $this->collVolumes = null; // important to set this to null since that means it is uninitialized
-        $this->collVolumesPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * reset is the collVolumes collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialVolumes($v = true)
-    {
-        $this->collVolumesPartial = $v;
-    }
-
-    /**
-     * Initializes the collVolumes collection.
-     *
-     * By default this just sets the collVolumes collection to an empty array (like clearcollVolumes());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initVolumes($overrideExisting = true)
-    {
-        if (null !== $this->collVolumes && !$overrideExisting) {
-            return;
-        }
-        $this->collVolumes = new PropelObjectCollection();
-        $this->collVolumes->setModel('Volume');
-    }
-
-    /**
-     * Gets an array of Volume objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Publication is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|Volume[] List of Volume objects
+     * @return Volume
      * @throws PropelException
      */
-    public function getVolumes($criteria = null, PropelPDO $con = null)
+    public function getVolume(PropelPDO $con = null)
     {
-        $partial = $this->collVolumesPartial && !$this->isNew();
-        if (null === $this->collVolumes || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collVolumes) {
-                // return empty collection
-                $this->initVolumes();
-            } else {
-                $collVolumes = VolumeQuery::create(null, $criteria)
-                    ->filterByPublication($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collVolumesPartial && count($collVolumes)) {
-                      $this->initVolumes(false);
 
-                      foreach ($collVolumes as $obj) {
-                        if (false == $this->collVolumes->contains($obj)) {
-                          $this->collVolumes->append($obj);
-                        }
-                      }
-
-                      $this->collVolumesPartial = true;
-                    }
-
-                    $collVolumes->getInternalIterator()->rewind();
-
-                    return $collVolumes;
-                }
-
-                if ($partial && $this->collVolumes) {
-                    foreach ($this->collVolumes as $obj) {
-                        if ($obj->isNew()) {
-                            $collVolumes[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collVolumes = $collVolumes;
-                $this->collVolumesPartial = false;
-            }
+        if ($this->singleVolume === null && !$this->isNew()) {
+            $this->singleVolume = VolumeQuery::create()->findPk($this->getPrimaryKey(), $con);
         }
 
-        return $this->collVolumes;
+        return $this->singleVolume;
     }
 
     /**
-     * Sets a collection of Volume objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
+     * Sets a single Volume object as related to this object by a one-to-one relationship.
      *
-     * @param PropelCollection $volumes A Propel collection.
-     * @param PropelPDO $con Optional connection object
+     * @param                  Volume $v Volume
      * @return Publication The current object (for fluent API support)
-     */
-    public function setVolumes(PropelCollection $volumes, PropelPDO $con = null)
-    {
-        $volumesToDelete = $this->getVolumes(new Criteria(), $con)->diff($volumes);
-
-
-        $this->volumesScheduledForDeletion = $volumesToDelete;
-
-        foreach ($volumesToDelete as $volumeRemoved) {
-            $volumeRemoved->setPublication(null);
-        }
-
-        $this->collVolumes = null;
-        foreach ($volumes as $volume) {
-            $this->addVolume($volume);
-        }
-
-        $this->collVolumes = $volumes;
-        $this->collVolumesPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related Volume objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related Volume objects.
      * @throws PropelException
      */
-    public function countVolumes(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function setVolume(Volume $v = null)
     {
-        $partial = $this->collVolumesPartial && !$this->isNew();
-        if (null === $this->collVolumes || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collVolumes) {
-                return 0;
-            }
+        $this->singleVolume = $v;
 
-            if ($partial && !$criteria) {
-                return count($this->getVolumes());
-            }
-            $query = VolumeQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByPublication($this)
-                ->count($con);
-        }
-
-        return count($this->collVolumes);
-    }
-
-    /**
-     * Method called to associate a Volume object to this object
-     * through the Volume foreign key attribute.
-     *
-     * @param    Volume $l Volume
-     * @return Publication The current object (for fluent API support)
-     */
-    public function addVolume(Volume $l)
-    {
-        if ($this->collVolumes === null) {
-            $this->initVolumes();
-            $this->collVolumesPartial = true;
-        }
-
-        if (!in_array($l, $this->collVolumes->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddVolume($l);
-
-            if ($this->volumesScheduledForDeletion and $this->volumesScheduledForDeletion->contains($l)) {
-                $this->volumesScheduledForDeletion->remove($this->volumesScheduledForDeletion->search($l));
-            }
+        // Make sure that that the passed-in Volume isn't already associated with this object
+        if ($v !== null && $v->getPublication(null, false) === null) {
+            $v->setPublication($this);
         }
 
         return $this;
     }
 
     /**
-     * @param	Volume $volume The volume object to add.
-     */
-    protected function doAddVolume($volume)
-    {
-        $this->collVolumes[]= $volume;
-        $volume->setPublication($this);
-    }
-
-    /**
-     * @param	Volume $volume The volume object to remove.
-     * @return Publication The current object (for fluent API support)
-     */
-    public function removeVolume($volume)
-    {
-        if ($this->getVolumes()->contains($volume)) {
-            $this->collVolumes->remove($this->collVolumes->search($volume));
-            if (null === $this->volumesScheduledForDeletion) {
-                $this->volumesScheduledForDeletion = clone $this->collVolumes;
-                $this->volumesScheduledForDeletion->clear();
-            }
-            $this->volumesScheduledForDeletion[]= clone $volume;
-            $volume->setPublication(null);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Clears out the collChapters collection
+     * Gets a single Chapter object, which is related to this object by a one-to-one relationship.
      *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return Publication The current object (for fluent API support)
-     * @see        addChapters()
-     */
-    public function clearChapters()
-    {
-        $this->collChapters = null; // important to set this to null since that means it is uninitialized
-        $this->collChaptersPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * reset is the collChapters collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialChapters($v = true)
-    {
-        $this->collChaptersPartial = $v;
-    }
-
-    /**
-     * Initializes the collChapters collection.
-     *
-     * By default this just sets the collChapters collection to an empty array (like clearcollChapters());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initChapters($overrideExisting = true)
-    {
-        if (null !== $this->collChapters && !$overrideExisting) {
-            return;
-        }
-        $this->collChapters = new PropelObjectCollection();
-        $this->collChapters->setModel('Chapter');
-    }
-
-    /**
-     * Gets an array of Chapter objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Publication is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|Chapter[] List of Chapter objects
+     * @return Chapter
      * @throws PropelException
      */
-    public function getChapters($criteria = null, PropelPDO $con = null)
+    public function getChapter(PropelPDO $con = null)
     {
-        $partial = $this->collChaptersPartial && !$this->isNew();
-        if (null === $this->collChapters || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collChapters) {
-                // return empty collection
-                $this->initChapters();
-            } else {
-                $collChapters = ChapterQuery::create(null, $criteria)
-                    ->filterByPublication($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collChaptersPartial && count($collChapters)) {
-                      $this->initChapters(false);
 
-                      foreach ($collChapters as $obj) {
-                        if (false == $this->collChapters->contains($obj)) {
-                          $this->collChapters->append($obj);
-                        }
-                      }
-
-                      $this->collChaptersPartial = true;
-                    }
-
-                    $collChapters->getInternalIterator()->rewind();
-
-                    return $collChapters;
-                }
-
-                if ($partial && $this->collChapters) {
-                    foreach ($this->collChapters as $obj) {
-                        if ($obj->isNew()) {
-                            $collChapters[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collChapters = $collChapters;
-                $this->collChaptersPartial = false;
-            }
+        if ($this->singleChapter === null && !$this->isNew()) {
+            $this->singleChapter = ChapterQuery::create()->findPk($this->getPrimaryKey(), $con);
         }
 
-        return $this->collChapters;
+        return $this->singleChapter;
     }
 
     /**
-     * Sets a collection of Chapter objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
+     * Sets a single Chapter object as related to this object by a one-to-one relationship.
      *
-     * @param PropelCollection $chapters A Propel collection.
-     * @param PropelPDO $con Optional connection object
+     * @param                  Chapter $v Chapter
      * @return Publication The current object (for fluent API support)
-     */
-    public function setChapters(PropelCollection $chapters, PropelPDO $con = null)
-    {
-        $chaptersToDelete = $this->getChapters(new Criteria(), $con)->diff($chapters);
-
-
-        $this->chaptersScheduledForDeletion = $chaptersToDelete;
-
-        foreach ($chaptersToDelete as $chapterRemoved) {
-            $chapterRemoved->setPublication(null);
-        }
-
-        $this->collChapters = null;
-        foreach ($chapters as $chapter) {
-            $this->addChapter($chapter);
-        }
-
-        $this->collChapters = $chapters;
-        $this->collChaptersPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related Chapter objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related Chapter objects.
      * @throws PropelException
      */
-    public function countChapters(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function setChapter(Chapter $v = null)
     {
-        $partial = $this->collChaptersPartial && !$this->isNew();
-        if (null === $this->collChapters || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collChapters) {
-                return 0;
-            }
+        $this->singleChapter = $v;
 
-            if ($partial && !$criteria) {
-                return count($this->getChapters());
-            }
-            $query = ChapterQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByPublication($this)
-                ->count($con);
-        }
-
-        return count($this->collChapters);
-    }
-
-    /**
-     * Method called to associate a Chapter object to this object
-     * through the Chapter foreign key attribute.
-     *
-     * @param    Chapter $l Chapter
-     * @return Publication The current object (for fluent API support)
-     */
-    public function addChapter(Chapter $l)
-    {
-        if ($this->collChapters === null) {
-            $this->initChapters();
-            $this->collChaptersPartial = true;
-        }
-
-        if (!in_array($l, $this->collChapters->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddChapter($l);
-
-            if ($this->chaptersScheduledForDeletion and $this->chaptersScheduledForDeletion->contains($l)) {
-                $this->chaptersScheduledForDeletion->remove($this->chaptersScheduledForDeletion->search($l));
-            }
+        // Make sure that that the passed-in Chapter isn't already associated with this object
+        if ($v !== null && $v->getPublication(null, false) === null) {
+            $v->setPublication($this);
         }
 
         return $this;
     }
 
     /**
-     * @param	Chapter $chapter The chapter object to add.
-     */
-    protected function doAddChapter($chapter)
-    {
-        $this->collChapters[]= $chapter;
-        $chapter->setPublication($this);
-    }
-
-    /**
-     * @param	Chapter $chapter The chapter object to remove.
-     * @return Publication The current object (for fluent API support)
-     */
-    public function removeChapter($chapter)
-    {
-        if ($this->getChapters()->contains($chapter)) {
-            $this->collChapters->remove($this->collChapters->search($chapter));
-            if (null === $this->chaptersScheduledForDeletion) {
-                $this->chaptersScheduledForDeletion = clone $this->collChapters;
-                $this->chaptersScheduledForDeletion->clear();
-            }
-            $this->chaptersScheduledForDeletion[]= clone $chapter;
-            $chapter->setPublication(null);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Clears out the collArticles collection
+     * Gets a single Article object, which is related to this object by a one-to-one relationship.
      *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return Publication The current object (for fluent API support)
-     * @see        addArticles()
-     */
-    public function clearArticles()
-    {
-        $this->collArticles = null; // important to set this to null since that means it is uninitialized
-        $this->collArticlesPartial = null;
-
-        return $this;
-    }
-
-    /**
-     * reset is the collArticles collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialArticles($v = true)
-    {
-        $this->collArticlesPartial = $v;
-    }
-
-    /**
-     * Initializes the collArticles collection.
-     *
-     * By default this just sets the collArticles collection to an empty array (like clearcollArticles());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initArticles($overrideExisting = true)
-    {
-        if (null !== $this->collArticles && !$overrideExisting) {
-            return;
-        }
-        $this->collArticles = new PropelObjectCollection();
-        $this->collArticles->setModel('Article');
-    }
-
-    /**
-     * Gets an array of Article objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Publication is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|Article[] List of Article objects
+     * @return Article
      * @throws PropelException
      */
-    public function getArticles($criteria = null, PropelPDO $con = null)
+    public function getArticle(PropelPDO $con = null)
     {
-        $partial = $this->collArticlesPartial && !$this->isNew();
-        if (null === $this->collArticles || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collArticles) {
-                // return empty collection
-                $this->initArticles();
-            } else {
-                $collArticles = ArticleQuery::create(null, $criteria)
-                    ->filterByPublication($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collArticlesPartial && count($collArticles)) {
-                      $this->initArticles(false);
 
-                      foreach ($collArticles as $obj) {
-                        if (false == $this->collArticles->contains($obj)) {
-                          $this->collArticles->append($obj);
-                        }
-                      }
-
-                      $this->collArticlesPartial = true;
-                    }
-
-                    $collArticles->getInternalIterator()->rewind();
-
-                    return $collArticles;
-                }
-
-                if ($partial && $this->collArticles) {
-                    foreach ($this->collArticles as $obj) {
-                        if ($obj->isNew()) {
-                            $collArticles[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collArticles = $collArticles;
-                $this->collArticlesPartial = false;
-            }
+        if ($this->singleArticle === null && !$this->isNew()) {
+            $this->singleArticle = ArticleQuery::create()->findPk($this->getPrimaryKey(), $con);
         }
 
-        return $this->collArticles;
+        return $this->singleArticle;
     }
 
     /**
-     * Sets a collection of Article objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
+     * Sets a single Article object as related to this object by a one-to-one relationship.
      *
-     * @param PropelCollection $articles A Propel collection.
-     * @param PropelPDO $con Optional connection object
+     * @param                  Article $v Article
      * @return Publication The current object (for fluent API support)
-     */
-    public function setArticles(PropelCollection $articles, PropelPDO $con = null)
-    {
-        $articlesToDelete = $this->getArticles(new Criteria(), $con)->diff($articles);
-
-
-        $this->articlesScheduledForDeletion = $articlesToDelete;
-
-        foreach ($articlesToDelete as $articleRemoved) {
-            $articleRemoved->setPublication(null);
-        }
-
-        $this->collArticles = null;
-        foreach ($articles as $article) {
-            $this->addArticle($article);
-        }
-
-        $this->collArticles = $articles;
-        $this->collArticlesPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related Article objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related Article objects.
      * @throws PropelException
      */
-    public function countArticles(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function setArticle(Article $v = null)
     {
-        $partial = $this->collArticlesPartial && !$this->isNew();
-        if (null === $this->collArticles || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collArticles) {
-                return 0;
-            }
+        $this->singleArticle = $v;
 
-            if ($partial && !$criteria) {
-                return count($this->getArticles());
-            }
-            $query = ArticleQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByPublication($this)
-                ->count($con);
-        }
-
-        return count($this->collArticles);
-    }
-
-    /**
-     * Method called to associate a Article object to this object
-     * through the Article foreign key attribute.
-     *
-     * @param    Article $l Article
-     * @return Publication The current object (for fluent API support)
-     */
-    public function addArticle(Article $l)
-    {
-        if ($this->collArticles === null) {
-            $this->initArticles();
-            $this->collArticlesPartial = true;
-        }
-
-        if (!in_array($l, $this->collArticles->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddArticle($l);
-
-            if ($this->articlesScheduledForDeletion and $this->articlesScheduledForDeletion->contains($l)) {
-                $this->articlesScheduledForDeletion->remove($this->articlesScheduledForDeletion->search($l));
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	Article $article The article object to add.
-     */
-    protected function doAddArticle($article)
-    {
-        $this->collArticles[]= $article;
-        $article->setPublication($this);
-    }
-
-    /**
-     * @param	Article $article The article object to remove.
-     * @return Publication The current object (for fluent API support)
-     */
-    public function removeArticle($article)
-    {
-        if ($this->getArticles()->contains($article)) {
-            $this->collArticles->remove($this->collArticles->search($article));
-            if (null === $this->articlesScheduledForDeletion) {
-                $this->articlesScheduledForDeletion = clone $this->collArticles;
-                $this->articlesScheduledForDeletion->clear();
-            }
-            $this->articlesScheduledForDeletion[]= clone $article;
-            $article->setPublication(null);
+        // Make sure that that the passed-in Article isn't already associated with this object
+        if ($v !== null && $v->getPublication(null, false) === null) {
+            $v->setPublication($this);
         }
 
         return $this;
@@ -9967,25 +9115,17 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
-            if ($this->collMultiVolumes) {
-                foreach ($this->collMultiVolumes as $o) {
-                    $o->clearAllReferences($deep);
-                }
+            if ($this->singleMultiVolume) {
+                $this->singleMultiVolume->clearAllReferences($deep);
             }
-            if ($this->collVolumes) {
-                foreach ($this->collVolumes as $o) {
-                    $o->clearAllReferences($deep);
-                }
+            if ($this->singleVolume) {
+                $this->singleVolume->clearAllReferences($deep);
             }
-            if ($this->collChapters) {
-                foreach ($this->collChapters as $o) {
-                    $o->clearAllReferences($deep);
-                }
+            if ($this->singleChapter) {
+                $this->singleChapter->clearAllReferences($deep);
             }
-            if ($this->collArticles) {
-                foreach ($this->collArticles as $o) {
-                    $o->clearAllReferences($deep);
-                }
+            if ($this->singleArticle) {
+                $this->singleArticle->clearAllReferences($deep);
             }
             if ($this->collSequenceEntries) {
                 foreach ($this->collSequenceEntries as $o) {
@@ -10110,22 +9250,22 @@ abstract class BasePublication extends BaseObject implements Persistent, \DTA\Me
         // nested_set behavior
         $this->collNestedSetChildren = null;
         $this->aNestedSetParent = null;
-        if ($this->collMultiVolumes instanceof PropelCollection) {
-            $this->collMultiVolumes->clearIterator();
+        if ($this->singleMultiVolume instanceof PropelCollection) {
+            $this->singleMultiVolume->clearIterator();
         }
-        $this->collMultiVolumes = null;
-        if ($this->collVolumes instanceof PropelCollection) {
-            $this->collVolumes->clearIterator();
+        $this->singleMultiVolume = null;
+        if ($this->singleVolume instanceof PropelCollection) {
+            $this->singleVolume->clearIterator();
         }
-        $this->collVolumes = null;
-        if ($this->collChapters instanceof PropelCollection) {
-            $this->collChapters->clearIterator();
+        $this->singleVolume = null;
+        if ($this->singleChapter instanceof PropelCollection) {
+            $this->singleChapter->clearIterator();
         }
-        $this->collChapters = null;
-        if ($this->collArticles instanceof PropelCollection) {
-            $this->collArticles->clearIterator();
+        $this->singleChapter = null;
+        if ($this->singleArticle instanceof PropelCollection) {
+            $this->singleArticle->clearIterator();
         }
-        $this->collArticles = null;
+        $this->singleArticle = null;
         if ($this->collSequenceEntries instanceof PropelCollection) {
             $this->collSequenceEntries->clearIterator();
         }

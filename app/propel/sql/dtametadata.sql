@@ -220,12 +220,11 @@ DROP TABLE IF EXISTS "multi_volume" CASCADE;
 
 CREATE TABLE "multi_volume"
 (
-    "id" serial NOT NULL,
     "publication_id" INTEGER NOT NULL,
     "volumes_total" INTEGER,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
-    PRIMARY KEY ("id")
+    PRIMARY KEY ("publication_id")
 );
 
 COMMENT ON COLUMN "multi_volume"."volumes_total" IS 'Anzahl Bände (gesamt)';
@@ -238,13 +237,12 @@ DROP TABLE IF EXISTS "volume" CASCADE;
 
 CREATE TABLE "volume"
 (
-    "id" serial NOT NULL,
     "publication_id" INTEGER NOT NULL,
     "volume_description" TEXT,
     "volume_numeric" INTEGER,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
-    PRIMARY KEY ("id")
+    PRIMARY KEY ("publication_id")
 );
 
 COMMENT ON COLUMN "volume"."volume_description" IS 'Bezeichnung des Bandes (alphanumerisch)';
@@ -259,12 +257,11 @@ DROP TABLE IF EXISTS "chapter" CASCADE;
 
 CREATE TABLE "chapter"
 (
-    "id" serial NOT NULL,
     "publication_id" INTEGER NOT NULL,
     "pages" TEXT,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
-    PRIMARY KEY ("id")
+    PRIMARY KEY ("publication_id")
 );
 
 COMMENT ON COLUMN "chapter"."pages" IS 'Seitenangabe';
@@ -277,12 +274,11 @@ DROP TABLE IF EXISTS "article" CASCADE;
 
 CREATE TABLE "article"
 (
-    "id" serial NOT NULL,
     "publication_id" INTEGER NOT NULL,
     "pages" TEXT,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
-    PRIMARY KEY ("id")
+    PRIMARY KEY ("publication_id")
 );
 
 COMMENT ON COLUMN "article"."pages" IS 'Seitenangabe';

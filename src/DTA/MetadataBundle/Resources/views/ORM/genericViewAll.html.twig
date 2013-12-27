@@ -64,35 +64,3 @@
         {% endfor %}
     {% endspaceless %}
     {% endblock tableBody %}
-
-    {%block additionalJS%}
-
-        function loadDetailPopover(tdElement){
-            var attrs = $('a', tdElement).attr('name').split('/');
-            var package   = attrs[0];
-            var className = attrs[1];
-            var recordId  = attrs[2];
-            var modalId   = recordId;
-            
-            if( $(tdElement).hasClass('loaded') ){
-                return true;
-            } else {
-                // $(tdElement).css('background-image', 'url("{{asset("bundles/webprofiler/images/profiler/spinner.gif")}}") no-repeat ');
-                //$(tdElement).css('border', '1px solid gray');
-                $(tdElement).addClass('loaded');
-                
-                //$.get( "{{ url("root") }}" + package + "/ajaxModalForm/" + className + "/" + modalId + "/Id/" + recordId, function( data ) {
-                $.get( "{{ url("root") }}" + package + "/show/" + className + "/" + recordId, function( data ) {
-                    $(tdElement).popover({'title':'{{className|trans}}', 'trigger':'click', 'container' : 'body', 
-                        placement: 'bottom',
-                        html: true, 
-                        content:data,
-                        animation: false
-                    });
-                    //$(tdElement).css('background-image', 'none');
-                    $(tdElement).popover('show');
-                });
-            }
-        }
-
-    {% endblock additionalJS%}

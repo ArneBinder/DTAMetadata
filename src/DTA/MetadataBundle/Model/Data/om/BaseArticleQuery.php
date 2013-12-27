@@ -18,13 +18,11 @@ use DTA\MetadataBundle\Model\Data\ArticleQuery;
 use DTA\MetadataBundle\Model\Data\Publication;
 
 /**
- * @method ArticleQuery orderById($order = Criteria::ASC) Order by the id column
  * @method ArticleQuery orderByPublicationId($order = Criteria::ASC) Order by the publication_id column
  * @method ArticleQuery orderByPages($order = Criteria::ASC) Order by the pages column
  * @method ArticleQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method ArticleQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
- * @method ArticleQuery groupById() Group by the id column
  * @method ArticleQuery groupByPublicationId() Group by the publication_id column
  * @method ArticleQuery groupByPages() Group by the pages column
  * @method ArticleQuery groupByCreatedAt() Group by the created_at column
@@ -41,12 +39,10 @@ use DTA\MetadataBundle\Model\Data\Publication;
  * @method Article findOne(PropelPDO $con = null) Return the first Article matching the query
  * @method Article findOneOrCreate(PropelPDO $con = null) Return the first Article matching the query, or a new Article object populated from the query conditions when no match is found
  *
- * @method Article findOneByPublicationId(int $publication_id) Return the first Article filtered by the publication_id column
  * @method Article findOneByPages(string $pages) Return the first Article filtered by the pages column
  * @method Article findOneByCreatedAt(string $created_at) Return the first Article filtered by the created_at column
  * @method Article findOneByUpdatedAt(string $updated_at) Return the first Article filtered by the updated_at column
  *
- * @method array findById(int $id) Return Article objects filtered by the id column
  * @method array findByPublicationId(int $publication_id) Return Article objects filtered by the publication_id column
  * @method array findByPages(string $pages) Return Article objects filtered by the pages column
  * @method array findByCreatedAt(string $created_at) Return Article objects filtered by the created_at column
@@ -139,7 +135,7 @@ abstract class BaseArticleQuery extends ModelCriteria
      * @return                 Article A model object, or null if the key is not found
      * @throws PropelException
      */
-     public function findOneById($key, $con = null)
+     public function findOneByPublicationId($key, $con = null)
      {
         return $this->findPk($key, $con);
      }
@@ -156,7 +152,7 @@ abstract class BaseArticleQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT "id", "publication_id", "pages", "created_at", "updated_at" FROM "article" WHERE "id" = :p0';
+        $sql = 'SELECT "publication_id", "pages", "created_at", "updated_at" FROM "article" WHERE "publication_id" = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -229,7 +225,7 @@ abstract class BaseArticleQuery extends ModelCriteria
     public function filterByPrimaryKey($key)
     {
 
-        return $this->addUsingAlias(ArticlePeer::ID, $key, Criteria::EQUAL);
+        return $this->addUsingAlias(ArticlePeer::PUBLICATION_ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -242,49 +238,7 @@ abstract class BaseArticleQuery extends ModelCriteria
     public function filterByPrimaryKeys($keys)
     {
 
-        return $this->addUsingAlias(ArticlePeer::ID, $keys, Criteria::IN);
-    }
-
-    /**
-     * Filter the query on the id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterById(1234); // WHERE id = 1234
-     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id >= 12
-     * $query->filterById(array('max' => 12)); // WHERE id <= 12
-     * </code>
-     *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ArticleQuery The current query, for fluid interface
-     */
-    public function filterById($id = null, $comparison = null)
-    {
-        if (is_array($id)) {
-            $useMinMax = false;
-            if (isset($id['min'])) {
-                $this->addUsingAlias(ArticlePeer::ID, $id['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($id['max'])) {
-                $this->addUsingAlias(ArticlePeer::ID, $id['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(ArticlePeer::ID, $id, $comparison);
+        return $this->addUsingAlias(ArticlePeer::PUBLICATION_ID, $keys, Criteria::IN);
     }
 
     /**
@@ -532,7 +486,7 @@ abstract class BaseArticleQuery extends ModelCriteria
     public function prune($article = null)
     {
         if ($article) {
-            $this->addUsingAlias(ArticlePeer::ID, $article->getId(), Criteria::NOT_EQUAL);
+            $this->addUsingAlias(ArticlePeer::PUBLICATION_ID, $article->getPublicationId(), Criteria::NOT_EQUAL);
         }
 
         return $this;

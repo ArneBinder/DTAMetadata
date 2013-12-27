@@ -40,11 +40,9 @@ class VolumeTableMap extends TableMap
         $this->setPhpName('Volume');
         $this->setClassname('DTA\\MetadataBundle\\Model\\Data\\Volume');
         $this->setPackage('src.DTA.MetadataBundle.Model.Data');
-        $this->setUseIdGenerator(true);
-        $this->setPrimaryKeyMethodInfo('volume_id_seq');
+        $this->setUseIdGenerator(false);
         // columns
-        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('publication_id', 'PublicationId', 'INTEGER', 'publication', 'id', true, null, null);
+        $this->addForeignPrimaryKey('publication_id', 'PublicationId', 'INTEGER' , 'publication', 'id', true, null, null);
         $this->addColumn('volume_description', 'VolumeDescription', 'LONGVARCHAR', false, null, null);
         $this->addColumn('volume_numeric', 'VolumeNumeric', 'INTEGER', false, null, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);

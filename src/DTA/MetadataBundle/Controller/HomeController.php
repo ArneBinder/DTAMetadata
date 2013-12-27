@@ -24,6 +24,10 @@ class HomeController extends ORMController {
     
     public function indexAction(Request $request) {
 
+//        $convert = \DTA\MetadataBundle\Model\Workflow\TasktypeQuery::create()->findOneById(59);
+//        $convert->moveToLastChildOf($convert->getParent());
+//        $convert->save();
+        
 //        $s = new Model\Master\SequenceEntry();
 //        $s->setSequencetype(Model\Master\SequenceEntryPeer::SEQUENCETYPE_SERIES)
 //                ->setPublicationId(17001);
@@ -77,7 +81,7 @@ class HomeController extends ORMController {
 //            $se2
 //            $queryClass
 //            $queryConstructionString
-             NULL
+             $groupA = \DTA\MetadataBundle\Model\Workflow\TasktypeQuery::create()->orderByTreeLeft()->select('Name')->find()
             //$p->getPersonalnames()
         ));
     }

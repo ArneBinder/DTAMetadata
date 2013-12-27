@@ -30,16 +30,13 @@ abstract class BaseMultiVolumePeer
     const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Data\\map\\MultiVolumeTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 5;
+    const NUM_COLUMNS = 4;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 5;
-
-    /** the column name for the id field */
-    const ID = 'multi_volume.id';
+    const NUM_HYDRATE_COLUMNS = 4;
 
     /** the column name for the publication_id field */
     const PUBLICATION_ID = 'multi_volume.publication_id';
@@ -72,12 +69,12 @@ abstract class BaseMultiVolumePeer
      * e.g. MultiVolumePeer::$fieldNames[MultiVolumePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'VolumesTotal', 'CreatedAt', 'UpdatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'volumesTotal', 'createdAt', 'updatedAt', ),
-        BasePeer::TYPE_COLNAME => array (MultiVolumePeer::ID, MultiVolumePeer::PUBLICATION_ID, MultiVolumePeer::VOLUMES_TOTAL, MultiVolumePeer::CREATED_AT, MultiVolumePeer::UPDATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'VOLUMES_TOTAL', 'CREATED_AT', 'UPDATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'volumes_total', 'created_at', 'updated_at', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+        BasePeer::TYPE_PHPNAME => array ('PublicationId', 'VolumesTotal', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('publicationId', 'volumesTotal', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (MultiVolumePeer::PUBLICATION_ID, MultiVolumePeer::VOLUMES_TOTAL, MultiVolumePeer::CREATED_AT, MultiVolumePeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('PUBLICATION_ID', 'VOLUMES_TOTAL', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('publication_id', 'volumes_total', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
     /**
@@ -87,12 +84,12 @@ abstract class BaseMultiVolumePeer
      * e.g. MultiVolumePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'VolumesTotal' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'volumesTotal' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
-        BasePeer::TYPE_COLNAME => array (MultiVolumePeer::ID => 0, MultiVolumePeer::PUBLICATION_ID => 1, MultiVolumePeer::VOLUMES_TOTAL => 2, MultiVolumePeer::CREATED_AT => 3, MultiVolumePeer::UPDATED_AT => 4, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'VOLUMES_TOTAL' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'volumes_total' => 2, 'created_at' => 3, 'updated_at' => 4, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+        BasePeer::TYPE_PHPNAME => array ('PublicationId' => 0, 'VolumesTotal' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('publicationId' => 0, 'volumesTotal' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
+        BasePeer::TYPE_COLNAME => array (MultiVolumePeer::PUBLICATION_ID => 0, MultiVolumePeer::VOLUMES_TOTAL => 1, MultiVolumePeer::CREATED_AT => 2, MultiVolumePeer::UPDATED_AT => 3, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('PUBLICATION_ID' => 0, 'VOLUMES_TOTAL' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
+        BasePeer::TYPE_FIELDNAME => array ('publication_id' => 0, 'volumes_total' => 1, 'created_at' => 2, 'updated_at' => 3, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
     /**
@@ -166,13 +163,11 @@ abstract class BaseMultiVolumePeer
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(MultiVolumePeer::ID);
             $criteria->addSelectColumn(MultiVolumePeer::PUBLICATION_ID);
             $criteria->addSelectColumn(MultiVolumePeer::VOLUMES_TOTAL);
             $criteria->addSelectColumn(MultiVolumePeer::CREATED_AT);
             $criteria->addSelectColumn(MultiVolumePeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.publication_id');
             $criteria->addSelectColumn($alias . '.volumes_total');
             $criteria->addSelectColumn($alias . '.created_at');
@@ -303,7 +298,7 @@ abstract class BaseMultiVolumePeer
     {
         if (Propel::isInstancePoolingEnabled()) {
             if ($key === null) {
-                $key = (string) $obj->getId();
+                $key = (string) $obj->getPublicationId();
             } // if key === null
             MultiVolumePeer::$instances[$key] = $obj;
         }
@@ -326,7 +321,7 @@ abstract class BaseMultiVolumePeer
     {
         if (Propel::isInstancePoolingEnabled() && $value !== null) {
             if (is_object($value) && $value instanceof MultiVolume) {
-                $key = (string) $value->getId();
+                $key = (string) $value->getPublicationId();
             } elseif (is_scalar($value)) {
                 // assume we've been passed a primary key
                 $key = (string) $value;
@@ -584,7 +579,8 @@ abstract class BaseMultiVolumePeer
                 } // if obj2 already loaded
 
                 // Add the $obj1 (MultiVolume) to $obj2 (Publication)
-                $obj2->addMultiVolume($obj1);
+                // one to one relationship
+                $obj1->setPublication($obj2);
 
             } // if joined row was not null
 
@@ -705,7 +701,7 @@ abstract class BaseMultiVolumePeer
                 } // if obj2 loaded
 
                 // Add the $obj1 (MultiVolume) to the collection in $obj2 (Publication)
-                $obj2->addMultiVolume($obj1);
+                $obj1->setPublication($obj2);
             } // if joined row not null
 
             $results[] = $obj1;
@@ -770,10 +766,6 @@ abstract class BaseMultiVolumePeer
             $criteria = $values->buildCriteria(); // build Criteria from MultiVolume object
         }
 
-        if ($criteria->containsKey(MultiVolumePeer::ID) && $criteria->keyContainsValue(MultiVolumePeer::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.MultiVolumePeer::ID.')');
-        }
-
 
         // Set the correct dbName
         $criteria->setDbName(MultiVolumePeer::DATABASE_NAME);
@@ -812,10 +804,10 @@ abstract class BaseMultiVolumePeer
         if ($values instanceof Criteria) {
             $criteria = clone $values; // rename for clarity
 
-            $comparison = $criteria->getComparison(MultiVolumePeer::ID);
-            $value = $criteria->remove(MultiVolumePeer::ID);
+            $comparison = $criteria->getComparison(MultiVolumePeer::PUBLICATION_ID);
+            $value = $criteria->remove(MultiVolumePeer::PUBLICATION_ID);
             if ($value) {
-                $selectCriteria->add(MultiVolumePeer::ID, $value, $comparison);
+                $selectCriteria->add(MultiVolumePeer::PUBLICATION_ID, $value, $comparison);
             } else {
                 $selectCriteria->setPrimaryTableName(MultiVolumePeer::TABLE_NAME);
             }
@@ -894,7 +886,7 @@ abstract class BaseMultiVolumePeer
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(MultiVolumePeer::DATABASE_NAME);
-            $criteria->add(MultiVolumePeer::ID, (array) $values, Criteria::IN);
+            $criteria->add(MultiVolumePeer::PUBLICATION_ID, (array) $values, Criteria::IN);
             // invalidate the cache for this object(s)
             foreach ((array) $values as $singleval) {
                 MultiVolumePeer::removeInstanceFromPool($singleval);
@@ -978,7 +970,7 @@ abstract class BaseMultiVolumePeer
         }
 
         $criteria = new Criteria(MultiVolumePeer::DATABASE_NAME);
-        $criteria->add(MultiVolumePeer::ID, $pk);
+        $criteria->add(MultiVolumePeer::PUBLICATION_ID, $pk);
 
         $v = MultiVolumePeer::doSelect($criteria, $con);
 
@@ -1005,7 +997,7 @@ abstract class BaseMultiVolumePeer
             $objs = array();
         } else {
             $criteria = new Criteria(MultiVolumePeer::DATABASE_NAME);
-            $criteria->add(MultiVolumePeer::ID, $pks, Criteria::IN);
+            $criteria->add(MultiVolumePeer::PUBLICATION_ID, $pks, Criteria::IN);
             $objs = MultiVolumePeer::doSelect($criteria, $con);
         }
 

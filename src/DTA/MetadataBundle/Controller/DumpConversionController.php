@@ -104,6 +104,8 @@ class DumpConversionController extends ORMController {
         $this->propelConnection = \Propel::getConnection(Model\Master\DtaUserPeer::DATABASE_NAME);
         $this->messages[] = array('message' => 'transaction begun on '.Model\Master\DtaUserPeer::DATABASE_NAME);
         
+        $this->createTaskTypes();
+        
         $this->convertUsers($dbh);          // before publication because of last changed by user id
         
 //        $this->convertFonts($dbh);          // before publication because of join with the 
@@ -142,7 +144,7 @@ class DumpConversionController extends ORMController {
             'errors'   => $this->errors,
         ));
     }
-        
+    
     // parses date string in format 2007-12-11 17:39:30 to \DateTime objects
     function parseSQLDate($dateString){
         
@@ -154,6 +156,69 @@ class DumpConversionController extends ORMController {
         $result->setDate($dateTime['year'], $dateTime['month'], $dateTime['day']);
         $result->setTime($dateTime['hour'], $dateTime['minute'], $dateTime['second']);
         return $result;
+    }
+    
+    function createTaskTypes(){
+        
+        $taskTypes = array( 
+            2 => array(
+                'name'=>'Gruppe A: Double Keying',
+                'children' => array(
+                    array(10=>'Textbeschaffung'),
+                    array(58=>'Vorkorrektur'),
+                    array(30=>'Zoning'),
+                    array(50=>'Abtippen'),
+                    array(59=>'Convert2TEIP5'),
+                 )
+            ),
+            3=>array(
+                'name'=>'Gruppe B',
+                'children' => array(
+                    array(31=>'GrobiZoning'),
+                    array(45=>'OCR2')
+                )
+            ),
+            4=>array(
+                'name' => 'Gruppe C',
+                'children' => array(
+                    array(20=>'Scannen (fakultativ)'))
+            ),
+            5=>array(
+                'name'=>'Gruppe D (OCR-Workflow, nach Zoning)',
+                'children' => array(
+                    array(40=>'OCR'),
+                    array(55=>'DON'),
+                    array(60=>'Compare'),
+                    array(65=>'DON2XML'),
+                    array(75=>'CoordinateMerge_Don'),
+                    array(70=>'Nachkorrektur'))
+            )
+        );
+        
+        $root = new Model\Workflow\Tasktype();
+        $root->setId(1)
+            ->setName('Workflows')
+            ->makeRoot()
+            ->save();
+        
+        foreach ($taskTypes as $id => $workflow) {
+            $taskType = new Model\Workflow\Tasktype();
+            $taskType->setId($id)
+                    ->setName($workflow['name'])
+                    ->insertAsLastChildOf($root)
+                    ->save();
+            
+            foreach ($workflow['children'] as $child) {
+                $childType = new Model\Workflow\Tasktype();
+                $childType->setId(array_keys($child)[0])
+                        ->setName($child[array_keys($child)[0]])
+                        ->insertAsLastChildOf($taskType)
+                        ->save();
+                
+            }
+            
+        }
+        
     }
     
     function convertFonts($dbh){
@@ -317,8 +382,8 @@ class DumpConversionController extends ORMController {
             $comment  = $row['dta_comments'];
             $comment .= $row['edition'] !== NULL ? "\nEdition: " . $row['edition'] : "";
             $comment .= $row['availability'] == "0" ? "\nGilt als nicht verfügbar." : "";
-            $comment .= $row['usecase'] !== NULL ? '\nGrund der Korpuszugehörigkeit: ' . $row['usecase'] : "";
-            $comment .= $row['metadata_comment'] !== NULL ? '\nKommentar Planung/Metadaten: ' . $row['metadata_comment'] : "";
+            $comment .= $row['usecase'] !== NULL ? "\nGrund der Korpuszugehörigkeit: " . $row['usecase'] : "";
+            $comment .= $row['metadata_comment'] !== NULL ? "\nKommentar Planung/Metadaten: " . $row['metadata_comment'] : "";
             
             // save ------------------------------------------------------------------------------------
             
@@ -357,11 +422,12 @@ class DumpConversionController extends ORMController {
                                     ->setTreeId($this->publicationIdCounter-1)
                                     ->makeRoot()
                                     ->setType(Model\Data\PublicationPeer::TYPE_MULTIVOLUME)
-                                    ->setTitle($title);
+                                    ->setTitle($title)
+                                    ->save();
                     
                     // create the multi-volume
                     $multiVolume = new Model\Data\MultiVolume();
-                    $multiVolume->setPublication($basePublication)
+                    $multiVolume->setPublicationId($basePublication->getId())
                                 ->setVolumesTotal($row['volumes_total'])
                                 ->save($this->propelConnection);
                     

@@ -30,16 +30,13 @@ abstract class BaseArticlePeer
     const TM_CLASS = 'DTA\\MetadataBundle\\Model\\Data\\map\\ArticleTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 5;
+    const NUM_COLUMNS = 4;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 5;
-
-    /** the column name for the id field */
-    const ID = 'article.id';
+    const NUM_HYDRATE_COLUMNS = 4;
 
     /** the column name for the publication_id field */
     const PUBLICATION_ID = 'article.publication_id';
@@ -72,12 +69,12 @@ abstract class BaseArticlePeer
      * e.g. ArticlePeer::$fieldNames[ArticlePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'PublicationId', 'Pages', 'CreatedAt', 'UpdatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'publicationId', 'pages', 'createdAt', 'updatedAt', ),
-        BasePeer::TYPE_COLNAME => array (ArticlePeer::ID, ArticlePeer::PUBLICATION_ID, ArticlePeer::PAGES, ArticlePeer::CREATED_AT, ArticlePeer::UPDATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PUBLICATION_ID', 'PAGES', 'CREATED_AT', 'UPDATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'publication_id', 'pages', 'created_at', 'updated_at', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+        BasePeer::TYPE_PHPNAME => array ('PublicationId', 'Pages', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('publicationId', 'pages', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (ArticlePeer::PUBLICATION_ID, ArticlePeer::PAGES, ArticlePeer::CREATED_AT, ArticlePeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('PUBLICATION_ID', 'PAGES', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('publication_id', 'pages', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
     /**
@@ -87,12 +84,12 @@ abstract class BaseArticlePeer
      * e.g. ArticlePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'PublicationId' => 1, 'Pages' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'publicationId' => 1, 'pages' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
-        BasePeer::TYPE_COLNAME => array (ArticlePeer::ID => 0, ArticlePeer::PUBLICATION_ID => 1, ArticlePeer::PAGES => 2, ArticlePeer::CREATED_AT => 3, ArticlePeer::UPDATED_AT => 4, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PUBLICATION_ID' => 1, 'PAGES' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'publication_id' => 1, 'pages' => 2, 'created_at' => 3, 'updated_at' => 4, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+        BasePeer::TYPE_PHPNAME => array ('PublicationId' => 0, 'Pages' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('publicationId' => 0, 'pages' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
+        BasePeer::TYPE_COLNAME => array (ArticlePeer::PUBLICATION_ID => 0, ArticlePeer::PAGES => 1, ArticlePeer::CREATED_AT => 2, ArticlePeer::UPDATED_AT => 3, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('PUBLICATION_ID' => 0, 'PAGES' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
+        BasePeer::TYPE_FIELDNAME => array ('publication_id' => 0, 'pages' => 1, 'created_at' => 2, 'updated_at' => 3, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
     /**
@@ -166,13 +163,11 @@ abstract class BaseArticlePeer
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(ArticlePeer::ID);
             $criteria->addSelectColumn(ArticlePeer::PUBLICATION_ID);
             $criteria->addSelectColumn(ArticlePeer::PAGES);
             $criteria->addSelectColumn(ArticlePeer::CREATED_AT);
             $criteria->addSelectColumn(ArticlePeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.publication_id');
             $criteria->addSelectColumn($alias . '.pages');
             $criteria->addSelectColumn($alias . '.created_at');
@@ -303,7 +298,7 @@ abstract class BaseArticlePeer
     {
         if (Propel::isInstancePoolingEnabled()) {
             if ($key === null) {
-                $key = (string) $obj->getId();
+                $key = (string) $obj->getPublicationId();
             } // if key === null
             ArticlePeer::$instances[$key] = $obj;
         }
@@ -326,7 +321,7 @@ abstract class BaseArticlePeer
     {
         if (Propel::isInstancePoolingEnabled() && $value !== null) {
             if (is_object($value) && $value instanceof Article) {
-                $key = (string) $value->getId();
+                $key = (string) $value->getPublicationId();
             } elseif (is_scalar($value)) {
                 // assume we've been passed a primary key
                 $key = (string) $value;
@@ -584,7 +579,8 @@ abstract class BaseArticlePeer
                 } // if obj2 already loaded
 
                 // Add the $obj1 (Article) to $obj2 (Publication)
-                $obj2->addArticle($obj1);
+                // one to one relationship
+                $obj1->setPublication($obj2);
 
             } // if joined row was not null
 
@@ -705,7 +701,7 @@ abstract class BaseArticlePeer
                 } // if obj2 loaded
 
                 // Add the $obj1 (Article) to the collection in $obj2 (Publication)
-                $obj2->addArticle($obj1);
+                $obj1->setPublication($obj2);
             } // if joined row not null
 
             $results[] = $obj1;
@@ -770,10 +766,6 @@ abstract class BaseArticlePeer
             $criteria = $values->buildCriteria(); // build Criteria from Article object
         }
 
-        if ($criteria->containsKey(ArticlePeer::ID) && $criteria->keyContainsValue(ArticlePeer::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ArticlePeer::ID.')');
-        }
-
 
         // Set the correct dbName
         $criteria->setDbName(ArticlePeer::DATABASE_NAME);
@@ -812,10 +804,10 @@ abstract class BaseArticlePeer
         if ($values instanceof Criteria) {
             $criteria = clone $values; // rename for clarity
 
-            $comparison = $criteria->getComparison(ArticlePeer::ID);
-            $value = $criteria->remove(ArticlePeer::ID);
+            $comparison = $criteria->getComparison(ArticlePeer::PUBLICATION_ID);
+            $value = $criteria->remove(ArticlePeer::PUBLICATION_ID);
             if ($value) {
-                $selectCriteria->add(ArticlePeer::ID, $value, $comparison);
+                $selectCriteria->add(ArticlePeer::PUBLICATION_ID, $value, $comparison);
             } else {
                 $selectCriteria->setPrimaryTableName(ArticlePeer::TABLE_NAME);
             }
@@ -894,7 +886,7 @@ abstract class BaseArticlePeer
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(ArticlePeer::DATABASE_NAME);
-            $criteria->add(ArticlePeer::ID, (array) $values, Criteria::IN);
+            $criteria->add(ArticlePeer::PUBLICATION_ID, (array) $values, Criteria::IN);
             // invalidate the cache for this object(s)
             foreach ((array) $values as $singleval) {
                 ArticlePeer::removeInstanceFromPool($singleval);
@@ -978,7 +970,7 @@ abstract class BaseArticlePeer
         }
 
         $criteria = new Criteria(ArticlePeer::DATABASE_NAME);
-        $criteria->add(ArticlePeer::ID, $pk);
+        $criteria->add(ArticlePeer::PUBLICATION_ID, $pk);
 
         $v = ArticlePeer::doSelect($criteria, $con);
 
@@ -1005,7 +997,7 @@ abstract class BaseArticlePeer
             $objs = array();
         } else {
             $criteria = new Criteria(ArticlePeer::DATABASE_NAME);
-            $criteria->add(ArticlePeer::ID, $pks, Criteria::IN);
+            $criteria->add(ArticlePeer::PUBLICATION_ID, $pks, Criteria::IN);
             $objs = ArticlePeer::doSelect($criteria, $con);
         }
 
