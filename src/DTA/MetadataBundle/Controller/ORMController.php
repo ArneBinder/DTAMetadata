@@ -30,10 +30,6 @@ class ORMController extends DTADomainController {
      */
     public function genericDeleteOneAction(Request $request, $package, $className, $recordId) {
 
-        if($this->package === null){
-            return $this->useSpecializedImplementation($package, __METHOD__, array('request'=>$request, 'package'=>$package, 'className'=>$className, 'recordId' => $recordId));
-        }
-        
         // get confirmation
         if ( ! $request->isMethod("POST")) {
 
@@ -81,10 +77,6 @@ class ORMController extends DTADomainController {
      * @param int    $recordId     
      */
     public function genericViewAction(Request $request, $package, $className, $recordId) {
-        
-        if($this->package === null){ // called through a HTTP request, not from another controller
-            return $this->useSpecializedImplementation($package, __METHOD__, array('package'=>$package, 'className'=>$className, 'recordId' => $recordId));
-        }
         
         $classNames = $this->relatedClassNames($package, $className);
 
@@ -160,76 +152,74 @@ class ORMController extends DTADomainController {
         // TODO compare form_row (form_div_layout.html.twig) error reporting mechanisms to the overriden version of form_row (viewConfigurationForModels.html.twig)
         // and test whether they work on different inputs.
         
+        // generic create procedure for the model entity
         $package = $entity['package'];
         $className = $entity['className'];
         $recordId = $entity['recordId'];
-        
         $classNames = $this->relatedClassNames($package, $className);
         
         if($recordId == 0){
-            
             // create new object from class name
             $obj = new $classNames['model'];
-            
         } else {
             // fetch the object from the database
             $queryObject = $classNames['model']::getRowViewQueryObject();
-//            $queryObject = $classNames['query']::create();
             $obj = $queryObject->findOneById($recordId);
             if( is_null($obj) ){
                 return array('transaction'=>'recordNotFound');
             }
-            
         }
 
         $form = $this->createForm(new $classNames['formType'], $obj, $formTypeOptions);
+        $form->handleRequest($request);
 
-        // handle form submission
-        if ($request->isMethod("POST")) {
-            
-            $form->handleRequest($request);
+        $errors = array();
+        
+        // symfony validation: required fields etc.
+        // also fails if the request doesn't contain POST data (form is displayed first, no submitted data)
+        if ($form->isValid()) {
 
-            // symfony validation: required fields etc.
-            if ($form->isValid()) {
+            // propel validation: unique constraints etc.
+            if ($obj->validate()) {
 
-                // propel validation: unique constraints etc.
-                if ($obj->validate()) {
-
-                    // user defined pre save logic closure.
-                    if(is_object($preSaveLogic) && ($preSaveLogic instanceof Closure)){
-                        echo "executing pre-save logic";
-                        $preSaveLogic();
-                    }
-                    
-//                    $this->saveRecursively($form);
-                    $obj->save();
-                    
-                    // return edited/created entity ID as transaction success receipt
-                    return array(
-                        'transaction'=>'complete', 
-                        'recordId'=>$form->getData()->getId(),
-                        'object' => $obj,
-                    );
-                    
-                } else { // propel validation fails
-
-                    // add propel validation messages to flash bag
-                    foreach ($obj->getValidationFailures() as $failure) {
-                        $this->addErrorFlash($failure->getMessage());
-                    }
+                // user defined pre save logic closure.
+                if(is_object($preSaveLogic) && ($preSaveLogic instanceof Closure)){
+                    echo "executing pre-save logic";
+                    $preSaveLogic();
                 }
-            } else { // symfony form validation fails
 
-                // add symfony validation messages to flash bag
-                foreach ($form->getErrors() as $error) {
-                    $this->addErrorFlash($error->getMessage());
+                $obj->save();
+
+                // return edited/created entity ID as transaction success receipt
+                return array(
+                    'transaction'=>'complete', 
+                    'recordId'=>$form->getData()->getId(),
+                    'object' => $obj,
+                );
+
+            } else { // propel validation fails
+
+                $errors[] = "Propel validation failed.";
+                // add propel validation messages to flash bag
+                foreach ($obj->getValidationFailures() as $failure) {
+                    $errors[] = $failure->getMessage();
+                    $this->addErrorFlash($failure->getMessage());
                 }
+            }
+        } else { // symfony form validation fails
+
+            // add symfony validation messages to flash bag
+            $errors[] = "Symfony validation failed.";
+            foreach ($form->getErrors() as $error) {
+                $errors[] = $error->getMessage();
+                $this->addErrorFlash($error->getMessage());
             }
         }
         
         return array(
             'transaction'   => $recordId == 0 ? 'create' : 'edit', 
-            'form'          => $form
+            'form'          => $form,
+            'errors'        => $errors,
         );
         
     }
@@ -243,10 +233,6 @@ class ORMController extends DTADomainController {
      * @param int       $recordId           The id of the entity to edit, 0 if new 
      */
     public function genericCreateOrEditAction(Request $request, $package, $className, $recordId) {
-        
-        if($this->package === null){
-            return $this->useSpecializedImplementation($package, __METHOD__, array('request'=>$request, 'package'=>$package, 'className'=>$className, 'recordId' => $recordId));
-        }
         
         $result = $this->genericCreateOrEdit(
                 $request, 
@@ -275,9 +261,28 @@ class ORMController extends DTADomainController {
                     'transaction' => $result['transaction'],    // whether the form is for edit or create
                     'className' => $className,
                     'recordId' => $recordId,
+                    //'debugCarl' => $result['form']->getErrorsAsString() //$this->getErrorMessages($result['form']),
                 ));
         }
     }
+    
+//    private function getErrorMessages(\Symfony\Component\Form\Form $form) {      
+//        $errors = array();
+//        $form->getErrors();
+//        if ($form->hasChildren()) {
+//            foreach ($form->getChildren() as $child) {
+//                if (!$child->isValid()) {
+//                    $errors[$child->getName()] = $this->getErrorMessages($child);
+//                }
+//            }
+//        } else {
+//            foreach ($form->getErrors() as $key => $error) {
+//                $errors[] = $error->getMessage();
+//            }   
+//        }
+//        
+//        return $errors;
+//    }
     
     /**
      * Renders the form for the model without any surrounding elements. 
@@ -292,11 +297,6 @@ class ORMController extends DTADomainController {
      */
     public function ajaxModalFormAction(Request $request, $package, $className, $modalId, $property = "Id", $recordId = 0) {
 
-        if($this->package === null){
-            return $this->useSpecializedImplementation($package, __METHOD__, array('request'=>$request, 
-                'package'=>$package, 'className'=>$className, 'modalId' => $modalId, 'recordId' => $recordId, 'property'=>$property));
-        }
-        
         $result = $this->genericCreateOrEdit(
                 $request, 
                 array(
@@ -363,26 +363,27 @@ class ORMController extends DTADomainController {
     
     /**
      * Visits recursively all nested form elements and saves them.
+     * Deprecated: this is propel's job. implement your own isChanged() method if propel doesn't save things recursively.
      * @param Form $form The form object that contains the data defined by the top level form type (PersonType, NamefragmentType, ...)
      */
-    protected function saveRecursively(\Symfony\Component\Form\Form $form) {
-
-        $entity = $form->getData();
-        if (is_object($entity)) {
-            $rc = new \ReflectionClass($entity);
-            if($rc->getName() === "PropelObjectCollection"){
-                foreach($entity as $e){
-                    $e->save();                    
-                }
-            } elseif ($rc->hasMethod('save')){
-                $entity->save();
-            }
-        }
-
-        foreach ($form->all() as $child) {
-            $this->saveRecursively($child);
-        }
-    }
+//    protected function saveRecursively(\Symfony\Component\Form\Form $form) {
+//
+//        $entity = $form->getData();
+//        if (is_object($entity)) {
+//            $rc = new \ReflectionClass($entity);
+//            if($rc->getName() === "PropelObjectCollection"){
+//                foreach($entity as $e){
+//                    $e->save();                    
+//                }
+//            } elseif ($rc->hasMethod('save')){
+//                $entity->save();
+//            }
+//        }
+//
+//        foreach ($form->all() as $child) {
+//            $this->saveRecursively($child);
+//        }
+//    }
     
 }
 

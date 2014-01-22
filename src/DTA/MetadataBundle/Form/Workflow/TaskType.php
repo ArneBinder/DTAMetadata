@@ -23,8 +23,8 @@ class TaskType extends BaseAbstractType
             'property' => 'name',
             'required' => true
         ));
-        $builder->add('start_date'); // , null, array('years'=>array('2013','2014','2015'),'widget' => 'choice')
-        $builder->add('end_date');
+        $builder->add('start_date', null, array('years'=>range(2005,2020),'widget' => 'choice'));
+        $builder->add('end_date', null, array('years'=>range(2005,2020),'widget' => 'choice'));
         $builder->add('comments');
         $builder->add('DTAUser', 'model', array(
             'property' => 'username',

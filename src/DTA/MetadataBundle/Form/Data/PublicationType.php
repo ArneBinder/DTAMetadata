@@ -88,9 +88,9 @@ class PublicationType extends BaseAbstractType
         ));
         
         $builder->add('doi', 'text', array('required' => false,'read_only' => true,));
+        $builder->add('wwwready');
         $builder->add('comment');
         $builder->add('format', 'text', array('required' => false));
-        $builder->add('directoryname', 'text', array('required' => false));
         
 //        // with tagging
 //        $builder->add('languages', new SelectOrAddType(), array(
@@ -132,6 +132,14 @@ class PublicationType extends BaseAbstractType
 //        $builder->add('editionNumerical', null, array(
 //            'label' => 'Edition (numerisch)',
 //        ));
+        
+        
+        $builder->add('publicationrelatedbyfirsteditionpublicationid', new SelectOrAddType(), array(
+            'class' => 'DTA\MetadataBundle\Model\Data\Publication',
+            'property' => 'SelectBoxString',
+            'label' => 'Erstauflage',
+            'required' => false,
+        ));
         
         $builder->add('publishingcompany', new SelectOrAddType(), array(
             'class' => 'DTA\MetadataBundle\Model\Data\Publishingcompany',

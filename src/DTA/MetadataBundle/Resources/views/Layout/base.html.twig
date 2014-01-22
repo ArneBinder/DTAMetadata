@@ -14,25 +14,11 @@
         <div class="container-fluid" style="padding: 0 30px;">
             
         {#  ---------------------------------------------
-            Print session flash (status results of actions)
-            --------------------------------------------- #}
-            
-            {% for flashType in ['success', 'warning', 'error'] %} 
-                {% for flash in app.session.flashbag.get(flashType) %} 
-                <div class="alert alert-{{flashType}}">
-                    <button type="button" class="close" data-dismiss="alert">&times;</button>
-                    {{ flash }}
-                </div>
-                {% endfor %} 
-            
-            {% endfor %}
-            
-        {#  ---------------------------------------------
             The content goes into the core block 
             --------------------------------------------- #}
                 
             {# fluid: Allow stacking of sidebar and main content if too few space is available #}
-            <div class="row" id="core" style="padding: 0 0px">
+            <div class="row" id="core" style="padding-left: 10px">
                 {% block core %}
                 {% endblock %}
             </div><!--/row-->

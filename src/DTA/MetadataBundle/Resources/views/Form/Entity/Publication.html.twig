@@ -1,3 +1,9 @@
+{# This template controls how the form for the shared core publication data looks like. 
+   It covers all form fields that the book publication type requires (title, author, sources, etc.).
+   Specialized publication types can reuse it by overriding any number of blocks (work, publication, sources, etc.)
+
+   Some macros (e.g. "dta.beginFieldset") are defined in buildingBlocks.html.twig (in the views/Form directory).
+#}
 
 {% import "DTAMetadataBundle:form:buildingBlocks.html.twig" as dta %}
 
@@ -18,22 +24,19 @@
     {{ form_row(form.PersonPublications) }}
     
     {% set modalId = 'moreOptionsForPublication' %}
-    
     {{ dta.beginLabelledContent({'labelCaption':'', 'controlId':'none'}) }}
         {{ dta.btnLaunchModal({'id':modalId, 'caption':'weitere Angaben...'})}}
     {{ dta.endLabelledContent() }}
-
-
     {{ dta.beginModal({
             'id': modalId,
             'title': 'Weitere Angaben zum Werk',
        })            
     }}
 
+        {{ form_row(form.wwwready) }}
         {{ form_row(form.doi) }}
         {{ form_row(form.comment) }}
         {{ form_row(form.format) }}
-        {{ form_row(form.directoryname) }}
 
     {{ dta.endModal({
             'id': modalId,
@@ -41,6 +44,8 @@
             'hideCancelButton': true,
        })
     }}
+
+    {{ form_row(form.publicationrelatedbyfirsteditionpublicationid) }}
 
 {{ dta.endFieldset()}}
 {% endblock work %}
@@ -110,11 +115,28 @@
 {{ dta.endFieldset()}}
 {% endblock %}
 
-{% block tasks %}
 {{ dta.beginFieldset({'caption':'Tasks'})}}
-    {{ form_row(form.Tasks) }}
+    {% set modalId = 'tasks' %}
+    {{ dta.beginLabelledContent({'labelCaption':'', 'controlId':'none'}) }}
+        {{ dta.btnLaunchModal({'id':modalId, 'caption':'tasks...'})}}
+    {{ dta.endLabelledContent() }}
+    {{ dta.beginModal({
+            'id': modalId,
+            'title': 'Tasks',
+       })            
+    }}
+    {% block tasks %}
+        {{ form_row(form.Tasks) }}
+    {% endblock %}
+
+    {{ dta.endModal({
+            'id': modalId,
+            'confirm': {'caption': 'Fertig', 'target': '#', 'attr':{'data-dismiss':'modal'} },
+            'hideCancelButton': true,
+       })
+    }}
 {{ dta.endFieldset()}}
-{% endblock %}
+
     
 
 {{ form_rest(form) }}
