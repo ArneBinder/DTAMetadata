@@ -49,7 +49,7 @@ class DumpConversionController extends ORMController {
         try {
             return new \PDO($dsn, $this->username, $this->password);
         } catch (\PDOException $e) {
-            throw new Exception("Connection failed: " . $e->getMessage());
+            throw new \Exception("Connection failed: " . $e->getMessage());
         }
     }
         
@@ -76,7 +76,7 @@ class DumpConversionController extends ORMController {
     function convertAction() {
         
         // during conversion, a lot of memory is allocated
-        ini_set('memory_limit', '600M');
+        ini_set('memory_limit', '1200M');
         ini_set('max_execution_time', 300); //300 seconds = 5 minutes
         //
         // stores warning messages generated during the conversion
@@ -93,13 +93,14 @@ class DumpConversionController extends ORMController {
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // ERASE ALL DATA FROM THE WORKING (TARGET DATABASE) ^^^^^^^
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // 
-        // connect to imported database
+
+        // connect to imported (legacy) database
         $dbh = $this->connect();
             
         // trim and NULL empty strings, remove some old records
         $this->cleanUpOldDatabase($dbh);
-            
+        // assert that certain assumptions hold for the dump (unused fields)
+        $this->checkOldDatabase($dbh);
         
         $this->propelConnection = \Propel::getConnection(Model\Master\DtaUserPeer::DATABASE_NAME);
         $this->messages[] = array('message' => 'transaction begun on '.Model\Master\DtaUserPeer::DATABASE_NAME);
@@ -108,11 +109,16 @@ class DumpConversionController extends ORMController {
         
         $this->convertUsers($dbh);          // before publication because of last changed by user id
         
-//        $this->convertFonts($dbh);          // before publication because of join with the 
+        $this->convertFonts($dbh);          // before publication
+        
         
         $this->propelConnection->beginTransaction();
         $this->convertPublications($dbh);
         $this->propelConnection->commit();
+
+        $this->convertFirstEditions($dbh);  // after publication because a first edition entity knows the publication id that links to it
+        
+        $this->convertPublicationGroups($dbh);
         
         $this->propelConnection->beginTransaction();
         $this->convertPartners($dbh);
@@ -222,16 +228,21 @@ class DumpConversionController extends ORMController {
     }
     
     function convertFonts($dbh){
-        throwException(new \Exception("Font conversion not implemented yet."));
+
+        $rawData = "
+            SELECT 
+                schriftart as `font_name`
+            FROM metadaten WHERE length(schriftart) > 0
+            GROUP BY schriftart;";
         
-//        
-//        $userData = array();
-//        foreach ($userList as $user) {
-//            $userData[] = '("' . $user['first_name'] . '", "' . $user['last_name'] . '")';
-//        }
-//        $query = 'INSERT INTO users (first_name,last_name) VALUES' . implode(',', $userData);
-//        mysql_query($query);
-                
+        foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+            // encode all data from the old database as UTF8
+            array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
+            
+            $font = new Model\Data\Font();
+            $font->setName($row['font_name'])
+                 ->save();
+        }
     }
     
     /** Returns an array of multi-volumed publications according to the criteria of the old system:
@@ -249,12 +260,12 @@ class DumpConversionController extends ORMController {
         
         $rawData = "
             SELECT 
-                title
-                ,autor1_lastname
-                ,count(*) as `count` 
-            FROM book 
-            GROUP BY title, autor1_lastname
-            HAVING `count` > 1
+                title, autor1_lastname, count(*) as `count`
+            FROM
+                book join metadaten on book.id_book = metadaten.id_book
+            WHERE 
+                    metadaten.type in ('MM', 'MMS')
+            GROUP BY title , autor1_lastname
             ;";
         
         $multiVolumes = array();
@@ -274,6 +285,138 @@ class DumpConversionController extends ORMController {
         return $multiVolumes;
     }
     
+    private function createMultiVolume($row, &$publication, $title, &$multiVolumes){
+        
+        // the parent publication (a multi-volume) to which the volume shall be added
+        $multiVolume = $multiVolumes[$row['title'].$row['autor1_lastname']]['multiVolume'];
+
+        // create the multi-volume if it doesn't already exist
+        if($multiVolume === NULL){
+
+            // create a new publication for the multi-volume
+            $basePublication = new Model\Data\Publication();
+            $basePublication->setId($this->publicationIdCounter++)
+                            ->setTreeId($this->publicationIdCounter-1)
+                            ->makeRoot()
+                            ->setType(Model\Data\PublicationPeer::TYPE_MULTIVOLUME)
+                            ->setTitle($title)
+                            ->save();
+
+            // create the multi-volume
+            $multiVolume = new Model\Data\MultiVolume();
+            $multiVolume->setId($basePublication->getId())
+                        ->setVolumesTotal($row['volumes_total'])
+                        ->save($this->propelConnection);
+
+            // make the multi-volume accessible to upcoming volumes of this work
+            $multiVolumes[$row['title'].$row['autor1_lastname']]['multiVolume'] = $multiVolume;
+
+        }
+
+        // check if the specified number of volumes matches the actual number of volumes in the database
+        if($multiVolumes[$row['title'].$row['autor1_lastname']]['volumes_present'] != $row['volumes_total'])
+            $this->warnings[] = array(
+                'message'=>'Angabe der Gesamtzahl Bände weicht von den tatsächlich in der Datenbank vorhandenen Bänden ab.'
+                ,'Titel'=>$row['title']
+                ,'Autor'=>$row['autor1_lastname']
+                ,'book.id_book'=>$row['id']
+                ,'In der Datenbank vorhanden'=>$multiVolumes[$row['title'].$row['autor1_lastname']]['volumes_present']
+                ,'Ausgegeben'=>$row['volumes_total']
+        );
+
+        // link the volume to its containing multi-volume
+
+        $publication->setTreeId($this->publicationIdCounter-1)
+//                        ->setParent($multiVolume->getPublication())
+                    ->insertAsLastChildOf($multiVolume->getPublication())
+                    ->setType(Model\Data\PublicationPeer::TYPE_VOLUME)
+                    ->save($this->propelConnection);
+
+        $volume = new Model\Data\Volume();
+        $volume->setVolumeDescription($row['volume_description'])
+               ->setVolumeNumeric($row['volume_numeric'])
+               ->setPublication($publication)
+               ->save($this->propelConnection);
+        
+        
+    }
+    
+    /** Adds the information about first edition (Erstausgabe) to the publication.  
+        Since mostly, only a year, location and a publishing company are needed, the entire information is stored in a plain text format. */
+    function convertFirstEditions($dbh){
+        
+        $rawData = "SELECT 
+                        book.id_book as id,
+                        first_pub_date,
+                        first_pub_name,
+                        first_pub_location,
+                        first_pub_verlag,
+                        first_reihe_titel,
+                        first_seiten,
+                        first_reihe_band,
+                        first_comments,
+                        CASE first_status
+                            WHEN '0' THEN NULL
+                            WHEN '1' THEN _utf8'Erstveröffentlichung'
+                            WHEN '2' THEN _utf8'Keine Erstveröffentlichung'
+                            WHEN '3' THEN _utf8'Unklar, ob Erstveröffentlichung'
+                            ELSE first_status
+                        END as `first_status`
+                    FROM
+                        book
+                    WHERE
+                        first_pub_date is not null
+                            OR first_pub_location is not null
+                            OR first_pub_verlag is not null
+                            OR first_reihe_titel is not null
+                            OR first_seiten is not null
+                            OR first_reihe_band is not null
+                            OR first_comments is not null
+                            OR (first_status is not null and first_status > 0)";
+        
+        foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+            
+            // encode all data from the old database as UTF8
+            array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
+
+            $fields = array(
+                'first_status',
+                'first_pub_date',
+                'first_pub_name',
+                'first_pub_verlag',
+                'first_pub_location',
+                'first_reihe_titel',
+                'first_reihe_band',
+                'first_seiten',
+                'first_comments');
+            $labels = array(
+                'Status',
+                'Erschienen', 
+                'Herausgeber',
+                'Verlag', 
+                'Ort',
+                'Titel (R/Z)',
+                'Band (R/Z)',
+                'Seitenangabe', 
+                'Kommentar', 
+            );
+            
+            $firstEditionData = "";
+            for ($fieldIdx = 0; $fieldIdx < count($fields); $fieldIdx++) {
+                if($row[$fields[$fieldIdx]] !== NULL ){
+                    $firstEditionData .= $labels[$fieldIdx] . ": " . $row[$fields[$fieldIdx]] . "\n";
+                }
+            }
+            
+            $publication = Model\Data\PublicationQuery::create()
+                    ->findOneById($row['id']);
+            $publication->setFirsteditionComment($firstEditionData)
+                        ->save();
+            
+            
+        }
+            
+    }
     
     function convertPublications($dbh) {
         
@@ -286,6 +429,7 @@ class DumpConversionController extends ORMController {
                 ,other_title as `subtitle2`
                 ,short_title as `shorttitle`
                 ,dta_auflage as `printrun`
+                ,dta_bibl_angabe as `citation`
                 ,FIND_IN_SET(sources.source,'china,don,kt,n/a') as `source_id`
 
                 ,IF(LENGTH(`year`) < 3, NULL, `year`) as `year` -- to sort out a 0 entry
@@ -301,15 +445,28 @@ class DumpConversionController extends ORMController {
                 ,dta_comments as `dta_comments`
                 ,special_comment as encoding_comment
                 ,metadaten.planung as `metadata_comment`
+                ,dta_comment2 as `edition_comment`
                 
                 ,dirname as `dirname`
                 
                 ,genre as `genre`
                 ,untergenre as `subgenre`
+                ,metadaten.dwds_kategorie1
+                ,metadaten.dwds_unterkategorie1
+                ,metadaten.dwds_kategorie2
+                ,metadaten.dwds_unterkategorie2
+                ,type as legacy_type
                 ,CASE type
-                    WHEN 'Reihe' THEN NULL
-                    WHEN 'X'     THEN NULL
-                    WHEN 'Zeitschrift' THEN 'J'
+                    WHEN 'M'  THEN 'BOOK'
+                    WHEN 'MS' THEN 'BOOK'
+                    WHEN 'X'     THEN 'BOOK'
+                    WHEN 'MM' THEN 'VOLUME'
+                    WHEN 'MMS' THEN 'VOLUME'
+                    WHEN 'DM' THEN 'CHAPTER'
+                    WHEN 'DS' THEN 'CHAPTER'
+                    WHEN 'JA' THEN 'ARTICLE'
+                    WHEN 'Reihe' THEN 'SERIES'
+                    WHEN 'Zeitschrift' THEN 'JOURNAL'
                     ELSE type
                 END as `publication_type`
                 
@@ -321,6 +478,7 @@ class DumpConversionController extends ORMController {
                 ,doi as `doi`
                 ,umfang as `numpages`
                 ,umfang_normiert as `numpages_numeric`
+                ,dta_seiten as `pages`
                 ,book.log_last_change
                 ,user.id_user as `updated_by`
                 ,usecase as `usecase`
@@ -349,7 +507,7 @@ class DumpConversionController extends ORMController {
             $title = new Model\Data\Title();
             
             // iterate over title columns and create titlefragments of the according type
-            $titleColumns = array("title"=>"Haupttitel", "subtitle"=>"Untertitel", "subtitle2"=>"Untertitel", "shorttitle"=>"Kurztitel", "printrun"=>"Auflage");
+            $titleColumns = array("title"=>"Haupttitel", "subtitle"=>"Untertitel", "subtitle2"=>"Untertitel", "shorttitle"=>"Kurztitel");
             $titleFragmentIdx = 1;
             foreach($titleColumns as $column=>$typeName){
                 if($row[$column] !== NULL){
@@ -395,100 +553,94 @@ class DumpConversionController extends ORMController {
                         ->setDatespecificationRelatedByPublicationdateId($publishedDate)
                         ->setNumpages($row['numpages'])
                         ->setNumpagesnumeric($row['numpages_numeric'])
+                        ->setCitation($row['citation'])
+                        ->setPrintrun($row['printrun'])
                         ->setComment($comment)
+                        ->setFirstpage($row['first_text_page'])
+                        ->setUsedcopylocationId($row['used_copy_location'])
+                        ->setEditioncomment($row['edition_comment'])
                         ->setEncodingComment($row['encoding_comment'])
                         ->setDoi($row['doi'])
                         ->setFormat($row['format'])
                         ->setSourceId($row['source_id'])
                         ->setLegacygenre($row['genre'])
                         ->setLegacysubgenre($row['subgenre'])
-                        ->setLegacytype($row['publication_type'])
+                        ->setLegacyDwdsCategory1($row['dwds_kategorie1'])
+                        ->setLegacyDwdsSubcategory1($row['dwds_unterkategorie1'])
+                        ->setLegacyDwdsCategory2($row['dwds_kategorie2'])
+                        ->setLegacyDwdsSubcategory2($row['dwds_unterkategorie2'])
+                        ->setLegacytype($row['legacy_type'])
                         ->setCreatedAt($this->parseSQLDate($row['dta_insert_date']))
                         ->setUpdatedAt($this->parseSQLDate($row['log_last_change']))
                         ->setLastChangedByUserId($row['updated_by']);
+
             
-            // if this row corresponds to a volume of a multi-volume publication
             if(array_key_exists($row['title'].$row['autor1_lastname'], $multiVolumes)){
                 
-                // the parent publication (a multi-volume) to which the volume shall be added
-                $multiVolume = $multiVolumes[$row['title'].$row['autor1_lastname']]['multiVolume'];
+                $this->createMultiVolume($row, $publication, $title, $multiVolumes);
                 
-                // create the multi-volume if it doesn't already exist
-                if($multiVolume === NULL){
-                    
-                    // create a new publication for the multi-volume
-                    $basePublication = new Model\Data\Publication();
-                    $basePublication->setId($this->publicationIdCounter++)
-                                    ->setTreeId($this->publicationIdCounter-1)
-                                    ->makeRoot()
-                                    ->setType(Model\Data\PublicationPeer::TYPE_MULTIVOLUME)
-                                    ->setTitle($title)
-                                    ->save();
-                    
-                    // create the multi-volume
-                    $multiVolume = new Model\Data\MultiVolume();
-                    $multiVolume->setPublicationId($basePublication->getId())
-                                ->setVolumesTotal($row['volumes_total'])
-                                ->save($this->propelConnection);
-                    
-                    // make the multi-volume accessible to upcoming volumes of this work
-                    $multiVolumes[$row['title'].$row['autor1_lastname']]['multiVolume'] = $multiVolume;
-                    
-                }
-                
-                // check if the specified number of volumes matches the actual number of volumes in the database
-                if($multiVolumes[$row['title'].$row['autor1_lastname']]['volumes_present'] != $row['volumes_total'])
-                    $this->warnings[] = array(
-                        'message'=>'Angabe der Gesamtzahl Bände weicht von den tatsächlich in der Datenbank vorhandenen Bänden ab.'
-                        ,'Titel'=>$row['title']
-                        ,'Autor'=>$row['autor1_lastname']
-                        ,'book.id_book'=>$row['id']
-                        ,'In der Datenbank vorhanden'=>$multiVolumes[$row['title'].$row['autor1_lastname']]['volumes_present']
-                        ,'Ausgegeben'=>$row['volumes_total']
-                );
-                
-                // link the volume to its containing multi-volume
-                
-                $publication->setTreeId($this->publicationIdCounter-1)
-//                        ->setParent($multiVolume->getPublication())
-                            ->insertAsLastChildOf($multiVolume->getPublication())
-                            ->setType(Model\Data\PublicationPeer::TYPE_VOLUME)
-                            ->save($this->propelConnection);
-                
-                $volume = new Model\Data\Volume();
-                $volume->setVolumeDescription($row['volume_description'])
-                       ->setVolumeNumeric($row['volume_numeric'])
-                       ->setPublication($publication)
-                       ->save($this->propelConnection);
             } else {
+                
                 // for non volumes, just save a basic publication
                 switch($row['publication_type']){
-                    case "M":
-                        $publication->setType (Model\Data\PublicationPeer::TYPE_BOOK);
+                    case "ARTICLE":
+                        $article = new Model\Data\Article();
+                        $article->setPublication($publication)
+                                ->setPages($row['pages'])
+                                ->save();
                         break;
-                    case "DM":
-                        $publication->setType (Model\Data\PublicationPeer::TYPE_CHAPTER);
-                        break;
-                    case "J":
-                        $publication->setType (Model\Data\PublicationPeer::TYPE_JOURNAL);
-                        break;
-                    case "JA":
-                        $publication->setType (Model\Data\PublicationPeer::TYPE_ARTICLE);
-                        break;
-                    default:
-                        $publication->setType (Model\Data\PublicationPeer::TYPE_BOOK);
+                    case "CHAPTER":
+                        $chapter = new Model\Data\Chapter();
+                        $chapter->setPublication($publication)
+                                ->setPages($row['pages'])
+                                ->save();
                         break;
                 }
                 
-                $publication->save($this->propelConnection);
+                $publication->setType($row['publication_type'])
+                            ->save($this->propelConnection);
                 
             }
         
             
         }// end for book rows
     }
+    
+    function convertPublicationGroups($dbh){
         
+        $rawData = "SELECT 
+                        book.id_book as publication_id, 
+                        groups.id_group as group_id, 
+                        group_name,
+                        groups.log_last_change as 'last_change'
+                    FROM groups, group_books, book
+                    WHERE
+                            book.id_book = group_books.id_book
+                            AND group_books.id_group = groups.id_group
+                    ORDER BY groups.id_group";
+            
+        $lastGroupId = -1;
+        $group = NULL;
+        foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+            // encode all data from the old database as UTF8
+            array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
+
+            if($row['group_id'] !== $lastGroupId){
+                
+                $group = new Model\Workflow\Publicationgroup();
+                $group->setId($row['group_id'])
+                      ->setName($row['group_name'])
+                      ->setUpdatedAt($this->parseSQLDate($row['last_change']))
+                      ->save();
+                
+                $lastGroupId = $row['group_id'];
+            }
+            
+            $publication = Model\Data\PublicationQuery::create()->findOneById($row['publication_id']);
+            $group->addPublication($publication);
+        }
         
+    }
     /* ---------------------------------------------------------------------
      * partner
      * ------------------------------------------------------------------ */
@@ -496,7 +648,6 @@ class DumpConversionController extends ORMController {
         
         $rawData = "SELECT * FROM partner";
             
-        $partner;
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
             array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
@@ -599,8 +750,7 @@ class DumpConversionController extends ORMController {
             if($row['publication_id'] === NULL){
                 $this->errors[] = array(
                     'message' => 'Task verweist auf nicht-existente Publikation.',
-                    'action'  => 'Datensatz übersprungen',
-                    'task_id'     => $row['task_id']
+                    'action'  => "Task $row[task_id] übersprungen",
                     );
                 continue;
             }
@@ -749,17 +899,18 @@ class DumpConversionController extends ORMController {
         
         // merge autor1_xxx and autor2_xxx columns into one table
         // autor3_xxx is never used.
-        // TODO: two rows have a autor1_spelling entry ("Lutz" and Friedrich "<II., Preußen, König>")
         $rawData = "SELECT  
                       id_book
-                      ,firstname as firstname       -- NULLIF: replace empty strings with NULL
-                      ,lastname as lastname
-                      ,pnd as pnd
+                      ,firstname 
+                      ,lastname 
+                      ,spelling
+                      ,pnd
                     FROM (
                         SELECT 
                             id_book
                             ,autor1_prename as firstname 
                             ,autor1_lastname as lastname
+                            ,autor1_spelling as spelling
                             ,autor1_pnd as pnd 
                         FROM book
                         WHERE autor1_prename <> '' OR autor1_lastname <> '' OR autor1_pnd <> ''
@@ -767,13 +918,12 @@ class DumpConversionController extends ORMController {
                         SELECT 
                             id_book
                             ,autor2_prename as firstname
-                            ,autor2_lastname as lastname 
+                            ,autor2_lastname as lastname
+                            ,NULL as spelling
                             ,autor2_pnd as pnd 
                         FROM book
                         WHERE autor2_prename <> '' OR autor2_lastname <> '' OR autor2_pnd <> ''
                     ) as names 
-                    -- GROUP BY
-                    --    lastname, firstname, pnd
                     ORDER BY
                         lastname, 
                         firstname, 
@@ -822,6 +972,8 @@ class DumpConversionController extends ORMController {
                     $name->addNamefragment(new Model\Data\Namefragment('Vorname', $row['firstname']));
                 if ($row['lastname'] !== NULL)
                     $name->addNamefragment(new Model\Data\Namefragment('Nachname', $row['lastname']));
+                if ($row['spelling'] !== NULL)
+                    $name->addNamefragment(new Model\Data\Namefragment('Alternative Schreibweise', $row['spelling']));
                 
                 $person = new Model\Data\Person();
                 $person->setGnd($row['pnd'])            // does nothing if pnd is NULL
@@ -936,11 +1088,113 @@ class DumpConversionController extends ORMController {
         }
     }
         
+    function checkOldDatabase(\PDO $dbh) {
+        
+
+        // normally, book.year and book.dta_pub_date contain the same values in all rows.
+        // check if that is still the case with the current input dump
+        $checkQuery = "select id_book as book_id, `year`, `dta_pub_date` from book where `year` <> `dta_pub_date`";
+
+        foreach ($dbh->query($checkQuery)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+            
+            $this->warnings[] = array(
+                'year and dta_pub_date differ'=>
+                $row['book_id'] . " year: $row[year] dta_pub_date: $row[dta_pub_date]"
+            );
+        }
+        
+        $checkQuery = " SELECT 
+                            book.id_book, title, autor1_lastname, year, dta_seiten, type
+                        FROM
+                            book join metadaten on book.id_book = metadaten.id_book
+                        WHERE
+                            dta_seiten is not null 
+                            AND type in ('M','MM','DM')";
+        
+        foreach ($dbh->query($checkQuery)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+            
+            $this->warnings[] = array(
+                'seitenangabe auf publikationstyp, der dies nicht unterstützt'=>"",
+                'id_book' => $row['id_book'],
+                'title' => $row['title'],
+                'autor' => $row['autor1_lastname'],
+                'dta_seiten' => $row['dta_seiten']
+            );
+        }
+        
+        // fields that contain no data or outdated data. They are not covered by the dump conversion routines.
+        $unusedFields = array(
+            'book' => array(
+                'autor3_spelling', 'autor2_syn_names', 'autor3_prename', 'autor3_lastname', 'autor3_spelling', 'autor3_syn_names', 'autor3_pnd', 
+                'dta_quelle', 'dta_pub_name', 
+                'zs_nummer', 'zs_jahrgang', 'zs_hg', 'zs_titel', 
+                'type_pub', 
+                'erschienen_in', 'dta_uebersetzer', 
+                'first_in_autor', 'first_auflagenvermerk', 'first_publisher', 'first_verlag', 'first_reihe_jahrgang', 'first_bibl_angabe'),
+            'metadaten' => array(
+                'book_sides', 'dta_book_sides', 
+                'log_last_change', 'log_last_user',
+                'klassifikation',
+                'prioritaet',
+                'encoding_desc',
+                'type_first'
+            ),
+            'open_tasks_groups' => array(
+                'task_name',
+                'realendtime',
+                'comments',
+                'physical_location',
+                'parent_task',
+                'active', 'activate_date',
+            ),
+            'open_tasks' => array(
+                'task_name',
+                'realendtime',
+                'physical_location',
+                'parent_task',
+                'active', 'activate_date',
+            ),
+            'partner' => array(
+                'adress',
+                'phone1', 'phone2', 'phone3', 'fax',
+                'log_last_change', 'log_last_user'
+            ),
+            'fundstellen' => array(
+                'quality', 'source'
+            ),
+            'user' => array(
+                'phone', 'pw', 'creation_date', 'last_use', 'last_book_id',
+            ),
+            'groups' => array(
+                'log_last_change', 'log_last_user'
+            )
+        );
+        
+        foreach ($unusedFields as $table => $fields){
+            
+            foreach($fields as $field){
+                
+                $query = "SELECT `$field` FROM `$table` WHERE `$field` IS NOT NULL GROUP BY `$field`;";
+                foreach ($dbh->query($query)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+                    $this->warnings[] = array(
+                        'some values in ignored column are not null'=> "$table.$field",
+                    );
+                    break;
+                 }
+                
+            }
+            
+        }
+        
+    }
     function cleanUpOldDatabase(\PDO $dbh) {
         
         // remove unused tables
         $queries[] = "DROP table `dtadb`.`corpus_use`;
                       DROP table `dtadb`.`lastusergroups`;";
+        
+        
+        
         
         // trim all text columns and set empty strings to NULL
         foreach ($dbh->query("SHOW tables") as $row) {
@@ -971,20 +1225,6 @@ class DumpConversionController extends ORMController {
             }
         }
         
-        // remove unused attributes
-        $queries[] = "ALTER TABLE `dtadb`.`book` DROP COLUMN `dta_quelle`, DROP INDEX `Index_5` ;";
-            
-        $queries[] = "ALTER TABLE `dtadb`.`open_tasks` DROP COLUMN `realendtime`;
-                      ALTER TABLE `dtadb`.`open_tasks` DROP COLUMN `parent_task`;";
-                          
-        $queries[] = "ALTER TABLE `dtadb`.`open_tasks_groups` DROP COLUMN `realendtime`;
-                      ALTER TABLE `dtadb`.`open_tasks_groups` DROP COLUMN `comments`;
-                      ALTER TABLE `dtadb`.`open_tasks_groups` DROP COLUMN `parent_task`;";
-                          
-        $queries[] = "ALTER TABLE `dtadb`.`user` DROP COLUMN `creation_date`;
-                      ALTER TABLE `dtadb`.`user` DROP COLUMN `last_use`;
-                      ALTER TABLE `dtadb`.`user` DROP COLUMN `last_book_id`;";
-                          
         // !!! remove an old test record
             
         $queries[] = "DELETE FROM `dtadb`.`book` WHERE `id_book`='17251';

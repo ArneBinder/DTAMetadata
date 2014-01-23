@@ -7,23 +7,11 @@ use DTA\MetadataBundle\Model;
 
 class Publication extends BasePublication
 {
-    // doesn't work!
-//    public function __construct(){
-//        
-//        parent::__construct();
-//        if($this->dirname === NULL){
-//            
-//            $this->dirname = "autor_wort_jahr";
-//            
-//        }
-//        
-//    }
-    
     /**
      * Retrieves the publication object (volume, chapter, article) which uses this object as core publication.
      */
     public function getSpecialization(){
-        // e.g. type = VOLUME, becomes Volume
+        // camelcase version of the type e.g. type = VOLUME, becomes Volume
         $publicationType = ucwords(strtolower($this->getType()));
         $getter = 'get'.$publicationType;
         return $this->$getter();
@@ -58,7 +46,7 @@ class Publication extends BasePublication
         $result = $title !== NULL ? $title->__toString() : "";
         if($withVolumeInformation && $this->getType() === PublicationPeer::TYPE_VOLUME ){
             $volume = $this->getVolume(); 
-            if($volume === NULL) throw new Exception("No volume entity related to volume publication ".$this->getId());
+            if($volume === NULL) throw new \Exception("No volume entity related to volume publication ".$this->getId()." ".$this->getShortTitle());
             $result .= $volume->getVolumeSummary();
         }
         

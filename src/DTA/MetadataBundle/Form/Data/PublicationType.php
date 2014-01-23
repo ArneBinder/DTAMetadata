@@ -26,35 +26,54 @@ class PublicationType extends BaseAbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         
+        // ----------------------------------------------------------------
+        // WORK 
+        // ----------------------------------------------------------------
+        
         $builder->add('title', new TitleType());
         $builder->add('dirname','text',array(
             'required' => false
         ));
-        
         $builder->add('PersonPublications', new DynamicCollectionType(), array(
             'type' => new Master\PersonPublicationType(),
             'inlineLabel' => false,
-            'sortable' => false,
-            'label' => 'Werkbezogene Personalia',
-//            'options' => array('isPublicationSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
+            'sortable' => true,
+            'label' => 'Publikationsbezogene Personalia',
+            'options' => array('isPublicationSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
         ));
-        $builder->add('CategoryPublications', new DynamicCollectionType(), array(
-            'type' => new Master\CategoryPublicationType(),
-            'inlineLabel' => false,
-            'sortable' => false,
-            'label' => 'Kategorien',
-//            'options' => array('isPublicationSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
+        $builder->add('wwwready');
+        $builder->add('doi', 'text', array('required' => false,'read_only' => true,));
+        $builder->add('format', 'text', array('required' => false));
+        $builder->add('citation');
+        
+        // ----------------------------------------------------------------
+        // PUBLICATION
+        // ----------------------------------------------------------------
+         
+        $builder->add('place', new SelectOrAddType(), array(
+            'class' => 'DTA\MetadataBundle\Model\Data\Place',
+            'property' => 'Name',
+            'label' => 'Druckort',
+            'required' => false,
+            
+        ));
+        $builder->add('DatespecificationRelatedByPublicationdateId', new Data\DatespecificationType(), array(
+            'label' => 'Erscheinungsjahr'
+        ));
+        $builder->add('publishingcompany', new SelectOrAddType(), array(
+            'class' => 'DTA\MetadataBundle\Model\Data\Publishingcompany',
+            'property' => 'Name',
+            'label' => 'Verlag',
+            'required' => false,
         ));
         
-        
-/**
- * @todo A more compact version using the select2 capabilities is strongly desirable.
- */
-//        $builder->add('categories', new SelectOrAddType(), array(
-//            'class' => '\DTA\MetadataBundle\Model\Data\Category',
-//            'property' => 'Name',
-//            'multiple' => true,
-//        ));
+        $builder->add('numpages');
+        $builder->add('numpagesnumeric');
+        $builder->add('firstpage');
+         
+        // ----------------------------------------------------------------
+        // CLASSIFICATION 
+        // ----------------------------------------------------------------
         
         $builder->add('LanguagePublications', new DynamicCollectionType(), array(
             'type' => new Master\LanguagePublicationType(),
@@ -64,13 +83,17 @@ class PublicationType extends BaseAbstractType
             'label' => 'vorherrschende Sprache',
 //            'options' => array('isPublicationSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
         ));
-        
         $builder->add('GenrePublications', new DynamicCollectionType(), array(
             'type' => new Master\GenrePublicationType(),
             'inlineLabel' => false,
             'sortable' => false,
             'label' => 'Genres',
         ));
+        
+        $builder->add('legacy_dwds_category1');
+        $builder->add('legacy_dwds_subcategory1');
+        $builder->add('legacy_dwds_category2');
+        $builder->add('legacy_dwds_subcategory2');
         
         $builder->add('CategoryPublications', new DynamicCollectionType(), array(
             'type' => new Master\CategoryPublicationType(),
@@ -79,7 +102,6 @@ class PublicationType extends BaseAbstractType
             'label' => 'Kategorien',
             'options' => array('isPublicationSelectable'=>false),
         ));
-        
         $builder->add('PublicationTags', new DynamicCollectionType(), array(
             'type' => new Master\PublicationTagType(),
             'inlineLabel' => false,
@@ -87,66 +109,9 @@ class PublicationType extends BaseAbstractType
             'label' => 'Schlagworte',
         ));
         
-        $builder->add('doi', 'text', array('required' => false,'read_only' => true,));
-        $builder->add('wwwready');
-        $builder->add('comment');
-        $builder->add('format', 'text', array('required' => false));
-        
-//        // with tagging
-//        $builder->add('languages', new SelectOrAddType(), array(
-//            'class' => '\DTA\MetadataBundle\Model\Data\Language',
-//            'property' => 'Name',
-//            'label' => 'vorherrschende Sprache',
-//            'multiple' => true,
-//        ));
-        
-        $builder->add('PersonPublications', new DynamicCollectionType(), array(
-            'type' => new Master\PersonPublicationType(),
-            'inlineLabel' => false,
-            'sortable' => true,
-            'label' => 'Publikationsbezogene Personalia',
-            'options' => array('isPublicationSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
-        ));
-        
-        $builder->add('place', new SelectOrAddType(), array(
-            'class' => 'DTA\MetadataBundle\Model\Data\Place',
-            'property' => 'Name',
-            'label' => 'Druckort',
-            'required' => false,
-            
-        ));
-        
-        $builder->add('DatespecificationRelatedByPublicationdateId', new Data\DatespecificationType(), array(
-            'label' => 'Erscheinungsjahr'
-        ));
-        
-
-        
-//        $builder->add('volume_alphanumeric', 'text');
-//        $builder->add('volume_numeric', 'text');
-//        $builder->add('volumes_total', 'text');
-        
-        $builder->add('editiondescription', 'text', array(
-            'required' => false
-        ));
-//        $builder->add('editionNumerical', null, array(
-//            'label' => 'Edition (numerisch)',
-//        ));
-        
-        
-        $builder->add('publicationrelatedbyfirsteditionpublicationid', new SelectOrAddType(), array(
-            'class' => 'DTA\MetadataBundle\Model\Data\Publication',
-            'property' => 'SelectBoxString',
-            'label' => 'Erstauflage',
-            'required' => false,
-        ));
-        
-        $builder->add('publishingcompany', new SelectOrAddType(), array(
-            'class' => 'DTA\MetadataBundle\Model\Data\Publishingcompany',
-            'property' => 'Name',
-            'label' => 'Verlag',
-            'required' => false,
-        ));
+        // ----------------------------------------------------------------
+        // SOURCES 
+        // ----------------------------------------------------------------
             
         $builder->add('ImageSources', new DynamicCollectionType(), array(
             'type' => new Workflow\ImagesourceType(),
@@ -168,19 +133,19 @@ class PublicationType extends BaseAbstractType
             'label' => false
         ));
         
+        // ----------------------------------------------------------------
+        // EDITION
+        // ----------------------------------------------------------------
+        
         $builder->add('editiondescription', 'textarea', array('required'=>false));
+        $builder->add('printrun');
         $builder->add('digitaleditioneditor', 'text', array('required'=>false));
-        $builder->add('transcriptioncomment', 'textarea', array('required'=>false));
         
-//        $builder->add('font', new SelectOrAddType(), array(
-//            'class' => '\DTA\MetadataBundle\Model\Data\Font',
-//            'property' => 'Name',
-//            'label' => 'vorherrschende Schriftart',
-//        ));
-        
-        $builder->add('comment', 'textarea', array(
-            'required' => false,
-        ));
+        $builder->add('comment');
+        $builder->add('editioncomment');
+        $builder->add('transcriptioncomment');
+        $builder->add('encodingcomment','textarea', array('required'=>false));
+        $builder->add('firsteditioncomment','textarea', array('required'=>false));
         
         $builder->add('Tasks', new DynamicCollectionType(), array(
             'type' => new Workflow\TaskType(),

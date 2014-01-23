@@ -133,7 +133,6 @@ CREATE TABLE "publication"
     "type" INT2,
     "legacytype" TEXT,
     "title_id" INTEGER NOT NULL,
-    "firsteditionpublication_id" INTEGER,
     "place_id" INTEGER,
     "publicationdate_id" INTEGER,
     "creationdate_id" INTEGER,
@@ -141,19 +140,28 @@ CREATE TABLE "publication"
     "source_id" INTEGER,
     "legacygenre" TEXT,
     "legacysubgenre" TEXT,
+    "legacy_dwds_category1" TEXT,
+    "legacy_dwds_subcategory1" TEXT,
+    "legacy_dwds_category2" TEXT,
+    "legacy_dwds_subcategory2" TEXT,
     "dirname" TEXT,
     "usedcopylocation_id" INTEGER,
     "partner_id" INTEGER,
     "editiondescription" TEXT,
     "digitaleditioneditor" TEXT,
-    "transcriptioncomment" TEXT,
+    "citation" TEXT,
+    "printrun" TEXT,
+    "printrun_numeric" INTEGER,
     "numpages" TEXT,
     "numpagesnumeric" INTEGER,
+    "firstpage" INTEGER,
     "comment" TEXT,
+    "editioncomment" TEXT,
+    "transcriptioncomment" TEXT,
     "encoding_comment" TEXT,
+    "firstedition_comment" TEXT,
     "doi" TEXT,
     "format" TEXT,
-    "directoryname" TEXT,
     "wwwready" INTEGER,
     "last_changed_by_user_id" INTEGER,
     "tree_id" INTEGER,
@@ -169,8 +177,6 @@ CREATE TABLE "publication"
 COMMENT ON COLUMN "publication"."type" IS 'Publikationstyp. Zur Auflösung des dynamischen Typs (ein Volume bettet ein Publication objekt ein, mit nichts als dem Publikationsobjekt in der Hand, lässt sich das zugehörige speziellere objekt aber nur durch ausprobieren aller objektarten herausfinden.)';
 
 COMMENT ON COLUMN "publication"."legacytype" IS 'Altes Publikationstypen-Kürzel (J, JA, M, MM, MMS, etc.)';
-
-COMMENT ON COLUMN "publication"."firsteditionpublication_id" IS 'Publikation, die die Informationen zur Erstauflage enthält';
 
 COMMENT ON COLUMN "publication"."place_id" IS 'Druckort';
 
@@ -196,15 +202,25 @@ COMMENT ON COLUMN "publication"."editiondescription" IS 'Art der Ausgabe';
 
 COMMENT ON COLUMN "publication"."digitaleditioneditor" IS 'Bearbeiter der digitalen Edition';
 
-COMMENT ON COLUMN "publication"."transcriptioncomment" IS 'Bemerkungen zu den Transkriptionsrichtlinien';
+COMMENT ON COLUMN "publication"."citation" IS 'Bibliografische Angabe';
+
+COMMENT ON COLUMN "publication"."printrun" IS 'Auflage';
+
+COMMENT ON COLUMN "publication"."printrun_numeric" IS 'Auflage (numerisch)';
 
 COMMENT ON COLUMN "publication"."numpages" IS 'Anzahl Seiten (Umfang)';
 
 COMMENT ON COLUMN "publication"."numpagesnumeric" IS 'Umfang (normiert)';
 
+COMMENT ON COLUMN "publication"."firstpage" IS 'Startseite';
+
 COMMENT ON COLUMN "publication"."comment" IS 'Anmerkungen';
 
+COMMENT ON COLUMN "publication"."transcriptioncomment" IS 'Bemerkungen zu den Transkriptionsrichtlinien';
+
 COMMENT ON COLUMN "publication"."encoding_comment" IS 'Kommentar Encoding';
+
+COMMENT ON COLUMN "publication"."firstedition_comment" IS 'Kommentar Encoding';
 
 COMMENT ON COLUMN "publication"."tree_id" IS 'Publikationen können vertikal organisiert werden (Teil/Ganzes). Die id dient zur Unterscheidung der einzelnen Bäume.';
 
@@ -220,11 +236,12 @@ DROP TABLE IF EXISTS "multi_volume" CASCADE;
 
 CREATE TABLE "multi_volume"
 (
-    "publication_id" INTEGER NOT NULL,
+    "id" INTEGER NOT NULL,
     "volumes_total" INTEGER,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
-    PRIMARY KEY ("publication_id")
+    PRIMARY KEY ("id"),
+    CONSTRAINT "multi_volume_U_1" UNIQUE ("id")
 );
 
 COMMENT ON COLUMN "multi_volume"."volumes_total" IS 'Anzahl Bände (gesamt)';
@@ -237,12 +254,13 @@ DROP TABLE IF EXISTS "volume" CASCADE;
 
 CREATE TABLE "volume"
 (
-    "publication_id" INTEGER NOT NULL,
+    "id" INTEGER NOT NULL,
     "volume_description" TEXT,
     "volume_numeric" INTEGER,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
-    PRIMARY KEY ("publication_id")
+    PRIMARY KEY ("id"),
+    CONSTRAINT "volume_U_1" UNIQUE ("id")
 );
 
 COMMENT ON COLUMN "volume"."volume_description" IS 'Bezeichnung des Bandes (alphanumerisch)';
@@ -257,11 +275,12 @@ DROP TABLE IF EXISTS "chapter" CASCADE;
 
 CREATE TABLE "chapter"
 (
-    "publication_id" INTEGER NOT NULL,
+    "id" INTEGER NOT NULL,
     "pages" TEXT,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
-    PRIMARY KEY ("publication_id")
+    PRIMARY KEY ("id"),
+    CONSTRAINT "chapter_U_1" UNIQUE ("id")
 );
 
 COMMENT ON COLUMN "chapter"."pages" IS 'Seitenangabe';
@@ -274,14 +293,36 @@ DROP TABLE IF EXISTS "article" CASCADE;
 
 CREATE TABLE "article"
 (
-    "publication_id" INTEGER NOT NULL,
+    "id" INTEGER NOT NULL,
     "pages" TEXT,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
-    PRIMARY KEY ("publication_id")
+    PRIMARY KEY ("id"),
+    CONSTRAINT "article_U_1" UNIQUE ("id")
 );
 
 COMMENT ON COLUMN "article"."pages" IS 'Seitenangabe';
+
+-----------------------------------------------------------------------
+-- series
+-----------------------------------------------------------------------
+
+DROP TABLE IF EXISTS "series" CASCADE;
+
+CREATE TABLE "series"
+(
+    "id" INTEGER NOT NULL,
+    "issue" TEXT,
+    "volume" TEXT,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
+    PRIMARY KEY ("id"),
+    CONSTRAINT "series_U_1" UNIQUE ("id")
+);
+
+COMMENT ON COLUMN "series"."issue" IS 'Band';
+
+COMMENT ON COLUMN "series"."volume" IS 'Jahrgang';
 
 -----------------------------------------------------------------------
 -- publishingcompany
@@ -448,26 +489,21 @@ CREATE TABLE "language"
 );
 
 -----------------------------------------------------------------------
--- sequence_entry
+-- series_publication
 -----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS "sequence_entry" CASCADE;
+DROP TABLE IF EXISTS "series_publication" CASCADE;
 
-CREATE TABLE "sequence_entry"
+CREATE TABLE "series_publication"
 (
     "id" serial NOT NULL,
+    "series_id" INTEGER NOT NULL,
     "publication_id" INTEGER NOT NULL,
-    "sequence_id" TEXT,
-    "sequence_name" TEXT,
-    "sequence_type" INT2 DEFAULT 0,
-    "title_id" INTEGER NOT NULL,
     "sortable_rank" INTEGER,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
-
-CREATE INDEX "sequence_entry_I_1" ON "sequence_entry" ("sequence_id");
 
 -----------------------------------------------------------------------
 -- language_publication
@@ -839,19 +875,23 @@ ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_7"
     REFERENCES "dta_user" ("id");
 
 ALTER TABLE "multi_volume" ADD CONSTRAINT "multi_volume_FK_1"
-    FOREIGN KEY ("publication_id")
+    FOREIGN KEY ("id")
     REFERENCES "publication" ("id");
 
 ALTER TABLE "volume" ADD CONSTRAINT "volume_FK_1"
-    FOREIGN KEY ("publication_id")
+    FOREIGN KEY ("id")
     REFERENCES "publication" ("id");
 
 ALTER TABLE "chapter" ADD CONSTRAINT "chapter_FK_1"
-    FOREIGN KEY ("publication_id")
+    FOREIGN KEY ("id")
     REFERENCES "publication" ("id");
 
 ALTER TABLE "article" ADD CONSTRAINT "article_FK_1"
-    FOREIGN KEY ("publication_id")
+    FOREIGN KEY ("id")
+    REFERENCES "publication" ("id");
+
+ALTER TABLE "series" ADD CONSTRAINT "series_FK_1"
+    FOREIGN KEY ("id")
     REFERENCES "publication" ("id");
 
 ALTER TABLE "personalname" ADD CONSTRAINT "personalname_FK_1"
@@ -877,13 +917,13 @@ ALTER TABLE "titlefragment" ADD CONSTRAINT "titlefragment_FK_2"
     FOREIGN KEY ("titlefragmenttype_id")
     REFERENCES "titlefragmenttype" ("id");
 
-ALTER TABLE "sequence_entry" ADD CONSTRAINT "sequence_entry_FK_1"
+ALTER TABLE "series_publication" ADD CONSTRAINT "series_publication_FK_1"
+    FOREIGN KEY ("series_id")
+    REFERENCES "series" ("id");
+
+ALTER TABLE "series_publication" ADD CONSTRAINT "series_publication_FK_2"
     FOREIGN KEY ("publication_id")
     REFERENCES "publication" ("id");
-
-ALTER TABLE "sequence_entry" ADD CONSTRAINT "sequence_entry_FK_2"
-    FOREIGN KEY ("title_id")
-    REFERENCES "title" ("id");
 
 ALTER TABLE "language_publication" ADD CONSTRAINT "language_publication_FK_1"
     FOREIGN KEY ("language_id")

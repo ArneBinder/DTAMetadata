@@ -58,8 +58,6 @@ DTA\MetadataBundle\Model\Classification\Titlefragmenttype:
         name: Untertitel
     Titlefragmenttype_3:
         name: Kurztitel
-    Titlefragmenttype_4:
-        name: Auflage
 DTA\MetadataBundle\Model\Data\Font:
     Font_1:
         name: Textur
@@ -67,10 +65,6 @@ DTA\MetadataBundle\Model\Data\Font:
         name: Rotunda
     Font_3:
         name: Schwabacher
-    Font_4:
-        name: Fraktur
-    Font_5:
-        name: Antiqua
     Font_6:
         name: Handschrift
 DTA\MetadataBundle\Model\Data\Language:

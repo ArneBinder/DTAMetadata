@@ -28,6 +28,7 @@ return array(
     'CHAPTER' => 'Kapitel',
     'JOURNAL' => 'Zeitschrift/Zeitung',
     'ARTICLE' => 'Artikel',
+    'SERIES' => 'Reihe',
     'PublicationMms' => 'Teil einer mehrbändigen Monographie, die ihrerseits Teil einer Reihe ist',
     'PublicationMs' => 'Selbstständiger Band einer Reihe',
     'Publishingcompany' => 'Verlag',
@@ -42,7 +43,18 @@ return array(
     // form labels: columns/properties
 
     'Directoryname' => 'Verzeichnisname',
+    'Citation' => 'Bibliografische Angabe',
+    'Printrun' => 'Auflage',
+    'Comment' => 'Kommentar',
     'Comments' => 'Kommentare',
+    'Editioncomment' => 'Kommentar Edition',
+    'Encodingcomment' => 'Kommentar Encoding',
+    'Firsteditioncomment' => 'Angaben zur Erstausgabe',
+    
+    'Numpages' => 'Anzahl Seiten',
+    'Numpagesnumeric' => 'Anzahl Seiten (numerisch)',
+    'Firstpage' => 'Startseite',
+    
     'Id' => '#',
     'id' => '#',
     'Username' => 'Benutzername',

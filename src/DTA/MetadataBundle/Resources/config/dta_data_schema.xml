@@ -25,14 +25,12 @@
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="false" required="true"/>
         
         <column name="type" description="Publikationstyp. Zur Auflösung des dynamischen Typs (ein Volume bettet ein Publication objekt ein, mit nichts als dem Publikationsobjekt in der Hand, lässt sich das zugehörige speziellere objekt aber nur durch ausprobieren aller objektarten herausfinden.)" 
-                type="ENUM" valueSet="BOOK,VOLUME,MULTIVOLUME,CHAPTER,JOURNAL,ARTICLE" />
+                type="ENUM" valueSet="BOOK,VOLUME,MULTIVOLUME,CHAPTER,JOURNAL,ARTICLE,SERIES" />
         <column name="legacytype" description="Altes Publikationstypen-Kürzel (J, JA, M, MM, MMS, etc.)" type="LONGVARCHAR" />
         
         <column name="title_id" type="INTEGER" required="true"/>
         
         <!--Personalia werden ueber Fremdschluessel von der Personenseite dargestellt.-->
-        
-        <column name="firsteditionpublication_id" description="Publikation, die die Informationen zur Erstauflage enthält" type="INTEGER"/>
         
         <column name="place_id" description="Druckort" type="INTEGER"/>
         <column name="publicationdate_id" description="Erscheinungsjahr" type="INTEGER"/>
@@ -42,6 +40,10 @@
         
         <column name="legacygenre" description="Alt-Angabe zum Genre, zur Weiterverarbeitung bei Umstellung auf das neue Genre-System." type="LONGVARCHAR"/>
         <column name="legacysubgenre" description="Alt-Angabe zum Untergenre." type="LONGVARCHAR"/>
+        <column name="legacy_dwds_category1" type="LONGVARCHAR"/>
+        <column name="legacy_dwds_subcategory1" type="LONGVARCHAR"/>
+        <column name="legacy_dwds_category2" type="LONGVARCHAR"/>
+        <column name="legacy_dwds_subcategory2" type="LONGVARCHAR"/>
         
         <column name="dirname" description="Textuelle ID (Kombination aus Autor, Titel, Jahr)" type="LONGVARCHAR"/>
         <column name="usedcopylocation_id" description="Vermutlich der eingesetzte Nachweis. Entspricht dem alten metadaten.id_nachweis. " type="INTEGER"/>
@@ -53,16 +55,24 @@
         <!--Editorisches-->        
         <column name="editiondescription" description="Art der Ausgabe" type="LONGVARCHAR"/>
         <column name="digitaleditioneditor" description="Bearbeiter der digitalen Edition" type="LONGVARCHAR"/>
-        <column name="transcriptioncomment" description="Bemerkungen zu den Transkriptionsrichtlinien" type="LONGVARCHAR"/>
+        
+        <column name="citation" description="Bibliografische Angabe" type="LONGVARCHAR"/>
+        
+        <column name="printrun" description="Auflage" type="LONGVARCHAR"/>
+        <column name="printrun_numeric" description="Auflage (numerisch)" type="INTEGER"/>
         
         <!--Klassifikation und Einordnung-->
         <!--vorherrschende Sprache, Kategorien, Schlagworte und Genres sind durch das Werk festgelegt.-->
     
         <column name="numpages" description="Anzahl Seiten (Umfang)" type="LONGVARCHAR"/>
         <column name="numpagesnumeric" description="Umfang (normiert)" type="INTEGER"/>
-    
+        <column name="firstpage" description="Startseite" type="INTEGER"/>
+        
         <column name="comment" description="Anmerkungen" type="LONGVARCHAR"/>
+        <column name="editioncomment" type="LONGVARCHAR"/>
+        <column name="transcriptioncomment" description="Bemerkungen zu den Transkriptionsrichtlinien" type="LONGVARCHAR"/>
         <column name="encoding_comment" description="Kommentar Encoding" type="LONGVARCHAR"/>
+        <column name="firstedition_comment" description="Kommentar Encoding" type="LONGVARCHAR"/>
         
         <column name="doi" type="LONGVARCHAR"/>
         <column name="format" type="LONGVARCHAR"/>
@@ -110,7 +120,6 @@
         
         
         <foreign-key foreignTable="title"> <reference local="title_id" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="publication"> <reference local="firsteditionpublication_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="source"> <reference local="source_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="publishingcompany"> <reference local="publishingcompany_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="place"> <reference local="place_id" foreign="id"/> </foreign-key>
@@ -130,14 +139,15 @@
         Zur Abbildung der Publikationstypen MM und MMS.
     -->
     <table name="multi_volume">
-        <!--<column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>-->
-        <column name="publication_id" primaryKey="true" type="INTEGER" required="true"/>
+        <column name="id" type="INTEGER" primaryKey="true" required="true"/>
+        <!--<column name="publication_id" primaryKey="true" type="INTEGER" required="true"/>-->
         
         <column name="volumes_total" description="Anzahl Bände (gesamt)" type="INTEGER"/>
         
         <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>
         
-        <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
+        <unique> <unique-column name="id"/> </unique>
+        <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
     </table> 
     
     <!--VOLUME               
@@ -145,15 +155,16 @@
         Zur Abbildung der Publikationstypen MM und MMS.
     -->
     <table name="volume">
-        <!--<column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>-->
-        <column name="publication_id" primaryKey="true" type="INTEGER" required="true"/>
+        <column name="id" type="INTEGER" primaryKey="true" required="true"/>
+        <!--<column name="publication_id" primaryKey="true" type="INTEGER" required="true"/>-->
         
         <column name="volume_description" description="Bezeichnung des Bandes (alphanumerisch)" type="LONGVARCHAR"/>
         <column name="volume_numeric" description="Bezeichnung des Bandes (numerisch)" type="INTEGER"/>
         
         <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>
         
-        <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
+        <unique> <unique-column name="id"/> </unique>
+        <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
     </table>   
     
     <!--CHAPTER
@@ -161,14 +172,15 @@
         Zur Abbildung des Publikationstyps DS.
     -->
     <table name="chapter">
-        <!--<column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>-->
-        <column name="publication_id" primaryKey="true" type="INTEGER" required="true"/>
+        <column name="id" type="INTEGER" primaryKey="true" required="true"/>
+        <!--<column name="publication_id" primaryKey="true" type="INTEGER" required="true"/>-->
         
         <column name="pages" description="Seitenangabe" type="LONGVARCHAR"/>
         
-        <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>
+        <!--<behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>-->
         
-        <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
+        <unique> <unique-column name="id"/> </unique>
+        <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
     </table> 
     
     <!--ARTICLE
@@ -176,17 +188,36 @@
         Zur Abbildung des Publikationstyps JA.
     -->
     <table name="article">
-        <!--<column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>-->
-        <column name="publication_id" primaryKey="true" type="INTEGER" required="true"/>
+        <column name="id" type="INTEGER" primaryKey="true" required="true"/>
+        <!--<column name="publication_id" primaryKey="true" type="INTEGER" required="true"/>-->
         
         <column name="pages" description="Seitenangabe" type="LONGVARCHAR"/>
         
+        <!--<behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>-->
+        
+        <unique> <unique-column name="id"/> </unique>
+        <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
+    </table> 
+    
+     <!--SERIES
+        Publikationsreihe. 
+        Zur Abbildung des Publikationskomponente S.
+    -->
+    <table name="series">
+        <column name="id" type="INTEGER" primaryKey="true" required="true"/>
+        <!--<column name="publication_id" primaryKey="true" type="INTEGER" required="true"/>-->
+        
+        <column name="issue" description="Band" type="LONGVARCHAR"/>
+        <column name="volume" description="Jahrgang" type="LONGVARCHAR"/>
+        
         <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>
         
-        <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
+        <unique> <unique-column name="id"/> </unique>
+        <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
     </table> 
     
     <!-- Other entities that can be considered historical facts. -->
+    <!-- ______________________________________________________  -->
 
     <table name="publishingcompany">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>

@@ -77,7 +77,7 @@ class MasterDomainController extends ORMController {
         
         $workingDir = $bundleDir . $modelLocation;
         $handle = opendir($workingDir);
-        if (!$handle) { throw new Exception("Problems opening $bundleDir"); }
+        if (!$handle) { throw new \Exception("Problems opening $bundleDir"); }
         
         // the model directory contains all basic entities and their query and peer classes.
         // 1. FIND ALL BASIC ENTITIES BY IGNORING THE PEER AND QUERY CLASSES.

@@ -15,28 +15,23 @@
         <!--If no parameters are defined, all columns are added. (WITHOUT embedding any related entities) -->
     </behavior>
     
-    <!--A sequence is an arbitrary ordered list of publications. At the moment, this table exists because nestedSet and-->
-    <table name="sequence_entry">
+    <table name="series_publication">
         
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        
+        <column name="series_id" type="INTEGER" required="true"/>
         <column name="publication_id" type="INTEGER" required="true"/>
-        
-        <column name="sequence_id" type="LONGVARCHAR" required="false"/>
-        <column name="sequence_name" type="LONGVARCHAR" required="false"/>
-        <column name="sequence_type" type="ENUM" valueSet="SERIES" defaultValue="SERIES" required="false"/>
-        
-        <column name="title_id" type="INTEGER" required="true"/>
         
         <behavior name="sortable">
             <parameter name="use_scope" value="true" />
-            <parameter name="scope_column" value="sequence_id" />
+            <parameter name="scope_column" value="series_id" />
         </behavior>
         
+        <foreign-key foreignTable="series"> <reference local="series_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="title"> <reference local="title_id" foreign="id"/> </foreign-key>
         
-        <index><index-column name="sequence_id"/></index>
     </table>
+
 
     <table name="language_publication" isCrossRef="true">
         

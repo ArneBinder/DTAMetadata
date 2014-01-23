@@ -35,7 +35,6 @@
 
         {{ form_row(form.wwwready) }}
         {{ form_row(form.doi) }}
-        {{ form_row(form.comment) }}
         {{ form_row(form.format) }}
 
     {{ dta.endModal({
@@ -45,7 +44,7 @@
        })
     }}
 
-    {{ form_row(form.publicationrelatedbyfirsteditionpublicationid) }}
+    {{ form_row(form.citation) }}
 
 {{ dta.endFieldset()}}
 {% endblock work %}
@@ -60,10 +59,10 @@
         {#{ form_row(form.DatespecificationRelatedByCreationDateId) }#}
     {{ dta.endLabelledContent() }}
     
-    {#{ form_row(form.volume_alphanumeric) }}
-    {{ form_row(form.volume_numeric) }}
-    {{ form_row(form.volumes_total) }#}
-    
+    {{ form_row(form.numpages) }}
+    {{ form_row(form.numpagesnumeric) }}
+    {{ form_row(form.firstpage) }}
+
     {{ form_row(form.publishingcompany) }}
 
 {{ dta.endFieldset()}}
@@ -85,6 +84,7 @@
 {% block editorialInformation %}
 {{ dta.beginFieldset({'caption':'Editorisches', 'collapsed': false})}}
 
+    {{ form_row(form.printrun) }}
     {{ form_row(form.editiondescription, {'attr':{'class':'col-7'} }) }}
     {{ form_row(form.digitaleditioneditor, {'attr':{'class':'col-7'} }) }}
     {{ form_row(form.transcriptioncomment, {'attr':{'class':'col-7'} }) }}
@@ -102,6 +102,11 @@
     {#{ form_row(form.font, {'label':'vorherrschende Schriftart'}) }#}
     {{ form_row(form.LanguagePublications, {'label':'vorherrschende Sprache'}) }}
     {{ form_row(form.GenrePublications, {'label':'Genre'}) }}
+    {{ form_row(form.legacy_dwds_category1) }}
+    {{ form_row(form.legacy_dwds_subcategory1) }}
+    {{ form_row(form.legacy_dwds_category2) }}
+    {{ form_row(form.legacy_dwds_subcategory2) }}
+    
     {{ form_row(form.CategoryPublications, {'label':'Kategorien'}) }}
     {{ form_row(form.PublicationTags, {'label':'Schlagworte'}) }}
     
@@ -111,7 +116,11 @@
 
 {% block comments %}
 {{ dta.beginFieldset({'caption':'Anmerkungen', 'collapsed': false})}}
-    {{ form_widget(form.comment, {'attr':{'style':'width:100%'} }) }}
+    {{ form_row(form.comment) }}
+    {{ form_row(form.editioncomment) }}
+    {{ form_row(form.transcriptioncomment) }}
+    {{ form_row(form.encodingcomment) }}
+    {{ form_row(form.firsteditioncomment) }}
 {{ dta.endFieldset()}}
 {% endblock %}
 

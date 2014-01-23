@@ -54,7 +54,7 @@
     {# see documentation above. setting default values #}
     {% set inlineLabel = inlineLabel|default(false) %}
     {% set inlineChildren = inlineChildren|default(false) %}
-    {% set hideLabelClass = hideLabel|default(false) ? 'sr-only' : '' %}
+    {% set hideLabelClass = hideLabel|default(false) ? 'sr-only ' : '' %}
     {% set inlined = inlined|default(false) %}
 
         {% if not inlineLabel and not inlined %}
@@ -103,8 +103,8 @@
             {% set label = name|humanize %}
         {% endif %}
         <label for="{{id}}" {% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+            {% if required %}* {% endif %}
             {{ label|trans({}, translation_domain) }}
-            {% if required %} * {% endif %}
         </label>
     {% endif %}
 {% endspaceless %}
