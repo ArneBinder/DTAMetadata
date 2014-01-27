@@ -97,6 +97,7 @@
             <!--<parameter name="entstanden" value="accessor:getDatespecificationRelatedByCreationdateId"/>-->
             <parameter name="veröffentlicht" value="accessor:getDatespecificationRelatedByPublicationdateId"/>
             <parameter name="Verlag" value="accessor:getPublishingCompany"/>
+            <parameter name="Ort" value="accessor:getPlace"/>
             <!--<parameter name="embedcolumnsstatus" value="status"/>-->
             <parameter name="Typ" value="type"/>
             <parameter name="query" value="\DTA\MetadataBundle\Model\Data\PublicationQuery::create()
@@ -207,8 +208,6 @@
         <column name="id" type="INTEGER" primaryKey="true" required="true"/>
         <!--<column name="publication_id" primaryKey="true" type="INTEGER" required="true"/>-->
         
-        <column name="issue" description="Band" type="LONGVARCHAR"/>
-        <column name="volume" description="Jahrgang" type="LONGVARCHAR"/>
         
         <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>
         

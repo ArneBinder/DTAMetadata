@@ -76,12 +76,15 @@ class HomeController extends ORMController {
 
 //        $personalName = Model\Data\PersonQuery::create()->findOneByGnd('119066882');
 //        Model\Data\PersonalnameQuery::create()->filterByNamefragment($personalName->getRepresentativePersonalName()->getNamefragments())->find();
+        $p = Model\Data\PersonQuery::create()->findOneByGnd('119066882');
         return $this->renderWithDomainData('DTAMetadataBundle:Home:index.html.twig', array(
             'testData' => 
 //            $se2
 //            $queryClass
 //            $queryConstructionString
-             $groupA = \DTA\MetadataBundle\Model\Workflow\TasktypeQuery::create()->orderByTreeLeft()->select('Name')->find()
+//             $groupA = Model\Workflow\TasktypeQuery::create()->orderByTreeLeft()->select('Name')->find()
+                $p
+//             $groupA = Model\Data\PlaceQuery::create()->findOneByName("Berlin")->getPublications()
             //$p->getPersonalnames()
         ));
     }

@@ -216,7 +216,7 @@ class TableRowViewBehavior extends Behavior {
     }
 
     /**
-     * Looks up and adds the columns designated for view in another table and adds all of them to the local colum list.
+     * Looks up and adds the columns designated for view in another table and adds all of them to the local column list.
      * @param string $tableName Another table (also implementing the table_row_view behavior) to embed the columns of.
      * @throws InvalidArgumentException if referenced table doesn't exist, doesn't implement table_row_view behavior or is the referencing table
      */

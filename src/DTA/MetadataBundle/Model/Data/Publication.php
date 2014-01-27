@@ -27,9 +27,9 @@ class Publication extends BasePublication
     
     /**
      * Used in displaying all publications (table row view behavior in the data schema definition) to select an author.
-     * @return string
+     * @return Personalname
      */
-    public function getFirstAuthor(){
+    public function getFirstAuthorName(){
         // TODO first person publication might not be the first author
         $personPublications = $this->getPersonPublications();
         if(count($personPublications) == 0 ) return NULL;

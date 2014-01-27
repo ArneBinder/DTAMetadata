@@ -7,21 +7,25 @@
 
 {% block core %}
 
+{% if errors|default({})|length > 0 %}
 <h1> Errors </h1>
+{% endif %}
 
 {% for error in errors|default({}) %}
     {% for key, value in error %}{{key}} => {{value}}<br/>{% endfor %}
 {% endfor %}
 
-
+{% if warnings|default({})|length > 0 %}
 <h1> Warnings </h1>
+{% endif %}
 
 {% for warning in warnings|default({}) %}
     {% for key, value in warning %}{{key}} => {{value}}<br/>{% endfor %}
 {% endfor %}
 
-
+{% if messages|default({})|length > 0 %}
 <h1> Messages </h1>
+{% endif %}
 
 {% for message in messages|default({}) %}
     {% for key, value in message %}{{key}} => {{value}}<br/>{% endfor %}

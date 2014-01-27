@@ -186,9 +186,9 @@ class DataDomainController extends ORMController {
 
             $linkTo = function($href,$title){return '<a href="'.$href.'">'.$title.'</a>';};
             $rows[] = array(
-                'context' => $linkTo($linkTarget, $pub->getTitleString()),
-                'repName' => $pub->getFirstAuthor(),
-                'id'      => $pub->getId()
+                'context' => $linkTo($linkTarget, $pub->getTitleString()),  // title
+                'repName' => $pub->getFirstAuthorName(),                        // representative name
+                'id'      => $pub->getId()                                  // id
             );
         }
         

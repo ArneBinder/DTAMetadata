@@ -312,17 +312,11 @@ DROP TABLE IF EXISTS "series" CASCADE;
 CREATE TABLE "series"
 (
     "id" INTEGER NOT NULL,
-    "issue" TEXT,
-    "volume" TEXT,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
     PRIMARY KEY ("id"),
     CONSTRAINT "series_U_1" UNIQUE ("id")
 );
-
-COMMENT ON COLUMN "series"."issue" IS 'Band';
-
-COMMENT ON COLUMN "series"."volume" IS 'Jahrgang';
 
 -----------------------------------------------------------------------
 -- publishingcompany
@@ -499,11 +493,17 @@ CREATE TABLE "series_publication"
     "id" serial NOT NULL,
     "series_id" INTEGER NOT NULL,
     "publication_id" INTEGER NOT NULL,
+    "issue" TEXT,
+    "volume" TEXT,
     "sortable_rank" INTEGER,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
+
+COMMENT ON COLUMN "series_publication"."issue" IS 'Band/Ausgabe';
+
+COMMENT ON COLUMN "series_publication"."volume" IS 'Jahrgang in der Reihe';
 
 -----------------------------------------------------------------------
 -- language_publication

@@ -1,9 +1,6 @@
 <?php
     
 namespace DTA\MetadataBundle\Controller;
-    
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use DTA\MetadataBundle\Model;
     
 /**
@@ -73,11 +70,25 @@ class DumpConversionController extends ORMController {
         $this->messages[] = array("loading database fixtures: " => $result);
         
     }
+    
+    function runTransaction($task, $dbh){
+        $start = microtime(true);
+        $this->propelConnection->beginTransaction();
+        
+        $this->$task($dbh);
+        
+        $this->propelConnection->commit();
+        $time_taken = microtime(true) - $start;
+        echo $task." ".$time_taken;
+        $this->messages[] = array("finished transaction ".$task=>$time_taken);
+    }
+    
+    /** Converts the legacy database dump into the new format. */
     function convertAction() {
         
         // during conversion, a lot of memory is allocated
         ini_set('memory_limit', '1200M');
-        ini_set('max_execution_time', 300); //300 seconds = 5 minutes
+        ini_set('max_execution_time', 600); //300 seconds = 5 minutes
         //
         // stores warning messages generated during the conversion
         $this->warnings = array();
@@ -107,42 +118,24 @@ class DumpConversionController extends ORMController {
         
         $this->createTaskTypes();
         
-        $this->convertUsers($dbh);          // before publication because of last changed by user id
+        $conversionTasks = array(
+            'convertUsers',                 // users first: they are referenced in last changed by columns
+            'convertPublications',          
+            'convertFirstEditions',
+            'convertSeries',
+            'convertPublicationGroups',
+            'convertPartners',
+            'convertCopyLocations',
+            'convertTasks',
+            'convertPublishingCompanies',
+            'convertFonts',
+            'convertPlaces',
+            'convertAuthors',
+            'convertSingleFieldPersons');
         
-        $this->convertFonts($dbh);          // before publication
-        
-        
-        $this->propelConnection->beginTransaction();
-        $this->convertPublications($dbh);
-        $this->propelConnection->commit();
-
-        $this->convertFirstEditions($dbh);  // after publication because a first edition entity knows the publication id that links to it
-        
-        $this->convertPublicationGroups($dbh);
-        
-        $this->propelConnection->beginTransaction();
-        $this->convertPartners($dbh);
-        $this->propelConnection->commit();
-        
-        $this->propelConnection->beginTransaction();
-        $this->convertCopyLocations($dbh);  // after publications and partners
-        $this->propelConnection->commit();
-        
-        $this->propelConnection->beginTransaction();
-        $this->convertTasks($dbh);          // after copy locations
-        $this->propelConnection->commit();
-        
-        $this->propelConnection->beginTransaction();
-        $this->convertPublishingCompanies($dbh);
-        $this->propelConnection->commit();
-
-        $this->propelConnection->beginTransaction();
-        $this->convertPlaces($dbh);
-        $this->propelConnection->commit();
-        
-        $this->convertAuthors($dbh);        // after publication because during merging duplicate persons, information is easiest retained by adding the merged person as author via the known publication id
-        
-        $this->convertSingleFieldPersons($dbh);
+        foreach ($conversionTasks as $task){
+            $this->runTransaction($task, $dbh);
+        }
         
         return $this->renderWithDomainData('DTAMetadataBundle:DumpConversion:conversionResult.html.twig', array(
             'warnings' => $this->warnings,
@@ -205,21 +198,21 @@ class DumpConversionController extends ORMController {
         $root->setId(1)
             ->setName('Workflows')
             ->makeRoot()
-            ->save();
+            ->save($this->propelConnection);
         
         foreach ($taskTypes as $id => $workflow) {
             $taskType = new Model\Workflow\Tasktype();
             $taskType->setId($id)
                     ->setName($workflow['name'])
                     ->insertAsLastChildOf($root)
-                    ->save();
+                    ->save($this->propelConnection);
             
             foreach ($workflow['children'] as $child) {
                 $childType = new Model\Workflow\Tasktype();
                 $childType->setId(array_keys($child)[0])
                         ->setName($child[array_keys($child)[0]])
                         ->insertAsLastChildOf($taskType)
-                        ->save();
+                        ->save($this->propelConnection);
                 
             }
             
@@ -229,19 +222,31 @@ class DumpConversionController extends ORMController {
     
     function convertFonts($dbh){
 
-        $rawData = "
-            SELECT 
-                schriftart as `font_name`
-            FROM metadaten WHERE length(schriftart) > 0
-            GROUP BY schriftart;";
+        $rawData = "SELECT 
+                        book.id_book as publication_id
+                        ,schriftart as `font_name`
+                    FROM
+                        metadaten JOIN book ON book.id_book = metadaten.id_book
+                    WHERE 
+                            length(schriftart) > 0
+                    ORDER BY font_name";
         
+        $currentFont = new Model\Data\Font();
+        $publications = Model\Data\PublicationQuery::create();
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
             array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
             
-            $font = new Model\Data\Font();
-            $font->setName($row['font_name'])
-                 ->save();
+            if($currentFont->getName() !== $row['font_name']){
+                
+                $currentFont = new Model\Data\Font();
+                $currentFont->setName($row['font_name'])
+                            ->save($this->propelConnection);
+            }
+            
+            $publications->findOneById($row['publication_id'])
+                         ->addFont($currentFont)
+                         ->save();
         }
     }
     
@@ -300,7 +305,7 @@ class DumpConversionController extends ORMController {
                             ->makeRoot()
                             ->setType(Model\Data\PublicationPeer::TYPE_MULTIVOLUME)
                             ->setTitle($title)
-                            ->save();
+                            ->save($this->propelConnection);
 
             // create the multi-volume
             $multiVolume = new Model\Data\MultiVolume();
@@ -339,83 +344,6 @@ class DumpConversionController extends ORMController {
                ->save($this->propelConnection);
         
         
-    }
-    
-    /** Adds the information about first edition (Erstausgabe) to the publication.  
-        Since mostly, only a year, location and a publishing company are needed, the entire information is stored in a plain text format. */
-    function convertFirstEditions($dbh){
-        
-        $rawData = "SELECT 
-                        book.id_book as id,
-                        first_pub_date,
-                        first_pub_name,
-                        first_pub_location,
-                        first_pub_verlag,
-                        first_reihe_titel,
-                        first_seiten,
-                        first_reihe_band,
-                        first_comments,
-                        CASE first_status
-                            WHEN '0' THEN NULL
-                            WHEN '1' THEN _utf8'Erstveröffentlichung'
-                            WHEN '2' THEN _utf8'Keine Erstveröffentlichung'
-                            WHEN '3' THEN _utf8'Unklar, ob Erstveröffentlichung'
-                            ELSE first_status
-                        END as `first_status`
-                    FROM
-                        book
-                    WHERE
-                        first_pub_date is not null
-                            OR first_pub_location is not null
-                            OR first_pub_verlag is not null
-                            OR first_reihe_titel is not null
-                            OR first_seiten is not null
-                            OR first_reihe_band is not null
-                            OR first_comments is not null
-                            OR (first_status is not null and first_status > 0)";
-        
-        foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
-            
-            // encode all data from the old database as UTF8
-            array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
-
-            $fields = array(
-                'first_status',
-                'first_pub_date',
-                'first_pub_name',
-                'first_pub_verlag',
-                'first_pub_location',
-                'first_reihe_titel',
-                'first_reihe_band',
-                'first_seiten',
-                'first_comments');
-            $labels = array(
-                'Status',
-                'Erschienen', 
-                'Herausgeber',
-                'Verlag', 
-                'Ort',
-                'Titel (R/Z)',
-                'Band (R/Z)',
-                'Seitenangabe', 
-                'Kommentar', 
-            );
-            
-            $firstEditionData = "";
-            for ($fieldIdx = 0; $fieldIdx < count($fields); $fieldIdx++) {
-                if($row[$fields[$fieldIdx]] !== NULL ){
-                    $firstEditionData .= $labels[$fieldIdx] . ": " . $row[$fields[$fieldIdx]] . "\n";
-                }
-            }
-            
-            $publication = Model\Data\PublicationQuery::create()
-                    ->findOneById($row['id']);
-            $publication->setFirsteditionComment($firstEditionData)
-                        ->save();
-            
-            
-        }
-            
     }
     
     function convertPublications($dbh) {
@@ -587,13 +515,13 @@ class DumpConversionController extends ORMController {
                         $article = new Model\Data\Article();
                         $article->setPublication($publication)
                                 ->setPages($row['pages'])
-                                ->save();
+                                ->save($this->propelConnection);
                         break;
                     case "CHAPTER":
                         $chapter = new Model\Data\Chapter();
                         $chapter->setPublication($publication)
                                 ->setPages($row['pages'])
-                                ->save();
+                                ->save($this->propelConnection);
                         break;
                 }
                 
@@ -604,6 +532,133 @@ class DumpConversionController extends ORMController {
         
             
         }// end for book rows
+    }
+    
+    /** Adds the information about first edition (Erstausgabe) to the publication.  
+        Since mostly, only a year, location and a publishing company are needed, the entire information is stored in a plain text format. */
+    function convertFirstEditions($dbh){
+        
+        $rawData = "SELECT 
+                        book.id_book as id,
+                        first_pub_date,
+                        first_pub_name,
+                        first_pub_location,
+                        first_pub_verlag,
+                        first_reihe_titel,
+                        first_seiten,
+                        first_reihe_band,
+                        first_comments,
+                        CASE first_status
+                            WHEN '0' THEN NULL
+                            WHEN '1' THEN _utf8'Erstveröffentlichung'
+                            WHEN '2' THEN _utf8'Keine Erstveröffentlichung'
+                            WHEN '3' THEN _utf8'Unklar, ob Erstveröffentlichung'
+                            ELSE first_status
+                        END as `first_status`
+                    FROM
+                        book
+                    WHERE
+                        first_pub_date is not null
+                            OR first_pub_location is not null
+                            OR first_pub_verlag is not null
+                            OR first_reihe_titel is not null
+                            OR first_seiten is not null
+                            OR first_reihe_band is not null
+                            OR first_comments is not null
+                            OR (first_status is not null and first_status > 0)";
+        
+        $publications = Model\Data\PublicationQuery::create();
+        foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+            
+            // encode all data from the old database as UTF8
+            array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
+
+            $fields = array(
+                'first_status',
+                'first_pub_date',
+                'first_pub_name',
+                'first_pub_verlag',
+                'first_pub_location',
+                'first_reihe_titel',
+                'first_reihe_band',
+                'first_seiten',
+                'first_comments');
+            $labels = array(
+                'Status',
+                'Erschienen', 
+                'Herausgeber',
+                'Verlag', 
+                'Ort',
+                'Titel (R/Z)',
+                'Band (R/Z)',
+                'Seitenangabe', 
+                'Kommentar', 
+            );
+            
+            $firstEditionData = "";
+            for ($fieldIdx = 0; $fieldIdx < count($fields); $fieldIdx++) {
+                if($row[$fields[$fieldIdx]] !== NULL ){
+                    $firstEditionData .= $labels[$fieldIdx] . ": " . $row[$fields[$fieldIdx]] . "\n";
+                }
+            }
+            
+            $publications->findOneById($row['id'])
+                        ->setFirsteditionComment($firstEditionData)
+                        ->save($this->propelConnection);
+            
+        }
+            
+    }
+    
+    function convertSeries($dbh){
+        
+        $rawData = "SELECT 
+                        id_book as publication_id
+                        ,dta_reihe_titel as title
+                        ,dta_reihe_jahrgang as volume
+						   ,dta_reihe_band as issue
+                        
+                    FROM
+                        book
+                    WHERE
+                        dta_reihe_titel is not null
+                    ORDER by dta_reihe_titel,dta_reihe_jahrgang,dta_reihe_band";
+        
+        $currentSeriesTitle = NULL;
+        $currentSeries = NULL;
+        foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+            
+            // encode all data from the old database as UTF8
+            array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
+
+            // create new series if the series title hasn't been seen before
+            if($currentSeriesTitle === NULL || $row['title'] != $currentSeriesTitle){
+                
+                $title = new Model\Data\Title();
+                $title->addTitlefragment(new Model\Data\Titlefragment("Haupttitel", $row['title']));
+                
+                $corePublication = new Model\Data\Publication();
+                $corePublication->setId($this->publicationIdCounter++)
+                                ->setTitle($title)
+                                ->setType(Model\Data\PublicationPeer::TYPE_SERIES);
+                
+                $currentSeries = new Model\Data\Series();
+                $currentSeries->setId($corePublication->getId())
+                              ->setPublication($corePublication);
+                
+                $currentSeriesTitle = $row['title'];
+            }
+            
+            $seriesPublication = new Model\Master\SeriesPublication();
+            $seriesPublication->setPublicationId($row['publication_id'])
+                              ->setIssue($row['issue'])
+                              ->setVolume($row['volume']);
+            $currentSeries->getPublication()->getTitleString();
+            $currentSeries->addSeriesPublication($seriesPublication)
+                          ->save($this->propelConnection);
+            
+        }
+        
     }
     
     function convertPublicationGroups($dbh){
@@ -621,6 +676,7 @@ class DumpConversionController extends ORMController {
             
         $lastGroupId = -1;
         $group = NULL;
+        $publications = Model\Data\PublicationQuery::create();
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
             array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
@@ -631,13 +687,13 @@ class DumpConversionController extends ORMController {
                 $group->setId($row['group_id'])
                       ->setName($row['group_name'])
                       ->setUpdatedAt($this->parseSQLDate($row['last_change']))
-                      ->save();
+                      ->save($this->propelConnection);
                 
                 $lastGroupId = $row['group_id'];
             }
             
-            $publication = Model\Data\PublicationQuery::create()->findOneById($row['publication_id']);
-            $group->addPublication($publication);
+            $group->addPublication($publications->findOneById($row['publication_id']))
+                    ->save($this->propelConnection);
         }
         
     }
@@ -795,20 +851,39 @@ class DumpConversionController extends ORMController {
          
     function convertPublishingCompanies($dbh) {
         
-        $rawData = "SELECT publishing_company FROM
-                    (SELECT dta_pub_verlag AS publishing_company FROM book 
-                    UNION 
-                    SELECT first_pub_verlag AS publishing_company FROM book) as pcs
-                    where publishing_company <> ''
+        $rawData = "SELECT 
+                        id_book as publication_id
+                        ,trim(char(9) from trim(publishing_company)) as `publishing_company`
+                    FROM
+                        (
+                            SELECT id_book, SUBSTRING_INDEX( SUBSTRING_INDEX( dta_pub_verlag, ';', 1), ';', -1 ) AS publishing_company FROM book 
+                            UNION 
+                            SELECT id_book, SUBSTRING_INDEX( SUBSTRING_INDEX( dta_pub_verlag, ';', 2), ';', -1 ) AS publishing_company FROM book 
+                            UNION 
+                            SELECT id_book, SUBSTRING_INDEX( SUBSTRING_INDEX( first_pub_verlag, ';', 1), ';', -1 ) AS publishing_company FROM book 
+                            UNION 
+                            SELECT id_book, SUBSTRING_INDEX( SUBSTRING_INDEX( first_pub_verlag, ';', 2), ';', -1 ) AS publishing_company FROM book 
+                        ) 
+                    as publishingCompanies
+                    WHERE publishing_company <> ''
                     order by publishing_company";
-                        
+         
+        $currentPublishingCompany = new Model\Data\Publishingcompany();
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
             array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
                         
-            $publishingCompany = new Model\Data\Publishingcompany();
-            $publishingCompany->setName($row['publishing_company'])
-                    ->save($this->propelConnection);
+            if($row['publishing_company'] !== $currentPublishingCompany->getName()){
+                
+                $currentPublishingCompany = new Model\Data\Publishingcompany();
+                $currentPublishingCompany->setName($row['publishing_company'])
+                                         ->save($this->propelConnection);
+            }
+            
+            $publications = Model\Data\PublicationQuery::create();
+            $publications->findOneById($row['publication_id'])
+                         ->setPublishingcompany($currentPublishingCompany)
+                         ->save($this->propelConnection);
         }
     }
     
@@ -819,46 +894,62 @@ class DumpConversionController extends ORMController {
     function convertPlaces($dbh) {
         
         $rawData = "
-                SELECT DISTINCT
-                    CASE location
+                SELECT 
+                    id_book as publication_id
+                    ,CASE location
                         WHEN 'Frankfurt a. M' THEN 'Frankfurt (Main)'
                         WHEN 'Freiburg i. Br.' THEN 'Freiburg (Breisgau)'
                         WHEN 'Halle a. S.' THEN 'Halle (Saale)'
                         WHEN 'Leipzig (fingierte Druckorte)' THEN 'Leipzig'
-                        ELSE location
+                        ELSE trim(CHAR(9) FROM trim(location))
                     END as `location`
                 FROM
-                    (SELECT DISTINCT 
-                        SUBSTRING_INDEX(SUBSTRING_INDEX(location, ';', 1), ';', - 1) as location
+                    -- split und union semicolon-separated places
+                    (SELECT 
+                        id_book
+                        ,SUBSTRING_INDEX(SUBSTRING_INDEX(location, ';', 1), ';', - 1) as location
                     FROM
-                        (SELECT dta_pub_location AS location FROM book 
-                         UNION SELECT first_pub_location AS location FROM book) as places
+                        (SELECT id_book, dta_pub_location AS location FROM book 
+                         UNION SELECT id_book, first_pub_location AS location FROM book) as places
                         
-                    UNION SELECT DISTINCT
-                        SUBSTRING_INDEX(SUBSTRING_INDEX(location, ';', 2), ';', - 1) as location
+                    UNION SELECT
+                        id_book
+                        ,SUBSTRING_INDEX(SUBSTRING_INDEX(location, ';', 2), ';', - 1) as location
                     FROM
-                        (SELECT dta_pub_location AS location FROM book 
-                         UNION SELECT first_pub_location AS location FROM book) as places
+                        (SELECT id_book, dta_pub_location AS location FROM book 
+                         UNION SELECT id_book, first_pub_location AS location FROM book) as places
                         
-                    UNION SELECT DISTINCT 
-                        SUBSTRING_INDEX(SUBSTRING_INDEX(location, ';', 3), ';', - 1) as location
+                    UNION SELECT 
+                        id_book
+                        ,SUBSTRING_INDEX(SUBSTRING_INDEX(location, ';', 3), ';', - 1) as location
                     FROM
-                        (SELECT dta_pub_location AS location FROM book 
-                         UNION SELECT first_pub_location AS location FROM book) as places
+                        (SELECT id_book, dta_pub_location AS location FROM book 
+                         UNION SELECT id_book, first_pub_location AS location FROM book) as places
                     ) as places
                 WHERE
                     location IS NOT NULL
                     AND LENGTH(location) > 0
                 ORDER BY 
                     location";
-                        
+           
+        $currentPlace = new Model\Data\Place();
+        $publications = Model\Data\PublicationQuery::create();
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
             array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
                         
-            $place = new Model\Data\Place();
-            $place->setName($row['location'])
-                    ->save($this->propelConnection);
+            if($currentPlace->getName() !== $row['location']){
+                
+                $currentPlace = new Model\Data\Place();
+                $currentPlace->setName($row['location'])
+                        ->save($this->propelConnection);
+                
+            }
+            
+             $publications->findOneById($row['publication_id'])
+                   ->setPlace($currentPlace)
+                   ->save($this->propelConnection);
+            
         }
     }
     
@@ -937,15 +1028,12 @@ class DumpConversionController extends ORMController {
             // encode all data from the old database as UTF8
             array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
 
-            $publication = Model\Data\PublicationQuery::create()
-                        ->findOneById($row['id_book']);
-            $gndCollisions = NULL;
+            $publication = Model\Data\PublicationQuery::create()->findOneById($row['id_book']);
+            $gndCollision = NULL;
             
             // try to detect duplicates with duplicate gnds
             if ($row['pnd'] !== NULL) {
-                $gndCollisions = Model\Data\PersonQuery::create()
-                        ->filterByGnd($row['pnd'])
-                        ->find();
+                $gndCollision = Model\Data\PersonQuery::create()->findOneByGnd($row['pnd']);
             }
             
             // subsequent rows usually contain the same person but a different book
@@ -957,13 +1045,13 @@ class DumpConversionController extends ORMController {
                 $publication
                     ->addPersonPublication(new Model\Master\PersonPublication($lastPerson->getId(), 'Autor'))
                     ->save($this->propelConnection);
-                
-            } else if($gndCollisions !== NULL && $gndCollisions->count() == 1){
+            // if the row refers to the same person (but this is inferred from the matching GND)
+            } else if($gndCollision !== NULL){
                 
                 $publication
-                    ->addPersonPublication(new Model\Master\PersonPublication($gndCollisions[0]->getId(), 'Autor'))
+                    ->addPersonPublication(new Model\Master\PersonPublication($gndCollision->getId(), 'Autor'))
                     ->save($this->propelConnection);
-                
+            // create new person
             } else {
                 
                 // create the name object
@@ -1002,24 +1090,25 @@ class DumpConversionController extends ORMController {
         // there are a few persons which don't have first name/last name columns, so the names must be split
         $rawData = "
             SELECT 
-                -- id_book,
-                person as person,
-                LOCATE('#', person) as hash_position
+                id_book as publication_id            
+                ,trim(char(9) from trim(person)) as person
+                ,role
                 ,LOCATE(',', person) as comma_position
                 ,LOCATE(' ', person) as space_position
+                ,NULLIF(substring(substring(person FROM LOCATE('#', person)) from 2), '') as gnd
             FROM (
                 
             -- first persons (if separated by ';')
                 SELECT DISTINCT 
-                        id_book, SUBSTRING_INDEX( SUBSTRING_INDEX( person, ';', 1), ';', -1 ) as person
+                    id_book, SUBSTRING_INDEX( SUBSTRING_INDEX( person, ';', 1), ';', -1 ) as person, role
                 FROM (
-                    SELECT id_book, uebersetzer AS person FROM book
+                    SELECT id_book, uebersetzer AS person, _utf8'Übersetzer' as role FROM book
                     UNION
-                    SELECT id_book, publisher AS person FROM book
+                    SELECT id_book, publisher AS person, 'Verleger' as role FROM book
                     UNION
-                    SELECT id_book, dta_in_autor AS person FROM book
+                    SELECT id_book, dta_in_autor AS person, 'Autor' as role FROM book
                     UNION
-                    SELECT id_book, autor1_syn_names AS person FROM book
+                    SELECT id_book, autor1_syn_names AS person, 'synonym' as role FROM book
                 ) as condensedNames 
                 WHERE person IS NOT NULL AND LENGTH(person) > 2 	-- for some reason, strings of length 2 survive the trim operation
                     
@@ -1027,64 +1116,78 @@ class DumpConversionController extends ORMController {
                     
             -- second persons (if separated by ';')
                 SELECT DISTINCT 
-                        id_book, SUBSTRING_INDEX( SUBSTRING_INDEX( person, ';', 2), ';', -1 ) as person
+                        id_book, SUBSTRING_INDEX( SUBSTRING_INDEX( person, ';', 2), ';', -1 ) as person, role
                 FROM (
-                    SELECT id_book, uebersetzer AS person FROM book
+                    SELECT id_book, uebersetzer AS person, _utf8'Übersetzer' as role FROM book
                     UNION
-                    SELECT id_book, publisher AS person FROM book
+                    SELECT id_book, publisher AS person, 'Verleger' as role FROM book
                     UNION
-                    SELECT id_book, dta_in_autor AS person FROM book
+                    SELECT id_book, dta_in_autor AS person, 'Autor' as role FROM book
                     UNION
-                    SELECT id_book, autor1_syn_names AS person FROM book
+                    SELECT id_book, autor1_syn_names AS person, 'synonym' as role FROM book
                 ) as condensedNames 
                 WHERE person IS NOT NULL AND LENGTH(person) > 2
             ) as names
             ORDER BY person";
                 
+        $publications = Model\Data\PublicationQuery::create();
+        $currentPerson = new Model\Data\Person();
+        $currentPersonIdentifier = NULL;
+        $synonymAdded = false;
+        
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
             array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
-                        
-            $person = new Model\Data\Person();
-            $gnd = NULL;
-            $name = new Model\Data\Personalname();
-            
-            // if there's a GND finding duplicates is mostly simple
-            // also remove the GND string part from the name to make splitting easier
-            if ($row['hash_position'] !== 0) {
                 
-                $gnd = substr($row['person'], $row['hash_position']);
-                // remove the gnd
-                $row['person'] = substr($row['person'], 0, $row['hash_position'] - 2);
-                    
-                $collision = Model\Data\PersonQuery::create()->findOneByGnd($gnd);
-                if ($collision !== NULL){
-                    
-                    $this->warnings[] = array(
-                        'message' => 'Personen-Duplikat: GND bereits vergeben.',
-                        'action' => 'Datensatz übersprungen.',
-                        'book.id_book' => $row['person'],
-                        'collision due to' => "ID: " . $collision->getId() . "; " . $collision->getRepresentativePersonalName());
+            // check if a new person identifier is found
+            if($row['person'] !== $currentPersonIdentifier){
+                
+                // if a GND is given, check whether the person already exists by looking up the GND
+                $collision = Model\Data\PersonQuery::create()->findOneByGnd($row['gnd']);
+                if($row['gnd'] !== NULL && $collision !== NULL){
+                    $currentPerson = $collision;
+                // no duplicate, create new
+                } else {
+                    $currentPerson = Model\Data\Person::parseFromString($row);
                 }
-                continue;
-            } // if no GND is given, no duplicate detection is performed.
-            // assume a ',' is indicating first name, last name format
-            if ($row['comma_position'] !== 0) {
-                $parts = explode(',', $row['person']);
-                $name->addNamefragment(new Model\Data\Namefragment('Nachname', $parts[0]));
-                $name->addNamefragment(new Model\Data\Namefragment('Vorname', $parts[1]));
-            } elseif ($row['space_position'] !== 0) {
-                $parts = explode(',', $row['person']);
-                $name->addNamefragment(new Model\Data\Namefragment('Vorname', $parts[0]));
-                $name->addNamefragment(new Model\Data\Namefragment('Nachname', $parts[1]));
-            } else {
-                $name->addNamefragment(new Model\Data\Namefragment('Nachname', $row['person']));
+             
+                $currentPersonIdentifier = $row['person'];
+                $synonymAdded = false;
             }
+            
+            
+            // person wurde im Feld Synonymer Name Autor 1 angegeben 
+            if($row['role'] === "synonym" && ! $synonymAdded ){
                 
-            // create person
-            $person->setGnd($gnd)
-                    ->addPersonalname($name)
-                    ->save($this->propelConnection);
+                $author = $publications
+                        ->findOneById($row['publication_id'])
+                        ->getFirstAuthorName()
+                        ->getPerson();
+                $author
+                        ->addPersonalname($currentPerson->getPersonalnames()->getFirst())
+                        ->save($this->propelConnection);
+                
+            // person wurde als Autor der Serie, Verleger oder Übersetzer angegeben
+            } else {
+                
+                $personRole = Model\Classification\PersonroleQuery::create()
+                        ->findOneByName($row['role']);
+                $personPublication = new Model\Master\PersonPublication();
+                $personPublication->setPerson($currentPerson)
+                        ->setPersonrole($personRole);
+
+                // falls es sich um den Autor einer Serie handelt, bitte per Hand Daten übernehmen
+                if($row['role'] === "Autor"){
+                    $this->errors[] = array('Bitte von Hand konvertieren'=>$row['person'], 'autor in: '=>$row['publication_id']);
+                } else {
+                    $publications->findOneById($row['publication_id'])
+                            ->addPersonPublication($personPublication)
+                            ->save($this->propelConnection);
+                }
+                
+            }
+            
+            
         }
     }
         
