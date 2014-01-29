@@ -11,11 +11,10 @@ class Task extends BaseTask
      */
     public function getReferee(){
         
-        $referee = $this->getPublication();
-        if($referee === NULL){
-            $referee = $this->getPublicationgroup();
+        if($this->getPublication() === NULL){
+            return "Publikationsgruppe: ".$this->getPublicationgroup()->getName();
         } else {
-            return $referee->getTitle();
+            return $this->getPublication()->getTitle();
         }
             
     }

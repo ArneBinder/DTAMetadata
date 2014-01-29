@@ -50,39 +50,6 @@ class DumpConversionController extends ORMController {
         }
     }
         
-    function dropAndSetupTargetDB(){
-        
-        // import dump
-        $importDumpCommand = "$this->mysqlExec -u $this->username -p$this->password dtadb < $this->dumpPath";
-        $this->messages[] = array("import dump command: " => $importDumpCommand);
-        system($importDumpCommand);
-        
-        // build current database schema
-        $result = system("$this->phpExec ../app/console propel:sql:build");
-        $this->messages[] = array("building database schema from xml model: " => $result );
-        
-        // import current database schema to target database (ERASES ALL DATA)
-        $result = system("$this->phpExec ../app/console propel:sql:insert --force");
-        $this->messages[] = array("resetting target database: " => $result);
-        
-        // loads fixtures (task types, name fragment types, etc.)
-        $result = system("$this->phpExec ../app/console propel:fixtures:load @DTAMetadataBundle");
-        $this->messages[] = array("loading database fixtures: " => $result);
-        
-    }
-    
-    function runTransaction($task, $dbh){
-        $start = microtime(true);
-        $this->propelConnection->beginTransaction();
-        
-        $this->$task($dbh);
-        
-        $this->propelConnection->commit();
-        $time_taken = microtime(true) - $start;
-        echo $task." ".$time_taken;
-        $this->messages[] = array("finished transaction ".$task=>$time_taken);
-    }
-    
     /** Converts the legacy database dump into the new format. */
     function convertAction() {
         
@@ -119,18 +86,18 @@ class DumpConversionController extends ORMController {
         $this->createTaskTypes();
         
         $conversionTasks = array(
-            'convertUsers',                 // users first: they are referenced in last changed by columns
+            'convertUsers',                 // users first: they are referenced in "last changed by" columns
             'convertPublications',          
             'convertFirstEditions',
             'convertSeries',
             'convertPublicationGroups',
             'convertPartners',
             'convertCopyLocations',
-            'convertTasks',
+            'convertTasks',                 // tasks are linked to publications and publication groups
             'convertPublishingCompanies',
-            'convertFonts',
-            'convertPlaces',
-            'convertAuthors',
+            'convertFonts',                 
+            'convertPlaces',                
+            'convertAuthors',               
             'convertSingleFieldPersons');
         
         foreach ($conversionTasks as $task){
@@ -142,6 +109,39 @@ class DumpConversionController extends ORMController {
             'messages' => $this->messages,
             'errors'   => $this->errors,
         ));
+    }
+    
+    function dropAndSetupTargetDB(){
+        
+        // import dump
+        $importDumpCommand = "$this->mysqlExec -u $this->username -p$this->password dtadb < $this->dumpPath";
+        $this->messages[] = array("import dump command: " => $importDumpCommand);
+        system($importDumpCommand);
+        
+        // build current database schema
+        $result = system("$this->phpExec ../app/console propel:sql:build");
+        $this->messages[] = array("building database schema from xml model: " => $result );
+        
+        // import current database schema to target database (ERASES ALL DATA)
+        $result = system("$this->phpExec ../app/console propel:sql:insert --force");
+        $this->messages[] = array("resetting target database: " => $result);
+        
+        // loads fixtures (task types, name fragment types, etc.)
+        $result = system("$this->phpExec ../app/console propel:fixtures:load @DTAMetadataBundle");
+        $this->messages[] = array("loading database fixtures: " => $result);
+        
+    }
+    
+    function runTransaction($task, $dbh){
+        $start = microtime(true);
+        $this->propelConnection->beginTransaction();
+        
+        $this->$task($dbh);
+        
+        $this->propelConnection->commit();
+        $time_taken = microtime(true) - $start;
+        echo $task." ".$time_taken;
+        $this->messages[] = array("finished transaction ".$task=>$time_taken);
     }
     
     // parses date string in format 2007-12-11 17:39:30 to \DateTime objects
@@ -250,8 +250,8 @@ class DumpConversionController extends ORMController {
         }
     }
     
-    /** Returns an array of multi-volumed publications according to the criteria of the old system:
-     *  The title and first authors last name match.
+    /** Returns an array of multi-volumed publications (warning: the criteria of the old system are "The title and first authors last name match")
+     *  according to the metadata.type field (is MM or MMS)
      *  Returns an array structured like this: array(
      *  [title concatenated with autor1_lastname] =>
      * array(
@@ -359,7 +359,8 @@ class DumpConversionController extends ORMController {
                 ,dta_auflage as `printrun`
                 ,dta_bibl_angabe as `citation`
                 ,FIND_IN_SET(sources.source,'china,don,kt,n/a') as `source_id`
-
+                ,ready as `www_ready`
+                
                 ,IF(LENGTH(`year`) < 3, NULL, `year`) as `year` -- to sort out a 0 entry
                 ,LOCATE('[', `year`) as `year_is_reconstructed`
 
@@ -476,31 +477,32 @@ class DumpConversionController extends ORMController {
             // basic publication data 
             $publication = new Model\Data\Publication();
             $publication->setId($row['id'])
-                        ->setDirname($row['dirname'])
-                        ->setTitle($title)
-                        ->setDatespecificationRelatedByPublicationdateId($publishedDate)
-                        ->setNumpages($row['numpages'])
-                        ->setNumpagesnumeric($row['numpages_numeric'])
                         ->setCitation($row['citation'])
-                        ->setPrintrun($row['printrun'])
+                        ->setCreatedAt($this->parseSQLDate($row['dta_insert_date']))
                         ->setComment($comment)
-                        ->setFirstpage($row['first_text_page'])
-                        ->setUsedcopylocationId($row['used_copy_location'])
+                        ->setDatespecificationRelatedByPublicationdateId($publishedDate)
+                        ->setDirname($row['dirname'])
+                        ->setDoi($row['doi'])
                         ->setEditioncomment($row['edition_comment'])
                         ->setEncodingComment($row['encoding_comment'])
-                        ->setDoi($row['doi'])
+                        ->setFirstpage($row['first_text_page'])
                         ->setFormat($row['format'])
-                        ->setSourceId($row['source_id'])
-                        ->setLegacygenre($row['genre'])
-                        ->setLegacysubgenre($row['subgenre'])
+                        ->setLastChangedByUserId($row['updated_by'])
                         ->setLegacyDwdsCategory1($row['dwds_kategorie1'])
                         ->setLegacyDwdsSubcategory1($row['dwds_unterkategorie1'])
                         ->setLegacyDwdsCategory2($row['dwds_kategorie2'])
                         ->setLegacyDwdsSubcategory2($row['dwds_unterkategorie2'])
+                        ->setLegacygenre($row['genre'])
+                        ->setLegacysubgenre($row['subgenre'])
                         ->setLegacytype($row['legacy_type'])
-                        ->setCreatedAt($this->parseSQLDate($row['dta_insert_date']))
-                        ->setUpdatedAt($this->parseSQLDate($row['log_last_change']))
-                        ->setLastChangedByUserId($row['updated_by']);
+                        ->setNumpages($row['numpages'])
+                        ->setNumpagesnumeric($row['numpages_numeric'])
+                        ->setPrintrun($row['printrun'])
+                        ->setWwwready($row['www_ready'])
+                        ->setSourceId($row['source_id'])
+                        ->setTitle($title)
+                        ->setUsedcopylocationId($row['used_copy_location'])
+                        ->setUpdatedAt($this->parseSQLDate($row['log_last_change']));
 
             
             if(array_key_exists($row['title'].$row['autor1_lastname'], $multiVolumes)){
@@ -544,9 +546,10 @@ class DumpConversionController extends ORMController {
                         first_pub_name,
                         first_pub_location,
                         first_pub_verlag,
-                        first_reihe_titel,
                         first_seiten,
+                        first_reihe_titel,
                         first_reihe_band,
+                        first_in_title,
                         first_comments,
                         CASE first_status
                             WHEN '0' THEN NULL
@@ -554,7 +557,8 @@ class DumpConversionController extends ORMController {
                             WHEN '2' THEN _utf8'Keine Erstveröffentlichung'
                             WHEN '3' THEN _utf8'Unklar, ob Erstveröffentlichung'
                             ELSE first_status
-                        END as `first_status`
+                        END as `first_status`,
+                        first_status_date
                     FROM
                         book
                     WHERE
@@ -575,20 +579,24 @@ class DumpConversionController extends ORMController {
 
             $fields = array(
                 'first_status',
+                'first_status_date',
                 'first_pub_date',
                 'first_pub_name',
                 'first_pub_verlag',
                 'first_pub_location',
+                'first_in_title',
                 'first_reihe_titel',
                 'first_reihe_band',
                 'first_seiten',
                 'first_comments');
             $labels = array(
                 'Status',
+                'Status Erstausgabe, Stand',
                 'Erschienen', 
                 'Herausgeber',
                 'Verlag', 
                 'Ort',
+                'Erstausgabe in: (Titel)',
                 'Titel (R/Z)',
                 'Band (R/Z)',
                 'Seitenangabe', 
@@ -616,7 +624,7 @@ class DumpConversionController extends ORMController {
                         id_book as publication_id
                         ,dta_reihe_titel as title
                         ,dta_reihe_jahrgang as volume
-						   ,dta_reihe_band as issue
+                        ,dta_reihe_band as issue
                         
                     FROM
                         book
@@ -715,8 +723,9 @@ class DumpConversionController extends ORMController {
                     ->setMail($row['mail'])
                     ->setWeb($row['web'])
                     ->setContactdata('Telefon: ' . $row['phone1'] . "\nAdresse: " . $row['adress'])
-                    ->setComments($row['comments']);
-            $partner->save($this->propelConnection);
+                    ->setComments($row['comments'])
+                    ->setUpdatedAt($this->parseSQLDate($row['log_last_change']))
+                    ->save($this->propelConnection);
         }
     }
         
@@ -747,8 +756,8 @@ class DumpConversionController extends ORMController {
                         
             if($row['publication_id'] === NULL){
                 $this->errors[] = array(
-                    'message' => 'Fundstelle verweist auf nicht-existierende Publikation.'
-                    ,'action' => 'Fundstelle nicht übernommen.'
+                    'message' => 'Fundstelle verweist auf nicht-existierende Publikation.',
+                    'action' => 'Fundstelle nicht übernommen.'
                 );
                 continue;
             }
@@ -775,13 +784,15 @@ class DumpConversionController extends ORMController {
             
     function convertTasks($dbh){
         
-        $rawData = "SELECT 
+        $rawData = "-- normal tasks (refering to a single publication)
+                    SELECT 
                         id_task as `task_id`
+                        ,'single' as `type` 
                         ,IF(FIND_IN_SET(task_type,'5,10,20,30,31,40,45,50,55,58,59,60,65,70,75') = 0, null, task_type) as `task_type_id`
-                        ,book.id_book as `publication_id`
-                        ,partner.id_book_locations as `partner_id`
-                        ,fundstellen.id_Fundstellen as `copy_location_id`
-                        ,user.id_user as `user_id`
+                        ,book.id_book as `reference_object`
+                        ,NULLIF(open_tasks.id_book_locations,0) as `partner_id`
+                        ,NULLIF(id_fundstelle,0) as `copy_location_id`
+                        ,NULLIF(open_tasks.id_user,0) as `user_id`
                         ,NULLIF(starttime, '0000-00-00 00:00:00') as `start_date`
                         ,NULLIF(endtime, '0000-00-00 00:00:00') as `end_date`
                         ,open_tasks.comments
@@ -790,22 +801,44 @@ class DumpConversionController extends ORMController {
                         ,NULLIF(open_tasks.log_last_change, '0000-00-00 00:00:00') as `updated_at`
                     FROM
                         open_tasks 
-                        LEFT JOIN book ON
-                                open_tasks.id_book = book.id_book
-                        LEFT JOIN user on
-                               open_tasks.id_user = user.id_user
-                        LEFT JOIN partner ON 
-                            open_tasks.id_book_locations = partner.id_book_locations
-                        LEFT JOIN fundstellen ON
-                            id_fundstelle = id_Fundstellen";
+                            left join book on open_tasks.id_book = book.id_book
+                            left join user on open_tasks.id_user = user.id_user
+                            left join fundstellen on open_tasks.id_fundstelle = fundstellen.id_Fundstellen
+                    WHERE
+                            -- ignore tasks that refer to publication groups.
+                            -- they are redundantly created, the publication group task contains all the information
+                            grouped_task = 0 
+                    UNION
+                    -- group tasks (referring to all publications of a group)
+                    SELECT 
+                        id_task as `task_id`
+                        ,'group' as `type`
+                        ,IF(FIND_IN_SET(task_type,'5,10,20,30,31,40,45,50,55,58,59,60,65,70,75') = 0, null, task_type) as `task_type_id`
+                        ,groups.id_group as `reference_object`
+                        ,NULLIF(id_book_locations,0)  as `partner_id`
+                        ,null as `copy_location_id`
+                        ,user.id_user as `user_id`
+                        ,NULLIF(starttime, '0000-00-00 00:00:00') as `start_date`
+                        ,NULLIF(endtime, '0000-00-00 00:00:00') as `end_date`
+                        ,comments
+                        ,closed
+                        ,NULLIF(createDate, '0000-00-00 00:00:00') as `created_at`
+                        ,NULLIF(open_tasks_groups.log_last_change, '0000-00-00 00:00:00') as `updated_at`
+                    FROM
+                        open_tasks_groups
+                            LEFT JOIN user on open_tasks_groups.id_user = user.id_user
+                            LEFT JOIN groups ON open_tasks_groups.id_group = groups.id_group";
             
+        $publications = Model\Data\PublicationQuery::create();
+        $groups = Model\Workflow\PublicationgroupQuery::create();
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
             array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
 
-            if($row['publication_id'] === NULL){
+            if($row['reference_object'] === NULL){
                 $this->errors[] = array(
                     'message' => 'Task verweist auf nicht-existente Publikation.',
+                    'typ'     => $row['type'],
                     'action'  => "Task $row[task_id] übersprungen",
                     );
                 continue;
@@ -815,32 +848,39 @@ class DumpConversionController extends ORMController {
                 $this->warnings[] = array(
                     'message' => "Task hat unbekannten Tasktyp.",
                     'action'  => 'Datensatz übersprungen',
-                    'task_id'     => $row['task_id']
+                    'task_id in old dump' => $row['task_id']
                     );
                 continue;
             }
             
-            try {
-
             $task = new Model\Workflow\Task();
             
-            $task->setId($row['task_id'])
-                    ->setTasktypeId($row['task_type_id'])
-                    ->setPublicationId($row['publication_id'])
-                    ->setPartnerId($row['partner_id'])
-                    ->setCopylocationId($row['copy_location_id'])
-                    ->setResponsibleuserId($row['user_id'])
-                    ->setStartDate($this->parseSQLDate($row['start_date']))
-                    ->setEndDate($this->parseSQLDate($row['end_date']))
-                    ->setComments($row['comments'])
-                    ->setClosed($row['closed'])
-                    ->setCreatedAt($this->parseSQLDate($row['created_at']))
-                    ->setUpdatedAt($this->parseSQLDate($row['updated_at']));
-            $task->save($this->propelConnection);
-            
-            } catch (\PropelException $exc) {
-                $this->errors[] = array('error' => 'on insert task', 'row' => $row);
+            $task->setTasktypeId($row['task_type_id'])
+                 ->setPartnerId($row['partner_id'])
+                 ->setCopylocationId($row['copy_location_id'])
+                 ->setResponsibleuserId($row['user_id'])
+                 ->setStartDate($this->parseSQLDate($row['start_date']))
+                 ->setEndDate($this->parseSQLDate($row['end_date']))
+                 ->setComments($row['comments'])
+                 ->setClosed($row['closed'])
+                 ->setCreatedAt($this->parseSQLDate($row['created_at']))
+                 ->setUpdatedAt($this->parseSQLDate($row['updated_at']));
+
+            if($row['type'] === 'single'){
+                $publications->findOneById($row['reference_object'])
+                        ->addTask($task)
+                        ->save($this->propelConnection);
+                
+            } elseif($row['type'] === 'group'){
+                
+                $groups->findOneById($row['reference_object'])
+                        ->addTask($task)
+                        ->save($this->propelConnection);
+                
+            } else{
+                $this->errors[] = array('task refers neither to single publication nor to publication group. legacy task id'=>$row['task_id']);
             }
+            
         }
         
     }
@@ -975,9 +1015,9 @@ class DumpConversionController extends ORMController {
             $user->setId($row['id_user'])
                     ->setUsername($row['name'])
                     ->setMail($row['mail'])
-                    ->setPassword($saltedPassword);
-                        
-            $user->save($this->propelConnection);
+                    ->setPassword($saltedPassword)
+                    ->setCreatedAt($this->parseSQLDate($row['creation_date']))
+                    ->save($this->propelConnection);
         }
         
     }
@@ -1201,7 +1241,7 @@ class DumpConversionController extends ORMController {
         foreach ($dbh->query($checkQuery)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             
             $this->warnings[] = array(
-                'year and dta_pub_date differ'=>
+                'year and dta_pub_date differ (only year will be converted to new database)'=>
                 $row['book_id'] . " year: $row[year] dta_pub_date: $row[dta_pub_date]"
             );
         }

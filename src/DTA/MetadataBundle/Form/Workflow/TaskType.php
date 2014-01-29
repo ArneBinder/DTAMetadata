@@ -23,6 +23,8 @@ class TaskType extends BaseAbstractType
             'property' => 'name',
             'required' => true
         ));
+//        $builder->add("publicationgroup", null, array(
+//        ));
         $builder->add('start_date', null, array('years'=>range(2005,2020),'widget' => 'choice'));
         $builder->add('end_date', null, array('years'=>range(2005,2020),'widget' => 'choice'));
         $builder->add('comments');

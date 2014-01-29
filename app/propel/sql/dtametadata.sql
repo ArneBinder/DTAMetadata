@@ -662,7 +662,7 @@ DROP TABLE IF EXISTS "task" CASCADE;
 
 CREATE TABLE "task"
 (
-    "id" INTEGER NOT NULL,
+    "id" serial NOT NULL,
     "tasktype_id" INTEGER NOT NULL,
     "closed" BOOLEAN,
     "start_date" DATE,

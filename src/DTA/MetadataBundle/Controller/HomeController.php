@@ -76,14 +76,18 @@ class HomeController extends ORMController {
 
 //        $personalName = Model\Data\PersonQuery::create()->findOneByGnd('119066882');
 //        Model\Data\PersonalnameQuery::create()->filterByNamefragment($personalName->getRepresentativePersonalName()->getNamefragments())->find();
-        $p = Model\Data\PersonQuery::create()->findOneByGnd('119066882');
+//        $p = Model\Data\PersonQuery::create()->findOneByGnd('119066882');
+//        $publications= Model\Data\PublicationQuery::create();
+//        $tasks = Model\Workflow\TaskQuery::create();
         return $this->renderWithDomainData('DTAMetadataBundle:Home:index.html.twig', array(
             'testData' => 
 //            $se2
+            null
 //            $queryClass
 //            $queryConstructionString
 //             $groupA = Model\Workflow\TasktypeQuery::create()->orderByTreeLeft()->select('Name')->find()
-                $p
+//                array($publications->findOneById(17096)->getFirstAuthorName(), $publications->findOneById(16207)->getFirstAuthorName())
+//            $tasks->findOneById(6016)->getPublicationgroup()->getName()
 //             $groupA = Model\Data\PlaceQuery::create()->findOneByName("Berlin")->getPublications()
             //$p->getPersonalnames()
         ));
