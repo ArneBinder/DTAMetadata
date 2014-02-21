@@ -24,43 +24,22 @@ class HomeController extends ORMController {
     
     public function indexAction(Request $request) {
 
-//        $persons = Model\Data\PersonQuery::create()
-//                ->limit(10)
-//                ->find();
-//
-//        $publications = array();
-//        $multiVolumes = array();
-//        
-//        foreach($persons as $person){
-//            
-//            // find publications with identical titles
-//            $publications = Model\Data\PublicationQuery::create()
-//                    ->usePersonPublicationQuery()
-//                        ->filterByPerson($person)
-//                    ->endUse()
-//                    ->find();
-//            $publicationsByTitle = array();
-//            foreach($publications as $publication){
-//                $title = $publication->getTitle()->__toString();
-//                $publicationsByTitle[$title][] = $publication;
-//            }
-//            
-//            // aggregate into multivolumes
-//            foreach($publicationsByTitle as $title => $aggregationData){
-//                $multiVolumes[$title] = $aggregationData;
-//            }
-//            
-//        }
-
         $lorenz = Model\Data\PersonQuery::create()->findOneById(300);
-        $pub = Model\Data\PublicationQuery::create()->findOneById(16846);
         
         return $this->renderWithDomainData('DTAMetadataBundle:Home:index.html.twig', array(
             'testData' => 
 //            null
+            array(
+                'multivol is root' => $multivolume->isRoot(),
+                'multivol scope'=>$multivolume->getScopeValue(),
+                'multivol parent'=>$multivolume->getParent(),
+                'volume is root'=>$volume->isRoot(),
+                'vol scope '=>$volume->getScopeValue(),
+//                'root'=>Model\Data\PublicationQuery::create()->findRoot(),
+//                'roots'=>Model\Data\PublicationQuery::create()->findRoots(),
+                )
             //$title->getTitleFragments()->getFirst()
-            $lorenz->getAuthorIndex($pub)
-                
+//               $authorsVolumes 
 //            $outcome
 //            $queryClass
 //            $queryConstructionString

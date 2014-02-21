@@ -4,10 +4,15 @@
 
 {% block core %}
 
-
-{#{% for value in testData %}#}
 {{dump(testData)}} <br/>
-{#{% endfor %}#}
+
+{#{% for value in testData %}
+{{dump(testData)}} <br/>
+{% endfor %}#}
+
+{#{% for volume in testData %}
+#{{volume.id}} {{volume.getPublication.getTitle}}<br/>
+{% endfor %}#}
 
 {#{% for key,value in testData %}
 {{key}}=====>{{value|length}} publikation(en)<br/>

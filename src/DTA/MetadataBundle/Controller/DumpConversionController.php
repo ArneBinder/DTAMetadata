@@ -91,7 +91,6 @@ class DumpConversionController extends ORMController {
             'convertUsers',                 // users first: they are referenced in "last changed by" columns
             'convertPublications',  
             'convertFirstEditions',
-            'convertSeries',
             'convertPublicationGroups',
             'convertPartners',
             'convertCopyLocations',
@@ -101,6 +100,7 @@ class DumpConversionController extends ORMController {
             'convertPlaces',                
             'convertAuthors',               
             'convertSingleFieldPersons',
+            'convertSeries',
             'convertMultiVolumes');
         
         foreach ($conversionTasks as $task){
@@ -269,15 +269,15 @@ class DumpConversionController extends ORMController {
             // find publications with identical titles ('title' => array(pub1, pub2, ...), ...)
             $publicationsByTitle = array();
             
-            // filter criteria for person role = author and publication type = volume (and query optimization with joins)
-            $authorOfAndVolume = Model\Master\PersonPublicationQuery::create()
-                                ->joinWith('Person')->joinWith('Person.Personalname')->joinWith('Personalname.Namefragment')
-                                ->joinWith('Publication')->joinWith('Publication.Title')->joinWith('Title.Titlefragment')
-                                ->filterByRole(Model\Master\PersonPublicationPeer::ROLE_AUTHOR)
-                                ->usePublicationQuery()
-                                    ->filterByType(Model\Data\PublicationPeer::TYPE_VOLUME)
-                                ->endUse();
-            $authorsVolumes = $person->getPersonPublications($authorOfAndVolume);
+            $authorsVolumes = Model\Data\VolumeQuery::create()
+                ->usePublicationQuery()
+                    ->usePersonPublicationQuery()
+                        ->filterByRole(Model\Master\PersonPublicationPeer::ROLE_AUTHOR)
+                        ->filterByPerson($person)
+                    ->endUse()
+                ->endUse()
+                ->orderByVolumeNumeric()
+                ->find();
             
             foreach($authorsVolumes as $volume){
                 /* @var $volume \DTA\MetadataBundle\Model\Data\Volume */
@@ -318,9 +318,9 @@ class DumpConversionController extends ORMController {
             ->getPublication()
             ->getTitle()
             ->copy(true) // deep copy (because of titlefragments)
-            ->clearPublications(); // publication was copied, too!
+            ->clearPublications(); // publication was copied, too -> saving causes duplicate publication ID error!
                     
-        // create multivolume
+        // create multivolume base publication
         $publicationId = $this->publicationIdCounter++;
         $basePublication = new Data\Publication();
         $basePublication->setId($publicationId)
@@ -328,14 +328,25 @@ class DumpConversionController extends ORMController {
                 ->setTitle($title)
                 // other person publications might be volume specific
                 ->addPersonPublication(Model\Master\PersonPublication::create($person->getId(), Model\Master\PersonPublicationPeer::ROLE_AUTHOR))
-                ->save();
+                ->setScopeValue($publicationId)
+                ->makeRoot()
+                ->save($this->propelConnection);
+        
+        // create multi volume
         $multiVolume = new Data\MultiVolume();
         $multiVolume->setId($publicationId)
-                ->save();
-
+                ->setVolumesTotal(count($volumes))
+                ->save($this->propelConnection);
+        
         foreach ($volumes as $volume) {
-            $volume->getPublication()->setParent($multiVolume);
+            /* @var $volume Data\Volume */
+            $volume->getPublication()
+                    ->setScopeValue($publicationId)
+                    ->insertAsLastChildOf($basePublication)
+                    ->save($this->propelConnection);
         }
+        
+
         
     }
     

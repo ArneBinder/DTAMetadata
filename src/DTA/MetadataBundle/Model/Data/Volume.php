@@ -6,14 +6,9 @@ use DTA\MetadataBundle\Model\Data\om\BaseVolume;
 
 class Volume extends BaseVolume
 {
-//    
-//    public function getPublication(PropelPDO $con = null, $doQuery = true){
-//        return PublicationQuery::create()->findOneById($this->getId());
-//    }
-    
+
     /** Returns the number of volumes that the parent multi-volume has in reality, as opposed to getNumberOfDigitizedVolumes. */
     public function getNumberOfRealVolumes(){
-        
         return $this->getPublication()->getParent()->getSpecialization()->getVolumesTotal();
         
     }
