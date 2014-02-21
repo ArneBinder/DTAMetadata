@@ -29,35 +29,6 @@ DTA\MetadataBundle\Model\Classification\Genre:
         name: "Sachliteratur: Fachliteratur"
     Genre_7:
         name: "Sachliteratur: Gebrauchsliteratur"
-DTA\MetadataBundle\Model\Classification\Namefragmenttype:
-    Namefragmenttype_1:
-        name: Vorname
-    Namefragmenttype_2:
-        name: Nachname
-    Namefragmenttype_3:
-        name: Adelstitel
-    Namefragmenttype_4:
-        name: Generation
-    Namefragmenttype_5:
-        name: Pseudonym
-    Namefragmenttype_6:
-        name: Alternative Schreibweise
-DTA\MetadataBundle\Model\Classification\Personrole:
-    Personrole_1:
-        name: Autor
-    Personrole_2:
-        name: Verleger
-    Personrole_3:
-        name: Übersetzer
-    Personrole_4:
-        name: Drucker
-DTA\MetadataBundle\Model\Classification\Titlefragmenttype:
-    Titlefragmenttype_1:
-        name: Haupttitel
-    Titlefragmenttype_2:
-        name: Untertitel
-    Titlefragmenttype_3:
-        name: Kurztitel
 DTA\MetadataBundle\Model\Data\Font:
     Font_1:
         name: Textur

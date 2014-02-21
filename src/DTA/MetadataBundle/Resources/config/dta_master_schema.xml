@@ -102,12 +102,11 @@
     <table name="person_publication" idMethod="native">
         
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>        
-
+        <column name="role" description="Art der Beziehung zwischen Person und Publikation." 
+                type="ENUM" valueSet="AUTHOR,PUBLISHER,TRANSLATOR,PRINTER" />
         <column name="person_id" type="INTEGER" required="true"/>
-        <column name="personrole_id" type="INTEGER" required="true"/>
         <column name="publication_id" type="INTEGER" required="true"/>
         <foreign-key foreignTable="person"> <reference local="person_id" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="personrole"> <reference local="personrole_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="publication"> <reference local="publication_id" foreign="id"/> </foreign-key>
     </table>
     

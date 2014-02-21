@@ -44,12 +44,12 @@ class DataDomainController extends ORMController {
     public function __construct(){
         
         // retrieve different person roles (Autor, Verleger, Drucker, etc.)        
-        $personRoles = Model\Classification\PersonroleQuery::create()->find();
+        $personRoles = Model\Master\PersonPublicationPeer::getValueSet(Model\Master\PersonPublicationPeer::ROLE);
         foreach($personRoles as $pr ){
             $this->domainMenu['person']['children'][] = array(
-                "caption" => $pr->getName(), 
+                "caption" => $pr, 
                 "route" => "viewPersonsByRole", 
-                "parameters" => array('personRoleId'=>$pr->getId())
+                "parameters" => array('personRoleId'=>$pr)
             );
         }
 
@@ -121,14 +121,13 @@ class DataDomainController extends ORMController {
     
     public function viewPersonsByRoleAction($personRoleId) {
         
-        $role = Model\Classification\PersonroleQuery::create()
-                ->findOneById($personRoleId);
-        
         $rows = array();//new \ArrayObject();
         $personPublications = Model\Master\PersonPublicationQuery::create()
-                ->filterByPersonroleId($personRoleId)
+                ->filterByRole($personRoleId)
                 ->usePublicationQuery()
-                    ->filterByType(Model\Data\PublicationPeer::TYPE_VOLUME, \Criteria::NOT_EQUAL)->endUse()
+                    // multi-volumes are enough, don't show each volume separately
+                    ->filterByType(Model\Data\PublicationPeer::TYPE_VOLUME, \Criteria::NOT_EQUAL)
+                ->endUse()
                 ->leftJoinWith('Person')
                 ->leftJoinWith('Person.Personalname')
                 ->leftJoinWith('Personalname.Namefragment')
@@ -163,7 +162,7 @@ class DataDomainController extends ORMController {
             'rows' => $rows,
             'columns' => $columns,
             'accessors' => $accessors,
-            'title' => $role->getName()
+            'title' => $personRoleId
         ));
     }
 

@@ -24,7 +24,7 @@
         <!-- TODO: enable autoincrement. During conversion, the ids are set as the ids of the legacy database.-->
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="false" required="true"/>
         
-        <column name="type" description="Publikationstyp. Zur Auflösung des dynamischen Typs (ein Volume bettet ein Publication objekt ein, mit nichts als dem Publikationsobjekt in der Hand, lässt sich das zugehörige speziellere objekt aber nur durch ausprobieren aller objektarten herausfinden.)" 
+        <column name="type" description="Publikationstyp. Zur Auflösung des dynamischen Typs (z.B. ein Volume bettet ein Publication-Objekt ein, mit nichts als dem Publikationsobjekt in der Hand, lässt sich das zugehörige speziellere objekt aber nur durch ausprobieren aller Publikationstypen herausfinden.)" 
                 type="ENUM" valueSet="BOOK,VOLUME,MULTIVOLUME,CHAPTER,JOURNAL,ARTICLE,SERIES" />
         <column name="legacytype" description="Altes Publikationstypen-Kürzel (J, JA, M, MM, MMS, etc.)" type="LONGVARCHAR" />
         
@@ -109,7 +109,7 @@
                     ->leftJoinWith('Person.Personalname')
                     ->leftJoinWith('Personalname.Namefragment')
                     ->leftJoinWith('Volume')
-                    ->orderBy('Titlefragment.TitlefragmenttypeId', 'asc')
+                    ->orderBy('Titlefragment.type', 'asc')
                     ->orderBy('Titlefragment.Name', 'asc')
                     ->orderBy('Title.Id', 'asc')
                     ->orderBy('Volume.VolumeNumeric', 'asc');" />
@@ -141,7 +141,6 @@
     -->
     <table name="multi_volume">
         <column name="id" type="INTEGER" primaryKey="true" required="true"/>
-        <!--<column name="publication_id" primaryKey="true" type="INTEGER" required="true"/>-->
         
         <column name="volumes_total" description="Anzahl Bände (gesamt)" type="INTEGER"/>
         
@@ -157,7 +156,6 @@
     -->
     <table name="volume">
         <column name="id" type="INTEGER" primaryKey="true" required="true"/>
-        <!--<column name="publication_id" primaryKey="true" type="INTEGER" required="true"/>-->
         
         <column name="volume_description" description="Bezeichnung des Bandes (alphanumerisch)" type="LONGVARCHAR"/>
         <column name="volume_numeric" description="Bezeichnung des Bandes (numerisch)" type="INTEGER"/>
@@ -174,7 +172,6 @@
     -->
     <table name="chapter">
         <column name="id" type="INTEGER" primaryKey="true" required="true"/>
-        <!--<column name="publication_id" primaryKey="true" type="INTEGER" required="true"/>-->
         
         <column name="pages" description="Seitenangabe" type="LONGVARCHAR"/>
         
@@ -190,7 +187,6 @@
     -->
     <table name="article">
         <column name="id" type="INTEGER" primaryKey="true" required="true"/>
-        <!--<column name="publication_id" primaryKey="true" type="INTEGER" required="true"/>-->
         
         <column name="pages" description="Seitenangabe" type="LONGVARCHAR"/>
         
@@ -206,8 +202,6 @@
     -->
     <table name="series">
         <column name="id" type="INTEGER" primaryKey="true" required="true"/>
-        <!--<column name="publication_id" primaryKey="true" type="INTEGER" required="true"/>-->
-        
         
         <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>
         
@@ -265,12 +259,11 @@
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="personalname_id" type="INTEGER" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true" primaryString="true"/>
-        <column name="namefragmenttypeid" type="INTEGER" required="true"/>
-
-        <foreign-key foreignTable="namefragmenttype"> 
-            <reference local="namefragmenttypeid" foreign="id"/> 
-        </foreign-key>
+        
+        <column name="type" description="Bedeutung des Fragments. Zum Beispiel Vorname, Nachname, Peerage (Adelstitel), Spelling (alternative schreibweise) etc." 
+                type="ENUM" valueSet="FIRST_NAME,LAST_NAME,PEERAGE,GENERATION,PSEUDONYM,SPELLING" />
         <foreign-key foreignTable="personalname" onDelete="cascade"> <reference local="personalname_id" foreign="id"/> </foreign-key>
+        
         
         <behavior name="sortable">
             <parameter name="use_scope" value="true"/>
@@ -278,7 +271,6 @@
         </behavior>
         <behavior name="table_row_view">
             <parameter name="bestandteil" value="name"/>
-            <parameter name="embedcolumnsart" value="namefragmenttype"/>
         </behavior>
     </table>
     
@@ -295,9 +287,11 @@
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true" primaryString="true"/>
         <column name="title_id" type="INTEGER" required="true"/>
-        <column name="titlefragmenttype_id" type="INTEGER" required="true"/>
+        
+        <column name="type" description="Bedeutung des Fragments. Zum Beispiel Haupttitel, Untertitel, etc." 
+                type="ENUM" valueSet="MAIN_TITLE,SUBTITLE,SHORT_TITLE" />
+        
         <foreign-key foreignTable="title" onDelete="cascade"> <reference local="title_id" foreign="id"/> </foreign-key>
-        <foreign-key foreignTable="titlefragmenttype"> <reference local="titlefragmenttype_id" foreign="id"/> </foreign-key>
         
         <behavior name="sortable">
             <parameter name="use_scope" value="true"/>
@@ -319,7 +313,12 @@
             <parameter name="erster name@representative" value="personalname"/>
             <!--<parameter name="namen gesamt@count" value="personalname"/>-->
             <parameter name="gnd" value="gnd"/>
-            <parameter name="query" value="DTA\MetadataBundle\Model\Data\PersonQuery::create()->joinWith('Personalname')->joinWith('Personalname.Namefragment')->joinWith('Namefragment.Namefragmenttype')->orderBy('Namefragmenttype.id', \Criteria::DESC)->orderBy('Namefragment.name');"/>
+            <parameter name="query" 
+                       value="DTA\MetadataBundle\Model\Data\PersonQuery::create()
+                            ->joinWith('Personalname')
+                            ->joinWith('Personalname.Namefragment')
+                            ->orderBy('Namefragment.type',\Criteria::DESC)
+                            ->orderBy('Namefragment.name');"/>
         </behavior>
         
         <unique> <unique-column name="gnd"/> </unique>

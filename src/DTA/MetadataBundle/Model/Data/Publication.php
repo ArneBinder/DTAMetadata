@@ -72,7 +72,7 @@ class Publication extends BasePublication
         // check if the title has a shortTitle fragment
         foreach ($titleFragments as $tf ){
             /* @var $tf Titlefragment */
-            if($tf->getTitlefragmenttype()->getName() == "Kurztitel")
+            if($tf->getType() == TitlefragmentPeer::TYPE_SHORT_TITLE)
                 return $tf->getName();
         }
         

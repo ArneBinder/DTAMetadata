@@ -4,14 +4,20 @@
 
 {% block core %}
 
-{{ dump(testData) }}
-{#
-{% for pn in testData %}
-{{pn}}
-{% endfor %}
-{{ url('root') }}
-#}
 
+{#{% for value in testData %}#}
+{{dump(testData)}} <br/>
+{#{% endfor %}#}
+
+{#{% for key,value in testData %}
+{{key}}=====>{{value|length}} publikation(en)<br/>
+{% for value in value %}
+#{{value.id}} {{value.getTitle}}<br/>
+{% endfor %}
+<hr/>
+{% endfor %}#}
+
+{#{{dump(testData)}}#}
 
 <h3>Bearbeitungsverlauf</h3>
 <table class="table" style="width:49%">

@@ -1,35 +1,5 @@
 
 -----------------------------------------------------------------------
--- titlefragmenttype
------------------------------------------------------------------------
-
-DROP TABLE IF EXISTS "titlefragmenttype" CASCADE;
-
-CREATE TABLE "titlefragmenttype"
-(
-    "id" serial NOT NULL,
-    "name" TEXT NOT NULL,
-    "created_at" TIMESTAMP,
-    "updated_at" TIMESTAMP,
-    PRIMARY KEY ("id")
-);
-
------------------------------------------------------------------------
--- namefragmenttype
------------------------------------------------------------------------
-
-DROP TABLE IF EXISTS "namefragmenttype" CASCADE;
-
-CREATE TABLE "namefragmenttype"
-(
-    "id" serial NOT NULL,
-    "name" TEXT NOT NULL,
-    "created_at" TIMESTAMP,
-    "updated_at" TIMESTAMP,
-    PRIMARY KEY ("id")
-);
-
------------------------------------------------------------------------
 -- personrole
 -----------------------------------------------------------------------
 
@@ -174,7 +144,7 @@ CREATE TABLE "publication"
     PRIMARY KEY ("id")
 );
 
-COMMENT ON COLUMN "publication"."type" IS 'Publikationstyp. Zur Auflösung des dynamischen Typs (ein Volume bettet ein Publication objekt ein, mit nichts als dem Publikationsobjekt in der Hand, lässt sich das zugehörige speziellere objekt aber nur durch ausprobieren aller objektarten herausfinden.)';
+COMMENT ON COLUMN "publication"."type" IS 'Publikationstyp. Zur Auflösung des dynamischen Typs (z.B. ein Volume bettet ein Publication-Objekt ein, mit nichts als dem Publikationsobjekt in der Hand, lässt sich das zugehörige speziellere objekt aber nur durch ausprobieren aller Publikationstypen herausfinden.)';
 
 COMMENT ON COLUMN "publication"."legacytype" IS 'Altes Publikationstypen-Kürzel (J, JA, M, MM, MMS, etc.)';
 
@@ -396,12 +366,14 @@ CREATE TABLE "namefragment"
     "id" serial NOT NULL,
     "personalname_id" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
-    "namefragmenttypeid" INTEGER NOT NULL,
+    "type" INT2,
     "sortable_rank" INTEGER,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
+
+COMMENT ON COLUMN "namefragment"."type" IS 'Bedeutung des Fragments. Zum Beispiel Vorname, Nachname, Peerage (Adelstitel), Spelling (alternative schreibweise) etc.';
 
 -----------------------------------------------------------------------
 -- title
@@ -428,13 +400,15 @@ CREATE TABLE "titlefragment"
     "id" serial NOT NULL,
     "name" TEXT NOT NULL,
     "title_id" INTEGER NOT NULL,
-    "titlefragmenttype_id" INTEGER NOT NULL,
+    "type" INT2,
     "sortable_rank" INTEGER,
     "name_is_reconstructed" BOOLEAN DEFAULT 'f',
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
+
+COMMENT ON COLUMN "titlefragment"."type" IS 'Bedeutung des Fragments. Zum Beispiel Haupttitel, Untertitel, etc.';
 
 -----------------------------------------------------------------------
 -- person
@@ -610,13 +584,15 @@ DROP TABLE IF EXISTS "person_publication" CASCADE;
 CREATE TABLE "person_publication"
 (
     "id" serial NOT NULL,
+    "role" INT2,
     "person_id" INTEGER NOT NULL,
-    "personrole_id" INTEGER NOT NULL,
     "publication_id" INTEGER NOT NULL,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
+
+COMMENT ON COLUMN "person_publication"."role" IS 'Art der Beziehung zwischen Person und Publikation.';
 
 -----------------------------------------------------------------------
 -- recent_use
@@ -900,10 +876,6 @@ ALTER TABLE "personalname" ADD CONSTRAINT "personalname_FK_1"
     ON DELETE CASCADE;
 
 ALTER TABLE "namefragment" ADD CONSTRAINT "namefragment_FK_1"
-    FOREIGN KEY ("namefragmenttypeid")
-    REFERENCES "namefragmenttype" ("id");
-
-ALTER TABLE "namefragment" ADD CONSTRAINT "namefragment_FK_2"
     FOREIGN KEY ("personalname_id")
     REFERENCES "personalname" ("id")
     ON DELETE CASCADE;
@@ -912,10 +884,6 @@ ALTER TABLE "titlefragment" ADD CONSTRAINT "titlefragment_FK_1"
     FOREIGN KEY ("title_id")
     REFERENCES "title" ("id")
     ON DELETE CASCADE;
-
-ALTER TABLE "titlefragment" ADD CONSTRAINT "titlefragment_FK_2"
-    FOREIGN KEY ("titlefragmenttype_id")
-    REFERENCES "titlefragmenttype" ("id");
 
 ALTER TABLE "series_publication" ADD CONSTRAINT "series_publication_FK_1"
     FOREIGN KEY ("series_id")
@@ -978,10 +946,6 @@ ALTER TABLE "person_publication" ADD CONSTRAINT "person_publication_FK_1"
     REFERENCES "person" ("id");
 
 ALTER TABLE "person_publication" ADD CONSTRAINT "person_publication_FK_2"
-    FOREIGN KEY ("personrole_id")
-    REFERENCES "personrole" ("id");
-
-ALTER TABLE "person_publication" ADD CONSTRAINT "person_publication_FK_3"
     FOREIGN KEY ("publication_id")
     REFERENCES "publication" ("id");
 

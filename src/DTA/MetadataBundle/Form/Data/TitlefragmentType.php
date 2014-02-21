@@ -16,10 +16,7 @@ class TitlefragmentType extends BaseAbstractType {
      *  {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options) {
-        $builder->add('titlefragmenttype', 'model', array(
-            'property' => 'name',
-            'class' => 'DTA\MetadataBundle\Model\Classification\Titlefragmenttype',
-        ));
+        $builder->add('type');
         
         $builder->add('name', 'textarea', array(
             'attr' => array('style'=>"width: 80%;"),

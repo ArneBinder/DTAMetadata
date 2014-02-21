@@ -20,10 +20,11 @@ class Title extends BaseTitle
         $fragmentStrings = [];
         // convert the fragment object to strings, possibly marking reconstructed title fragments
         foreach ($this->getTitlefragments() as $nf) {
-            if($nf instanceof \DTA\MetadataBundle\Model\reconstructed_flaggable\ReconstructedFlaggableInterface)
+            if($nf instanceof \DTA\MetadataBundle\Model\reconstructed_flaggable\ReconstructedFlaggableInterface){
                 $fragmentStrings[] = $nf->getMarkedByName('Name');
-            else
+            } else {
                 $fragmentStrings[] = $nf->getName();
+            }
         }
 //        won't work because of output escaping.
 //        implement a specialized view here.

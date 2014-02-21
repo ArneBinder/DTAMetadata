@@ -3,6 +3,7 @@
 namespace DTA\MetadataBundle\Controller;
 
 use \Symfony\Component\Security\Core\SecurityContext;
+use \Symfony\Component\HttpFoundation\Request;
 
 class MasterDomainController extends ORMController {
 
@@ -51,6 +52,21 @@ class MasterDomainController extends ORMController {
         return $this->renderWithDomainData('DTAMetadataBundle:Package_Master:index.html.twig', array(
                     'hash' => 200
                 ));
+    }
+    
+    /**
+     * Clears the application cache 
+     * @param type $request the http request wrapper
+     * @param string Either "dev" or "prod" since the development mode and production mode have separate caches
+     * Route is /Admin/ClearCache/{applicationMode}
+     */
+    public function clearCacheAction(Request $request, $applicationMode){
+        
+        // the application mode string is constrained via the parameter requirements in routing.yml
+        // the route matches only /Admin/ClearCache/dev and  /Admin/ClearCache/prod
+        $result = system("php ../app/console cache:clear $applicationMode");
+        return \Symfony\Component\HttpFoundation\Response::create($result);
+        
     }
     
     /**

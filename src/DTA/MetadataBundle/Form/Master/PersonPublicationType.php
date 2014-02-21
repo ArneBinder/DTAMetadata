@@ -33,10 +33,7 @@ class PersonPublicationType extends BaseAbstractType
             'searchable' => true,
             'query' => \DTA\MetadataBundle\Model\Data\Person::getRowViewQueryObject()
         ));
-        $builder->add('personrole', 'model', array(
-            'class' => '\DTA\MetadataBundle\Model\Classification\Personrole',
-            'property' => 'name',
-        ));
+        $builder->add('role');
 
         // display the work selection input only if the work id was not specified (e.g. via the embedding work form)
         if($options['isPublicationSelectable'] === true){

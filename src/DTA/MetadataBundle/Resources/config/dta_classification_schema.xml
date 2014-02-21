@@ -18,18 +18,6 @@
         <!--If no parameters are defined, all columns are shown in the list view (WITHOUT embedding any related entities) -->
     </behavior>
     
-    <!-- Verfügbare Arten von Titelfragmenten. Zum Beispiel Haupttitel, Untertitel, Kurztitel, etc. -->
-    <table name="titlefragmenttype">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="name" type="LONGVARCHAR" required="true" primaryString="true"/>
-    </table>
-
-    <!-- Verfuegbare Arten von Namensfragmenten. Zum Beispiel Vorname, Nachname, Kuenstlername, etc. -->
-    <table name="namefragmenttype">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
-        <column name="name" type="LONGVARCHAR" required="true" primaryString="true"/>
-    </table>
-    
     <!--Beziehungstypen zwischen Personen und Publikationen. Zum Beispiel Verleger, Drucker, Übersetzer oder Autor -->
     <table name="personrole" idMethod="native">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>

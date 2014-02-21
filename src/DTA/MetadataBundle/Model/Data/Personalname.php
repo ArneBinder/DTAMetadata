@@ -7,7 +7,7 @@ use DTA\MetadataBundle\Model\Data\om\BasePersonalname;
 class Personalname extends BasePersonalname
 {
     public function getNameFragments($criteria = NULL, PropelPDO $con = NULL){
-        $collection = parent::getNamefragments();
+        $collection = parent::getNamefragments($criteria);
          // Re-sort them by Sequence, numerically
         $collection->uasort(function($a, $b) {
             return $a->getSortableRank() - $b->getSortableRank();
@@ -29,12 +29,11 @@ class Personalname extends BasePersonalname
         $lastNames  = array();
         $simpleName = true;
         foreach($allNF as $nameFragment){
-            $nft = $nameFragment->getNamefragmenttype()->getName();
-            switch ($nft) {
-                case "Vorname":
+            switch ($nameFragment->getType()) {
+                case NamefragmentPeer::TYPE_FIRST_NAME:
                     $firstNames[] = $nameFragment->getName();
                     break;
-                case "Nachname":
+                case NamefragmentPeer::TYPE_LAST_NAME:
                     $lastNames[] = $nameFragment->getName();
                     break;
                 default: // if there are other types, the simple scheme won't fit

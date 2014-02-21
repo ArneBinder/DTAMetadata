@@ -7,24 +7,15 @@ use DTA\MetadataBundle\Model;
 
 class Namefragment extends BaseNamefragment
 {
-    /** array of format ('Vorname' => <id of namefragmenttype>, 'Nachname' => ...) */
-    private static $nameFragmentTypeIds = null;
-    /** calculates and returns $nameFragmentTypeIds */
-    public static function getNameFragmentTypeIds(){
-        // retrieve IDs of namefragment types only once
-        if(Namefragment::$nameFragmentTypeIds === null){
-            $nameFragmentTypes = Model\Classification\NamefragmenttypeQuery::create()->setFormatter('PropelArrayFormatter')->find();
-            foreach ($nameFragmentTypes as $nft) {
-                Namefragment::$nameFragmentTypeIds[$nft['Name']] = $nft['Id'];
-            }
-        }
-        return Namefragment::$nameFragmentTypeIds;
-    }
-    
-    // construct as e.g. new Namefragment('Vorname', '...')
-    public function __construct($nameFragmentTypeName = "Nachname", $nameFragmentValue = NULL){
-        $nftIds = Namefragment::getNameFragmentTypeIds();
-        $this->setNamefragmenttypeid($nftIds[$nameFragmentTypeName]);
-        $this->setName($nameFragmentValue);
+    /**
+     * @param String $value Fragment content e.g. 'Hans'
+     * @param ENUM_VALUE $type Type, e.g. NamefragmentPeer::TYPE_LAST_NAME
+     * @return \DTA\MetadataBundle\Model\Data\Namefragment
+     */
+    public static function create($value, $type = NamefragmentPeer::TYPE_LAST_NAME){
+        $result = new Namefragment();
+        $result->setType($type);
+        $result->setName($value);
+        return $result;
     }
 }

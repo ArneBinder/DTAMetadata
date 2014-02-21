@@ -15,7 +15,7 @@ class ClassificationDomainController extends ORMController {
 //            "children" => array(
 //                array('caption' => "DTA", 'route' => 'home'),
 //                array('caption' => "DWDS", 'route' => 'home'))),
-        array("caption" => "Publikationsgruppen", 'route' => 'Workflow_genericViewAll', 'parameters' => array('className'=>'Publicationgroup' )),
+//        array("caption" => "Publikationsgruppen", 'route' => 'Workflow_genericViewAll', 'parameters' => array('className'=>'Publicationgroup' )),
         array("caption" => "Genres", "modelClass" => 'Genre'),
         array("caption" => "Kategorien", "modelClass" => 'Category'),
         array("caption" => "Schlagworte", "modelClass" => 'Tag'),

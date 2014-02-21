@@ -28,6 +28,12 @@ home:
 administrationDomain:
   path: /Admin
   defaults: { _controller: DTAMetadataBundle:MasterDomain:index }
+
+clearCache:
+    path:      /Admin/ClearCache/{applicationMode}
+    defaults:  { _controller: DTAMetadataBundle:MasterDomain:clearCache, applicationMode: 'dev' }
+    requirements:
+        applicationMode:  (dev|prod)
   
 sourceMonitor:
   path: /Dev/sourceMonitor

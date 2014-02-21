@@ -26,7 +26,7 @@
 {% endblock %}
 
 {% block imagesource_row %}
-    {% import  'DTAMetadataBundle:form:buildingBlocks.html.twig' as dta %}
+    {% import  'DTAMetadataBundle:Form:buildingBlocks.html.twig' as dta %}
     <div>
     {{ form_row(form.partner) }}
             
@@ -90,7 +90,7 @@
 {# --------------------- Space and Time --------------------- #}
         
 {% block datespecification_row %}
-    {% import  'DTAMetadataBundle:form:buildingBlocks.html.twig' as dta %}
+    {% import  'DTAMetadataBundle:Form:buildingBlocks.html.twig' as dta %}
     
     {{ dta.beginLabelledContent({'controlId':id, 'labelCaption': form.vars.label }) }}
  
@@ -136,7 +136,7 @@
 
 {% block titlefragment_row %}
     <div class="form-inline">
-            {{ form_widget(form.titlefragmenttype)}}
+            {{ form_widget(form.type)}}
             {{ form_widget(form.name,{'attr':{'class':'medium-text'} }) }} 
             <br/>
             {{ form_row(form.NameIsReconstructed ) }}
@@ -163,7 +163,7 @@
 
 {% block namefragment_row %}
     <div class="form-inline">
-            {{ form_widget(form.namefragmenttype)}}
+            {{ form_widget(form.type)}}
             {{ form_widget(form.name) }} 
             {{ form_rest(form) }}
     </div>
@@ -173,7 +173,7 @@
 
 {% block personwork_row %}
     <div class="dynamic-collection-deletable">
-        {{ form_row(form.personrole, {'inlineLabel':true,'hideLabel':true}) }}
+        {{ form_row(form.role, {'inlineLabel':true,'hideLabel':true}) }}
         {{ form_row(form.person, {'hideLabel':true,'inlineLabel':true}) }}
         {{ form_rest(form) }}
     </div>
@@ -181,7 +181,7 @@
 
 {% block personpublication_row %}
   <div class="dynamic-collection-deletable">
-    {{ form_row(form.personrole, {'inlineLabel':true,'hideLabel':true}) }}
+    {{ form_row(form.role, {'inlineLabel':true,'hideLabel':true}) }}
     {{ form_row(form.person, {'hideLabel':true,'inlineLabel':true}) }}
     {{ form_rest(form) }}
   </div>

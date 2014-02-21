@@ -2,6 +2,7 @@
     
 namespace DTA\MetadataBundle\Controller;
 use DTA\MetadataBundle\Model;
+use DTA\MetadataBundle\Model\Data;
     
 /**
  * @author Carl Witt <carl.witt@fu-berlin.de>
@@ -85,20 +86,22 @@ class DumpConversionController extends ORMController {
         
         $this->createTaskTypes();
         
+        // names of the functions to wrap in transaction code
         $conversionTasks = array(
             'convertUsers',                 // users first: they are referenced in "last changed by" columns
-            'convertPublications',          
+            'convertPublications',  
             'convertFirstEditions',
             'convertSeries',
             'convertPublicationGroups',
             'convertPartners',
             'convertCopyLocations',
             'convertTasks',                 // tasks are linked to publications and publication groups
-            'convertPublishingCompanies',
             'convertFonts',                 
+            'convertPublishingCompanies',
             'convertPlaces',                
             'convertAuthors',               
-            'convertSingleFieldPersons');
+            'convertSingleFieldPersons',
+            'convertMultiVolumes');
         
         foreach ($conversionTasks as $task){
             $this->runTransaction($task, $dbh);
@@ -109,27 +112,6 @@ class DumpConversionController extends ORMController {
             'messages' => $this->messages,
             'errors'   => $this->errors,
         ));
-    }
-    
-    function dropAndSetupTargetDB(){
-        
-        // import dump
-        $importDumpCommand = "$this->mysqlExec -u $this->username -p$this->password dtadb < $this->dumpPath";
-        $this->messages[] = array("import dump command: " => $importDumpCommand);
-        system($importDumpCommand);
-        
-        // build current database schema
-        $result = system("$this->phpExec ../app/console propel:sql:build");
-        $this->messages[] = array("building database schema from xml model: " => $result );
-        
-        // import current database schema to target database (ERASES ALL DATA)
-        $result = system("$this->phpExec ../app/console propel:sql:insert --force");
-        $this->messages[] = array("resetting target database: " => $result);
-        
-        // loads fixtures (task types, name fragment types, etc.)
-        $result = system("$this->phpExec ../app/console propel:fixtures:load @DTAMetadataBundle");
-        $this->messages[] = array("loading database fixtures: " => $result);
-        
     }
     
     function runTransaction($task, $dbh){
@@ -143,6 +125,28 @@ class DumpConversionController extends ORMController {
         echo $task." ".$time_taken;
         $this->messages[] = array("finished transaction ".$task=>$time_taken);
     }
+    
+    function dropAndSetupTargetDB(){
+        
+        // import dump
+        $importDumpCommand = "$this->mysqlExec -u $this->username -p$this->password dtadb < $this->dumpPath";
+        $this->messages[] = array("import dump command: " => $importDumpCommand);
+        system($importDumpCommand);
+        
+        // build current database schema
+        $resultBuildDBCode = system("$this->phpExec ../app/console propel:sql:build");
+        $this->messages[] = array("building database schema from xml model: " => $resultBuildDBCode );
+        
+        // import current database schema to target database (ERASES ALL DATA)
+        $resultSetupDB = system("$this->phpExec ../app/console propel:sql:insert --force");
+        $this->messages[] = array("resetting target database: " => $resultSetupDB);
+        
+        // loads fixtures (task types, name fragment types, etc.)
+        $resultFixturesLoad = system("$this->phpExec ../app/console propel:fixtures:load @DTAMetadataBundle");
+        $this->messages[] = array("loading database fixtures: " => $resultFixturesLoad);
+        
+    }
+    
     
     // parses date string in format 2007-12-11 17:39:30 to \DateTime objects
     function parseSQLDate($dateString){
@@ -235,7 +239,7 @@ class DumpConversionController extends ORMController {
         $publications = Model\Data\PublicationQuery::create();
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
-            array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
+            array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
             
             if($currentFont->getName() !== $row['font_name']){
                 
@@ -250,99 +254,88 @@ class DumpConversionController extends ORMController {
         }
     }
     
-    /** Returns an array of multi-volumed publications (warning: the criteria of the old system are "The title and first authors last name match")
-     *  according to the metadata.type field (is MM or MMS)
-     *  Returns an array structured like this: array(
-     *  [title concatenated with autor1_lastname] =>
-     * array(
-     *      'title' => [title],
-     *      'author_lastname' => [autor1_lastname],
-     *      'volumes_present' => [count(*)],
-     *      'multiVolume'     => null
-     * )
+    /**
+     * No conversion, just aggregation:
+     * Creates a multi-volume parent object for volumes (with the same title and author)
      */
-    function findMultiVolumes($dbh) {
+    function convertMultiVolumes(){
+
+        // retrieve all persons
+        $persons = Model\Data\PersonQuery::create()
+                ->find();
         
-        $rawData = "
-            SELECT 
-                title, autor1_lastname, count(*) as `count`
-            FROM
-                book join metadaten on book.id_book = metadaten.id_book
-            WHERE 
-                    metadaten.type in ('MM', 'MMS')
-            GROUP BY title , autor1_lastname
-            ;";
-        
-        $multiVolumes = array();
-        foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
-            // encode all data from the old database as UTF8
-            array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
+        foreach($persons as $person){
+            /* @var $person \DTA\MetadataBundle\Model\Data\Person */
+            // find publications with identical titles ('title' => array(pub1, pub2, ...), ...)
+            $publicationsByTitle = array();
             
-            $multiVolumes[$row['title'].$row['autor1_lastname']] = array(
-                'title'=>$row['title'],
-                'author_lastname'=>$row['autor1_lastname'],
-                'volumes_present'=>$row['count'],
-                'multiVolume'=>NULL,
-            );
+            // filter criteria for person role = author and publication type = volume (and query optimization with joins)
+            $authorOfAndVolume = Model\Master\PersonPublicationQuery::create()
+                                ->joinWith('Person')->joinWith('Person.Personalname')->joinWith('Personalname.Namefragment')
+                                ->joinWith('Publication')->joinWith('Publication.Title')->joinWith('Title.Titlefragment')
+                                ->filterByRole(Model\Master\PersonPublicationPeer::ROLE_AUTHOR)
+                                ->usePublicationQuery()
+                                    ->filterByType(Model\Data\PublicationPeer::TYPE_VOLUME)
+                                ->endUse();
+            $authorsVolumes = $person->getPersonPublications($authorOfAndVolume);
+            
+            foreach($authorsVolumes as $volume){
+                /* @var $volume \DTA\MetadataBundle\Model\Data\Volume */
+                // volumes are identified by identical first author and title 
+                // additionally, further authors must be excluded to avoid duplicate creation of multivolumes
+                if( 1 === $person->getAuthorIndex($volume->getPublication())){
+                    $title = $volume->getPublication()->getTitle()->__toString();
+                    $publicationsByTitle[$title][] = $volume;
+                }
+            }
+            
+            // aggregate into multivolumes
+            foreach($publicationsByTitle as $title => $volumes){
+                
+                if( count($volumes) > 1 ){
+                    // create multi volume with the given volumes as children
+                    $this->createMultiVolume($volumes, $person);
+                    
+                } else {
+                    $this->warnings[] = array('volume without siblings'=>$volume->getPublication()->getTitle()->__toString()." id=".$volume->getId());
+                }
+            }
             
         }
         
-        return $multiVolumes;
     }
     
-    private function createMultiVolume($row, &$publication, $title, &$multiVolumes){
+    /**
+     * Creates a multi volume with the same data as the given volumes.
+     * Saves the multi volume and adds the volumes as its children.
+     * @param array $volumes Array of type Model\Data\Volume
+     * @param Data\Person $person The first author of volumes
+     */
+    private function createMultiVolume($volumes, $person){
         
-        // the parent publication (a multi-volume) to which the volume shall be added
-        $multiVolume = $multiVolumes[$row['title'].$row['autor1_lastname']]['multiVolume'];
+        // take the title from the first volume (all titles are assumed to be the same)
+        $title = $volumes[0]
+            ->getPublication()
+            ->getTitle()
+            ->copy(true) // deep copy (because of titlefragments)
+            ->clearPublications(); // publication was copied, too!
+                    
+        // create multivolume
+        $publicationId = $this->publicationIdCounter++;
+        $basePublication = new Data\Publication();
+        $basePublication->setId($publicationId)
+                ->setType(Data\PublicationPeer::TYPE_MULTIVOLUME)
+                ->setTitle($title)
+                // other person publications might be volume specific
+                ->addPersonPublication(Model\Master\PersonPublication::create($person->getId(), Model\Master\PersonPublicationPeer::ROLE_AUTHOR))
+                ->save();
+        $multiVolume = new Data\MultiVolume();
+        $multiVolume->setId($publicationId)
+                ->save();
 
-        // create the multi-volume if it doesn't already exist
-        if($multiVolume === NULL){
-
-            // create a new publication for the multi-volume
-            $basePublication = new Model\Data\Publication();
-            $basePublication->setId($this->publicationIdCounter++)
-                            ->setTreeId($this->publicationIdCounter-1)
-                            ->makeRoot()
-                            ->setType(Model\Data\PublicationPeer::TYPE_MULTIVOLUME)
-                            ->setTitle($title)
-                            ->save($this->propelConnection);
-
-            // create the multi-volume
-            $multiVolume = new Model\Data\MultiVolume();
-            $multiVolume->setId($basePublication->getId())
-                        ->setVolumesTotal($row['volumes_total'])
-                        ->save($this->propelConnection);
-
-            // make the multi-volume accessible to upcoming volumes of this work
-            $multiVolumes[$row['title'].$row['autor1_lastname']]['multiVolume'] = $multiVolume;
-
+        foreach ($volumes as $volume) {
+            $volume->getPublication()->setParent($multiVolume);
         }
-
-        // check if the specified number of volumes matches the actual number of volumes in the database
-        if($multiVolumes[$row['title'].$row['autor1_lastname']]['volumes_present'] != $row['volumes_total'])
-            $this->warnings[] = array(
-                'message'=>'Angabe der Gesamtzahl Bände weicht von den tatsächlich in der Datenbank vorhandenen Bänden ab.'
-                ,'Titel'=>$row['title']
-                ,'Autor'=>$row['autor1_lastname']
-                ,'book.id_book'=>$row['id']
-                ,'In der Datenbank vorhanden'=>$multiVolumes[$row['title'].$row['autor1_lastname']]['volumes_present']
-                ,'Ausgegeben'=>$row['volumes_total']
-        );
-
-        // link the volume to its containing multi-volume
-
-        $publication->setTreeId($this->publicationIdCounter-1)
-//                        ->setParent($multiVolume->getPublication())
-                    ->insertAsLastChildOf($multiVolume->getPublication())
-                    ->setType(Model\Data\PublicationPeer::TYPE_VOLUME)
-                    ->save($this->propelConnection);
-
-        $volume = new Model\Data\Volume();
-        $volume->setVolumeDescription($row['volume_description'])
-               ->setVolumeNumeric($row['volume_numeric'])
-               ->setPublication($publication)
-               ->save($this->propelConnection);
-        
         
     }
     
@@ -426,21 +419,24 @@ class DumpConversionController extends ORMController {
                 LEFT JOIN fundstellen ON id_nachweis = id_Fundstellen
             ;";
         
-        $multiVolumes = $this->findMultiVolumes($dbh);
-        
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
-            array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
+            array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
     
             // title ------------------------------------------------------------------------------------
             $title = new Model\Data\Title();
             
             // iterate over title columns and create titlefragments of the according type
-            $titleColumns = array("title"=>"Haupttitel", "subtitle"=>"Untertitel", "subtitle2"=>"Untertitel", "shorttitle"=>"Kurztitel");
+            $titleColumns = array(
+                "title"=>  Model\Data\TitlefragmentPeer::TYPE_MAIN_TITLE, 
+                "subtitle"=>  Model\Data\TitlefragmentPeer::TYPE_SUBTITLE, 
+                "subtitle2"=>Model\Data\TitlefragmentPeer::TYPE_SUBTITLE,
+                "shorttitle"=>Model\Data\TitlefragmentPeer::TYPE_SHORT_TITLE,);
+            
             $titleFragmentIdx = 1;
-            foreach($titleColumns as $column=>$typeName){
+            foreach($titleColumns as $column=>$type){
                 if($row[$column] !== NULL){
-                    $fragment = new Model\Data\Titlefragment($typeName, $row[$column]);
+                    $fragment = Model\Data\Titlefragment::create($row[$column], $type);
                     $fragment->setSortableRank($titleFragmentIdx);
                     $title->addTitlefragment($fragment);
                     $titleFragmentIdx++;
@@ -501,37 +497,36 @@ class DumpConversionController extends ORMController {
                         ->setWwwready($row['www_ready'])
                         ->setSourceId($row['source_id'])
                         ->setTitle($title)
+                        ->setType($row['publication_type'])
                         ->setUsedcopylocationId($row['used_copy_location'])
                         ->setUpdatedAt($this->parseSQLDate($row['log_last_change']));
 
-            
-            if(array_key_exists($row['title'].$row['autor1_lastname'], $multiVolumes)){
-                
-                $this->createMultiVolume($row, $publication, $title, $multiVolumes);
-                
-            } else {
-                
-                // for non volumes, just save a basic publication
-                switch($row['publication_type']){
-                    case "ARTICLE":
-                        $article = new Model\Data\Article();
-                        $article->setPublication($publication)
-                                ->setPages($row['pages'])
-                                ->save($this->propelConnection);
-                        break;
-                    case "CHAPTER":
-                        $chapter = new Model\Data\Chapter();
-                        $chapter->setPublication($publication)
-                                ->setPages($row['pages'])
-                                ->save($this->propelConnection);
-                        break;
-                }
-                
-                $publication->setType($row['publication_type'])
+            // for specialized publication types, create the according objects
+            switch($row['publication_type']){
+                case "ARTICLE":
+                    $article = new Model\Data\Article();
+                    $article->setPublication($publication)
+                            ->setPages($row['pages'])
                             ->save($this->propelConnection);
-                
+                    break;
+                case "CHAPTER":
+                    $chapter = new Model\Data\Chapter();
+                    $chapter->setPublication($publication)
+                            ->setPages($row['pages'])
+                            ->save($this->propelConnection);
+                    break;
+                case "VOLUME":
+                    $volume = new Model\Data\Volume();
+                    $volume->setPublication($publication)
+                           ->setVolumeDescription($row['volume_description'])
+                           ->setVolumeNumeric($row['volume_numeric'])
+                           ->save($this->propelConnection);
+                    break;
+                // some SERIES publications are created by simply  type is handled in convertSeries()
+                // MULTIVOLUME publication type is handled in convertMultiVolumes()
             }
-        
+
+            $publication->save($this->propelConnection);
             
         }// end for book rows
     }
@@ -575,7 +570,7 @@ class DumpConversionController extends ORMController {
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             
             // encode all data from the old database as UTF8
-            array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
+            array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
 
             $fields = array(
                 'first_status',
@@ -625,7 +620,6 @@ class DumpConversionController extends ORMController {
                         ,dta_reihe_titel as title
                         ,dta_reihe_jahrgang as volume
                         ,dta_reihe_band as issue
-                        
                     FROM
                         book
                     WHERE
@@ -637,13 +631,13 @@ class DumpConversionController extends ORMController {
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             
             // encode all data from the old database as UTF8
-            array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
+            array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
 
             // create new series if the series title hasn't been seen before
             if($currentSeriesTitle === NULL || $row['title'] != $currentSeriesTitle){
                 
                 $title = new Model\Data\Title();
-                $title->addTitlefragment(new Model\Data\Titlefragment("Haupttitel", $row['title']));
+                $title->addTitlefragment(Model\Data\Titlefragment::create($row['title']));
                 
                 $corePublication = new Model\Data\Publication();
                 $corePublication->setId($this->publicationIdCounter++)
@@ -687,7 +681,7 @@ class DumpConversionController extends ORMController {
         $publications = Model\Data\PublicationQuery::create();
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
-            array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
+            array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
 
             if($row['group_id'] !== $lastGroupId){
                 
@@ -710,11 +704,18 @@ class DumpConversionController extends ORMController {
      * ------------------------------------------------------------------ */
     function convertPartners($dbh) {
         
-        $rawData = "SELECT * FROM partner";
+        $rawData = "SELECT 
+                        id_book_locations,
+                        name,
+                        person,
+                        mail, web, phone1, adress,
+                        NULLIF(log_last_change, '0000-00-00 00:00:00') as `log_last_change`,
+                        comments
+                    FROM partner";
             
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
-            array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
+            array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
                         
             $partner = new Model\Workflow\Partner();
             $partner->setId($row['id_book_locations'])
@@ -752,7 +753,7 @@ class DumpConversionController extends ORMController {
             
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
-            array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
+            array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
                         
             if($row['publication_id'] === NULL){
                 $this->errors[] = array(
@@ -777,7 +778,7 @@ class DumpConversionController extends ORMController {
             $copyLocation->save($this->propelConnection);
             
             } catch (\PropelException $exc) {
-                $this->errors[] = array('message' => 'on inserting copy location');
+                $this->errors[] = array('message' => $exc . 'on inserting copy location');
             }
         }
     }
@@ -833,7 +834,7 @@ class DumpConversionController extends ORMController {
         $groups = Model\Workflow\PublicationgroupQuery::create();
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
-            array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
+            array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
 
             if($row['reference_object'] === NULL){
                 $this->errors[] = array(
@@ -909,9 +910,10 @@ class DumpConversionController extends ORMController {
                     order by publishing_company";
          
         $currentPublishingCompany = new Model\Data\Publishingcompany();
+        $publications = Model\Data\PublicationQuery::create();
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
-            array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
+            array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
                         
             if($row['publishing_company'] !== $currentPublishingCompany->getName()){
                 
@@ -920,10 +922,9 @@ class DumpConversionController extends ORMController {
                                          ->save($this->propelConnection);
             }
             
-            $publications = Model\Data\PublicationQuery::create();
-            $publications->findOneById($row['publication_id'])
-                         ->setPublishingcompany($currentPublishingCompany)
-                         ->save($this->propelConnection);
+            $publication = $publications->findOneById($row['publication_id']);
+            $publication->setPublishingcompany($currentPublishingCompany)
+                        ->save($this->propelConnection);
         }
     }
     
@@ -976,20 +977,19 @@ class DumpConversionController extends ORMController {
         $publications = Model\Data\PublicationQuery::create();
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
-            array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
-                        
+            array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
+                
             if($currentPlace->getName() !== $row['location']){
                 
                 $currentPlace = new Model\Data\Place();
                 $currentPlace->setName($row['location'])
                         ->save($this->propelConnection);
-                
+                            
             }
-            
-             $publications->findOneById($row['publication_id'])
-                   ->setPlace($currentPlace)
-                   ->save($this->propelConnection);
-            
+                
+             $publication = $publications->findOneById($row['publication_id']);
+             $publication->setPlace($currentPlace)
+                         ->save($this->propelConnection);
         }
     }
     
@@ -1003,7 +1003,7 @@ class DumpConversionController extends ORMController {
         
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
-            array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
+            array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
                         
             $user = new Model\Master\DtaUser();
                 
@@ -1059,64 +1059,48 @@ class DumpConversionController extends ORMController {
                         lastname, 
                         firstname, 
                         pnd DESC -- NULL pnds come second and the record with a pnd is used as base for the merge of subsequent persons with same name";
-                            
-        $lastPerson = NULL;
-        $lastFirstname = NULL;
-        $lastLastname = NULL;
+                      
+        
+        $currentPerson = NULL;
         
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
-            array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
+            array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
 
+            // create new person if the next row can not be considered duplicate of the current person
+            if( NULL === $currentPerson || FALSE === $currentPerson->match($row) ){
+                
+                $gndCollision = NULL;
+                // try to detect duplicates with duplicate gnds (duplicates apart from $currentPerson)
+                if($row['pnd'] !== NULL ) {
+                    $gndCollision = Model\Data\PersonQuery::create()->findOneByGnd($row['pnd']);
+                }
+                if($gndCollision !== NULL){
+                    $currentPerson = $gndCollision;
+                } else{
+
+                    // create the name object
+                    $name = new Model\Data\Personalname();
+                    if ($row['firstname'] !== NULL)
+                        $name->addNamefragment(Model\Data\Namefragment::create($row['firstname'], Model\Data\NamefragmentPeer::TYPE_FIRST_NAME));
+                    if ($row['lastname'] !== NULL)
+                        $name->addNamefragment(Model\Data\Namefragment::create($row['lastname'], Model\Data\NamefragmentPeer::TYPE_LAST_NAME));
+                    if ($row['spelling'] !== NULL)
+                        $name->addNamefragment(Model\Data\Namefragment::create($row['spelling'], Model\Data\NamefragmentPeer::TYPE_SPELLING));
+
+                    $currentPerson = new Model\Data\Person();
+                    $currentPerson->setGnd($row['pnd'])            // does nothing if pnd is NULL
+                            ->addPersonalname($name)
+                            ->save($this->propelConnection);
+
+                }
+                
+            }
+            
             $publication = Model\Data\PublicationQuery::create()->findOneById($row['id_book']);
-            $gndCollision = NULL;
-            
-            // try to detect duplicates with duplicate gnds
-            if ($row['pnd'] !== NULL) {
-                $gndCollision = Model\Data\PersonQuery::create()->findOneByGnd($row['pnd']);
-            }
-            
-            // subsequent rows usually contain the same person but a different book
-            // if the row refers to the same person
-            if($lastPerson !== NULL 
-                    && $row['firstname'] == $lastFirstname 
-                    && $row['lastname']  == $lastLastname){
-                
-                $publication
-                    ->addPersonPublication(new Model\Master\PersonPublication($lastPerson->getId(), 'Autor'))
+            $publication
+                    ->addPersonPublication(Model\Master\PersonPublication::create($currentPerson->getId(), 'AUTHOR'))
                     ->save($this->propelConnection);
-            // if the row refers to the same person (but this is inferred from the matching GND)
-            } else if($gndCollision !== NULL){
-                
-                $publication
-                    ->addPersonPublication(new Model\Master\PersonPublication($gndCollision->getId(), 'Autor'))
-                    ->save($this->propelConnection);
-            // create new person
-            } else {
-                
-                // create the name object
-                $name = new Model\Data\Personalname();
-                if ($row['firstname'] !== NULL)
-                    $name->addNamefragment(new Model\Data\Namefragment('Vorname', $row['firstname']));
-                if ($row['lastname'] !== NULL)
-                    $name->addNamefragment(new Model\Data\Namefragment('Nachname', $row['lastname']));
-                if ($row['spelling'] !== NULL)
-                    $name->addNamefragment(new Model\Data\Namefragment('Alternative Schreibweise', $row['spelling']));
-                
-                $person = new Model\Data\Person();
-                $person->setGnd($row['pnd'])            // does nothing if pnd is NULL
-                        ->addPersonalname($name)
-                        ->save($this->propelConnection);
-                
-                $lastPerson = $person;
-                $lastFirstname = $row['firstname'];
-                $lastLastname  = $row['lastname'];
-                
-                $publication
-                    ->addPersonPublication(new Model\Master\PersonPublication($person->getId(), 'Autor'))
-                    ->save($this->propelConnection);
-            }
-                
         }
     }
         
@@ -1142,13 +1126,13 @@ class DumpConversionController extends ORMController {
                 SELECT DISTINCT 
                     id_book, SUBSTRING_INDEX( SUBSTRING_INDEX( person, ';', 1), ';', -1 ) as person, role
                 FROM (
-                    SELECT id_book, uebersetzer AS person, _utf8'Übersetzer' as role FROM book
+                    SELECT id_book, uebersetzer AS person, 'TRANSLATOR' as role FROM book
                     UNION
-                    SELECT id_book, publisher AS person, 'Verleger' as role FROM book
+                    SELECT id_book, publisher AS person, 'PUBLISHER' as role FROM book
                     UNION
-                    SELECT id_book, dta_in_autor AS person, 'Autor' as role FROM book
+                    SELECT id_book, dta_in_autor AS person, 'AUTHOR' as role FROM book
                     UNION
-                    SELECT id_book, autor1_syn_names AS person, 'synonym' as role FROM book
+                    SELECT id_book, autor1_syn_names AS person, 'SYNONYM' as role FROM book
                 ) as condensedNames 
                 WHERE person IS NOT NULL AND LENGTH(person) > 2 	-- for some reason, strings of length 2 survive the trim operation
                     
@@ -1158,13 +1142,13 @@ class DumpConversionController extends ORMController {
                 SELECT DISTINCT 
                         id_book, SUBSTRING_INDEX( SUBSTRING_INDEX( person, ';', 2), ';', -1 ) as person, role
                 FROM (
-                    SELECT id_book, uebersetzer AS person, _utf8'Übersetzer' as role FROM book
+                    SELECT id_book, uebersetzer AS person, 'TRANSLATOR' as role FROM book
                     UNION
-                    SELECT id_book, publisher AS person, 'Verleger' as role FROM book
+                    SELECT id_book, publisher AS person, 'PUBLISHER' as role FROM book
                     UNION
-                    SELECT id_book, dta_in_autor AS person, 'Autor' as role FROM book
+                    SELECT id_book, dta_in_autor AS person, 'AUTHOR' as role FROM book
                     UNION
-                    SELECT id_book, autor1_syn_names AS person, 'synonym' as role FROM book
+                    SELECT id_book, autor1_syn_names AS person, 'SYNONYM' as role FROM book
                 ) as condensedNames 
                 WHERE person IS NOT NULL AND LENGTH(person) > 2
             ) as names
@@ -1177,7 +1161,7 @@ class DumpConversionController extends ORMController {
         
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
-            array_walk($row, function(&$value, $key) { $value = $value === NULL ? NULL : utf8_encode($value); });
+            array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
                 
             // check if a new person identifier is found
             if($row['person'] !== $currentPersonIdentifier){
@@ -1188,7 +1172,7 @@ class DumpConversionController extends ORMController {
                     $currentPerson = $collision;
                 // no duplicate, create new
                 } else {
-                    $currentPerson = Model\Data\Person::parseFromString($row);
+                    $currentPerson = Model\Data\Person::createFromArray($row);
                 }
              
                 $currentPersonIdentifier = $row['person'];
@@ -1197,7 +1181,7 @@ class DumpConversionController extends ORMController {
             
             
             // person wurde im Feld Synonymer Name Autor 1 angegeben 
-            if($row['role'] === "synonym" && ! $synonymAdded ){
+            if($row['role'] === "SYNONYM" && ! $synonymAdded ){
                 
                 $author = $publications
                         ->findOneById($row['publication_id'])
@@ -1210,14 +1194,12 @@ class DumpConversionController extends ORMController {
             // person wurde als Autor der Serie, Verleger oder Übersetzer angegeben
             } else {
                 
-                $personRole = Model\Classification\PersonroleQuery::create()
-                        ->findOneByName($row['role']);
                 $personPublication = new Model\Master\PersonPublication();
                 $personPublication->setPerson($currentPerson)
-                        ->setPersonrole($personRole);
+                        ->setRole($row['role']);
 
                 // falls es sich um den Autor einer Serie handelt, bitte per Hand Daten übernehmen
-                if($row['role'] === "Autor"){
+                if($row['role'] === "AUTHOR"){
                     $this->errors[] = array('Bitte von Hand konvertieren'=>$row['person'], 'autor in: '=>$row['publication_id']);
                 } else {
                     $publications->findOneById($row['publication_id'])
@@ -1236,9 +1218,9 @@ class DumpConversionController extends ORMController {
 
         // normally, book.year and book.dta_pub_date contain the same values in all rows.
         // check if that is still the case with the current input dump
-        $checkQuery = "select id_book as book_id, `year`, `dta_pub_date` from book where `year` <> `dta_pub_date`";
+        $checkYearPubDateSame = "select id_book as book_id, `year`, `dta_pub_date` from book where `year` <> `dta_pub_date`";
 
-        foreach ($dbh->query($checkQuery)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+        foreach ($dbh->query($checkYearPubDateSame)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             
             $this->warnings[] = array(
                 'year and dta_pub_date differ (only year will be converted to new database)'=>
@@ -1246,6 +1228,7 @@ class DumpConversionController extends ORMController {
             );
         }
         
+        // the "seiten" field refers to excerpts and shouldn't be used on monographs and multivolumes 
         $checkQuery = " SELECT 
                             book.id_book, title, autor1_lastname, year, dta_seiten, type
                         FROM
