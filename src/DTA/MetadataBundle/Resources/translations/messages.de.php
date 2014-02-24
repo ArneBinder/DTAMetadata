@@ -22,6 +22,8 @@ return array(
     'PersonWork' => 'Werkpersonalie',
     'Place' => 'Ort',
     'Publication' => 'Publikation',
+    
+    // publication types
     'BOOK' => 'Buch',
     'VOLUME' => 'Buchband',
     'MULTIVOLUME' => 'Mehrbändiges Werk',
@@ -29,6 +31,18 @@ return array(
     'JOURNAL' => 'Zeitschrift/Zeitung',
     'ARTICLE' => 'Artikel',
     'SERIES' => 'Reihe',
+    
+    // person roles
+    'AUTHOR' => 'Autor',
+    'PUBLISHER' => 'Verleger',
+    'TRANSLATOR' => 'Übsersetzer',
+    'PRINTER' => 'Drucker',
+    
+    // title types
+    'MAIN_TITLE' => 'Haupttitel',
+    'SUBTITLE' => 'Untertitel',
+    'SHORT_TITLE' => 'Kurztitel',
+    
     'PublicationMms' => 'Teil einer mehrbändigen Monographie, die ihrerseits Teil einer Reihe ist',
     'PublicationMs' => 'Selbstständiger Band einer Reihe',
     'Publishingcompany' => 'Verlag',

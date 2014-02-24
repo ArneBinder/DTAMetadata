@@ -16,26 +16,9 @@ class DataDomainController extends ORMController {
      * from the database in the __construct() method.
      */
     public $domainMenu = array(
-        'publication' => array(
-            "caption" => "Publikationen", 
-            "children"=>array(
-                array("caption" => "Alle anzeigen", "modelClass"=> 'Publication'),
-                array("kind" => "divider"),
-                // the rest is added in the controller constructor
-        )), 
-        'person' => array(
-            "caption" => "Personen", 
-            "children" => array(
-                array(
-                    "caption" => "Alle anzeigen", 
-                    "modelClass" => "Person"),
-                // the rest is added controller constructor
-        )),
-        'publishingcompany' => array(
-            "caption" => "Verlage", 
-            'modelClass' => 'Publishingcompany'),
-        array("caption" => "Schriftarten", "modelClass" => 'Font'),
-        array("caption" => "Sprachen", "modelClass" => 'Language'),
+        'specializedTemplate' => 'DTAMetadataBundle:Package_Data:domainMenu.html.twig',
+        'publicationTypes' => 'added in constructor',
+        'puersonRoles' => 'added in constructor',
     );
     
     /**
@@ -43,25 +26,70 @@ class DataDomainController extends ORMController {
      */
     public function __construct(){
         
+        // retrieve different publication types
+        $this->domainMenu['publicationTypes'] = Model\Data\om\BasePublicationPeer::getValueSet(Model\Data\PublicationPeer::TYPE);
+        
         // retrieve different person roles (Autor, Verleger, Drucker, etc.)        
-        $personRoles = Model\Master\PersonPublicationPeer::getValueSet(Model\Master\PersonPublicationPeer::ROLE);
-        foreach($personRoles as $pr ){
-            $this->domainMenu['person']['children'][] = array(
-                "caption" => $pr, 
-                "route" => "viewPersonsByRole", 
-                "parameters" => array('personRoleId'=>$pr)
-            );
-        }
+        $this->domainMenu['personRoles'] = Model\Master\PersonPublicationPeer::getValueSet(Model\Master\PersonPublicationPeer::ROLE);
 
-        // render different publication types
-        // see dta_data_schema for explanations on the single types.
-        $publicationTypes = Model\Data\om\BasePublicationPeer::getValueSet(Model\Data\PublicationPeer::TYPE);
-        foreach( $publicationTypes as $pt => $type){
-            $this->domainMenu['publication']['children'][] = array(
-                "caption" => $type, 
-                "route" => 'viewPublicationsByType',
-                "parameters" => array('publicationType'=>$type),
-            );
+    }
+    
+    /**
+     * Handles creation of publications (since for some publication types specialized classes exist, a bit of extra logic is required.)
+     * @param Request $request the request wrapper
+     * @param string $publicationType The publication type as enumerated by the {@link Model\Data\PublicationPeer Publication peer} class. 
+     */
+    public function newPublicationAction(Request $request, $publicationType){
+        
+        $basepublication = new Model\Data\Publication();
+        $basepublication->setType($publicationType);
+
+        $specializedPublication = NULL;
+        
+        switch ($publicationType) {
+            case Model\Data\PublicationPeer::TYPE_BOOK:
+            case Model\Data\PublicationPeer::TYPE_JOURNAL:
+                $specializedPublication = $basepublication;
+                break;
+            case Model\Data\PublicationPeer::TYPE_SERIES:
+                $specializedPublication = new Model\Data\Series();
+                break;
+            case Model\Data\PublicationPeer::TYPE_CHAPTER:
+                $specializedPublication = new Model\Data\Chapter();
+                break;
+            case Model\Data\PublicationPeer::TYPE_VOLUME:
+                $specializedPublication = new Model\Data\Volume();
+                break;
+            case Model\Data\PublicationPeer::TYPE_MULTIVOLUME:
+                $specializedPublication = new Model\Data\MultiVolume();
+                break;
+        }
+        
+        $logger = $this->get('logger');
+        $logger->info('I just got the logger');
+        
+        $result = parent::genericCreateOrEdit($request, $specializedPublication);
+        
+        $className = get_class($specializedPublication);
+        
+        switch( $result['transaction'] ){
+            case "recordNotFound":
+                $this->addErrorFlash("Der gewünschte Datensatz kann nicht bearbeitet werden, weil er nicht gefunden wurde.");
+                $target = $this->generateUrl('Data_genericViewAll',array('package'=>'Data', 'className'=>$className));
+                
+                return $this->redirect($target);
+            case "complete":
+                $this->addSuccessFlash("Änderungen vorgenommen.");
+                $target = $this->generateUrl($package.'_genericViewAll',array('package'=>$package, 'className'=>$className));
+                return $this->redirect($target);
+            case "edit":
+            case "create":
+                return $this->renderWithDomainData("DTAMetadataBundle:ORM:createOrEdit.html.twig", array(
+                    'form' => $result['form']->createView(),
+                    'transaction' => $result['transaction'],    // whether the form is for edit or create
+                    'className' => $className,
+                    'recordId' => $specializedPublication->getId(),
+                ));
         }
         
     }

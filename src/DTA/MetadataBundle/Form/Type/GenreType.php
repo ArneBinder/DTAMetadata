@@ -5,11 +5,11 @@ namespace DTA\MetadataBundle\Form\Type;
 use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class CategorytypeType extends BaseAbstractType
+class GenreType extends BaseAbstractType
 {
     protected $options = array(
-        'data_class' => 'DTA\MetadataBundle\Model\Classification\Categorytype',
-        'name'       => 'categorytype',
+        'data_class' => 'DTA\MetadataBundle\Model\Classification\Genre',
+        'name'       => 'genre',
     );
 
     /**
@@ -18,5 +18,7 @@ class CategorytypeType extends BaseAbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('name');
+        $builder->add('createdAt');
+        $builder->add('updatedAt');
     }
 }

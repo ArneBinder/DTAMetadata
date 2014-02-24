@@ -6,6 +6,19 @@
         Styles generic html elements, independently of context.
 */
 
+/* menu */
+
+a.dropdownMenuCreateEntityButton {
+    display: inline-block;
+    position: absolute;
+    right: 0;
+    background: white;
+    width: 10px;
+}
+a.dropdownMenuCreateEntityButton:hover {
+    background: #ddd;
+}
+
 /* forms */
 
 textarea{

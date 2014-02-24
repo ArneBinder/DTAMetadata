@@ -86,11 +86,7 @@ class ORMController extends DTADomainController {
         
         $record = $query->findOneById($recordId);
         
-        $form = $this->genericCreateOrEdit($request, array(
-                    'package'   => $package, 
-                    'className' => $className, 
-                    'recordId'  => $recordId), 
-                    $record, array());
+        $form = $this->genericCreateOrEdit($request, $record);
         
 //        return $this->renderWithDomainData("DTAMetadataBundle:ORM:createOrEdit.html.twig", array(
 //                    'form' => $form['form']->createView(),
@@ -132,25 +128,11 @@ class ORMController extends DTADomainController {
     }
 
     /**
-     * Core logic for creating/editing entities. Database logic and form creation.
-     * Can be reused in the domain controllers and customized by passing additional options.
-     * Also handles the POST HTTP requests that have been set off by the form.
-     * @param array     $entity             Associative array with the parameters that identify a record: package, className, recordId
-     * @param function  $preSaveLogic       A closure that performs additional actions before saving.
-     * @param array     $formTypeOptions    Options to influence the mapping of the object to a form 
-     * 
-     * @return array    Contains two fields, transaction (either 'edit', 'create', 'complete' or 'recordNotFound') which indicates 
-     *                  what happened and depending on the transaction outcome 
-     *                  the created entity, its id or the form to create it.
+     * Retrieves or creates (if the record ID is zero) an object of a model class.
+     * @param array $entity Associative array with the parameters that identify a record: package, className, recordId
+     * @return type The created or fetched entity.
      */
-    protected function genericCreateOrEdit(
-            Request $request, 
-            $entity, 
-            $preSaveLogic, 
-            $formTypeOptions = array()) {
-        
-        // TODO compare form_row (form_div_layout.html.twig) error reporting mechanisms to the overriden version of form_row (viewConfigurationForModels.html.twig)
-        // and test whether they work on different inputs.
+    protected function fetchOrCreate($entity){
         
         // generic create procedure for the model entity
         $package = $entity['package'];
@@ -165,11 +147,43 @@ class ORMController extends DTADomainController {
             // fetch the object from the database
             $queryObject = $classNames['model']::getRowViewQueryObject();
             $obj = $queryObject->findOneById($recordId);
-            if( is_null($obj) ){
-                return array('transaction'=>'recordNotFound');
-            }
+            
         }
+        
+    }
+    /**
+     * Core logic for creating/editing entities. Database logic and form creation.
+     * Can be reused in the domain controllers and customized by passing additional options.
+     * Also handles the POST HTTP requests that have been set off by the form.
+     * @param model     $obj                The object to fill with data or to edit
+     * @param array     $additionalLogic    An array with closures that covers additional actions 
+     *                                      'preSaveLogic' => closure // applied before saving.
+     * @param array     $formTypeOptions    Options to influence the mapping of the object to a form 
+     * 
+     * @return array    Contains two fields, transaction (either 'edit', 'create', 'complete' or 'recordNotFound') which indicates 
+     *                  what happened and depending on the transaction outcome 
+     *                  the created entity, its id or the form to create it.
+     */
+    protected function genericCreateOrEdit(
+            Request $request, 
+            $obj, 
+            $additionalLogic = array('preSaveLogic'=>NULL), 
+            $formTypeOptions = array()) {
+        
+        // TODO compare form_row (form_div_layout.html.twig) error reporting mechanisms to the overriden version of form_row (viewConfigurationForModels.html.twig)
+        // and test whether they work on different inputs.
+        
+        if( is_null($obj) ){
+            return array('transaction'=>'recordNotFound');
+        }
+        
+        $recordId = $obj->getId();
 
+        /* @var $obj \DTA\MetadataBundle\Model\Data\Person */
+        $package = explode(".", $obj->getPeer()->getTableMap()->getPackage());
+        $className = $obj->getPeer()->getTableMap()->getPhpName();
+        $classNames = $this->relatedClassNames(array_pop($package), $className);
+        
         $form = $this->createForm(new $classNames['formType'], $obj, $formTypeOptions);
         $form->handleRequest($request);
 
@@ -183,8 +197,8 @@ class ORMController extends DTADomainController {
             if ($obj->validate()) {
 
                 // user defined pre save logic closure.
+                $preSaveLogic = $additionalLogic['preSaveLogic'];
                 if(is_object($preSaveLogic) && ($preSaveLogic instanceof Closure)){
-                    echo "executing pre-save logic";
                     $preSaveLogic();
                 }
 
@@ -234,15 +248,13 @@ class ORMController extends DTADomainController {
      */
     public function genericCreateOrEditAction(Request $request, $package, $className, $recordId) {
         
-        $result = $this->genericCreateOrEdit(
-                $request, 
-                array(
-                    'package'   => $package, 
-                    'className' => $className, 
-                    'recordId'  => $recordId), 
-                function(){},
-                array()
+        $obj = $this->fetchOrCreate( array(
+            'package'   => $package, 
+            'className' => $className, 
+            'recordId'  => $recordId)
         );
+        
+        $result = $this->genericCreateOrEdit($request, $obj);
 
         switch( $result['transaction'] ){
             case "recordNotFound":
@@ -266,24 +278,6 @@ class ORMController extends DTADomainController {
         }
     }
     
-//    private function getErrorMessages(\Symfony\Component\Form\Form $form) {      
-//        $errors = array();
-//        $form->getErrors();
-//        if ($form->hasChildren()) {
-//            foreach ($form->getChildren() as $child) {
-//                if (!$child->isValid()) {
-//                    $errors[$child->getName()] = $this->getErrorMessages($child);
-//                }
-//            }
-//        } else {
-//            foreach ($form->getErrors() as $key => $error) {
-//                $errors[] = $error->getMessage();
-//            }   
-//        }
-//        
-//        return $errors;
-//    }
-    
     /**
      * Renders the form for the model without any surrounding elements. 
      * Used via AJAX to create database entities.
@@ -297,14 +291,15 @@ class ORMController extends DTADomainController {
      */
     public function ajaxModalFormAction(Request $request, $package, $className, $modalId, $property = "Id", $recordId = 0) {
 
+        $obj = $this->fetchOrCreate( array(
+            'package'   => $package, 
+            'className' => $className, 
+            'recordId'  => $recordId)
+        );
+        
         $result = $this->genericCreateOrEdit(
                 $request, 
-                array(
-                    'package'   => $package, 
-                    'className' => $className, 
-                    'recordId'  => $recordId), 
-                function(){},
-                array()
+                $obj
         );
 
         switch( $result['transaction'] ){

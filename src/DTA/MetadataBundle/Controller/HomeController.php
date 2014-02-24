@@ -10,7 +10,7 @@ use DTA\MetadataBundle\Form;
 /**
  * Controls the functionality of the home page, e.g. the recently edited, viewed, created boxes.
  */
-class HomeController extends ORMController {
+class HomeController extends DTADomainController {
 
     /** @inheritdoc */
     public $package = "Home";
@@ -24,17 +24,17 @@ class HomeController extends ORMController {
     
     public function indexAction(Request $request) {
 
-        $lorenz = Model\Data\PersonQuery::create()->findOneById(300);
+//        $lorenz = Model\Data\PersonQuery::create()->findOneById(300);
         
         return $this->renderWithDomainData('DTAMetadataBundle:Home:index.html.twig', array(
             'testData' => 
 //            null
             array(
-                'multivol is root' => $multivolume->isRoot(),
-                'multivol scope'=>$multivolume->getScopeValue(),
-                'multivol parent'=>$multivolume->getParent(),
-                'volume is root'=>$volume->isRoot(),
-                'vol scope '=>$volume->getScopeValue(),
+//                'multivol is root' => $multivolume->isRoot(),
+//                'multivol scope'=>$multivolume->getScopeValue(),
+//                'multivol parent'=>$multivolume->getParent(),
+//                'volume is root'=>$volume->isRoot(),
+//                'vol scope '=>$volume->getScopeValue(),
 //                'root'=>Model\Data\PublicationQuery::create()->findRoot(),
 //                'roots'=>Model\Data\PublicationQuery::create()->findRoots(),
                 )

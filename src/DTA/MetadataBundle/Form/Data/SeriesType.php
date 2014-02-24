@@ -17,6 +17,6 @@ class SeriesType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('titleId');
+        $builder->add('publication', new PublicationType());
     }
 }

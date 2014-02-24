@@ -91,6 +91,10 @@ dataDomain:
   path: /Data/
   defaults: { _controller: DTAMetadataBundle:DataDomain:index }
 
+Data_newPublication:
+  path: /Data/edit/{publicationType}
+  defaults: { _controller: DTAMetadataBundle:DataDomain:newPublication }
+
 # displayed content in the right side bar of the list view (data overview and task/copy location edit options)
 publicationControls:
   path: /Data/publicationControls/{publicationId}
@@ -100,13 +104,12 @@ viewPublications:
   path: /Data/showAll/Publication
   defaults: { _controller: DTAMetadataBundle:DataDomain:viewPublications}
 
-
-viewPublicationsByType:
+Data_viewPublicationsByType:
   path: /Data/viewPublicationsByType/{publicationType}
   defaults: { _controller: DTAMetadataBundle:DataDomain:viewPublicationsByType}
 
 
-viewPersonsByRole:
+Data_viewPersonsByRole:
   path: /Data/viewPersonsByRole/{personRoleId}
   defaults: { _controller: DTAMetadataBundle:DataDomain:viewPersonsByRole }
   

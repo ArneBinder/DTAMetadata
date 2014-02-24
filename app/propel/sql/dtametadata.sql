@@ -25,26 +25,13 @@ CREATE TABLE "category"
     "id" serial NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
-    "categorytype_id" INTEGER NOT NULL,
+    "type" INT2,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
------------------------------------------------------------------------
--- categorytype
------------------------------------------------------------------------
-
-DROP TABLE IF EXISTS "categorytype" CASCADE;
-
-CREATE TABLE "categorytype"
-(
-    "id" serial NOT NULL,
-    "name" TEXT NOT NULL,
-    "created_at" TIMESTAMP,
-    "updated_at" TIMESTAMP,
-    PRIMARY KEY ("id")
-);
+COMMENT ON COLUMN "category"."type" IS 'Wissensbereich, Textsorte, Präsentationsform, Sitz im Leben';
 
 -----------------------------------------------------------------------
 -- tag
@@ -210,8 +197,7 @@ CREATE TABLE "multi_volume"
     "volumes_total" INTEGER,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
-    PRIMARY KEY ("id"),
-    CONSTRAINT "multi_volume_U_1" UNIQUE ("id")
+    PRIMARY KEY ("id")
 );
 
 COMMENT ON COLUMN "multi_volume"."volumes_total" IS 'Anzahl Bände (gesamt)';
@@ -229,8 +215,7 @@ CREATE TABLE "volume"
     "volume_numeric" INTEGER,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
-    PRIMARY KEY ("id"),
-    CONSTRAINT "volume_U_1" UNIQUE ("id")
+    PRIMARY KEY ("id")
 );
 
 COMMENT ON COLUMN "volume"."volume_description" IS 'Bezeichnung des Bandes (alphanumerisch)';
@@ -249,8 +234,7 @@ CREATE TABLE "chapter"
     "pages" TEXT,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
-    PRIMARY KEY ("id"),
-    CONSTRAINT "chapter_U_1" UNIQUE ("id")
+    PRIMARY KEY ("id")
 );
 
 COMMENT ON COLUMN "chapter"."pages" IS 'Seitenangabe';
@@ -267,8 +251,7 @@ CREATE TABLE "article"
     "pages" TEXT,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
-    PRIMARY KEY ("id"),
-    CONSTRAINT "article_U_1" UNIQUE ("id")
+    PRIMARY KEY ("id")
 );
 
 COMMENT ON COLUMN "article"."pages" IS 'Seitenangabe';
@@ -284,8 +267,7 @@ CREATE TABLE "series"
     "id" INTEGER NOT NULL,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
-    PRIMARY KEY ("id"),
-    CONSTRAINT "series_U_1" UNIQUE ("id")
+    PRIMARY KEY ("id")
 );
 
 -----------------------------------------------------------------------
@@ -817,10 +799,6 @@ CREATE TABLE "publicationgroup"
     "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
-
-ALTER TABLE "category" ADD CONSTRAINT "category_FK_1"
-    FOREIGN KEY ("categorytype_id")
-    REFERENCES "categorytype" ("id");
 
 ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_1"
     FOREIGN KEY ("title_id")

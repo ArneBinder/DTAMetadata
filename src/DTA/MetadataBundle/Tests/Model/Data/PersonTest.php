@@ -14,6 +14,7 @@ class PersonTest extends \PHPUnit_Framework_TestCase
             'comma_position' => '7', 
             'space_position' => '8', 
             'gnd' => null);
-        $person = Data\Person::createFromArray($input);
+//        $person = Data\Person::createFromArray($input);
+//        var_dump($input);
     }
 }

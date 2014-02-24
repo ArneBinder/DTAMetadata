@@ -292,13 +292,13 @@ class DumpConversionController extends ORMController {
             // aggregate into multivolumes
             foreach($publicationsByTitle as $title => $volumes){
                 
-                if( count($volumes) > 1 ){
+//                if( count($volumes) > 1 ){
                     // create multi volume with the given volumes as children
                     $this->createMultiVolume($volumes, $person);
                     
-                } else {
-                    $this->warnings[] = array('volume without siblings'=>$volume->getPublication()->getTitle()->__toString()." id=".$volume->getId());
-                }
+//                } else {
+//                    $this->warnings[] = array('volume without siblings'=>$volume->getPublication()->getTitle()->__toString()." id=".$volume->getId());
+//                }
             }
             
         }
@@ -403,7 +403,7 @@ class DumpConversionController extends ORMController {
                     ELSE type
                 END as `publication_type`
                 
-                ,NULLIF(band_zaehlung, 0) as `volume_numeric`
+                ,IF(band_zaehlung = 0, 1, band_zaehlung) as `volume_numeric`    -- single volumes seem to have a zero based index
                 ,NULLIF(band_anzahl, 0) as `volumes_total`
                 ,band_alphanum as `volume_description`
                 ,autor1_lastname    -- to detect multi-volume publications, the author name and title need to match

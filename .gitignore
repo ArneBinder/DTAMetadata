@@ -28,3 +28,4 @@ build/
 /src/DTA/MetadataBundle/Model/Data/map/
 /src/DTA/MetadataBundle/Model/Workflow/om/
 /src/DTA/MetadataBundle/Model/Workflow/map/
+/app/propel/fixtures/

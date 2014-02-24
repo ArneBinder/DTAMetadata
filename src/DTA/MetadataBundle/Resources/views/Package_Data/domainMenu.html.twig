@@ -1,0 +1,77 @@
+<ul class="nav navbar-nav">
+    
+    <li class="dropdown"> 
+        
+        <a data-toggle="dropdown" class="dropdown-toggle" href="#"> 
+            Publikationen
+            <b class="caret"></b>
+        </a>
+        
+        <ul class="dropdown-menu" role="menu" style="min-width:180px">
+            <li>
+                <a href="/app_dev.php/Data/showAll/Publication">
+                    Alle anzeigen 
+                </a>
+            </li>
+            
+            <li class="divider"></li>
+            
+            {% for publicationType in domainMenu.publicationTypes %}
+            <li>
+                <a href="{{ path('Data_genericCreateOrEdit', {'package':'Data', 'className':publicationType}) }}" class="dropdownMenuCreateEntityButton">
+                    +
+                </a>
+                <a href="{{ path('Data_viewPublicationsByType', {'publicationType':publicationType}) }}">
+                    {{publicationType|trans}}
+                </a>
+            </li>
+            {% endfor %}
+            
+        </ul>
+    </li>
+    
+    
+    
+    <li class="dropdown"> 
+        
+        <a data-toggle="dropdown" class="dropdown-toggle" href="#"> 
+            Personen
+            <b class="caret"></b>
+        </a>
+        
+        <ul class="dropdown-menu" role="menu" style="min-width:180px">
+            <li>
+                <a href="/app_dev.php/Data/showAll/Person">
+                    Alle anzeigen 
+                </a>
+            </li>
+            <li class="divider"></li>
+                
+            {% for personRole in domainMenu.personRoles %}
+            <li>
+                <a href="{{ path('Data_viewPersonsByRole', {'personRoleId':personRole}) }}">
+                    {{personRole|trans}}
+                </a>
+            </li>
+            {% endfor %}
+            
+        </ul>
+    </li>
+    
+    <li>
+        <a href="{{ path('Data_genericViewAll', {'package':'data', 'className':'Publishingcompany'}) }}"> 
+            Verlage 
+        </a>
+    </li>
+    <li>
+        <a href="{{ path('Data_genericViewAll', {'package':'data', 'className':'Font'}) }}"> 
+            Schriftarten 
+        </a>
+    </li>
+    <li>
+        <a href="{{ path('Data_genericViewAll', {'package':'data', 'className':'Language'}) }}"> 
+            Sprachen 
+        </a>
+    </li>
+    
+</ul>

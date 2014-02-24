@@ -58,7 +58,6 @@
     </table>
 
     <table name="tasktype">
-        
         <!-- TODO: enable autoincrement. During conversion, the ids are set as the ids of the legacy database.-->
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="false" required="true"/>
         

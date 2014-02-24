@@ -5,11 +5,11 @@ namespace DTA\MetadataBundle\Form\Data;
 use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class PublicationMsType extends BaseAbstractType
+class ChapterType extends BaseAbstractType
 {
     protected $options = array(
-        'data_class' => 'DTA\MetadataBundle\Model\Data\PublicationMS',
-        'name'       => 'publicationms',
+        'data_class' => 'DTA\MetadataBundle\Model\Data\Chapter',
+        'name'       => 'chapter',
     );
 
     /**
@@ -17,8 +17,8 @@ class PublicationMsType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('publicationId');
-        $builder->add('seriesId');
-        $builder->add('volumenumberinseries');
+        $builder->add('publication', new PublicationType());
+        $builder->add('pages');
+        
     }
 }

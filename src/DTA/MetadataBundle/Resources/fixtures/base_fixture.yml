@@ -3,17 +3,6 @@
 # basic categories and types
 # ------------------------------------------------------------------------------
 
-DTA\MetadataBundle\Model\Classification\Categorytype:
-    Categorytype_1:
-        name: Wissensgebiet
-    Categorytype_2:
-        name: "Präsentationsform"
-    Categorytype_3:
-        name: "Textsorte"
-    Categorytype_4:
-        name: "Sitz im Leben"
-    Categorytype_5:
-        name: "Nicht verwenden"
 DTA\MetadataBundle\Model\Classification\Genre:
     Genre_1:
         name: "Belletristik: allgemeine"

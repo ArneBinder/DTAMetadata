@@ -29,7 +29,6 @@ class PublicationType extends BaseAbstractType
         // ----------------------------------------------------------------
         // WORK 
         // ----------------------------------------------------------------
-        
         $builder->add('title', new TitleType());
         $builder->add('dirname','text',array(
             'required' => false

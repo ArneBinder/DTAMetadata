@@ -28,10 +28,6 @@
 {# to highlight the active entity: get class name from url.  #}
 {% set highlightItem = app.request.attributes.get('_route_params').className|default(app.request.attributes.get('_route')) %}
 
-{% macro input(name, value, type, size) %}
-    <input type="{{ type|default('text') }}" name="{{ name }}" value="{{ value|e }}" size="{{ size|default(20) }}" />
-{% endmacro %}
-
 <div class="nav ">
     <ul class="nav navbar-nav">
             
@@ -60,6 +56,10 @@
                 <ul class="dropdown-menu" role="menu" style="min-width:180px">
                 {% for child in item.children%}
                         
+                    {% set createEntityButton = child.createEntityAction is defined ? 
+                        '<a class="dropdownMenuCreateEntityButton">'~child.createEntityAction.modelClass~'</a>' : 
+                        ''%}
+                    
                     {% if child.kind|default('') == 'divider' %}
                     <li class="divider"></li>
                     {% elseif child.modelClass is defined %}
@@ -67,17 +67,16 @@
                     <li>
                         <a href="{{ path(package~'_genericViewAll', {'package':package, 'className':child.modelClass}) }}">
                             {{ child.caption|default(child.modelClass|trans)|trans}} 
-                            {#<span class="glyphicon glyphicon-plus pull-right"></span>
-                            <span class="glyphicon glyphicon-list pull-right"></span>#}
+                            {{createEntityButton|raw}}
                         </a>
-                    {#<p style="padding: 0 10px"> 
-                        &nbsp;{{ child.caption|default(child.modelClass|trans) }} 
-                        <a href="#" class="glyphicon glyphicon-plus pull-right">&nbsp;</a>
-                        <a href="#" class="glyphicon glyphicon-eye-open pull-right">&nbsp;</a>
-                    </p>#}
                     </li>
                     {% else %}
-                    <li><a href="{{ path(child.route, child.parameters|default({})) }}">{{ child.caption|trans }}</a></li>
+                    <li>
+                        <a href="{{ path(child.route, child.parameters|default({})) }}">
+                            {{ child.caption|trans }}
+                            {{createEntityButton|raw}}
+                        </a>
+                    </li>
                     {% endif %}
                 {% endfor %}
                 </ul>
