@@ -14,16 +14,13 @@
     können mit eben solchen versehen werden, wenn diese durch ein Semikolon getrennt werden.
 
 </div-->
-
-{%set publication = form.publication|default(form) %}
-
 {% block work %}
 {{ dta.beginFieldset({'caption':'Werk'})}}
 
-    {{ form_row(publication.title) }}
-    {{ form_row(publication.dirname) }}
+    {{ form_row(form.title) }}
+    {{ form_row(form.dirname) }}
 
-    {{ form_row(publication.PersonPublications) }}
+    {{ form_row(form.PersonPublications) }}
     
     {% set modalId = 'moreOptionsForPublication' %}
     {{ dta.beginLabelledContent({'labelCaption':'', 'controlId':'none'}) }}
@@ -35,9 +32,9 @@
        })            
     }}
 
-        {{ form_row(publication.wwwready) }}
-        {{ form_row(publication.doi) }}
-        {{ form_row(publication.format) }}
+        {{ form_row(form.wwwready) }}
+        {{ form_row(form.doi) }}
+        {{ form_row(form.format) }}
 
     {{ dta.endModal({
             'id': modalId,
@@ -46,7 +43,7 @@
        })
     }}
 
-    {{ form_row(publication.citation) }}
+    {{ form_row(form.citation) }}
 
 {{ dta.endFieldset()}}
 {% endblock work %}
@@ -54,18 +51,18 @@
 {% block publication %}
 {{ dta.beginFieldset({'caption':'Angaben zur Publikation der Vorlage'})}}
 
-    {{ form_row(publication.place) }}
+    {{ form_row(form.place) }}
     
     {{ dta.beginLabelledContent({'controlId':'none', 'labelCaption':'Datierung'}) }}
-        {{ form_row(publication.DatespecificationRelatedByPublicationdateId) }}
-        {#{ form_row(publication.DatespecificationRelatedByCreationDateId) }#}
+        {{ form_row(form.DatespecificationRelatedByPublicationdateId) }}
+        {#{ form_row(form.DatespecificationRelatedByCreationDateId) }#}
     {{ dta.endLabelledContent() }}
     
-    {{ form_row(publication.numpages) }}
-    {{ form_row(publication.numpagesnumeric) }}
-    {{ form_row(publication.firstpage) }}
+    {{ form_row(form.numpages) }}
+    {{ form_row(form.numpagesnumeric) }}
+    {{ form_row(form.firstpage) }}
 
-    {{ form_row(publication.publishingcompany) }}
+    {{ form_row(form.publishingcompany) }}
 
 {{ dta.endFieldset()}}
 {% endblock %}
@@ -74,11 +71,11 @@
 {{ dta.beginFieldset({'caption':'Quellen'})}}
     Bild
     <div class="well">
-        {{ form_row(publication.ImageSources) }}
+        {{ form_row(form.ImageSources) }}
     </div>
     Text
     <div class="well">
-        {{ form_row(publication.TextSources) }}
+        {{ form_row(form.TextSources) }}
     </div>
 {{ dta.endFieldset()}}
 {% endblock %}
@@ -86,10 +83,10 @@
 {% block editorialInformation %}
 {{ dta.beginFieldset({'caption':'Editorisches', 'collapsed': false})}}
 
-    {{ form_row(publication.printrun) }}
-    {{ form_row(publication.editiondescription, {'attr':{'class':'col-7'} }) }}
-    {{ form_row(publication.digitaleditioneditor, {'attr':{'class':'col-7'} }) }}
-    {{ form_row(publication.transcriptioncomment, {'attr':{'class':'col-7'} }) }}
+    {{ form_row(form.printrun) }}
+    {{ form_row(form.editiondescription, {'attr':{'class':'col-7'} }) }}
+    {{ form_row(form.digitaleditioneditor, {'attr':{'class':'col-7'} }) }}
+    {{ form_row(form.transcriptioncomment, {'attr':{'class':'col-7'} }) }}
 
 {{ dta.endFieldset()}}
 {% endblock %}
@@ -101,16 +98,16 @@
     <script type="text/javascript">
         $("#taggerTest").select2({tags:["fraktur", "antiqua", "schwabacher"]});
     </script-->
-    {#{ form_row(publication.font, {'label':'vorherrschende Schriftart'}) }#}
-    {{ form_row(publication.LanguagePublications, {'label':'vorherrschende Sprache'}) }}
-    {{ form_row(publication.GenrePublications, {'label':'Genre'}) }}
-    {{ form_row(publication.legacy_dwds_category1) }}
-    {{ form_row(publication.legacy_dwds_subcategory1) }}
-    {{ form_row(publication.legacy_dwds_category2) }}
-    {{ form_row(publication.legacy_dwds_subcategory2) }}
+    {#{ form_row(form.font, {'label':'vorherrschende Schriftart'}) }#}
+    {{ form_row(form.LanguagePublications, {'label':'vorherrschende Sprache'}) }}
+    {{ form_row(form.GenrePublications, {'label':'Genre'}) }}
+    {{ form_row(form.legacy_dwds_category1) }}
+    {{ form_row(form.legacy_dwds_subcategory1) }}
+    {{ form_row(form.legacy_dwds_category2) }}
+    {{ form_row(form.legacy_dwds_subcategory2) }}
     
-    {{ form_row(publication.CategoryPublications, {'label':'Kategorien'}) }}
-    {{ form_row(publication.PublicationTags, {'label':'Schlagworte'}) }}
+    {{ form_row(form.CategoryPublications, {'label':'Kategorien'}) }}
+    {{ form_row(form.PublicationTags, {'label':'Schlagworte'}) }}
     
 {{ dta.endFieldset()}}
 {% endblock %}
@@ -118,15 +115,15 @@
 
 {% block comments %}
 {{ dta.beginFieldset({'caption':'Anmerkungen', 'collapsed': false})}}
-    {{ form_row(publication.comment) }}
-    {{ form_row(publication.editioncomment) }}
-    {{ form_row(publication.transcriptioncomment) }}
-    {{ form_row(publication.encodingcomment) }}
-    {{ form_row(publication.firsteditioncomment) }}
+    {{ form_row(form.comment) }}
+    {{ form_row(form.editioncomment) }}
+    {{ form_row(form.transcriptioncomment) }}
+    {{ form_row(form.encodingcomment) }}
+    {{ form_row(form.firsteditioncomment) }}
 {{ dta.endFieldset()}}
 {% endblock %}
 
-{% block tasks %}
+{% block rest %}
 {{ dta.beginFieldset({'caption':'Tasks'})}}
     {% set modalId = 'tasks' %}
     {{ dta.beginLabelledContent({'labelCaption':'', 'controlId':'none'}) }}
@@ -137,7 +134,9 @@
             'title': 'Tasks',
        })            
     }}
-    {{ form_row(publication.Tasks) }}
+    {% block tasks %}
+        {{ form_row(form.Tasks) }}
+    {% endblock %}
 
     {{ dta.endModal({
             'id': modalId,
@@ -146,7 +145,7 @@
        })
     }}
 {{ dta.endFieldset()}}
-{% endblock tasks %}
-{% block rest %}
+
+    
 {{ form_rest(form) }}
 {% endblock rest %}

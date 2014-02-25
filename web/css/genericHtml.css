@@ -1,11 +1,18 @@
 /* 
     Document   : genericHtml
     Created on : 04.12.2012, 15:17:30
-    Author     : stud
+    Author     : Carl Witt
     Description:
         Styles generic html elements, independently of context.
 */
 
+html{
+    overflow-y: scroll;
+}
+
+nav.navbar.navbar-default{
+    border-radius: 0;
+}
 /* menu */
 
 a.dropdownMenuCreateEntityButton {

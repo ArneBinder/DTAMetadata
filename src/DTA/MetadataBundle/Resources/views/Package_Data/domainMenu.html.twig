@@ -9,7 +9,7 @@
         
         <ul class="dropdown-menu" role="menu" style="min-width:180px">
             <li>
-                <a href="/app_dev.php/Data/showAll/Publication">
+                <a href="{{path('Data_genericViewAll', {'className':'Publication'})}}">
                     Alle anzeigen 
                 </a>
             </li>
@@ -18,7 +18,7 @@
             
             {% for publicationType in domainMenu.publicationTypes %}
             <li>
-                <a href="{{ path('Data_genericCreateOrEdit', {'package':'Data', 'className':publicationType}) }}" class="dropdownMenuCreateEntityButton">
+                <a href="{{ path('Data_newPublication', {'publicationType':publicationType}) }}" class="dropdownMenuCreateEntityButton">
                     +
                 </a>
                 <a href="{{ path('Data_viewPublicationsByType', {'publicationType':publicationType}) }}">
@@ -41,7 +41,7 @@
         
         <ul class="dropdown-menu" role="menu" style="min-width:180px">
             <li>
-                <a href="/app_dev.php/Data/showAll/Person">
+                <a href="{{path('Data_genericViewAll', {'className':'Person'})}}">
                     Alle anzeigen 
                 </a>
             </li>

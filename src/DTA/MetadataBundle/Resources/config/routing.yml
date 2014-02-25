@@ -92,7 +92,7 @@ dataDomain:
   defaults: { _controller: DTAMetadataBundle:DataDomain:index }
 
 Data_newPublication:
-  path: /Data/edit/{publicationType}
+  path: /Data/createPublication/{publicationType}
   defaults: { _controller: DTAMetadataBundle:DataDomain:newPublication }
 
 # displayed content in the right side bar of the list view (data overview and task/copy location edit options)

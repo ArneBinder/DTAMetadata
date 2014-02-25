@@ -63,38 +63,46 @@ class DataDomainController extends ORMController {
             case Model\Data\PublicationPeer::TYPE_MULTIVOLUME:
                 $specializedPublication = new Model\Data\MultiVolume();
                 break;
+            case Model\Data\PublicationPeer::TYPE_ARTICLE:
+                $specializedPublication = new Model\Data\Article();
+                break;
+            default:
+                throw new \Exception("Don't know how to create publication type $publicationType.");
+                break;
         }
-        
-        $logger = $this->get('logger');
-        $logger->info('I just got the logger');
         
         $result = parent::genericCreateOrEdit($request, $specializedPublication);
         
-        $className = get_class($specializedPublication);
+        $classNameParts = explode('\\',get_class($specializedPublication));
+        $className = array_pop($classNameParts);
         
         switch( $result['transaction'] ){
             case "recordNotFound":
                 $this->addErrorFlash("Der gewünschte Datensatz kann nicht bearbeitet werden, weil er nicht gefunden wurde.");
-                $target = $this->generateUrl('Data_genericViewAll',array('package'=>'Data', 'className'=>$className));
-                
-                return $this->redirect($target);
+                return $this->redirect(
+                    $this->generateUrl('Data_genericViewAll',array('package'=>'Data', 'className'=>$className))
+                );
             case "complete":
                 $this->addSuccessFlash("Änderungen vorgenommen.");
-                $target = $this->generateUrl($package.'_genericViewAll',array('package'=>$package, 'className'=>$className));
-                return $this->redirect($target);
+                return $this->redirect(
+                    $this->generateUrl('Data_genericViewAll',array('package'=>'Data', 'className'=>$className))
+                );
             case "edit":
             case "create":
                 return $this->renderWithDomainData("DTAMetadataBundle:ORM:createOrEdit.html.twig", array(
                     'form' => $result['form']->createView(),
                     'transaction' => $result['transaction'],    // whether the form is for edit or create
-                    'className' => $className,
+                    'className' => $className,          // this will be used for the logic
+                    'entityName' => $publicationType,   // this will be displayed in the headline (i.e. book is just a publication with type=book but it should read "create new book" and not "create new publication"
                     'recordId' => $specializedPublication->getId(),
+//                    'publication' => $result['form']->createView(),
                 ));
         }
         
     }
     
     public function indexAction() {
+        
         return $this->renderWithDomainData('DTAMetadataBundle:Package_Data:index.html.twig', array(
 //            "person" => "array_shift()" //$persont->getRelations() //count($p->getPersonalnames()->getArrayCopy())//[0]->__toString(),
             // get_declared_classes()
@@ -120,14 +128,6 @@ class DataDomainController extends ORMController {
         
         $rows = array();
         foreach ($records as $pub) {
-
-            $linkTarget = $this->generateUrl("Data_genericCreateOrEdit", array(
-                    'className'=> 'Publication', 
-                    'recordId'=>$pub->getId()
-                )
-            );
-
-            $linkTo = function($href,$title){return '<a href="'.$href.'">'.$title.'</a>';};
             $row = array();
             foreach ($columns as $col) {
                 $row[$col] = $pub->getAttributeByTableViewColumName($col);

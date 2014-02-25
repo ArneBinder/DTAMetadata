@@ -331,6 +331,9 @@
         <column name="name" type="LONGVARCHAR" required="true" primaryString="true"/>
         <behavior name="table_row_view">
             <parameter name="Name" value="name"/>
+            <parameter name="query" 
+                       value="DTA\MetadataBundle\Model\Data\FontQuery::create()
+                            ->orderBy('Name');"/>
         </behavior>
     </table>
     
@@ -339,6 +342,9 @@
         <column name="name" type="LONGVARCHAR" required="true" primaryString="true"/>
         <behavior name="table_row_view">
             <parameter name="Name" value="name"/>
+            <parameter name="query" 
+                       value="DTA\MetadataBundle\Model\Data\LanguageQuery::create()
+                            ->orderBy('Name');"/>
         </behavior>
     </table>
     

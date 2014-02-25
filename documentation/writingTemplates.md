@@ -39,7 +39,7 @@ public function buildForm(FormBuilderInterface $builder, array $options)
 The file ```buildingBlocks.html.twig``` contains macros to ease recurring tasks.
 It can be included using the following directive.
 ```php
-{# template PublicationM.html.twig #}
+{# template Publication.html.twig #}
 {% import  'DTAMetadataBundle:Form:buildingBlocks.html.twig' as dta %}
 ```
 Sometimes it might be necessary to include within a block to use it: 

@@ -1,0 +1,30 @@
+{# This template controls how the form for the shared core publication data looks like. 
+   It covers all form fields that the book publication type requires (title, author, sources, etc.).
+   Specialized publication types can reuse it by overriding any number of blocks (work, publication, sources, etc.)
+
+   Some macros (e.g. "dta.beginFieldset") are defined in buildingBlocks.html.twig (in the views/Form directory).
+#}
+
+{% import "DTAMetadataBundle:Form:buildingBlocks.html.twig" as dta %}
+{% extends "DTAMetadataBundle:Form/Entity:Publication.html.twig" %}
+
+{% block publication %}
+{{ dta.beginFieldset({'caption':'Angaben zur Publikation der Vorlage'})}}
+
+    {{ form_row(form.volumes_total) }}
+
+    {{ form_row(publication.place) }}
+    
+    {{ dta.beginLabelledContent({'controlId':'none', 'labelCaption':'Datierung'}) }}
+        {{ form_row(publication.DatespecificationRelatedByPublicationdateId) }}
+        {#{ form_row(publication.DatespecificationRelatedByCreationDateId) }#}
+    {{ dta.endLabelledContent() }}
+    
+    {{ form_row(publication.numpages) }}
+    {{ form_row(publication.numpagesnumeric) }}
+    {{ form_row(publication.firstpage) }}
+
+    {{ form_row(publication.publishingcompany) }}
+
+{{ dta.endFieldset()}}
+{% endblock %}

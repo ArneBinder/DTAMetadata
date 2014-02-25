@@ -32,6 +32,12 @@ return array(
     'ARTICLE' => 'Artikel',
     'SERIES' => 'Reihe',
     
+    'Volume description' => 'Bandbeschreibung',
+    'Volume numeric' => 'Bandnummer',
+    'Volumes total' => 'Anzahl Bände gesamt',
+    
+    'Pages' => 'Seitenangabe',
+    
     // person roles
     'AUTHOR' => 'Autor',
     'PUBLISHER' => 'Verleger',

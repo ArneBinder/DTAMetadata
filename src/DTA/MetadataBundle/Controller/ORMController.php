@@ -147,8 +147,9 @@ class ORMController extends DTADomainController {
             // fetch the object from the database
             $queryObject = $classNames['model']::getRowViewQueryObject();
             $obj = $queryObject->findOneById($recordId);
-            
         }
+        
+        return $obj;
         
     }
     /**
@@ -259,6 +260,7 @@ class ORMController extends DTADomainController {
         switch( $result['transaction'] ){
             case "recordNotFound":
                 $this->addErrorFlash("Der gewünschte Datensatz kann nicht bearbeitet werden, weil er nicht gefunden wurde.");
+                $this->get('logger')->log('error', "Record not found: $package $className $recordId");
                 $target = $this->generateUrl($package.'_genericViewAll',array('package'=>$package, 'className'=>$className));
                 
                 return $this->redirect($target);

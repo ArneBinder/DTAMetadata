@@ -23,7 +23,7 @@
 
     {% if file_exists(specializedTemplate) %}
 
-        {% include 'DTAMetadataBundle:Form/Entity:'~className~'.html.twig' %}
+        {% include 'DTAMetadataBundle:Form/Entity:'~entityName|default(className)~'.html.twig' %}
 
     {% else %}
 
