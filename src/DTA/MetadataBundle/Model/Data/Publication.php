@@ -14,7 +14,17 @@ class Publication extends BasePublication
         // camelcase version of the type e.g. type = VOLUME, becomes Volume
         $publicationType = ucwords(strtolower($this->getType()));
         $getter = 'get'.$publicationType;
-        return $this->$getter();
+        if(method_exists($this, $getter)){
+            return $this->$getter();
+        } else {
+            return $this;
+        }
+    }
+    
+    /** @return the class name (WITHOUT full qualification) of the specialization class. Might be Publication in case there exists no extra class to represent the publications type. */
+    public function getSpecializationClassName(){
+        $specializedClassNameParts = explode('\\', get_class($this->getSpecialization())); // fully qualified
+        return array_pop($specializedClassNameParts);
     }
     
     /**

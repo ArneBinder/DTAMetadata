@@ -119,9 +119,11 @@ class DataDomainController extends ORMController {
         
     }
 
-    /** Render list of all publications with publication options panel. */
+    /** Render list of all publications with publication options panel. (The option panel's why the generic list view isn't used)
+     *  the route is /Data/showAll/Publication */
     public function viewPublicationsAction(){
         
+        // use optimized query as defined in the data schema (dta_data_schema.xml)
         $records = Model\Data\Publication::getRowViewQueryObject()->find();
         
         $columns = Model\Data\Publication::getTableViewColumnNames();
@@ -133,12 +135,18 @@ class DataDomainController extends ORMController {
                 $row[$col] = $pub->getAttributeByTableViewColumName($col);
             }
             $row['id'] = $pub->getId();
+            
+            $editLinkTarget = $this->generateUrl("Data_genericCreateOrEdit", array(
+                'className'=>$pub->getSpecializationClassName(), 
+                'recordId'=>$pub->getId(),
+            ));
+            $row['Titel'] = "<a href='$editLinkTarget'>$row[Titel]</a>";
             $rows[] = $row;
         }
         
         return $this->renderWithDomainData("DTAMetadataBundle::listViewWithOptions.html.twig", array(
                     'title' => 'Publikationen',
-                    'columns' => Model\Data\Publication::getTableViewColumnNames(),
+                    'columns' => $columns,
                     'rows' => $rows,
                     'updatedObjectId' => 0,
                     'accessors' => $columns,
@@ -203,24 +211,27 @@ class DataDomainController extends ORMController {
                 ->filterByType($publicationType)
                 ->find();
         
+        $columns = array('Titel', 'Erster Autor');
+        $accessors = array('titleLink', 'repName');
+        
         foreach ($publications as $pub) {
 
+            
+            /* @var $pub \DTA\MetadataBundle\Model\Data\Publication */
             $linkTarget = $this->generateUrl("Data_genericCreateOrEdit", array(
-                    'className'=> 'Publication', 
+                    'className'=> $pub->getSpecializationClassName(),
                     'recordId'=>$pub->getId()
                 )
             );
 
             $linkTo = function($href,$title){return '<a href="'.$href.'">'.$title.'</a>';};
             $rows[] = array(
-                'context' => $linkTo($linkTarget, $pub->getTitleString()),  // title
+                'titleLink' => $linkTo($linkTarget, $pub->getTitleString()),  // title
                 'repName' => $pub->getFirstAuthorName(),                        // representative name
                 'id'      => $pub->getId()                                  // id
             );
         }
         
-        $columns = array('Titel', 'Erster Autor');
-        $accessors = array('context', 'repName');
 //        $compareRow = function($a, $b){ return strcmp($a['context'],$b['context']); };
 //        uasort($rows, $compareRow);
         return $this->renderWithDomainData('DTAMetadataBundle::listViewWithOptions.html.twig', array(

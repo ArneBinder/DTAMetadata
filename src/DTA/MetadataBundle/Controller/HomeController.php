@@ -24,12 +24,13 @@ class HomeController extends DTADomainController {
     
     public function indexAction(Request $request) {
 
-//        $lorenz = Model\Data\PersonQuery::create()->findOneById(300);
+        $lorenz = Model\Data\PersonQuery::create()->findOneById(300);
         
         return $this->renderWithDomainData('DTAMetadataBundle:Home:index.html.twig', array(
             'testData' => 
 //            null
             array(
+                "lorenz class" => get_class($lorenz)
 //                'multivol is root' => $multivolume->isRoot(),
 //                'multivol scope'=>$multivolume->getScopeValue(),
 //                'multivol parent'=>$multivolume->getParent(),

@@ -64,7 +64,19 @@ class MasterDomainController extends ORMController {
         
         // the application mode string is constrained via the parameter requirements in routing.yml
         // the route matches only /Admin/ClearCache/dev and  /Admin/ClearCache/prod
-        $result = system("php ../app/console cache:clear $applicationMode");
+        $phpBinary = exec("which php");
+        echo $phpBinary." -- ";
+        $workingDirectory = exec("pwd");
+        echo exec("whoami")." -- ";
+//        echo implode(DIRECTORY_SEPARATOR, array($workingDirectory, '..', 'app', 'cache', 'dev'));
+        $clearCacheCommand = "$phpBinary $workingDirectory/../app/console cache:clear";
+        echo $clearCacheCommand;
+        $result = exec($clearCacheCommand);
+//        rmdir( implode(DIRECTORY_SEPARATOR, array($workingDirectory, '..', 'app', 'cache', 'dev')) . DIRECTORY_SEPARATOR);
+//        echo $workingDirectory;
+//        echo getcwd();
+//        echo $applicationMode;
+//        echo $result;
         return \Symfony\Component\HttpFoundation\Response::create($result);
         
     }

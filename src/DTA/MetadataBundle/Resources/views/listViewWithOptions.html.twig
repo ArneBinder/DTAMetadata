@@ -62,6 +62,7 @@
         {% endspaceless %}
 </div>
 <div class="well col-md-3" id="publicationOptions" style="margin-top:-4px;">
+    <h4> Auf eine Publikation klicken, um Informationen anzuzeigen. </h4>
 </div>
 {% endblock core %}
 
@@ -90,7 +91,7 @@ console.log($(this));
 $(document).ready(function() {
     
     optionsPanel = $('#publicationOptions');
-    optionsPanel.hide();
+{#    optionsPanel.hide();#}
     
     // make table rows clickable
     var rows = $('table.table tr').slice(1);   // skip table head
