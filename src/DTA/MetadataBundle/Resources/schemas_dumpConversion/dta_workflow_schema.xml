@@ -58,7 +58,8 @@
     </table>
 
     <table name="tasktype">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <!-- TODO: enable autoincrement. During conversion, the ids are set as the ids of the legacy database.-->
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="false" required="true"/>
         
         <column name="name" type="LONGVARCHAR" required="true" primaryString="true"/>
         
@@ -76,7 +77,8 @@
         Ist prinzipiell eine many-to-many Beziehung, weist aber zusätzliche Attribute auf (deswegen nicht im Master Schema).-->
     <table name="copy_location">
         
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <!-- TODO: enable autoincrement. During conversion, the ids are set as the ids of the legacy database.-->
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="false" required="true"/>
         
         <column name="publication_id" type="INTEGER" required="true"/>
         <column name="partner_id" description="Anbieter Leitdruck" type="INTEGER"/>
@@ -117,7 +119,8 @@
 
     <table name="partner">
         
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <!-- TODO: enable autoincrement. During conversion, the ids are set as the ids of the legacy database.-->
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="false" required="true"/>
         
         <column name="name" type="LONGVARCHAR" primaryString="true"/>
         <column name="mail" type="LONGVARCHAR"/>
@@ -192,7 +195,8 @@
     
     <table name="publicationgroup">
         
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <!-- TODO: enable autoincrement. During conversion, the ids are set as the ids of the legacy database.-->
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="false" required="true"/>
         
         <column name="name" type="LONGVARCHAR" required="true" primaryString="true"/>
     </table>

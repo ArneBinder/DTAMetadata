@@ -63,6 +63,8 @@ class DumpConversionController extends ORMController {
         $this->messages = array();
         $this->errors   = array();
         
+        $this->useDumpConversionFiles();
+        
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // ERASE ALL DATA FROM THE WORKING (TARGET DATABASE) vvvvvv
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -107,6 +109,9 @@ class DumpConversionController extends ORMController {
             $this->runTransaction($task, $dbh);
         }
         
+        $this->enableAutoIncrement($this->propelConnection);
+        $this->useProductionFiles();
+        
         return $this->renderWithDomainData('DTAMetadataBundle:DumpConversion:conversionResult.html.twig', array(
             'warnings' => $this->warnings,
             'messages' => $this->messages,
@@ -124,6 +129,31 @@ class DumpConversionController extends ORMController {
         $time_taken = microtime(true) - $start;
         echo $task." ".$time_taken;
         $this->messages[] = array("finished transaction ".$task=>$time_taken);
+    }
+    
+    /** Use the schema files for dump conversion */
+    function useDumpConversionFiles(){
+        // current working directory is web
+        $dumpConversionSchemasDir = "../src/DTA/MetadataBundle/Resources/schemas_dumpConversion";
+        foreach (array('dta_data_schema.xml', 'dta_master_schema.xml', 'dta_workflow_schema.xml', 'dta_classification_schema.xml') as $schema) {
+            $this->messages[] = array("bringing dump conversion version of $schema into place", system("cp $dumpConversionSchemasDir/$schema $dumpConversionSchemasDir/../config/$schema"));
+        }
+        // build propel entity classes
+        $this->messages[] = array('building model from dump conversion schemas', system("$this->phpExec ../app/console propel:model:build"));
+    }
+    
+    /** Use the schema files for dump conversion */
+    function useProductionFiles(){
+        // current working directory is web
+        $productionSchemasDir = "../src/DTA/MetadataBundle/Resources/schemas_final";
+        foreach (array('dta_data_schema.xml', 'dta_master_schema.xml', 'dta_workflow_schema.xml', 'dta_classification_schema.xml') as $schema) {
+            $this->messages[] = array(
+                "bringing dump conversion version of $schema into place", 
+                system("cp $productionSchemasDir/$schema $productionSchemasDir/../config/$schema")
+            );
+        }
+        // build propel entity classes
+        $this->messages[] = array('building model from production schemas', system("$this->phpExec ../app/console propel:model:build"));
     }
     
     function dropAndSetupTargetDB(){
@@ -261,8 +291,10 @@ class DumpConversionController extends ORMController {
     function convertMultiVolumes(){
 
         // retrieve all persons
-        $persons = Model\Data\PersonQuery::create()
-                ->find();
+        $persons = Data\Person::getRowViewQueryObject()->find();
+        
+//        $persons = Model\Data\PersonQuery::create()
+//                ->find();
         
         foreach($persons as $person){
             /* @var $person \DTA\MetadataBundle\Model\Data\Person */
@@ -276,6 +308,9 @@ class DumpConversionController extends ORMController {
                         ->filterByPerson($person)
                     ->endUse()
                 ->endUse()
+                ->joinWith("Publication")
+                ->joinWith("Publication.Title")
+                ->joinWith("Title.Titlefragment")
                 ->orderByVolumeNumeric()
                 ->find();
             
@@ -1457,7 +1492,46 @@ class DumpConversionController extends ORMController {
             
         return $this->render("DTAMetadataBundle:DumpConversion:pcDuplicates.csv.twig", array('candidates' => $candidates));
     }
+
+    /** For conversion, some id columns are created as non-auto incrementing. To be able to work with the database conveniently, auto-incrementing is enabled manually. 
+     * This is postgres specific logic. Maybe that's also the reason why a migration won't do (propel doesn't even seem to recognize the difference between the schemas if auto-increment is on/off).
+     * Note that changing the schema is necessary, and the propel classes need to be rebuild afterwards. 
+     * php /Users/macbookdata/NetBeansProjects/DTAMetadata/app/console propel:model:build
+     */
+    public function enableAutoIncrement($propelConnection) {
         
+        // publication.id
+        $enableAutoIncrement = function($table, $column, $propelConnection){
+            $sequenceName = implode("_", array($table, $column, 'seq'));
+            $create =
+            "CREATE SEQUENCE $sequenceName INCREMENT 1 NO CYCLE;                            -- create sequence";
+            $default =
+            "ALTER TABLE $table ALTER $column SET DEFAULT nextval('$sequenceName');         -- add default value for id column";
+            $own =
+            "ALTER SEQUENCE $sequenceName OWNED BY $table.$column;                          -- declare dependency of sequence to column (if moved or deleted)";
+            $setMin =
+            "SELECT setval( '$sequenceName', max($column)+1 ) FROM $table;                  -- make sequence start after highest value in publications";
+            
+            $stmt = $propelConnection->prepare($create);    $stmt->execute();
+            $stmt = $propelConnection->prepare($default);   $stmt->execute();
+            $stmt = $propelConnection->prepare($own);       $stmt->execute();
+            $stmt = $propelConnection->prepare($setMin);    $stmt->execute();
+        };
+        
+        // data
+        $enableAutoIncrement('publication', 'id', $propelConnection);
+        
+        // master
+        $enableAutoIncrement('dta_user', 'id', $propelConnection);
+        
+        // workflow
+        $enableAutoIncrement('copy_location', 'id', $propelConnection);
+        $enableAutoIncrement('tasktype', 'id', $propelConnection);
+        $enableAutoIncrement('partner', 'id', $propelConnection);
+        $enableAutoIncrement('publicationgroup', 'id', $propelConnection);
+        
+    }
+
 }
     
 ?>

@@ -26,11 +26,21 @@ class HomeController extends DTADomainController {
 
         $lorenz = Model\Data\PersonQuery::create()->findOneById(300);
         
+        
+//        $bp = new Model\Data\Publication();
+//        $bp->setTitle(new Model\Data\Title());
+//        $bp->save();
+//        
+//        $mv = new Model\Data\MultiVolume();
+//        $mv->setPublication($bp);
+//        $mv->save();
+        
+        
         return $this->renderWithDomainData('DTAMetadataBundle:Home:index.html.twig', array(
             'testData' => 
 //            null
             array(
-                "lorenz class" => get_class($lorenz)
+                "lorenz class" => getcwd()
 //                'multivol is root' => $multivolume->isRoot(),
 //                'multivol scope'=>$multivolume->getScopeValue(),
 //                'multivol parent'=>$multivolume->getParent(),

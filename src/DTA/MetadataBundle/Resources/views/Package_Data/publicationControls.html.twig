@@ -2,6 +2,9 @@
     This template displays an overview of the publications data. It is displayed when the user clicks on a publication in the special list view (views/listViewWithOptions.html.twig). 
     The data is retrieved via ajax using the publicationControlsAction of the Data Domain controller.
 #}
+
+{# --------------- Basisinformationen --------------- #}
+
 <table>
   <thead>
     <tr>
@@ -51,10 +54,14 @@
   </tbody>
 </table>
 
+{# --------------- Vollanzeige/Bearbeiten --------------- #}
+
 <div style="margin-top:10px">
 <a href="#" class="btn btn-default disabled btn-sm">Vollanzeige</a> 
-<a href="{{path('Data_genericCreateOrEdit', {'className':'Publication','recordId':publication.id})}}" class="btn btn-default btn-sm">Editieren</a> 
+<a href="{{path('Data_genericCreateOrEdit', {'className':publication.getSpecializationClassName ,'recordId':publication.id})}}" class="btn btn-default btn-sm">Editieren</a> 
 </div>
+
+{# --------------- Tasks --------------- #}
 
 {% if publication.getTasksByClosed(false)|length > 0 %}
     <h4>Offene Tasks</h4>
@@ -68,6 +75,8 @@
 
 {# old format: CoordinateMerge_Don	12.03.2010	12.03.2010 #}
 
+{# --------------- Fundstellen --------------- #}
+    
 {% set copyLocations = publication.getCopyLocations %}
 {% if copyLocations|length > 0 %}
 <h4>Nachweise</h4>

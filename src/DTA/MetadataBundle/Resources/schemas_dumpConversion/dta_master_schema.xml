@@ -123,7 +123,8 @@
 
     <table name="dta_user">
         
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <!-- TODO: enable autoincrement. During conversion, the ids are set as the ids of the legacy database.-->
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="false" required="true"/>
         
         <column name="username" type="LONGVARCHAR" primaryString="true"/>
         <column name="password" type="VARCHAR" size="512"/>

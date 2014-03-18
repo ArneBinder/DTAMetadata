@@ -53,18 +53,23 @@ class DataDomainController extends ORMController {
                 break;
             case Model\Data\PublicationPeer::TYPE_SERIES:
                 $specializedPublication = new Model\Data\Series();
+                $specializedPublication->setPublication($basepublication);
                 break;
             case Model\Data\PublicationPeer::TYPE_CHAPTER:
                 $specializedPublication = new Model\Data\Chapter();
+                $specializedPublication->setPublication($basepublication);
                 break;
             case Model\Data\PublicationPeer::TYPE_VOLUME:
                 $specializedPublication = new Model\Data\Volume();
+                $specializedPublication->setPublication($basepublication);
                 break;
             case Model\Data\PublicationPeer::TYPE_MULTIVOLUME:
                 $specializedPublication = new Model\Data\MultiVolume();
+                $specializedPublication->setPublication($basepublication);
                 break;
             case Model\Data\PublicationPeer::TYPE_ARTICLE:
                 $specializedPublication = new Model\Data\Article();
+                $specializedPublication->setPublication($basepublication);
                 break;
             default:
                 throw new \Exception("Don't know how to create publication type $publicationType.");
@@ -73,8 +78,8 @@ class DataDomainController extends ORMController {
         
         $result = parent::genericCreateOrEdit($request, $specializedPublication);
         
-        $classNameParts = explode('\\',get_class($specializedPublication));
-        $className = array_pop($classNameParts);
+//        $classNameParts = explode('\\',get_class($specializedPublication));
+//        $className = array_pop($classNameParts);
         
         switch( $result['transaction'] ){
             case "recordNotFound":
@@ -92,7 +97,7 @@ class DataDomainController extends ORMController {
                 return $this->renderWithDomainData("DTAMetadataBundle:ORM:createOrEdit.html.twig", array(
                     'form' => $result['form']->createView(),
                     'transaction' => $result['transaction'],    // whether the form is for edit or create
-                    'className' => $className,          // this will be used for the logic
+                    'className' => $basepublication->getSpecializationClassName(),          
                     'entityName' => $publicationType,   // this will be displayed in the headline (i.e. book is just a publication with type=book but it should read "create new book" and not "create new publication"
                     'recordId' => $specializedPublication->getId(),
 //                    'publication' => $result['form']->createView(),

@@ -91,4 +91,9 @@ class Publication extends BasePublication
         
     }
     
+//    public function postInsert(\PropelPDO $con = NULL){
+//        var_dump($this->getId());
+//        $this->getSpecialization()->setId($this->getId());
+//    }
+    
 }
