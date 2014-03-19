@@ -136,8 +136,8 @@
 
 {% block titlefragment_row %}
     <div class="form-inline">
-            {{ form_widget(form.type)}}
-            {{ form_widget(form.name,{'attr':{'class':'medium-text'} }) }} 
+            {{ form_row(form.type)}}
+            {{ form_row(form.name,{'attr':{'class':'medium-text'} }) }} 
             <br/>
             {{ form_row(form.NameIsReconstructed ) }}
             {{ form_rest(form) }}
@@ -163,8 +163,8 @@
 
 {% block namefragment_row %}
     <div class="form-inline">
-            {{ form_widget(form.type)}}
-            {{ form_widget(form.name) }} 
+            {{ form_row(form.type)}}
+            {{ form_row(form.name) }} 
             {{ form_rest(form) }}
     </div>
 {% endblock %}
@@ -203,7 +203,7 @@
 
 {% block languagework_row %}
     <div class="form-inline">
-        {{ form_widget(form.language)}}
+        {{ form_row(form.language)}}
         {{ form_rest(form) }}
     </div>
 {% endblock %}

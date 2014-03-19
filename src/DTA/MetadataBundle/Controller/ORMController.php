@@ -3,7 +3,6 @@
 namespace DTA\MetadataBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -48,8 +47,9 @@ class ORMController extends DTADomainController {
                 $query = new $classNames['query'];
                 $record = $query->findOneById($recordId);
                 
-                if($record === null) 
+                if($record === null){
                     $this->addErrorFlash("The record ($className #$recordId) to be deleted doesn't exist.");
+                }
                 else{
                     $record->delete();
                     $this->addSuccessFlash("Datensatz gelöscht.");
@@ -58,10 +58,11 @@ class ORMController extends DTADomainController {
             // abort
             } else {
                 
-                if( ! $request->get("reallyDelete") )
+                if( ! $request->get("reallyDelete") ){
                     $this->addWarningFlash("Datensatz nicht gelöscht.");
-                else if(! $request->get('recordId'))
+                } else if(! $request->get('recordId')){
                     $this->addErrorFlash("Datensatz kann nicht gelöscht werden: Er existiert nicht.");
+                }
                 
             }
             
@@ -82,7 +83,7 @@ class ORMController extends DTADomainController {
 
         // for retrieving the entities
         $query    = new $classNames['query'];
-        $formType = new $classNames['formType'];
+//        $formType = new $classNames['formType'];
         
         $record = $query->findOneById($recordId);
         
@@ -168,7 +169,6 @@ class ORMController extends DTADomainController {
     protected function genericCreateOrEdit(
             Request $request, 
             $obj, 
-            $additionalLogic = array('preSaveLogic'=>NULL), 
             $formTypeOptions = array()) {
         
         // TODO compare form_row (form_div_layout.html.twig) error reporting mechanisms to the overriden version of form_row (viewConfigurationForModels.html.twig)
@@ -180,7 +180,7 @@ class ORMController extends DTADomainController {
         
         $recordId = $obj->getId();
 
-        /* @var $obj \DTA\MetadataBundle\Model\Data\Person */
+        // reflection
         $package = explode(".", $obj->getPeer()->getTableMap()->getPackage());
         $className = $obj->getPeer()->getTableMap()->getPhpName();
         $classNames = $this->relatedClassNames(array_pop($package), $className);
@@ -196,12 +196,6 @@ class ORMController extends DTADomainController {
 
             // propel validation: unique constraints etc.
             if ($obj->validate()) {
-
-                // user defined pre save logic closure.
-                $preSaveLogic = $additionalLogic['preSaveLogic'];
-                if(is_object($preSaveLogic) && ($preSaveLogic instanceof Closure)){
-                    $preSaveLogic();
-                }
 
                 $obj->save();
 
@@ -314,8 +308,9 @@ class ORMController extends DTADomainController {
                 // check whether the caption accessor function exists
                 $classNames = $this->relatedClassNames($package, $className);
                 $cr = new \ReflectionClass($classNames['model']);
-                if( ! $cr->hasMethod($captionAccessor) )
+                if( ! $cr->hasMethod($captionAccessor) ){
                     throw new \Exception("Can't retrieve caption via $captionAccessor from $className object.");
+                }
                 
                 $caption = $obj->$captionAccessor();
                 return new Response("<option value='$id'>$caption</option>");
@@ -356,6 +351,31 @@ class ORMController extends DTADomainController {
     public static function getPackageName($fullyQualifiedClassName){
         $nameSpaceParts = explode('\\', $fullyQualifiedClassName);
         return $nameSpaceParts[count($nameSpaceParts)-2];
+    }
+   
+    
+    /**
+     * Visits recursively all nested form elements and saves them.
+     * Deprecated: this is propel's job. implement your own isChanged() method if propel doesn't save things recursively.
+     * @param Form $form The form object that contains the data defined by the top level form type (PersonType, NamefragmentType, ...)
+     */
+    protected function validateRecursively(\Symfony\Component\Form\Form $form) {
+
+        $entity = $form->getData();
+        if (is_object($entity)) {
+            $rc = new \ReflectionClass($entity);
+            if($rc->getName() === "PropelObjectCollection"){
+                foreach($entity as $e){
+                    $e->validate();                    
+                }
+            } elseif ($rc->hasMethod('validate')){
+                $validator->validate($entity->save());
+            }
+        }
+
+        foreach ($form->all() as $child) {
+            $this->saveRecursively($child);
+        }
     }
     
     /**

@@ -1,0 +1,25 @@
+DTA\MetadataBundle\Model\Workflow\Task:
+    properties:
+        tasktype_id: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Workflow\Tasktype:
+    properties:
+        name: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Workflow\CopyLocation:
+    properties:
+        publication_id: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Workflow\Partner:
+    properties: {  }
+DTA\MetadataBundle\Model\Workflow\Imagesource:
+    properties:
+        publication_id: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Workflow\Textsource:
+    properties:
+        publication_id: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Workflow\License:
+    properties:
+        name: [{ NotBlank: ~ }]
+        applicable_to_image: [{ NotBlank: ~ }]
+        applicable_to_text: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Workflow\Publicationgroup:
+    properties:
+        name: [{ NotBlank: ~ }]

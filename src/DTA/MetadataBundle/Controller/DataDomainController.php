@@ -34,73 +34,45 @@ class DataDomainController extends ORMController {
 
     }
     
+    public function genericViewAllAction($package, $className, $updatedObjectId = 0){
+        
+        $listViewWithOptionsFor = array("Publication", "Book", "Volume", "Multivolume", "Chapter", "Journal", "Article", "Series");
+        if(FALSE === array_search($className, $listViewWithOptionsFor)){
+            return parent::genericViewAllAction($package, $className);
+        } else {
+            if($className == "Publication"){
+                return $this->viewPublicationsAction();
+            } else {
+                return $this->viewPublicationsByTypeAction(strtoupper($className));
+            }
+        }
+        
+    }
     /**
      * Handles creation of publications (since for some publication types specialized classes exist, a bit of extra logic is required.)
      * @param Request $request the request wrapper
      * @param string $publicationType The publication type as enumerated by the {@link Model\Data\PublicationPeer Publication peer} class. 
      */
-    public function newPublicationAction(Request $request, $publicationType){
+    public function newPublicationAction(Request $request, $publicationType, $recordId = NULL){
         
-        $basepublication = new Model\Data\Publication();
-        $basepublication->setType($publicationType);
-
-        $specializedPublication = NULL;
-        
-        switch ($publicationType) {
-            case Model\Data\PublicationPeer::TYPE_BOOK:
-            case Model\Data\PublicationPeer::TYPE_JOURNAL:
-                $specializedPublication = $basepublication;
-                break;
-            case Model\Data\PublicationPeer::TYPE_SERIES:
-                $specializedPublication = new Model\Data\Series();
-                $specializedPublication->setPublication($basepublication);
-                break;
-            case Model\Data\PublicationPeer::TYPE_CHAPTER:
-                $specializedPublication = new Model\Data\Chapter();
-                $specializedPublication->setPublication($basepublication);
-                break;
-            case Model\Data\PublicationPeer::TYPE_VOLUME:
-                $specializedPublication = new Model\Data\Volume();
-                $specializedPublication->setPublication($basepublication);
-                break;
-            case Model\Data\PublicationPeer::TYPE_MULTIVOLUME:
-                $specializedPublication = new Model\Data\MultiVolume();
-                $specializedPublication->setPublication($basepublication);
-                break;
-            case Model\Data\PublicationPeer::TYPE_ARTICLE:
-                $specializedPublication = new Model\Data\Article();
-                $specializedPublication->setPublication($basepublication);
-                break;
-            default:
-                throw new \Exception("Don't know how to create publication type $publicationType.");
-                break;
-        }
-        
+        $specializedPublication = Model\Data\Publication::create($publicationType);
         $result = parent::genericCreateOrEdit($request, $specializedPublication);
         
-//        $classNameParts = explode('\\',get_class($specializedPublication));
-//        $className = array_pop($classNameParts);
-        
         switch( $result['transaction'] ){
-            case "recordNotFound":
-                $this->addErrorFlash("Der gewünschte Datensatz kann nicht bearbeitet werden, weil er nicht gefunden wurde.");
-                return $this->redirect(
-                    $this->generateUrl('Data_genericViewAll',array('package'=>'Data', 'className'=>$className))
-                );
             case "complete":
                 $this->addSuccessFlash("Änderungen vorgenommen.");
                 return $this->redirect(
-                    $this->generateUrl('Data_genericViewAll',array('package'=>'Data', 'className'=>$className))
+                    $this->generateUrl('Data_viewPublicationsByType',array('publicationType'=>$publicationType))
                 );
             case "edit":
             case "create":
                 return $this->renderWithDomainData("DTAMetadataBundle:ORM:createOrEdit.html.twig", array(
                     'form' => $result['form']->createView(),
                     'transaction' => $result['transaction'],    // whether the form is for edit or create
-                    'className' => $basepublication->getSpecializationClassName(),          
+                    'className' => $specializedPublication->getPublication()->getSpecializationClassName(),          
                     'entityName' => $publicationType,   // this will be displayed in the headline (i.e. book is just a publication with type=book but it should read "create new book" and not "create new publication"
                     'recordId' => $specializedPublication->getId(),
-//                    'publication' => $result['form']->createView(),
+                    'sendDataTo' => $this->generateUrl('Data_newPublication', array('publicationType'=>$publicationType)),
                 ));
         }
         
@@ -160,6 +132,46 @@ class DataDomainController extends ORMController {
         
     }
     
+    public function viewPublicationsByTypeAction($publicationType) {
+        
+        $rows = array();
+        
+        $publications = 
+                Model\Data\Publication::getRowViewQueryObject()
+                ->filterByType($publicationType)
+                ->find();
+        
+        $columns = array('Titel', 'Erster Autor');
+        $accessors = array('titleLink', 'repName');
+        
+        foreach ($publications as $pub) {
+
+            /* @var $pub \DTA\MetadataBundle\Model\Data\Publication */
+            $linkTarget = $this->generateUrl("Data_genericCreateOrEdit", array(
+                    'className'=> $pub->getSpecializationClassName(),
+                    'recordId'=>$pub->getId()
+                )
+            );
+
+            $linkTo = function($href,$title){return '<a href="'.$href.'">'.$title.'</a>';};
+            $rows[] = array(
+                'titleLink' => $linkTo($linkTarget, $pub->getTitleString()),  // title
+                'repName' => $pub->getFirstAuthorName(),                        // representative name
+                'id'      => $pub->getId()                                  // id
+            );
+        }
+        
+//        $compareRow = function($a, $b){ return strcmp($a['context'],$b['context']); };
+//        uasort($rows, $compareRow);
+        return $this->renderWithDomainData('DTAMetadataBundle::listViewWithOptions.html.twig', array(
+            'rows' => $rows,
+            'columns' => $columns,
+            'accessors' => $accessors,
+            'title' => $publicationType,
+            'optionsLinkTemplate' => $this->generateUrl("publicationControls", array('publicationId'=>'__id__')),
+        ));
+    }
+
     public function viewPersonsByRoleAction($personRoleId) {
         
         $rows = array();//new \ArrayObject();
@@ -206,48 +218,7 @@ class DataDomainController extends ORMController {
             'title' => $personRoleId
         ));
     }
-
-    public function viewPublicationsByTypeAction($publicationType) {
-        
-        $rows = array();
-        
-        $publications = 
-                Model\Data\Publication::getRowViewQueryObject()
-                ->filterByType($publicationType)
-                ->find();
-        
-        $columns = array('Titel', 'Erster Autor');
-        $accessors = array('titleLink', 'repName');
-        
-        foreach ($publications as $pub) {
-
-            
-            /* @var $pub \DTA\MetadataBundle\Model\Data\Publication */
-            $linkTarget = $this->generateUrl("Data_genericCreateOrEdit", array(
-                    'className'=> $pub->getSpecializationClassName(),
-                    'recordId'=>$pub->getId()
-                )
-            );
-
-            $linkTo = function($href,$title){return '<a href="'.$href.'">'.$title.'</a>';};
-            $rows[] = array(
-                'titleLink' => $linkTo($linkTarget, $pub->getTitleString()),  // title
-                'repName' => $pub->getFirstAuthorName(),                        // representative name
-                'id'      => $pub->getId()                                  // id
-            );
-        }
-        
-//        $compareRow = function($a, $b){ return strcmp($a['context'],$b['context']); };
-//        uasort($rows, $compareRow);
-        return $this->renderWithDomainData('DTAMetadataBundle::listViewWithOptions.html.twig', array(
-            'rows' => $rows,
-            'columns' => $columns,
-            'accessors' => $accessors,
-            'title' => $publicationType,
-            'optionsLinkTemplate' => $this->generateUrl("publicationControls", array('publicationId'=>'__id__')),
-        ));
-    }
-
+    
     //    public function lexicographicalComparison($s1, $s2){
 //        for($i = 0; $i < max(array(count($s1),count($s2))); $i++){
 //            if(ord($s1[$i]) > ord($s2[$i]))

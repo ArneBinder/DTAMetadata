@@ -186,6 +186,34 @@ CREATE INDEX "publication_I_1" ON "publication" ("tree_id");
 CREATE INDEX "publication_I_2" ON "publication" ("type");
 
 -----------------------------------------------------------------------
+-- book
+-----------------------------------------------------------------------
+
+DROP TABLE IF EXISTS "book" CASCADE;
+
+CREATE TABLE "book"
+(
+    "id" INTEGER NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
+    PRIMARY KEY ("id")
+);
+
+-----------------------------------------------------------------------
+-- journal
+-----------------------------------------------------------------------
+
+DROP TABLE IF EXISTS "journal" CASCADE;
+
+CREATE TABLE "journal"
+(
+    "id" INTEGER NOT NULL,
+    "created_at" TIMESTAMP,
+    "updated_at" TIMESTAMP,
+    PRIMARY KEY ("id")
+);
+
+-----------------------------------------------------------------------
 -- multi_volume
 -----------------------------------------------------------------------
 
@@ -827,6 +855,14 @@ ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_6"
 ALTER TABLE "publication" ADD CONSTRAINT "publication_FK_7"
     FOREIGN KEY ("last_changed_by_user_id")
     REFERENCES "dta_user" ("id");
+
+ALTER TABLE "book" ADD CONSTRAINT "book_FK_1"
+    FOREIGN KEY ("id")
+    REFERENCES "publication" ("id");
+
+ALTER TABLE "journal" ADD CONSTRAINT "journal_FK_1"
+    FOREIGN KEY ("id")
+    REFERENCES "publication" ("id");
 
 ALTER TABLE "multi_volume" ADD CONSTRAINT "multi_volume_FK_1"
     FOREIGN KEY ("id")

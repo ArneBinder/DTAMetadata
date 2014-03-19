@@ -23,6 +23,10 @@ class TitleType extends BaseAbstractType {
             'allow_add' => true,
             'allow_delete' => true,
             'by_reference' => false,
+            'constraints' => array(  
+                new \Symfony\Component\Validator\Constraints\Count(array('min'=>1,'minMessage'=>'Titel darf nicht leer sein.'))
+//                , new \Symfony\Component\Validator\Constraints\Valid(array('traverse'=>TRUE)) 
+                ),
         ));
     }
 

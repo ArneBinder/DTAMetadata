@@ -31,6 +31,13 @@ return array(
     'JOURNAL' => 'Zeitschrift/Zeitung',
     'ARTICLE' => 'Artikel',
     'SERIES' => 'Reihe',
+    'Book' => 'Buch',
+    'Volume' => 'Buchband',
+    'MultiVolume' => 'Mehrbändiges Werk',
+    'Chapter' => 'Kapitel',
+    'Journal' => 'Zeitschrift/Zeitung',
+    'Article' => 'Artikel',
+    'Series' => 'Reihe',
     
     'Volume description' => 'Bandbeschreibung',
     'Volume numeric' => 'Bandnummer',

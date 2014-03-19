@@ -1,8 +1,171 @@
-DTA\MetadataBundle\Model\Publication:
+# ------------------------------------------------------------------------------
+# Data domain
+# ------------------------------------------------------------------------------
+
+DTA\MetadataBundle\Model\Data\Publication:
     properties:
-      numpages:
-        - Type:
-              type: integer
-        - Range:
-              min: 1
-              minMessage: "Wenn keine Seitenzahl bekannt ist, bitte leerlassen."              
+        aTitle: [{ valid: ~ }]
+        numpagesnumeric:
+            - Type: {type: integer}
+            - Range: 
+                min: 1
+                minMessage: "Wenn keine Seitenzahl bekannt ist, bitte leerlassen."
+
+#DTA\MetadataBundle\Model\Data\Book:
+#    properties:
+#        aPublication: [{valid: ~}]
+DTA\MetadataBundle\Model\Data\Journal:
+    properties:
+        aPublication: [{valid: ~}]
+DTA\MetadataBundle\Model\Data\MultiVolume:
+    properties:
+        aPublication: [{valid: ~}]
+DTA\MetadataBundle\Model\Data\Volume:
+    properties:
+        aPublication: [{valid: ~}]
+DTA\MetadataBundle\Model\Data\Chapter:
+    properties:
+        aPublication: [{valid: ~}]
+DTA\MetadataBundle\Model\Data\Article:
+    properties:
+        aPublication: [{valid: ~}]
+DTA\MetadataBundle\Model\Data\Series:
+    properties:
+        aPublication: [{valid: ~}]
+    
+DTA\MetadataBundle\Model\Data\Title:
+    properties:
+        collTitlefragments:
+            - valid: ~
+#            - Count:
+#                min: 1
+#                minMessage: Title needs to consist of at least 1 fragment
+                
+DTA\MetadataBundle\Model\Data\Titlefragment:
+    properties:
+        type: [{NotBlank: ~}]
+        name: 
+            - { Email: {message: 'not a valid email ({{ value }})'} }
+            - { NotBlank: {message: 'nicht doch leer lassen'} }
+#        title_id: [{ NotBlank: {message: 'nicht doch leer lassen'} }]
+
+DTA\MetadataBundle\Model\Data\Person:
+    properties: {  }
+DTA\MetadataBundle\Model\Data\Personalname:
+    properties:
+        person_id: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Data\Namefragment:
+    properties:
+        personalname_id: [{ NotBlank: ~ }]
+        name: [{ NotBlank: ~ }]
+        
+DTA\MetadataBundle\Model\Data\Publishingcompany:
+    properties:
+        name: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Data\Place:
+    properties:
+        name: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Data\Datespecification:
+    properties: {  }
+    
+DTA\MetadataBundle\Model\Data\Font:
+    properties:
+        name: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Data\Language:
+    properties:
+        name: [{ NotBlank: ~ }]
+        
+# ------------------------------------------------------------------------------
+# Master domain
+# ------------------------------------------------------------------------------
+
+DTA\MetadataBundle\Model\Master\SeriesPublication:
+    properties:
+        series_id: [{ NotBlank: ~ }]
+        publication_id: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Master\LanguagePublication:
+    properties:
+        language_id: [{ NotBlank: ~ }]
+        publication_id: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Master\GenrePublication:
+    properties:
+        genre_id: [{ NotBlank: ~ }]
+        publication_id: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Master\PublicationTag:
+    properties:
+        tag_id: [{ NotBlank: ~ }]
+        publication_id: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Master\CategoryPublication:
+    properties:
+        category_id: [{ NotBlank: ~ }]
+        publication_id: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Master\FontPublication:
+    properties:
+        font_id: [{ NotBlank: ~ }]
+        publication_id: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Master\PublicationPublicationgroup:
+    properties:
+        publicationgroup_id: [{ NotBlank: ~ }]
+        publication_id: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Master\PersonPublication:
+    properties:
+        person_id: [{ NotBlank: ~ }]
+        publication_id: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Master\RecentUse:
+    properties:
+        dta_user_id: [{ NotBlank: ~ }]
+        publication_id: [{ NotBlank: ~ }]
+        date: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Master\DtaUser:
+    properties: {  }
+
+# ------------------------------------------------------------------------------
+# Classification domain
+# ------------------------------------------------------------------------------
+
+DTA\MetadataBundle\Model\Classification\Personrole:
+    properties:
+        name: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Classification\Category:
+    properties:
+        name: [{ NotBlank: ~ }]
+        description: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Classification\Tag:
+    properties:
+        name: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Classification\Genre:
+    properties:
+        name: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Classification\Source:
+    properties:
+        name: [{ NotBlank: ~ }]
+
+# ------------------------------------------------------------------------------
+# Workflow domain
+# ------------------------------------------------------------------------------
+
+DTA\MetadataBundle\Model\Workflow\Task:
+    properties:
+        tasktype_id: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Workflow\Tasktype:
+    properties:
+        name: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Workflow\CopyLocation:
+    properties:
+        publication_id: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Workflow\Partner:
+    properties: {  }
+DTA\MetadataBundle\Model\Workflow\Imagesource:
+    properties:
+        publication_id: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Workflow\Textsource:
+    properties:
+        publication_id: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Workflow\License:
+    properties:
+        name: [{ NotBlank: ~ }]
+        applicable_to_image: [{ NotBlank: ~ }]
+        applicable_to_text: [{ NotBlank: ~ }]
+DTA\MetadataBundle\Model\Workflow\Publicationgroup:
+    properties:
+        name: [{ NotBlank: ~ }]

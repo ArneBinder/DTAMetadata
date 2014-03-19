@@ -99,15 +99,13 @@ Data_newPublication:
 publicationControls:
   path: /Data/publicationControls/{publicationId}
   defaults: { _controller: DTAMetadataBundle:DataDomain:publicationControls}
-
-viewPublications:
-  path: /Data/showAll/Publication
-  defaults: { _controller: DTAMetadataBundle:DataDomain:viewPublications}
-
+    
 Data_viewPublicationsByType:
-  path: /Data/viewPublicationsByType/{publicationType}
+  path: /Data/showAll/{publicationType}
   defaults: { _controller: DTAMetadataBundle:DataDomain:viewPublicationsByType}
-
+  requirements:
+      publicationType: (BOOK|VOLUME|MULTIVOLUME|CHAPTER|JOURNAL|ARTICLE|SERIES)
+#      publicationType: Book | Volume | Multivolume | Chapter | Journal | Article | Series
 
 Data_viewPersonsByRole:
   path: /Data/viewPersonsByRole/{personRoleId}

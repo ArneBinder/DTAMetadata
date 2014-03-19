@@ -21,7 +21,6 @@
     Bildet die Publikationstypen M, MM (teilweise, da volumes via $publication->addChild() hinzugefügt werden müssen), MS, DM und J ab. -->
     <table name="publication">
         
-        <!-- TODO: enable autoincrement. During conversion, the ids are set as the ids of the legacy database.-->
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="false" required="true"/>
         
         <column name="type" description="Publikationstyp. Zur Auflösung des dynamischen Typs (z.B. ein Volume bettet ein Publication-Objekt ein, mit nichts als dem Publikationsobjekt in der Hand, lässt sich das zugehörige speziellere objekt aber nur durch ausprobieren aller Publikationstypen herausfinden.)" 
@@ -134,6 +133,22 @@
     </table>
 
     <!-- Publication types. -->
+
+    <!--Einfaches Buch.
+        Zur Abbildung des Publikationstypen M.
+    -->
+    <table name="book">
+        <column name="id" type="INTEGER" primaryKey="true" required="true"/>
+        <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
+    </table> 
+    
+    <!--Zeitschrift/Zeitung
+        Zur Abbildung der J
+    -->
+    <table name="journal">
+        <column name="id" type="INTEGER" primaryKey="true" required="true"/>
+        <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
+    </table> 
 
     <!--MULTI-VOLUME               
         Mehrbändiges Werk.

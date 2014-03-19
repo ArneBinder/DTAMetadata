@@ -568,7 +568,17 @@ class DumpConversionController extends ORMController {
                            ->setVolumeNumeric($row['volume_numeric'])
                            ->save($this->propelConnection);
                     break;
-                // some SERIES publications are created by simply  type is handled in convertSeries()
+                case "BOOK":
+                    $volume = new Model\Data\Book();
+                    $volume->setPublication($publication)
+                           ->save($this->propelConnection);
+                    break;
+                case "JOURNAL":
+                    $volume = new Model\Data\Journal();
+                    $volume->setPublication($publication)
+                           ->save($this->propelConnection);
+                    break;
+                // SERIES publications are handled in convertSeries()
                 // MULTIVOLUME publication type is handled in convertMultiVolumes()
             }
 
