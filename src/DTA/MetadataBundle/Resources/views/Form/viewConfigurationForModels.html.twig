@@ -5,6 +5,11 @@
 
     The form_div_layout_dta.html.twig defines how to render basic form input elements such 
     as text areas, password fields, select boxes, etc. and adds some extra options.
+    
+    notes: 
+    passing a css class to the form_widget function
+         form_widget( form.name,{'attr':{'class':'medium-text'} )
+
  #}
 
 {% extends 'DTAMetadataBundle:Form:form_div_layout_dta.html.twig' %}
@@ -94,14 +99,12 @@
     
     {{ dta.beginLabelledContent({'controlId':id, 'labelCaption': form.vars.label }) }}
  
-            {{ form_errors(form.year) }}
-            {{ form_label(form.year) }}
-            {{ form_widget(form.year) }}
+            {{ form_row(form.year) }}
 
 
             {# add addtional options to a modal #}
             {% set modalId = 'extraOptionsModalFor'~id %}
-            {{ dta.btnLaunchModal({'id':modalId, 'caption':'mehr zur Datumsangabe...'})}}
+            {{ dta.btnLaunchModal({'id':modalId, 'class':'btn btn-default btn-xs'})}}
 
             {{ dta.beginModal({
                     'id': modalId,
@@ -135,12 +138,36 @@
 {% endblock %}
 
 {% block titlefragment_row %}
-    <div class="form-inline">
-            {{ form_row(form.type)}}
-            {{ form_row(form.name,{'attr':{'class':'medium-text'} }) }} 
-            <br/>
+    {% import  'DTAMetadataBundle:Form:buildingBlocks.html.twig' as dta %}
+
+    <div class="form-inline" style="position:relative">
+            {{ form_errors(form.type)}}{{ form_widget(form.type)}}
+            
+            {{ form_errors(form.name)}}{{ form_widget(form.name)}} 
+            {% set modalId = 'extraOptionsModalFor'~id %}
+            {{ dta.btnLaunchModal({'id':modalId})}}
+            {{ dta.beginModal({
+                    'id': modalId,
+                    'title': 'Weitere Angaben zum Titefragment',
+                    'hideWindowCloser': true 
+               })            
+            }}
+            
+            {#{{ form_row(form.comments) }}
+            
+            {{ dta.beginLabelledContent({'controlId':form.yearIsReconstructed.vars.id, 'labelCaption': form.yearIsReconstructed.vars.label }) }}
+                {{ form_widget(form.yearIsReconstructed) }}
+            {{ dta.endLabelledContent() }}
+            #}
             {{ form_row(form.NameIsReconstructed ) }}
             {{ form_rest(form) }}
+
+            {{ dta.endModal({
+                    'id': modalId,
+                    'confirm': {'caption': 'Fertig', 'target': '#', 'attr':{'data-dismiss':'modal'} },
+                    'hideCancelButton': true,
+               })
+            }}
     </div>
 {% endblock %}
 
@@ -172,15 +199,15 @@
 {# --------------------- Person / Work / Publication Relations --------------------- #}
 
 {% block personwork_row %}
-    <div class="dynamic-collection-deletable">
+    <div class="dynamic-collection-deletable" style="position: relative;">
         {{ form_row(form.role, {'inlineLabel':true,'hideLabel':true}) }}
-        {{ form_row(form.person, {'hideLabel':true,'inlineLabel':true}) }}
+        {{ form_row(form.person, {'inlineLabel':true,'hideLabel':true}) }}
         {{ form_rest(form) }}
     </div>
 {% endblock %}
 
 {% block personpublication_row %}
-  <div class="dynamic-collection-deletable">
+  <div class="dynamic-collection-deletable form-inline" style="position: relative;">
     {{ form_row(form.role, {'inlineLabel':true,'hideLabel':true}) }}
     {{ form_row(form.person, {'hideLabel':true,'inlineLabel':true}) }}
     {{ form_rest(form) }}
@@ -188,35 +215,35 @@
 {% endblock %}
 
 {% block categorywork_row %}
-    <div class="dynamic-collection-deletable">
+    <div class="dynamic-collection-deletable" style="position: relative;">
         {{ form_row(form, {'inlineLabel':true, 'hideLabel':true, 'inlineChildren': true}) }}
         {{ form_rest(form) }}
     </div>
 {% endblock %}
 
 {% block category_row %}
-    <div class="dynamic-collection-deletable">
+    <div class="dynamic-collection-deletable" style="position: relative;">
         {{ form_row(form, {'inlineLabel':true, 'hideLabel':true, 'inlineChildren': true}) }}
         {{ form_rest(form) }}
     </div>
 {% endblock %}
 
 {% block languagework_row %}
-    <div class="form-inline">
+    <div class="form-inline" style="position: relative;">
         {{ form_row(form.language)}}
         {{ form_rest(form) }}
     </div>
 {% endblock %}
 
 {% block genrework_row %}
-    <div class="form-inline">
+    <div class="form-inline" style="position: relative;">
         {{ form_widget(form.genre)}}
         {{ form_rest(form) }}
     </div>
 {% endblock %}
 
 {% block worktag_row %}
-    <div class="form-inline">
+    <div class="form-inline" style="position: relative;">
         {{ form_widget(form.tag)}}
         {{ form_rest(form) }}
     </div>

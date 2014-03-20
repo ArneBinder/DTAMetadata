@@ -18,49 +18,6 @@
 {% extends 'form_div_layout.html.twig' %}
 
 {#  -----------------------------------------------------------------------------
-    dynamic collection widget
-    ----------------------------------------------------------------------------- #}
-
-{# By default, don't add an extra column for the label of the dynamic collection #}
-{% block dynamicCollection_row %}
-    {{ form_row(form, {'inlineLabel':inlineLabel, 'hideLabel':true }) }}
-{% endblock %}
-
-{% block dynamicCollection_widget %}
-
-    {% if prototype is defined %}
-        {# Add prototype for dynamically adding forms with JS #}
-        {% set attr = attr|merge({'data-prototype': form_row(prototype) }) %}
-    {% endif %}
-
-<ol class='dynamic-collection list {{ listAdditionalCssClasses }}' {{ block('widget_container_attributes') }} >
-        {% if form.parent is empty %}
-            {{ form_errors(form) }}
-        {% endif %}
-
-        {% for child in form %}
-        <li>
-            
-            {{ form_row(child) }}
-            </li>
-        {% endfor %}
-
-        {{ form_rest(form) }}
-        </ol>
-        {#onclick="function(){console.log('success')}"#}
-
-        <a href="#" class="dynamic-collection add-entity">
-            <i class='icon-plus'></i>{{ form.vars.modelClass|trans }} hinzufügen
-        </a>
-
-    {# For the javascript to have access to the translated modelClass name.
-       The up and down dynamic controls need this to be more expressive.   #}
-        <input type="hidden" name="translatedModelClassName" value="{{ form.vars.modelClass|trans }}"/>
-        <input type="hidden" name="modelClassName" value="{{ form.vars.modelClass }}"/>
-
-{% endblock %}
-
-{#  -----------------------------------------------------------------------------
     The selectOrAdd widget extends a select box with 
     an option to add a new database entity 
     ----------------------------------------------------------------------------- #}

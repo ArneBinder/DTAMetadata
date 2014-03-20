@@ -48,7 +48,7 @@
     caption: title of the button
 #}
 {% macro btnLaunchModal(configuration) %}
-    <a data-toggle="modal" href="#{{configuration.id}}" class="{{configuration.class|default('btn btn-default btn-xs')}}">{{configuration.caption}}</a>
+    <a data-toggle="modal" href="#{{configuration.id}}" class="{{configuration.class|default('btn btn-default btn-sm')}}">{{configuration.caption|default('mehr...')}}</a>
 {% endmacro %}
 
 {# pass the following: 

@@ -3,17 +3,21 @@
 # ------------------------------------------------------------------------------
 
 DTA\MetadataBundle\Model\Data\Publication:
-    properties:
-        aTitle: [{ valid: ~ }]
+    getters:
+        datespecificationRelatedByPublicationdateId:
+            - Valid: ~
+        personPublications:
+            - Valid: ~
+        title: [{ valid: ~ }]
         numpagesnumeric:
             - Type: {type: integer}
             - Range: 
                 min: 1
                 minMessage: "Wenn keine Seitenzahl bekannt ist, bitte leerlassen."
 
-#DTA\MetadataBundle\Model\Data\Book:
-#    properties:
-#        aPublication: [{valid: ~}]
+DTA\MetadataBundle\Model\Data\Book:
+    getters:
+        publication: [{valid: ~}]
 DTA\MetadataBundle\Model\Data\Journal:
     properties:
         aPublication: [{valid: ~}]
@@ -34,20 +38,17 @@ DTA\MetadataBundle\Model\Data\Series:
         aPublication: [{valid: ~}]
     
 DTA\MetadataBundle\Model\Data\Title:
-    properties:
-        collTitlefragments:
-            - valid: ~
-#            - Count:
-#                min: 1
-#                minMessage: Title needs to consist of at least 1 fragment
-                
+    getters:
+        titleFragments:
+            - Valid: ~
+            - Count:
+                min: 1
+                minMessage: Bitte einen Titel angeben.
 DTA\MetadataBundle\Model\Data\Titlefragment:
-    properties:
+    getters:
         type: [{NotBlank: ~}]
         name: 
-            - { Email: {message: 'not a valid email ({{ value }})'} }
-            - { NotBlank: {message: 'nicht doch leer lassen'} }
-#        title_id: [{ NotBlank: {message: 'nicht doch leer lassen'} }]
+            - { NotBlank: {message: 'Bitte alle Titelfragmente füllen.'} }
 
 DTA\MetadataBundle\Model\Data\Person:
     properties: {  }
@@ -66,8 +67,8 @@ DTA\MetadataBundle\Model\Data\Place:
     properties:
         name: [{ NotBlank: ~ }]
 DTA\MetadataBundle\Model\Data\Datespecification:
-    properties: {  }
-    
+    getters: {}
+   
 DTA\MetadataBundle\Model\Data\Font:
     properties:
         name: [{ NotBlank: ~ }]
@@ -111,6 +112,7 @@ DTA\MetadataBundle\Model\Master\PersonPublication:
     properties:
         person_id: [{ NotBlank: ~ }]
         publication_id: [{ NotBlank: ~ }]
+        role: [{NotBlank: ~}]
 DTA\MetadataBundle\Model\Master\RecentUse:
     properties:
         dta_user_id: [{ NotBlank: ~ }]

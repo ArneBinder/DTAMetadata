@@ -1,0 +1,16 @@
+/*
+Styling of the forms in the DTA MetadataBundle.
+*/
+
+textarea{
+    height: 30px;
+    width: 80%
+}
+.dynamic-collection-remove-item-link{
+    position: absolute; 
+    top: 6px; 
+    right: 0;
+}
+.dynamic-collection.list li{
+    padding-bottom: 8px;
+}

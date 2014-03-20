@@ -216,21 +216,32 @@ class ORMController extends DTADomainController {
                 }
             }
         } else { // symfony form validation fails
-
-            // add symfony validation messages to flash bag
-            $errors[] = "Symfony validation failed.";
-            foreach ($form->getErrors() as $error) {
-                $errors[] = $error->getMessage();
-                $this->addErrorFlash($error->getMessage());
+            $errors = array();
+            $this->collectErrorsRecursive($form, $errors);
+            $combinedErrors = "";
+            foreach ($errors as $error) {
+                $combinedErrors .= $error->getMessage() . '<br/>';
+            }
+            if("" !== $combinedErrors){
+                $this->addErrorFlash($combinedErrors);
             }
         }
         
         return array(
             'transaction'   => $recordId == 0 ? 'create' : 'edit', 
             'form'          => $form,
-            'errors'        => $errors,
         );
         
+    }
+    
+    private function collectErrorsRecursive($form, &$errors){
+        // add symfony validation messages to flash bag
+        foreach ($form->getErrors() as $error) {
+            $errors[] = $error;
+        }
+        foreach($form->getIterator() as $child ){
+            $this->collectErrorsRecursive($child, $errors);
+        }
     }
 
     /**
@@ -269,7 +280,6 @@ class ORMController extends DTADomainController {
                     'transaction' => $result['transaction'],    // whether the form is for edit or create
                     'className' => $className,
                     'recordId' => $recordId,
-                    //'debugCarl' => $result['form']->getErrorsAsString() //$this->getErrorMessages($result['form']),
                 ));
         }
     }

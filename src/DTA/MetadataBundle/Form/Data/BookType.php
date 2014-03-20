@@ -17,8 +17,9 @@ class BookType extends BaseAbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('publication', new PublicationType(), array(
-//            'constraints' => array(new \Symfony\Component\Validator\Constraints\Valid())
-        ));
+        $builder->add('publication', new PublicationType());
+        
+        // add special properties of the book class here
+        
     }
 }

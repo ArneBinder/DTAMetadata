@@ -61,9 +61,9 @@
         <div class="form-group">
             {# form_label automatically generates a label tag, with the correct id specified, the label class, added, etc. #}
             {{ form_label(form, null , {'label_attr':{'class': hideLabelClass ~ 'control-label col-lg-'~formLabelWidth} }) }}
+            {{ form_errors(form) }}
             <div class="col-lg-{{formWidgetWidth}} {#{ inlineChildren ? 'form-inline' : 'labelled' }#}">
         {% endif %}
-        
 
         {% if inlineChildren %}
             {%for child in form.children %}
@@ -128,7 +128,7 @@
     {% endif %}
     {% if not form.vars.selectOrAddConfiguration is defined%}
         {% set attr = attr|merge({'class':attr.class|default('')~' form-control input-sm'}) %}
-        {% set attr = attr|merge({'style':attr.style|default('')~' width: auto;float:left;'}) %}
+        {% set attr = attr|merge({'style':attr.style|default('')~' width: auto;'}) %}
     {% endif %}
     <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
         {% if empty_value is not none %}

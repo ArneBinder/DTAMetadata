@@ -131,7 +131,7 @@ function createElementControls(element, translatedModelClassName){
     
     var removeButtonLink = $('<a></a>')
         .on('click', function(){ $(element).remove() })
-        .html('<i class="icon-remove"></i>'+translatedModelClassName+' entfernen');
+        .html('<span class="glyphicon glyphicon-remove dynamic-collection-remove-item-link"></span>');
         
 //    var iconUpStr = '<i class="icon-arrow-up"></i>';
 //    var iconDownStr = '<i class="icon-arrow-down"></i>';
@@ -140,6 +140,6 @@ function createElementControls(element, translatedModelClassName){
 //    var up   = $('<a href="#" class="sortable-up">'+ iconUpStr + /*translatedModelClassName + upStr + */'</a> ');
 //    var down = $('<a href="#" class="sortable-down">'+ iconDownStr + /*translatedModelClassName + downStr + */'</a>');
 
-    $(element).children('div').append(removeButtonLink);
+    $(element).children('div').prepend(removeButtonLink);
 }
 

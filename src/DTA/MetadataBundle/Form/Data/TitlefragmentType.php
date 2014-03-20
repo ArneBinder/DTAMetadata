@@ -19,7 +19,6 @@ class TitlefragmentType extends BaseAbstractType {
         $builder->add('type');
         
         $builder->add('name', 'textarea', array(
-            'attr' => array('style'=>"width: 80%;"),
         ));
         $builder->add('NameIsReconstructed', 'checkbox', array(
             'required'=>false,
