@@ -38,41 +38,26 @@ class HomeController extends DTADomainController {
 
         $lorenz = Model\Data\PersonQuery::create()->findOneById(300);
         
-        $publication = new Model\Data\Publication();
-        $publication->setNumpagesnumeric(0);
-        $title = new Model\Data\Title();
-        $title->addTitlefragment(Model\Data\Titlefragment::create(null, Model\Data\TitlefragmentPeer::TYPE_MAIN_TITLE));
-        $publication->setTitle($title);
+//        $publication = new Model\Data\Publication();
+//        $publication->setNumpagesnumeric(0);
+//        $title = new Model\Data\Title();
+//        $title->addTitlefragment(Model\Data\Titlefragment::create(null, Model\Data\TitlefragmentPeer::TYPE_MAIN_TITLE));
+//        $publication->setTitle($title);
+//        
+//        $book = new Model\Data\Book();
+//        $book->setPublication($publication);
         
-        $book = new Model\Data\Book();
-        $book->setPublication($publication);
-        
-        
-//        $titleFragment->save();
-        
-//        $bp = new Model\Data\Publication();
-//        $bp->setTitle(new Model\Data\Title());
-//        $bp->save();
-//        $mv = new Model\Data\MultiVolume();
-//        $mv->setPublication($bp);
-//        $mv->save();
-        
-        $form = $this->createForm(new Form\Data\BookType(), $book);
+        $q = Model\Data\BookQuery::create();
+        $count = $q->count();
+        $firstRecords = $q->findOne();
         
         return $this->renderWithDomainData('DTAMetadataBundle:Home:index.html.twig', array(
             'testData' => 
 //            null
             array(
-                "empty fragment valid" => $form->isValid(),
-                "messages: "=>$form->getErrors(),
-//                "empty fragment validation failures" => $titleFragment->getValidationFailures(),
-//                'multivol is root' => $multivolume->isRoot(),
-//                'multivol scope'=>$multivolume->getScopeValue(),
-//                'multivol parent'=>$multivolume->getParent(),
-//                'volume is root'=>$volume->isRoot(),
-//                'vol scope '=>$volume->getScopeValue(),
-//                'root'=>Model\Data\PublicationQuery::create()->findRoot(),
-//                'roots'=>Model\Data\PublicationQuery::create()->findRoots(),
+
+                'count' => $count,
+                'firstRec' => $firstRecords,
                 )
             //$title->getTitleFragments()->getFirst()
 //               $authorsVolumes 

@@ -3,6 +3,7 @@
 namespace DTA\MetadataBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 use \DTA\MetadataBundle\Model;
 
@@ -18,8 +19,10 @@ class DataDomainController extends ORMController {
     public $domainMenu = array(
         'specializedTemplate' => 'DTAMetadataBundle:Package_Data:domainMenu.html.twig',
         'publicationTypes' => 'added in constructor',
-        'puersonRoles' => 'added in constructor',
+        'personRoles' => 'added in constructor',
     );
+    
+    private $listViewWithOptionsFor = array("Publication", "Book", "Volume", "MultiVolume", "Chapter", "Journal", "Article", "Series");
     
     /**
      * Dynamically generate the domain menu.
@@ -27,26 +30,17 @@ class DataDomainController extends ORMController {
     public function __construct(){
         
         // retrieve different publication types
-        $this->domainMenu['publicationTypes'] = Model\Data\om\BasePublicationPeer::getValueSet(Model\Data\PublicationPeer::TYPE);
+        $this->domainMenu['publicationTypes'] = array('Book', 'Volume', 'MultiVolume', 'Chapter', 'Journal', 'Article', 'Series');
         
         // retrieve different person roles (Autor, Verleger, Drucker, etc.)        
         $this->domainMenu['personRoles'] = Model\Master\PersonPublicationPeer::getValueSet(Model\Master\PersonPublicationPeer::ROLE);
 
     }
     
-    public function genericViewAllAction($package, $className, $updatedObjectId = 0){
+    public function indexAction() {
         
-        $listViewWithOptionsFor = array("Publication", "Book", "Volume", "Multivolume", "Chapter", "Journal", "Article", "Series");
-        if(FALSE === array_search($className, $listViewWithOptionsFor)){
-            return parent::genericViewAllAction($package, $className);
-        } else {
-            if($className == "Publication"){
-                return $this->viewPublicationsAction();
-            } else {
-                return $this->viewPublicationsByTypeAction(strtoupper($className));
-            }
-        }
-        
+        return $this->renderWithDomainData('DTAMetadataBundle:Package_Data:index.html.twig', array(
+        ));
     }
     /**
      * Handles creation of publications (since for some publication types specialized classes exist, a bit of extra logic is required.)
@@ -78,14 +72,90 @@ class DataDomainController extends ORMController {
         
     }
     
-    public function indexAction() {
+    public function genericViewAllAction($package, $className, $updatedObjectId = 0){
         
-        return $this->renderWithDomainData('DTAMetadataBundle:Package_Data:index.html.twig', array(
-//            "person" => "array_shift()" //$persont->getRelations() //count($p->getPersonalnames()->getArrayCopy())//[0]->__toString(),
-            // get_declared_classes()
-        ));
+        if(FALSE === array_search($className, $this->listViewWithOptionsFor)){
+            return parent::genericViewAllAction($package, $className);
+        } else {
+            $classNames = $this->relatedClassNames($package, $className);
+
+            // for retrieving the column names
+            $modelClass = new $classNames["model"];
+
+            return $this->renderWithDomainData("DTAMetadataBundle::listViewWithOptions.html.twig", array(
+                'className' => $className,
+                'columns' => $modelClass::getTableViewColumnNames(),
+                'data' => array(),
+                'updatedObjectId' => $updatedObjectId,
+                'optionsLinkTemplate' => $this->generateUrl("publicationControls", array('publicationId'=>'__id__')),
+            ));
+        }
+        
     }
+
+    /** @inheritdoc
+     * This provides an additional ID column for list view with options to be able to request a control panel for a clicked publication.
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param type $package
+     * @param type $className
+     */
+    public function genericDataTablesDataSourceAction(Request $request, $package, $className){
+        
+        if(FALSE === array_search($className, $this->listViewWithOptionsFor)){
+            return parent::genericDataTablesDataSourceAction($request, $package, $className);
+        }
     
+        // ------------------------------------------------------------------------
+        // specialized logic for datatables displaying publications (added an id column) 
+        // ------------------------------------------------------------------------
+        
+        $classNames = $this->relatedClassNames($package, $className);
+        $modelClass = new $classNames["model"];
+
+        $columns = $modelClass::getTableViewColumnNames();
+        $query = $modelClass::getRowViewQueryObject();
+
+        $totalRecords = $query->count();
+
+        // Output
+        $response = array(
+            "sEcho" => intval($request->get('sEcho')),
+            "iTotalRecords" => $totalRecords,
+            "iTotalDisplayRecords" => $query->count(),
+            "aaData" => array()
+        );
+
+        $entities = $this->findPaginatedSortedFiltered($request, $package, $className);
+
+        foreach($entities as $entity) {
+            $row = array($entity->getId());
+            for ($i = 0; $i < count($columns); $i++) {
+                $column = $columns[$i];
+                $attribute = $entity->getAttributeByTableViewColumName($column);
+                if(is_object($attribute)){
+                    $value = $attribute->__toString();
+                } else {
+                    $value = $attribute;
+                }
+                // add an edit button to the efirst column entry
+                if($i === 0){
+                    $editLink = $this->generateUrl($package . '_genericCreateOrEdit', array(
+                        'package'=>$package, 
+                        'className'=>$className, 
+                        'recordId'=>$entity->getId()
+                    ));
+                    $row[] = "<a href='$editLink'><span class='glyphicon glyphicon-edit'></span></a> $value";
+                } else {
+                    $row[] = $value;
+                }
+            }
+//            $row[] = "<a href='#'>click</a>";
+            $response['aaData'][] = $row;
+        }
+
+        return new Response(json_encode( $response ));
+
+    }
     public function publicationControlsAction($publicationId) {
         
         $publication = Model\Data\Publication::getRowViewQueryObject()->findOneById($publicationId);
@@ -94,82 +164,6 @@ class DataDomainController extends ORMController {
             'publication' => $publication,
         ));
         
-    }
-
-    /** Render list of all publications with publication options panel. (The option panel's why the generic list view isn't used)
-     *  the route is /Data/showAll/Publication */
-    public function viewPublicationsAction(){
-        
-        // use optimized query as defined in the data schema (dta_data_schema.xml)
-        $records = Model\Data\Publication::getRowViewQueryObject()->find();
-        
-        $columns = Model\Data\Publication::getTableViewColumnNames();
-        
-        $rows = array();
-        foreach ($records as $pub) {
-            $row = array();
-            foreach ($columns as $col) {
-                $row[$col] = $pub->getAttributeByTableViewColumName($col);
-            }
-            $row['id'] = $pub->getId();
-            
-            $editLinkTarget = $this->generateUrl("Data_genericCreateOrEdit", array(
-                'className'=>$pub->getSpecializationClassName(), 
-                'recordId'=>$pub->getId(),
-            ));
-            $row['Titel'] = "<a href='$editLinkTarget'>$row[Titel]</a>";
-            $rows[] = $row;
-        }
-        
-        return $this->renderWithDomainData("DTAMetadataBundle::listViewWithOptions.html.twig", array(
-                    'title' => 'Publikationen',
-                    'columns' => $columns,
-                    'rows' => $rows,
-                    'updatedObjectId' => 0,
-                    'accessors' => $columns,
-                    'optionsLinkTemplate' => $this->generateUrl("publicationControls", array('publicationId'=>'__id__'))
-                ));
-        
-    }
-    
-    public function viewPublicationsByTypeAction($publicationType) {
-        
-        $rows = array();
-        
-        $publications = 
-                Model\Data\Publication::getRowViewQueryObject()
-                ->filterByType($publicationType)
-                ->find();
-        
-        $columns = array('Titel', 'Erster Autor');
-        $accessors = array('titleLink', 'repName');
-        
-        foreach ($publications as $pub) {
-
-            /* @var $pub \DTA\MetadataBundle\Model\Data\Publication */
-            $linkTarget = $this->generateUrl("Data_genericCreateOrEdit", array(
-                    'className'=> $pub->getSpecializationClassName(),
-                    'recordId'=>$pub->getId()
-                )
-            );
-
-            $linkTo = function($href,$title){return '<a href="'.$href.'">'.$title.'</a>';};
-            $rows[] = array(
-                'titleLink' => $linkTo($linkTarget, $pub->getTitleString()),  // title
-                'repName' => $pub->getFirstAuthorName(),                        // representative name
-                'id'      => $pub->getId()                                  // id
-            );
-        }
-        
-//        $compareRow = function($a, $b){ return strcmp($a['context'],$b['context']); };
-//        uasort($rows, $compareRow);
-        return $this->renderWithDomainData('DTAMetadataBundle::listViewWithOptions.html.twig', array(
-            'rows' => $rows,
-            'columns' => $columns,
-            'accessors' => $accessors,
-            'title' => $publicationType,
-            'optionsLinkTemplate' => $this->generateUrl("publicationControls", array('publicationId'=>'__id__')),
-        ));
     }
 
     public function viewPersonsByRoleAction($personRoleId) {

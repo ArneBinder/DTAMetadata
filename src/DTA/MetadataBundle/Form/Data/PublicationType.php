@@ -41,7 +41,7 @@ class PublicationType extends BaseAbstractType
             'options' => array('isPublicationSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
         ));
         $builder->add('wwwready');
-        $builder->add('doi', 'text');
+        $builder->add('doi', 'text', array('required' => false));
         $builder->add('format', 'text', array('required' => false));
         $builder->add('citation');
         
@@ -137,8 +137,8 @@ class PublicationType extends BaseAbstractType
         // ----------------------------------------------------------------
         
         $builder->add('editiondescription', 'textarea', array('required'=>false));
-        $builder->add('printrun');
-        $builder->add('digitaleditioneditor', 'text', array('required'=>false));
+        $builder->add('printrun', 'textarea', array('required'=>false));
+        $builder->add('digitaleditioneditor', 'textarea', array('required'=>false));
         
         $builder->add('comment');
         $builder->add('editioncomment');

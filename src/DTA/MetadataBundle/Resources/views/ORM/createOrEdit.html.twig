@@ -1,9 +1,11 @@
+{# Renders a static create/edit form for a given entity. #}
+
 {% extends 'DTAMetadataBundle:Layout:base.html.twig' %}
 
 {% block core %}
 
-    {# renders "<className> bearbeiten" as headline of the form #}
     <h3> 
+        {# renders "<className> bearbeiten" as headline of the form #}
         {{entityName|default(className)|trans}} {{ ("form." ~ transaction ~ ".suffix")|trans }} 
     </h3>
 

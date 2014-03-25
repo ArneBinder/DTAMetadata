@@ -25,7 +25,7 @@
 
     {{ form_row(publication.PersonPublications) }}
     
-    {% set modalId = 'moreOptionsForPublication' %}
+    {#{% set modalId = 'moreOptionsForPublication' %}
     {{ dta.beginLabelledContent({'labelCaption':'', 'controlId':'none'}) }}
         {{ dta.btnLaunchModal({'id':modalId, 'caption':'weitere Angaben...'})}}
     {{ dta.endLabelledContent() }}
@@ -33,18 +33,18 @@
             'id': modalId,
             'title': 'Weitere Angaben zum Werk',
        })            
-    }}
+    }}#}
 
         {{ form_row(publication.wwwready) }}
         {{ form_row(publication.doi) }}
         {{ form_row(publication.format) }}
 
-    {{ dta.endModal({
+    {#{{ dta.endModal({
             'id': modalId,
             'confirm': {'caption': 'Fertig', 'target': '#', 'attr':{'data-dismiss':'modal'} },
             'hideCancelButton': true,
        })
-    }}
+    }}#}
 
     {{ form_row(publication.citation) }}
 

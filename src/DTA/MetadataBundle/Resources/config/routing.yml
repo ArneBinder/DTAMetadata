@@ -82,6 +82,11 @@ Master_genericNew:
     _controller: DTAMetadataBundle:MasterDomain:genericNew
     package: Master
     property: Id
+
+Master_dataTablesDataSource: 
+    path: /Master/dataTables/{package}/{className}
+    defaults: { _controller: DTAMetadataBundle:MasterDomain:genericDataTablesDataSource }
+    
     
 # ==============================================================================
 # data domain controller
@@ -155,6 +160,10 @@ Data_genericNew:
     package: Data
     property: Id
     
+Data_dataTablesDataSource: 
+    path: /Data/dataTables/{package}/{className}
+    defaults: { _controller: DTAMetadataBundle:DataDomain:genericDataTablesDataSource }
+    
 # ==============================================================================
 # classification domain controller
 # ==============================================================================
@@ -207,6 +216,10 @@ Classification_genericNew:
     package: Classification
     property: Id
 
+Classification_dataTablesDataSource: 
+    path: /Classification/dataTables/{package}/{className}
+    defaults: { _controller: DTAMetadataBundle:ClassificationDomain:genericDataTablesDataSource }
+    
 # ==============================================================================
 # workflow domain controller
 # ==============================================================================
@@ -268,3 +281,7 @@ Workflow_genericNew:
     _controller: DTAMetadataBundle:WorkflowDomain:genericNew
     package: Workflow
     property: Id
+    
+Workflow_dataTablesDataSource: 
+    path: /Workflow/dataTables/{package}/{className}
+    defaults: { _controller: DTAMetadataBundle:WorkflowDomain:genericDataTablesDataSource }

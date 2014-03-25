@@ -99,14 +99,14 @@ propel > dbal > connections for connection setup. -->
             <parameter name="Ort" value="accessor:getPlace"/>
             <parameter name="Typ" value="type"/>
             <parameter name="query" value="\DTA\MetadataBundle\Model\Data\PublicationQuery::create()
-                    ->leftJoinWith('Title')
-                    ->leftJoinWith('Title.Titlefragment')
-                    ->leftJoinWith('DatespecificationRelatedByPublicationdateId')
-                    ->leftJoinWith('PersonPublication')
-                    ->leftJoinWith('PersonPublication.Person')
-                    ->leftJoinWith('Person.Personalname')
-                    ->leftJoinWith('Personalname.Namefragment')
-                    ->leftJoinWith('Volume')
+                    ->leftJoin('Title')
+                    ->leftJoin('Title.Titlefragment')
+                    ->leftJoin('DatespecificationRelatedByPublicationdateId')
+                    ->leftJoin('PersonPublication')
+                    ->leftJoin('PersonPublication.Person')
+                    ->leftJoin('Person.Personalname')
+                    ->leftJoin('Personalname.Namefragment')
+                    ->leftJoin('Volume')
                     ->orderBy('Titlefragment.type', 'asc')
                     ->orderBy('Titlefragment.Name', 'asc')
                     ->orderBy('Title.Id', 'asc')
@@ -139,6 +139,9 @@ propel > dbal > connections for connection setup. -->
     <table name="book">
         <column name="id" type="INTEGER" primaryKey="true" required="true"/>
         <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
+         <behavior name="table_row_view">
+            <parameter name="embedColumns2" value="publication"/>
+         </behavior>
     </table> 
     
     <!--Zeitschrift/Zeitung
@@ -348,8 +351,8 @@ propel > dbal > connections for connection setup. -->
             <parameter name="gnd" value="gnd"/>
             <parameter name="query" 
                        value="DTA\MetadataBundle\Model\Data\PersonQuery::create()
-                            ->joinWith('Personalname')
-                            ->joinWith('Personalname.Namefragment')
+                            ->join('Personalname')
+                            ->join('Personalname.Namefragment')
                             ->orderBy('Namefragment.type',\Criteria::DESC)
                             ->orderBy('Namefragment.name');"/>
         </behavior>

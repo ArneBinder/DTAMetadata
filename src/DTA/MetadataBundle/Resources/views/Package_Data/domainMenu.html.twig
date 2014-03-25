@@ -21,7 +21,7 @@
                 <a href="{{ path('Data_newPublication', {'publicationType':publicationType}) }}" class="dropdownMenuCreateEntityButton">
                     +
                 </a>
-                <a href="{{ path('Data_viewPublicationsByType', {'publicationType':publicationType}) }}">
+                <a href="{{ path('Data_genericViewAll', {'package': 'Data', 'className':publicationType}) }}">
                     {{publicationType|trans}}
                 </a>
             </li>

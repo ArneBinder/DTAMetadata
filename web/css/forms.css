@@ -14,3 +14,6 @@ textarea{
 .dynamic-collection.list li{
     padding-bottom: 8px;
 }
+.dataTables_processing{
+    padding-top: 4px !important;
+}

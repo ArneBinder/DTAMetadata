@@ -102,6 +102,143 @@ class ORMController extends DTADomainController {
                 ));
     }
     
+    protected function findPaginatedSortedFiltered($request, $package, $className){
+        
+        $classNames = $this->relatedClassNames($package, $className);
+        $modelClass = new $classNames["model"];
+        $query = $modelClass::getRowViewQueryObject();
+        
+        // pagination offset
+        $offset = $request->get('iDisplayStart');
+        $numRecords = $request->get('iDisplayLength');
+        
+        $entities = $query->setFormatter(\ModelCriteria::FORMAT_ON_DEMAND)
+                          ->offset($offset)
+                          ->limit($numRecords)
+                          ->find();
+        
+        return $entities;
+        
+//        } catch (\PropelException $exc) {
+////            $query = $modelClass::getRowViewQueryObject();
+//            $query->offset(NULL)->limit(NULL);
+//            $allEntities = $query->find();
+//            $entities = array();//array_slice($entities->toArray(), $offset, $numRecords);
+//            for ($i = 0; $i < $numRecords; $i++) {
+//                $entities[] = $allEntities->get($offset+$i);
+//            }
+//        }
+    }
+    
+    /**
+     * Responds to XHR requests of the data tables module. 
+     */
+    public function genericDataTablesDataSourceAction(Request $request, $package, $className){
+        
+        $classNames = $this->relatedClassNames($package, $className);
+        $modelClass = new $classNames["model"];
+        
+        $columns = $modelClass::getTableViewColumnNames();
+        $query = $modelClass::getRowViewQueryObject();
+        
+	$totalRecords = $query->count();
+        
+        // Output
+	$response = array(
+            "sEcho" => intval($request->get('sEcho')),
+            "iTotalRecords" => $totalRecords,
+            "iTotalDisplayRecords" => $query->count(),
+            "aaData" => array()
+	);
+
+        $entities = $this->findPaginatedSortedFiltered($request, $package, $className);
+        
+        foreach($entities as $entity) {
+            $row = array();
+            for ($i = 0; $i < count($columns); $i++) {
+                $column = $columns[$i];
+                $attribute = $entity->getAttributeByTableViewColumName($column);
+                if(is_object($attribute)){
+                    $value = $attribute->__toString();
+                } else {
+                    $value = $attribute;
+                }
+                // add an edit button to the efirst column entry
+                if($i === 0){
+                    $editLink = $this->generateUrl($package . '_genericCreateOrEdit', array(
+                        'package'=>$package, 
+                        'className'=>$className, 
+                        'recordId'=>$entity->getId()
+                    ));
+                    $row[] = "<a href='$editLink'><span class='glyphicon glyphicon-edit'></span></a> $value";
+                } else {
+                    $row[] = $value;
+                }
+            }
+//            $row[] = "<a href='#'>click</a>";
+            $response['aaData'][] = $row;
+	}
+            
+	return new Response(json_encode( $response ));
+        
+//        $_GET['iDisplayStart'] // offset
+//        $_GET['iDisplayLength'] // number of records to send back at most
+        
+	/*
+	 * Ordering
+	 */
+//        bSortable_<id>        is columns #id sortable?
+//        iSortingCols          the number of columns by which is sorted
+//        iSortCol_<id>         the id-th column to order by
+//        sSortDir_<id>         asc/desc sort order for column #id
+//        
+//	$sOrder = "";
+//	if ( isset( $_GET['iSortCol_0'] ) )
+//	{
+//		$sOrder = "ORDER BY  ";
+//		for ( $i=0 ; $i<intval( $_GET['iSortingCols'] ) ; $i++ )
+//		{
+//			if ( $_GET[ 'bSortable_'.intval($_GET['iSortCol_'.$i]) ] == "true" )
+//			{
+//				$sOrder .= "`".$aColumns[ intval( $_GET['iSortCol_'.$i] ) ]."` ".
+//					($_GET['sSortDir_'.$i]==='asc' ? 'asc' : 'desc') .", ";
+//			}
+//		}
+//	}
+	
+	/* 
+	 * Filtering
+	 */
+//	$sWhere = "";
+//	if ( isset($_GET['sSearch']) && $_GET['sSearch'] != "" )
+//	{
+//		$sWhere = "WHERE (";
+//		for ( $i=0 ; $i<count($aColumns) ; $i++ )
+//		{
+//			$sWhere .= "`".$aColumns[$i]."` LIKE '%".mysql_real_escape_string( $_GET['sSearch'] )."%' OR ";
+//		}
+//		$sWhere = substr_replace( $sWhere, "", -3 );
+//		$sWhere .= ')';
+//	}
+//	
+//	/* Individual column filtering */
+//	for ( $i=0 ; $i<count($aColumns) ; $i++ )
+//	{
+//		if ( isset($_GET['bSearchable_'.$i]) && $_GET['bSearchable_'.$i] == "true" && $_GET['sSearch_'.$i] != '' )
+//		{
+//			if ( $sWhere == "" )
+//			{
+//				$sWhere = "WHERE ";
+//			}
+//			else
+//			{
+//				$sWhere .= " AND ";
+//			}
+//			$sWhere .= "`".$aColumns[$i]."` LIKE '%".mysql_real_escape_string($_GET['sSearch_'.$i])."%' ";
+//		}
+//	}
+
+    }
     /**
      * Renders a list of all entities of a certain type.
      * Takes into account how the list should be rendered according to the XML schema.
@@ -116,9 +253,9 @@ class ORMController extends DTADomainController {
         // for retrieving the column names
         $modelClass = new $classNames["model"];
         
-        $query = $modelClass::getRowViewQueryObject();
-        
-        $records = $query->find();
+//        $query = $modelClass::getRowViewQueryObject();
+//        $recourds = $query->find();  // the data is provided by the data tables ajax response route 
+        $records = array(); 
         
         return $this->renderWithDomainData("DTAMetadataBundle:ORM:genericViewAll.html.twig", array(
                     'className' => $className,
