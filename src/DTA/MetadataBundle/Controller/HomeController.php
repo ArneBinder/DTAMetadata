@@ -17,9 +17,9 @@ class HomeController extends DTADomainController {
 
     /** @inheritdoc */
     public $domainMenu = array(
-        array("caption" => "Offene Tasks", 'route' => 'home'),
-        array("caption" => "Aktuell in Bearbeitung", 'route' => 'home'),
-        array("caption" => "Zuletzt Angesehen", 'route' => 'home'),
+//        array("caption" => "Offene Tasks", 'route' => 'home'),
+//        array("caption" => "Aktuell in Bearbeitung", 'route' => 'home'),
+//        array("caption" => "Zuletzt Angesehen", 'route' => 'home'),
     );
     
     /**
@@ -35,27 +35,10 @@ class HomeController extends DTADomainController {
 //    }
     
     public function indexAction(Request $request) {
-
-        $lorenz = Model\Data\PersonQuery::create()->findOneById(300);
-        
-//        $publication = new Model\Data\Publication();
-//        $publication->setNumpagesnumeric(0);
-//        $title = new Model\Data\Title();
-//        $title->addTitlefragment(Model\Data\Titlefragment::create(null, Model\Data\TitlefragmentPeer::TYPE_MAIN_TITLE));
-//        $publication->setTitle($title);
-//        
-//        $book = new Model\Data\Book();
-//        $book->setPublication($publication);
-        
-        /* @var $title DTA\MetadataBundle\Model\Data\Title */
-//        $title = new Model\Data\Title();
-//        $title->getpublic
-                
-        $q = Model\Data\TitleQuery::create()->usePublicationQuery()->filterByType(Model\Data\PublicationPeer::TYPE_CHAPTER)->endUse();
         
         return $this->renderWithDomainData('DTAMetadataBundle:Home:index.html.twig', array(
             'testData' => 
-            $q->find()
+            null
 //            array(
 //                'chapterTitles' => $q->find(),
 //                )

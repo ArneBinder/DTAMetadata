@@ -113,16 +113,22 @@ class ORMController extends DTADomainController {
         $numRecords = $request->get('iDisplayLength');
 
         
-//        $query = $query->usePersonalnameQuery()->useNamefragmentQuery()->filterByName('%ze%')->endUse()->endUse();
+        // filtering is more difficult than initially thought!
+        // - using ILIKE, case insensitive search is performed
+        // - using % and _ several and a single character can be wildcarded, respectively
+        // - a union mechanism seems to be missing (search on each column and union the matches), could be simulated by appending the search results manually, but that destroys sorting
+        //   another option might be to use criteria (the $query->where(...) methods) because there is an _or() function to use with them but it is not obvious how to formulate 
+        //   expressions like the ones below in this syntax (especially if it comes to date specifications which are related by different columns)
+       
         /* @var $query \DTA\MetadataBundle\Model\Data\BookQuery */
-        $result2 = $modelClass::getRowViewQueryObject()->usePublicationQuery()->useTitleQuery()->useTitlefragmentQuery()->filterByName('%lage%', \ModelCriteria::ILIKE)->endUse()->endUse()->endUse()->find();
-        $result1 = $modelClass::getRowViewQueryObject()->usePublicationQuery()->useTitleQuery()->useTitlefragmentQuery()->filterByName('%sinn%', \ModelCriteria::ILIKE)->endUse()->endUse()->endUse()->find();
-        foreach($result2 as $result)
-        $result1->append($result);
-        /* @var $result1 \PropelObjectCollection */
-        $result1->asort();
+//        $result2 = $modelClass::getRowViewQueryObject()->usePublicationQuery()->useTitleQuery()->useTitlefragmentQuery()->filterByName('%lage%', \ModelCriteria::ILIKE)->endUse()->endUse()->endUse()->find();
+//        $result1 = $modelClass::getRowViewQueryObject()->usePublicationQuery()->useTitleQuery()->useTitlefragmentQuery()->filterByName('%sinn%', \ModelCriteria::ILIKE)->endUse()->endUse()->endUse()->find();
+//        /* @var $result1 \PropelObjectCollection */
+//        foreach($result2 as $result)
+//        $result1->append($result);
 //        $query = $query->usePublicationQuery()->useDatespecificationRelatedByPublicationdateIdQuery()->filterByYear('1811')->endUse()->endUse();
 //        $query = $query->wh // where('year = ?', 1811);
+
         // use the class specific default sorting
         if(method_exists($classNames['query'], 'sqlSort')){
             $query = $classNames['query']::sqlSort($query, \ModelCriteria::ASC);
@@ -136,7 +142,6 @@ class ORMController extends DTADomainController {
                           ->limit($numRecords)
                           ->find();
         
-        $entities = $result1;
         return $entities;
         
 //        } catch (\PropelException $exc) {

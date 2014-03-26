@@ -27,9 +27,9 @@
       <td>Veröffentlicht</td>
       <td>{{publication.getDatespecificationRelatedByPublicationdateId}}</td>
     </tr>
-    {% if publication.getType == "VOLUME" %}
+    {% if publication.getType == "Volume" %}
     {% set volume = publication.getSpecialization %}
-    <tr>
+    {#<tr>
       <td>Band</td>
       <td>
         
@@ -47,10 +47,8 @@
             </a>
         {% endif %} 
         <br/>
-{#        Zeige alle Bände#}
-        
       </td>
-    </tr>
+    </tr>#}
     {% endif %}
   </tbody>
 </table>

@@ -6,9 +6,9 @@
 
 {#{{dump(testData)}} <br/>#}
 
-{% for value in testData %}
+{#{% for value in testData %}
 {{value}} #{{value.publications.get(0).id}} <br/>
-{% endfor %}
+{% endfor %}#}
 
 {#{% for volume in testData %}
 #{{volume.id}} {{volume.getPublication.getTitle}}<br/>
@@ -24,7 +24,7 @@
 
 {#{{dump(testData)}}#}
 
-<h3>Bearbeitungsverlauf</h3>
+{#<h3>Bearbeitungsverlauf</h3>
 <table class="table" style="width:49%">
 <thead>
   <tr>
@@ -47,6 +47,6 @@
   </tr>
 </tbody>
 </table>
-<h3>Offene Tasks (einzel und gruppe)</h3>
+<h3>Offene Tasks (einzel und gruppe)</h3>#}
 
 {% endblock %}

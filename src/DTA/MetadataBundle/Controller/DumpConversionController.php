@@ -329,12 +329,12 @@ class DumpConversionController extends ORMController {
             // aggregate into multivolumes
             foreach($publicationsByTitle as $title => $volumes){
                 
-                if( count($volumes) > 1 ){
+//                if( count($volumes) > 1 ){
                     // create multi volume with the given volumes as children
                     $this->createMultiVolume($volumes, $person);
-                } else {
-                    $this->warnings[] = array('volume without siblings'=>$volume->getPublication()->getTitle()->__toString()." id=".$volume->getId());
-                }
+//                } else {
+//                    $this->warnings[] = array('volume without siblings'=>$volume->getPublication()->getTitle()->__toString()." id=".$volume->getId());
+//                }
             }
             
         }

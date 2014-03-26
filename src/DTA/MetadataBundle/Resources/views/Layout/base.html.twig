@@ -99,11 +99,12 @@
                 
                 $('.table.fullyFeatured').dataTable( {
                     
-                    "bProcessing": true,
-                    "bServerSide": true,
-                    "sAjaxSource": "{{path(package~'_dataTablesDataSource', {'package': package, 'className': className}) }}",
-                    //"bSort":false // disables sorting completely
-                    bSortClasses: false
+                    "bProcessing": true
+                    ,"bServerSide": true
+                    ,"sAjaxSource": "{{path(package~'_dataTablesDataSource', {'package': package, 'className': className}) }}"
+                    ,"bSort":false // disables sorting completely
+                    ,"bFilter":false // disables filtering
+                    ,bSortClasses: false
                     ,aaSorting:[]
                     ,"aLengthMenu": [
                         [10, 50, 100, -1],
