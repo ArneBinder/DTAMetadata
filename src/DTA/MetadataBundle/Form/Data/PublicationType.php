@@ -78,7 +78,7 @@ class PublicationType extends BaseAbstractType
             'type' => new Master\LanguagePublicationType(),
             // TODO remove inlineLabel option from the dynamic collection type.
             'inlineLabel' => false,
-            'sortable' => true,
+            'sortable' => false,
             'label' => 'vorherrschende Sprache',
 //            'options' => array('isPublicationSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
         ));

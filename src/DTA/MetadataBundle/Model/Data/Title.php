@@ -6,6 +6,7 @@ use DTA\MetadataBundle\Model\Data\om\BaseTitle;
 
 class Title extends BaseTitle
 {
+
     public function getTitleFragments($criteria = NULL, PropelPDO $con = NULL){
          $collection = parent::getTitlefragments();
          // Re-sort them by Sequence, numerically

@@ -111,12 +111,32 @@ class ORMController extends DTADomainController {
         // pagination offset
         $offset = $request->get('iDisplayStart');
         $numRecords = $request->get('iDisplayLength');
+
         
+//        $query = $query->usePersonalnameQuery()->useNamefragmentQuery()->filterByName('%ze%')->endUse()->endUse();
+        /* @var $query \DTA\MetadataBundle\Model\Data\BookQuery */
+        $result2 = $modelClass::getRowViewQueryObject()->usePublicationQuery()->useTitleQuery()->useTitlefragmentQuery()->filterByName('%lage%', \ModelCriteria::ILIKE)->endUse()->endUse()->endUse()->find();
+        $result1 = $modelClass::getRowViewQueryObject()->usePublicationQuery()->useTitleQuery()->useTitlefragmentQuery()->filterByName('%sinn%', \ModelCriteria::ILIKE)->endUse()->endUse()->endUse()->find();
+        foreach($result2 as $result)
+        $result1->append($result);
+        /* @var $result1 \PropelObjectCollection */
+        $result1->asort();
+//        $query = $query->usePublicationQuery()->useDatespecificationRelatedByPublicationdateIdQuery()->filterByYear('1811')->endUse()->endUse();
+//        $query = $query->wh // where('year = ?', 1811);
+        // use the class specific default sorting
+        if(method_exists($classNames['query'], 'sqlSort')){
+            $query = $classNames['query']::sqlSort($query, \ModelCriteria::ASC);
+        }
+        
+        
+        $this->get('logger')->critical($query->find()->count());
+        /* @var $query \DTA\MetadataBundle\Model\Data\PublicationQuery */
         $entities = $query->setFormatter(\ModelCriteria::FORMAT_ON_DEMAND)
                           ->offset($offset)
                           ->limit($numRecords)
                           ->find();
         
+        $entities = $result1;
         return $entities;
         
 //        } catch (\PropelException $exc) {
@@ -130,6 +150,47 @@ class ORMController extends DTADomainController {
 //        }
     }
     
+    /**
+     * 
+     * @param type $entities Propel entities
+     * @param type $columns  The attributes to display, needs to be a subset of the table row view defined columns
+     * @param type $package  Data, Workflow, Classification or Master
+     * @param type $className The unqualified class name of the entity
+     * @return type array containing one array per record, listing the values of the given attributes (columns)
+     */
+    protected function formatAsArray($entities, $columns, $package, $className){
+        $result = array();
+        foreach($entities as $entity) {
+            $row = array();
+            for ($i = 0; $i < count($columns); $i++) {
+                $column = $columns[$i];
+                $attribute = $entity->getAttributeByTableViewColumName($column);
+                if(is_object($attribute)){
+                    $value = $attribute->__toString();
+                } else {
+                    $value = $attribute;
+                }
+                // add an edit button to the efirst column entry
+                if($i === 0){
+                    $editLink = $this->generateUrl($package . '_genericCreateOrEdit', array(
+                        'package'=>$package, 'className'=>$className, 'recordId'=>$entity->getId() 
+                    ));
+//                    $deleteLink = $this->generateUrl($package . '_deleteRecord', array(
+//                        'package'=>$package, 'className'=>$className, 'recordId'=>$entity->getId() 
+//                    ));
+                    $row[] = "<a href='$editLink'><span class='glyphicon glyphicon-edit'></span></a>"
+//                            ."<a href='$deleteLink'><span class='glyphicon glyphicon-trash'></span></a> "
+                            ."$value";
+                } else {
+                    $row[] = $value;
+                }
+            }
+            $result[] = $row;
+	}
+        
+        return $result;
+        
+    }
     /**
      * Responds to XHR requests of the data tables module. 
      */
@@ -151,33 +212,11 @@ class ORMController extends DTADomainController {
             "aaData" => array()
 	);
 
+        // retrieve entities
         $entities = $this->findPaginatedSortedFiltered($request, $package, $className);
         
-        foreach($entities as $entity) {
-            $row = array();
-            for ($i = 0; $i < count($columns); $i++) {
-                $column = $columns[$i];
-                $attribute = $entity->getAttributeByTableViewColumName($column);
-                if(is_object($attribute)){
-                    $value = $attribute->__toString();
-                } else {
-                    $value = $attribute;
-                }
-                // add an edit button to the efirst column entry
-                if($i === 0){
-                    $editLink = $this->generateUrl($package . '_genericCreateOrEdit', array(
-                        'package'=>$package, 
-                        'className'=>$className, 
-                        'recordId'=>$entity->getId()
-                    ));
-                    $row[] = "<a href='$editLink'><span class='glyphicon glyphicon-edit'></span></a> $value";
-                } else {
-                    $row[] = $value;
-                }
-            }
-//            $row[] = "<a href='#'>click</a>";
-            $response['aaData'][] = $row;
-	}
+        // format in data tables response format
+        $response['aaData'] = $this->formatAsArray($entities, $columns, $package, $className);
             
 	return new Response(json_encode( $response ));
         

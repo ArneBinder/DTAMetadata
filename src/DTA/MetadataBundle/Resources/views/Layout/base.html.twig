@@ -114,7 +114,7 @@
                     ,"bPaginate": true
                     ,"sPaginationType": "full_numbers"
                     ,"oLanguage": { "sUrl": "{{asset('js/DataTables-1.9.4/dataTablesGermanTranslation.json')}}" }
-                    ,"oTableTools": {
+              {#    ,"oTableTools": {
                             "aButtons": [
                                     "copy"
                                     ,"print"
@@ -124,11 +124,11 @@
                                             ,"aButtons":    [ "csv", "xls", "pdf" ]
                                     }*/
                             ]
-                    }
+                    }      #}
                 } );
-
-    
+            $("#datatable_filter input").attr('placeholder', 'wildcards: _ und %')
         {% endif %}
+            
             });
             /**
              * Requests a confirmation on clicking a link which e.g. deletes something.
@@ -142,6 +142,7 @@
                     event.preventDefault();
                 };
             }
+            
             {% block additionalJS %}
             {% endblock %}
 

@@ -103,7 +103,8 @@ class DumpConversionController extends ORMController {
             'convertAuthors',               
             'convertSingleFieldPersons',
             'convertSeries',
-            'convertMultiVolumes');
+            'convertMultiVolumes',
+            );
         
         foreach ($conversionTasks as $task){
             $this->runTransaction($task, $dbh);
@@ -136,6 +137,10 @@ class DumpConversionController extends ORMController {
         // current working directory is web
         $dumpConversionSchemasDir = "../src/DTA/MetadataBundle/Resources/schemas_dumpConversion";
         foreach (array('dta_data_schema.xml', 'dta_master_schema.xml', 'dta_workflow_schema.xml', 'dta_classification_schema.xml') as $schema) {
+            
+            // backup current version in config as production file
+            system("cp $dumpConversionSchemasDir/../config/$schema $dumpConversionSchemasDir/../schemas_final/$schema ");
+            
             $this->messages[] = array("bringing dump conversion version of $schema into place", system("cp $dumpConversionSchemasDir/$schema $dumpConversionSchemasDir/../config/$schema"));
         }
         // build propel entity classes
@@ -293,9 +298,6 @@ class DumpConversionController extends ORMController {
         // retrieve all persons
         $persons = Data\Person::getRowViewQueryObject()->find();
         
-//        $persons = Model\Data\PersonQuery::create()
-//                ->find();
-        
         foreach($persons as $person){
             /* @var $person \DTA\MetadataBundle\Model\Data\Person */
             // find publications with identical titles ('title' => array(pub1, pub2, ...), ...)
@@ -327,13 +329,12 @@ class DumpConversionController extends ORMController {
             // aggregate into multivolumes
             foreach($publicationsByTitle as $title => $volumes){
                 
-//                if( count($volumes) > 1 ){
+                if( count($volumes) > 1 ){
                     // create multi volume with the given volumes as children
                     $this->createMultiVolume($volumes, $person);
-                    
-//                } else {
-//                    $this->warnings[] = array('volume without siblings'=>$volume->getPublication()->getTitle()->__toString()." id=".$volume->getId());
-//                }
+                } else {
+                    $this->warnings[] = array('volume without siblings'=>$volume->getPublication()->getTitle()->__toString()." id=".$volume->getId());
+                }
             }
             
         }
@@ -425,16 +426,16 @@ class DumpConversionController extends ORMController {
                 ,metadaten.dwds_unterkategorie2
                 ,type as legacy_type
                 ,CASE type
-                    WHEN 'M'  THEN 'BOOK'
-                    WHEN 'MS' THEN 'BOOK'
-                    WHEN 'X'     THEN 'BOOK'
-                    WHEN 'MM' THEN 'VOLUME'
-                    WHEN 'MMS' THEN 'VOLUME'
-                    WHEN 'DM' THEN 'CHAPTER'
-                    WHEN 'DS' THEN 'CHAPTER'
-                    WHEN 'JA' THEN 'ARTICLE'
-                    WHEN 'Reihe' THEN 'SERIES'
-                    WHEN 'Zeitschrift' THEN 'JOURNAL'
+                    WHEN 'M'  THEN 'Book'
+                    WHEN 'MS' THEN 'Book'
+                    WHEN 'X'     THEN 'Book'
+                    WHEN 'MM' THEN 'Volume'
+                    WHEN 'MMS' THEN 'Volume'
+                    WHEN 'DM' THEN 'Chapter'
+                    WHEN 'DS' THEN 'Chapter'
+                    WHEN 'JA' THEN 'Article'
+                    WHEN 'Reihe' THEN 'Series'
+                    WHEN 'Zeitschrift' THEN 'Journal'
                     ELSE type
                 END as `publication_type`
                 
@@ -549,31 +550,31 @@ class DumpConversionController extends ORMController {
 
             // for specialized publication types, create the according objects
             switch($row['publication_type']){
-                case "ARTICLE":
+                case "Article":
                     $article = new Model\Data\Article();
                     $article->setPublication($publication)
                             ->setPages($row['pages'])
                             ->save($this->propelConnection);
                     break;
-                case "CHAPTER":
+                case "Chapter":
                     $chapter = new Model\Data\Chapter();
                     $chapter->setPublication($publication)
                             ->setPages($row['pages'])
                             ->save($this->propelConnection);
                     break;
-                case "VOLUME":
+                case "Volume":
                     $volume = new Model\Data\Volume();
                     $volume->setPublication($publication)
                            ->setVolumeDescription($row['volume_description'])
                            ->setVolumeNumeric($row['volume_numeric'])
                            ->save($this->propelConnection);
                     break;
-                case "BOOK":
+                case "Book":
                     $volume = new Model\Data\Book();
                     $volume->setPublication($publication)
                            ->save($this->propelConnection);
                     break;
-                case "JOURNAL":
+                case "Journal":
                     $volume = new Model\Data\Journal();
                     $volume->setPublication($publication)
                            ->save($this->propelConnection);

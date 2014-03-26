@@ -103,20 +103,4 @@
                 
     </ul>  
         
-    {#  ---------------------------------------------
-        Print session flash (status results of actions)
-        --------------------------------------------- #}
-    <ul class="nav navbar-nav navbar-right">
-        {% for flashType in ['success', 'warning', 'error'] %} 
-            {% for flash in app.session.flashbag.get(flashType) %} 
-            <li><a href="#" style="font-style:italic">{{ flash }}</a></li>
-            {#<div class="alert alert-{{flashType}}">
-                <button type="button" class="close" data-dismiss="alert">&times;</button>
-                {{ flash }}
-            </div>#}
-        {% endfor %} 
-    </ul>
-            
-            
-            {% endfor %}
 </div><!--/.nav-collapse -->

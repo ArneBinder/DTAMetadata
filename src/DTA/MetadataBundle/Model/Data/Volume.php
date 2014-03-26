@@ -25,7 +25,7 @@ class Volume extends BaseVolume
     
     public function getVolumeSummary(){
         
-        return sprintf(" (%d) %s", $this->getVolumeNumeric(), $this->getVolumeDescription());
+        return sprintf(" (Band %d)", $this->getVolumeNumeric(), $this->getVolumeDescription());
         
     }
 }

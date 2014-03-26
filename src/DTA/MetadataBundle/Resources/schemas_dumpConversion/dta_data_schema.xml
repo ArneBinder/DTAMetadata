@@ -24,7 +24,7 @@
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="false" required="true"/>
         
         <column name="type" description="Publikationstyp. Zur Auflösung des dynamischen Typs (z.B. ein Volume bettet ein Publication-Objekt ein, mit nichts als dem Publikationsobjekt in der Hand, lässt sich das zugehörige speziellere objekt aber nur durch ausprobieren aller Publikationstypen herausfinden.)" 
-                type="ENUM" valueSet="BOOK,VOLUME,MULTIVOLUME,CHAPTER,JOURNAL,ARTICLE,SERIES" />
+                type="ENUM" valueSet="Book,Volume,MultiVolume,Chapter,Journal,Article,Series" />
         <column name="legacytype" description="Altes Publikationstypen-Kürzel (J, JA, M, MM, MMS, etc.)" type="LONGVARCHAR" />
         
         <column name="title_id" type="INTEGER" required="true"/>

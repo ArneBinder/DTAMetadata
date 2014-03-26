@@ -24,7 +24,7 @@ propel > dbal > connections for connection setup. -->
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         
         <column name="type" description="Publikationstyp. Zur Auflösung des dynamischen Typs (z.B. ein Volume bettet ein Publication-Objekt ein, mit nichts als dem Publikationsobjekt in der Hand, lässt sich das zugehörige speziellere objekt aber nur durch ausprobieren aller Publikationstypen herausfinden.)" 
-                type="ENUM" valueSet="BOOK,VOLUME,MULTIVOLUME,CHAPTER,JOURNAL,ARTICLE,SERIES" />
+                type="ENUM" valueSet="Book,Volume,MultiVolume,Chapter,Journal,Article,Series" />
         <column name="legacytype" description="Altes Publikationstypen-Kürzel (J, JA, M, MM, MMS, etc.)" type="LONGVARCHAR" />
         
         <column name="title_id" type="INTEGER" required="true"/>
@@ -97,20 +97,17 @@ propel > dbal > connections for connection setup. -->
             <parameter name="veröffentlicht" value="accessor:getDatespecificationRelatedByPublicationdateId"/>
             <parameter name="Verlag" value="accessor:getPublishingCompany"/>
             <parameter name="Ort" value="accessor:getPlace"/>
-            <parameter name="Typ" value="type"/>
+            <!--<parameter name="Typ" value="type"/>-->
             <parameter name="query" value="\DTA\MetadataBundle\Model\Data\PublicationQuery::create()
-                    ->leftJoin('Title')
-                    ->leftJoin('Title.Titlefragment')
-                    ->leftJoin('DatespecificationRelatedByPublicationdateId')
-                    ->leftJoin('PersonPublication')
-                    ->leftJoin('PersonPublication.Person')
-                    ->leftJoin('Person.Personalname')
-                    ->leftJoin('Personalname.Namefragment')
-                    ->leftJoin('Volume')
-                    ->orderBy('Titlefragment.type', 'asc')
-                    ->orderBy('Titlefragment.Name', 'asc')
-                    ->orderBy('Title.Id', 'asc')
-                    ->orderBy('Volume.VolumeNumeric', 'asc');" />
+                    ->join('Title')
+                    ->join('Title.Titlefragment')
+                    ->join('DatespecificationRelatedByPublicationdateId')
+                    ->join('PersonPublication')
+                    ->join('PersonPublication.Person')
+                    ->join('Person.Personalname')
+                    ->join('Personalname.Namefragment')
+                    ->join('Volume')
+;" />
         </behavior>
         
         <behavior name="reconstructed_flaggable">
@@ -139,9 +136,7 @@ propel > dbal > connections for connection setup. -->
     <table name="book">
         <column name="id" type="INTEGER" primaryKey="true" required="true"/>
         <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
-         <behavior name="table_row_view">
-            <parameter name="embedColumns2" value="publication"/>
-         </behavior>
+        <behavior name="table_row_view"> <parameter name="embedColumns" value="publication"/> </behavior>
     </table> 
     
     <!--Zeitschrift/Zeitung
@@ -150,6 +145,7 @@ propel > dbal > connections for connection setup. -->
     <table name="journal">
         <column name="id" type="INTEGER" primaryKey="true" required="true"/>
         <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
+        <behavior name="table_row_view"> <parameter name="embedColumns" value="publication"/> </behavior>
     </table> 
     
     <!--MULTI-VOLUME               
@@ -167,6 +163,10 @@ propel > dbal > connections for connection setup. -->
         <validator column="volumes_total">
             <rule name="minValue" value="2" message="Ein mehrbändiges Werk muss aus mindestens ${value} Bänden bestehen."/>
         </validator>
+        <behavior name="table_row_view"> 
+            <parameter name="embedColumns" value="publication"/> 
+            <parameter name="Anzahl Bände" value="volumes_total"/>
+        </behavior>
     </table> 
     
     <!--VOLUME               
@@ -179,9 +179,12 @@ propel > dbal > connections for connection setup. -->
         <column name="volume_description" description="Bezeichnung des Bandes (alphanumerisch)" type="LONGVARCHAR"/>
         <column name="volume_numeric" description="Bezeichnung des Bandes (numerisch)" type="INTEGER"/>
         
-        <foreign-key foreignTable="publication"> 
-            <reference local="id" foreign="id"/> 
-        </foreign-key>
+        <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
+        <behavior name="table_row_view"> 
+            <parameter name="embedColumns" value="publication"/> 
+            <parameter name="Band (numerisch)" value="volume_numeric"/>
+            <parameter name="Bandbeschreibung" value="volume_description"/>
+        </behavior>
     </table>   
     
     <!--CHAPTER
@@ -193,9 +196,11 @@ propel > dbal > connections for connection setup. -->
         
         <column name="pages" description="Seitenangabe" type="LONGVARCHAR"/>
         
-        <foreign-key foreignTable="publication"> 
-            <reference local="id" foreign="id"/> 
-        </foreign-key>
+        <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
+        <behavior name="table_row_view"> 
+            <parameter name="embedColumns" value="publication"/> 
+            <parameter name="Seitenangabe" value="pages"/>
+        </behavior>
     </table> 
     
     <!--ARTICLE
@@ -207,9 +212,11 @@ propel > dbal > connections for connection setup. -->
         
         <column name="pages" description="Seitenangabe" type="LONGVARCHAR"/>
         
-        <foreign-key foreignTable="publication"> 
-            <reference local="id" foreign="id"/> 
-        </foreign-key>
+        <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
+        <behavior name="table_row_view"> 
+            <parameter name="embedColumns" value="publication"/> 
+            <parameter name="Seitenangabe" value="pages"/>
+        </behavior>
     </table> 
     
     <!--SERIES
@@ -219,9 +226,8 @@ propel > dbal > connections for connection setup. -->
     <table name="series">
         <column name="id" type="INTEGER" primaryKey="true" required="true"/>
         
-        <foreign-key foreignTable="publication"> 
-            <reference local="id" foreign="id"/> 
-        </foreign-key>
+        <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
+        <behavior name="table_row_view"> <parameter name="embedColumns" value="publication"/> </behavior>
     </table> 
     
     <!-- Other entities that can be considered historical facts. -->
@@ -352,9 +358,7 @@ propel > dbal > connections for connection setup. -->
             <parameter name="query" 
                        value="DTA\MetadataBundle\Model\Data\PersonQuery::create()
                             ->join('Personalname')
-                            ->join('Personalname.Namefragment')
-                            ->orderBy('Namefragment.type',\Criteria::DESC)
-                            ->orderBy('Namefragment.name');"/>
+                            ->join('Personalname.Namefragment');"/>
         </behavior>
         
         <unique> 

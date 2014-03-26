@@ -18,6 +18,5 @@ class GenreType extends BaseAbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('name');
-//        $builder->add('childof');
     }
 }

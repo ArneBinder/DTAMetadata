@@ -6,9 +6,9 @@
 
 {#{{dump(testData)}} <br/>#}
 
-{#{% for value in testData %}
-{{dump(testData)}} <br/>
-{% endfor %}#}
+{% for value in testData %}
+{{value}} #{{value.publications.get(0).id}} <br/>
+{% endfor %}
 
 {#{% for volume in testData %}
 #{{volume.id}} {{volume.getPublication.getTitle}}<br/>

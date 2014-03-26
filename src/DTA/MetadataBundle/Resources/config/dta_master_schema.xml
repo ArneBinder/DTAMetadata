@@ -134,9 +134,9 @@
         <behavior name="timestampable"/>
         <behavior name="table_row_view">
             <parameter name="id" value="id"/>
-            <parameter name="benutzername" value="username"/>
-            <parameter name="mail" value="mail"/>
-            <parameter name="administratorrechte" value="accessor:adminToString"/>
+            <parameter name="Benutzername" value="username"/>
+            <parameter name="Mail" value="mail"/>
+            <parameter name="Administratorrechte" value="accessor:adminToString"/>
         </behavior>
         
     </table>

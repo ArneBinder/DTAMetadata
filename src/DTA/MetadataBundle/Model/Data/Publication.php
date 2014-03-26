@@ -4,52 +4,27 @@ namespace DTA\MetadataBundle\Model\Data;
 
 use DTA\MetadataBundle\Model\Data\om\BasePublication;
 use DTA\MetadataBundle\Model;
-use Symfony\Component\Validator\Constraints as Assert;
-/**
- * 
- */
+
 class Publication extends BasePublication
 {
     public static function create($publicationType){
         // check type is valid
         $validTypes = PublicationPeer::getValueSet(PublicationPeer::TYPE);
         if( FALSE === array_search($publicationType, $validTypes)){
-            throw new \Exception("Cannot create publication of type $publicationType, use one of $validTypes");
+            throw new \Exception("Cannot create publication of type $publicationType, use one of ".implode(', ',$validTypes));
         }
         
         $basepublication = new Publication();
         $basepublication->setType($publicationType);
         
-        switch ($publicationType) {
-            case Model\Data\PublicationPeer::TYPE_BOOK:
-                $specializedPublication = new Model\Data\Book();
-                break;
-            case Model\Data\PublicationPeer::TYPE_JOURNAL:
-                $specializedPublication = new Model\Data\Journal();
-                break;
-            case Model\Data\PublicationPeer::TYPE_SERIES:
-                $specializedPublication = new Model\Data\Series();
-                break;
-            case Model\Data\PublicationPeer::TYPE_CHAPTER:
-                $specializedPublication = new Model\Data\Chapter();
-                break;
-            case Model\Data\PublicationPeer::TYPE_VOLUME:
-                $specializedPublication = new Model\Data\Volume();
-                break;
-            case Model\Data\PublicationPeer::TYPE_MULTIVOLUME:
-                $specializedPublication = new Model\Data\MultiVolume();
-                break;
-            case Model\Data\PublicationPeer::TYPE_ARTICLE:
-                $specializedPublication = new Model\Data\Article();
-                break;
-            default:
-                throw new \Exception("Don't know how to create publication type $publicationType.");
-        }
-        
+        // the type string equals the unqualified class name
+        $className = 'DTA\\MetadataBundle\\Model\\Data\\' . $publicationType;
+        $specializedPublication = new $className();
         $specializedPublication->setPublication($basepublication);
         return $specializedPublication;
         
     }
+    
     /**
      * Retrieves the publication object (volume, chapter, article) which uses this object as core publication.
      */

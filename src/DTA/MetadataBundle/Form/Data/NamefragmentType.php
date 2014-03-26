@@ -18,7 +18,7 @@ class NamefragmentType extends BaseAbstractType {
     public function buildForm(FormBuilderInterface $builder, array $options) {
         $builder->add('type');
         $builder->add('name', 'text');
-        $builder->add('sortableRank', 'hidden');     
+        $builder->add('sortable_rank', 'hidden');     
     }
 
 }

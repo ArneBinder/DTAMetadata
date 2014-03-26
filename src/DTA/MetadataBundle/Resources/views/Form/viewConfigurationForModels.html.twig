@@ -184,12 +184,14 @@
 {% endblock %}
 
 {% block personalname_row %}
+    <div style="position: relative">
     {{ form_row(form, {'inlineLabel':true, 'hideLabel':true }) }}
     {{ form_rest(form) }}
+    </div>
 {% endblock %}
 
 {% block namefragment_row %}
-    <div class="form-inline">
+    <div class="form-inline" style="position: relative">
             {{ form_row(form.type)}}
             {{ form_row(form.name) }} 
             {{ form_rest(form) }}
@@ -223,7 +225,6 @@
 
 {% block category_row %}
     <div class="dynamic-collection-deletable" style="position: relative;">
-        {{ form_row(form, {'inlineLabel':true, 'hideLabel':true, 'inlineChildren': true}) }}
         {{ form_rest(form) }}
     </div>
 {% endblock %}

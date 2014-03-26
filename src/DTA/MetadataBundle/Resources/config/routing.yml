@@ -105,12 +105,11 @@ publicationControls:
   path: /Data/publicationControls/{publicationId}
   defaults: { _controller: DTAMetadataBundle:DataDomain:publicationControls}
     
-Data_viewPublicationsByType:
-  path: /Data/showAll/{publicationType}
-  defaults: { _controller: DTAMetadataBundle:DataDomain:viewPublicationsByType}
-  requirements:
-      publicationType: (BOOK|VOLUME|MULTIVOLUME|CHAPTER|JOURNAL|ARTICLE|SERIES)
-#      publicationType: Book | Volume | Multivolume | Chapter | Journal | Article | Series
+#Data_viewPublicationsByType:
+#  path: /Data/showAll/{publicationType}
+#  defaults: { _controller: DTAMetadataBundle:DataDomain:genericViewAll, className: {{publicationType}}, package: Data}
+#  requirements:
+#      publicationType: (Book|Volume|MultiVolume|Chapter|Journal|Article|Series)
 
 Data_viewPersonsByRole:
   path: /Data/viewPersonsByRole/{personRoleId}

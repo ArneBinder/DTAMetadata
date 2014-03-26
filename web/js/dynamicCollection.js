@@ -48,7 +48,7 @@ function updateSortableRanks( event, ui ){
     // traverse in order of dom tree, push this 'visible' index to the hidden inputs
     $dynamicCollectionList.children('li').each(function(index, listElement){
 //        console.log($(listElement), $(listElement).children().children('input[name*=sortableRank]').val());
-        $(listElement).children().children('input[name*=sortableRank]').val(index);
+        $(listElement).children().children('input[name*=sortable_rank]').val(index);
     });
 }
 

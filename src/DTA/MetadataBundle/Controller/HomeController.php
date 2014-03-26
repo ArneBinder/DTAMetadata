@@ -47,18 +47,18 @@ class HomeController extends DTADomainController {
 //        $book = new Model\Data\Book();
 //        $book->setPublication($publication);
         
-        $q = Model\Data\BookQuery::create();
-        $count = $q->count();
-        $firstRecords = $q->findOne();
+        /* @var $title DTA\MetadataBundle\Model\Data\Title */
+//        $title = new Model\Data\Title();
+//        $title->getpublic
+                
+        $q = Model\Data\TitleQuery::create()->usePublicationQuery()->filterByType(Model\Data\PublicationPeer::TYPE_CHAPTER)->endUse();
         
         return $this->renderWithDomainData('DTAMetadataBundle:Home:index.html.twig', array(
             'testData' => 
-//            null
-            array(
-
-                'count' => $count,
-                'firstRec' => $firstRecords,
-                )
+            $q->find()
+//            array(
+//                'chapterTitles' => $q->find(),
+//                )
             //$title->getTitleFragments()->getFirst()
 //               $authorsVolumes 
 //            $outcome

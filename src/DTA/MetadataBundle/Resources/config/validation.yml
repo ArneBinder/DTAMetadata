@@ -63,14 +63,26 @@ DTA\MetadataBundle\Model\Data\Titlefragment:
             - { NotBlank: {message: 'Bitte alle Titelfragmente füllen.'} }
 
 DTA\MetadataBundle\Model\Data\Person:
-    properties: {  }
+    getters: 
+        personalnames:
+            - Valid: ~
+            - Count:
+                min: 1
+                minMessage: Bitte mindestens einen Namen angeben.
 DTA\MetadataBundle\Model\Data\Personalname:
     properties:
         person_id: [{ NotBlank: {message: 'Dem Namen ist keine Person zugeordnet.'} }]
+    getters:
+        nameFragments:
+            - Valid: ~
+            - Count:
+                min: 1
+                minMessage: Bitte mindestens ein Namensfragment angeben.
 DTA\MetadataBundle\Model\Data\Namefragment:
     properties:
         personalname_id: [{ NotBlank: {message: 'Dem Namensfragment ist kein Name zugeordnet.'} }]
         name: [{ NotBlank: {message: 'Bitte kein Namensfragment leer lassen.'} }]
+        type: [{ NotBlank: {message: 'Bitte einen Typ für das Namensfragment angeben.'} }]
         
 DTA\MetadataBundle\Model\Data\Publishingcompany:
     properties:
@@ -98,36 +110,28 @@ DTA\MetadataBundle\Model\Master\SeriesPublication:
 DTA\MetadataBundle\Model\Master\LanguagePublication:
     properties:
         language_id: [{ NotBlank: {message: 'Bei der Zuordnung Sprache/Publikation fehlt die Sprache.'} }]
-        publication_id: [{ NotBlank: {message: 'Bei der Zuordnung Sprache/Publikation fehlt die Publikation.'} }]
 DTA\MetadataBundle\Model\Master\GenrePublication:
     properties:
         genre_id: [{ NotBlank: {message: 'Bei der Zuordnung Genre/Publikation fehlt das Genre.'} }]
-        publication_id: [{ NotBlank: {message: 'Bei der Zuordnung Genre/Publikation fehlt die Publikation.'} }]
 DTA\MetadataBundle\Model\Master\PublicationTag:
     properties:
         tag_id: [{ NotBlank: {message: 'Bei der Zuordnung Tag/Publikation fehlt das Tag.'} }]
-        publication_id: [{ NotBlank: {message: 'Bei der Zuordnung Tag/Publikation fehlt die Publikation.'} }]
 DTA\MetadataBundle\Model\Master\CategoryPublication:
     properties:
         category_id: [{ NotBlank: {message: 'Bei der Zuordnung Kategorie/Publikation fehlt das Tag.'} }]
-        publication_id: [{ NotBlank: {message: 'Bei der Zuordnung Kategorie/Publikation fehlt die Publikation.'} }]
 DTA\MetadataBundle\Model\Master\FontPublication:
     properties:
         font_id: [{ NotBlank: {message: 'Bei der Zuordnung Schriftart/Publikation fehlt die Schriftart.'} }]
-        publication_id: [{ NotBlank: {message: 'Bei der Zuordnung Schriftart/Publikation fehlt die Publikation.'} }]
 DTA\MetadataBundle\Model\Master\PublicationPublicationgroup:
     properties:
         publicationgroup_id: [{ NotBlank: {message: 'Bei der Zuordnung Publikationsgruppe/Publikation fehlt die Publikationsgruppe.'} }]
-        publication_id: [{ NotBlank: {message: 'Bei der Zuordnung Publikationsgruppe/Publikation fehlt die Publikation.'} }]
 DTA\MetadataBundle\Model\Master\PersonPublication:
     properties:
         person_id: [{ NotBlank: {message: 'Bei der Zuordnung Person/Publikation fehlt die Person.'} }]
-        publication_id: [{ NotBlank: {message: 'Bei der Zuordnung Person/Publikation fehlt die Publikation.'} }]
         role: [{NotBlank: {message: 'Bei der Zuordnung Person/Publikation fehlt die Rolle.'} }]
 DTA\MetadataBundle\Model\Master\RecentUse:
     properties:
         dta_user_id: [{ NotBlank: {message: 'Bei der Zuordnung Benutzer/zuletzt benutzte Publikation fehlt der Nutzer.'} }]
-        publication_id: [{ NotBlank: {message: 'Bei der Zuordnung Benutzer/zuletzt benutzte Publikation fehlt die Publikation.'} }]
         date: [{ NotBlank: {message: 'Bei der Zuordnung Benutzer/zuletzt benutzte Publikation fehlt das Datum.'} }]
 DTA\MetadataBundle\Model\Master\DtaUser:
     properties: {  }
@@ -142,7 +146,7 @@ DTA\MetadataBundle\Model\Classification\Personrole:
 DTA\MetadataBundle\Model\Classification\Category:
     properties:
         name: [{ NotBlank: {message: 'Die Kategorie muss benannt werden.'} }]
-        description: [{ NotBlank: {message: 'Die Kategorie braucht eine Beschreibung.'} }]
+        type: [{ NotBlank: {message: 'Die Kategorie braucht einen Typ.'} }]
 DTA\MetadataBundle\Model\Classification\Tag:
     properties:
         name: [{ NotBlank: {message: 'Das Tag muss benannt werden.'} }]
