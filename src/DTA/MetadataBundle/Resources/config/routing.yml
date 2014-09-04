@@ -9,7 +9,10 @@ convertDump:
 nearDuplicateProposal:
   path: /Duplicate
   defaults: { _controller: DTAMetadataBundle:DumpConversion:nearDuplicateProposal }
-  
+
+addUser:
+   path: /addUser/{name}/{password}
+   defaults: { _controller: DTAMetadataBundle:DumpConversion:addUser }
 # ==============================================================================
 # home controller
 # ==============================================================================
@@ -28,6 +31,14 @@ home:
 administrationDomain:
   path: /Admin
   defaults: { _controller: DTAMetadataBundle:MasterDomain:index }
+
+administrationCreateOrEditUser:
+  path: /Master/edit/DtaUser/{recordId}
+  defaults:
+    _controller: DTAMetadataBundle:MasterDomain:createOrEditUser
+    package: Master
+    className: DtaUser
+    recordId: 0
 
 clearCache:
     path:      /Admin/ClearCache/{applicationMode}

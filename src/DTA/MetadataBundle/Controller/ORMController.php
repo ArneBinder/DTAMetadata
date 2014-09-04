@@ -11,16 +11,16 @@ use Symfony\Component\HttpFoundation\Response;
  */
 
 /**
- * Base class for all domain controllers. Contains generic actions (list all records, new record) 
+ * Base class for all domain controllers. Contains generic actions (list all records, new record)
  * that are derived from the database schema.
  */
 class ORMController extends DTADomainController {
 
     public $package = null;
-    
+
     // TODO: pressing enter in a modal form leads to a form submit and all data is lost, 
     // because the server redirects to the ajax response page
-    
+
     /**
      * Deletes a record from the database after having asked for a confirmation.
      * @param type $package   like in genericViewOneAction
@@ -36,17 +36,17 @@ class ORMController extends DTADomainController {
                 'className' => $className,
                 'recordId' => $recordId,
             ));
-        
+
         // try to really delete data on confirm POST
         } else {
-            
+
             // confirmed
             if( $request->get("reallyDelete") ){                                    // && $request->get('recordId')
-                
+
                 $classNames = $this->relatedClassNames($package, $className);
                 $query = new $classNames['query'];
                 $record = $query->findOneById($recordId);
-                
+
                 if($record === null){
                     $this->addErrorFlash("The record ($className #$recordId) to be deleted doesn't exist.");
                 }
@@ -54,20 +54,20 @@ class ORMController extends DTADomainController {
                     $record->delete();
                     $this->addSuccessFlash("Datensatz gelöscht.");
                 }
-                
+
             // abort
             } else {
-                
+
                 if( ! $request->get("reallyDelete") ){
                     $this->addWarningFlash("Datensatz nicht gelöscht.");
                 } else if(! $request->get('recordId')){
                     $this->addErrorFlash("Datensatz kann nicht gelöscht werden: Er existiert nicht.");
                 }
-                
+
             }
-            
+
             return $this->genericViewAllAction($package, $className);
-            
+
         }
     }
 
@@ -75,51 +75,51 @@ class ORMController extends DTADomainController {
      * Renders a single entity for ajax display (i.e. without any additional markup like menus or footers).
      * @param string $package      domain/object model package (Data, Classification, Workflow, Master)
      * @param string $className    model class
-     * @param int    $recordId     
+     * @param int    $recordId
      */
     public function genericViewAction(Request $request, $package, $className, $recordId) {
-        
+
         $classNames = $this->relatedClassNames($package, $className);
 
         // for retrieving the entities
         $query    = new $classNames['query'];
 //        $formType = new $classNames['formType'];
-        
+
         $record = $query->findOneById($recordId);
-        
+
         $form = $this->genericCreateOrEdit($request, $record);
-        
+
 //        return $this->renderWithDomainData("DTAMetadataBundle:ORM:createOrEdit.html.twig", array(
 //                    'form' => $form['form']->createView(),
 //                    'transaction' => $form['transaction'],    // whether the form is for edit or create
 //                    'className' => $className,
 //                    'recordId' => $recordId,
 //                ));
-        
+
         return $this->renderWithDomainData("DTAMetadataBundle:Form:genericBaseForm.html.twig", array(
                     'className' => $className,
                     'form' => $form['form']->createView(),
                 ));
     }
-    
+
     protected function findPaginatedSortedFiltered($request, $package, $className){
-        
+
         $classNames = $this->relatedClassNames($package, $className);
         $modelClass = new $classNames["model"];
         $query = $modelClass::getRowViewQueryObject();
-        
+
         // pagination offset
         $offset = $request->get('iDisplayStart');
         $numRecords = $request->get('iDisplayLength');
 
-        
+
         // filtering is more difficult than initially thought!
         // - using ILIKE, case insensitive search is performed
         // - using % and _ several and a single character can be wildcarded, respectively
         // - a union mechanism seems to be missing (search on each column and union the matches), could be simulated by appending the search results manually, but that destroys sorting
         //   another option might be to use criteria (the $query->where(...) methods) because there is an _or() function to use with them but it is not obvious how to formulate 
         //   expressions like the ones below in this syntax (especially if it comes to date specifications which are related by different columns)
-       
+
         /* @var $query \DTA\MetadataBundle\Model\Data\BookQuery */
 //        $result2 = $modelClass::getRowViewQueryObject()->usePublicationQuery()->useTitleQuery()->useTitlefragmentQuery()->filterByName('%lage%', \ModelCriteria::ILIKE)->endUse()->endUse()->endUse()->find();
 //        $result1 = $modelClass::getRowViewQueryObject()->usePublicationQuery()->useTitleQuery()->useTitlefragmentQuery()->filterByName('%sinn%', \ModelCriteria::ILIKE)->endUse()->endUse()->endUse()->find();
@@ -133,17 +133,17 @@ class ORMController extends DTADomainController {
         if(method_exists($classNames['query'], 'sqlSort')){
             $query = $classNames['query']::sqlSort($query, \ModelCriteria::ASC);
         }
-        
-        
+
+
         $this->get('logger')->critical($query->find()->count());
         /* @var $query \DTA\MetadataBundle\Model\Data\PublicationQuery */
         $entities = $query->setFormatter(\ModelCriteria::FORMAT_ON_DEMAND)
                           ->offset($offset)
                           ->limit($numRecords)
                           ->find();
-        
+
         return $entities;
-        
+
 //        } catch (\PropelException $exc) {
 ////            $query = $modelClass::getRowViewQueryObject();
 //            $query->offset(NULL)->limit(NULL);
@@ -154,9 +154,9 @@ class ORMController extends DTADomainController {
 //            }
 //        }
     }
-    
+
     /**
-     * 
+     *
      * @param type $entities Propel entities
      * @param type $columns  The attributes to display, needs to be a subset of the table row view defined columns
      * @param type $package  Data, Workflow, Classification or Master
@@ -178,7 +178,7 @@ class ORMController extends DTADomainController {
                 // add an edit button to the efirst column entry
                 if($i === 0){
                     $editLink = $this->generateUrl($package . '_genericCreateOrEdit', array(
-                        'package'=>$package, 'className'=>$className, 'recordId'=>$entity->getId() 
+                        'package'=>$package, 'className'=>$className, 'recordId'=>$entity->getId()
                     ));
 //                    $deleteLink = $this->generateUrl($package . '_deleteRecord', array(
 //                        'package'=>$package, 'className'=>$className, 'recordId'=>$entity->getId() 
@@ -192,23 +192,23 @@ class ORMController extends DTADomainController {
             }
             $result[] = $row;
 	}
-        
+
         return $result;
-        
+
     }
     /**
-     * Responds to XHR requests of the data tables module. 
+     * Responds to XHR requests of the data tables module.
      */
     public function genericDataTablesDataSourceAction(Request $request, $package, $className){
-        
+
         $classNames = $this->relatedClassNames($package, $className);
         $modelClass = new $classNames["model"];
-        
+
         $columns = $modelClass::getTableViewColumnNames();
         $query = $modelClass::getRowViewQueryObject();
-        
+
 	$totalRecords = $query->count();
-        
+
         // Output
 	$response = array(
             "sEcho" => intval($request->get('sEcho')),
@@ -219,15 +219,15 @@ class ORMController extends DTADomainController {
 
         // retrieve entities
         $entities = $this->findPaginatedSortedFiltered($request, $package, $className);
-        
+
         // format in data tables response format
         $response['aaData'] = $this->formatAsArray($entities, $columns, $package, $className);
-            
+
 	return new Response(json_encode( $response ));
-        
+
 //        $_GET['iDisplayStart'] // offset
 //        $_GET['iDisplayLength'] // number of records to send back at most
-        
+
 	/*
 	 * Ordering
 	 */
@@ -249,8 +249,8 @@ class ORMController extends DTADomainController {
 //			}
 //		}
 //	}
-	
-	/* 
+
+	/*
 	 * Filtering
 	 */
 //	$sWhere = "";
@@ -291,16 +291,16 @@ class ORMController extends DTADomainController {
      * @param string $className    model class
      */
     public function genericViewAllAction($package, $className, $updatedObjectId = 0) {
-        
+
         $classNames = $this->relatedClassNames($package, $className);
 
         // for retrieving the column names
         $modelClass = new $classNames["model"];
-        
+
 //        $query = $modelClass::getRowViewQueryObject();
 //        $recourds = $query->find();  // the data is provided by the data tables ajax response route 
-        $records = array(); 
-        
+        $records = array();
+
         return $this->renderWithDomainData("DTAMetadataBundle:ORM:genericViewAll.html.twig", array(
                     'className' => $className,
                     'columns' => $modelClass::getTableViewColumnNames(),
@@ -315,13 +315,13 @@ class ORMController extends DTADomainController {
      * @return type The created or fetched entity.
      */
     protected function fetchOrCreate($entity){
-        
+
         // generic create procedure for the model entity
         $package = $entity['package'];
         $className = $entity['className'];
         $recordId = $entity['recordId'];
         $classNames = $this->relatedClassNames($package, $className);
-        
+
         if($recordId == 0){
             // create new object from class name
             $obj = new $classNames['model'];
@@ -330,51 +330,55 @@ class ORMController extends DTADomainController {
             $queryObject = $classNames['model']::getRowViewQueryObject();
             $obj = $queryObject->findOneById($recordId);
         }
-        
+
         return $obj;
-        
+
     }
     /**
      * Core logic for creating/editing entities. Database logic and form creation.
      * Can be reused in the domain controllers and customized by passing additional options.
      * Also handles the POST HTTP requests that have been set off by the form.
      * @param model     $obj                The object to fill with data or to edit
-     * @param array     $additionalLogic    An array with closures that covers additional actions 
+     * @param array     $additionalLogic    An array with closures that covers additional actions
      *                                      'preSaveLogic' => closure // applied before saving.
-     * @param array     $formTypeOptions    Options to influence the mapping of the object to a form 
-     * 
-     * @return array    Contains two fields, transaction (either 'edit', 'create', 'complete' or 'recordNotFound') which indicates 
-     *                  what happened and depending on the transaction outcome 
+     * @param array     $formTypeOptions    Options to influence the mapping of the object to a form
+     *
+     * @return array    Contains two fields, transaction (either 'edit', 'create', 'complete' or 'recordNotFound') which indicates
+     *                  what happened and depending on the transaction outcome
      *                  the created entity, its id or the form to create it.
      */
     protected function genericCreateOrEdit(
-            Request $request, 
-            $obj, 
-            $formTypeOptions = array()) {
-        
+            Request $request,
+            $obj,
+            $formTypeOptions = array(),
+            $additionalLogic = null) {
+
+        $additionalLogic = ($additionalLogic==null? function($o){}:$additionalLogic);
+
         // TODO compare form_row (form_div_layout.html.twig) error reporting mechanisms to the overriden version of form_row (viewConfigurationForModels.html.twig)
         // and test whether they work on different inputs.
-        
+
         if( is_null($obj) ){
             return array('transaction'=>'recordNotFound');
         }
-        
+
         $recordId = $obj->getId();
 
         // reflection
         $package = explode(".", $obj->getPeer()->getTableMap()->getPackage());
         $className = $obj->getPeer()->getTableMap()->getPhpName();
         $classNames = $this->relatedClassNames(array_pop($package), $className);
-        
+
         $form = $this->createForm(new $classNames['formType'], $obj, $formTypeOptions);
         $form->handleRequest($request);
 
         $errors = array();
-        
+
         // symfony validation: required fields etc.
         // also fails if the request doesn't contain POST data (form is displayed first, no submitted data)
         if ($form->isValid()) {
 
+            $additionalLogic($obj);
             // propel validation: unique constraints etc.
             if ($obj->validate()) {
 
@@ -382,7 +386,7 @@ class ORMController extends DTADomainController {
 
                 // return edited/created entity ID as transaction success receipt
                 return array(
-                    'transaction'=>'complete', 
+                    'transaction'=>'complete',
                     'recordId'=>$form->getData()->getId(),
                     'object' => $obj,
                 );
@@ -407,14 +411,14 @@ class ORMController extends DTADomainController {
                 $this->addErrorFlash($combinedErrors);
             }
         }
-        
+
         return array(
-            'transaction'   => $recordId == 0 ? 'create' : 'edit', 
+            'transaction'   => $recordId == 0 ? 'create' : 'edit',
             'form'          => $form,
         );
-        
+
     }
-    
+
     private function collectErrorsRecursive($form, &$errors){
         // add symfony validation messages to flash bag
         foreach ($form->getErrors() as $error) {
@@ -431,61 +435,67 @@ class ORMController extends DTADomainController {
      * these will be preferred by the router.
      * @param String    $package            The namespace/package name (Data/Workflow/Classification/Master)
      * @param String    $className          The model class name see src/DTA/MetadataBundle/Model/<$package>/ for classes
-     * @param int       $recordId           The id of the entity to edit, 0 if new 
+     * @param int       $recordId           The id of the entity to edit, 0 if new
      */
     public function genericCreateOrEditAction(Request $request, $package, $className, $recordId) {
-        
+
         $obj = $this->fetchOrCreate( array(
-            'package'   => $package, 
-            'className' => $className, 
+            'package'   => $package,
+            'className' => $className,
             'recordId'  => $recordId)
         );
-        
+
         $result = $this->genericCreateOrEdit($request, $obj);
 
-        switch( $result['transaction'] ){
-            case "recordNotFound":
-                $this->addErrorFlash("Der gewünschte Datensatz kann nicht bearbeitet werden, weil er nicht gefunden wurde.");
-                $this->get('logger')->log('error', "Record not found: $package $className $recordId");
-                $target = $this->generateUrl($package.'_genericViewAll',array('package'=>$package, 'className'=>$className));
-                
-                return $this->redirect($target);
-            case "complete":
-                $this->addSuccessFlash("Änderungen vorgenommen.");
-                $target = $this->generateUrl($package.'_genericViewAll',array('package'=>$package, 'className'=>$className));
-                return $this->redirect($target);
-            case "edit":
-            case "create":
-                return $this->renderWithDomainData("DTAMetadataBundle:ORM:createOrEdit.html.twig", array(
-                    'form' => $result['form']->createView(),
-                    'transaction' => $result['transaction'],    // whether the form is for edit or create
-                    'className' => $className,
-                    'recordId' => $recordId,
-                ));
+        return $this->handleResult($result, 'createOrEdit', $package, $className, $recordId);
+    }
+
+    protected function handleResult($result, $mode, $package, $className, $recordId){
+        switch( $mode ){
+            case 'createOrEdit':
+                switch( $result['transaction'] ){
+                    case "recordNotFound":
+                        $this->addErrorFlash("Der gewünschte Datensatz kann nicht bearbeitet werden, weil er nicht gefunden wurde.");
+                        $this->get('logger')->log('error', "Record not found: $package $className $recordId");
+                        $target = $this->generateUrl($package.'_genericViewAll',array('package'=>$package, 'className'=>$className));
+                        return $this->redirect($target);
+                    case "complete":
+                        $this->addSuccessFlash("Änderungen vorgenommen.");
+                        $target = $this->generateUrl($package.'_genericViewAll',array('package'=>$package, 'className'=>$className));
+                        return $this->redirect($target);
+                    case "edit":
+                    case "create":
+                        return $this->renderWithDomainData("DTAMetadataBundle:ORM:createOrEdit.html.twig", array(
+                                'form' => $result['form']->createView(),
+                                'transaction' => $result['transaction'],    // whether the form is for edit or create
+                                'className' => $className,
+                                'recordId' => $recordId,
+                            ));
+                }
         }
     }
-    
+
     /**
-     * Renders the form for the model without any surrounding elements. 
+     * Renders the form for the model without any surrounding elements.
      * Used via AJAX to create database entities.
-     * 
+     *
      * @param string $package       see above
      * @param string $className     name of the model class (e.g. Publication, Title, Titlefragment)
      * @param string $modalId       html id tag content for the modal to generate (for access in JS)
      * @param string $property      class member to access for getting a caption for the generated select option
      * @param int    $recordId       id of the record to edit. Zero indicates that a new record shall be created (since one is the smallest id)
-     * 
+     *
      */
     public function ajaxModalFormAction(Request $request, $package, $className, $modalId, $property = "Id", $recordId = 0) {
 
         $obj = $this->fetchOrCreate( array(
-            'package'   => $package, 
-            'className' => $className, 
+            'package'   => $package,
+            'className' => $className,
             'recordId'  => $recordId)
         );
-        
+
         $result = $this->genericCreateOrEdit(
-                $request, 
+                $request,
                 $obj
         );
 
@@ -495,17 +505,17 @@ class ORMController extends DTADomainController {
                 $obj = $result['object'];
                 $id = $obj->getId();
                 $captionAccessor = "get" . $property;
-                
+
                 // check whether the caption accessor function exists
                 $classNames = $this->relatedClassNames($package, $className);
                 $cr = new \ReflectionClass($classNames['model']);
                 if( ! $cr->hasMethod($captionAccessor) ){
                     throw new \Exception("Can't retrieve caption via $captionAccessor from $className object.");
                 }
-                
+
                 $caption = $obj->$captionAccessor();
                 return new Response("<option value='$id'>$caption</option>");
-                
+
             case "edit":
             case "create":
                 // plain ajax response, html form wrapped in twitter bootstrap modal markup
@@ -522,7 +532,7 @@ class ORMController extends DTADomainController {
                         )
                 );
         }
-                
+
     }
 
     /**
@@ -538,13 +548,13 @@ class ORMController extends DTADomainController {
             "formType"  => "DTA\\MetadataBundle\\Form\\$package\\" . $className . "Type",     // class for generating form inputs
         );
     }
-    
+
     public static function getPackageName($fullyQualifiedClassName){
         $nameSpaceParts = explode('\\', $fullyQualifiedClassName);
         return $nameSpaceParts[count($nameSpaceParts)-2];
     }
-   
-    
+
+
     /**
      * Visits recursively all nested form elements and saves them.
      * Deprecated: this is propel's job. implement your own isChanged() method if propel doesn't save things recursively.
@@ -557,7 +567,7 @@ class ORMController extends DTADomainController {
             $rc = new \ReflectionClass($entity);
             if($rc->getName() === "PropelObjectCollection"){
                 foreach($entity as $e){
-                    $e->validate();                    
+                    $e->validate();
                 }
             } elseif ($rc->hasMethod('validate')){
                 $validator->validate($entity->save());
@@ -568,7 +578,7 @@ class ORMController extends DTADomainController {
             $this->saveRecursively($child);
         }
     }
-    
+
     /**
      * Visits recursively all nested form elements and saves them.
      * Deprecated: this is propel's job. implement your own isChanged() method if propel doesn't save things recursively.
@@ -592,14 +602,14 @@ class ORMController extends DTADomainController {
 //            $this->saveRecursively($child);
 //        }
 //    }
-    
+
 }
 
     /*
-     * @param string captionProperty For ajax use: 
-     *      Which attribute does the select use to describe the entities it lists? 
+     * @param string captionProperty For ajax use:
+     *      Which attribute does the select use to describe the entities it lists?
      *      Used to generate a new select option via ajax.
-     * @return HTML Option Element|nothing 
+     * @return HTML Option Element|nothing
      *      If the new action is called by a nested ajax form (selectOrAdd form type) the result is the option element to add to the nearby select.
      */
 //    public function genericNewAction(Request $request, $className, $domainKey, $property = "Id") {

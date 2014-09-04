@@ -5,27 +5,21 @@ app/bootstrap*
 vendor/*
 */logs/*
 */cache/*
-web/uploads/*
-web/bundles/*
+web/uploads/
+web/bundles/
 
 # Configuration files
 app/config/parameters.ini
 app/config/parameters.yml
 
-web/bundles/
 build/
 !vendor/propel
-/nbproject/private/
 !/vendor/autoload.php
-/src/DTA/MetadataBundle/Model/om/
-/src/DTA/MetadataBundle/Model/map/
 !/composer.phar
-/src/DTA/MetadataBundle/Model/Master/om/
-/src/DTA/MetadataBundle/Model/Master/map/
-/src/DTA/MetadataBundle/Model/Classification/om/
-/src/DTA/MetadataBundle/Model/Classification/map/
-/src/DTA/MetadataBundle/Model/Data/om/
-/src/DTA/MetadataBundle/Model/Data/map/
-/src/DTA/MetadataBundle/Model/Workflow/om/
-/src/DTA/MetadataBundle/Model/Workflow/map/
-/app/propel/fixtures/
+/src/DTA/MetadataBundle/Model/*/om/
+/src/DTA/MetadataBundle/Model/*/map/
+app/propel/
+
+# IDE
+/nbproject/
+/.idea/

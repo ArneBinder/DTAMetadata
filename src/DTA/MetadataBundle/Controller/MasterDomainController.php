@@ -53,6 +53,37 @@ class MasterDomainController extends ORMController {
                     'hash' => 200
                 ));
     }
+
+    public function createOrEditUserAction(Request $request, $package, $className, $recordId) {
+
+        $obj = $this->fetchOrCreate( array(
+                'package'   => $package,
+                'className' => $className,
+                'recordId'  => $recordId)
+        );
+
+        $encrypter = null;
+        //if($request->request->count() > 0){
+            $params = implode(', ',$request->request->keys());
+            $this->get('logger')->log('error','TEST logging '.$params);
+            $dtauser = $request->request->get('dtauser');
+            $this->get('logger')->log('error','$dtauser '.count($dtauser));
+        //}
+
+        $this->get('logger')->log('error','TEST logging '.$request->request->count());
+        //if($request->request->get('password')!=''){
+
+        $encrypter = function(&$o){
+            // password encryption
+            $encoder = $this->get('security.encoder_factory')->getEncoder($o);
+            //$o->setSalt(md5(rand(-1239432, 23429304)));
+            $o->setSalt(100);
+            $o->setPassword($encoder->encodePassword($o->getPassword(), $o->getSalt()));
+        };
+        //}
+        $result = $this->genericCreateOrEdit($request, $obj, array(), $encrypter);
+        return $this->handleResult($result, 'genericCreateOrEdit', $package, $className, $recordId);
+    }
     
     /**
      * Clears the application cache 

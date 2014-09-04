@@ -23,7 +23,7 @@ security:
             pattern:  ^/(_(profiler|wdt)|css|images|js)/
             security: false
         import:
-            pattern: ^/Convert
+            pattern: ^/(Convert|addUser)
             security: false
         login:
             pattern: ^/Login

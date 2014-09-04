@@ -1543,6 +1543,30 @@ class DumpConversionController extends ORMController {
         
     }
 
+    //DEBUG
+    //public $propelConnection;
+    public function addUserAction($name, $password){
+        echo "addUser ".$name;
+        //$this->propelConnection = \Propel::getConnection(Model\Master\DtaUserPeer::DATABASE_NAME);
+        $this->get('logger')->log('error','ADD USER '.$name);
+        $this->propelConnection = \Propel::getConnection(Model\Master\DtaUserPeer::DATABASE_NAME);
+        $this->propelConnection->beginTransaction();
+        $user = new Model\Master\DtaUser();
+
+        // password encryption
+        $encoder = $this->get('security.encoder_factory')->getEncoder($user);
+        $user->setSalt(md5(rand(-1239432, 23429304)));
+        $saltedPassword = $encoder->encodePassword($password, $user->getSalt());
+
+        $user->setUsername($name)
+            ->setPassword($saltedPassword)
+            ->save($this->propelConnection);
+
+        $this->propelConnection->commit();
+        return $this->forward('DTAMetadataBundle:Home:index',array());
+    }
+    //DEBUG END
+
 }
     
 ?>
