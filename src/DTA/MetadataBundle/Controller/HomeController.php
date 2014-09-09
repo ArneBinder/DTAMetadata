@@ -37,8 +37,8 @@ class HomeController extends DTADomainController {
     public function indexAction(Request $request) {
         
         return $this->renderWithDomainData('DTAMetadataBundle:Home:index.html.twig', array(
-            'testData' => 
-            null
+            'testData' =>
+                $request
 //            array(
 //                'chapterTitles' => $q->find(),
 //                )

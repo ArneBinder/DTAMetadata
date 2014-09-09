@@ -13,6 +13,8 @@ class MasterDomainController extends ORMController {
     /** @inheritdoc */
     public $domainMenu = array(
         array("caption" => "Benutzer", 'modelClass' => 'DtaUser'),
+        array("caption" => "Arbeitsfluss", 'route' => 'workflowDomain'),
+        array("caption" => "Ordnungssystem", 'route' => 'classificationDomain')
     );
 
     /**
@@ -70,7 +72,7 @@ class MasterDomainController extends ORMController {
             $this->get('logger')->log('error','$dtauser '.count($dtauser));
         //}
 
-        $this->get('logger')->log('error','TEST logging '.$request->request->count());
+        //$this->get('logger')->log('error','TEST logging '.$request->request->count());
         //if($request->request->get('password')!=''){
 
         $encrypter = function(&$o){

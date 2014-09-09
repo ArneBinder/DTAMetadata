@@ -49,16 +49,16 @@
             <parameter name="Für" value="accessor:getReferee"/>
             <parameter name="Verantwortlich" value="accessor:getResponsibleUser"/>
             <parameter name="query" value="\DTA\MetadataBundle\Model\Workflow\TaskQuery::create()
-                    ->leftJoin('Publication')
-                    ->leftJoin('Publication.Title')
-                    ->leftJoin('Title.Titlefragment')
-                    ->leftJoin('Tasktype')
-                    ->leftJoin('DtaUser');" />
+                    ->leftJoinWith('Publication')
+                    ->leftJoinWith('Publication.Title')
+                    ->leftJoinWith('Title.Titlefragment')
+                    ->leftJoinWith('Tasktype')
+                    ->leftJoinWith('DtaUser');" />
         </behavior>
     </table>
 
     <table name="tasktype">
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="false" required="true"/>
         
         <column name="name" type="LONGVARCHAR" required="true" primaryString="true"/>
         
@@ -76,7 +76,7 @@
         Ist prinzipiell eine many-to-many Beziehung, weist aber zusätzliche Attribute auf (deswegen nicht im Master Schema).-->
     <table name="copy_location">
         
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="false" required="true"/>
         
         <column name="publication_id" type="INTEGER" required="true"/>
         <column name="partner_id" description="Anbieter Leitdruck" type="INTEGER"/>
@@ -103,21 +103,21 @@
             <parameter name="Signatur" value="catalogue_signature"/>
             <parameter name="embedColumns2" value="publication"/>
             <parameter name="query" value="\DTA\MetadataBundle\Model\Workflow\CopyLocationQuery::create()
-                    ->leftJoin('Publication')
-                    ->leftJoin('Publication.Title')
-                    ->leftJoin('Title.Titlefragment')
-                    ->leftJoin('Publication.DatespecificationRelatedByPublicationdateId')
-                    ->leftJoin('Publication.PersonPublication')
-                    ->leftJoin('PersonPublication.Person')
-                    ->leftJoin('Person.Personalname')
-                    ->leftJoin('Personalname.Namefragment');" />
+                    ->leftJoinWith('Publication')
+                    ->leftJoinWith('Publication.Title')
+                    ->leftJoinWith('Title.Titlefragment')
+                    ->leftJoinWith('Publication.DatespecificationRelatedByPublicationdateId')
+                    ->leftJoinWith('Publication.PersonPublication')
+                    ->leftJoinWith('PersonPublication.Person')
+                    ->leftJoinWith('Person.Personalname')
+                    ->leftJoinWith('Personalname.Namefragment');" />
         </behavior>
     </table>
     
 
     <table name="partner">
         
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="false" required="true"/>
         
         <column name="name" type="LONGVARCHAR" primaryString="true"/>
         <column name="mail" type="LONGVARCHAR"/>
@@ -192,7 +192,7 @@
     
     <table name="publicationgroup">
         
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="false" required="true"/>
         
         <column name="name" type="LONGVARCHAR" required="true" primaryString="true"/>
     </table>

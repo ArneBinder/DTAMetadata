@@ -16,11 +16,13 @@ class DumpConversionController extends ORMController {
      */
     private $username  = 'root';
     private $password  = 'root'; //garamond4000
-    private $database  = "dtadb";
-    private $dumpPath  = '/Users/macbookdata/Dropbox/DTA/dumpConversion/dtadb_2013-09-29_07-10-01.sql';
-    private $mysqlExec = '/Applications/MAMP/Library/bin/mysql'; // for importing the dump
-    private $phpExec   = '/usr/local/php5/bin/php';
-        
+    private $database  = 'dtadb';
+    //private $dumpPath  = '/Users/macbookdata/Dropbox/DTA/dumpConversion/dtadb_2013-09-29_07-10-01.sql';
+    private $dumpPath  = 'C:\Users\Arne\Documents\Arbeit\DTA\DTAMetadata\DTA\dumpConversion\dtadb_2013-09-29_07-10-01.sql';
+    //private $mysqlExec = '/Applications/MAMP/Library/bin/mysql'; // for importing the dump
+    private $mysqlExec  = 'mysql'; //added "C:\Program Files\MySQL\MySQL Server 5.6\bin" to $PATH
+    //private $phpExec   = '/usr/local/php5/bin/php';
+    private $phpExec   = 'C:\xampp\php\php.exe';
     /** Stores problematic actions taken in the conversion process. */
     private $messages;
     private $warnings;
@@ -56,7 +58,7 @@ class DumpConversionController extends ORMController {
         
         // during conversion, a lot of memory is allocated
         ini_set('memory_limit', '1200M');
-        ini_set('max_execution_time', 600); //300 seconds = 5 minutes
+        ini_set('max_execution_time', 1800); //300 seconds = 5 minutes
         //
         // stores warning messages generated during the conversion
         $this->warnings = array();
@@ -164,7 +166,7 @@ class DumpConversionController extends ORMController {
     function dropAndSetupTargetDB(){
         
         // import dump
-        $importDumpCommand = "$this->mysqlExec -u $this->username -p$this->password dtadb < $this->dumpPath";
+        $importDumpCommand = "$this->mysqlExec -u $this->username -p$this->password $this->database < $this->dumpPath";
         $this->messages[] = array("import dump command: " => $importDumpCommand);
         system($importDumpCommand);
         
@@ -1545,7 +1547,7 @@ class DumpConversionController extends ORMController {
 
     //DEBUG
     //public $propelConnection;
-    public function addUserAction($name, $password){
+    /*public function addUserAction($name, $password){
         echo "addUser ".$name;
         //$this->propelConnection = \Propel::getConnection(Model\Master\DtaUserPeer::DATABASE_NAME);
         $this->get('logger')->log('error','ADD USER '.$name);
@@ -1564,7 +1566,7 @@ class DumpConversionController extends ORMController {
 
         $this->propelConnection->commit();
         return $this->forward('DTAMetadataBundle:Home:index',array());
-    }
+    }*/
     //DEBUG END
 
 }

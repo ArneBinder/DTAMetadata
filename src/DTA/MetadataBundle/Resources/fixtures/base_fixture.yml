@@ -86,7 +86,7 @@ DTA\MetadataBundle\Model\Classification\Source:
 DTA\MetadataBundle\Model\Master\DtaUser:
     DtaUser_1:
         id: 100
-        username: Carl Witt
+        username: Arne Binder
         salt: 6e145800af4083d354da87df70e92fe5
         password: gszsoJ8ZI4vPkOkO0BKzv16wyRampVzO3F6gA7XxhWKBXC42jKEI6xjgDQ5TGNZm55ipm2fcdCw7LD+EZC0HWw==
         admin: true
