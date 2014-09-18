@@ -3,6 +3,7 @@
 namespace DTA\MetadataBundle\Controller;
 use DTA\MetadataBundle\Model;
 use DTA\MetadataBundle\Model\Data;
+use Exception;
     
 /**
  * @author Carl Witt <carl.witt@fu-berlin.de>
@@ -19,6 +20,7 @@ class DumpConversionController extends ORMController {
     private $database  = 'dtadb';
     //private $dumpPath  = '/Users/macbookdata/Dropbox/DTA/dumpConversion/dtadb_2013-09-29_07-10-01.sql';
     private $dumpPath  = '../temp/dtadb_2013-09-29_07-10-01.sql';
+    private $pgDumpPath = '../temp/dtadb_pg';
     //private $mysqlExec = '/Applications/MAMP/Library/bin/mysql'; // for importing the dump
     private $mysqlExec  = 'mysql'; //added "C:\Program Files\MySQL\MySQL Server 5.6\bin" to $PATH
     //private $phpExec   = '/usr/local/php5/bin/php';
@@ -55,7 +57,6 @@ class DumpConversionController extends ORMController {
         
     /** Converts the legacy database dump into the new format. */
     function convertAction() {
-        
         // during conversion, a lot of memory is allocated
         ini_set('memory_limit', '1200M');
         ini_set('max_execution_time', 1800); //300 seconds = 5 minutes
@@ -114,6 +115,14 @@ class DumpConversionController extends ORMController {
         
         $this->enableAutoIncrement($this->propelConnection);
         $this->useProductionFiles();
+
+        // dump new database
+        $dbname = $this->getDatabaseName();
+        $dbuser = $this->getDataseUser();
+        $dumpfile = $this->pgDumpPath.'_'.date("Y-m-d").'.sql';
+        $this->messages[] = array('dump database: ' => $dbname);
+        $this->messages[] = array('database user: ' => $dbuser);
+        $this->messages[] = array('dumped' => shell_exec("pg_dump -d $dbname -U $dbuser -f $dumpfile"));
 
         return $this->renderWithDomainData('DTAMetadataBundle:DumpConversion:conversionResult.html.twig', array(
             'warnings' => $this->warnings,
@@ -1578,6 +1587,21 @@ class DumpConversionController extends ORMController {
     }*/
     //DEBUG END
 
+
+    public function getDatabaseName(){
+        $propelConf = \Propel::getConfiguration();
+        //$this->messages[] = array("test" => print_r($propelConf, true));
+        preg_match('/dbname=([^; ]+)/', $propelConf['datasources']['dtametadata']['connection']['dsn'], $matches);
+        if($matches!=null and count($matches)>1){
+            return $matches[1];
+        }
+        throw new Exception('Could not fetch database name from propel config.');
+    }
+
+    public function getDataseUser(){
+        $propelConf = \Propel::getConfiguration();
+        return $propelConf['datasources']['dtametadata']['connection']['user'];
+    }
 }
     
 ?>
