@@ -4,6 +4,7 @@ namespace DTA\MetadataBundle\Controller;
 
 use \Symfony\Component\Security\Core\SecurityContext;
 use \Symfony\Component\HttpFoundation\Request;
+use Exception;
 //DEBUG
 use DTA\MetadataBundle\Model;
 //DEBUG END
@@ -22,59 +23,6 @@ class MasterDomainController extends ORMController {
     /**
      * Displays the login form for the entire application.
      */
-    private $propelConnection;
-
-    //DEBUG
-    function dummy(){
-        $this->propelConnection = \Propel::getConnection(Model\Master\DtaUserPeer::DATABASE_NAME);
-        $start = microtime(true);
-        $this->propelConnection->beginTransaction();
-        $user = new Model\Master\DtaUser();
-        // password encryption
-        $encoder = $this->get('security.encoder_factory')->getEncoder($user);
-        $user->setSalt(md5(rand(-1239432, 23429304)));
-        $saltedPassword = $encoder->encodePassword('$dta010', $user->getSalt());
-        echo $saltedPassword;
-        echo "XXX";
-        echo $user->getSalt();
-        $user->setUsername("Arne Binder")
-            ->setPassword($saltedPassword)
-            ->save($this->propelConnection);
-        $this->propelConnection->commit();
-        //$time_taken = microtime(true) - $start;
-        //echo $task." ".$time_taken;
-        //$this->messages[] = array("finished transaction ".$task=>$time_taken);
-    }
-    //DEBUG END
-
-    public function loginFormAction() {
-        //$this->dummy();
-        $request = $this->getRequest();
-        $session = $request->getSession();
-
-        // get the login error if there is one
-        if ($request->attributes->has(SecurityContext::AUTHENTICATION_ERROR)) {
-            $error = $request->attributes->get(
-                    SecurityContext::AUTHENTICATION_ERROR
-            );
-        } else {
-            $error = $session->get(SecurityContext::AUTHENTICATION_ERROR);
-            $session->remove(SecurityContext::AUTHENTICATION_ERROR);
-        }
-        
-        // provide registered users as dropdown
-        $uq = \DTA\MetadataBundle\Model\Master\DtaUserQuery::create()
-                ->orderByUsername()
-                ->find();
-
-        return $this->renderWithDomainData('DTAMetadataBundle:Package_Master:login.html.twig', array(
-                    // last username entered by the user
-                    'last_username' => $session->get(SecurityContext::LAST_USERNAME),
-                    'error' => $error,
-                    'userNames' => $uq,
-                )
-        );
-    }
 
     public function indexAction() {
 
@@ -91,27 +39,30 @@ class MasterDomainController extends ORMController {
                 'recordId'  => $recordId)
         );
 
-        $encrypter = null;
-        //if($request->request->count() > 0){
-            $params = implode(', ',$request->request->keys());
-            $this->get('logger')->log('error','TEST logging '.$params);
-            $dtauser = $request->request->get('dtauser');
-            $this->get('logger')->log('error','$dtauser '.count($dtauser));
-        //}
+        $dtauser = $request->request->get('dtauser');
+        $newPass = $request->request->get('dtauser')['password'];
+        if($dtauser!=null){
+            if($newPass!=null){
+                $result = $this->genericCreateOrEdit($request, $obj, array(),
+                    function(&$o){
+                        // password encryption
+                        $encoder = $this->get('security.encoder_factory')->getEncoder($o);
+                        $o->setSalt(md5(rand(-1239432, 23429304)));
+                        //$o->setSalt(100);
+                        $o->setPassword($encoder->encodePassword($o->getPassword(), $o->getSalt()));
+                    });
+            }else{
+                $oldPass = $obj->getPassword();
+                $result = $this->genericCreateOrEdit($request, $obj, array(),
+                    function(&$o)use($oldPass){
+                        $o->setPassword($oldPass);
+                    });
+            }
+        }else{
+            $result = $this->genericCreateOrEdit($request, $obj, array());
+        }
 
-        //$this->get('logger')->log('error','TEST logging '.$request->request->count());
-        //if($request->request->get('password')!=''){
-
-        $encrypter = function(&$o){
-            // password encryption
-            $encoder = $this->get('security.encoder_factory')->getEncoder($o);
-            //$o->setSalt(md5(rand(-1239432, 23429304)));
-            $o->setSalt(100);
-            $o->setPassword($encoder->encodePassword($o->getPassword(), $o->getSalt()));
-        };
-        //}
-        $result = $this->genericCreateOrEdit($request, $obj, array(), $encrypter);
-        return $this->handleResult($result, 'genericCreateOrEdit', $package, $className, $recordId);
+        return $this->handleResult($result, 'createOrEdit', $package, $className, $recordId);
     }
     
     /**

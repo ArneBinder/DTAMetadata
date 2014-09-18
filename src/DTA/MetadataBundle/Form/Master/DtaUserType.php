@@ -22,7 +22,7 @@ class DtaUserType extends BaseAbstractType
             'required' => false,
         ));
         $builder->add('password', 'password', array(
-            'required' => true,
+            'required' => false,
         ));
         $builder->add('admin', 'checkbox', array(
             'label' => 'Administratorenrechte',

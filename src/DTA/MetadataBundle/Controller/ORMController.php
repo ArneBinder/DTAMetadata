@@ -4,6 +4,7 @@ namespace DTA\MetadataBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Exception;
 
 /**
  * TODO: Nice to have: if the labels on the horizontal forms (column layout) would slide down the screen (position: fixed)
@@ -415,6 +416,8 @@ class ORMController extends DTADomainController {
         return array(
             'transaction'   => $recordId == 0 ? 'create' : 'edit',
             'form'          => $form,
+            //DEBUG
+            'request'       => $request
         );
 
     }
@@ -451,6 +454,7 @@ class ORMController extends DTADomainController {
     }
 
     protected function handleResult($result, $mode, $package, $className, $recordId){
+        $this->get('logger')->log('warning','HERE mode='.$mode);
         switch( $mode ){
             case 'createOrEdit':
                 switch( $result['transaction'] ){
@@ -470,8 +474,12 @@ class ORMController extends DTADomainController {
                                 'transaction' => $result['transaction'],    // whether the form is for edit or create
                                 'className' => $className,
                                 'recordId' => $recordId,
+                                //DEBUG
+                                'testData' => $result
                             ));
                 }
+            default:
+                throw new Exception('Unknown mode: '.$mode);
         }
     }
 
