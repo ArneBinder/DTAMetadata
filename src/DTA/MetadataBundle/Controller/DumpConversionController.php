@@ -18,11 +18,11 @@ class DumpConversionController extends ORMController {
     private $password  = 'root'; //garamond4000
     private $database  = 'dtadb';
     //private $dumpPath  = '/Users/macbookdata/Dropbox/DTA/dumpConversion/dtadb_2013-09-29_07-10-01.sql';
-    private $dumpPath  = 'C:\Users\Arne\Documents\Arbeit\DTA\DTAMetadata\DTA\dumpConversion\dtadb_2013-09-29_07-10-01.sql';
+    private $dumpPath  = 'C:\Dokumente und Einstellungen\binder\Eigene Dateien\Projekte\DTAMetadata\dtadb_2013-09-29_07-10-01.sql';
     //private $mysqlExec = '/Applications/MAMP/Library/bin/mysql'; // for importing the dump
     private $mysqlExec  = 'mysql'; //added "C:\Program Files\MySQL\MySQL Server 5.6\bin" to $PATH
     //private $phpExec   = '/usr/local/php5/bin/php';
-    private $phpExec   = 'C:\xampp\php\php.exe';
+    private $phpExec   = 'php';
     /** Stores problematic actions taken in the conversion process. */
     private $messages;
     private $warnings;
@@ -141,12 +141,15 @@ class DumpConversionController extends ORMController {
         foreach (array('dta_data_schema.xml', 'dta_master_schema.xml', 'dta_workflow_schema.xml', 'dta_classification_schema.xml') as $schema) {
             
             // backup current version in config as production file
-            system("cp $dumpConversionSchemasDir/../config/$schema $dumpConversionSchemasDir/../schemas_final/$schema ");
+            copy("$dumpConversionSchemasDir/../config/$schema", "$dumpConversionSchemasDir/../schemas_final/$schema");
+            //system("cp $dumpConversionSchemasDir/../config/$schema $dumpConversionSchemasDir/../schemas_final/$schema ");
             
-            $this->messages[] = array("bringing dump conversion version of $schema into place", system("cp $dumpConversionSchemasDir/$schema $dumpConversionSchemasDir/../config/$schema"));
+            //$this->messages[] = array("bringing dump conversion version of $schema into place", system("cp $dumpConversionSchemasDir/$schema $dumpConversionSchemasDir/../config/$schema"));
+            $this->messages[] = array("bringing dump conversion version of $schema into place", copy("$dumpConversionSchemasDir/$schema","$dumpConversionSchemasDir/../config/$schema"));
         }
         // build propel entity classes
-        $this->messages[] = array('building model from dump conversion schemas', system("$this->phpExec ../app/console propel:model:build"));
+        //$this->messages[] = array('building model from dump conversion schemas', system("$this->phpExec ../app/console propel:model:build"));
+        $this->messages[] = array('building model from dump conversion schemas', shell_exec("$this->phpExec ../app/console propel:model:build"));
     }
     
     /** Use the schema files for dump conversion */
@@ -155,12 +158,14 @@ class DumpConversionController extends ORMController {
         $productionSchemasDir = "../src/DTA/MetadataBundle/Resources/schemas_final";
         foreach (array('dta_data_schema.xml', 'dta_master_schema.xml', 'dta_workflow_schema.xml', 'dta_classification_schema.xml') as $schema) {
             $this->messages[] = array(
-                "bringing dump conversion version of $schema into place", 
-                system("cp $productionSchemasDir/$schema $productionSchemasDir/../config/$schema")
+                "bringing dump conversion version of $schema into place",
+                //system("cp $productionSchemasDir/$schema $productionSchemasDir/../config/$schema")
+                copy("$productionSchemasDir/$schema","$productionSchemasDir/../config/$schema")
             );
         }
         // build propel entity classes
-        $this->messages[] = array('building model from production schemas', system("$this->phpExec ../app/console propel:model:build"));
+        //$this->messages[] = array('building model from production schemas', system("$this->phpExec ../app/console propel:model:build"));
+        $this->messages[] = array('building model from production schemas', shell_exec("$this->phpExec ../app/console propel:model:build"));
     }
     
     function dropAndSetupTargetDB(){
@@ -168,18 +173,22 @@ class DumpConversionController extends ORMController {
         // import dump
         $importDumpCommand = "$this->mysqlExec -u $this->username -p$this->password $this->database < $this->dumpPath";
         $this->messages[] = array("import dump command: " => $importDumpCommand);
-        system($importDumpCommand);
-        
+        //system($importDumpCommand);
+        $this->messages[] = array(shell_exec($importDumpCommand));
+
         // build current database schema
-        $resultBuildDBCode = system("$this->phpExec ../app/console propel:sql:build");
+        //$resultBuildDBCode = system("$this->phpExec ../app/console propel:sql:build");
+        $resultBuildDBCode = shell_exec("$this->phpExec ../app/console propel:sql:build");
         $this->messages[] = array("building database schema from xml model: " => $resultBuildDBCode );
         
         // import current database schema to target database (ERASES ALL DATA)
-        $resultSetupDB = system("$this->phpExec ../app/console propel:sql:insert --force");
+        //$resultSetupDB = system("$this->phpExec ../app/console propel:sql:insert --force");
+        $resultSetupDB = shell_exec("$this->phpExec ../app/console propel:sql:insert --force");
         $this->messages[] = array("resetting target database: " => $resultSetupDB);
         
         // loads fixtures (task types, name fragment types, etc.)
-        $resultFixturesLoad = system("$this->phpExec ../app/console propel:fixtures:load @DTAMetadataBundle");
+        //$resultFixturesLoad = system("$this->phpExec ../app/console propel:fixtures:load @DTAMetadataBundle");
+        $resultFixturesLoad = shell_exec("$this->phpExec ../app/console propel:fixtures:load @DTAMetadataBundle");
         $this->messages[] = array("loading database fixtures: " => $resultFixturesLoad);
         
     }

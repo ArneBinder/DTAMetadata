@@ -4,7 +4,9 @@ namespace DTA\MetadataBundle\Controller;
 
 use \Symfony\Component\Security\Core\SecurityContext;
 use \Symfony\Component\HttpFoundation\Request;
-
+//DEBUG
+use DTA\MetadataBundle\Model;
+//DEBUG END
 class MasterDomainController extends ORMController {
 
     /** @inheritdoc */
@@ -20,8 +22,33 @@ class MasterDomainController extends ORMController {
     /**
      * Displays the login form for the entire application.
      */
+    private $propelConnection;
+
+    //DEBUG
+    function dummy(){
+        $this->propelConnection = \Propel::getConnection(Model\Master\DtaUserPeer::DATABASE_NAME);
+        $start = microtime(true);
+        $this->propelConnection->beginTransaction();
+        $user = new Model\Master\DtaUser();
+        // password encryption
+        $encoder = $this->get('security.encoder_factory')->getEncoder($user);
+        $user->setSalt(md5(rand(-1239432, 23429304)));
+        $saltedPassword = $encoder->encodePassword('$dta010', $user->getSalt());
+        echo $saltedPassword;
+        echo "XXX";
+        echo $user->getSalt();
+        $user->setUsername("Arne Binder")
+            ->setPassword($saltedPassword)
+            ->save($this->propelConnection);
+        $this->propelConnection->commit();
+        //$time_taken = microtime(true) - $start;
+        //echo $task." ".$time_taken;
+        //$this->messages[] = array("finished transaction ".$task=>$time_taken);
+    }
+    //DEBUG END
+
     public function loginFormAction() {
-        
+        //$this->dummy();
         $request = $this->getRequest();
         $session = $request->getSession();
 

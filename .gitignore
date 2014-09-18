@@ -2,7 +2,7 @@
 app/bootstrap*
 
 # Symfony directories
-vendor/*
+vendor
 */logs/*
 */cache/*
 web/uploads/
@@ -12,14 +12,15 @@ web/bundles/
 app/config/parameters.ini
 app/config/parameters.yml
 
-build/
+build
 !vendor/propel
 !/vendor/autoload.php
 !/composer.phar
 /src/DTA/MetadataBundle/Model/*/om/
 /src/DTA/MetadataBundle/Model/*/map/
-app/propel/
+app/propel
 
 # IDE
-/nbproject/
-/.idea/
+nbproject
+.idea
+propel

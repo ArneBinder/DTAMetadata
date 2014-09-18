@@ -2,4 +2,6 @@
 dtametadata.sql=dtametadata
 # Sqlfile -> Database map
 dtametadata.sql=dtametadata
+# Sqlfile -> Database map
+dtametadata.sql=dtametadata
 DTAMetadata.sql=DTAMetadata
