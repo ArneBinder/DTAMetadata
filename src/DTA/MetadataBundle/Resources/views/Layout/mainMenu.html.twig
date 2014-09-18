@@ -25,11 +25,23 @@
                     <a href="{{ path('classificationDomain') }}">
                         Ordnungssysteme
                     </a></li>-->
-                <li {% if package == "Master" %} class='active' {% endif %} >
-                    <a href="{{ path('administrationDomain') }}">
-                        Administration
-                    </a>
-                </li>
+
+
+                {% if is_granted('ROLE_ADMIN') %}
+                    <li {% if package in ["Master", "Classification", "Workflow"] %} class='active' {% endif %} >
+                        <a href="{{ path('administrationDomain') }}">
+                            Administration
+                        </a>
+                    </li>
+                {% else %}
+                    <li class='disabled'>
+                        <a href="#">
+                            Administration
+                        </a>
+                    </li>
+                {% endif %}
+
+
             {% endblock %}
             </ul>
                 
