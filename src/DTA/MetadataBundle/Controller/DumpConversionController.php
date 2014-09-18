@@ -18,7 +18,7 @@ class DumpConversionController extends ORMController {
     private $password  = 'root'; //garamond4000
     private $database  = 'dtadb';
     //private $dumpPath  = '/Users/macbookdata/Dropbox/DTA/dumpConversion/dtadb_2013-09-29_07-10-01.sql';
-    private $dumpPath  = 'C:\Dokumente und Einstellungen\binder\Eigene Dateien\Projekte\DTAMetadata\dtadb_2013-09-29_07-10-01.sql';
+    private $dumpPath  = '../temp/dtadb_2013-09-29_07-10-01.sql';
     //private $mysqlExec = '/Applications/MAMP/Library/bin/mysql'; // for importing the dump
     private $mysqlExec  = 'mysql'; //added "C:\Program Files\MySQL\MySQL Server 5.6\bin" to $PATH
     //private $phpExec   = '/usr/local/php5/bin/php';
@@ -114,7 +114,7 @@ class DumpConversionController extends ORMController {
         
         $this->enableAutoIncrement($this->propelConnection);
         $this->useProductionFiles();
-        
+
         return $this->renderWithDomainData('DTAMetadataBundle:DumpConversion:conversionResult.html.twig', array(
             'warnings' => $this->warnings,
             'messages' => $this->messages,
