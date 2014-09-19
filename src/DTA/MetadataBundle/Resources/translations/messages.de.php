@@ -5,15 +5,18 @@ return array(
 
     'Author' => 'Autor',
     'Category' => 'Kategorie',
+    'CategoryPublication' => 'Kategorie',
     'CategoryWork' => 'Kategorie',
     'Corpus' => 'Korpus',
     'CopyLocation' => 'Fundstelle',
     'Datespecification' => 'Datumsangabe',
     'DtaUser' => 'Benutzer',
     'Font' => 'Schriftart',
+    'GenrePublication' => 'Genre',
     'GenreWork' => 'Genre',
     'Imagesource' => 'Bildquelle',
     'Language' => 'Sprache',
+    'LanguagePublication' => 'Sprache',
     'LanguageWork' => 'Sprache',
     'License' => 'Lizenz',
     'Namefragment' => 'Namensbestandteil',
@@ -60,6 +63,7 @@ return array(
     'PublicationMs' => 'Selbstständiger Band einer Reihe',
     'Publishingcompany' => 'Verlag',
     'Tag' => 'Schlagwort',
+    'PublicationTag' => 'Schlagwort',
     'Tasktype' => 'Arbeitsschritt',
     'Textsource' => 'Textquelle',
     'Title' => 'Titel',
@@ -70,6 +74,7 @@ return array(
     // form labels: columns/properties
 
     'Directoryname' => 'Verzeichnisname',
+    'Dirname' => 'Verzeichnis',
     'Citation' => 'Bibliografische Angabe',
     'Printrun' => 'Auflage',
     'Comment' => 'Kommentar',
@@ -86,29 +91,39 @@ return array(
     'id' => '#',
     'Username' => 'Benutzername',
     
-        // date specification
-        'Year' => 'Jahr',
-    
-        // print run
-        'Numeric' => 'numerisch',
-    
-        // image and text source
-        'Cataloguesignature' => 'Signatur',
-        'Catalogueurl' => 'URL',
-        'Numfaksimiles' => 'Faksimiles',
-        'Extentasofcatalogue' => 'lt. Katalog',
-        'Imageurl' => 'URL Bilddigitalisate',
-        'Imageurn' => 'URN Bilddigitalisate',
-        'Faksimilerefrange' => 'Faksimile-Seiten',
-        'Originalrefrange' => 'original Seitenzahlen',
-    
-        'Texturl' => 'URL Textdigitalisate',
-        'Attribution' => 'Attributionszeile',
-    
-        // editorial notes
-        'Editiondescription' => 'Art der Textausgabe',
-        'Digitaleditioneditor' => 'Bearbeiter der digitalen Edition',
-        'Transcriptioncomment' => 'Sonstige Bemerkungen zu den Transkriptionsrichtlinien',
+    // date specification
+    'Year' => 'Jahr',
+    'Start date' => 'Startdatum',
+    'End date' => 'Enddatum',
+
+    // print run
+    'Numeric' => 'numerisch',
+
+    // image and text source
+    'Cataloguesignature' => 'Signatur',
+    'Catalogueurl' => 'URL',
+    'Numfaksimiles' => 'Faksimiles',
+    'Extentasofcatalogue' => 'lt. Katalog',
+    'Imageurl' => 'URL Bilddigitalisate',
+    'Imageurn' => 'URN Bilddigitalisate',
+    'Faksimilerefrange' => 'Faksimile-Seiten',
+    'Originalrefrange' => 'original Seitenzahlen',
+
+    'Texturl' => 'URL Textdigitalisate',
+    'Attribution' => 'Attributionszeile',
+
+    // editorial notes
+    'Editiondescription' => 'Art der Textausgabe',
+    'Digitaleditioneditor' => 'Bearbeiter der digitalen Edition',
+    'Transcriptioncomment' => 'Sonstige Bemerkungen zu den Transkriptionsrichtlinien',
+
+    // dta specific
+    'Wwwready' => 'Veröffentlichungsstatus',
+    'Legacy dwds category1' => 'DWDS Kategorie1',
+    'Legacy dwds subcategory1' => 'DWDS Unterkategorie1',
+    'Legacy dwds category2' => 'DWDS Kategorie2',
+    'Legacy dwds subcategory2' => 'DWDS Unterkategorie2',
+
 
     // form labels: controls
 
