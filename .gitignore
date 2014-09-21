@@ -22,5 +22,7 @@ app/propel
 # IDE
 nbproject
 .idea
+
+
 /temp/*.sql
 /app/autoload.php

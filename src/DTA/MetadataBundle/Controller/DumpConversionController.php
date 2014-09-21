@@ -25,6 +25,8 @@ class DumpConversionController extends ORMController {
     private $mysqlExec  = 'mysql'; //added "C:\Program Files\MySQL\MySQL Server 5.6\bin" to $PATH
     //private $phpExec   = '/usr/local/php5/bin/php';
     private $phpExec   = 'php';
+
+    private $psql = 'psql';
     /** Stores problematic actions taken in the conversion process. */
     private $messages;
     private $warnings;
@@ -178,13 +180,23 @@ class DumpConversionController extends ORMController {
     }
     
     function dropAndSetupTargetDB(){
-        
+
+        //recreate source database
+        shell_exec("$this->mysqlExec -u $this->username -p$this->password -e \"DROP DATABASE IF EXISTS $this->database\"");
+        shell_exec("$this->mysqlExec -u $this->username -p$this->password -e \"CREATE DATABASE $this->database\"");
+
         // import dump
         $importDumpCommand = "$this->mysqlExec -u $this->username -p$this->password $this->database < $this->dumpPath";
         $this->messages[] = array("import dump command: " => $importDumpCommand);
         //system($importDumpCommand);
         $this->messages[] = array(shell_exec($importDumpCommand));
 
+        //recreate target database
+        $dbname = $this->getDatabaseName();
+        $dbuser = $this->getDataseUser();
+        // WARNING: postgreSQL-specific!
+        shell_exec("dropdb -U $dbuser --if-exists $dbname");
+        shell_exec("createdb -U $dbuser $dbname");
         // build current database schema
         //$resultBuildDBCode = system("$this->phpExec ../app/console propel:sql:build");
         $resultBuildDBCode = shell_exec("$this->phpExec ../app/console propel:sql:build");
