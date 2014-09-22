@@ -24,14 +24,14 @@ CREATE TABLE "category"
 (
     "id" serial NOT NULL,
     "name" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
+    "description" TEXT,
     "type" INT2,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
     PRIMARY KEY ("id")
 );
 
-COMMENT ON COLUMN "category"."type" IS 'Wissensbereich, Textsorte, Präsentationsform, Sitz im Leben';
+COMMENT ON COLUMN "category"."type" IS 'Wissensbereich, Textsorte, Präsentationsform, Sitz im Leben, Nicht benutzen';
 
 -----------------------------------------------------------------------
 -- tag
@@ -86,7 +86,7 @@ DROP TABLE IF EXISTS "publication" CASCADE;
 
 CREATE TABLE "publication"
 (
-    "id" INTEGER NOT NULL,
+    "id" serial NOT NULL,
     "type" INT2,
     "legacytype" TEXT,
     "title_id" INTEGER NOT NULL,
@@ -629,7 +629,7 @@ DROP TABLE IF EXISTS "dta_user" CASCADE;
 
 CREATE TABLE "dta_user"
 (
-    "id" INTEGER NOT NULL,
+    "id" serial NOT NULL,
     "username" TEXT,
     "password" VARCHAR(512),
     "salt" VARCHAR(512),
@@ -675,7 +675,7 @@ DROP TABLE IF EXISTS "tasktype" CASCADE;
 
 CREATE TABLE "tasktype"
 (
-    "id" INTEGER NOT NULL,
+    "id" serial NOT NULL,
     "name" TEXT NOT NULL,
     "tree_left" INTEGER,
     "tree_right" INTEGER,
@@ -693,7 +693,7 @@ DROP TABLE IF EXISTS "copy_location" CASCADE;
 
 CREATE TABLE "copy_location"
 (
-    "id" INTEGER NOT NULL,
+    "id" serial NOT NULL,
     "publication_id" INTEGER NOT NULL,
     "partner_id" INTEGER,
     "catalogue_signature" TEXT,
@@ -731,7 +731,7 @@ DROP TABLE IF EXISTS "partner" CASCADE;
 
 CREATE TABLE "partner"
 (
-    "id" INTEGER NOT NULL,
+    "id" serial NOT NULL,
     "name" TEXT,
     "mail" TEXT,
     "web" TEXT,
@@ -821,7 +821,7 @@ DROP TABLE IF EXISTS "publicationgroup" CASCADE;
 
 CREATE TABLE "publicationgroup"
 (
-    "id" INTEGER NOT NULL,
+    "id" serial NOT NULL,
     "name" TEXT NOT NULL,
     "created_at" TIMESTAMP,
     "updated_at" TIMESTAMP,
