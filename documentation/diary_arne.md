@@ -24,4 +24,7 @@
 	+ php app/console propel:model:build
 	+ chmod app/cache -R 077
 	+ chmod app/logs -R 077
+ o tried to fix display error: edit or create publication
+	+ seems to be a problem conerning xdebug: disabled local, rebuild (->Installationsanweisung) and connected to empty database (dtab3) and it works again (just local)
+	
 	
