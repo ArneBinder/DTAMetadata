@@ -11,7 +11,9 @@
 
 2014-09-21
  o modified dumpConversion: added recreation of databases (mysql & postgres)
- > usage of xdebug
+ o usage of xdebug:
+	+ configure xdebug: http://www.jetbrains.com/phpstorm/webhelp/configuring-xdebug.html
+	+ enable debugging:http://confluence.jetbrains.com/display/PhpStorm/Zero-configuration+Web+Application+Debugging+with+Xdebug+and+PhpStorm
  
 2014-09-22
  o deployed current version of DTAMetadata on khan (without updating the database content)
