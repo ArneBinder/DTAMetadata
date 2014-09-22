@@ -123,7 +123,7 @@
 
     <table name="dta_user">
         
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="false" required="true"/>
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         
         <column name="username" type="LONGVARCHAR" primaryString="true"/>
         <column name="password" type="VARCHAR" size="512"/>
@@ -134,9 +134,9 @@
         <behavior name="timestampable"/>
         <behavior name="table_row_view">
             <parameter name="id" value="id"/>
-            <parameter name="benutzername" value="username"/>
-            <parameter name="mail" value="mail"/>
-            <parameter name="administratorrechte" value="accessor:adminToString"/>
+            <parameter name="Benutzername" value="username"/>
+            <parameter name="Mail" value="mail"/>
+            <parameter name="Administratorrechte" value="accessor:adminToString"/>
         </behavior>
         
     </table>
