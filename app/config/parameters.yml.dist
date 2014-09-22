@@ -1,15 +1,15 @@
 parameters:
     database_driver:   pdo_pgsql
-    database_host:     127.0.0.1
-    database_port:     ~
-    database_name:     symfony
-    database_user:     root
+    database_host:     localhost
+    database_port:     5432
+    database_name:     dtametadata
+    database_user:     dtametadata
     database_password: ~
 
     mailer_transport:  smtp
-    mailer_host:       127.0.0.1
+    mailer_host:       localhost
     mailer_user:       ~
     mailer_password:   ~
 
-    locale:            en
-    secret:            ThisTokenIsNotSoSecretChangeIt
+    locale:            de
+    secret:            ac457e27974545ae8bb8edee43ae0e02

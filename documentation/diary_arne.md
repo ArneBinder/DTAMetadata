@@ -10,4 +10,16 @@
 	> Form/Data/PublicationType.php defines the fields presented in the book edit form, e.g
 
 2014-09-21
- - 
+ o modified dumpConversion: added recreation of databases (mysql & postgres)
+ > usage of xdebug
+ 
+2014-09-22
+ o deployed current version of DTAMetadata on khan (without updating the database content)
+	+ git clone git@github.com:ArneBinder/DTAMetadata.git DTAProjectDB
+	+ cd DTAProjectDB/
+	+ php composer.phar install
+		(using carlwitt's parameter.yml)
+	+ php app/console propel:model:build
+	+ chmod app/cache -R 077
+	+ chmod app/logs -R 077
+	
