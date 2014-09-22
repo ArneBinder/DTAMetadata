@@ -5,7 +5,7 @@
 -->
 
 <!--The name attribute refers to the connection to use. See app/config/config.yml under
-    propel > dbal > connections for connection setup. -->
+propel > dbal > connections for connection setup. -->
 <database name="dtametadata" namespace="DTA\MetadataBundle\Model\Data" defaultIdMethod="native">
   
     <!--Add the columns created_at and updated_at to all entities. These columns are automatically updated when making changes to the database.-->
@@ -21,7 +21,7 @@
     Bildet die Publikationstypen M, MM (teilweise, da volumes via $publication->addChild() hinzugefügt werden müssen), MS, DM und J ab. -->
     <table name="publication">
         
-        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="false" required="true"/>
+        <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         
         <column name="type" description="Publikationstyp. Zur Auflösung des dynamischen Typs (z.B. ein Volume bettet ein Publication-Objekt ein, mit nichts als dem Publikationsobjekt in der Hand, lässt sich das zugehörige speziellere objekt aber nur durch ausprobieren aller Publikationstypen herausfinden.)" 
                 type="ENUM" valueSet="Book,Volume,MultiVolume,Chapter,Journal,Article,Series" />
@@ -97,21 +97,17 @@
             <parameter name="veröffentlicht" value="accessor:getDatespecificationRelatedByPublicationdateId"/>
             <parameter name="Verlag" value="accessor:getPublishingCompany"/>
             <parameter name="Ort" value="accessor:getPlace"/>
-            <!--<parameter name="embedcolumnsstatus" value="status"/>-->
-            <parameter name="Typ" value="type"/>
+            <!--<parameter name="Typ" value="type"/>-->
             <parameter name="query" value="\DTA\MetadataBundle\Model\Data\PublicationQuery::create()
-                    ->leftJoinWith('Title')
-                    ->leftJoinWith('Title.Titlefragment')
-                    ->leftJoinWith('DatespecificationRelatedByPublicationdateId')
-                    ->leftJoinWith('PersonPublication')
-                    ->leftJoinWith('PersonPublication.Person')
-                    ->leftJoinWith('Person.Personalname')
-                    ->leftJoinWith('Personalname.Namefragment')
-                    ->leftJoinWith('Volume')
-                    ->orderBy('Titlefragment.type', 'asc')
-                    ->orderBy('Titlefragment.Name', 'asc')
-                    ->orderBy('Title.Id', 'asc')
-                    ->orderBy('Volume.VolumeNumeric', 'asc');" />
+                    ->join('Title')
+                    ->join('Title.Titlefragment')
+                    ->join('DatespecificationRelatedByPublicationdateId')
+                    ->join('PersonPublication')
+                    ->join('PersonPublication.Person')
+                    ->join('Person.Personalname')
+                    ->join('Personalname.Namefragment')
+                    ->join('Volume')
+;" />
         </behavior>
         
         <behavior name="reconstructed_flaggable">
@@ -127,8 +123,8 @@
         <foreign-key foreignTable="datespecification"> <reference local="creationdate_id" foreign="id"/> </foreign-key>
         <foreign-key foreignTable="dta_user" phpName="LastChangedByUser" refPhpName="LastChangedPublication"> <reference local="last_changed_by_user_id" foreign="id"/> </foreign-key>
         
-        <index><index-column name="tree_id"/></index>
-        <index><index-column name="type"/></index>
+        <index> <index-column name="tree_id"/> </index>
+        <index> <index-column name="type"/> </index>
         
     </table>
 
@@ -140,6 +136,7 @@
     <table name="book">
         <column name="id" type="INTEGER" primaryKey="true" required="true"/>
         <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
+        <behavior name="table_row_view"> <parameter name="embedColumns" value="publication"/> </behavior>
     </table> 
     
     <!--Zeitschrift/Zeitung
@@ -148,8 +145,9 @@
     <table name="journal">
         <column name="id" type="INTEGER" primaryKey="true" required="true"/>
         <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
+        <behavior name="table_row_view"> <parameter name="embedColumns" value="publication"/> </behavior>
     </table> 
-
+    
     <!--MULTI-VOLUME               
         Mehrbändiges Werk.
         Zur Abbildung der Publikationstypen MM und MMS.
@@ -159,10 +157,16 @@
         
         <column name="volumes_total" description="Anzahl Bände (gesamt)" type="INTEGER"/>
         
-        <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>
-        
-        <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
-        <validator column="volumes_total"><rule name="minValue" value="2" message="Ein mehrbändiges Werk muss aus mindestens ${value} Bänden bestehen."/></validator>
+        <foreign-key foreignTable="publication"> 
+            <reference local="id" foreign="id"/> 
+        </foreign-key>
+        <validator column="volumes_total">
+            <rule name="minValue" value="2" message="Ein mehrbändiges Werk muss aus mindestens ${value} Bänden bestehen."/>
+        </validator>
+        <behavior name="table_row_view"> 
+            <parameter name="embedColumns" value="publication"/> 
+            <parameter name="Anzahl Bände" value="volumes_total"/>
+        </behavior>
     </table> 
     
     <!--VOLUME               
@@ -175,9 +179,12 @@
         <column name="volume_description" description="Bezeichnung des Bandes (alphanumerisch)" type="LONGVARCHAR"/>
         <column name="volume_numeric" description="Bezeichnung des Bandes (numerisch)" type="INTEGER"/>
         
-        <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>
-        
         <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
+        <behavior name="table_row_view"> 
+            <parameter name="embedColumns" value="publication"/> 
+            <parameter name="Band (numerisch)" value="volume_numeric"/>
+            <parameter name="Bandbeschreibung" value="volume_description"/>
+        </behavior>
     </table>   
     
     <!--CHAPTER
@@ -189,9 +196,11 @@
         
         <column name="pages" description="Seitenangabe" type="LONGVARCHAR"/>
         
-        <!--<behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>-->
-        
         <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
+        <behavior name="table_row_view"> 
+            <parameter name="embedColumns" value="publication"/> 
+            <parameter name="Seitenangabe" value="pages"/>
+        </behavior>
     </table> 
     
     <!--ARTICLE
@@ -203,21 +212,22 @@
         
         <column name="pages" description="Seitenangabe" type="LONGVARCHAR"/>
         
-        <!--<behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>-->
-        
         <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
+        <behavior name="table_row_view"> 
+            <parameter name="embedColumns" value="publication"/> 
+            <parameter name="Seitenangabe" value="pages"/>
+        </behavior>
     </table> 
     
-     <!--SERIES
+    <!--SERIES
         Publikationsreihe. 
         Zur Abbildung des Publikationskomponente S.
     -->
     <table name="series">
         <column name="id" type="INTEGER" primaryKey="true" required="true"/>
         
-        <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>
-        
         <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
+        <behavior name="table_row_view"> <parameter name="embedColumns" value="publication"/> </behavior>
     </table> 
     
     <!-- Other entities that can be considered historical facts. -->
@@ -235,16 +245,24 @@
                     ->orderBy('Name', 'asc');" />
         </behavior>
         
-        <unique> <unique-column name="gnd"/> </unique>
-        <validator column="gnd"> <rule name="unique" message="GND ist schon vergeben!"/> </validator>
+        <unique> 
+            <unique-column name="gnd"/> 
+        </unique>
+        <validator column="gnd"> 
+            <rule name="unique" message="GND ist schon vergeben!"/> 
+        </validator>
     </table>
 
     <table name="place">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true" primaryString="true"/>
         <column name="gnd" type="VARCHAR" size="255"/> 
-        <unique> <unique-column name="gnd"/> </unique>
-        <validator column="gnd"> <rule name="unique" message="GND ist schon vergeben!"/> </validator>
+        <unique> 
+            <unique-column name="gnd"/> 
+        </unique>
+        <validator column="gnd"> 
+            <rule name="unique" message="GND ist schon vergeben!"/> 
+        </validator>
     </table>
 
     <table name="datespecification">
@@ -269,7 +287,9 @@
             <parameter name="zugeordnet (personen-id)" value="person_id"/>
             <parameter name="reihenfolge" value="accessor:getSortableRank"/>
         </behavior>
-        <foreign-key foreignTable="person" onDelete="cascade"> <reference local="person_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="person" onDelete="cascade"> 
+            <reference local="person_id" foreign="id"/> 
+        </foreign-key>
     </table>
     
     <!-- Namensfragmente sind Bestandteile eines Namens, z.B. Vor- oder Nachname. -->
@@ -280,7 +300,9 @@
         
         <column name="type" description="Bedeutung des Fragments. Zum Beispiel Vorname, Nachname, Peerage (Adelstitel), Spelling (alternative schreibweise) etc." 
                 type="ENUM" valueSet="FIRST_NAME,LAST_NAME,PEERAGE,GENERATION,PSEUDONYM,SPELLING" />
-        <foreign-key foreignTable="personalname" onDelete="cascade"> <reference local="personalname_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="personalname" onDelete="cascade"> 
+            <reference local="personalname_id" foreign="id"/> 
+        </foreign-key>
         
         
         <behavior name="sortable">
@@ -309,7 +331,9 @@
         <column name="type" description="Bedeutung des Fragments. Zum Beispiel Haupttitel, Untertitel, etc." 
                 type="ENUM" valueSet="MAIN_TITLE,SUBTITLE,SHORT_TITLE" />
         
-        <foreign-key foreignTable="title" onDelete="cascade"> <reference local="title_id" foreign="id"/> </foreign-key>
+        <foreign-key foreignTable="title" onDelete="cascade"> 
+            <reference local="title_id" foreign="id"/> 
+        </foreign-key>
         
         <behavior name="sortable">
             <parameter name="use_scope" value="true"/>
@@ -333,13 +357,13 @@
             <parameter name="gnd" value="gnd"/>
             <parameter name="query" 
                        value="DTA\MetadataBundle\Model\Data\PersonQuery::create()
-                            ->joinWith('Personalname')
-                            ->joinWith('Personalname.Namefragment')
-                            ->orderBy('Namefragment.type',\Criteria::DESC)
-                            ->orderBy('Namefragment.name');"/>
+                            ->join('Personalname')
+                            ->join('Personalname.Namefragment');"/>
         </behavior>
         
-        <unique> <unique-column name="gnd"/> </unique>
+        <unique> 
+            <unique-column name="gnd"/> 
+        </unique>
     </table>
     
     <table name="font">

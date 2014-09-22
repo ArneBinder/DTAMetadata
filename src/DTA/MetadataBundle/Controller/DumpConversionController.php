@@ -152,14 +152,12 @@ class DumpConversionController extends ORMController {
         foreach (array('dta_data_schema.xml', 'dta_master_schema.xml', 'dta_workflow_schema.xml', 'dta_classification_schema.xml') as $schema) {
             
             // backup current version in config as production file
-            copy("$dumpConversionSchemasDir/../config/$schema", "$dumpConversionSchemasDir/../schemas_final/$schema");
-            //system("cp $dumpConversionSchemasDir/../config/$schema $dumpConversionSchemasDir/../schemas_final/$schema ");
-            
-            //$this->messages[] = array("bringing dump conversion version of $schema into place", system("cp $dumpConversionSchemasDir/$schema $dumpConversionSchemasDir/../config/$schema"));
+            //// WARNING: IF DUMP CONVERTION ABORTS AND IS RESTARTED WITHOUT MANUAL MOVING THE PRODUCTION SCHEMA FILES BACK IN PLACE, THE DUMPCONVERSION SCHEMA FILES ARE CONSIDERED AS PRODUCTION FILES!!!
+            //copy("$dumpConversionSchemasDir/../config/$schema", "$dumpConversionSchemasDir/../schemas_final/$schema");
+
             $this->messages[] = array("bringing dump conversion version of $schema into place", copy("$dumpConversionSchemasDir/$schema","$dumpConversionSchemasDir/../config/$schema"));
         }
         // build propel entity classes
-        //$this->messages[] = array('building model from dump conversion schemas', system("$this->phpExec ../app/console propel:model:build"));
         $this->messages[] = array('building model from dump conversion schemas', shell_exec("$this->phpExec ../app/console propel:model:build"));
     }
     
