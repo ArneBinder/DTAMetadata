@@ -30,9 +30,14 @@
     --> don't copy current schema files to folder schemas_final anymore, but take schemas from schemas_final in the end
 	
 2014-10-21
- o still trying to fix disply error
+ o added aliases at khan: cleardev (clears symfony dev cache) and reapache (restarts the apache server)
+ o still trying to fix disply form error
 	+ tried to rebuild everything at the server (except complete dumpconversion)
 	+ imported several (different encodings: e.g. utf8; different methods: via pgAdmin, pg_dump) data dumps from good working local version to the server
+	--> disabling xdebug did it! (but just hacky style via renaming the file /etc/php5/conf.d/20-xdebug.ini to ...20-xdebug.bk)
+ o still encoding errors
+    + local: WIN1252
+    --> have to start new dumpConversion (encoding for rebuilding the postgres database is already set to UTF8)
 	
 	
 	
