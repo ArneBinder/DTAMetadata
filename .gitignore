@@ -12,7 +12,7 @@ web/bundles/
 app/config/parameters.ini
 app/config/parameters.yml
 
-!/composer.phar
+# !/composer.phar
 /src/DTA/MetadataBundle/Model/*/om/
 /src/DTA/MetadataBundle/Model/*/map/
 app/propel
@@ -23,4 +23,6 @@ nbproject
 
 
 /temp/*.sql
-/app/autoload.php
+
+bin
+/composer.lock
