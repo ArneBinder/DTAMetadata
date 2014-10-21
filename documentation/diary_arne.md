@@ -25,6 +25,14 @@
 	+ chmod app/cache -R 077
 	+ chmod app/logs -R 077
  o tried to fix display error: edit or create publication
-	+ seems to be a problem conerning xdebug: disabled local, rebuild (->Installationsanweisung) and connected to empty database (dtab3) and it works again (just local)
+	+ seems to be a problem concerning xdebug: disabled local, rebuild (->Installationsanweisung) and connected to empty database (dtab3) and it works again (just local)
+ o WARNING: IF DUMP CONVERSION ABORTS AND IS RESTARTED WITHOUT MANUAL MOVING THE PRODUCTION SCHEMA FILES BACK IN PLACE, THE DUMPCONVERSION SCHEMA FILES ARE CONSIDERED AS PRODUCTION FILES!!!
+    --> don't copy current schema files to folder schemas_final anymore, but take schemas from schemas_final in the end
+	
+2014-10-21
+ o still trying to fix disply error
+	+ tried to rebuild everything at the server (except complete dumpconversion)
+	+ imported several (different encodings: e.g. utf8; different methods: via pgAdmin, pg_dump) data dumps from good working local version to the server
+	
 	
 	

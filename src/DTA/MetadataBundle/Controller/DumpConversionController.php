@@ -9,24 +9,34 @@ use Exception;
  * @author Carl Witt <carl.witt@fu-berlin.de>
  * Convert database dump of the old DTA project database (metadatenbank) by alex siebert
  * into new database schema by carl witt.
+ *
+ * Preconditions:
+ *   - mySQL, postgreSQL have to be installed and running
+ *   - the mySQL user ($sourceUsername) and the postgreSQL user (defined via parameters.yml) have to exist
+ *   - the mySQL dump file which contains the data to convert
  */
 class DumpConversionController extends ORMController {
     
     /**
      * Configure
+     * source: the mysql database where the dump will be imported to extract the data from
+     * target: the postgres database which will contain the converted data (the connection parameters from parameters.yml are used)
      */
-    private $username  = 'root';
-    private $password  = 'root'; //garamond4000
-    private $database  = 'dtadb';
-    //private $dumpPath  = '/Users/macbookdata/Dropbox/DTA/dumpConversion/dtadb_2013-09-29_07-10-01.sql';
-    private $dumpPath  = '../temp/dtadb_2013-09-29_07-10-01.sql';
-    private $pgDumpPath = '../temp/dtadb_pg';
-    //private $mysqlExec = '/Applications/MAMP/Library/bin/mysql'; // for importing the dump
-    private $mysqlExec  = 'mysql'; //added "C:\Program Files\MySQL\MySQL Server 5.6\bin" to $PATH
-    //private $phpExec   = '/usr/local/php5/bin/php';
-    private $phpExec   = 'php';
+    private $sourceUsername  = 'root';
+    private $sourcePassword  = 'root'; //garamond4000
+    private $sourceDatabase  = 'dtadb'; //will be created if it does not exist
+    private $sourceDumpPath  = '../temp/dtadb_2013-09-29_07-10-01.sql'; //'/Users/macbookdata/Dropbox/DTA/dumpConversion/dtadb_2013-09-29_07-10-01.sql';
 
-    private $psql = 'psql';
+    // This dump file can be used to import into the production system
+    private $targetDumpPath = '../temp/dtadb_pg';
+
+    /** Used programs */
+    private $mysqlExec  = 'mysql'; //added "C:\Program Files\MySQL\MySQL Server 5.6\bin" to $PATH
+    private $pgDropDB = 'dropdb';
+    private $pgCreateDB = 'createdb';
+    private $phpExec   = 'php'; //'/usr/local/php5/bin/php';
+    //private $psql = 'psql';
+
     /** Stores problematic actions taken in the conversion process. */
     private $messages;
     private $warnings;
@@ -49,9 +59,9 @@ class DumpConversionController extends ORMController {
      * @throws Exception
      */
     function connect() {
-        $dsn = "mysql:dbname=" . $this->database . ";host=127.0.0.1";
+        $dsn = "mysql:dbname=" . $this->sourceDatabase . ";host=127.0.0.1";
         try {
-            return new \PDO($dsn, $this->username, $this->password);
+            return new \PDO($dsn, $this->sourceUsername, $this->sourcePassword);
         } catch (\PDOException $e) {
             throw new \Exception("Connection failed: " . $e->getMessage());
         }
@@ -121,7 +131,7 @@ class DumpConversionController extends ORMController {
         // dump new database
         $dbname = $this->getDatabaseName();
         $dbuser = $this->getDataseUser();
-        $dumpfile = $this->pgDumpPath.'_'.date("Y-m-d").'.sql';
+        $dumpfile = $this->targetDumpPath.'_'.date("Y-m-d").'.sql';
         $this->messages[] = array('dump database: ' => $dbname);
         $this->messages[] = array('database user: ' => $dbuser);
         $this->messages[] = array('dumped' => shell_exec("pg_dump -d $dbname -U $dbuser -f $dumpfile"));
@@ -180,11 +190,11 @@ class DumpConversionController extends ORMController {
     function dropAndSetupTargetDB(){
 
         //recreate source database
-        shell_exec("$this->mysqlExec -u $this->username -p$this->password -e \"DROP DATABASE IF EXISTS $this->database\"");
-        shell_exec("$this->mysqlExec -u $this->username -p$this->password -e \"CREATE DATABASE $this->database\"");
+        shell_exec("$this->mysqlExec -u $this->sourceUsername -p$this->sourcePassword -e \"DROP DATABASE IF EXISTS $this->sourceDatabase\"");
+        shell_exec("$this->mysqlExec -u $this->sourceUsername -p$this->sourcePassword -e \"CREATE DATABASE $this->sourceDatabase\"");
 
         // import dump
-        $importDumpCommand = "$this->mysqlExec -u $this->username -p$this->password $this->database < $this->dumpPath";
+        $importDumpCommand = "$this->mysqlExec -u $this->sourceUsername -p$this->sourcePassword $this->sourceDatabase < $this->sourceDumpPath";
         $this->messages[] = array("import dump command: " => $importDumpCommand);
         //system($importDumpCommand);
         $this->messages[] = array(shell_exec($importDumpCommand));
@@ -192,9 +202,8 @@ class DumpConversionController extends ORMController {
         //recreate target database
         $dbname = $this->getDatabaseName();
         $dbuser = $this->getDataseUser();
-        // WARNING: postgreSQL-specific!
-        shell_exec("dropdb -U $dbuser --if-exists $dbname");
-        shell_exec("createdb -U $dbuser $dbname");
+        shell_exec("$this->pgDropDB -U $dbuser --if-exists $dbname");
+        shell_exec("$this->pgCreateDB -U $dbuser -E UTF8 $dbname");
         // build current database schema
         //$resultBuildDBCode = system("$this->phpExec ../app/console propel:sql:build");
         $resultBuildDBCode = shell_exec("$this->phpExec ../app/console propel:sql:build");
@@ -1412,7 +1421,7 @@ class DumpConversionController extends ORMController {
         // trim all text columns and set empty strings to NULL
         foreach ($dbh->query("SHOW tables") as $row) {
             
-            $relation = $row["Tables_in_" . $this->database];
+            $relation = $row["Tables_in_" . $this->sourceDatabase];
             
             $getTextColumns = "SHOW COLUMNS FROM $relation WHERE 
                                 `Type` LIKE 'varchar%' -- varchars of any length 
