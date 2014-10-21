@@ -203,7 +203,7 @@ class DumpConversionController extends ORMController {
         $dbname = $this->getDatabaseName();
         $dbuser = $this->getDataseUser();
         shell_exec("$this->pgDropDB -U $dbuser --if-exists $dbname");
-        shell_exec("$this->pgCreateDB -U $dbuser -E UTF8 $dbname");
+        shell_exec("$this->pgCreateDB -U $dbuser -E UTF8 -T template0 $dbname");
         // build current database schema
         //$resultBuildDBCode = system("$this->phpExec ../app/console propel:sql:build");
         $resultBuildDBCode = shell_exec("$this->phpExec ../app/console propel:sql:build");
