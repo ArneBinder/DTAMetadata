@@ -1,4 +1,4 @@
 @echo off
-%windir%\system32\runas.exe /user:postgres "pg_ctl start"
+start_postgres_server_all_pp.exe
 cd ..
 php app/console server:run
