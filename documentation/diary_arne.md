@@ -37,7 +37,13 @@
 	--> disabling xdebug did it! (but just hacky style via renaming the file /etc/php5/conf.d/20-xdebug.ini to ...20-xdebug.bk)
  o still encoding errors
     + local: WIN1252
-    --> have to start new dumpConversion (encoding for rebuilding the postgres database is already set to UTF8)
+    --> have to start new dumpConversion (encoding for rebuilding the postgres database is already set to UTF8) --> no changes --> using again Carl's converted dump (database dtametadata)
 	
+2014-10-22
+ o getting into layout:
+   + changed Publication layout: PublicationType.php sets the elements presented, so switched type of some elements to change there appearance ('text' --> null) 
+   + form_div_layout defines the appearance of singel elmentes: started to modifie the date_widget to display the choice boxes in one row (not yet ready)
+   + could form_div_layut be used to define the behavior of textareas and so on?
+   + HINT: modals. useable for checks before deleting/canceling?
 	
 	
