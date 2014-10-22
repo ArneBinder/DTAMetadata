@@ -30,8 +30,9 @@ class PublicationType extends BaseAbstractType
         // WORK 
         // ----------------------------------------------------------------
         $builder->add('title', new TitleType(), array('cascade_validation'=>true));
-        $builder->add('dirname','text',array(
-            'required' => false
+        $builder->add('dirname',null,array(
+            'required' => false,
+            'label' => 'Verzeichnis/Ordnername'
         ));
         $builder->add('PersonPublications', new DynamicCollectionType(), array(
             'type' => new Master\PersonPublicationType(),
@@ -41,7 +42,7 @@ class PublicationType extends BaseAbstractType
             'options' => array('isPublicationSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
         ));
         $builder->add('wwwready');
-        $builder->add('doi', 'text', array('required' => false));
+        $builder->add('doi', null, array('required' => false, 'label' => 'URN/DOI/PURL'));
         $builder->add('format', 'text', array('required' => false));
         $builder->add('citation');
         
