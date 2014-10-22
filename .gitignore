@@ -27,3 +27,6 @@ nbproject
 bin
 /composer.lock
 /app/propel/sql
+/web/config.php
+/app/SymfonyRequirements.php
+/app/check.php
