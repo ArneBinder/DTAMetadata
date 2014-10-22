@@ -127,7 +127,7 @@ return array(
 
     // form labels: controls
 
-    'submitBtn.caption' => 'Senden',
+    'submitBtn.caption' => 'Speichern',
     'modal.closeWithoutAction' => 'Abbrechen',
     'selectOrAdd.addBtn.suffix' => 'hinzufügen...',
     'listView.edit.row.buttonSuffix' => 'bearbeiten',
