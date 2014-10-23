@@ -45,5 +45,9 @@
    + form_div_layout defines the appearance of singel elmentes: started to modifie the date_widget to display the choice boxes in one row (not yet ready)
    + could form_div_layut be used to define the behavior of textareas and so on?
    + HINT: modals. useable for checks before deleting/canceling?
+
+2014-10-23
+ o changeoradd publication is different from specialpublication (Book, ...) --> different layout!
+ o added autoresize for textarea (but adds a new line in every textarea)
 	
 	
