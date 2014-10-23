@@ -73,7 +73,7 @@
             {% endfor %}
         {% else %}
             {% if inlineLabel or inlined %}
-                {{ form_label(form, null, {'label_attr':{'class': hideLabelClass} }) }} 
+                {{ form_label(form, null, {'label_attr':{'class': hideLabelClass} }) }}
             {% endif %}
             {{ form_errors(form) }}
             {{ form_widget(form) }}
