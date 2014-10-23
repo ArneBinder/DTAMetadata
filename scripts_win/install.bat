@@ -1,7 +1,7 @@
 @echo off
 cd ..
 :: update composer
-php composer.phar self-install
+php composer.phar self-update
 :: install needed components
 php composer.phar install
 :: SQL Schema wird generiert
