@@ -163,3 +163,11 @@
         {% endif %}
     {% endspaceless %}
 {% endblock date_widget %}
+
+{% block text_widget %}
+    {% spaceless %}
+        {% set type = type|default('text') %}
+        {% set attr = attr|merge({'style': 'width: 350px'}) %}
+        {{ block('form_widget_simple') }}
+    {% endspaceless %}
+{% endblock text_widget %}

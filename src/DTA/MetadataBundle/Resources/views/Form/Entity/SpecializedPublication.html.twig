@@ -21,7 +21,7 @@
     {{ form_row(form.dirname) }}
 
     {{ form_row(form.PersonPublications) }}
-    
+
     {% set modalId = 'moreOptionsForPublication' %}
     {{ dta.beginLabelledContent({'labelCaption':'', 'controlId':'none'}) }}
         {{ dta.btnLaunchModal({'id':modalId, 'caption':'weitere Angaben...'})}}
@@ -29,7 +29,7 @@
     {{ dta.beginModal({
             'id': modalId,
             'title': 'Weitere Angaben zum Werk',
-       })            
+       })
     }}
 
         {{ form_row(form.wwwready) }}
@@ -52,12 +52,12 @@
 {{ dta.beginFieldset({'caption':'Angaben zur Publikation der Vorlage'})}}
 
     {{ form_row(form.place) }}
-    
+
     {{ dta.beginLabelledContent({'controlId':'none', 'labelCaption':'Datierung'}) }}
         {{ form_row(form.DatespecificationRelatedByPublicationdateId) }}
         {#{ form_row(form.DatespecificationRelatedByCreationDateId) }#}
     {{ dta.endLabelledContent() }}
-    
+
     {{ form_row(form.numpages) }}
     {{ form_row(form.numpagesnumeric) }}
     {{ form_row(form.firstpage) }}
@@ -105,10 +105,10 @@
     {{ form_row(form.legacy_dwds_subcategory1) }}
     {{ form_row(form.legacy_dwds_category2) }}
     {{ form_row(form.legacy_dwds_subcategory2) }}
-    
+
     {{ form_row(form.CategoryPublications, {'label':'Kategorien'}) }}
     {{ form_row(form.PublicationTags, {'label':'Schlagworte'}) }}
-    
+
 {{ dta.endFieldset()}}
 {% endblock %}
 
@@ -132,7 +132,7 @@
     {{ dta.beginModal({
             'id': modalId,
             'title': 'Tasks',
-       })            
+       })
     }}
     {% block tasks %}
         {{ form_row(form.Tasks) }}
@@ -146,6 +146,6 @@
     }}
 {{ dta.endFieldset()}}
 
-    
+
 {{ form_rest(form) }}
 {% endblock rest %}

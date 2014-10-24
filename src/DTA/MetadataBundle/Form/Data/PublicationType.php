@@ -30,7 +30,7 @@ class PublicationType extends BaseAbstractType
         // WORK 
         // ----------------------------------------------------------------
         $builder->add('title', new TitleType(), array('cascade_validation'=>true));
-        $builder->add('dirname',null,array(
+        $builder->add('dirname','text',array(
             'required' => false,
             'label' => 'Verzeichnis/Ordnername'
         ));
@@ -42,7 +42,7 @@ class PublicationType extends BaseAbstractType
             'options' => array('isPublicationSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
         ));
         $builder->add('wwwready');
-        $builder->add('doi', null, array('required' => false, 'label' => 'URN/DOI/PURL'));
+        $builder->add('doi', 'text', array('required' => false, 'label' => 'URN/DOI/PURL'));
         $builder->add('format', 'text', array('required' => false));
         $builder->add('citation');
         
@@ -90,10 +90,10 @@ class PublicationType extends BaseAbstractType
             'label' => 'Genres',
         ));
         
-        $builder->add('legacy_dwds_category1');
-        $builder->add('legacy_dwds_subcategory1');
-        $builder->add('legacy_dwds_category2');
-        $builder->add('legacy_dwds_subcategory2');
+        $builder->add('legacy_dwds_category1', 'text');
+        $builder->add('legacy_dwds_subcategory1', 'text');
+        $builder->add('legacy_dwds_category2', 'text');
+        $builder->add('legacy_dwds_subcategory2', 'text');
         
         $builder->add('CategoryPublications', new DynamicCollectionType(), array(
             'type' => new Master\CategoryPublicationType(),
