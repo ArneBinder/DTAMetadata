@@ -49,5 +49,9 @@
 2014-10-23
  o changeoradd publication is different from specialpublication (Book, ...) --> different layout!
  o added autoresize for textarea (but adds a new line in every textarea)
+ 
+2014-10-24
+ o created win script to back up IDE (PhpStorm) data when they are changed. The environment variable IDEA_BACKUP_PATH has to be set for usage.
+ o changed date_widget: displayed in one row
 	
 	

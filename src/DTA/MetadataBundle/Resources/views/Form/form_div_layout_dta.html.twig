@@ -153,7 +153,7 @@
         {% if widget == 'single_text' %}
             {{ block('form_widget_simple') }}
         {% else %}
-            <div {{ block('widget_container_attributes') }}>
+            <div class="form-inline" style="position:relative"{{ block('widget_container_attributes') }}>
                 {{ date_pattern|replace({
                 '{{ year }}':  form_widget(form.year),
                 '{{ month }}': form_widget(form.month),
