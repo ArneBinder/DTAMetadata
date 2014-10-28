@@ -1,0 +1,9 @@
+{# This template controls how the form for the shared core publication data looks like. 
+   It covers all form fields that the book publication type requires (title, author, sources, etc.).
+   Specialized publication types can reuse it by overriding any number of blocks (work, publication, sources, etc.)
+
+   Some macros (e.g. "dta.beginFieldset") are defined in buildingBlocks.html.twig (in the views/Form directory).
+#}
+
+{% extends "DTAMetadataBundle:Form:SpecializedPublication.html.twig" %}
+
