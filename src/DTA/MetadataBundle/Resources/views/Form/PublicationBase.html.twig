@@ -130,21 +130,21 @@
     {{ dta.beginFieldset({'caption':'Tasks'})}}
     {% set modalId = 'tasks' %}
     {{ dta.beginLabelledContent({'labelCaption':'', 'controlId':'none'}) }}
-    {{ dta.btnLaunchModal({'id':modalId, 'caption':'Tasks anzeigen'})}}
+    {#{ dta.btnLaunchModal({'id':modalId, 'caption':'Tasks anzeigen'})}#}
     {{ dta.endLabelledContent() }}
-    {{ dta.beginModal({
+    {#{ dta.beginModal({
     'id': modalId,
     'title': 'Tasks',
     })
-    }}
+    }#}
     {{ form_row(publication.Tasks) }}
 
-    {{ dta.endModal({
+    {#{ dta.endModal({
     'id': modalId,
     'confirm': {'caption': 'Fertig', 'target': '#', 'attr':{'data-dismiss':'modal'} },
     'hideCancelButton': true,
     })
-    }}
+    }#}
     {{ dta.endFieldset()}}
 {% endblock tasks %}
 {% block rest %}
