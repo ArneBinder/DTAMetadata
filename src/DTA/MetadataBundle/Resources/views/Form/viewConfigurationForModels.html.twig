@@ -172,7 +172,21 @@
 {% endblock %}
 
 {% block task_row %}
-    {{ form_row(form, {'inlineLabel':true, 'hideLabel':true}) }}
+    {% import  'DTAMetadataBundle:Form:buildingBlocks.html.twig' as dta %}
+    <div class="form-inline">
+        <span data-toggle="collapse" data-target="#{{id}}">
+        {#{id}#}
+        {#{ dump(_context|keys) }#}
+        {#{ dump(task) }#}
+        {#{ dump(value) }#}
+            {{ form_row(form.tasktype, {'inlineLabel':true, 'hideLabel':true, 'disabled':true}) }}
+        </span>
+        {{ form_row(form.closed) }}
+    </div>
+    <div class="collapse" id="{{ id }}">
+        {#{ form_row(form.tasktype, {'inlineLabel':true, 'hideLabel':true}) }#}
+        {{ form_rest(form, {'inlineLabel':true, 'hideLabel':true}) }}
+    </div>
 {% endblock %}
 
 {# --------------------- Personal Name --------------------- #}
