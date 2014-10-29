@@ -175,6 +175,9 @@
     {% import  'DTAMetadataBundle:Form:buildingBlocks.html.twig' as dta %}
     {% set parent_id = parent_id|default('randomId'~random()) %}
     {% set collapsed = collapsed|default(false) %}
+    {#% if task.getClosed() %}
+        {{ dump(task.getClosed()) }}
+    {% endif %#}
 
         <div class="panel-heading accordion-caret">
             <div class="panel-title form-inline accordion-toggle{{ collapsed?' collapsed':'' }}" data-toggle="collapse" data-parent="#{{ parent_id }}" data-target="#{{id}}">
