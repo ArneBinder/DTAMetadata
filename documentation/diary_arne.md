@@ -55,4 +55,10 @@
  o changed date_widget: displayed in one row
  o added text_widget: set width to 350px
 	
+2014-10-28
+ o To dump only the available variable keys use: {{ dump(_context|keys) }} 
+	source: https://www.drupal.org/node/1906780
+
+2014-10-29	
+ o tasks as collapsible panels
 	
