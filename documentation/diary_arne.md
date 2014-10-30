@@ -61,4 +61,25 @@
 
 2014-10-29	
  o tasks as collapsible panels
+ 
+2014-10-30
+ o setup of dev enviroment at new win pc:
+	- install git
+	- install php 
+		+ add install path to win env var PATH
+		+ modified php.ini (php.ini-production) according to http://php.net/manual/de/install.windows.manual.php
+			> required extensions: php_bz2.dll, php_curl.dll, php_mbstring.dll, php_exif.dll, php_gd2.dll, php_gettext.dll, php_intl.dll, php_mysql.dll, php_openssl.dll, php_pdo_mysql.dll, php_pdo_pgsql.dll, php_pgsql.dll
+			> date.timezone=Europe/Berlin
+	- install postgres: 
+		+ add install path to win env var PATH
+		+ add windows user postgres
+		+ add env var PGDATA (e.g. C:\Dokumente und Einstellungen\postgres\DATA) --> switch to this user to generate folders & restart
+		+ runas /user:postgres "initdb --encoding=UTF8" to generate db files
+		+ create database with name <db_name> via PgAdmin (replace <db_name>)
+		+ runas /user:postgres "pgsql <db_name> < <dump_file>" (replace <db_name> and <dump_file>)	
+	- install phpstorm
+		+ install plugins: symfony2
+		+ clone from github
+		+ backup old .idea folder in IDEA_BACKUP_PATH and add windows env var IDEA_BACKUP_PATH (e.g. H:\IDEA_BACKUPS) 
+	
 	

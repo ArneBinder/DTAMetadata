@@ -1,5 +1,5 @@
 @echo off
-cd ..
+cd %~dp0\..
 :: update composer
 php composer.phar self-update
 :: install needed components

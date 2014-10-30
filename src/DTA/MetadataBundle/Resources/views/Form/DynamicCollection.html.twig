@@ -33,18 +33,18 @@
         {% set attr = attr|merge({'data-prototype': form_row(prototype) }) %}
     {% endif %}
 
-    <div class='dynamic-collection {{ listAdditionalCssClasses }} accordion-group accordion-caret panel-group' {{ block('widget_container_attributes') }} >
+    <ol class='dynamic-collection list {{ listAdditionalCssClasses }} ' {{ block('widget_container_attributes') }} >
         {% if form.parent is empty %}
             {{ form_errors(form) }}
         {% endif %}
 
     {#        Render the elements of the collection         #}
         {% for child in form %}
-        <div class="panel panel-default">{{ form_row(child, {'parent_id':id, 'collapsed':true}) }}</div>
+        <li class="panel panel-default">{{ form_row(child, {'parent_id':id, 'collapsed':true}) }}</li>
         {% endfor %}
 
         {{ form_rest(form) }}
-    </div>
+    </ol>
         {#onclick="function(){console.log('success')}"#}
 
         <a href="#" class="dynamic-collection add-entity">
