@@ -81,5 +81,8 @@
 		+ install plugins: symfony2
 		+ clone from github
 		+ backup old .idea folder in IDEA_BACKUP_PATH and add windows env var IDEA_BACKUP_PATH (e.g. H:\IDEA_BACKUPS) 
+ o trying to pass data to task_row
+	+ Hint: http://stackoverflow.com/questions/12356025/how-to-pass-an-array-from-symfony-2-controller-to-a-twig-template
+	+ Hint2: http://toni.uebernickel.info/2011/11/25/how-to-extend-form-fields-in-symfony2.html
 	
 	
