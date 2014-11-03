@@ -84,5 +84,9 @@
  o trying to pass data to task_row
 	+ Hint: http://stackoverflow.com/questions/12356025/how-to-pass-an-array-from-symfony-2-controller-to-a-twig-template
 	+ Hint2: http://toni.uebernickel.info/2011/11/25/how-to-extend-form-fields-in-symfony2.html
-	
+
+2014-11-03	
+ o PublicationType: 
+	+ legacy_dwds_category2 and ...subcategory2 aren't required anymore
+	+ wwwready (Veröffentlichungsstatus) set to min:0 and max:3
 	

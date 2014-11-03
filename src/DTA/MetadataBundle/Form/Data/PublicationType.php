@@ -41,7 +41,7 @@ class PublicationType extends BaseAbstractType
             'label' => 'Publikationsbezogene Personalia',
             'options' => array('isPublicationSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
         ));
-        $builder->add('wwwready');
+        $builder->add('wwwready', null, array('attr' => array('min' => 0, 'max' => 3)));
         $builder->add('doi', 'text', array('required' => false, 'label' => 'URN/DOI/PURL'));
         $builder->add('format', 'text', array('required' => false));
         $builder->add('citation');
@@ -92,8 +92,8 @@ class PublicationType extends BaseAbstractType
         
         $builder->add('legacy_dwds_category1', 'text');
         $builder->add('legacy_dwds_subcategory1', 'text');
-        $builder->add('legacy_dwds_category2', 'text');
-        $builder->add('legacy_dwds_subcategory2', 'text');
+        $builder->add('legacy_dwds_category2', 'text', array('required' => false));
+        $builder->add('legacy_dwds_subcategory2', 'text', array('required' => false));
         
         $builder->add('CategoryPublications', new DynamicCollectionType(), array(
             'type' => new Master\CategoryPublicationType(),
