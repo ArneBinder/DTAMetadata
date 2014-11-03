@@ -24,6 +24,9 @@
         "sensio/generator-bundle": "2.3.*",
         "incenteev/composer-parameter-handler": "~2.0",
         "symfony/icu": "~1.2"
+        //"symfony/expression-language": "2.6.*@dev"
+        //"stephanecollot/datetimepicker-bundle": "dev-master",
+        //"symfony/framework-bundle": "2.*"
     },
     "scripts": {
         "post-install-cmd": [

@@ -68,8 +68,8 @@ class PublicationType extends BaseAbstractType
         ));
         
         $builder->add('numpages');
-        $builder->add('numpagesnumeric');
-        $builder->add('firstpage');
+        $builder->add('numpagesnumeric', null, array('attr' => array('min' => 1)));
+        $builder->add('firstpage', null, array('attr' => array('min' => 1)));
          
         // ----------------------------------------------------------------
         // CLASSIFICATION 

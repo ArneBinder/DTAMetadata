@@ -89,4 +89,10 @@
  o PublicationType: 
 	+ legacy_dwds_category2 and ...subcategory2 aren't required anymore
 	+ wwwready (Veröffentlichungsstatus) set to min:0 and max:3
+ o tried to use dateTimePicker (collot_datetime)
+ o tried to pass data to form builder (http://stackoverflow.com/questions/7807388/passing-data-from-controller-to-type-symfony2?lq=1)
+	+ furthermore: setDefaultOptions?
+ o validate startDate and endDate: via Callback? or Expression (http://symfony.com/doc/current/reference/constraints/Expression.html)?
+	+ tried to prepare using expressions
+	+ have a look to https://github.com/symfony/symfony/issues/7726
 	

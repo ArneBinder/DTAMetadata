@@ -155,3 +155,6 @@ monolog:
         syslog:
             type: syslog
             level: error
+
+sc_datetimepicker:
+    picker: ~

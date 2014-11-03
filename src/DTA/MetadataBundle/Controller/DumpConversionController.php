@@ -25,10 +25,10 @@ class DumpConversionController extends ORMController {
     private $sourceUsername  = 'root';
     private $sourcePassword  = 'root'; //garamond4000
     private $sourceDatabase  = 'dtadb'; //will be created if it does not exist
-    private $sourceDumpPath  = '../temp/dtadb_2013-09-29_07-10-01.sql'; //'/Users/macbookdata/Dropbox/DTA/dumpConversion/dtadb_2013-09-29_07-10-01.sql';
+    private $sourceDumpPath  = '../dbdumps/dtadb_2013-09-29_07-10-01.sql'; //'/Users/macbookdata/Dropbox/DTA/dumpConversion/dtadb_2013-09-29_07-10-01.sql';
 
     // This dump file can be used to import into the production system
-    private $targetDumpPath = '../temp/dtadb_pg';
+    private $targetDumpPath = '../dbdumps/dtadb_pg';
 
     /** Used programs */
     private $mysqlExec  = 'mysql'; //added "C:\Program Files\MySQL\MySQL Server 5.6\bin" to $PATH
@@ -119,6 +119,8 @@ class DumpConversionController extends ORMController {
             'convertSingleFieldPersons',
             'convertSeries',
             'convertMultiVolumes',
+            'convertGenres',
+            'convertTags',
             );
         
         foreach ($conversionTasks as $task){
@@ -1088,7 +1090,24 @@ class DumpConversionController extends ORMController {
                          ->save($this->propelConnection);
         }
     }
-    
+
+    /* ---------------------------------------------------------------------
+    * genre TODO
+    * ------------------------------------------------------------------ */
+
+    function convertGenres($dbh){
+
+    }
+
+    /* ---------------------------------------------------------------------
+    * tag TODO
+    * ------------------------------------------------------------------ */
+
+    function convertTags($dbh){
+
+    }
+
+
     /* ---------------------------------------------------------------------
      * user
      * ------------------------------------------------------------------ */
