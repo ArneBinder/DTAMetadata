@@ -25,8 +25,9 @@ class TaskType extends BaseAbstractType
         ));
 //        $builder->add("publicationgroup", null, array(
 //        ));
-        $builder->add('start_date', null, array('years'=>range(2005,2020),'widget' => 'choice'));
-        $builder->add('end_date', null, array('years'=>range(2005,2020),'widget' => 'choice'));
+        $builder->add('start_date', null, array('years'=>range(2005,2020), 'widget' => 'single_text')); //$builder->getName()
+        //$builder->add('start_date', null, array('years'=>range(2005,2020), 'widget' => 'single_text', 'attr' => array('threshold_id'=> '_end_date', 'threshold' => 'Max')));
+        $builder->add('end_date', null, array('years'=>range(2005,2020),'widget' => 'single_text'));
         $builder->add('comments');
         $builder->add('DTAUser', 'model', array(
             'property' => 'username',

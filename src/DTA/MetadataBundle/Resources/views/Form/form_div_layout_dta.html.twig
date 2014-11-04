@@ -150,8 +150,23 @@
 
 {% block date_widget %}
     {% spaceless %}
+    {# {% if test is defined %}
+        {{ dump(test) }}
+    {% else %}
+        blaaa
+    {% endif %} #}
         {% if widget == 'single_text' %}
             {{ block('form_widget_simple') }}
+            {% if threshold_id is defined %}
+                <script type="text/javascript">
+                    $(function () {
+                        $("#{{ id }}").datetimepicker();
+                        $('#{{ threshold_id }}').datetimepicker();
+                        $("#{{ id }}").on("dp.change",function (e) {
+                            $("#{{ threshold_id }}").data("DateTimePicker").set{{ threshold }}Date(e.date);
+                        });
+                    });
+            {% endif %}
         {% else %}
             <div class="form-inline" style="position:relative"{{ block('widget_container_attributes') }}>
                 {{ date_pattern|replace({
@@ -161,6 +176,7 @@
                 })|raw }}
             </div>
         {% endif %}
+
     {% endspaceless %}
 {% endblock date_widget %}
 
