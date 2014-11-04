@@ -175,19 +175,20 @@
     {% import  'DTAMetadataBundle:Form:buildingBlocks.html.twig' as dta %}
     {% set parent_id = parent_id|default('randomId'~random()) %}
     {% set collapsed = collapsed|default(false) %}
+    {% set panel = asPanel|default(false)%}
     {#% if task.getClosed() %}
         {{ dump(task.getClosed()) }}
     {% endif %#}
     {#<pre>
         {{ dump(data) }}
     </pre>#}
-        <div class="panel-heading accordion-caret">
-            <div class="panel-title form-inline accordion-toggle{{ collapsed?' collapsed':'' }}" data-toggle="collapse" data-parent="#{{ parent_id }}" data-target="#{{id}}">
+        <div class="{{ panel?'panel-heading':''}} accordion-caret">
+            <div class="{{ panel?'panel-title':''}} form-inline accordion-toggle{{ collapsed?' collapsed':'' }}" data-toggle="collapse" data-parent="#{{ parent_id }}" data-target="#{{id}}">
                 {{ form_row(form.tasktype, {'inlineLabel':true, 'hideLabel':true}) }}
             </div>
         </div>
-        <div id="{{id}}" class="panel-collapse collapse{{ collapsed?'':' in' }}">
-            <div class="panel-body">
+        <div id="{{id}}" class="{{ panel?'panel-collapse':''}} collapse{{ collapsed?'':' in' }}">
+            <div {{ panel?'class="panel-body"':''}}>
                 {{ form_rest(form, {'inlineLabel':true, 'hideLabel':true}) }}
             </div>
         </div>

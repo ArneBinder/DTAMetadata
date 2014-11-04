@@ -40,7 +40,7 @@
 
     {#        Render the elements of the collection         #}
         {% for child in form %}
-        <li class="panel panel-default">{{ form_row(child, {'parent_id':id, 'collapsed':true}) }}</li>
+        <li {{panel?'class="panel panel-default"':''}}>{{ form_row(child, {'parent_id':id, 'collapsed':true, 'asPanel':panel}) }}</li>
         {% endfor %}
 
         {{ form_rest(form) }}
