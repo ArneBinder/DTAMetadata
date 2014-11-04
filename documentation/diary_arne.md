@@ -96,3 +96,10 @@
 	+ tried to prepare using expressions
 	+ have a look to https://github.com/symfony/symfony/issues/7726
 	
+2014-11-04
+ o added option to DynamicCollection: asPanel (default:false)
+ o collot_datetime:
+   + javascript doesnt work because it's embedded? https://github.com/genemu/GenemuFormBundle/issues/285
+		https://github.com/genemu/GenemuFormBundle/blob/master/Resources/doc/template.md
+   + http://symfony.com/doc/current/cookbook/form/form_collections.html
+   + or take this http://eonasdan.github.io/bootstrap-datetimepicker/#example9
