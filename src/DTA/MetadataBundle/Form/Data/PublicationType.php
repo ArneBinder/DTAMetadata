@@ -38,7 +38,7 @@ class PublicationType extends BaseAbstractType
             'type' => new Master\PersonPublicationType(),
             'inlineLabel' => false,
             'sortable' => true,
-            'label' => 'Publikationsbezogene Personalia',
+            'label' => 'Autor/Verleger/Übersetzer/Drucker/Herausgeber',
             'options' => array('isPublicationSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
         ));
         $builder->add('wwwready', null, array('attr' => array('min' => 0, 'max' => 3)));

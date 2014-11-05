@@ -164,12 +164,6 @@ DTA\MetadataBundle\Model\Classification\Source:
 DTA\MetadataBundle\Model\Workflow\Task:
     properties:
         tasktype_id: [{ NotBlank: {message: 'Der Task muss einem Typ zugeordnet werden.'} }]
-
-    # TODO: fix this!
-    constraints:
-        - Expression:
-            expression: "this.getStartDate() <= this.getEndDate()"
-            message: "startDate have to be before endDate"
 DTA\MetadataBundle\Model\Workflow\Tasktype:
     properties:
         name: [{ NotBlank: {message: 'Der Tasktyp muss benannt werden.'} }]

@@ -20,7 +20,7 @@ class CopyLocationType extends BaseAbstractType
         $builder->add('partner', new \DTA\MetadataBundle\Form\DerivedType\SelectOrAddType(), array(
             'class' => 'DTA\MetadataBundle\Model\Workflow\Partner',
             'property' => 'Name',
-            'label' => 'Anbieter Leitdruck',
+            'label' => 'Bibliothek/Archiv/Anbieter',
             'searchable' => true,
             'query' => \DTA\MetadataBundle\Model\Workflow\Partner::getRowViewQueryObject()
         ));

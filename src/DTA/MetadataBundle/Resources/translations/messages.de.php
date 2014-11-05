@@ -14,7 +14,7 @@ return array(
     'Font' => 'Schriftart',
     'GenrePublication' => 'Genre',
     'GenreWork' => 'Genre',
-    'Imagesource' => 'Bildquelle',
+    'Imagesource' => 'Nachweise der Bilddigitalisate',
     'Language' => 'Sprache',
     'LanguagePublication' => 'Sprache',
     'LanguageWork' => 'Sprache',
