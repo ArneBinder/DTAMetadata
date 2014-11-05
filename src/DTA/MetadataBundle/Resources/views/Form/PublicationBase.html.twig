@@ -144,6 +144,9 @@
     }#}
     {{ dta.endFieldset()}}
 {% endblock tasks %}
-{% block rest %}
-    {{ form_rest(form) }}
-{% endblock rest %}
+
+{% block specialized %}
+    {{ dta.beginFieldset({'caption':'Publikationstypspezifisches'})}}
+        {{ form_rest(form) }}
+    {{ dta.endFieldset()}}
+{% endblock specialized %}
