@@ -108,3 +108,4 @@
  o access data in twig template via form.VALUE (form.year) or form.parent.VALUE to get data of embedding form. access twig data of embedding form (e.g. id) via form.parent.vars.VALUE (e.g. form.parent.vars.id)
  o form type extensions! (http://symfony.com/doc/current/cookbook/form/create_form_type_extension.html)
  o modified start_date/end_date: it's not possible to select a start_date after an end_date and vice versa :-)
+ o get closed from task_row: dump(form.parent.vars.value[0].closed). no id doesn't work right...
