@@ -4,6 +4,7 @@ namespace DTA\MetadataBundle\Form\Data;
 
 use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\Length;
 
 use DTA\MetadataBundle\Form\DerivedType\DynamicCollectionType;
 use DTA\MetadataBundle\Form\DerivedType\SelectOrAddType;
@@ -90,7 +91,7 @@ class PublicationType extends BaseAbstractType
             'label' => 'Genres',
         ));
         
-        $builder->add('legacy_dwds_category1', 'text');
+        $builder->add('legacy_dwds_category1', 'text');//, array('constraints' => new Length(array('min' => 3))));
         $builder->add('legacy_dwds_subcategory1', 'text');
         $builder->add('legacy_dwds_category2', 'text', array('required' => false));
         $builder->add('legacy_dwds_subcategory2', 'text', array('required' => false));

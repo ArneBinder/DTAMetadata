@@ -18,6 +18,10 @@ services:
         class: DTA\MetadataBundle\Form\Extensions\DateWithThresholdExtension
         tags:
             - { name: form.type_extension, alias: date }
+    dta.text_type_extension:
+        class: DTA\MetadataBundle\Form\Extensions\TextTabDisallowedExtension
+        tags:
+            - { name: form.type_extension, alias: text }
 
 # registering the form type as a service allows to use 'dynamicCollection' in the 
 # form builders instead of new Form\DerivedType\DynamicCollectionType()

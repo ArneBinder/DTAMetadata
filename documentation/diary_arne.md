@@ -109,3 +109,8 @@
  o form type extensions! (http://symfony.com/doc/current/cookbook/form/create_form_type_extension.html)
  o modified start_date/end_date: it's not possible to select a start_date after an end_date and vice versa :-)
  o get closed from task_row: dump(form.parent.vars.value[0].closed). no id doesn't work right...
+ o validation:
+	+ http://stackoverflow.com/questions/21486538/symfony2-how-to-use-constraints-on-custom-compound-form-type
+	+ http://symfony2-document.readthedocs.org/en/latest/cookbook/validation/custom_constraint.html
+	+ http://stackoverflow.com/questions/16936437/validate-a-collection-field-type-in-symfony-2-with-allowextrafields-true
+ o read http://symfony.com/blog/form-goodness-in-symfony-2-1
