@@ -182,6 +182,9 @@
     {#<pre>
         {{ dump(data) }}
     </pre>#}
+    {#{% if form.closed == true %}
+        test
+    {% endif %}#}
         <div class="{{ panel?'panel-heading':''}} accordion-caret">
             <div class="{{ panel?'panel-title':''}} form-inline accordion-toggle{{ collapsed?' collapsed':'' }}" data-toggle="collapse" data-parent="#{{ parent_id }}" data-target="#{{id}}">
                 {{ form_row(form.tasktype, {'inlineLabel':true, 'hideLabel':true}) }}

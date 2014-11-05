@@ -2,8 +2,10 @@
 
 namespace DTA\MetadataBundle\Form\Workflow;
 
+use DTA\MetadataBundle\Form\Extensions\DateTypeExtension;
 use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+
 
 class TaskType extends BaseAbstractType
 {
@@ -23,11 +25,10 @@ class TaskType extends BaseAbstractType
             'property' => 'name',
             'required' => true
         ));
-//        $builder->add("publicationgroup", null, array(
-//        ));
-        $builder->add('start_date', null, array('years'=>range(2005,2020), 'widget' => 'single_text')); //$builder->getName()
+
+        $builder->add('start_date', null, array('years'=>range(2005,2020), 'widget' => 'single_text', 'date_ref' => 'end_date', 'threshold' => 'min')); //$builder->getName()
         //$builder->add('start_date', null, array('years'=>range(2005,2020), 'widget' => 'single_text', 'attr' => array('threshold_id'=> '_end_date', 'threshold' => 'Max')));
-        $builder->add('end_date', null, array('years'=>range(2005,2020),'widget' => 'single_text'));
+        $builder->add('end_date', null, array('years'=>range(2005,2020),'widget' => 'single_text', 'date_ref' => 'start_date', 'threshold' => 'max'));
         $builder->add('comments');
         $builder->add('DTAUser', 'model', array(
             'property' => 'username',
