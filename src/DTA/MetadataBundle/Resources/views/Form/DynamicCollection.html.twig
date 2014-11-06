@@ -30,7 +30,7 @@
 
     {% if prototype is defined %}
         {# Add prototype for dynamically adding forms with JS #}
-        {% set attr = attr|merge({'data-prototype': form_row(prototype) }) %}
+        {% set attr = attr|merge({'data-prototype': form_row(prototype, {'parent_id':id, 'asPanel':asPanel}) }) %}
     {% endif %}
 
     <ol class='dynamic-collection list {{ listAdditionalCssClasses }} ' {{ block('widget_container_attributes') }} >
@@ -40,7 +40,7 @@
 
     {#        Render the elements of the collection         #}
         {% for child in form %}
-        <li {{asPanel?'class="panel panel-default"':''}}>{{ form_row(child, {'parent_id':id, 'collapsed':true, 'asPanel':asPanel}) }}</li>
+        <li {{asPanel?'class="panel panel-default"':''}}>{{ form_row(child, {'parent_id':id, 'asPanel':asPanel, 'collapsed':true}) }}</li>
         {% endfor %}
 
         {{ form_rest(form) }}
@@ -55,5 +55,6 @@
        The up and down dynamic controls need this to be more expressive.   #}
         <input type="hidden" name="translatedModelClassName" value="{{ form.vars.modelClass|trans }}"/>
         <input type="hidden" name="modelClassName" value="{{ form.vars.modelClass }}"/>
+        <input type="hidden" name="asPanel" value="{{ asPanel }}"/>
 
 {% endblock %}

@@ -2,9 +2,13 @@
 
 namespace DTA\MetadataBundle\Form\Workflow;
 
-use DTA\MetadataBundle\Form\Extensions\DateTypeExtension;
+//use DTA\MetadataBundle\Form\Extensions\DateWithThresholdExtension;
 use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
 
 
 class TaskType extends BaseAbstractType
@@ -26,8 +30,8 @@ class TaskType extends BaseAbstractType
             'required' => true
         ));
 
-        $builder->add('start_date', null, array('years'=>range(2005,2020), 'widget' => 'single_text', 'date_ref' => 'end_date', 'threshold' => 'min')); //$builder->getName()
-        //$builder->add('start_date', null, array('years'=>range(2005,2020), 'widget' => 'single_text', 'attr' => array('threshold_id'=> '_end_date', 'threshold' => 'Max')));
+        $builder->add('start_date', null, array('years'=>range(2005,2020), 'widget' => 'single_text', 'date_ref' => 'end_date', 'threshold' => 'min'));//,
+            //'data' => (isset($options['data']) && $options['data']->getStartDate() !== null) ? $options['data']->getStartDate() : new \DateTime('today')));
         $builder->add('end_date', null, array('years'=>range(2005,2020),'widget' => 'single_text', 'date_ref' => 'start_date', 'threshold' => 'max'));
         $builder->add('comments');
         $builder->add('DTAUser', 'model', array(
@@ -45,5 +49,16 @@ class TaskType extends BaseAbstractType
             'label' => 'Abgeschlossen',
             'attr' => array('expanded'=>true),
         ));
+    }
+
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        parent::setDefaultOptions($resolver);
+        $resolver->setDefaults(array('collapsed' => false));
+    }
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars['collapsed'] = $options['collapsed'];
+        //echo "TEST";
     }
 }

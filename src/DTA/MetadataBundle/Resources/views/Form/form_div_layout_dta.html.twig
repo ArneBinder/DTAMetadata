@@ -93,9 +93,10 @@
 {% spaceless %}
     {% if (label is not sameas(false)) and (label != "@suppress") %}
 
-        {% if not compound %}
+        {# % if not compound and (not attribute(label_attr, 'for') is defined or attribute(label_attr, 'for') == id)% #}
+        {# { % if not compound %}
             {% set label_attr = label_attr|merge({'for': id}) %}
-        {% endif %}
+        {% endif %} #}
         {% if required %}
             {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
         {% endif %}

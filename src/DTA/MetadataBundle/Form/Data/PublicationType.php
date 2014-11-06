@@ -153,6 +153,7 @@ class PublicationType extends BaseAbstractType
             'inlineLabel' => false,
             'sortable' => false,
             'label' => 'Tasks',
+            'asPanel' => true
 //            'options' => array('isPublicationSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
         ));
         

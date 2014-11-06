@@ -115,7 +115,10 @@
 	+ http://stackoverflow.com/questions/16936437/validate-a-collection-field-type-in-symfony-2-with-allowextrafields-true
  o read http://symfony.com/blog/form-goodness-in-symfony-2-1
  
- 
+2014-11-06
+ o added regex constraint to disallow tabs in input fields
+ o set default value (for start_date): http://stackoverflow.com/questions/17986481/set-default-values-using-form-classes-in-symfony-2
+	+ second approach of second answer seems to work... but doesnt: data' => (isset($options['data']) && $options['data']->getStartDate() !== null) ? $options['data']->getStartDate() : new \DateTime('today')
  
  
  TODO:
@@ -129,3 +132,5 @@
  o add genre and tag import from old database
  
  o add filter to search for entries
+ 
+ o use inherit_data (http://symfony.com/doc/current/cookbook/form/inherit_data_option.html)

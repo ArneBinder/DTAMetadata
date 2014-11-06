@@ -78,6 +78,9 @@ function addFormElement(){
     var translatedModelClassName = $collectionHolder
         .children('input[name=translatedModelClassName]')
         .val();
+    var asPanel = $collectionHolder
+        .children('input[name=asPanel]')
+        .val();
     
     // remove leading and trailing whitespace, because jQuery has problems to recognize the string otherwise
     var prototype = $.trim($collectionList.attr("data-prototype"));
@@ -92,8 +95,12 @@ function addFormElement(){
     // CREATE NEW DOM ELEMENT 
     var $newForm = $(prototype);
     
-    var $newFormLi = $('<li></li>')
-        .append($newForm);
+    var $newFormLi = $('<li></li>');
+
+    if (asPanel){
+        $newFormLi.addClass('panel').addClass('panel-default');
+    }
+    $newFormLi.append($newForm);
     
     // add e.g. remove button
     createElementControls($newFormLi, translatedModelClassName);
