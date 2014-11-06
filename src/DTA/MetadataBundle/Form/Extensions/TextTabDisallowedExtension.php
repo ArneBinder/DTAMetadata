@@ -14,19 +14,24 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
+//use Symfony\Component\Validator\Constraints\Length;
+//use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Regex;
 
 class TextTabDisallowedExtension extends AbstractTypeExtension{
 
-    //public function setDefaultOptions(OptionsResolverInterface $resolver)
-    //{
-        //$resolver->setDefaults(array('validation_groups' => array('no_tabs')));
-    //}
+    public function setDefaultOptions(OptionsResolverInterface $resolver) {
+
+        parent::setDefaultOptions($resolver);
+
+        $resolver->setDefaults(array(
+            'constraints' => new Regex(array('pattern' => '/\t/', 'match'=> false, 'message' => 'Die Eingabe darf keine Tabstops enthalten.')))
+       );
+    }
 
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['constraints'] = array(new NotBlank);
+        //$view->vars['constraints'] = array(new NotBlank);
         //echo "TEST";
     }
 

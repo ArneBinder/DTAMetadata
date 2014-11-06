@@ -114,3 +114,18 @@
 	+ http://symfony2-document.readthedocs.org/en/latest/cookbook/validation/custom_constraint.html
 	+ http://stackoverflow.com/questions/16936437/validate-a-collection-field-type-in-symfony-2-with-allowextrafields-true
  o read http://symfony.com/blog/form-goodness-in-symfony-2-1
+ 
+ 
+ 
+ 
+ TODO:
+ o Tab-Constraint
+ o merge multiple spaces
+ 
+ o Fix delete task buttons
+ o Fix display of validation errors
+ 
+ o add confirm form when deleting entries
+ o add genre and tag import from old database
+ 
+ o add filter to search for entries
