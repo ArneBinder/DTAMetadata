@@ -119,7 +119,8 @@
  o added regex constraint to disallow tabs in input fields
  o set default value (for start_date): http://stackoverflow.com/questions/17986481/set-default-values-using-form-classes-in-symfony-2
 	+ second approach of second answer seems to work... but doesnt: data' => (isset($options['data']) && $options['data']->getStartDate() !== null) ? $options['data']->getStartDate() : new \DateTime('today')
- 
+	+ try this: http://symfony.com/doc/current/cookbook/form/dynamic_form_modification.html#cookbook-form-events-underlying-data
+		--> worked! (via event listener)
  
  TODO:
  o Tab-Constraint

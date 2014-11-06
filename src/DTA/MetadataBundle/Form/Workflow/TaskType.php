@@ -5,9 +5,12 @@ namespace DTA\MetadataBundle\Form\Workflow;
 //use DTA\MetadataBundle\Form\Extensions\DateWithThresholdExtension;
 use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use DTA\MetadataBundle\Model\Workflow\Task;
 
 
 
@@ -30,25 +33,35 @@ class TaskType extends BaseAbstractType
             'required' => true
         ));
 
-        $builder->add('start_date', null, array('years'=>range(2005,2020), 'widget' => 'single_text', 'date_ref' => 'end_date', 'threshold' => 'min'));//,
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            $task = $event->getData();
+            $form = $event->getForm();
+
+            if (!$task || null === $task->getId()) {
+                $form->add('start_date', null, array('years'=>range(2005,2020), 'widget' => 'single_text', 'date_ref' => 'end_date', 'threshold' => 'min', 'data' => new \DateTime('today')));
+            }else{
+                $form->add('start_date', null, array('years'=>range(2005,2020), 'widget' => 'single_text', 'date_ref' => 'end_date', 'threshold' => 'min'));
+            }
+            $form->add('end_date', null, array('years'=>range(2005,2020),'widget' => 'single_text', 'date_ref' => 'start_date', 'threshold' => 'max'));
+            $form->add('comments');
+            $form->add('DTAUser', 'model', array(
+                'property' => 'username',
+                'class' => 'DTA\MetadataBundle\Model\Master\DTAUser',
+                'label' => 'verantwortlich'
+            ));
+            $form->add('Partner', 'model', array(
+                'property' => 'name',
+                'class' => 'DTA\MetadataBundle\Model\Workflow\Partner',
+                'label' => 'Partner',
+                'query' => \DTA\MetadataBundle\Model\Workflow\Partner::getRowViewQueryObject()
+            ));
+            $form->add('closed', null, array(
+                'label' => 'Abgeschlossen',
+                'attr' => array('expanded'=>true),
+            ));
+        });
+        //$builder->add('start_date', null, array('years'=>range(2005,2020), 'widget' => 'single_text', 'date_ref' => 'end_date', 'threshold' => 'min'));//,
             //'data' => (isset($options['data']) && $options['data']->getStartDate() !== null) ? $options['data']->getStartDate() : new \DateTime('today')));
-        $builder->add('end_date', null, array('years'=>range(2005,2020),'widget' => 'single_text', 'date_ref' => 'start_date', 'threshold' => 'max'));
-        $builder->add('comments');
-        $builder->add('DTAUser', 'model', array(
-            'property' => 'username',
-            'class' => 'DTA\MetadataBundle\Model\Master\DTAUser',
-            'label' => 'verantwortlich'
-        ));
-        $builder->add('Partner', 'model', array(
-            'property' => 'name',
-            'class' => 'DTA\MetadataBundle\Model\Workflow\Partner',
-            'label' => 'Partner',
-            'query' => \DTA\MetadataBundle\Model\Workflow\Partner::getRowViewQueryObject()
-        ));
-        $builder->add('closed', null, array(
-            'label' => 'Abgeschlossen',
-            'attr' => array('expanded'=>true),
-        ));
     }
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)
