@@ -17,137 +17,143 @@
 
 {%set publication = form.publication|default(form) %}
 
-{% block work %}
-    {{ dta.beginFieldset({'caption':'Werk'})}}
+<div class="row">
+    <div class="col-lg-6">
+        {% block work %}
+            {{ dta.beginFieldset({'caption':'Werk'})}}
 
-    {{ form_row(publication.title) }}
-    {{ form_row(publication.dirname) }}
+            {{ form_row(publication.title) }}
+            {{ form_row(publication.dirname) }}
 
-    {{ form_row(publication.PersonPublications) }}
+            {{ form_row(publication.PersonPublications) }}
 
-    {#{% set modalId = 'moreOptionsForPublication' %}
-    {{ dta.beginLabelledContent({'labelCaption':'', 'controlId':'none'}) }}
-        {{ dta.btnLaunchModal({'id':modalId, 'caption':'weitere Angaben...'})}}
-    {{ dta.endLabelledContent() }}
-    {{ dta.beginModal({
+            {#{% set modalId = 'moreOptionsForPublication' %}
+            {{ dta.beginLabelledContent({'labelCaption':'', 'controlId':'none'}) }}
+                {{ dta.btnLaunchModal({'id':modalId, 'caption':'weitere Angaben...'})}}
+            {{ dta.endLabelledContent() }}
+            {{ dta.beginModal({
+                    'id': modalId,
+                    'title': 'Weitere Angaben zum Werk',
+               })
+            }}#}
+
+            {{ form_row(publication.wwwready) }}
+            {{ form_row(publication.doi) }}
+            {{ form_row(publication.format) }}
+
+            {#{{ dta.endModal({
+                    'id': modalId,
+                    'confirm': {'caption': 'Fertig', 'target': '#', 'attr':{'data-dismiss':'modal'} },
+                    'hideCancelButton': true,
+               })
+            }}#}
+
+            {{ form_row(publication.citation) }}
+
+            {{ dta.endFieldset()}}
+        {% endblock work %}
+
+        {% block publication %}
+            {{ dta.beginFieldset({'caption':'Angaben zur Publikation der Vorlage'})}}
+
+            {{ form_row(publication.place) }}
+
+            {{ dta.beginLabelledContent({'controlId':'none', 'labelCaption':'Datierung'}) }}
+            {{ form_row(publication.DatespecificationRelatedByPublicationdateId) }}
+            {#{ form_row(publication.DatespecificationRelatedByCreationDateId) }#}
+            {{ dta.endLabelledContent() }}
+
+            {{ form_row(publication.numpages) }}
+            {{ form_row(publication.numpagesnumeric) }}
+            {{ form_row(publication.firstpage) }}
+
+            {{ form_row(publication.publishingcompany) }}
+
+            {{ dta.endFieldset()}}
+        {% endblock %}
+
+        {% block editorialInformation %}
+            {{ dta.beginFieldset({'caption':'Editorisches', 'collapsed': false})}}
+
+            {{ form_row(publication.printrun) }}
+            {{ form_row(publication.editiondescription, {'attr':{'class':'col-7'} }) }}
+            {{ form_row(publication.digitaleditioneditor, {'attr':{'class':'col-7'} }) }}
+            {{ form_row(publication.transcriptioncomment, {'attr':{'class':'col-7'} }) }}
+
+            {{ dta.endFieldset()}}
+        {% endblock %}
+
+        {% block classification %}
+            {{ dta.beginFieldset({'caption':'Klassifikation und Einordnung', 'collapsed': false})}}
+
+            <!--div id="taggerTest" style="width:400px"></div>
+            <script type="text/javascript">
+                $("#taggerTest").select2({tags:["fraktur", "antiqua", "schwabacher"]});
+            </script-->
+            {#{ form_row(publication.font, {'label':'vorherrschende Schriftart'}) }#}
+            {{ form_row(publication.LanguagePublications, {'label':'vorherrschende Sprache'}) }}
+            {{ form_row(publication.GenrePublications, {'label':'Genre'}) }}
+            {{ form_row(publication.legacy_dwds_category1) }}
+            {{ form_row(publication.legacy_dwds_subcategory1) }}
+            {{ form_row(publication.legacy_dwds_category2) }}
+            {{ form_row(publication.legacy_dwds_subcategory2) }}
+
+            {{ form_row(publication.CategoryPublications, {'label':'Kategorien'}) }}
+            {{ form_row(publication.PublicationTags, {'label':'Schlagworte'}) }}
+
+            {{ dta.endFieldset()}}
+        {% endblock %}
+    </div>
+    <div class="col-lg-6">
+        {% block tasks %}
+            {{ dta.beginFieldset({'caption':'Tasks'})}}
+            {% set modalId = 'tasks' %}
+            {#{ dta.beginModal({
             'id': modalId,
-            'title': 'Weitere Angaben zum Werk',
-       })            
-    }}#}
+            'title': 'Tasks',
+            })
+            }#}
+            {{ form_row(publication.Tasks) }}
 
-    {{ form_row(publication.wwwready) }}
-    {{ form_row(publication.doi) }}
-    {{ form_row(publication.format) }}
-
-    {#{{ dta.endModal({
+            {#{ dta.endModal({
             'id': modalId,
             'confirm': {'caption': 'Fertig', 'target': '#', 'attr':{'data-dismiss':'modal'} },
             'hideCancelButton': true,
-       })
-    }}#}
+            })
+            }#}
+            {{ dta.endFieldset()}}
+        {% endblock tasks %}
 
-    {{ form_row(publication.citation) }}
+        {% block sources %}
+            {{ dta.beginFieldset({'caption':'Quellen'})}}
+            Bild
+            <div class="well">
+                {{ form_row(publication.ImageSources) }}
+            </div>
+            Text
+            <div class="well">
+                {{ form_row(publication.TextSources) }}
+            </div>
+            {{ dta.endFieldset()}}
+        {% endblock %}
 
-    {{ dta.endFieldset()}}
-{% endblock work %}
+        {% block comments %}
+            {{ dta.beginFieldset({'caption':'Anmerkungen', 'collapsed': false})}}
+            {{ form_row(publication.comment) }}
+            {{ form_row(publication.editioncomment) }}
+            {{ form_row(publication.transcriptioncomment) }}
+            {{ form_row(publication.encodingcomment) }}
+            {{ form_row(publication.firsteditioncomment) }}
+            {{ dta.endFieldset()}}
+        {% endblock %}
 
-{% block publication %}
-    {{ dta.beginFieldset({'caption':'Angaben zur Publikation der Vorlage'})}}
-
-    {{ form_row(publication.place) }}
-
-    {{ dta.beginLabelledContent({'controlId':'none', 'labelCaption':'Datierung'}) }}
-    {{ form_row(publication.DatespecificationRelatedByPublicationdateId) }}
-    {#{ form_row(publication.DatespecificationRelatedByCreationDateId) }#}
-    {{ dta.endLabelledContent() }}
-
-    {{ form_row(publication.numpages) }}
-    {{ form_row(publication.numpagesnumeric) }}
-    {{ form_row(publication.firstpage) }}
-
-    {{ form_row(publication.publishingcompany) }}
-
-    {{ dta.endFieldset()}}
-{% endblock %}
-
-{% block sources %}
-    {{ dta.beginFieldset({'caption':'Quellen'})}}
-    Bild
-    <div class="well">
-        {{ form_row(publication.ImageSources) }}
+        {% block specialized %}
+            {{ dta.beginFieldset({'caption':'Publikationstypspezifisches'})}}
+            {{ form_rest(form) }}
+            {{ dta.endFieldset()}}
+        {% endblock specialized %}
     </div>
-    Text
-    <div class="well">
-        {{ form_row(publication.TextSources) }}
-    </div>
-    {{ dta.endFieldset()}}
-{% endblock %}
+</div>
 
-{% block editorialInformation %}
-    {{ dta.beginFieldset({'caption':'Editorisches', 'collapsed': false})}}
-
-    {{ form_row(publication.printrun) }}
-    {{ form_row(publication.editiondescription, {'attr':{'class':'col-7'} }) }}
-    {{ form_row(publication.digitaleditioneditor, {'attr':{'class':'col-7'} }) }}
-    {{ form_row(publication.transcriptioncomment, {'attr':{'class':'col-7'} }) }}
-
-    {{ dta.endFieldset()}}
-{% endblock %}
-
-{% block classification %}
-    {{ dta.beginFieldset({'caption':'Klassifikation und Einordnung', 'collapsed': false})}}
-
-    <!--div id="taggerTest" style="width:400px"></div>
-    <script type="text/javascript">
-        $("#taggerTest").select2({tags:["fraktur", "antiqua", "schwabacher"]});
-    </script-->
-    {#{ form_row(publication.font, {'label':'vorherrschende Schriftart'}) }#}
-    {{ form_row(publication.LanguagePublications, {'label':'vorherrschende Sprache'}) }}
-    {{ form_row(publication.GenrePublications, {'label':'Genre'}) }}
-    {{ form_row(publication.legacy_dwds_category1) }}
-    {{ form_row(publication.legacy_dwds_subcategory1) }}
-    {{ form_row(publication.legacy_dwds_category2) }}
-    {{ form_row(publication.legacy_dwds_subcategory2) }}
-
-    {{ form_row(publication.CategoryPublications, {'label':'Kategorien'}) }}
-    {{ form_row(publication.PublicationTags, {'label':'Schlagworte'}) }}
-
-    {{ dta.endFieldset()}}
-{% endblock %}
-
-
-{% block comments %}
-    {{ dta.beginFieldset({'caption':'Anmerkungen', 'collapsed': false})}}
-    {{ form_row(publication.comment) }}
-    {{ form_row(publication.editioncomment) }}
-    {{ form_row(publication.transcriptioncomment) }}
-    {{ form_row(publication.encodingcomment) }}
-    {{ form_row(publication.firsteditioncomment) }}
-    {{ dta.endFieldset()}}
-{% endblock %}
-
-{% block tasks %}
-    {{ dta.beginFieldset({'caption':'Tasks'})}}
-    {% set modalId = 'tasks' %}
-    {#{ dta.beginModal({
-    'id': modalId,
-    'title': 'Tasks',
-    })
-    }#}
-    {{ form_row(publication.Tasks) }}
-
-    {#{ dta.endModal({
-    'id': modalId,
-    'confirm': {'caption': 'Fertig', 'target': '#', 'attr':{'data-dismiss':'modal'} },
-    'hideCancelButton': true,
-    })
-    }#}
-    {{ dta.endFieldset()}}
-{% endblock tasks %}
-
-{% block specialized %}
-    {{ dta.beginFieldset({'caption':'Publikationstypspezifisches'})}}
-        {{ form_rest(form) }}
-    {{ dta.endFieldset()}}
-{% endblock specialized %}
+{# if block specialized is overwritten #}
 {{ form_rest(form) }}
