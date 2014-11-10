@@ -123,7 +123,13 @@
 		--> worked! (via event listener)
 		
 2014-11-10
- o twig template globals are defined in config.yml/twig/globals 
+ o twig template globals are defined in config.yml/twig/globals
+ o changed layout to two columns
+ o try to merge duplicated spaces:
+	+ http://stackoverflow.com/questions/11348370/symfony2-how-to-modify-a-form-value-before-validation
+	+ via dataTransformer http://symfony.com/doc/master/cookbook/form/data_transformers.html
+	+ or FormEvents http://symfony.com/doc/master/cookbook/form/dynamic_form_modification.html 
+		--> works. but no feedback for the user is implemented yet!
  
  TODO:
  o Tab-Constraint DONE

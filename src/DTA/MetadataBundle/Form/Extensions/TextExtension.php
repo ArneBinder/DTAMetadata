@@ -10,15 +10,19 @@ namespace DTA\MetadataBundle\Form\Extensions;
 
 
 use Symfony\Component\Form\AbstractTypeExtension;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
+//use Symfony\Component\Form\FormError;
+//use Symfony\Component\Form\FormView;
+//use Symfony\Component\Form\FormInterface;
+//use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 //use Symfony\Component\Validator\Constraints\Length;
 //use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormBuilderInterface;
 
-class TextTabDisallowedExtension extends AbstractTypeExtension{
+class TextExtension extends AbstractTypeExtension{
 
     public function setDefaultOptions(OptionsResolverInterface $resolver) {
 
@@ -29,10 +33,18 @@ class TextTabDisallowedExtension extends AbstractTypeExtension{
        );
     }
 
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        //$view->vars['constraints'] = array(new NotBlank);
-        //echo "TEST";
+        // to merge duplicated spaces in input data (no feedback for the user is implemented yet!)...
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            $text = $event->getData();
+            $form = $event->getForm();
+            if(preg_match('/  /',$text)===1){
+                //$form->addError(new FormError('text field contains double spaces'));
+                $event->setData(preg_replace('/  +/',' ',$text));
+            }
+
+        });
     }
 
     /**

@@ -19,7 +19,7 @@ services:
         tags:
             - { name: form.type_extension, alias: date }
     dta.text_type_extension:
-        class: DTA\MetadataBundle\Form\Extensions\TextTabDisallowedExtension
+        class: DTA\MetadataBundle\Form\Extensions\TextExtension
         tags:
             - { name: form.type_extension, alias: text }
 
