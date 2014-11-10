@@ -121,6 +121,9 @@
 	+ second approach of second answer seems to work... but doesnt: data' => (isset($options['data']) && $options['data']->getStartDate() !== null) ? $options['data']->getStartDate() : new \DateTime('today')
 	+ try this: http://symfony.com/doc/current/cookbook/form/dynamic_form_modification.html#cookbook-form-events-underlying-data
 		--> worked! (via event listener)
+		
+2014-11-10
+ o twig template globals are defined in config.yml/twig/globals 
  
  TODO:
  o Tab-Constraint DONE
