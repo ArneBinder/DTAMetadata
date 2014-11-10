@@ -17,14 +17,14 @@ class DateWithThresholdExtension extends AbstractTypeExtension{
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setOptional(array('date_ref', 'threshold'));
+        $resolver->setOptional(array('threshold_ref', 'threshold_type'));
     }
 
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        if (array_key_exists('date_ref', $options) and array_key_exists('threshold', $options)) {
-            $view->vars['date_ref'] = $options['date_ref'];
-            $view->vars['threshold'] = $options['threshold'];
+        if (array_key_exists('threshold_ref', $options) and array_key_exists('threshold_type', $options)) {
+            $view->vars['threshold_ref'] = $options['threshold_ref'];
+            $view->vars['threshold_type'] = $options['threshold_type'];
         }
     }
 

@@ -163,13 +163,13 @@
             </div>
         {% endif %}
 
-        {% if date_ref is defined and threshold is defined %}
-            {%  set threshold_id = form.parent.vars.id~'_'~date_ref %}
+        {% if threshold_ref is defined and threshold_type is defined %}
+            {%  set threshold_id = form.parent.vars.id~'_'~threshold_ref %}
             <script type="text/javascript">
                 $(function () {
                     $("#{{ id }}").on("change",function (e) {
                         var el = document.querySelector("#{{ threshold_id }}");
-                        el.setAttribute("{{ threshold }}",$("#{{ id }}").val());
+                        el.setAttribute("{{ threshold_type }}",$("#{{ id }}").val());
                     });
                     $("#{{ id }}").change();
                 });

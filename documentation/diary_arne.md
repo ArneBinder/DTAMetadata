@@ -123,11 +123,12 @@
 		--> worked! (via event listener)
  
  TODO:
- o Tab-Constraint
+ o Tab-Constraint DONE
  o merge multiple spaces
  
  o Fix delete task buttons
  o Fix display of validation errors
+ o Fix sortable tables
  
  o add confirm form when deleting entries
  o add genre and tag import from old database

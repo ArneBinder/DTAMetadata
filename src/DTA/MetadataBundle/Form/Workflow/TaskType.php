@@ -38,11 +38,11 @@ class TaskType extends BaseAbstractType
             $form = $event->getForm();
 
             if (!$task || null === $task->getId()) {
-                $form->add('start_date', null, array('years'=>range(2005,2020), 'widget' => 'single_text', 'date_ref' => 'end_date', 'threshold' => 'min', 'data' => new \DateTime('today')));
+                $form->add('start_date', null, array('years'=>range(2005,2020), 'widget' => 'single_text', 'threshold_ref' => 'end_date', 'threshold_type' => 'min', 'data' => new \DateTime('today')));
             }else{
-                $form->add('start_date', null, array('years'=>range(2005,2020), 'widget' => 'single_text', 'date_ref' => 'end_date', 'threshold' => 'min'));
+                $form->add('start_date', null, array('years'=>range(2005,2020), 'widget' => 'single_text', 'threshold_ref' => 'end_date', 'threshold_type' => 'min'));
             }
-            $form->add('end_date', null, array('years'=>range(2005,2020),'widget' => 'single_text', 'date_ref' => 'start_date', 'threshold' => 'max'));
+            $form->add('end_date', null, array('years'=>range(2005,2020),'widget' => 'single_text', 'threshold_ref' => 'start_date', 'threshold_type' => 'max'));
             $form->add('comments');
             $form->add('DTAUser', 'model', array(
                 'property' => 'username',
