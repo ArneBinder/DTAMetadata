@@ -4,15 +4,15 @@
         <!-- --------------- main menu --------------- -->
         
         <div class="row-fluid">
-            <a class="navbar-brand" href="{{ path('home') }}">
+            <a class="navbar-brand" href="{{ path('dataDomain') }}">
                 DTA Projektdatenbank
             </a>
             <ul class="nav navbar-nav">
             {% block domainMenu %}
-                <li {% if package == "Home" %} class='active' {% endif %} >
+                {#<li {% if package == "Home" %} class='active' {% endif %} >
                     <a href="{{ path('home') }}">
                         Startseite
-                    </a></li>
+                    </a></li>#}
                 <li {% if package == "Data" %} class='active' {% endif %} >
                     <a href="{{ path('dataDomain') }}">
                         Daten

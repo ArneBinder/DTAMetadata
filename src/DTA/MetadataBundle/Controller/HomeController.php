@@ -35,8 +35,9 @@ class HomeController extends DTADomainController {
 //    }
     
     public function indexAction(Request $request) {
-        
-        return $this->renderWithDomainData('DTAMetadataBundle:Home:index.html.twig', array(
+
+        return $this->redirect($this->generateUrl('dataDomain'));
+        /*return $this->renderWithDomainData('DTAMetadataBundle:Home:index.html.twig', array(
             'testData' =>
                 $request
 //            array(
@@ -52,6 +53,6 @@ class HomeController extends DTADomainController {
 //            $tasks->findOneById(6016)->getPublicationgroup()->getName()
 //             $groupA = Model\Data\PlaceQuery::create()->findOneByName("Berlin")->getPublications()
             //$p->getPersonalnames()
-        ));
+        ));*/
     }
 }

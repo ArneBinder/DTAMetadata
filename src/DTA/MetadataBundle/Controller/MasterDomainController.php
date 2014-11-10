@@ -108,9 +108,13 @@ class MasterDomainController extends ORMController {
         $workingDirectory = exec("pwd");
         echo exec("whoami")." -- ";
 //        echo implode(DIRECTORY_SEPARATOR, array($workingDirectory, '..', 'app', 'cache', 'dev'));
-        $clearCacheCommand = "$phpBinary $workingDirectory/../app/console cache:clear";
+        if($applicationMode == null){
+            $applicationMode = "dev";
+        }
+        $clearCacheCommand = "$phpBinary $workingDirectory/../app/console cache:clear --env=".$applicationMode;
         echo $clearCacheCommand;
         $result = exec($clearCacheCommand);
+        echo "cache cleared for ".$applicationMode;
 //        rmdir( implode(DIRECTORY_SEPARATOR, array($workingDirectory, '..', 'app', 'cache', 'dev')) . DIRECTORY_SEPARATOR);
 //        echo $workingDirectory;
 //        echo getcwd();
