@@ -130,6 +130,7 @@
 	+ via dataTransformer http://symfony.com/doc/master/cookbook/form/data_transformers.html
 	+ or FormEvents http://symfony.com/doc/master/cookbook/form/dynamic_form_modification.html 
 		--> works. but no feedback for the user is implemented yet!
+ o prepared constraint for Language: has to begin with a capital letter
  
  TODO:
  o Tab-Constraint DONE
