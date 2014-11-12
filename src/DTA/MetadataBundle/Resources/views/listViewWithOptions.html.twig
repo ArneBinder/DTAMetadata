@@ -55,8 +55,15 @@
         </table>
         {% endspaceless %}
 </div>
-<div class="well col-md-3" id="publicationOptions" style="margin-top:-4px;">
-    <h4> Auf eine Publikation klicken, um Informationen anzuzeigen. </h4>
+<div class="col-md-3">
+    <div style="margin-top:10px; margin-bottom: 10px">
+        <a href="{{ path('Data_newPublication', {'publicationType':className}) }}" class="btn btn-default btn-sm">
+            {{ className|trans}} neu anlegen
+        </a>
+    </div>
+    <div class="well" id="publicationOptions">
+        <h4> Auf eine Publikation klicken, um Informationen anzuzeigen. </h4>
+    </div>
 </div>
 {% endblock core %}
 

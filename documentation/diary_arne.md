@@ -134,6 +134,7 @@
  
 2014-11-12
  o Home redirects to showAll/Publication
+ o added Button "<Publicationstype> neu anlegen" to listViewWithoptions (button is displayed ahead the publication data overview)
  
  TODO:
  o Tab-Constraint DONE
