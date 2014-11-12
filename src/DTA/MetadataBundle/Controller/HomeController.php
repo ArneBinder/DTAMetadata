@@ -36,6 +36,8 @@ class HomeController extends DTADomainController {
     
     public function indexAction(Request $request) {
 
+        //return $this->redirect($this->generateUrl('dataDomain'));
+        //return $this->redirect($this->generateUrl('Data_genericViewAll', array('className' => 'Publication')));
         return $this->redirect($this->generateUrl('dataDomain'));
         /*return $this->renderWithDomainData('DTAMetadataBundle:Home:index.html.twig', array(
             'testData' =>

@@ -44,8 +44,8 @@ class DataDomainController extends ORMController {
     
     public function indexAction() {
         
-        return $this->renderWithDomainData('DTAMetadataBundle:Package_Data:index.html.twig', array(
-        ));
+        //return $this->renderWithDomainData('DTAMetadataBundle:Package_Data:index.html.twig', array());
+        return $this->redirect($this->generateUrl('Data_genericViewAll', array('className' => 'Publication')));
     }
     /**
      * Handles creation of publications (since for some publication types specialized classes exist, a bit of extra logic is required.)

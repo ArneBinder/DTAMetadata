@@ -132,6 +132,9 @@
 		--> works. but no feedback for the user is implemented yet!
  o prepared constraint for Language: has to begin with a capital letter
  
+2014-11-12
+ o Home redirects to showAll/Publication
+ 
  TODO:
  o Tab-Constraint DONE
  o merge multiple spaces
