@@ -135,6 +135,8 @@
 2014-11-12
  o Home redirects to showAll/Publication
  o added Button "<Publicationstype> neu anlegen" to listViewWithoptions (button is displayed ahead the publication data overview)
+ o modified panel head of task: splitted clickable (to expand) area --> disabled data-toggle at "closed" etc.
+	+ size of placeholder span not correct yet!
  
  TODO:
  o Tab-Constraint DONE

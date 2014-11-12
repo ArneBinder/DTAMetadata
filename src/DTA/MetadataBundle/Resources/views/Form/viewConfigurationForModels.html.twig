@@ -186,8 +186,13 @@
         test
     {% endif %}#}
         <div class="{{ panel?'panel-heading':''}} accordion-caret">
-            <div class="{{ panel?'panel-title':''}} form-inline accordion-toggle{{ collapsed?' collapsed':'' }}" data-toggle="collapse" data-parent="#{{ parent_id }}" data-target="#{{id}}">
-                {{ form_row(form.tasktype, {'inlineLabel':true, 'hideLabel':true}) }}
+            <div class="{{ panel?'class="panel-title':''}}" style="white-space: nowrap">
+                <span class="form-inline accordion-toggle{{ collapsed?' collapsed':'' }}" data-toggle="collapse" data-parent="#{{ parent_id }}" data-target="#{{id}}"></span>
+                <span class="form-inline" >
+                    {{ form_row(form.tasktype, {'inlineLabel':true, 'hideLabel':true}) }}
+                    {{ form_row(form.closed) }}
+                </span>
+                <span class="form-inline" style="display:inline-block;overflow:hidden;width:100%;height:100%;" data-toggle="collapse" data-parent="#{{ parent_id }}" data-target="#{{id}}"></span>
             </div>
         </div>
         <div id="{{id}}" class="{{ panel?'panel-collapse':''}} collapse{{ collapsed?'':' in' }}">
