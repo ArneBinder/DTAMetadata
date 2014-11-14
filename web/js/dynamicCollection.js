@@ -17,7 +17,7 @@ function createGui(){
     jQuery(document).on('DOMNodeRemoved', '.dynamic-collection.list li', updateSortableRanks);
     
     // add up and down control elements for dynamic collections
-    var dynamicElements = jQuery('.dynamic-collection > *');
+    var dynamicElements = jQuery('.dynamic-collection > div, .dynamic-collection > li');
     
     
     jQuery.each(dynamicElements, function(idx,element){
@@ -138,14 +138,14 @@ function createElementControls(element, translatedModelClassName){
     var $collectionHolder = $(element).parent().parent(); // element: li, parent: ol, parent: collection holder
     var elementId = $(element).attr('class');
     
-    console.log(element, elementId);
+    //console.log(element, elementId);
     //console.log($(element).parent().parent());
     
     if(undefined === translatedModelClassName)
         translatedModelClassName = $collectionHolder
             .children('input[name=translatedModelClassName]')
             .val();
-    
+
     var removeButtonLink = $('<a></a>')
         .on('click', function(){ $(element).remove() })
         .html('<span class="glyphicon glyphicon-remove dynamic-collection-remove-item-link"></span>');
@@ -162,7 +162,7 @@ function createElementControls(element, translatedModelClassName){
         .val();
 
     if(asPanel) {
-        $(element).prepend(removeButtonLink);
+       $(element).prepend(removeButtonLink);
     }else{
         $(element).children('div').prepend(removeButtonLink);
     }

@@ -42,9 +42,10 @@
 
             {#        Render the elements of the collection         #}
             {% for child in form %}
-                <div class="panel panel-default">{{ form_row(child, {'parent_id':id, 'asPanel':asPanel, 'collapsed':true}) }}</div>
+                <div class="panel panel-default">
+                    {{ form_row(child, {'parent_id':id, 'asPanel':asPanel, 'collapsed':true}) }}
+                </div>
             {% endfor %}
-
             {{ form_rest(form) }}
         </div>
     {% else %}
