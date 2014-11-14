@@ -56,9 +56,10 @@
         {% endspaceless %}
 </div>
 <div class="col-md-3">
+    {% set publicationType = className != 'Publication'?className:'Book' %}
     <div style="margin-top:10px; margin-bottom: 10px">
-        <a href="{{ path('Data_newPublication', {'publicationType':className}) }}" class="btn btn-default btn-sm">
-            {{ className|trans}} neu anlegen
+        <a href="{{ path('Data_newPublication', {'publicationType':publicationType}) }}" class="btn btn-default btn-sm">
+            {{ publicationType|trans}} neu anlegen
         </a>
     </div>
     <div class="well" id="publicationOptions">

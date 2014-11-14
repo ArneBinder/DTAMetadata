@@ -140,6 +140,7 @@
 	
 2014-11-12
  o fixed delete button for tasks (wrong position): position of containing element has to be absolute, fixed or relative to use 'position: absolute' in child element correctly (finally added position:relative to .panel in forms.css)
+ o Button "<Publikationstyp> neu anlegen" next to listView: if className='Publication' (all publications are displayed), it will be "BUCH neu anlegen" 
  
  
  TODO:
