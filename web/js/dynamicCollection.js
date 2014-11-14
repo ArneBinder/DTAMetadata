@@ -17,7 +17,7 @@ function createGui(){
     jQuery(document).on('DOMNodeRemoved', '.dynamic-collection.list li', updateSortableRanks);
     
     // add up and down control elements for dynamic collections
-    var dynamicElements = jQuery('.dynamic-collection.list li');
+    var dynamicElements = jQuery('.dynamic-collection > *');
     
     
     jQuery.each(dynamicElements, function(idx,element){
@@ -67,11 +67,8 @@ function addFormElement(){
     if($collectionList.attr("data-prototype") === undefined){
         console.log('No protoype element for the collection editor available!');
         return false;
-    }            
-    
-    // using the children method (instead of find) is important here, because dynamic collections might be nested,
-    // in which the li selector might illegally descend into other dynamic collections.
-    var elementId = $collectionList.children("li").length; 
+    }
+
     var modelClassName = $collectionHolder
         .children('input[name=modelClassName]')
         .val();
@@ -81,6 +78,16 @@ function addFormElement(){
     var asPanel = $collectionHolder
         .children('input[name=asPanel]')
         .val();
+
+    // using the children method (instead of find) is important here, because dynamic collections might be nested,
+    // in which the li selector might illegally descend into other dynamic collections.
+    var elementId;
+    if(asPanel){
+        elementId = $collectionList.children("div").length;
+    } else{
+        elementId = $collectionList.children("li").length;
+    }
+
     
     // remove leading and trailing whitespace, because jQuery has problems to recognize the string otherwise
     var prototype = $.trim($collectionList.attr("data-prototype"));
@@ -94,31 +101,33 @@ function addFormElement(){
 
     // CREATE NEW DOM ELEMENT 
     var $newForm = $(prototype);
-    
-    var $newFormLi = $('<li></li>');
-
-    if (asPanel){
-        $newFormLi.addClass('panel').addClass('panel-default');
+    var $newFormElement;
+    if(asPanel){
+        $newFormElement = $('<div></div>');
+        $newFormElement.addClass('panel').addClass('panel-default');
+    }else {
+        $newFormElement = $('<li></li>');
     }
-    $newFormLi.append($newForm);
+
+    $newFormElement.append($newForm);
     
     // add e.g. remove button
-    createElementControls($newFormLi, translatedModelClassName);
+    createElementControls($newFormElement, translatedModelClassName);
         
     var sortable = $collectionList.hasClass('sortable');
     if(sortable){
         
         // add a caption to feed the enumeration (with just a plain div, list elements can't be numbered)
         // without the list-style-type set to decimal, more compact list elements are possible and preferred
-//        $newFormLi.prepend($('<span/>').text(translatedModelClassName));
+//        $newFormElement.prepend($('<span/>').text(translatedModelClassName));
 
         // initialize the rank hidden input field
         var rank = elementId + 1; // the rank is 1-based
-        var $rankInput = $newFormLi.find('input[name*=sortableRank]');
+        var $rankInput = $newFormElement.find('input[name*=sortableRank]');
         $rankInput.attr('value', rank);
     }
     
-    $collectionList.append($newFormLi);
+    $collectionList.append($newFormElement);
     
     return false;
 }
@@ -129,7 +138,8 @@ function createElementControls(element, translatedModelClassName){
     var $collectionHolder = $(element).parent().parent(); // element: li, parent: ol, parent: collection holder
     var elementId = $(element).attr('class');
     
-//    console.log(element, elementId);
+    console.log(element, elementId);
+    //console.log($(element).parent().parent());
     
     if(undefined === translatedModelClassName)
         translatedModelClassName = $collectionHolder
@@ -147,6 +157,14 @@ function createElementControls(element, translatedModelClassName){
 //    var up   = $('<a href="#" class="sortable-up">'+ iconUpStr + /*translatedModelClassName + upStr + */'</a> ');
 //    var down = $('<a href="#" class="sortable-down">'+ iconDownStr + /*translatedModelClassName + downStr + */'</a>');
 
-    $(element).children('div').prepend(removeButtonLink);
+    var asPanel = $collectionHolder
+        .children('input[name=asPanel]')
+        .val();
+
+    if(asPanel) {
+        $(element).prepend(removeButtonLink);
+    }else{
+        $(element).children('div').prepend(removeButtonLink);
+    }
 }
 

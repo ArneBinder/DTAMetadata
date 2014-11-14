@@ -33,18 +33,34 @@
         {% set attr = attr|merge({'data-prototype': form_row(prototype, {'parent_id':id, 'asPanel':asPanel}) }) %}
     {% endif %}
 
-    <ol class='dynamic-collection list {{ listAdditionalCssClasses }} ' {{ block('widget_container_attributes') }} >
-        {% if form.parent is empty %}
-            {{ form_errors(form) }}
-        {% endif %}
+    {% if asPanel %}
+        {# TODO: why is 'list' necessary? (otherwise no prototype is defined... but why?)#}
+        <div class='dynamic-collection list panel-group {{ listAdditionalCssClasses }} ' {{ block('widget_container_attributes') }} >
+            {% if form.parent is empty %}
+                {{ form_errors(form) }}
+            {% endif %}
 
-    {#        Render the elements of the collection         #}
-        {% for child in form %}
-        <li {{asPanel?'class="panel panel-default"':''}}>{{ form_row(child, {'parent_id':id, 'asPanel':asPanel, 'collapsed':true}) }}</li>
-        {% endfor %}
+            {#        Render the elements of the collection         #}
+            {% for child in form %}
+                <div class="panel panel-default">{{ form_row(child, {'parent_id':id, 'asPanel':asPanel, 'collapsed':true}) }}</div>
+            {% endfor %}
 
-        {{ form_rest(form) }}
-    </ol>
+            {{ form_rest(form) }}
+        </div>
+    {% else %}
+        <ol class='dynamic-collection list {{ listAdditionalCssClasses }} ' {{ block('widget_container_attributes') }} >
+            {% if form.parent is empty %}
+                {{ form_errors(form) }}
+            {% endif %}
+
+            {#        Render the elements of the collection         #}
+            {% for child in form %}
+                <li>{{ form_row(child, {'parent_id':id, 'asPanel':asPanel, 'collapsed':true}) }}</li>
+            {% endfor %}
+
+            {{ form_rest(form) }}
+        </ol>
+    {% endif %}
         {#onclick="function(){console.log('success')}"#}
 
         <a href="#" class="dynamic-collection add-entity">
