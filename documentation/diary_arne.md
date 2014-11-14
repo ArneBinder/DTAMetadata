@@ -137,12 +137,16 @@
  o added Button "<Publicationstype> neu anlegen" to listViewWithoptions (button is displayed ahead the publication data overview)
  o modified panel head of task: splitted clickable (to expand) area --> disabled data-toggle at "closed" etc.
 	+ size of placeholder span not correct yet!
+	
+2014-11-12
+ o fixed delete button for tasks (wrong position): position of containing element has to be absolute, fixed or relative to use 'position: absolute' in child element correctly (finally added position:relative to .panel in forms.css)
+ 
  
  TODO:
  o Tab-Constraint DONE
  o merge multiple spaces
  
- o Fix delete task buttons
+ o Fix delete task buttons DONE
  o Fix display of validation errors
  o Fix sortable tables
  
