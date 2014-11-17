@@ -94,10 +94,10 @@
                 
                 var paginationControlsHeight = 45;
                 var tableHeaderHeight = $('thead').first().outerHeight();
-                // TODO: disabled because offset() is null... correct?
-                //var tableTop = $('.table.fullyFeatured').offset().top;
-                //var tableHeight = $(window).innerHeight() - tableTop - tableHeaderHeight - paginationControlsHeight;
-                var tableHeight = $(window).innerHeight() - tableHeaderHeight - paginationControlsHeight;
+                // TODO: disabled because offset() is null... correct? reverted...
+                var tableTop = $('.table.fullyFeatured').offset().top;
+                var tableHeight = $(window).innerHeight() - tableTop - tableHeaderHeight - paginationControlsHeight;
+               // var tableHeight = $(window).innerHeight() - tableHeaderHeight - paginationControlsHeight;
 
 
                 $('.table.fullyFeatured').dataTable( {
