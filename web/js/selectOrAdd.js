@@ -12,9 +12,28 @@ jQuery(function(){
     var searchableConfiguration = {};
     jQuery('.selectOrAdd.select.searchable').select2(searchableConfiguration);
     jQuery('body').on('DOMNodeInserted', function(e){
-        $(e.target).find('.selectOrAdd.select.searchable').select2(searchableConfiguration)
+        if($(e.target)) {
+            $(e.target).find('.selectOrAdd.select.searchable').select2(searchableConfiguration)
+        }
     });
+
+
+    /*$(".select2-drop").each(function(){
+        //console.log($(this));
+        // get the modal id from the id of the select2 element
+        var $s2_id = $(this).parent().attr('id');
+        var $modal_id = "modal_for_"+$s2_id.split("_").slice(1).join("_");
+        $(this).append('<button class="selectOrAdd add btn btn-default btn-sm" type="button" data-toggle="modal" href="'+$modal_id+'"onclick="selectOrAdd_launchAddDialog.call(this)">neu anlegen </button>');
+        //$(this).append('<div><input type="text" style="width: 86%;padding: 9px;"name="lname" value='+$modal_id+'><input class="PrimaryBtn" type="submit" value="Add"></div>');
+    });*/
+
+
+    //$(".select2-drop").append('<div><input type="text" style="width: 86%;padding: 9px;"name="lname" value='+$(this).getAttribute('id')+'><input class="PrimaryBtn" type="submit" value="Add"></div>');
+    //$(".select2-drop").append('<button class="selectOrAdd add btn btn-default btn-sm" type="button" data-toggle="modal" href="{{ modalId }}"onclick="selectOrAdd_launchAddDialog.call(this)">neu anlegen </button>');
 });
+
+
+
 
 /**
  * Called when the add button of a select box. Creates a modal containing a 
@@ -23,7 +42,7 @@ jQuery(function(){
 function selectOrAdd_launchAddDialog(){
     
     var $addButton = $(this);
-    
+    console.log($addButton);
     // create modal only once
     if( ! $addButton.hasClass('modalCreated')){
         
@@ -100,7 +119,8 @@ function createAjaxFormModal(addButton){
     // the url to the form generating controller routine is rendered from the template engine into a hidden input
     // @see dtaFormExtensions.html.twig under {% block selectOrAdd_widget %}
     var modalRetrieveUrl = $(addButton).siblings('input[name=modalRetrieveUrl]').val();
-    
+    console.log($(addButton));
+    console.log(modalRetrieveUrl);
     var $body = $('body');
     // create the backdrop and wait for next modal to be triggered
     $body.modalmanager('loading');
