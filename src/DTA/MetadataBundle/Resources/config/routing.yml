@@ -63,7 +63,7 @@ Master_deleteRecord:
 Master_viewRecord:
   path: /Master/show/{className}/{recordId}
   defaults: 
-    _controller: DTAMetadataBundle:MasterDomaingen:genericView
+    _controller: DTAMetadataBundle:MasterDomain:genericView
     package: Master
 
 Master_genericViewAll:

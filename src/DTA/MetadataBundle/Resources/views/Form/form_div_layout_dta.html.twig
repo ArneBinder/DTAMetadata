@@ -30,8 +30,9 @@
     Whether or not to render the label at all. Works only for inline labels.
 
     4. inlined = true | false
-    This is purely internal, as it is used as a flag that is passed on recursively to the children to
+    This is purely internal*, as it is used as a flag that is passed on recursively to the children to
     achieve a flattened structure for inline controls.
+    *not exactly. e.g. Tasks are rendered with inlined=true to prevent the empty label space
  #}
 
 {#  The form_div_layout.html.twig defines how to render basic form input elements such 

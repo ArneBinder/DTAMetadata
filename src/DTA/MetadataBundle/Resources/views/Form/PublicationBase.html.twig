@@ -107,20 +107,7 @@
     <div class="col-lg-6">
         {% block tasks %}
             {{ dta.beginFieldset({'caption':'Tasks'})}}
-            {% set modalId = 'tasks' %}
-            {#{ dta.beginModal({
-            'id': modalId,
-            'title': 'Tasks',
-            })
-            }#}
-            {{ form_row(publication.Tasks) }}
-
-            {#{ dta.endModal({
-            'id': modalId,
-            'confirm': {'caption': 'Fertig', 'target': '#', 'attr':{'data-dismiss':'modal'} },
-            'hideCancelButton': true,
-            })
-            }#}
+            {{ form_row(publication.Tasks, {'inlined':true}) }}
             {{ dta.endFieldset()}}
         {% endblock tasks %}
 
