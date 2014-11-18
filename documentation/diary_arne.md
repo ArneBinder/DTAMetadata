@@ -145,6 +145,9 @@
 2014-11-17
  o dataTable options are set in base.html.twig http://www.datatables.net/
  
+2014-11-18
+ o prepared to move 'neu anlegen' button into the dropdown menu. 
+ 
  TODO:
  o Tab-Constraint DONE
  o merge multiple spaces
