@@ -188,21 +188,19 @@
 
         <div class="panel-heading accordion-caret">
             <div class="panel-title">
-                <div style="display:flex; white-space: nowrap">
-                    <span id="{{ id~'_acc_caret' }}" class="accordion-toggle{{ collapsed?' collapsed':'' }}" data-toggle="collapse" data-parent="#{{ parent_id }}" data-target="#{{id}}"></span>
-                    <span class="form-inline" >
-                        {{ form_row(form.tasktype, {'inlineLabel':true, 'hideLabel':true}) }}
-                        {{ form_row(form.closed) }}
-                    </span>
-                    <span id="{{ id~'_acc_caret_toggle' }}" style="width:100%;" />
-                    <script type="text/javascript">
-                        $(function () {
-                            $("#{{ id~'_acc_caret_toggle' }}").on("click",function (e) {
-                                $("#{{ id~'_acc_caret' }}").click();
-                            });
+                <span id="{{ id~'_acc_caret' }}" class="accordion-toggle{{ collapsed?' collapsed':'' }}" data-toggle="collapse" data-parent="#{{ parent_id }}" data-target="#{{id}}"></span>
+                <span class="form-inline" >
+                    {{ form_row(form.tasktype, {'inlineLabel':true, 'hideLabel':true}) }}
+                    {{ form_row(form.closed) }}
+                </span>
+                <span id="{{ id~'_acc_caret_toggle' }}" style="width:100%;" />
+                <script type="text/javascript">
+                    $(function () {
+                        $("#{{ id~'_acc_caret_toggle' }}").on("click",function (e) {
+                            $("#{{ id~'_acc_caret' }}").click();
                         });
-                    </script>
-                </div>
+                    });
+                </script>
             </div>
         </div>
         <div id="{{id}}" class="panel-collapse collapse{{ collapsed?'':' in' }}">
