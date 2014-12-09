@@ -148,6 +148,10 @@
 2014-11-18
  o prepared to move 'neu anlegen' button into the dropdown menu. 
  
+2014-12-09
+ o select2 dropdown: moved 'neu anlegen' button into the dropdown menu. 
+	But dropdown content doesn't refresh! 
+ 
  TODO:
  o Tab-Constraint DONE
  o merge multiple spaces

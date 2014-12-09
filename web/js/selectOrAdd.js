@@ -130,7 +130,15 @@ function createAjaxFormModal(addButton){
     // create the backdrop and wait for next modal to be triggered
     $body.modalmanager('loading');
 
+    //TODO
     var selectWidget = $(addButton).parent().children('select.selectOrAdd');
+    console.log(modalId);
+    var s2_id = str_replace("modal_for","s2id_",modalId, 1);
+    console.log("s2_id: "+s2_id);
+    //var selectWidget = $body.getElementById();
+
+    console.log("selectWidget:");
+    console.log(selectWidget);
     
     // fill the modal with modal skeleton markup (header, body, footer) and form inputs
     $.get(modalRetrieveUrl, '', function(data){
