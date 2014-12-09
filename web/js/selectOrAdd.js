@@ -18,18 +18,23 @@ jQuery(function(){
     });
 
 
-    /*$(".select2-drop").each(function(){
-        //console.log($(this));
-        // get the modal id from the id of the select2 element
-        var $s2_id = $(this).parent().attr('id');
-        var $modal_id = "modal_for_"+$s2_id.split("_").slice(1).join("_");
-        $(this).append('<button class="selectOrAdd add btn btn-default btn-sm" type="button" data-toggle="modal" href="'+$modal_id+'"onclick="selectOrAdd_launchAddDialog.call(this)">neu anlegen </button>');
-        //$(this).append('<div><input type="text" style="width: 86%;padding: 9px;"name="lname" value='+$modal_id+'><input class="PrimaryBtn" type="submit" value="Add"></div>');
-    });*/
-
-
-    //$(".select2-drop").append('<div><input type="text" style="width: 86%;padding: 9px;"name="lname" value='+$(this).getAttribute('id')+'><input class="PrimaryBtn" type="submit" value="Add"></div>');
-    //$(".select2-drop").append('<button class="selectOrAdd add btn btn-default btn-sm" type="button" data-toggle="modal" href="{{ modalId }}"onclick="selectOrAdd_launchAddDialog.call(this)">neu anlegen </button>');
+    $(".select2-drop").each(function(){
+        // append the add button only, if an modalRetrieveUrl is set
+        // @see dtaFormExtensions.html.twig under {% block selectOrAdd_widget %}
+        var $modalRetrieveUrl = $(this).parent().siblings('input[name=modalRetrieveUrl]').val();
+        if($modalRetrieveUrl) {
+            // get the modal id from the id of the select2 element
+            var $s2_id = $(this).parent().attr('id');
+            //console.log("s2_id: " + $s2_id);
+            var $id = $s2_id.split("_").slice(1).join("_");
+            //console.log("id: " + $id);
+            var $modal_id = "modal_for_" + $id;
+            //console.log("modal_id: " + $modal_id);
+            //console.log("modalRetrieveUrl: " + $modalRetrieveUrl);
+            $(this).append('<button class="selectOrAdd add btn btn-default btn-sm" type="button" data-toggle="modal" href="' + $modal_id + '"onclick="selectOrAdd_launchAddDialog.call(this)">neu anlegen </button>');
+            $(this).append('<input type="hidden" name="modalRetrieveUrl" class="selectOrAdd" value="'+$modalRetrieveUrl+'"/>');
+        }
+    });
 });
 
 
@@ -111,7 +116,7 @@ function selectOrAdd_updateSelectWidget($modal, data){
  * @param addButton    dom element    button belonging to the select or add widget
  */
 function createAjaxFormModal(addButton){
-    
+    console.log("createAjaxFormModal");
     // the href attribute is preset to '#modal_for_<select box id>'
     // @see dtaFormExtensions.html.twig under {% block selectOrAdd_widget %} 
     var modalId = $(addButton).attr('href');
@@ -120,7 +125,7 @@ function createAjaxFormModal(addButton){
     // @see dtaFormExtensions.html.twig under {% block selectOrAdd_widget %}
     var modalRetrieveUrl = $(addButton).siblings('input[name=modalRetrieveUrl]').val();
     console.log($(addButton));
-    console.log(modalRetrieveUrl);
+    console.log("modalRetrieveUrl(ajax): "+modalRetrieveUrl);
     var $body = $('body');
     // create the backdrop and wait for next modal to be triggered
     $body.modalmanager('loading');

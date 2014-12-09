@@ -36,17 +36,17 @@
     {# this specifies whether the widget allows to add a new entity to the database. #}
     {% if selectOrAddConfiguration.addButton %}
 
-    {% set modalId = "modal_for_" ~ id %}
-    {# The add button #}
-        <button class="selectOrAdd add btn btn-default btn-sm" type="button" data-toggle="modal" 
-                href="{{ modalId }}"
-                onclick="selectOrAdd_launchAddDialog.call(this)">
-        {{ selectOrAddConfiguration.modalRetrievePathParameters.className|trans }} anlegen
-        </button>
+        {% set modalId = "modal_for_" ~ id %}
+        {# The add button #}
+            {#<button class="selectOrAdd add btn btn-default btn-sm" type="button" data-toggle="modal"
+                    href="{{ modalId }}"
+                    onclick="selectOrAdd_launchAddDialog.call(this)">
+            {{ selectOrAddConfiguration.modalRetrievePathParameters.className|trans }} anlegen
+            </button>#}
 
-    {# Supplementary data for the javascript #}
-        <input type="hidden" name="modalRetrieveUrl"  class="selectOrAdd" 
-               value="{{ path(selectOrAddConfiguration.modalRetrievePathParameters.package~'_ajaxModalForm', selectOrAddConfiguration.modalRetrievePathParameters|merge({'modalId':modalId }) ) }}"/>
+        {# Supplementary data for the javascript #}
+            <input type="hidden" name="modalRetrieveUrl"  class="selectOrAdd"
+                   value="{{ path(selectOrAddConfiguration.modalRetrievePathParameters.package~'_ajaxModalForm', selectOrAddConfiguration.modalRetrievePathParameters|merge({'modalId':modalId }) ) }}"/>
 
     {% endif %}
     {{ form_rest(form) }}
