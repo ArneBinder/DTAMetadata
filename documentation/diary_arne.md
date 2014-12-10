@@ -151,6 +151,10 @@
 2014-12-09
  o select2 dropdown: moved 'neu anlegen' button into the dropdown menu. 
 	But dropdown content doesn't refresh! 
+
+2014-12-10
+ o fixed dropdown refresh issue
+ o <publication_type> & dropdown neu anlegen button: adapted style from genericViewAll.html.twig (used by 'Verlag', etc.)
  
  TODO:
  o Tab-Constraint DONE

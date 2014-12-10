@@ -33,7 +33,13 @@
 
     {% block preTable %}
     
-        <h3> {{ title|default(className|default('Listenansicht'))|trans }} </h3>
+        <h3> {{ title|default(className|default('Listenansicht'))|trans }}
+            {% set publicationType = className != 'Publication'?className:'Book' %}
+            <a class="btn btn-mini listView-add-button pull-right" href="{{ path('Data_newPublication', {'publicationType':publicationType}) }}" class="btn btn-default btn-sm">
+                <i class="icon-plus"></i>
+                {{ publicationType|trans}} neu anlegen
+            </a>
+        </h3>
     
     {% endblock preTable %}
     
@@ -56,12 +62,6 @@
         {% endspaceless %}
 </div>
 <div class="col-md-3">
-    {% set publicationType = className != 'Publication'?className:'Book' %}
-    <div style="margin-top:10px; margin-bottom: 10px">
-        <a href="{{ path('Data_newPublication', {'publicationType':publicationType}) }}" class="btn btn-default btn-sm">
-            {{ publicationType|trans}} neu anlegen
-        </a>
-    </div>
     <div class="well" id="publicationOptions">
         <h4> Auf eine Publikation klicken, um Informationen anzuzeigen. </h4>
     </div>
