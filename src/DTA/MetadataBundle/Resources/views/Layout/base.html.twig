@@ -70,7 +70,7 @@
                 // TODO remove debug output
                 console.log('retrieving records {{package}}\{{className}}');
                 // buttons with bootstrap CSS classes   
-                $.extend( true, $.fn.DataTable.TableTools.classes, {
+                {#$.extend( true, $.fn.DataTable.TableTools.classes, {
                         "container": "btn-group",
                         "buttons": {
                                 "normal": "btn btn-default",
@@ -92,7 +92,7 @@
                                 "button": "div",
                                 "liner": "a"
                         }
-                } );
+                } );#}
                 
                 
                 var paginationControlsHeight = 45;
@@ -105,22 +105,22 @@
 
                 $('.table.fullyFeatured').DataTable( {
                     
-                    "bProcessing": true
-                    ,"bServerSide": true
-                    ,"sAjaxSource": "{{path(package~'_dataTablesDataSource', {'package': package, 'className': className}) }}"
-                    ,"bSort":false // disables sorting completely
-                    ,"bFilter":false // disables filtering
-                    ,bSortClasses: false
-                    ,aaSorting:[]
-                    ,"aLengthMenu": [
+                    "processing": true
+                    ,"serverSide": true
+                    ,"ajax": "{{path(package~'_dataTablesDataSource', {'package': package, 'className': className}) }}"
+                    ,"ordering":false // disables sorting completely
+                    ,"searching":false // disables filtering
+                    ,orderClasses: false
+                    ,order:[]
+                    ,"lengthMenu": [
                         [10, 50, 100, -1],
                         [10, 50, 100, "Alle"] ]
-                    ,"iDisplayLength" : 50
-                    ,"sDom": 'rt<"bottom"iflp>'
-                    ,"sScrollY": tableHeight+"px"
-                    ,"bPaginate": true
-                    ,"sPaginationType": "full_numbers"
-                    ,"oLanguage": { "sUrl": "{{asset('js/DataTables-1.9.4/dataTablesGermanTranslation.json')}}" }
+                    ,"pageLength" : 50
+                    ,"dom": 'rt<"bottom"iflp>'
+                    ,"scrollY": tableHeight+"px"
+                    ,"paging": true
+                    ,"pagingType": "full_numbers"
+                    ,"language": { "url": "{{asset('js/DataTables-1.10.4/dataTablesGermanTranslation.json')}}" }
               {#    ,"oTableTools": {
                             "aButtons": [
                                     "copy"
