@@ -110,9 +110,8 @@ class ORMController extends DTADomainController {
         $query = $modelClass::getRowViewQueryObject();
 
         // pagination offset
-        $offset = $request->get('iDisplayStart');
-        $numRecords = $request->get('iDisplayLength');
-
+        $offset = $request->get('start');
+        $numRecords = $request->get('length');
 
         // filtering is more difficult than initially thought!
         // - using ILIKE, case insensitive search is performed
@@ -213,16 +212,16 @@ class ORMController extends DTADomainController {
         // Output
 	$response = array(
             "sEcho" => intval($request->get('sEcho')),
-            "iTotalRecords" => $totalRecords,
-            "iTotalDisplayRecords" => $query->count(),
-            "aaData" => array()
+            "recordsTotal" => $totalRecords,
+            "recordsFiltered" => $query->count(),
+            "data" => array()
 	);
 
         // retrieve entities
         $entities = $this->findPaginatedSortedFiltered($request, $package, $className);
 
         // format in data tables response format
-        $response['aaData'] = $this->formatAsArray($entities, $columns, $package, $className);
+        $response['data'] = $this->formatAsArray($entities, $columns, $package, $className);
 
 	return new Response(json_encode( $response ));
 

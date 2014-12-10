@@ -125,9 +125,9 @@ class DataDomainController extends ORMController {
         // Output
         $response = array(
             "sEcho" => intval($request->get('sEcho')),
-            "iTotalRecords" => $totalRecords,
-            "iTotalDisplayRecords" => $query->count(),
-            "aaData" => array()
+            "recordsTotal" => $totalRecords,
+            "recordsFiltered" => $query->count(),
+            "data" => array()
         );
         
         $entities = $this->findPaginatedSortedFiltered($request, $package, $className);
@@ -158,7 +158,7 @@ class DataDomainController extends ORMController {
                 }
             }
 //            $row[] = "<a href='#'>click</a>";
-            $response['aaData'][] = $row;
+            $response['data'][] = $row;
         }
 
         return new Response(json_encode( $response ));
