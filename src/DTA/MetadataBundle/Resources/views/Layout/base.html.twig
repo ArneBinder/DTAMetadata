@@ -103,7 +103,7 @@
                // var tableHeight = $(window).innerHeight() - tableHeaderHeight - paginationControlsHeight;
 
 
-                $('.table.fullyFeatured').dataTable( {
+                $('.table.fullyFeatured').DataTable( {
                     
                     "bProcessing": true
                     ,"bServerSide": true
@@ -134,6 +134,10 @@
                     }      #}
                 } );
             $("#datatable_filter input").attr('placeholder', 'wildcards: _ und %');
+
+                {#var tt = new $.fn.dataTable.TableTools( $('.table.fullyFeatured') );
+
+                $( tt.fnContainer() ).insertBefore('div.dataTables_wrapper');#}
         {% endif %}
             
             });

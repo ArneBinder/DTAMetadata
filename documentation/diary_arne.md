@@ -156,8 +156,8 @@
  o fixed dropdown refresh issue
  o <publication_type> & dropdown neu anlegen button: adapted style from genericViewAll.html.twig (used by 'Verlag', etc.)
  o ORMController.php/findPaginatedSortedFiltered: add filtering logic here
- o reference for datatables 1.9: http://legacy.datatables.net/usage/server-side
- 
+ o reference for datatables 1.9: http://legacy.datatables.net/usage/server-side, upgrading names: http://datatables.net/upgrade/1.10-convert
+ o switched to datatables 1.10.4 (shallow): breaks layout of bootstrap style buttons, but better positioning of column heads
  
  TODO:
  o Tab-Constraint DONE
