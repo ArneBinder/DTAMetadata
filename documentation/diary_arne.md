@@ -155,6 +155,9 @@
 2014-12-10
  o fixed dropdown refresh issue
  o <publication_type> & dropdown neu anlegen button: adapted style from genericViewAll.html.twig (used by 'Verlag', etc.)
+ o ORMController.php/findPaginatedSortedFiltered: add filtering logic here
+ o reference for datatables 1.9: http://legacy.datatables.net/usage/server-side
+ 
  
  TODO:
  o Tab-Constraint DONE
