@@ -38,11 +38,11 @@
 
         {% set modalId = "modal_for_" ~ id %}
         {# The add button #}
-            <button class="selectOrAdd add btn btn-default btn-sm" type="button" data-toggle="modal"
+           {# <button class="selectOrAdd add btn btn-default btn-sm" type="button" data-toggle="modal"
                     href="{{ modalId }}"
                     onclick="selectOrAdd_launchAddDialog.call(this)">
             {{ selectOrAddConfiguration.modalRetrievePathParameters.className|trans }} anlegen
-            </button>
+            </button> #}
 
         {# Supplementary data for the javascript #}
             <input type="hidden" name="modalRetrieveUrl"  class="selectOrAdd"

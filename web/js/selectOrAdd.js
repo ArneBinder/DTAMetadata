@@ -24,13 +24,8 @@ jQuery(function(){
         var $modalRetrieveUrl = $(this).parent().siblings('input[name=modalRetrieveUrl]').val();
         if($modalRetrieveUrl) {
             // get the modal id from the id of the select2 element
-            var $s2_id = $(this).parent().attr('id');
-            //console.log("s2_id: " + $s2_id);
-            var $id = $s2_id.split("_").slice(1).join("_");
-            //console.log("id: " + $id);
-            var $modal_id = "modal_for_" + $id;
-            //console.log("modal_id: " + $modal_id);
-            //console.log("modalRetrieveUrl: " + $modalRetrieveUrl);
+            var $s2id = $(this).parent().attr('id');
+            var $modal_id = $s2id.replace(/s2id_/, "modal_for_"); //"modal_for_" + $id;
             $(this).append('<button class="selectOrAdd add btn btn-default btn-sm" type="button" data-toggle="modal" href="' + $modal_id + '"onclick="selectOrAdd_launchAddDialog.call(this)">neu anlegen </button>');
             $(this).append('<input type="hidden" name="modalRetrieveUrl" class="selectOrAdd" value="'+$modalRetrieveUrl+'"/>');
         }
@@ -116,7 +111,6 @@ function selectOrAdd_updateSelectWidget($modal, data){
  * @param addButton    dom element    button belonging to the select or add widget
  */
 function createAjaxFormModal(addButton){
-    console.log("createAjaxFormModal");
     // the href attribute is preset to '#modal_for_<select box id>'
     // @see dtaFormExtensions.html.twig under {% block selectOrAdd_widget %} 
     var modalId = $(addButton).attr('href');
@@ -130,15 +124,12 @@ function createAjaxFormModal(addButton){
     // create the backdrop and wait for next modal to be triggered
     $body.modalmanager('loading');
 
-    //TODO
-    var selectWidget = $(addButton).parent().children('select.selectOrAdd');
-    console.log(modalId);
-    var s2_id = str_replace("modal_for","s2id_",modalId, 1);
-    console.log("s2_id: "+s2_id);
-    //var selectWidget = $body.getElementById();
+    //var selectWidget = $(addButton).parent().children('select.selectOrAdd');
+    var id = modalId.replace(/modal_for_/,""); //str_replace("modal_for","s2id_",modalId, 1);
 
-    console.log("selectWidget:");
-    console.log(selectWidget);
+    var selectWidget = $( "#"+id);
+    //var selectWidgetId = $(selectWidget)[0].id;
+    //console.log("selectWidgetId: "+selectWidgetId);
     
     // fill the modal with modal skeleton markup (header, body, footer) and form inputs
     $.get(modalRetrieveUrl, '', function(data){
