@@ -16,6 +16,12 @@
     /*margin-left: 7px;*/
 }
 
+.selectOrAdd.add.btn.btn-dropdown{
+    color: #3cb0fd;
+    border: none;
+    background: none;
+}
+
 .sortable-up{
     position: absolute;
     top: 18px;
