@@ -30,10 +30,11 @@
 
     {% if prototype is defined %}
         {# Add prototype for dynamically adding forms with JS #}
-        {% set attr = attr|merge({'data-prototype': form_row(prototype, {'parent_id':id, 'asPanel':asPanel}) }) %}
+        {% set attr = attr|merge({'data-prototype': form_row(prototype, {'parent_id':id, 'displayAs':displayAs}) }) %}
     {% endif %}
+    {{ dump(displayAs) }}
 
-    {% if asPanel %}
+    {% if displayAs == 'panel' %}
         {# TODO: why is 'list' necessary? (otherwise no prototype is defined... but why?)#}
         <div class='dynamic-collection list panel-group {{ listAdditionalCssClasses }} ' {{ block('widget_container_attributes') }} >
             {% if form.parent is empty %}
@@ -43,12 +44,12 @@
             {#        Render the elements of the collection         #}
             {% for child in form %}
                 <div class="panel panel-default">
-                    {{ form_row(child, {'parent_id':id, 'asPanel':asPanel, 'collapsed':true}) }}
+                    {{ form_row(child, {'parent_id':id, 'displayAs':displayAs, 'collapsed':true}) }}
                 </div>
             {% endfor %}
             {{ form_rest(form) }}
         </div>
-    {% else %}
+    {% elseif displayAs == 'list' %}
         <ol class='dynamic-collection list {{ listAdditionalCssClasses }} ' {{ block('widget_container_attributes') }} >
             {% if form.parent is empty %}
                 {{ form_errors(form) }}
@@ -56,11 +57,13 @@
 
             {#        Render the elements of the collection         #}
             {% for child in form %}
-                <li>{{ form_row(child, {'parent_id':id, 'asPanel':asPanel, 'collapsed':true}) }}</li>
+                <li>{{ form_row(child, {'parent_id':id, 'displayAs':displayAs, 'collapsed':true}) }}</li>
             {% endfor %}
 
             {{ form_rest(form) }}
         </ol>
+    {% else %}
+        ERROR: Unknown displayAs value '{{ displayAs }}'. Use 'panel' or 'list'.
     {% endif %}
         {#onclick="function(){console.log('success')}"#}
 
@@ -72,6 +75,6 @@
        The up and down dynamic controls need this to be more expressive.   #}
         <input type="hidden" name="translatedModelClassName" value="{{ form.vars.modelClass|trans }}"/>
         <input type="hidden" name="modelClassName" value="{{ form.vars.modelClass }}"/>
-        <input type="hidden" name="asPanel" value="{{ asPanel }}"/>
+        <input type="hidden" name="displayAs" value="{{ displayAs }}"/>
 
 {% endblock %}

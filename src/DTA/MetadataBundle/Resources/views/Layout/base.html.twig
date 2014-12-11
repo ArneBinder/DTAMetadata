@@ -97,10 +97,8 @@
                 
                 var paginationControlsHeight = 45;
                 var tableHeaderHeight = $('thead').first().outerHeight();
-                // TODO: disabled because offset() is null... correct? reverted...
                 var tableTop = $('.table.fullyFeatured').offset().top;
                 var tableHeight = $(window).innerHeight() - tableTop - tableHeaderHeight - paginationControlsHeight;
-               // var tableHeight = $(window).innerHeight() - tableHeaderHeight - paginationControlsHeight;
 
 
                 $('.table.fullyFeatured').DataTable( {
@@ -108,8 +106,8 @@
                     "processing": true
                     ,"serverSide": true
                     ,"ajax": "{{path(package~'_dataTablesDataSource', {'package': package, 'className': className}) }}"
-                    ,"ordering":false // disables sorting completely
-                    ,"searching":false // disables filtering
+                    ,"ordering":true // disables sorting completely
+                    ,"searching":true // disables filtering
                     ,orderClasses: false
                     ,order:[]
                     ,"lengthMenu": [

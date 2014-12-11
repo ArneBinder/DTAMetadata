@@ -75,14 +75,14 @@ function addFormElement(){
     var translatedModelClassName = $collectionHolder
         .children('input[name=translatedModelClassName]')
         .val();
-    var asPanel = $collectionHolder
-        .children('input[name=asPanel]')
+    var displayAs = $collectionHolder
+        .children('input[name=displayAs]')
         .val();
 
     // using the children method (instead of find) is important here, because dynamic collections might be nested,
     // in which the li selector might illegally descend into other dynamic collections.
     var elementId;
-    if(asPanel){
+    if(displayAs == "panel"){
         elementId = $collectionList.children("div").length;
     } else{
         elementId = $collectionList.children("li").length;
@@ -102,7 +102,7 @@ function addFormElement(){
     // CREATE NEW DOM ELEMENT 
     var $newForm = $(prototype);
     var $newFormElement;
-    if(asPanel){
+    if(displayAs == "panel"){
         $newFormElement = $('<div></div>');
         $newFormElement.addClass('panel').addClass('panel-default');
     }else {
@@ -157,11 +157,11 @@ function createElementControls(element, translatedModelClassName){
 //    var up   = $('<a href="#" class="sortable-up">'+ iconUpStr + /*translatedModelClassName + upStr + */'</a> ');
 //    var down = $('<a href="#" class="sortable-down">'+ iconDownStr + /*translatedModelClassName + downStr + */'</a>');
 
-    var asPanel = $collectionHolder
-        .children('input[name=asPanel]')
+    var displayAs = $collectionHolder
+        .children('input[name=displayAs]')
         .val();
 
-    if(asPanel) {
+    if(displayAs == "panel") {
        $(element).prepend(removeButtonLink);
     }else{
         $(element).children('div').prepend(removeButtonLink);

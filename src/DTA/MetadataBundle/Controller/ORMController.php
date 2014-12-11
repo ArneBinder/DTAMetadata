@@ -108,6 +108,7 @@ class ORMController extends DTADomainController {
         $classNames = $this->relatedClassNames($package, $className);
         $modelClass = new $classNames["model"];
         $query = $modelClass::getRowViewQueryObject();
+        $this->get('logger')->critical($modelClass);
 
         // pagination offset
         $offset = $request->get('start');
@@ -135,6 +136,7 @@ class ORMController extends DTADomainController {
         }
 
 
+        $this->get('logger')->critical(urldecode($request));
         $this->get('logger')->critical($query->find()->count());
         /* @var $query \DTA\MetadataBundle\Model\Data\PublicationQuery */
         $entities = $query->setFormatter(\ModelCriteria::FORMAT_ON_DEMAND)
@@ -453,7 +455,7 @@ class ORMController extends DTADomainController {
     }
 
     protected function handleResult($result, $mode, $package, $className, $recordId){
-        $this->get('logger')->log('warning','HERE mode='.$mode);
+        //$this->get('logger')->log('warning','HERE mode='.$mode);
         switch( $mode ){
             case 'createOrEdit':
                 switch( $result['transaction'] ){

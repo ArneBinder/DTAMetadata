@@ -76,7 +76,7 @@ class DynamicCollectionType extends \Symfony\Component\Form\Extension\Core\Type\
         $view->vars['sortable'] = $options['sortable'];
         $view->vars['listAdditionalCssClasses'] = $listAdditionalCssClasses;
         $view->vars['inlineLabel'] = $options['inlineLabel'];
-        $view->vars['asPanel'] = $options['asPanel'];
+        $view->vars['displayAs'] = $options['displayAs'];
     }
 
     public function setDefaultOptions(OptionsResolverInterface $resolver) {
@@ -90,7 +90,7 @@ class DynamicCollectionType extends \Symfony\Component\Form\Extension\Core\Type\
             'sortable' => true,
             'inlineLabel' => true,
             'required' => false,
-            'asPanel' => false,
+            'displayAs' => 'list',
         ));
     }
 

@@ -160,6 +160,13 @@
  o switched to datatables 1.10.4 (shallow): breaks layout of bootstrap style buttons, but better positioning of column heads
  o switched to datatables 1.10.4 (deep): pagination works
  
+2014-12-11
+ o fixed dropdown add button: returned from <a/> to <button/>, otherwise an option is selected which will reload the page and close the modal
+ o DataTablesBundle for Symfony2/Doctrine: http://code.rbsolutions.us/datatables/
+ o DynamicCollection: changed asPanel(boolean) to displayAs(string) with possible values: 'list'(default) and 'panel', to add value 'tag' or similar later
+ 
+ 
+ 
  TODO:
  o Tab-Constraint DONE
  o merge multiple spaces
@@ -170,6 +177,7 @@
  
  o add confirm form when deleting entries
  o add genre and tag import from old database
+ o change tag list to tag field
  
  o add filter to search for entries
  
