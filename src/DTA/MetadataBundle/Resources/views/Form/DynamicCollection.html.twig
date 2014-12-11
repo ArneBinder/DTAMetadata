@@ -32,7 +32,6 @@
         {# Add prototype for dynamically adding forms with JS #}
         {% set attr = attr|merge({'data-prototype': form_row(prototype, {'parent_id':id, 'displayAs':displayAs}) }) %}
     {% endif %}
-    {{ dump(displayAs) }}
 
     {% if displayAs == 'panel' %}
         {# TODO: why is 'list' necessary? (otherwise no prototype is defined... but why?)#}
