@@ -23,6 +23,11 @@ class AppKernel extends Kernel
             new DTA\MetadataBundle\DTAMetadataBundle(),
             //new SC\DatetimepickerBundle\SCDatetimepickerBundle(),
             //new Genemu\Bundle\FormBundle\GenemuFormBundle()
+
+            new Zenstruck\Bundle\FormBundle\ZenstruckFormBundle(),
+
+            // enable if you want to use the grouped form
+            // new Cocur\Slugify\Bridge\Symfony\CocurSlugifyBundle()
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {

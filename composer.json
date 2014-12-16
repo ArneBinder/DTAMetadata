@@ -24,7 +24,10 @@
         "sensio/generator-bundle": "2.3.*",
         "incenteev/composer-parameter-handler": "~2.0",
         "symfony/icu": "~1.2",
-        "symfony/expression-language": "2.6.*@dev"
+        "symfony/expression-language": "2.6.*@dev",
+        "zenstruck/form-bundle":"~1.4",
+        "zendframework/zend-crypt":"~2.0,!=2.1.1",
+        "cocur/slugify":"~0.8"
     },
     "scripts": {
         "post-install-cmd": [

@@ -42,6 +42,9 @@ twig:
              - 'DTAMetadataBundle:Form:SelectOrAdd.html.twig'
             # how to render specific model classes (monograph, author, etc.)
              - 'DTAMetadataBundle:Form:viewConfigurationForModels.html.twig'
+            # ZenstruckFormBundle for bootstrap 3.x
+            # - 'ZenstruckFormBundle:Twitter:form_bootstrap3_layout.html.twig'
+
     # absolute path on the server to the web directory, needed sometimes for file_exists
     globals:
         dtaMetadataBundlePath: %kernel.root_dir%/../src/DTA/MetadataBundle/
@@ -155,3 +158,8 @@ monolog:
         syslog:
             type: syslog
             level: error
+
+
+zenstruck_form:
+    form_types:
+        ajax_entity: true
