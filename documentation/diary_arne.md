@@ -169,8 +169,9 @@
  o symfony select2: https://github.com/kbond/ZenstruckFormBundle
  o sets a field as rendered: {% do form.field_name.setRendered %}
  
- 
- 
+2014-12-16
+ o trying to get column names (DataDomainController.php): http://propelorm.org/documentation/cookbook/runtime-introspection.html
+
  TODO:
  o Tab-Constraint DONE
  o merge multiple spaces
@@ -180,7 +181,7 @@
  o Fix sortable tables
  
  o add confirm form when deleting entries
- o add genre and tag import from old database DEPRECATED?
+ o add genre and tag import from old database DEPRICATED?
  o change tag list to tag field
  
  o add filter to search for entries

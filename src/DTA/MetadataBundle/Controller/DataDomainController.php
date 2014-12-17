@@ -113,15 +113,27 @@ class DataDomainController extends ORMController {
         // ------------------------------------------------------------------------
         // specialized logic for datatables displaying publications (added an id column) 
         // ------------------------------------------------------------------------
-        
+
         $classNames = $this->relatedClassNames($package, $className);
         $modelClass = new $classNames["model"];
-
+        $this->get('logger')->critical("className: ".$className);
         $columns = $modelClass::getTableViewColumnNames();
+
+        $this->get('logger')->critical(implode(", ",$columns));
         $query = $modelClass::getRowViewQueryObject();
+
+        $tableMapClass = new $classNames["tableMap"];
+        $this->get('logger')->critical("tableMapClass: ".$classNames["tableMap"]);
+        //$tableMap = $tableMapClass::getTableMap();
+        //$tableMapColumns = $tableMap->getColumns();
+        //foreach ($tableMapColumns as $column) {
+        //    echo $column->getName();
+        //}
+        //$this->get('logger')->critical("tableMapColumns: ".implode(", ",$tableMapColumns));
 
         $totalRecords = $query->count();
 
+        $this->get('logger')->critical("totalRecords: ".$totalRecords);
         // Output
         $response = array(
             "sEcho" => intval($request->get('sEcho')),
@@ -129,7 +141,7 @@ class DataDomainController extends ORMController {
             "recordsFiltered" => $query->count(),
             "data" => array()
         );
-        
+
         $entities = $this->findPaginatedSortedFiltered($request, $package, $className);
         
         foreach($entities as $entity) {

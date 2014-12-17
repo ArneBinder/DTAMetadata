@@ -555,6 +555,7 @@ class ORMController extends DTADomainController {
             "query"     => "DTA\\MetadataBundle\\Model\\$package\\" . $className . "Query",   // utility class for generating queries
             "peer"      => "DTA\\MetadataBundle\\Model\\$package\\" . $className . "Peer",    // utility class for reflection
             "formType"  => "DTA\\MetadataBundle\\Form\\$package\\" . $className . "Type",     // class for generating form inputs
+            "tableMap"       => "DTA\\MetadataBundle\\Model\\$package\\map\\" . $className . "TableMap",
         );
     }
 
