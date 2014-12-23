@@ -171,6 +171,10 @@
  
 2014-12-16
  o trying to get column names (DataDomainController.php): http://propelorm.org/documentation/cookbook/runtime-introspection.html
+ 
+2014-12-23
+ o calling getColumns() from PublicationTableMap directly... but context error (static vs not static)
+ o http://stackoverflow.com/questions/20688246/how-do-i-check-if-columns-are-valid-in-propel --> gives all columns in the model
 
  TODO:
  o Tab-Constraint DONE
