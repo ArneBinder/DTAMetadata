@@ -24,7 +24,7 @@ class AppKernel extends Kernel
             //new SC\DatetimepickerBundle\SCDatetimepickerBundle(),
             //new Genemu\Bundle\FormBundle\GenemuFormBundle()
 
-            new Zenstruck\Bundle\FormBundle\ZenstruckFormBundle(),
+            //new Zenstruck\Bundle\FormBundle\ZenstruckFormBundle(),
 
             // enable if you want to use the grouped form
             // new Cocur\Slugify\Bridge\Symfony\CocurSlugifyBundle()

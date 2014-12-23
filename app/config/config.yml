@@ -160,6 +160,6 @@ monolog:
             level: error
 
 
-zenstruck_form:
-    form_types:
-        ajax_entity: true
+#zenstruck_form:
+#    form_types:
+#        ajax_entity: true
