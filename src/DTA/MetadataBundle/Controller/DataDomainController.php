@@ -122,18 +122,6 @@ class DataDomainController extends ORMController {
         $this->get('logger')->critical("columns: ".implode(", ",$columns));
         $query = $modelClass::getRowViewQueryObject();
 
-        //$tableMap = new $classNames["tableMap"];
-        //$this->get('logger')->critical("tableMapClass: ".$classNames["tableMap"]);
-        $peerClass = new $classNames["peer"];
-        //$this->get('logger')->critical("$peerClass: ".$classNames["peer"]);
-        $tableMap = $peerClass::getTableMap();
-        //$tableMap = $tableMap::getColumns();
-        $tableMapColumns = $tableMap->getColumns();
-        $temp = "";
-        foreach ($tableMapColumns as $column) {
-            $temp = $temp.$column->getName().", ";
-        }
-        $this->get('logger')->critical("tableMapColumns: ".$temp);
 
         $totalRecords = $query->count();
 

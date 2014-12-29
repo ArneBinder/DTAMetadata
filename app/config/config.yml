@@ -158,6 +158,13 @@ monolog:
         syslog:
             type: syslog
             level: error
+        console:
+            type: console
+            verbosity_levels:
+                VERBOSITY_NORMAL:       WARNING
+                VERBOSITY_VERBOSE:      NOTICE
+                VERBOSITY_VERY_VERBOSE: INFO
+                VERBOSITY_DEBUG:        DEBUG
 
 
 #zenstruck_form:

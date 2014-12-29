@@ -108,7 +108,16 @@ class ORMController extends DTADomainController {
         $classNames = $this->relatedClassNames($package, $className);
         $modelClass = new $classNames["model"];
         $query = $modelClass::getRowViewQueryObject();
-        $this->get('logger')->critical($modelClass);
+        $this->get('logger')->critical("modelClass: ".$modelClass);
+        $columns = $modelClass::getTableViewColumnNames();
+
+        $temp = "";
+        foreach ($columns as $column) {
+            $accessor = $modelClass->tableRowViewAccessors[$column];
+            $temp = $temp.$accessor.", ";
+        }
+
+        $this->get('logger')->critical("accessors: ".$temp);
 
         // pagination offset
         $offset = $request->get('start');
@@ -555,7 +564,7 @@ class ORMController extends DTADomainController {
             "query"     => "DTA\\MetadataBundle\\Model\\$package\\" . $className . "Query",   // utility class for generating queries
             "peer"      => "DTA\\MetadataBundle\\Model\\$package\\" . $className . "Peer",    // utility class for reflection
             "formType"  => "DTA\\MetadataBundle\\Form\\$package\\" . $className . "Type",     // class for generating form inputs
-            "tableMap"       => "DTA\\MetadataBundle\\Model\\$package\\map\\" . $className . "TableMap",
+            //"tableMap"       => "DTA\\MetadataBundle\\Model\\$package\\map\\" . $className . "TableMap",
         );
     }
 
