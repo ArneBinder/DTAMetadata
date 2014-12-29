@@ -175,6 +175,11 @@
 2014-12-23
  o calling getColumns() from PublicationTableMap directly... but context error (static vs not static)
  o http://stackoverflow.com/questions/20688246/how-do-i-check-if-columns-are-valid-in-propel --> gives all columns in the model
+ 
+2014-12-29
+ o deleted doctrine bundle (composer.json)
+ o updated monolog-symfony bridge to ver 2.4 (tried to enable log console output... doesn't work yet)
+ o getting accessors for displayed columns (ORMController). How to do sorting considering an accessor?
 
  TODO:
  o Tab-Constraint DONE

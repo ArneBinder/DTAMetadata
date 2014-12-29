@@ -108,6 +108,8 @@ class ORMController extends DTADomainController {
         $classNames = $this->relatedClassNames($package, $className);
         $modelClass = new $classNames["model"];
         $query = $modelClass::getRowViewQueryObject();
+
+        //DEBUG
         $this->get('logger')->critical("modelClass: ".$modelClass);
         $columns = $modelClass::getTableViewColumnNames();
 
@@ -118,6 +120,11 @@ class ORMController extends DTADomainController {
         }
 
         $this->get('logger')->critical("accessors: ".$temp);
+
+        if($request->get('order')) {
+            $this->get('logger')->critical("order accessor: " . $modelClass->tableRowViewAccessors[$columns[$request->get('order')[0]['column']]]);
+        }
+        // DEBUG END
 
         // pagination offset
         $offset = $request->get('start');
