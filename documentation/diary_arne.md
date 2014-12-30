@@ -184,7 +184,9 @@
 2014-12-30
  o modify row_table_view behavior http://propelorm.org/documentation/06-behaviors.html 
  o modified TableRowView: moved query and embedColumns to a new parameter "attribute*" (the name is arbitrary and can be changed). New syntax for the value: "query:<queryString>" or "embedColumns:<tableName>". Furthermore multiple parameters can be added to one caption by concatenating them: e.g name="Ort" value="accessor:getPlace orderBy:<>".
-
+ o ordering for columns without an acessor works
+ o check out virtual columns http://propelorm.org/Propel/reference/model-criteria.html#adding-columns
+ o handle resolveEmbeddedColumns and resolveRepresentativeColumn for ordering!
  
  
  TODO:

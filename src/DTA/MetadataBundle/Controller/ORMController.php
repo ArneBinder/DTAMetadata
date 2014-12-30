@@ -125,15 +125,19 @@ class ORMController extends DTADomainController {
         $this->get('logger')->critical(urldecode($request));
         if($request->get('order')) {
             $accessor = $modelClass->tableRowViewAccessors[$columns[$request->get('order')[0]['column'] - $idColumnOffset]];
+            $this->get('logger')->critical("order accessor: " . $accessor);
             $direction = $request->get('order')[0]['dir'];
             //if the accessor isn't manuel defined...
             if(strncmp($accessor, "accessor:", strlen("accessor:"))) {
                 eval('$query = $query->orderBy'.$accessor.'("'.$direction.'");');
             }else{
-
+                $modifiedAccessor = substr($accessor,strlen("accessor:get"));
+                //$accessorParts = preg_split("/Of/",$modifiedAccessor);
+                $this->get('logger')->critical("current query: " . $query->toString());
+                $this->get('logger')->critical("try to order: " . '->orderBy'.$modifiedAccessor.'("'.$direction.'");');
+                eval('$query = $query->orderBy'.$modifiedAccessor.'("'.$direction.'");');
             }
 
-            $this->get('logger')->critical("order accessor: " . $accessor);
         }
         // DEBUG END
 

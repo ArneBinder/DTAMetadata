@@ -247,7 +247,7 @@ class TableRowViewBehavior extends Behavior {
         $relatedEntity = $table->getDatabase()->getTable($tableName);
         if (!$relatedEntity)
             throw new InvalidArgumentException(sprintf(
-                            'The entity \'%s\' referenced by the parameter \'%s\' in the table_row_view behavior of table \'%s\' doesn\'t exist. Please use the table name as specified by the schema <table> tag.', $tableName, $captionOrIndicator, $table->getName()));
+                            'The entity \'%s\' in the table_row_view behavior of table \'%s\' doesn\'t exist. Please use the table name as specified by the schema <table> tag.', $tableName, $table->getName()));
 
         // prevent recursion
         if ($table->getName() === $relatedEntity->getName())
@@ -258,7 +258,7 @@ class TableRowViewBehavior extends Behavior {
         $otherBehavior = $relatedEntity->getBehavior('table_row_view');
         if (!$otherBehavior)
             throw new InvalidArgumentException(sprintf(
-                            'The entity \'%s\' referenced by the parameter \'%s\' in the table_row_view behavior of table \'%s\' doesn\'t implement the table_row_behavior. Please add it before proceeding.', $tableName, $captionOrIndicator, $table->getName()));
+                            'The entity \'%s\' in the table_row_view behavior of table \'%s\' doesn\'t implement the table_row_behavior. Please add it before proceeding.', $tableName,$table->getName()));
 
         // build the behavior (e.g. parse embed columns parameters recursively) 
         $otherBehavior->build();
@@ -269,7 +269,8 @@ class TableRowViewBehavior extends Behavior {
             $i++;
             // generate a getter function that redirected the remote accessor to the related entity
             $relatedEntityPhpName = $relatedEntity->getPhpName();
-            $embeddedGetterFunctionName = 'getEmbeddedColumn' . $i . 'Of' . $relatedEntityPhpName;
+            //$embeddedGetterFunctionName = 'getEmbeddedColumn' . $i . 'Of' . $relatedEntityPhpName;
+            $embeddedGetterFunctionName = str_replace("accessor:","",$remoteAccessor) . 'Of' . $relatedEntityPhpName;
             $this->embeddedGetterFunctions[] = $this->renderTemplate('tableRowViewEmbeddedGetter',array(
                 'functionName' => $embeddedGetterFunctionName,
                 'relatedEntity' => $relatedEntityPhpName,
@@ -300,7 +301,7 @@ class TableRowViewBehavior extends Behavior {
         $relatedEntity = $table->getDatabase()->getTable($tableName);
         if (!$relatedEntity)
             throw new InvalidArgumentException(sprintf(
-                            'The entity \'%s\' referenced by the parameter \'%s\' in the table_row_view behavior of table \'%s\' doesn\'t exist. Please use the table name as specified by the schema <table> tag.', $tableName, $captionOrIndicator, $table->getName()));
+                            'The entity \'%s\' in the table_row_view behavior of table \'%s\' doesn\'t exist. Please use the table name as specified by the schema <table> tag.', $tableName, $table->getName()));
         
         // prevent recursion
         if ($table->getName() === $relatedEntity->getName())
