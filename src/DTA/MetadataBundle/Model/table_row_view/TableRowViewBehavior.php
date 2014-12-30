@@ -166,27 +166,45 @@ class TableRowViewBehavior extends Behavior {
 
         foreach ($behavior->getParameters() as $captionOrIndicator => $columnOrEntityOrAccessor) {
 
+            // split parameter into map
+            $parameterArray = preg_split('/(accessor|query|embedColumns|orderBy):/',$columnOrEntityOrAccessor, null, PREG_SPLIT_DELIM_CAPTURE);
+            //echo implode(implode(', ',$parameterArray))."\n";
+            $parameters = array();
+            if(count($parameterArray) % 2 == 1){
+                //the anonymous parameter part is the propel accessor
+                $parameters['propelAccessor'] = trim(array_shift($parameterArray));
+            }
+            $key = null;
+            foreach ($parameterArray as $param) {
+                if ($key != null) {
+                    $parameters[$key] = trim($param);
+                    $key = null;
+                } else {
+                    $key = $param;
+                }
+            }
+
             // check whether the string starts with 'embedColumns'
-            if (!strncmp($captionOrIndicator, "embedColumns", strlen("embedColumns"))) {
-                $entity = $columnOrEntityOrAccessor;
+            if($parameters['embedColumns']){
+                $entity = $parameters['embedColumns'];
                 $behavior->resolveEmbeddedColumns($entity);
-                // ... or to insert a complex entity as single column ... 
-            } elseif(!strncmp($captionOrIndicator, "query", strlen("query"))) {
-                $behavior->queryConstructionString = $columnOrEntityOrAccessor;
-            } elseif ($behavior->getTable()->getDatabase()->hasTable($columnOrEntityOrAccessor)) {
-                $entity = $columnOrEntityOrAccessor;
+                // ... or to insert a complex entity as single column ...
+            } elseif($parameters['query']) {
+                $behavior->queryConstructionString = $parameters['query'];
+            } elseif ($parameters['propelAccessor'] && $behavior->getTable()->getDatabase()->hasTable($parameters['propelAccessor'])) {
+                $entity = $parameters['propelAccessor'];
                 $caption = $captionOrIndicator;
                 $behavior->resolveRepresentativeColumn($caption, $entity);
                 // ... or an explicitly defined accessor to the object ...
-            } elseif(!strncmp($columnOrEntityOrAccessor, "accessor:", strlen("accessor:"))) {
+            } elseif($parameters['accessor']) {
                 // the prefix 'accessor:' is left as an indicator for the generated getAttributeByTableViewColumName method
                 // to prevent using a standard propel getter
-                $accessor = $columnOrEntityOrAccessor;
+                $accessor = 'accessor:'.$parameters['accessor'];
                 $caption = $captionOrIndicator;
                 $behavior->addViewElement($caption, $accessor);
                 // or if it defines how to construct the query object
             } else {
-                $column = $columnOrEntityOrAccessor;
+                $column = $parameters['propelAccessor'];
                 $caption = $captionOrIndicator;
                 $behavior->resolveAtomicColumn($caption, $column);
             }

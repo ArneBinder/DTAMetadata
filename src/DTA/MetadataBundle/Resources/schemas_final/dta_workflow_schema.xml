@@ -42,13 +42,13 @@
         <foreign-key foreignTable="copy_location"> <reference local="copylocation_id" foreign="id"/> </foreign-key>
         
         <behavior name="table_row_view">
-            <parameter name="embedColumns1" value="tasktype"/>
+            <parameter name="embedColumns1" value="embedColumns:tasktype"/>
             <parameter name="Abgeschlossen" value="closed"/>
             <parameter name="Start" value="start_date"/>
             <parameter name="Ende" value="end_date"/>
             <parameter name="Für" value="accessor:getReferee"/>
             <parameter name="Verantwortlich" value="accessor:getResponsibleUser"/>
-            <parameter name="query" value="\DTA\MetadataBundle\Model\Workflow\TaskQuery::create()
+            <parameter name="query" value="query:\DTA\MetadataBundle\Model\Workflow\TaskQuery::create()
                     ->leftJoin('Publication')
                     ->leftJoin('Publication.Title')
                     ->leftJoin('Title.Titlefragment')
@@ -101,8 +101,8 @@
         <behavior name="table_row_view">
             <!--<parameter name="embedColumns1" value="partner"/>-->
             <parameter name="Signatur" value="catalogue_signature"/>
-            <parameter name="embedColumns2" value="publication"/>
-            <parameter name="query" value="\DTA\MetadataBundle\Model\Workflow\CopyLocationQuery::create()
+            <parameter name="embedColumns2" value="embedColumns:publication"/>
+            <parameter name="query" value="query:\DTA\MetadataBundle\Model\Workflow\CopyLocationQuery::create()
                     ->leftJoin('Publication')
                     ->leftJoin('Publication.Title')
                     ->leftJoin('Title.Titlefragment')

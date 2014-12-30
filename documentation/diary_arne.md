@@ -181,6 +181,12 @@
  o updated monolog-symfony bridge to ver 2.4 (tried to enable log console output... doesn't work yet)
  o getting accessors for displayed columns (ORMController). How to do sorting considering an accessor?
 
+2014-12-30
+ o modify row_table_view behavior http://propelorm.org/documentation/06-behaviors.html 
+ o modified TableRowView: moved query and embedColumns to a new parameter "attribute*" (the name is arbitrary and can be changed). New syntax for the value: "query:<queryString>" or "embedColumns:<tableName>". Furthermore multiple parameters can be added to one caption by concatenating them: e.g name="Ort" value="accessor:getPlace orderBy:<>".
+
+ 
+ 
  TODO:
  o Tab-Constraint DONE
  o merge multiple spaces

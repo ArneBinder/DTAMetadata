@@ -159,7 +159,7 @@
         
         <column name="volumes_total" description="Anzahl Bände (gesamt)" type="INTEGER"/>
         
-        <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>
+        <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="embedColumns:publication"/> </behavior>
         
         <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
         <validator column="volumes_total"><rule name="minValue" value="2" message="Ein mehrbändiges Werk muss aus mindestens ${value} Bänden bestehen."/></validator>
@@ -175,7 +175,7 @@
         <column name="volume_description" description="Bezeichnung des Bandes (alphanumerisch)" type="LONGVARCHAR"/>
         <column name="volume_numeric" description="Bezeichnung des Bandes (numerisch)" type="INTEGER"/>
         
-        <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>
+        <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="embedColumns:publication"/> </behavior>
         
         <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
     </table>   
@@ -189,7 +189,7 @@
         
         <column name="pages" description="Seitenangabe" type="LONGVARCHAR"/>
         
-        <!--<behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>-->
+        <!--<behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="embedColumns:publication"/> </behavior>-->
         
         <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
     </table> 
@@ -203,7 +203,7 @@
         
         <column name="pages" description="Seitenangabe" type="LONGVARCHAR"/>
         
-        <!--<behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>-->
+        <!--<behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="embedColumns:publication"/> </behavior>-->
         
         <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
     </table> 
@@ -215,7 +215,7 @@
     <table name="series">
         <column name="id" type="INTEGER" primaryKey="true" required="true"/>
         
-        <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="publication"/> </behavior>
+        <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="embedColumns:publication"/> </behavior>
         
         <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
     </table> 
@@ -231,7 +231,7 @@
         <behavior name="table_row_view">
             <parameter name="Name" value="name"/>
             <parameter name="GND" value="gnd"/> 
-            <parameter name="query" value="\DTA\MetadataBundle\Model\Data\PublishingcompanyQuery::create()
+            <parameter name="query" value="query:\DTA\MetadataBundle\Model\Data\PublishingcompanyQuery::create()
                     ->orderBy('Name', 'asc');" />
         </behavior>
         
@@ -332,7 +332,7 @@
             <!--<parameter name="namen gesamt@count" value="personalname"/>-->
             <parameter name="gnd" value="gnd"/>
             <parameter name="query" 
-                       value="DTA\MetadataBundle\Model\Data\PersonQuery::create()
+                       value="query:DTA\MetadataBundle\Model\Data\PersonQuery::create()
                             ->joinWith('Personalname')
                             ->joinWith('Personalname.Namefragment')
                             ->orderBy('Namefragment.type',\Criteria::DESC)
@@ -348,7 +348,7 @@
         <behavior name="table_row_view">
             <parameter name="Name" value="name"/>
             <parameter name="query" 
-                       value="DTA\MetadataBundle\Model\Data\FontQuery::create()
+                       value="query:DTA\MetadataBundle\Model\Data\FontQuery::create()
                             ->orderBy('Name');"/>
         </behavior>
     </table>
@@ -359,7 +359,7 @@
         <behavior name="table_row_view">
             <parameter name="Name" value="name"/>
             <parameter name="query" 
-                       value="DTA\MetadataBundle\Model\Data\LanguageQuery::create()
+                       value="query:DTA\MetadataBundle\Model\Data\LanguageQuery::create()
                             ->orderBy('Name');"/>
         </behavior>
     </table>
