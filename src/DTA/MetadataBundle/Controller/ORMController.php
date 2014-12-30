@@ -110,7 +110,7 @@ class ORMController extends DTADomainController {
         $query = $modelClass::getRowViewQueryObject();
 
         //DEBUG
-        $this->get('logger')->critical("modelClass: ".$modelClass);
+        //$this->get('logger')->critical("modelClass: ".$modelClass);
         $columns = $modelClass::getTableViewColumnNames();
 
         $temp = "";
@@ -121,8 +121,19 @@ class ORMController extends DTADomainController {
 
         $this->get('logger')->critical("accessors: ".$temp);
 
+        $idColumnOffset = 1;
+        $this->get('logger')->critical(urldecode($request));
         if($request->get('order')) {
-            $this->get('logger')->critical("order accessor: " . $modelClass->tableRowViewAccessors[$columns[$request->get('order')[0]['column']]]);
+            $accessor = $modelClass->tableRowViewAccessors[$columns[$request->get('order')[0]['column'] - $idColumnOffset]];
+            $direction = $request->get('order')[0]['dir'];
+            //if the accessor isn't manuel defined...
+            if(strncmp($accessor, "accessor:", strlen("accessor:"))) {
+                eval('$query = $query->orderBy'.$accessor.'("'.$direction.'");');
+            }else{
+
+            }
+
+            $this->get('logger')->critical("order accessor: " . $accessor);
         }
         // DEBUG END
 
@@ -152,7 +163,7 @@ class ORMController extends DTADomainController {
         }
 
 
-        $this->get('logger')->critical(urldecode($request));
+
         $this->get('logger')->critical($query->find()->count());
         /* @var $query \DTA\MetadataBundle\Model\Data\PublicationQuery */
         $entities = $query->setFormatter(\ModelCriteria::FORMAT_ON_DEMAND)
