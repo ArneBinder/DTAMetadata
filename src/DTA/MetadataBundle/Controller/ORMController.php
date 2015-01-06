@@ -121,10 +121,11 @@ class ORMController extends DTADomainController {
 
         $this->get('logger')->critical("accessors: ".$temp);
 
-        $idColumnOffset = 1;
+
+        $showId = true;
         $this->get('logger')->critical(urldecode($request));
         if($request->get('order')) {
-            $accessor = $modelClass->tableRowViewAccessors[$columns[$request->get('order')[0]['column'] - $idColumnOffset]];
+            $accessor = $modelClass->tableRowViewAccessors[$columns[$request->get('order')[0]['column'] - ($showId?0:1)]];
             $this->get('logger')->critical("order accessor: " . $accessor);
             $direction = $request->get('order')[0]['dir'];
             //if the accessor isn't manuel defined...
