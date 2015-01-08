@@ -88,7 +88,7 @@ function updateOptionsPanel(id){
 
 function recordClicked(){
 
-    var rowData = dataTable.fnGetData( this );
+    var rowData = dataTable.row( this ).data();// fnGetData( this );
     console.log(rowData);
     var id = rowData[0];
     updateOptionsPanel(id);
