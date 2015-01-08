@@ -9,7 +9,7 @@ namespace DTA\MetadataBundle\Model\table_row_view;
 interface TableRowViewInterface {
    
     /* To specify which columns are to be visible in the user display (view all database records of a class as table)*/
-    public static function getTableViewColumnNames();
+    public static function getTableViewColumnNames($showInvisible = false);
     
     /* To access the data using the specified column names */
     public function getAttributeByTableViewColumName($columnName);    
