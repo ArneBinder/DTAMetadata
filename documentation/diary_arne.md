@@ -189,7 +189,10 @@
  o handle resolveEmbeddedColumns and resolveRepresentativeColumn for ordering!
  
 2015-01-06
- o index of ordering column is shifted by inserted column via reconstructed_flaggable
+ o index of ordering column is shifted by inserted column via reconstructed_flaggable WRONG
+
+2015-01-06 
+ o index is shifted because ID column is invisible via listViewWithOptions.html.twig
  
  TODO:
  o Tab-Constraint DONE

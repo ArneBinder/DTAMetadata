@@ -101,11 +101,12 @@ $(document).ready(function() {
     // make table rows clickable
     $('table.table').on("click", "tr", recordClicked);
     
-    dataTable = $('table.table').dataTable();
+    dataTable = $('table.table').DataTable();
     
     // hide the column containg the ID
     var idCol = 0;
-    dataTable.fnSetColumnVis( idCol, false );
+    //dataTable.fnSetColumnVis( idCol, false );
+    dataTable.column(idCol).visible(false);
 {#    var bVis = dataTable.fnSettings().aoColumns[idCol].bVisible;#}
     
 }); // document ready
