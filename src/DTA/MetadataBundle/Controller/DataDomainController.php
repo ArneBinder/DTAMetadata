@@ -134,7 +134,7 @@ class DataDomainController extends ORMController {
             "data" => array()
         );
 
-        $entities = $this->findPaginatedSortedFiltered($request, $package, $className);
+        $entities = $this->findPaginatedSortedFiltered($request, $package, $className, true);
         
         foreach($entities as $entity) {
             $row = array($entity->getId());

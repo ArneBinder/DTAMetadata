@@ -195,6 +195,9 @@
  o index is shifted because ID column is invisible via listViewWithOptions.html.twig
  o why is the ID column accessible? It's added DataDomainController/genericDataTablesDataSourceAction. Why not to add to $tableRowViewCaptions?
  
+2015-01-12
+ o Added parameter $hiddenIdColumn to findPaginatedSortedFiltered in order to handle the index shift. 
+ 
  TODO:
  o Tab-Constraint DONE
  o merge multiple spaces

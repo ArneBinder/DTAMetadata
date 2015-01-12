@@ -2,13 +2,9 @@
  * To specify which columns are to be visible in the user display 
  * (In the view that lists all database records of a class as a table) 
  */
-public static function getTableViewColumnNames($showInvisible = false){
+public static function getTableViewColumnNames(){
     $rc = new \ReflectionClass(get_called_class());
-    if($showInvisible and $rc->getStaticPropertyValue("tableRowViewCaptionsInvisible")){
-        $rc->getStaticPropertyValue("tableRowViewCaptionsInvisible");
-    }else{
-        return $rc->getStaticPropertyValue("tableRowViewCaptions");
-    }
+    return $rc->getStaticPropertyValue("tableRowViewCaptions");
 }
 
 /** 

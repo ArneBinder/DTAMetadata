@@ -103,7 +103,7 @@ class ORMController extends DTADomainController {
                 ));
     }
 
-    protected function findPaginatedSortedFiltered($request, $package, $className){
+    protected function findPaginatedSortedFiltered($request, $package, $className, $hiddenIdColumn = false){
 
         $classNames = $this->relatedClassNames($package, $className);
         $modelClass = new $classNames["model"];
@@ -122,10 +122,10 @@ class ORMController extends DTADomainController {
         $this->get('logger')->critical("accessors: ".$temp);
 
 
-        $showId = true;
+        //$showId = true;
         $this->get('logger')->critical(urldecode($request));
         if($request->get('order')) {
-            $accessor = $modelClass->tableRowViewAccessors[$columns[$request->get('order')[0]['column'] - ($showId?0:1)]];
+            $accessor = $modelClass->tableRowViewAccessors[$columns[$request->get('order')[0]['column'] - ($hiddenIdColumn?1:0)]];
             $this->get('logger')->critical("order accessor: " . $accessor);
             $direction = $request->get('order')[0]['dir'];
             //if the accessor isn't manuel defined...
