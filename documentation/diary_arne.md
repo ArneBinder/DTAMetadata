@@ -197,6 +197,7 @@
  
 2015-01-12
  o Added parameter $hiddenIdColumn to findPaginatedSortedFiltered in order to handle the index shift. 
+ o sorting for _not_ embedded/representive columns works
  
  TODO:
  o Tab-Constraint DONE

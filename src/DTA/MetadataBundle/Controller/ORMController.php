@@ -119,7 +119,7 @@ class ORMController extends DTADomainController {
             $temp = $temp.$accessor.", ";
         }
 
-        $this->get('logger')->critical("accessors: ".$temp);
+        $this->get('logger')->critical("ORMcontroller accessors: ".$temp);
 
 
         //$showId = true;
@@ -130,16 +130,19 @@ class ORMController extends DTADomainController {
             $direction = $request->get('order')[0]['dir'];
             //if the accessor isn't manuel defined...
             if(strncmp($accessor, "accessor:", strlen("accessor:"))) {
-                eval('$query = $query->orderBy'.$accessor.'("'.$direction.'");');
+                //eval('$query = $query->orderBy'.$accessor.'("'.$direction.'");');
+                $query = $query->orderBy($accessor,$direction);
             }else{
                 $modifiedAccessor = substr($accessor,strlen("accessor:get"));
                 //$accessorParts = preg_split("/Of/",$modifiedAccessor);
                 $this->get('logger')->critical("current query: " . $query->toString());
                 $this->get('logger')->critical("try to order: " . '->orderBy'.$modifiedAccessor.'("'.$direction.'");');
-                eval('$query = $query->orderBy'.$modifiedAccessor.'("'.$direction.'");');
+                eval('$query = $query->orderBy'.$modifiedAccessor.'($query,"'.$direction.'");');
+                //$query = $query->orderBy($modifiedAccessor,$direction);
             }
 
         }
+        $this->get('logger')->critical("sorted query: " . $query->toString());
         // DEBUG END
 
         // pagination offset
@@ -163,9 +166,9 @@ class ORMController extends DTADomainController {
 //        $query = $query->wh // where('year = ?', 1811);
 
         // use the class specific default sorting
-        if(method_exists($classNames['query'], 'sqlSort')){
-            $query = $classNames['query']::sqlSort($query, \ModelCriteria::ASC);
-        }
+        //if(method_exists($classNames['query'], 'sqlSort')){
+        //    $query = $classNames['query']::sqlSort($query, \ModelCriteria::ASC);
+        //}
 
 
 
@@ -602,24 +605,24 @@ class ORMController extends DTADomainController {
      * Deprecated: this is propel's job. implement your own isChanged() method if propel doesn't save things recursively.
      * @param Form $form The form object that contains the data defined by the top level form type (PersonType, NamefragmentType, ...)
      */
-    protected function validateRecursively(\Symfony\Component\Form\Form $form) {
-
-        $entity = $form->getData();
-        if (is_object($entity)) {
-            $rc = new \ReflectionClass($entity);
-            if($rc->getName() === "PropelObjectCollection"){
-                foreach($entity as $e){
-                    $e->validate();
-                }
-            } elseif ($rc->hasMethod('validate')){
-                $validator->validate($entity->save());
-            }
-        }
-
-        foreach ($form->all() as $child) {
-            $this->saveRecursively($child);
-        }
-    }
+//    protected function validateRecursively(\Symfony\Component\Form\Form $form) {
+//
+//        $entity = $form->getData();
+//        if (is_object($entity)) {
+//            $rc = new \ReflectionClass($entity);
+//            if($rc->getName() === "PropelObjectCollection"){
+//                foreach($entity as $e){
+//                    $e->validate();
+//                }
+//            } elseif ($rc->hasMethod('validate')){
+//                $validator->validate($entity->save());
+//            }
+//        }
+//
+//        foreach ($form->all() as $child) {
+//            $this->saveRecursively($child);
+//        }
+//    }
 
     /**
      * Visits recursively all nested form elements and saves them.
