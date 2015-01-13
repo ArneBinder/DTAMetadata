@@ -200,7 +200,7 @@
  o sorting for _not_ embedded/representive columns works
  
 205-01-13
- o sorting of embedded columns is working. added field $tableRowViewOrderAccessors to TableRowViewBehavior. 
+ o sorting of embedded columns is working. 
  
  TODO:
  o Tab-Constraint DONE

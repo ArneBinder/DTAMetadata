@@ -103,6 +103,21 @@ class ORMController extends DTADomainController {
                 ));
     }
 
+    /**
+     *
+     */
+    private static function extractPureAccessor($accessor){
+        if(strncmp($accessor, "accessor:", strlen("accessor:"))) {
+            return $accessor;
+        }elseif(!strncmp($accessor, "accessor:get", strlen("accessor:get"))) {
+            $modifiedAccessor = substr($accessor,strlen("accessor:get"));
+            return $modifiedAccessor;
+        }else{
+            throw new InvalidArgumentException(sprintf(
+                'Could not extract pure accessor of \'%s\'.', $accessor));
+        }
+    }
+
     protected function findPaginatedSortedFiltered($request, $package, $className, $hiddenIdColumn = false){
 
         $classNames = $this->relatedClassNames($package, $className);
@@ -128,7 +143,7 @@ class ORMController extends DTADomainController {
         if($request->get('order')) {
             $direction = $request->get('order')[0]['dir'];
             $orderColumn = $columns[$request->get('order')[0]['column'] - ($hiddenIdColumn?1:0)];
-            $orderAccessor = $modelClass->tableRowViewOrderAccessors[$orderColumn];
+            $orderAccessor = 'orderBy'.ORMController::extractPureAccessor($modelClass->tableRowViewAccessors[$orderColumn]);
 
             // is the column embedded?
             $embeddedAccessor = explode('Of',$orderAccessor);
@@ -139,7 +154,10 @@ class ORMController extends DTADomainController {
             }
 
             if(is_callable(array($query,$orderAccessor))){
+                $this->get('logger')->critical("sort via: ".$orderAccessor." ".$direction);
                 $query = $query->$orderAccessor($direction);
+            }else{
+                $this->get('logger')->critical("not callable: ".$orderAccessor);
             }
             // is the column embedded? Then Close it.
             if(count($embeddedAccessor)>1){
