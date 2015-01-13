@@ -343,6 +343,25 @@ class TableRowViewBehavior extends Behavior {
     }
 
     /**
+     *
+     */
+    private function extractPureAccessor($accessor){
+        if(strncmp($accessor, "accessor:", strlen("accessor:"))) {
+            return $accessor;
+        }elseif(!strncmp($accessor, "accessor:get", strlen("accessor:get"))) {
+            $modifiedAccessor = substr($accessor,strlen("accessor:get"));
+            //$accessorParts = preg_split("/Of/",$modifiedAccessor);
+            //$this->get('logger')->critical("current query: " . $query->toString());
+            //$this->get('logger')->critical("try to order: " . '->orderBy'.$modifiedAccessor.'("'.$direction.'");');
+            return $modifiedAccessor;
+            //$query = $query->orderBy($modifiedAccessor,$direction);
+        }else{
+            throw new InvalidArgumentException(sprintf(
+                'Could not extract pure accessor of \'%s\'.', $accessor));
+        }
+    }
+
+    /**
      * Adds the $tableRowViewCaptions and $tableRowViewAccessors attributes to each object implementing the behavior.
      * Is called before objectMethods, so the results of the parseParameters call are available in the objectMethods function as well.
      */
@@ -358,14 +377,19 @@ class TableRowViewBehavior extends Behavior {
 
         // accessors will be available as $tableRowViewAccessors
         $accessorsString = 'public   $tableRowViewAccessors = array(';
-        foreach ($this->accessors as $caption => $accessor)
+        $orderAccessorString = 'public   $tableRowViewOrderAccessors = array(';
+        foreach ($this->accessors as $caption => $accessor) {
             $accessorsString .= "'$caption'=>'$accessor', ";
+            $pureAccessor = $this->extractPureAccessor($accessor);
+            $orderAccessorString .= "'$caption'=>'orderBy$pureAccessor', ";
+        }
         $accessorsString .= ");";
+        $orderAccessorString .= ");";
         
         $queryConstructionStringValue = $this->queryConstructionString === NULL ? 'NULL' : '"' . $this->queryConstructionString . '"';
         $queryConstruction = 'public static $queryConstructionString = ' . $queryConstructionStringValue . ';';
 
-        return $captionsString . "\r\t" . $accessorsString . "\r\t" . $queryConstruction . "\r";
+        return $captionsString . "\r\t" . $accessorsString . "\r\t" . $orderAccessorString . "\r\t" . $queryConstruction . "\r";
     }
 
     /**

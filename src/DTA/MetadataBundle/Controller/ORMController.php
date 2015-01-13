@@ -120,30 +120,41 @@ class ORMController extends DTADomainController {
         }
 
         $this->get('logger')->critical("ORMcontroller accessors: ".$temp);
-
-
-        //$showId = true;
         $this->get('logger')->critical(urldecode($request));
+        $this->get('logger')->critical("hiddenIdColumn: ".$hiddenIdColumn);
+        //DEBUG END
+
+        // SORTING
         if($request->get('order')) {
-            $accessor = $modelClass->tableRowViewAccessors[$columns[$request->get('order')[0]['column'] - ($hiddenIdColumn?1:0)]];
-            $this->get('logger')->critical("order accessor: " . $accessor);
             $direction = $request->get('order')[0]['dir'];
-            //if the accessor isn't manuel defined...
-            if(strncmp($accessor, "accessor:", strlen("accessor:"))) {
-                //eval('$query = $query->orderBy'.$accessor.'("'.$direction.'");');
-                $query = $query->orderBy($accessor,$direction);
-            }else{
-                $modifiedAccessor = substr($accessor,strlen("accessor:get"));
-                //$accessorParts = preg_split("/Of/",$modifiedAccessor);
-                $this->get('logger')->critical("current query: " . $query->toString());
-                $this->get('logger')->critical("try to order: " . '->orderBy'.$modifiedAccessor.'("'.$direction.'");');
-                eval('$query = $query->orderBy'.$modifiedAccessor.'($query,"'.$direction.'");');
-                //$query = $query->orderBy($modifiedAccessor,$direction);
+            $orderColumn = $columns[$request->get('order')[0]['column'] - ($hiddenIdColumn?1:0)];
+            $orderAccessor = $modelClass->tableRowViewOrderAccessors[$orderColumn];
+
+            // is the column embedded?
+            $embeddedAccessor = explode('Of',$orderAccessor);
+            if(count($embeddedAccessor)>1){
+                $useQuery = "use$embeddedAccessor[1]Query";
+                $orderAccessor = $embeddedAccessor[0];
+                $query = $query->$useQuery();
             }
 
+            if(is_callable(array($query,$orderAccessor))){
+                $query = $query->$orderAccessor($direction);
+            }
+            // is the column embedded? Then Close it.
+            if(count($embeddedAccessor)>1){
+                $query = $query->endUse();
+            }
+        }else{
+            // use the class specific default sorting
+            if(method_exists($classNames['query'], 'sqlSort')){
+                $query = $classNames['query']::sqlSort($query, \ModelCriteria::ASC);
+            }
         }
+        // SORTING END
+
         $this->get('logger')->critical("sorted query: " . $query->toString());
-        // DEBUG END
+
 
         // pagination offset
         $offset = $request->get('start');
@@ -165,10 +176,7 @@ class ORMController extends DTADomainController {
 //        $query = $query->usePublicationQuery()->useDatespecificationRelatedByPublicationdateIdQuery()->filterByYear('1811')->endUse()->endUse();
 //        $query = $query->wh // where('year = ?', 1811);
 
-        // use the class specific default sorting
-        //if(method_exists($classNames['query'], 'sqlSort')){
-        //    $query = $classNames['query']::sqlSort($query, \ModelCriteria::ASC);
-        //}
+
 
 
 

@@ -199,6 +199,9 @@
  o Added parameter $hiddenIdColumn to findPaginatedSortedFiltered in order to handle the index shift. 
  o sorting for _not_ embedded/representive columns works
  
+205-01-13
+ o sorting of embedded columns is working. added field $tableRowViewOrderAccessors to TableRowViewBehavior. 
+ 
  TODO:
  o Tab-Constraint DONE
  o merge multiple spaces
