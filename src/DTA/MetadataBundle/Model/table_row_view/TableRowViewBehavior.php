@@ -103,6 +103,14 @@ class TableRowViewBehavior extends Behavior {
     public $embeddedGetterFunctions = array(
         // strings, containing the php code of the single methods
     );
+
+
+    /**
+     *
+     */
+    public $orderColumnFunctions = array(
+        // strings, containing the php code of the single methods
+    );
     
     /** [optional] Executable code that generates the propel query object for the class to return records in a certain manner (e.g. more efficient). 
      * A valid string would be 
@@ -149,6 +157,18 @@ class TableRowViewBehavior extends Behavior {
     public function addViewElement($caption, $accessor) {
         $this->captions[] = $caption;
         $this->accessors[$caption] = $accessor;
+    }
+
+    private static function extractPureAccessor($accessor){
+        if(strncmp($accessor, "accessor:", strlen("accessor:"))) {
+            return $accessor;
+        }elseif(!strncmp($accessor, "accessor:get", strlen("accessor:get"))) {
+            $modifiedAccessor = substr($accessor,strlen("accessor:get"));
+            return $modifiedAccessor;
+        }else{
+            throw new InvalidArgumentException(sprintf(
+                'Could not extract pure accessor of \'%s\'.', $accessor));
+        }
     }
 
     /**
@@ -202,6 +222,13 @@ class TableRowViewBehavior extends Behavior {
                 $accessor = 'accessor:'.$parameters['accessor'];
                 $caption = $captionOrIndicator;
                 $behavior->addViewElement($caption, $accessor);
+                if(!strncmp($parameters['accessor'], "get", strlen("get"))) {
+                    $modifiedAccessor = substr($parameters['accessor'], strlen("get"));
+                    $behavior->orderColumnFunctions[] = $behavior->renderTemplate('tableRowViewOrderColumnFunction', array(
+                        'functionName'=> $modifiedAccessor,
+                        'orderEntity' => $modifiedAccessor
+                    ));
+                }
                 // or if it defines how to construct the query object
             } else {
                 $column = $parameters['propelAccessor'];
@@ -320,6 +347,11 @@ class TableRowViewBehavior extends Behavior {
             $representativeCaption = substr($caption, 0, $captionCharacters);
             $representativeAccessor = 'accessor:getRepresentative' . $relatedPhpName;
             $this->addViewElement($representativeCaption, $representativeAccessor);
+
+            $this->orderColumnFunctions[] = $this->renderTemplate('tableRowViewOrderColumnFunction', array(
+                'functionName'=> "Representative$relatedPhpName",
+                'orderEntity' => $relatedPhpName
+            ));
             
         } elseif (!strncmp($countCandidate, "@count", strlen("@count"))) {
             
@@ -391,6 +423,12 @@ class TableRowViewBehavior extends Behavior {
         // the comment causes problems if other behaviors want to add interfaces, too. "// TableRowViewInterface automatically implemented by the TableRowViewBehavior.php\r" .
         $replace = 'abstract class ${1} extends ${2} implements ${3}, \DTA\MetadataBundle\Model\table_row_view\TableRowViewInterface';
         $script = preg_replace($pattern, $replace, $script);
+    }
+
+    public function queryMethods(){
+        return $this->renderTemplate('tableRowViewQueryMethods', array(
+            'orderColumnFunctions' => $this->orderColumnFunctions
+        ));
     }
 
 }

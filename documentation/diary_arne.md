@@ -200,7 +200,8 @@
  o sorting for _not_ embedded/representive columns works
  
 205-01-13
- o sorting of embedded columns is working. 
+ o sorting of embedded columns is working.
+ o prepared to generate orderBy functions. added templates tableRowOrderColumnFunction and tableRowViewQueryMethods to the table_row_view behavior. 
  
  TODO:
  o Tab-Constraint DONE

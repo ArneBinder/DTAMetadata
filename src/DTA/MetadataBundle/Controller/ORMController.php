@@ -151,6 +151,7 @@ class ORMController extends DTADomainController {
                 $useQuery = "use$embeddedAccessor[1]Query";
                 $orderAccessor = $embeddedAccessor[0];
                 $query = $query->$useQuery();
+            // is it a representative?
             }
 
             if(is_callable(array($query,$orderAccessor))){
@@ -163,11 +164,10 @@ class ORMController extends DTADomainController {
             if(count($embeddedAccessor)>1){
                 $query = $query->endUse();
             }
-        }else{
-            // use the class specific default sorting
-            if(method_exists($classNames['query'], 'sqlSort')){
+
+        // use the class specific default sorting
+        }elseif(method_exists($classNames['query'], 'sqlSort')){
                 $query = $classNames['query']::sqlSort($query, \ModelCriteria::ASC);
-            }
         }
         // SORTING END
 
