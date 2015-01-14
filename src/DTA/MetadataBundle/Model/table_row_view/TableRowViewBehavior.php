@@ -222,13 +222,13 @@ class TableRowViewBehavior extends Behavior {
                 $accessor = 'accessor:'.$parameters['accessor'];
                 $caption = $captionOrIndicator;
                 $behavior->addViewElement($caption, $accessor);
-                if(!strncmp($parameters['accessor'], "get", strlen("get"))) {
+                /*if(!strncmp($parameters['accessor'], "get", strlen("get"))) {
                     $modifiedAccessor = substr($parameters['accessor'], strlen("get"));
                     $behavior->orderColumnFunctions[] = $behavior->renderTemplate('tableRowViewOrderColumnFunction', array(
                         'functionName'=> $modifiedAccessor,
                         'orderEntity' => $modifiedAccessor
                     ));
-                }
+                }*/
                 // or if it defines how to construct the query object
             } else {
                 $column = $parameters['propelAccessor'];
@@ -348,10 +348,10 @@ class TableRowViewBehavior extends Behavior {
             $representativeAccessor = 'accessor:getRepresentative' . $relatedPhpName;
             $this->addViewElement($representativeCaption, $representativeAccessor);
 
-            $this->orderColumnFunctions[] = $this->renderTemplate('tableRowViewOrderColumnFunction', array(
+            /*$this->orderColumnFunctions[] = $this->renderTemplate('tableRowViewOrderColumnFunction', array(
                 'functionName'=> "Representative$relatedPhpName",
                 'orderEntity' => $relatedPhpName
-            ));
+            ));*/
             
         } elseif (!strncmp($countCandidate, "@count", strlen("@count"))) {
             
@@ -425,12 +425,12 @@ class TableRowViewBehavior extends Behavior {
         $script = preg_replace($pattern, $replace, $script);
     }
 
-    public function queryMethods(){
+    /*public function queryMethods(){
         return $this->renderTemplate('tableRowViewQueryMethods', array(
             'orderColumnFunctions' => $this->orderColumnFunctions
         ));
     }
-
+*/
 }
 
 ?>

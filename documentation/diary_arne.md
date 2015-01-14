@@ -199,9 +199,12 @@
  o Added parameter $hiddenIdColumn to findPaginatedSortedFiltered in order to handle the index shift. 
  o sorting for _not_ embedded/representive columns works
  
-205-01-13
+2015-01-13
  o sorting of embedded columns is working.
  o prepared to generate orderBy functions. added templates tableRowOrderColumnFunction and tableRowViewQueryMethods to the table_row_view behavior. 
+ 
+2015-01-14
+ o reverted generation of sort methods via table_row_view behavior. could not declare required classes in the Query classes.
  
  TODO:
  o Tab-Constraint DONE
