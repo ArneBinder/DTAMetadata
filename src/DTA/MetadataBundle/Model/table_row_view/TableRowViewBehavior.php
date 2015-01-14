@@ -209,7 +209,12 @@ class TableRowViewBehavior extends Behavior {
             }
 
             if(array_key_exists('filterColumn',$parameters)){
-                $behavior->filterColumns[] = "'$captionOrIndicator'";
+                $splitted = explode('@',$captionOrIndicator);
+                if(count($splitted)>1){
+                    $behavior->filterColumns[]="'$splitted[0]'";
+                }else {
+                    $behavior->filterColumns[] = "'$captionOrIndicator'";
+                }
             }
 
             // check whether the string starts with 'embedColumns'

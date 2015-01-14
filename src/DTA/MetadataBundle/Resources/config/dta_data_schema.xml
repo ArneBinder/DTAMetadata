@@ -353,9 +353,9 @@ propel > dbal > connections for connection setup. -->
         <!--The name is added in the personalName table because it's a one-to-many relationship.-->
         
         <behavior name="table_row_view">
-            <parameter name="erster name@representative" value="personalname"/>
+            <parameter name="erster name@representative" value="personalname filterColumn:"/>
             <!--<parameter name="namen gesamt@count" value="personalname"/>-->
-            <parameter name="gnd" value="gnd"/>
+            <parameter name="gnd" value="gnd filterColumn:"/>
             <parameter name="attribute3"
                        value="query:DTA\MetadataBundle\Model\Data\PersonQuery::create()
                             ->join('Personalname')

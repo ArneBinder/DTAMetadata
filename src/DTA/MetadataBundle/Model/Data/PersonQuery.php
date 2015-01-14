@@ -14,6 +14,10 @@ class PersonQuery extends BasePersonQuery implements \DTA\MetadataBundle\Model\S
         return PersonalnameQuery::sqlSort($this->usePersonalnameQuery(), $direction)->endUse();
     }
 
+    public function filterByRepresentativePersonalname($filterString){
+        return PersonalnameQuery::sqlFilter($this->usePersonalnameQuery(), $filterString)->endUse();
+    }
+
     /**
      * Adds a filtering clause to the database query that filters the entities by a given string.
      * @param $filterString the string which the entities have to contain
