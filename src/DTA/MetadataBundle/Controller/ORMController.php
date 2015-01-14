@@ -118,6 +118,52 @@ class ORMController extends DTADomainController {
         }
     }
 
+    /**
+     * Adds a sorting or filtering criteria to the given query.
+     * If no fitting filter/order method is available the original query will be returned and critical logging entry is added.
+     * @param $query The source query where the criteria will be added.
+     * @param $type 'filter' or 'order'
+     * @param $columnCaption The caption which determines the column of the criteria.
+     * @param $modelClass To get the correct accessors the model class is needed.
+     * @param $data depends on the type value: 'filter' -> filterstring, 'order' -> sorting direction (asc/desc)
+     * @return mixed the modifeid query
+     * @throws InvalidArgumentException
+     */
+    private function addCriteria($query, $type, $columnCaption, $modelClass, $data){
+        if(!in_array($type, array('filter','order')))
+            throw new \InvalidArgumentException(sprintf(
+                '\'%s\' is not allowed as value for $type. Use \'filter\' or \'order\'.',$type));
+        $criteriaAccessor = $type.'By'.ORMController::extractPureAccessor($modelClass::$tableRowViewAccessors[$columnCaption]);
+
+        // is the column embedded?
+        $embeddedAccessor = explode('Of',$criteriaAccessor);
+        if(count($embeddedAccessor)>1){
+            $useQuery = "use$embeddedAccessor[1]Query";
+            $criteriaAccessor = $embeddedAccessor[0];
+            $query = $query->$useQuery();
+            // is it a representative?
+        }
+
+        // adding "String" to the function name prevents collision with propel filter method
+        if(method_exists($query,$criteriaAccessor."String")){
+            $criteriaAccessor = $criteriaAccessor."String";
+            //$this->get('logger')->critical($type." via: ".$criteriaAccessor." ".$data);
+            $query = $query->$criteriaAccessor($data);
+        }
+        elseif(is_callable(array($query,$criteriaAccessor))){
+            //$this->get('logger')->critical($type." via: ".$criteriaAccessor." ".$data);
+            $query = $query->$criteriaAccessor($data);
+        }else{
+            $this->get('logger')->critical("not callable: ".$criteriaAccessor);
+        }
+
+        // is the column embedded? Then Close it.
+        if(count($embeddedAccessor)>1){
+            $query = $query->endUse();
+        }
+        return $query;
+    }
+
     protected function findPaginatedSortedFiltered($request, $package, $className, $hiddenIdColumn = false){
 
         $classNames = $this->relatedClassNames($package, $className);
@@ -129,10 +175,10 @@ class ORMController extends DTADomainController {
         $columns = $modelClass::getTableViewColumnNames();
 
         $temp = "";
-        foreach ($columns as $column) {
-            $accessor = $modelClass->tableRowViewAccessors[$column];
-            $temp = $temp.$accessor.", ";
-        }
+        //foreach ($columns as $column) {
+        //    $accessor = $modelClass->tableRowViewAccessors[$column];
+        //    $temp = $temp.$accessor.", ";
+        //}
 
         $this->get('logger')->critical("ORMcontroller accessors: ".$temp);
         $this->get('logger')->critical(urldecode($request));
@@ -142,28 +188,8 @@ class ORMController extends DTADomainController {
         // SORTING
         if($request->get('order')) {
             $direction = $request->get('order')[0]['dir'];
-            $orderColumn = $columns[$request->get('order')[0]['column'] - ($hiddenIdColumn?1:0)];
-            $orderAccessor = 'orderBy'.ORMController::extractPureAccessor($modelClass->tableRowViewAccessors[$orderColumn]);
-
-            // is the column embedded?
-            $embeddedAccessor = explode('Of',$orderAccessor);
-            if(count($embeddedAccessor)>1){
-                $useQuery = "use$embeddedAccessor[1]Query";
-                $orderAccessor = $embeddedAccessor[0];
-                $query = $query->$useQuery();
-            // is it a representative?
-            }
-
-            if(is_callable(array($query,$orderAccessor))){
-                $this->get('logger')->critical("sort via: ".$orderAccessor." ".$direction);
-                $query = $query->$orderAccessor($direction);
-            }else{
-                $this->get('logger')->critical("not callable: ".$orderAccessor);
-            }
-            // is the column embedded? Then Close it.
-            if(count($embeddedAccessor)>1){
-                $query = $query->endUse();
-            }
+            $orderColumnCaption = $columns[$request->get('order')[0]['column'] - ($hiddenIdColumn?1:0)];
+            $query = $this->addCriteria($query,'order',$orderColumnCaption,$modelClass,$direction);
 
         // use the class specific default sorting
         }elseif(method_exists($classNames['query'], 'sqlSort')){
@@ -173,6 +199,21 @@ class ORMController extends DTADomainController {
 
         $this->get('logger')->critical("sorted query: " . $query->toString());
 
+        // FILTERING
+        if($request->get('search')['value']) {
+            $this->get('logger')->critical("filterColumns: " . implode(", ",$modelClass::getTableViewFilterColumns()));
+            $this->get('logger')->critical("FILTER");
+            $filterString = $request->get('search')['value'];
+
+            $filterColumnCaptions = $modelClass::getTableViewFilterColumns();
+            if(!empty($filterColumnCaptions)){
+                $query = $this->addCriteria($query,'filter',array_shift($filterColumnCaptions),$modelClass,$filterString);
+            }
+            foreach($filterColumnCaptions as $columnCaption){
+                $query = $this->addCriteria($query->_or(),'filter',$columnCaption,$modelClass,$filterString);
+            }
+        }
+        //FILTERING END
 
         // pagination offset
         $offset = $request->get('start');

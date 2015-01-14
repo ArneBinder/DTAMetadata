@@ -91,11 +91,11 @@ propel > dbal > connections for connection setup. -->
             
         <behavior name="table_row_view">
             <!--<parameter name="Datenbank ID" value="id"/>-->
-            <parameter name="Titel" value="accessor:getTitleString"/>
-            <parameter name="erster Autor" value="accessor:getFirstAuthorName"/>
+            <parameter name="Titel" value="accessor:getTitleString filterColumn:"/>
+            <parameter name="erster Autor" value="accessor:getFirstAuthorName filterColumn:"/>
             <!--<parameter name="entstanden" value="accessor:getDatespecificationRelatedByCreationdateId"/>-->
-            <parameter name="veröffentlicht" value="accessor:getDatespecificationRelatedByPublicationdateId"/>
-            <parameter name="Verlag" value="accessor:getPublishingCompany"/>
+            <parameter name="veröffentlicht" value="accessor:getDatespecificationRelatedByPublicationdateId filterColumn:"/>
+            <parameter name="Verlag" value="accessor:getPublishingcompany"/>
             <parameter name="Ort" value="accessor:getPlace"/>
             <!--<parameter name="Typ" value="type"/>-->
             <parameter name="attribute1" value="query:\DTA\MetadataBundle\Model\Data\PublicationQuery::create()

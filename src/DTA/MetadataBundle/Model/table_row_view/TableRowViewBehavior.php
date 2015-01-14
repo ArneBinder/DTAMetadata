@@ -86,6 +86,10 @@ class TableRowViewBehavior extends Behavior {
         // 'caption'=>'accessor',
     );
 
+    public $filterColumns = array(
+
+    );
+
     /**
      * For each parameter that requires display of a representative entity of a *-to-many relationship, 
      * a selector method is generated, providing a default for overriding in the model classes derived from the generated base classes.
@@ -187,7 +191,7 @@ class TableRowViewBehavior extends Behavior {
         foreach ($behavior->getParameters() as $captionOrIndicator => $columnOrEntityOrAccessor) {
 
             // split parameter into map
-            $parameterArray = preg_split('/(accessor|query|embedColumns|orderBy):/',$columnOrEntityOrAccessor, null, PREG_SPLIT_DELIM_CAPTURE);
+            $parameterArray = preg_split('/(accessor|query|embedColumns|filterColumn):/',$columnOrEntityOrAccessor, null, PREG_SPLIT_DELIM_CAPTURE);
             //echo implode(implode(', ',$parameterArray))."\n";
             $parameters = array();
             if(count($parameterArray) % 2 == 1){
@@ -202,6 +206,10 @@ class TableRowViewBehavior extends Behavior {
                 } else {
                     $key = $param;
                 }
+            }
+
+            if(array_key_exists('filterColumn',$parameters)){
+                $behavior->filterColumns[] = "'$captionOrIndicator'";
             }
 
             // check whether the string starts with 'embedColumns'
@@ -303,7 +311,11 @@ class TableRowViewBehavior extends Behavior {
                 'relatedEntity' => $relatedEntityPhpName,
                 'caption' => $remoteCaption,
             ));
-            
+
+            if(in_array("'$remoteCaption'", $otherBehavior->filterColumns)){
+                $this->filterColumns[] = "'$remoteCaption'";
+            }
+
             $subAccessor = 'accessor:' . $embeddedGetterFunctionName;
 //            visualizing the structure is useful but results in long table headlines, that are impractical
 //            $this->addViewElement($relatedEntityPhpName."_".$remoteCaption, $subAccessor);
@@ -391,7 +403,7 @@ class TableRowViewBehavior extends Behavior {
         $captionsString .= ");";
 
         // accessors will be available as $tableRowViewAccessors
-        $accessorsString = 'public   $tableRowViewAccessors = array(';
+        $accessorsString = 'public static $tableRowViewAccessors = array(';
         foreach ($this->accessors as $caption => $accessor) {
             $accessorsString .= "'$caption'=>'$accessor', ";
 
@@ -399,9 +411,11 @@ class TableRowViewBehavior extends Behavior {
         $accessorsString .= ");";
 
         $queryConstructionStringValue = $this->queryConstructionString === NULL ? 'NULL' : '"' . $this->queryConstructionString . '"';
-        $queryConstruction = 'public static $queryConstructionString = ' . $queryConstructionStringValue . ';';
+        $queryConstructionString = 'public static $queryConstructionString = ' . $queryConstructionStringValue . ';';
 
-        return $captionsString . "\r\t" . $accessorsString . "\r\t" . $queryConstruction . "\r";
+        $filterColumnsString = 'public static $filterColumns = array('. implode(",",$this->filterColumns). ");";
+
+        return $captionsString . "\r\t" . $accessorsString . "\r\t" . $queryConstructionString . "\r\t" . $filterColumnsString . "\r";
     }
 
     /**
