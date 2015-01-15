@@ -164,26 +164,21 @@ class ORMController extends DTADomainController {
         return $query;
     }
 
-    protected function findPaginatedSortedFiltered($request, $package, $className, $hiddenIdColumn = false){
-
+    /**
+     * @param $request
+     * @param $package
+     * @param $className
+     * @param bool $hiddenIdColumn
+     * @return \ModelCriteria
+     */
+    protected function getSortedFilteredQuery($request, $package, $className, $hiddenIdColumn = false){
         $classNames = $this->relatedClassNames($package, $className);
         $modelClass = new $classNames["model"];
         $query = $modelClass::getRowViewQueryObject();
-
-        //DEBUG
-        //$this->get('logger')->critical("modelClass: ".$modelClass);
         $columns = $modelClass::getTableViewColumnNames();
 
-        $temp = "";
-        //foreach ($columns as $column) {
-        //    $accessor = $modelClass->tableRowViewAccessors[$column];
-        //    $temp = $temp.$accessor.", ";
-        //}
-
-        $this->get('logger')->critical("ORMcontroller accessors: ".$temp);
-        $this->get('logger')->critical(urldecode($request));
-        $this->get('logger')->critical("hiddenIdColumn: ".$hiddenIdColumn);
-        //DEBUG END
+        //$this->get('logger')->critical(urldecode($request));
+        //$this->get('logger')->critical("hiddenIdColumn: ".$hiddenIdColumn);
 
         // SORTING
         if($request->get('order')) {
@@ -191,9 +186,9 @@ class ORMController extends DTADomainController {
             $orderColumnCaption = $columns[$request->get('order')[0]['column'] - ($hiddenIdColumn?1:0)];
             $query = $this->addCriteria($query,'order',$orderColumnCaption,$modelClass,$direction);
 
-        // use the class specific default sorting
+            // use the class specific default sorting
         }elseif(method_exists($classNames['query'], 'sqlSort')){
-                $query = $classNames['query']::sqlSort($query, \ModelCriteria::ASC);
+            $query = $classNames['query']::sqlSort($query, \ModelCriteria::ASC);
         }
         // SORTING END
 
@@ -213,17 +208,13 @@ class ORMController extends DTADomainController {
                 $query = $this->addCriteria($query->_or(),'filter',$columnCaption,$modelClass,$filterString);
             }
         }
-        //FILTERING END
-
-        // pagination offset
-        $offset = $request->get('start');
-        $numRecords = $request->get('length');
+        return $query;
 
         // filtering is more difficult than initially thought!
         // - using ILIKE, case insensitive search is performed
         // - using % and _ several and a single character can be wildcarded, respectively
         // - a union mechanism seems to be missing (search on each column and union the matches), could be simulated by appending the search results manually, but that destroys sorting
-        //   another option might be to use criteria (the $query->where(...) methods) because there is an _or() function to use with them but it is not obvious how to formulate 
+        //   another option might be to use criteria (the $query->where(...) methods) because there is an _or() function to use with them but it is not obvious how to formulate
         //   expressions like the ones below in this syntax (especially if it comes to date specifications which are related by different columns)
 
         /* @var $query \DTA\MetadataBundle\Model\Data\BookQuery */
@@ -237,9 +228,13 @@ class ORMController extends DTADomainController {
 
 
 
+    }
 
+    protected function getPaginatedEntities($request, $query){
+        // pagination offset
+        $offset = $request->get('start');
+        $numRecords = $request->get('length');
 
-        $this->get('logger')->critical($query->find()->count());
         /* @var $query \DTA\MetadataBundle\Model\Data\PublicationQuery */
         $entities = $query->setFormatter(\ModelCriteria::FORMAT_ON_DEMAND)
                           ->offset($offset)
@@ -265,12 +260,16 @@ class ORMController extends DTADomainController {
      * @param type $columns  The attributes to display, needs to be a subset of the table row view defined columns
      * @param type $package  Data, Workflow, Classification or Master
      * @param type $className The unqualified class name of the entity
+     * @param bool $addIdColumn If true, an id column will be added
      * @return type array containing one array per record, listing the values of the given attributes (columns)
      */
-    protected function formatAsArray($entities, $columns, $package, $className){
+    protected function formatAsArray($entities, $columns, $package, $className, $addIdColumn = false){
         $result = array();
         foreach($entities as $entity) {
             $row = array();
+            if($addIdColumn){
+                $row = array($entity->getId());
+            }
             for ($i = 0; $i < count($columns); $i++) {
                 $column = $columns[$i];
                 $attribute = $entity->getAttributeByTableViewColumName($column);
@@ -295,39 +294,42 @@ class ORMController extends DTADomainController {
                 }
             }
             $result[] = $row;
-	}
+	    }
 
         return $result;
 
     }
     /**
      * Responds to XHR requests of the data tables module.
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param String $package
+     * @param String $className
+     * @param bool $addIdColumn
+     * @return Response
      */
-    public function genericDataTablesDataSourceAction(Request $request, $package, $className){
-
+    public function genericDataTablesDataSourceAction(Request $request, $package, $className, $addIdColumn = false){
         $classNames = $this->relatedClassNames($package, $className);
         $modelClass = new $classNames["model"];
-
         $columns = $modelClass::getTableViewColumnNames();
-        $query = $modelClass::getRowViewQueryObject();
-
-	$totalRecords = $query->count();
+        // construct the sorted and filtered query
+        $query = $this->getSortedFilteredQuery($request, $package, $className, $addIdColumn);
+	    $totalRecords = $query->count();
 
         // Output
-	$response = array(
+	    $response = array(
             "sEcho" => intval($request->get('sEcho')),
             "recordsTotal" => $totalRecords,
             "recordsFiltered" => $query->count(),
             "data" => array()
-	);
+	    );
 
         // retrieve entities
-        $entities = $this->findPaginatedSortedFiltered($request, $package, $className);
+        $entities = $this->getPaginatedEntities($request, $query);
 
         // format in data tables response format
-        $response['data'] = $this->formatAsArray($entities, $columns, $package, $className);
+        $response['data'] = $this->formatAsArray($entities, $columns, $package, $className, $addIdColumn);
 
-	return new Response(json_encode( $response ));
+	    return new Response(json_encode( $response ));
 
 //        $_GET['iDisplayStart'] // offset
 //        $_GET['iDisplayLength'] // number of records to send back at most
