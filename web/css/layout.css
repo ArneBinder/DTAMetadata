@@ -22,6 +22,17 @@
     padding: 0px;
 }
 
+
+
+.dataTables_wrapper .dataTables_filter {
+    float: left !important;
+    text-align: left !important
+}
+
+.dataTables_wrapper .dataTables_length {
+    float: right !important;
+    text-align: right !important;
+}
 /*
 #core .dta-data-filter-box h3{
     text-align: right;
