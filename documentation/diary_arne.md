@@ -218,6 +218,12 @@
  o pagination bar updates after filtering
  o simplified genericDataTablesDataSourceAction of ORMController and DataController, added the boolean parameter $addIdColumn, which is passed to the underlying methods (getSortedFilteredQuery and formatAsArray)
  
+2015-01-19
+ o Filter input will be expanded via '*'. Or via '0' and '9', if it is a year (SQL 'IN' statement).
+ o Added translation strings (lables and captions) to messages.de.php. All strings of 'Publication' are translated.
+ o The filter box and pagination length are displayed above the table. But still on incorrect sides!
+ o Added column adjustment after resizing.
+ 
  TODO:
  o Tab-Constraint DONE
  o merge multiple spaces

@@ -20,7 +20,7 @@ class ImagesourceType extends BaseAbstractType
         $builder->add('partner', new \DTA\MetadataBundle\Form\DerivedType\SelectOrAddType(), array(
             'class' => 'DTA\MetadataBundle\Model\Workflow\Partner',
             'property' => 'Name',
-            'label' => 'Bibliothek/Archiv/Anbieter',
+            'label' => 'Imagesourcepartner',
             'searchable' => true,
             'query' => \DTA\MetadataBundle\Model\Workflow\Partner::getRowViewQueryObject()
         ));
@@ -37,7 +37,7 @@ class ImagesourceType extends BaseAbstractType
         $builder->add('license', new \DTA\MetadataBundle\Form\DerivedType\SelectOrAddType(), array(
             'class' => 'DTA\MetadataBundle\Model\Workflow\License',
             'property' => 'Name',
-            'label' => 'Lizenz Bilddigitalisate',
+            'label' => 'Imagelicence',
         ));
     }
 }

@@ -18,7 +18,7 @@ class NamefragmentQuery extends BaseNamefragmentQuery implements \DTA\MetadataBu
      */
     public static function sqlFilter(\ModelCriteria $query, $filterString)
     {
-        return $query->filterByName($filterString);
+        return $query->filterByName("$filterString*");
         //return $this->where('Name = ?', $filterString);
     }
 }

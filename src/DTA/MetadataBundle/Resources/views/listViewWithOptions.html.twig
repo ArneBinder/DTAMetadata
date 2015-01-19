@@ -33,7 +33,7 @@
 
     {% block preTable %}
     
-        <h3> {{ title|default(className|default('Listenansicht'))|trans }}
+        <h3> {{ title|default(className|default('Listview'))|trans }}
             {% set publicationType = className != 'Publication'?className:'Book' %}
             <a class="btn btn-mini listView-add-button pull-right" href="{{ path('Data_newPublication', {'publicationType':publicationType}) }}" class="btn btn-default btn-sm">
                 <i class="icon-plus"></i>

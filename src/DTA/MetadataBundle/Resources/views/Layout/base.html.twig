@@ -50,7 +50,7 @@
         <script type="text/javascript">
             
             // this script block is defined in the base.html.twig template.
-            
+            var dataTable;
             $(document).ready(function() {
             
                 // automatically focus the first form input
@@ -66,79 +66,113 @@
                 // DataTables plugin setup
                 // ------------------------------------------------------
                 
-        {% if package is defined and className is defined %}
-                // TODO remove debug output
-                console.log('retrieving records {{package}}\{{className}}');
-                // buttons with bootstrap CSS classes   
-                {#$.extend( true, $.fn.DataTable.TableTools.classes, {
-                        "container": "btn-group",
-                        "buttons": {
-                                "normal": "btn btn-default",
-                                "disabled": "btn disabled"
-                        },
-                        "collection": {
-                                "container": "DTTT_dropdown dropdown-menu",
+                {% if package is defined and className is defined %}
+                        // TODO remove debug output
+                        console.log('retrieving records {{package}}\{{className}}');
+                        // buttons with bootstrap CSS classes
+                        {#$.extend( true, $.fn.DataTable.TableTools.classes, {
+                                "container": "btn-group",
                                 "buttons": {
-                                        "normal": "",
-                                        "disabled": "disabled"
+                                        "normal": "btn btn-default",
+                                        "disabled": "btn disabled"
+                                },
+                                "collection": {
+                                        "container": "DTTT_dropdown dropdown-menu",
+                                        "buttons": {
+                                                "normal": "",
+                                                "disabled": "disabled"
+                                        }
                                 }
-                        }
-                } );
+                        } );
 
-                // Have the collection use a bootstrap compatible dropdown
-                $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
-                        "collection": {
-                                "container": "ul",
-                                "button": "div",
-                                "liner": "a"
-                        }
-                } );#}
-                
-                
-                var paginationControlsHeight = 45;
-                var tableHeaderHeight = $('thead').first().outerHeight();
-                var tableTop = $('.table.fullyFeatured').offset().top;
-                var tableHeight = $(window).innerHeight() - tableTop - tableHeaderHeight - paginationControlsHeight;
+                        // Have the collection use a bootstrap compatible dropdown
+                        $.extend( true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
+                                "collection": {
+                                        "container": "ul",
+                                        "button": "div",
+                                        "liner": "a"
+                                }
+                        } );#}
 
 
-                $('.table.fullyFeatured').DataTable( {
-                    
-                    "processing": true
-                    ,"serverSide": true
-                    ,"ajax": "{{path(package~'_dataTablesDataSource', {'package': package, 'className': className}) }}"
-                    ,"ordering":true // disables sorting completely
-                    ,"searching":true // disables filtering
-                    ,orderClasses: false
-                    ,order:[]
-                    ,"lengthMenu": [
-                        [10, 50, 100, -1],
-                        [10, 50, 100, "Alle"] ]
-                    ,"pageLength" : 50
-                    ,"dom": 'rt<"bottom"iflp>'
-                    ,"scrollY": tableHeight+"px"
-                    ,"paging": true
-                    ,"pagingType": "full_numbers"
-                    ,"language": { "url": "{{asset('js/DataTables-1.10.4/dataTablesGermanTranslation.json')}}" }
-              {#    ,"oTableTools": {
-                            "aButtons": [
-                                    "copy"
-                                    ,"print"
-                                    /*,{
-                                            "sExtends":    "collection"
-                                            ,"sButtonText": 'Save <span class="caret" />'
-                                            ,"aButtons":    [ "csv", "xls", "pdf" ]
-                                    }*/
-                            ]
-                    }      #}
-                } );
-            $("#datatable_filter input").attr('placeholder', 'wildcards: _ und %');
+                        dataTable = $('.table.fullyFeatured');
+                        var paginationControlsHeight = 45;
+                        var filterInputHeight = 50;//$('#datatable_filter').outerHeight();
+                        //console.debug(filterInputHeight);
+                        var tableHeaderHeight = $('thead').first().outerHeight();
+                        console.debug(tableHeaderHeight);
+                        var tableTop = dataTable.offset().top;
+                        var tableHeight = $(window).innerHeight() - tableTop - tableHeaderHeight - paginationControlsHeight - filterInputHeight;
+                        console.debug(tableHeight);
 
-                {#var tt = new $.fn.dataTable.TableTools( $('.table.fullyFeatured') );
 
-                $( tt.fnContainer() ).insertBefore('div.dataTables_wrapper');#}
-        {% endif %}
+                        dataTable.DataTable( {
+
+                            "processing": true
+                            ,"serverSide": true
+                            ,"ajax": "{{path(package~'_dataTablesDataSource', {'package': package, 'className': className}) }}"
+                            ,"ordering":true // disables sorting completely
+                            ,"searching":true // disables filtering
+                            ,orderClasses: false
+                            ,order:[]
+                            ,"lengthMenu": [
+                                [10, 50, 100, -1],
+                                [10, 50, 100, "Alle"] ]
+                            ,"pageLength" : 50
+                            ,"dom": '<"top"fl>rt<"bottom"ip>'
+                            ,"scrollY": tableHeight+"px"
+                            ,"paging": true
+                            ,"pagingType": "full_numbers"
+                            ,"language": { "url": "{{asset('js/DataTables-1.10.4/dataTablesGermanTranslation.json')}}" }
+                      {#    ,"oTableTools": {
+                                    "aButtons": [
+                                            "copy"
+                                            ,"print"
+                                            /*,{
+                                                    "sExtends":    "collection"
+                                                    ,"sButtonText": 'Save <span class="caret" />'
+                                                    ,"aButtons":    [ "csv", "xls", "pdf" ]
+                                            }*/
+                                    ]
+                            }      #}
+                        } );
+                    $("#datatable_filter input").attr('placeholder', 'wildcards: _ und %');
+
+
+
+
+
+                //dataTable.css('height',100);
+                //var tableSettings = dataTable.;
+                //console.debug(tableSettings);
+                //tableSettings.oScroll.sY = 101;
+                //var scrollBody = $('.table.fullyFeatured').first();
+                //console.debug(scrollBody.style);//.style.height = '100px';
+                 //   $('div.dataTables_wrapper').height();
+
+                        {#var tt = new $.fn.dataTable.TableTools( $('.table.fullyFeatured') );
+
+                        $( tt.fnContainer() ).insertBefore('div.dataTables_wrapper');#}
+                {% endif %}
+
+
             
             });
+
+            $(window).on('resize', function () {
+                //dataTable = $('table.table');
+                //console.debug(dataTable);
+                dataTable.columns.adjust();
+
+
+            } );
+
+            function adjustTableHeight(){
+                /*var tableWrapper = $('#datatable_wrapper');
+                console.debug(tableWrapper.style.height);
+                $('.dataTables_scrollBody').css('height', 400);
+                dataTable.draw();*/
+            }
             /**
              * Requests a confirmation on clicking a link which e.g. deletes something.
              * Uses the link's title attribute to determine the warning message for the dialog.

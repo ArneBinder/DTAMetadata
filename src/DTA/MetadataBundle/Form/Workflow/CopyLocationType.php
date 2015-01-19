@@ -43,7 +43,7 @@ class CopyLocationType extends BaseAbstractType
         $builder->add('license', new \DTA\MetadataBundle\Form\DerivedType\SelectOrAddType(), array(
             'class' => 'DTA\MetadataBundle\Model\Workflow\License',
             'property' => 'Name',
-            'label' => 'Lizenz',
+            'label' => 'Licence',
         ));
         
         

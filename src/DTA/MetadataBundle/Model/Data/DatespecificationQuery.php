@@ -18,6 +18,9 @@ class DatespecificationQuery extends BaseDatespecificationQuery  implements \DTA
     public static function sqlFilter(\ModelCriteria $query, $filterString)
     {
         if(ctype_digit($filterString)) {
+            if(strlen($filterString)<4){
+                return $query->filterByYear(array(intval(str_pad($filterString,4,'0')),intval(str_pad($filterString,4,'9'))));
+            }
             return $query->filterByYear(intval($filterString));
         }else{
             return $query;

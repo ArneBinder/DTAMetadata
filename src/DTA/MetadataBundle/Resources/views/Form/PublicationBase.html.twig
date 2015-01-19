@@ -20,7 +20,7 @@
 <div class="row">
     <div class="col-lg-6">
         {% block work %}
-            {{ dta.beginFieldset({'caption':'Werk'})}}
+            {{ dta.beginFieldset({'caption':'Work'})}}
 
             {{ form_row(publication.title) }}
             {{ form_row(publication.dirname) }}
@@ -54,11 +54,11 @@
         {% endblock work %}
 
         {% block publication %}
-            {{ dta.beginFieldset({'caption':'Angaben zur Publikation der Vorlage'})}}
+            {{ dta.beginFieldset({'caption':'Publicationcaption'})}}
 
             {{ form_row(publication.place) }}
 
-            {{ dta.beginLabelledContent({'controlId':'none', 'labelCaption':'Datierung'}) }}
+            {{ dta.beginLabelledContent({'controlId':'none', 'labelCaption':'Dating'}) }}
             {{ form_row(publication.DatespecificationRelatedByPublicationdateId) }}
             {#{ form_row(publication.DatespecificationRelatedByCreationDateId) }#}
             {{ dta.endLabelledContent() }}
@@ -73,33 +73,33 @@
         {% endblock %}
 
         {% block editorialInformation %}
-            {{ dta.beginFieldset({'caption':'Editorisches', 'collapsed': false})}}
+            {{ dta.beginFieldset({'caption':'Editorial', 'collapsed': false})}}
 
             {{ form_row(publication.printrun) }}
             {{ form_row(publication.editiondescription, {'attr':{'class':'col-7'} }) }}
             {{ form_row(publication.digitaleditioneditor, {'attr':{'class':'col-7'} }) }}
-            {{ form_row(publication.transcriptioncomment, {'attr':{'class':'col-7'} }) }}
+            {{ form_row(publication.transcriptioncomment, {'attr':{'class':'col-7'}, 'label':'Sonstige Bemerkungen zu den Richtlinien der Transkription' }) }}
 
             {{ dta.endFieldset()}}
         {% endblock %}
 
         {% block classification %}
-            {{ dta.beginFieldset({'caption':'Klassifikation und Einordnung', 'collapsed': false})}}
+            {{ dta.beginFieldset({'caption':'Classificationandplacement', 'collapsed': false})}}
 
             <!--div id="taggerTest" style="width:400px"></div>
             <script type="text/javascript">
                 $("#taggerTest").select2({tags:["fraktur", "antiqua", "schwabacher"]});
             </script-->
             {#{ form_row(publication.font, {'label':'vorherrschende Schriftart'}) }#}
-            {{ form_row(publication.LanguagePublications, {'label':'vorherrschende Sprache'}) }}
-            {{ form_row(publication.GenrePublications, {'label':'Genre'}) }}
+            {{ form_row(publication.LanguagePublications, {'label':'Primarylanguage'}) }}
+            {{ form_row(publication.GenrePublications) }}
             {{ form_row(publication.legacy_dwds_category1) }}
             {{ form_row(publication.legacy_dwds_subcategory1) }}
             {{ form_row(publication.legacy_dwds_category2) }}
             {{ form_row(publication.legacy_dwds_subcategory2) }}
 
-            {{ form_row(publication.CategoryPublications, {'label':'Kategorien'}) }}
-            {{ form_row(publication.PublicationTags, {'label':'Schlagworte'}) }}
+            {{ form_row(publication.CategoryPublications) }}
+            {{ form_row(publication.PublicationTags) }}
 
             {{ dta.endFieldset()}}
         {% endblock %}
@@ -112,7 +112,7 @@
         {% endblock tasks %}
 
         {% block sources %}
-            {{ dta.beginFieldset({'caption':'Quellen'})}}
+            {{ dta.beginFieldset({'caption':'Sources'})}}
             Bild
             <div class="well">
                 {{ form_row(publication.ImageSources) }}
@@ -125,7 +125,7 @@
         {% endblock %}
 
         {% block comments %}
-            {{ dta.beginFieldset({'caption':'Anmerkungen', 'collapsed': false})}}
+            {{ dta.beginFieldset({'caption':'Annotations', 'collapsed': false})}}
             {{ form_row(publication.comment) }}
             {{ form_row(publication.editioncomment) }}
             {{ form_row(publication.transcriptioncomment) }}
@@ -135,7 +135,7 @@
         {% endblock %}
 
         {% block specialized %}
-            {{ dta.beginFieldset({'caption':'Publikationstypspezifisches'})}}
+            {{ dta.beginFieldset({'caption':'Publicationspecific'})}}
             {{ form_rest(form) }}
             {{ dta.endFieldset()}}
         {% endblock specialized %}

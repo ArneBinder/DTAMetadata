@@ -21,6 +21,6 @@ class TitlefragmentQuery extends BaseTitlefragmentQuery implements \DTA\Metadata
      */
     public static function sqlFilter(\ModelCriteria $query, $filterString)
     {
-        return $query->filterByName($filterString);
+        return $query->filterByName("$filterString*");
     }
 }

@@ -2,7 +2,7 @@
 return array(
 
     // model classes
-
+    'Publicationcaption' => 'Angaben zur Publikation der Vorlage',
     'Author' => 'Autor',
     'Category' => 'Kategorie',
     'CategoryPublication' => 'Kategorie',
@@ -21,7 +21,8 @@ return array(
     'License' => 'Lizenz',
     'Namefragment' => 'Namensbestandteil',
     'Personalname' => 'Name',
-    'PersonPublication' => 'Publikationspersonalie',
+    //'PersonPublication' => 'Publikationspersonalie',
+    'PersonPublication' => 'Autor/Verleger/Übersetzer/Drucker/Herausgeber',
     'PersonWork' => 'Werkpersonalie',
     'Place' => 'Ort',
     'Publication' => 'Publikation',
@@ -53,6 +54,11 @@ return array(
     'PUBLISHER' => 'Verleger',
     'TRANSLATOR' => 'Übsersetzer',
     'PRINTER' => 'Drucker',
+
+    'KNOWLEDGE_DOMAIN' => 'Wissensdomäne',
+    'TEXT_KIND' => 'Textsorte',
+    'PRESENTATION' => 'Darstellung',
+    //'SOCIOLOGICAL_SETTING' => 'Soziologische ',
     
     // title types
     'MAIN_TITLE' => 'Haupttitel',
@@ -62,6 +68,8 @@ return array(
     'PublicationMms' => 'Teil einer mehrbändigen Monographie, die ihrerseits Teil einer Reihe ist',
     'PublicationMs' => 'Selbstständiger Band einer Reihe',
     'Publishingcompany' => 'Verlag',
+    'Dating' => 'Datierung',
+    'Publishingyear' => 'Erscheinungsjahr',
     'Tag' => 'Schlagwort',
     'PublicationTag' => 'Schlagwort',
     'Tasktype' => 'Arbeitsschritt',
@@ -76,7 +84,12 @@ return array(
     'Directoryname' => 'Verzeichnisname',
     'Dirname' => 'Verzeichnis',
     'Citation' => 'Bibliografische Angabe',
+    'Editorial' => 'Editorisches',
+    'Classificationandplacement' => 'Klassifikation und Einordnung',
+    'Primarylanguage' => 'vorherrschende Sprache',
     'Printrun' => 'Auflage',
+    'Printplace' => 'Druckort',
+    'Annotations' => 'Anmerkungen',
     'Comment' => 'Kommentar',
     'Comments' => 'Kommentare',
     'Editioncomment' => 'Kommentar Edition',
@@ -100,6 +113,7 @@ return array(
     'Numeric' => 'numerisch',
 
     // image and text source
+    'Sources' => 'Quellen',
     'Cataloguesignature' => 'Signatur',
     'Catalogueurl' => 'URL',
     'Numfaksimiles' => 'Faksimiles',
@@ -108,6 +122,11 @@ return array(
     'Imageurn' => 'URN Bilddigitalisate',
     'Faksimilerefrange' => 'Faksimile-Seiten',
     'Originalrefrange' => 'original Seitenzahlen',
+    'Imagesourcepartner' => 'Bibliothek/Anbieter/Korpus',
+    'Textsourcepartner' => 'Korpus/Anbieter/Bibliothek',
+    'Licence' => 'Lizenz',
+    'Textlicence' => 'Lizenz Textdigitalisate',
+    'Imagelicence' => 'Lizenz Bilddigitalisate',
 
     'Texturl' => 'URL Textdigitalisate',
     'Attribution' => 'Attributionszeile',
@@ -118,12 +137,15 @@ return array(
     'Transcriptioncomment' => 'Sonstige Bemerkungen zu den Transkriptionsrichtlinien',
 
     // dta specific
-    'Wwwready' => 'Veröffentlichungsstatus',
+    'Wwwready' => 'Status',
     'Legacy dwds category1' => 'DWDS Kategorie1',
     'Legacy dwds subcategory1' => 'DWDS Unterkategorie1',
     'Legacy dwds category2' => 'DWDS Kategorie2',
     'Legacy dwds subcategory2' => 'DWDS Unterkategorie2',
 
+    'Publicationspecific' => 'Publikationstypspezifisches',
+
+    'Listview' => 'Listenansicht',
 
     // form labels: controls
 

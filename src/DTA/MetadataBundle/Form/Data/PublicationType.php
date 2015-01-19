@@ -32,14 +32,13 @@ class PublicationType extends BaseAbstractType
         // ----------------------------------------------------------------
         $builder->add('title', new TitleType(), array('cascade_validation'=>true));
         $builder->add('dirname','text',array(
-            'required' => false,
-            'label' => 'Verzeichnis/Ordnername'
+            'required' => false
         ));
         $builder->add('PersonPublications', new DynamicCollectionType(), array(
             'type' => new Master\PersonPublicationType(),
             'inlineLabel' => false,
             'sortable' => true,
-            'label' => 'Autor/Verleger/Übersetzer/Drucker/Herausgeber',
+            //'label' => 'Autor/Verleger/Übersetzer/Drucker/Herausgeber',
             'options' => array('isPublicationSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
         ));
         $builder->add('wwwready', null, array('attr' => array('min' => 0, 'max' => 3)));
@@ -54,17 +53,16 @@ class PublicationType extends BaseAbstractType
         $builder->add('place', new SelectOrAddType(), array(
             'class' => 'DTA\MetadataBundle\Model\Data\Place',
             'property' => 'Name',
-            'label' => 'Druckort',
+            'label' => 'Printplace',
             'required' => false,
             
         ));
         $builder->add('DatespecificationRelatedByPublicationdateId', new Data\DatespecificationType(), array(
-            'label' => 'Erscheinungsjahr'
+            'label' => 'Publishingyear'
         ));
         $builder->add('publishingcompany', new SelectOrAddType(), array(
             'class' => 'DTA\MetadataBundle\Model\Data\Publishingcompany',
             'property' => 'Name',
-            'label' => 'Verlag',
             'required' => false,
         ));
         
@@ -81,14 +79,14 @@ class PublicationType extends BaseAbstractType
             // TODO remove inlineLabel option from the dynamic collection type.
             'inlineLabel' => false,
             'sortable' => false,
-            'label' => 'vorherrschende Sprache',
+            'label' => 'Primarylanguage',
 //            'options' => array('isPublicationSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
         ));
         $builder->add('GenrePublications', new DynamicCollectionType(), array(
             'type' => new Master\GenrePublicationType(),
             'inlineLabel' => false,
             'sortable' => false,
-            'label' => 'Genres',
+            //'label' => 'Genres',
         ));
         
         $builder->add('legacy_dwds_category1', 'text');//, array('constraints' => new Length(array('min' => 3))));
@@ -100,14 +98,14 @@ class PublicationType extends BaseAbstractType
             'type' => new Master\CategoryPublicationType(),
             'inlineLabel' => false,
             'sortable' => false,
-            'label' => 'Kategorien',
+            //'label' => 'Kategorien',
             'options' => array('isPublicationSelectable'=>false),
         ));
         $builder->add('PublicationTags', new DynamicCollectionType(), array(
             'type' => new Master\PublicationTagType(),
             'inlineLabel' => false,
             'sortable' => false,
-            'label' => 'Schlagworte',
+            //'label' => 'Schlagworte',
         ));
         
         // ----------------------------------------------------------------
@@ -152,7 +150,7 @@ class PublicationType extends BaseAbstractType
             'type' => new Workflow\TaskType(),
             'inlineLabel' => false,
             'sortable' => false,
-            'label' => 'Tasks',
+            //'label' => 'Tasks',
             'displayAs' => 'panel'
 //            'options' => array('isPublicationSelectable'=>false),  // the work is implied by the context (the work that is currently edited)
         ));

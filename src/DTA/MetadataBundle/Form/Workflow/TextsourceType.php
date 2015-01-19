@@ -20,7 +20,7 @@ class TextsourceType extends BaseAbstractType
         $builder->add('partner', new \DTA\MetadataBundle\Form\DerivedType\SelectOrAddType(), array(
             'class' => 'DTA\MetadataBundle\Model\Workflow\Partner',
             'property' => 'Name',
-            'label' => 'Anbieter Textdigitalisate',
+            'label' => 'Textsourcepartner',
             'searchable' => true,
             'query' => \DTA\MetadataBundle\Model\Workflow\Partner::getRowViewQueryObject()
         ));
@@ -29,7 +29,7 @@ class TextsourceType extends BaseAbstractType
         $builder->add('license', new \DTA\MetadataBundle\Form\DerivedType\SelectOrAddType(), array(
             'class' => 'DTA\MetadataBundle\Model\Workflow\License',
             'property' => 'Name',
-            'label' => 'Lizenz Textdigitalisate',
+            'label' => 'Textlicence',
         ));
     }
 }
