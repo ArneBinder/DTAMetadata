@@ -48,14 +48,39 @@
         {#<script src="{{ asset('js/jquery-ui.min.js') }}"></script>#}
         
         <script type="text/javascript">
-            
+
+            /*function thisHeight(){
+                return $(this).height();
+            }
+            $(".top").height(function() {
+                return Math.max.apply(Math, $(this).children().map(thisHeight));
+            });*/
+            // Plugin
+           /* $.fn.equalize = function() {
+                var maxHeight = 0;
+
+                return this.each(function(){
+                    var $this = $(this);
+
+                    if ($(this).height() > maxHeight) { maxHeight = $(this).height(); }
+
+                    $this.height(maxHeight);
+                });
+            };*/
+
+            //var h = Math.max.apply(Math, $.map($(‘.el’),function(el){return $(el).height()}));
+
+
+            //var scrolly = 0;
+            //window.addEventListener("DOMContentLoaded", adjustTableHeight, false);
+
             // this script block is defined in the base.html.twig template.
             var dataTable;
             $(document).ready(function() {
-            
+
                 // automatically focus the first form input
                 $('form:first input:first').focus();
-                
+
                 // confirm functionality
                 $('a.confirmClick').on('click', confirmCriticalAction);
 
@@ -65,7 +90,7 @@
                 // ------------------------------------------------------
                 // DataTables plugin setup
                 // ------------------------------------------------------
-                
+
                 {% if package is defined and className is defined %}
                         // TODO remove debug output
                         console.log('retrieving records {{package}}\{{className}}');
@@ -96,14 +121,16 @@
 
 
                         dataTable = $('.table.fullyFeatured');
+                        //var topHeight = Math.max.apply(Math, $.map($('.top'),function(el){return $(el).height()}));
+
                         var paginationControlsHeight = 45;
                         var filterInputHeight = 50;//$('#datatable_filter').outerHeight();
                         //console.debug(filterInputHeight);
                         var tableHeaderHeight = $('thead').first().outerHeight();
-                        console.debug(tableHeaderHeight);
+                        //console.debug(tableHeaderHeight);
                         var tableTop = dataTable.offset().top;
                         var tableHeight = $(window).innerHeight() - tableTop - tableHeaderHeight - paginationControlsHeight - filterInputHeight;
-                        console.debug(tableHeight);
+                        //console.debug(tableHeight);
 
 
                         dataTable.DataTable( {
@@ -120,7 +147,7 @@
                                 [10, 50, 100, "Alle"] ]
                             ,"pageLength" : 50
                             ,"dom": '<"top"fl>rt<"bottom"ip>'
-                            ,"scrollY": tableHeight+"px"
+                            ,"scrollY": tableHeight+"px"//"1px"
                             ,"paging": true
                             ,"pagingType": "full_numbers"
                             ,"language": { "url": "{{asset('js/DataTables-1.10.4/dataTablesGermanTranslation.json')}}" }
@@ -140,7 +167,7 @@
 
 
 
-
+                //adjustTableHeight();
 
                 //dataTable.css('height',100);
                 //var tableSettings = dataTable.;
@@ -155,21 +182,37 @@
                         $( tt.fnContainer() ).insertBefore('div.dataTables_wrapper');#}
                 {% endif %}
 
+                //adjustTableHeight();
 
-            
             });
+
 
             $(window).on('resize', function () {
                 //dataTable = $('table.table');
                 //console.debug(dataTable);
                 dataTable.columns.adjust();
+                //adjustTableHeight();
+
             } );
 
             function adjustTableHeight(){
-                /*var tableWrapper = $('#datatable_wrapper');
-                console.debug(tableWrapper.style.height);
-                $('.dataTables_scrollBody').css('height', 400);
-                dataTable.draw();*/
+                //if(scrolly==0) {
+
+                $('.dta-data-options').css('visibility', 'hidden');
+                $('.dataTables_scrollBody').css('height', 0);
+                dataTable.draw();
+                var scrolly = $(window).innerHeight() - $('html').outerHeight();
+                //scrolly = $(window).height() - $('html').height();
+                //var tableWrapper = $('.dataTables_wrapper').first();
+                //var container = $('.dataTables_wrapper').parent();
+                //console.debug($('html').height());
+                console.debug("html: \t" + $('html').height());
+                console.debug("window: \t" + $(window).height());
+
+                $('.dta-data-options').css('visibility', 'visible');
+                $('.dataTables_scrollBody').css('height', scrolly);
+                //$('.dta-data-options').css('visibility', 'visible');
+                //}
             }
             /**
              * Requests a confirmation on clicking a link which e.g. deletes something.
