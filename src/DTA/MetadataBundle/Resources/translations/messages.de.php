@@ -145,6 +145,17 @@ return array(
 
     'Publicationspecific' => 'Publikationstypspezifisches',
 
+    'Publicationgroup' => 'Publikationsgruppe',
+    'CreatedAt' => 'Erstellt am',
+    'UpdatedAt' => 'Geändert am',
+
+    'Contact person' => 'Kontaktperson',
+    'Contact data' => 'Kontaktdaten',
+
+    'Description' => 'Beschreibung',
+    'Type' => 'Typ',
+
+
     'Listview' => 'Listenansicht',
 
     // form labels: controls
