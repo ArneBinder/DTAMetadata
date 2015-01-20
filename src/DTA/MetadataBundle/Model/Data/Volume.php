@@ -28,4 +28,21 @@ class Volume extends BaseVolume
         return sprintf(" (Band %d)", $this->getVolumeNumeric(), $this->getVolumeDescription());
         
     }
+
+    public function convertToBook(){
+        $publication = $this->getPublication();
+        $parent = $publication->getParent();
+        $this->delete();
+
+        $newBook = new Book();
+        $newBook->setPublication($this->getPublication());
+        $newBook->getPublication()
+            ->setType(PublicationPeer::TYPE_BOOK)
+            ->setScopeValue($publication->getId());
+        if($parent->countChildren()==0){
+            //$parent->delete();
+            $parent->getPeer()->deleteTree($parent->getScopeValue());
+        }
+        return $newBook;
+    }
 }
