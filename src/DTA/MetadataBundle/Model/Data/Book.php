@@ -22,7 +22,7 @@ class Book extends BaseBook
         $newVolume = new Volume();
         $newVolume->setPublication($this->getPublication());
         $newVolume->getPublication()
-            ->setType(PublicationPeer::TYPE_MULTIVOLUME)
+            ->setType(PublicationPeer::TYPE_VOLUME)
             ->setScopeValue($parent->getPublication()->getId())
             ->insertAsLastChildOf($parent->getPublication());
         $this->delete();

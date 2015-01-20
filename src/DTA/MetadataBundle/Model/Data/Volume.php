@@ -33,6 +33,46 @@ class Volume extends BaseVolume
         return $this->getPublication()->getParent();
     }
 
+    /**
+     * @param MultiVolume $multiVolume
+     * @throws \Exception
+     * @throws \PropelException
+     */
+    public function setParentPublication($multiVolume){
+        if($multiVolume!=null) {
+            $oldParent = $this->getPublication()->getParent();
+            $newParent = $multiVolume->getPublication();
+
+            //$newParent.isAncestorOf
+            if (($oldParent != $newParent) and !($newParent->isAncestorOf($this->getPublication()))) {
+                if (!$newParent->isRoot()) {
+                    $newParent->makeRoot();
+
+                }
+                if (!$newParent->getScopeValue()) {
+                    //throw new \Exception("TESTA ". $newParent->getScopeValue());
+                    $newParent->setScopeValue($newParent->getId());
+                }
+
+                $multiVolume->setVolumesTotal($multiVolume->getVolumesTotal() + 1);
+                $this->getPublication()
+                    //->setScopeValue($newParent->getScopeValue())
+                    ->insertAsLastChildOf($newParent)
+                    ->save();
+                //$multiVolume->save();
+                //throw new \Exception("TEST ". $this->getPublication()->getParent());
+
+
+                //$newParent->insertAsLastChildOf($this->getPublication())->save();
+                //$multiVolume->setVolumesTotal($newParent->countChildren())->save();
+                if ($oldParent != null and $oldParent->countChildren() == 0) {
+                    //$parent->delete();
+                    $oldParent->getPeer()->deleteTree($oldParent->getScopeValue());
+                }
+            }
+        }
+    }
+
     public function convertToBook(){
         $publication = $this->getPublication();
         $parent = $publication->getParent();
