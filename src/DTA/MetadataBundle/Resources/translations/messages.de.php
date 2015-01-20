@@ -157,6 +157,7 @@ return array(
 
 
     'Listview' => 'Listenansicht',
+    'Parent publication' => 'Teil des mehrbändigen Werkes',
 
     // form labels: controls
 

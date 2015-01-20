@@ -29,6 +29,10 @@ class Volume extends BaseVolume
         
     }
 
+    public function getParentPublication(){
+        return $this->getPublication()->getParent();
+    }
+
     public function convertToBook(){
         $publication = $this->getPublication();
         $parent = $publication->getParent();
