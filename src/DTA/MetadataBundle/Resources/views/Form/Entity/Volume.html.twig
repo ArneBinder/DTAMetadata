@@ -1,3 +1,29 @@
 
 {% extends "DTAMetadataBundle:Form:PublicationBase.html.twig" %}
+{% block specialized %}
+    <input type="checkbox" data-toggle="collapse" data-target="#fieldset_isVolume" id="checkbox_isVolume" value="isVolume" onClick="changeToVolume()" checked> ist Teil eines mehrbändigen Werkes<br>
+    {{ dta.beginFieldset({'caption':'Publicationspecific', 'id':'fieldset_isVolume'})}}
+    {{ form_rest(form) }}
+    {{ dta.endFieldset()}}
+
+    <script type="text/javascript">
+        function changeToVolume() {
+            $fieldset = $('#fieldset_isVolume');
+            console.debug($fieldset);
+            if(!$('#checkbox_isVolume').is(':checked')){
+                $fieldset.css('visibility','hidden');
+                //$fieldset.removeClass("in");
+                //$fieldset.addClass("collapse");
+
+            }else{
+                $fieldset.css('visibility','visible');
+                //$fieldset.addClass("in");
+                //$fieldset.removeClass("collapse");
+
+            }
+            console.debug($('#checkbox_isVolume').is(':checked'));
+        }
+    </script>
+{% endblock specialized %}
+
 

@@ -93,6 +93,7 @@
 
                 {% if package is defined and className is defined %}
                         // TODO remove debug output
+                if($('.table.fullyFeatured').length){
                         console.log('retrieving records {{package}}\{{className}}');
                         // buttons with bootstrap CSS classes
                         {#$.extend( true, $.fn.DataTable.TableTools.classes, {
@@ -164,7 +165,7 @@
                             }      #}
                         } );
                     $("#datatable_filter input").attr('placeholder', 'wildcards: _ und %');
-
+                }
 
 
                 //adjustTableHeight();
@@ -190,9 +191,12 @@
             $(window).on('resize', function () {
                 //dataTable = $('table.table');
                 //console.debug(dataTable);
-                dataTable.columns.adjust();
-                //adjustTableHeight();
+                if(dataTable!=null)
+                {
+                    dataTable.columns.adjust();
 
+                    //adjustTableHeight();
+                }
             } );
 
             function adjustTableHeight(){

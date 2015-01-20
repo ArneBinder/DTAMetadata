@@ -103,11 +103,12 @@ $(document).ready(function() {
     $('table.table').on("click", "tr", recordClicked);
     
     dataTable = $('table.table').DataTable();
-    
-    // hide the column containg the ID
-    var idCol = 0;
-    //dataTable.fnSetColumnVis( idCol, false );
-    dataTable.column(idCol).visible(false);
+    if(dataTable!=null){
+        // hide the column containg the ID
+        var idCol = 0;
+        //dataTable.fnSetColumnVis( idCol, false );
+        dataTable.column(idCol).visible(false);
+    }
 {#    var bVis = dataTable.fnSettings().aoColumns[idCol].bVisible;#}
     
 }); // document ready
