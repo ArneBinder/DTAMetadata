@@ -60,7 +60,7 @@
         {% set publicationType = className != 'Publication'?className:'Book' %}
         <a class="btn btn-mini listView-add-button pull-right" href="{{ path('Data_newPublication', {'publicationType':publicationType}) }}" class="btn btn-default btn-sm">
             <i class="icon-plus"></i>
-            {{ publicationType|trans}} neu anlegen
+            neu anlegen
         </a>
     </h3>
     <div class="well" id="publicationOptions">
