@@ -23,7 +23,7 @@ class VolumeType extends BaseAbstractType
         $builder->add('volume_numeric');
         $builder->add('parentPublication', new SelectOrAddType(), array(
                 'class' => 'DTA\MetadataBundle\Model\Data\MultiVolume',
-                'property' => 'FirstAuthorName',
+                'property' => 'TitleString',
                 'required' => false,
             ));
     }
