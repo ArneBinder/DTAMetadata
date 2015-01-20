@@ -15,6 +15,7 @@ class DynamicCollectionType extends \Symfony\Component\Form\Extension\Core\Type\
      * @var string contains the unqualified model class name to use in the view (for translation, dynamic controls, etc.)
      */
     public $modelClass;
+    public $package;
     protected $themeBlockName;
 
     public function getName() {
@@ -49,6 +50,7 @@ class DynamicCollectionType extends \Symfony\Component\Form\Extension\Core\Type\
         $dataClassStr = $options['type']->getOption('data_class');
         $parts = explode('\\', $dataClassStr);
         $this->modelClass = array_pop($parts);
+        $this->package = array_pop($parts);
 
         $prototypeName = '__' . $this->modelClass . 'ID__';
 
@@ -68,6 +70,7 @@ class DynamicCollectionType extends \Symfony\Component\Form\Extension\Core\Type\
 
     public function finishView(FormView $view, FormInterface $form, array $options) {
         $view->vars['modelClass'] = $this->modelClass;
+        $view->vars['package'] = $this->package;
         
         $listAdditionalCssClasses = '';
         if($options['sortable'] === true)
@@ -91,6 +94,8 @@ class DynamicCollectionType extends \Symfony\Component\Form\Extension\Core\Type\
             'inlineLabel' => true,
             'required' => false,
             'displayAs' => 'list',
+            'modelClass' => $this->modelClass,
+            'package' => $this->package,
         ));
     }
 

@@ -61,6 +61,19 @@
 
             {{ form_rest(form) }}
         </ol>
+    {% elseif displayAs == 'link' %}
+        <ol class='dynamic-collection list {{ listAdditionalCssClasses }} ' {{ block('widget_container_attributes') }} >
+            {% if form.parent is empty %}
+                {{ form_errors(form) }}
+            {% endif %}
+
+            {#        Render the elements of the collection         #}
+            {% for child in form %}
+                <li>{{ form_row(child, {'parent_id':id, 'displayAs':displayAs, 'collapsed':true, 'modelClass':modelClass, 'package':package}) }}</li>
+            {% endfor %}
+
+            {{ form_rest(form) }}
+        </ol>
     {% else %}
         ERROR: Unknown displayAs value '{{ displayAs }}'. Use 'panel' or 'list'.
     {% endif %}

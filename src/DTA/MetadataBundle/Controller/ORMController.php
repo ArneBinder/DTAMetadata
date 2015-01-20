@@ -278,7 +278,7 @@ class ORMController extends DTADomainController {
                 } else {
                     $value = $attribute;
                 }
-                // add an edit button to the efirst column entry
+                // add an edit button to the first column entry
                 if($i === 0){
                     $editLink = $this->generateUrl($package . '_genericCreateOrEdit', array(
                         'package'=>$package, 'className'=>$className, 'recordId'=>$entity->getId()

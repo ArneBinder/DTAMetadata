@@ -4,6 +4,7 @@ namespace DTA\MetadataBundle\Form\Data;
 
 use Propel\PropelBundle\Form\BaseAbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use DTA\MetadataBundle\Form\DerivedType\DynamicCollectionType;
 
 class MultiVolumeType extends BaseAbstractType
 {
@@ -19,6 +20,13 @@ class MultiVolumeType extends BaseAbstractType
     {
         $builder->add('publication', new PublicationType());
         $builder->add('volumes_total');
+        $builder->add('volumes', new DynamicCollectionType(), array(
+            'type' => new VolumeType(),
+            'inlineLabel' => false,
+            'sortable' => false,
+            'displayAs' => 'link',
+            'label' => 'zugehörige Bände',
+        ));
         
     }
 }

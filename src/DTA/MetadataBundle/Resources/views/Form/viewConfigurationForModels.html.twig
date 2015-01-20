@@ -25,6 +25,22 @@
     {{ form_rest(form) }}
 {% endblock %}
 
+{% block volume_row %}
+    {% set displayAsLink = (displayAs|default('standard'))=='link'?true:false %}
+    {% set modelClass = modelClass|default(null)%}
+    {% set package = package|default(null)%}
+    {% if  displayAsLink and modelClass and package %}
+        {% set actionTarget = sendDataTo|default( path(package~'_genericCreateOrEdit', {'package': package, 'className':modelClass, 'recordId':form.vars.value.getId()}) )%}
+        <a href='{{ actionTarget }}'>{{ form.vars.value.getPublication().getTitleString() }}</a>
+        {% for element in form %}
+            {% do element.setRendered %}
+        {% endfor %}
+    {% else %}
+        {{ form_row(form, {'inlineLabel':false, 'hideLabel': true}) }}
+    {% endif %}
+    {{ form_rest(form) }}
+{% endblock volume_row %}
+
 {% block _partner_isOrganization_row %}
     {{ form_row(form, {'expanded':true}) }}
     {{ form_rest(form) }}

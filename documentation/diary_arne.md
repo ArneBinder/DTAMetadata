@@ -224,6 +224,10 @@
  o The filter box and pagination length are displayed above the table. But still on incorrect sides!
  o Added column adjustment after resizing.
  
+2015-01-19
+ o imported database dump from server (khan) into local database dtadb_khan_utf8
+ o all child volumes are linked in it's multi volume. still to do: enable editing! 
+ 
  TODO:
  o Tab-Constraint DONE
  o merge multiple spaces
