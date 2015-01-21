@@ -29,8 +29,11 @@ class Volume extends BaseVolume
         
     }
 
+    /**
+     * @return MultiVolume
+     */
     public function getParentPublication(){
-        return $this->getPublication()->getParent();
+        return $this->getPublication()->getParent()->getSpecialization();
     }
 
     /**
