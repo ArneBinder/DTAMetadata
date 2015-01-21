@@ -33,8 +33,24 @@ class Volume extends BaseVolume
      * @return MultiVolume
      */
     public function getParentPublication(){
-        return $this->getPublication()->getParent()->getSpecialization();
+        $parent = $this->getPublication()->getParent();
+        if($parent !== null) {
+            return $this->getPublication()->getParent()->getSpecialization();
+        }else{
+            return new MultiVolume();
+        }
     }
+
+    public function getParentPublicationTitleString(){
+        $parent = $this->getPublication()->getParent();
+        if($parent !== null) {
+            return $this->getPublication()->getParent()->getShortTitle();
+        }else{
+            return "WARNING: no parent set!";
+        }
+    }
+
+
 
     /**
      * @param MultiVolume $multiVolume
@@ -70,7 +86,7 @@ class Volume extends BaseVolume
 
                 //$newParent->insertAsLastChildOf($this->getPublication())->save();
                 //$multiVolume->setVolumesTotal($newParent->countChildren())->save();
-                if ($oldParent->countChildren() == 0) {
+                if ($oldParent!==null and $oldParent->countChildren() == 0) {
                    $oldParent->getPeer()->deleteTree($oldParent->getScopeValue());
                 }
             }
