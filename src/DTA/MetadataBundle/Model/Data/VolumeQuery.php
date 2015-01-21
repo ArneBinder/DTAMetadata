@@ -9,4 +9,8 @@ class VolumeQuery extends BaseVolumeQuery implements \DTA\MetadataBundle\Model\S
     public static function sqlSort(\ModelCriteria $query, $direction = \ModelCriteria::ASC){
         return PublicationQuery::sqlSort($query->usePublicationQuery(), $direction)->endUse();
     }
+
+    public function orderByParentPublicationShortTitle($direction){
+        return PublicationQuery::sqlSort($this->usePublicationQuery(),$direction)->endUse();
+    }
 }

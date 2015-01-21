@@ -41,7 +41,7 @@ class Volume extends BaseVolume
         }
     }
 
-    public function getParentPublicationTitleString(){
+    public function getParentPublicationShortTitle(){
         $parent = $this->getPublication()->getParent();
         if($parent !== null) {
             return $this->getPublication()->getParent()->getShortTitle();
