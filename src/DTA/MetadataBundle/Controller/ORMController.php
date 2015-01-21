@@ -273,6 +273,7 @@ class ORMController extends DTADomainController {
             for ($i = 0; $i < count($columns); $i++) {
                 $column = $columns[$i];
                 $attribute = $entity->getAttributeByTableViewColumName($column);
+
                 if(is_object($attribute)){
                     $value = $attribute->__toString();
                 } else {
@@ -289,7 +290,21 @@ class ORMController extends DTADomainController {
                     $row[] = "<a href='$editLink'><span class='glyphicon glyphicon-edit'></span></a>"
 //                            ."<a href='$deleteLink'><span class='glyphicon glyphicon-trash'></span></a> "
                             ."$value";
-                } else {
+                } elseif(is_object($attribute)) {
+                        // reflection
+                        $classNameParts = explode('\\',get_class($attribute));
+                        $linkClassName = array_pop($classNameParts);
+                        $linkÜackage = array_pop($classNameParts);
+                        $editLink = $this->generateUrl(
+                            $package . '_genericCreateOrEdit',
+                            array(
+                                'package' => $linkÜackage,
+                                'className' => $linkClassName,
+                                'recordId' => $attribute->getId()
+                            )
+                        );
+                        $row[] = "<a href='$editLink'>$value</a>";
+                }else{
                     $row[] = $value;
                 }
             }

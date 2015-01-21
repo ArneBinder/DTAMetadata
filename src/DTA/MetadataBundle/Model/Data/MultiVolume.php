@@ -13,7 +13,11 @@ class MultiVolume extends BaseMultiVolume
 
     public function getTitleString(){
         $publication = $this->getPublication();
-        return $publication->getFirstAuthorName().": ".$publication->getTitleString();
+        if($publication!==null) {
+            return $publication->getFirstAuthorName() . ": " . $publication->getTitleString();
+        }else{
+            return "null";
+        }
     }
 
     public function getVolumes(){
@@ -53,5 +57,9 @@ class MultiVolume extends BaseMultiVolume
 
         $this->setVolumesTotal($this->getPublication()->countChildren())->save();
         */
+    }
+
+    public function __toString(){
+        return $this->getTitleString();
     }
 }

@@ -185,7 +185,7 @@ propel > dbal > connections for connection setup. -->
             <parameter name="embedColumns" value="embedColumns:publication"/>
             <parameter name="Band (numerisch)" value="volume_numeric"/>
             <parameter name="Bandbeschreibung" value="volume_description"/>
-            <parameter name="Übergeordnetes Werk" value="accessor:getParentPublicationShortTitle"/>
+            <parameter name="Übergeordnetes Werk" value="accessor:getParentPublication"/>
         </behavior>
     </table>   
     
