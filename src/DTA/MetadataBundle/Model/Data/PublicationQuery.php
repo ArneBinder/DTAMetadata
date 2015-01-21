@@ -3,8 +3,11 @@
 namespace DTA\MetadataBundle\Model\Data;
 
 use DTA\MetadataBundle\Model\Data\om\BasePublicationQuery;
+use DTA\MetadataBundle\Model\ModelCriteria;
+use Exception;
+use ReflectionMethod;
 
-class PublicationQuery extends BasePublicationQuery implements \DTA\MetadataBundle\Model\SQLSortable
+class PublicationQuery extends BasePublicationQuery implements \DTA\MetadataBundle\Model\SQLSortable, \DTA\MetadataBundle\Model\SQLFilterable
 {
     public static function sqlSort(\ModelCriteria $query, $direction = \ModelCriteria::ASC){
         return TitleQuery::sqlSort($query->useTitleQuery(), $direction)->endUse();
@@ -42,7 +45,7 @@ class PublicationQuery extends BasePublicationQuery implements \DTA\MetadataBund
         return TitleQuery::sqlFilter($this->useTitleQuery(), $filterString)->endUse();
     }
 
-    public function filterByFirstAuthorName($direction){
+    public function filterByFirstAuthorNameString($direction){
         return PersonQuery::sqlFilter($this->usePersonPublicationQuery()->usePersonQuery(),$direction)->endUse()->endUse();
     }
 
@@ -52,5 +55,37 @@ class PublicationQuery extends BasePublicationQuery implements \DTA\MetadataBund
     }
 
 
+    /**
+     * Adds a filtering clause to the database query that filters the entities by a given string.
+     * @param $filterString the string which the entities have to contain
+     * @return ModelCriteria the modified query object that will return the filtered entities
+     */
+    public static function sqlFilter(\ModelCriteria $query, $filterString)
+    {
+        // get all methods which start with 'filterBy' and end with 'String'
+        $filterMethods = array();
+        ob_start();
+        foreach(get_class_methods(new PublicationQuery) as $possibleFilterMethod){
+            if(!substr_compare($possibleFilterMethod,'filterBy', 0, strlen('filterBy') ) and !substr_compare($possibleFilterMethod,'String',-strlen('String'),strlen('String'))){
+                $functionReflection = new ReflectionMethod(new PublicationQuery, $possibleFilterMethod);
+                $parameters = $functionReflection->getParameters();
+                if(count($parameters)==1 ){
+                    //$rp = new \ReflectionParameter(array(new PublicationQuery, $possibleFilterMethod),$($parameters[0]->name));
+                    //var_dump($rp->getClass()->getName());
+                    //var_dump($rp);
+                    $filterMethods[] = $possibleFilterMethod;
+                }
+            }
+        }
 
+        //throw new Exception(ob_get_clean());
+
+        if(!empty($filterMethods)){
+            $query = $query->$filterMethods[0]();
+        }
+        foreach($filterMethods as $filterMethod){
+            $query = $query->_or()->$filterMethod();
+        }
+        return $query;
+    }
 }
