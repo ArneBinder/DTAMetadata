@@ -55,6 +55,9 @@ return array(
     'TRANSLATOR' => 'Übsersetzer',
     'PRINTER' => 'Drucker',
 
+    'LAST_NAME' => 'Nachmname',
+    'FIRST_NAME' => 'Vorname',
+
     'KNOWLEDGE_DOMAIN' => 'Wissensdomäne',
     'TEXT_KIND' => 'Textsorte',
     'PRESENTATION' => 'Darstellung',
