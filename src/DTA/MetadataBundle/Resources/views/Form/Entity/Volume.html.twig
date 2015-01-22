@@ -1,29 +1,31 @@
 
 {% extends "DTAMetadataBundle:Form:PublicationBase.html.twig" %}
+
 {% block specialized %}
-    <input type="checkbox" data-toggle="collapse" data-target="#fieldset_isVolume" id="checkbox_isVolume" value="isVolume" onClick="changeToVolume()" checked> ist Teil eines mehrbändigen Werkes<br>
-    {{ dta.beginFieldset({'caption':'Publicationspecific', 'id':'fieldset_isVolume'})}}
-    {{ form_rest(form) }}
+    {{ dta.beginFieldset({'caption':'Publicationspecific', 'id': 'fieldset'~form.vars.id~'_publication_specific' })}}
+    {{ form_row(form.is_volume) }}
+    <div id="volume_specific_data" style="overflow: hidden">
+        {{ form_rest(form) }}
+    </div>
     {{ dta.endFieldset()}}
 
     <script type="text/javascript">
-        function changeToVolume() {
-            $fieldset = $('#fieldset_isVolume');
-            console.debug($fieldset);
-            if(!$('#checkbox_isVolume').is(':checked')){
-                $fieldset.css('visibility','hidden');
-                //$fieldset.removeClass("in");
-                //$fieldset.addClass("collapse");
-
+        $(document).ready(function() {
+            $volume_specific_data_checkbox = $("#{{ form.vars.id~'_is_volume' }}");
+            $volume_specific_data_checkbox.attr("onClick", "change_ToVolume_Visibility()");
+            change_ToVolume_Visibility();
+        });
+        function change_ToVolume_Visibility() {
+            $volume_specific_data = $('#volume_specific_data');
+            $volume_specific_data_checkbox = $("#{{ form.vars.id~'_is_volume' }}");
+            if(!$volume_specific_data_checkbox.is(':checked')){
+                $volume_specific_data.css('visibility','hidden');
+                $volume_specific_data.css('height',0);
             }else{
-                $fieldset.css('visibility','visible');
-                //$fieldset.addClass("in");
-                //$fieldset.removeClass("collapse");
-
+                $volume_specific_data.css('visibility','visible');
+                $volume_specific_data.css('height','auto');
             }
-            console.debug($('#checkbox_isVolume').is(':checked'));
-        }
+        };
     </script>
 {% endblock specialized %}
-
 

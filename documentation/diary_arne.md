@@ -227,6 +227,12 @@
 2015-01-19
  o imported database dump from server (khan) into local database dtadb_khan_utf8
  o all child volumes are linked in it's multi volume. still to do: enable editing! 
+ o Hint: to get object data in twig template, e.g: form.vars.value.getPublication().getTitleString()
+ o added links to all entries which are objects in table view
+ 
+2015-01-22
+ o implemented convertion of Book <-> Volume
+ o got new database dumps (mysql and postgres) from Frank. Not yet imported!
  
  TODO:
  o Tab-Constraint DONE

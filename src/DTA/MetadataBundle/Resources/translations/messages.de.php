@@ -158,6 +158,7 @@ return array(
 
     'Listview' => 'Listenansicht',
     'Parent publication' => 'Teil des mehrbändigen Werkes',
+    'Is part of multi volume' => 'ist Teil eines mehrbändigen Werkes',
 
     // form labels: controls
 

@@ -118,7 +118,7 @@
     {% else %}
         <label class="checkbox">
             {{ form_widget(form) }}
-            {{ label }}
+            {{ label|trans({}, translation_domain) }}
         </label>
     {% endif %}
 {% endblock checkbox_row %}

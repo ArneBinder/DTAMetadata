@@ -111,39 +111,5 @@ class Publication extends BasePublication
         
     }
 
-    public function deleteFromTree(){
-        if ($this->isDeleted()) {
-            throw new PropelException("This object has already been deleted.");
-        }
-        $con = Propel::getConnection(PublicationPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
-        $con->beginTransaction();
-        try {
-            // nested_set behavior
-            if ($this->isRoot()) {
-                throw new PropelException('Deletion of a root node is disabled for nested sets. Use PublicationPeer::deleteTree($scope) instead to delete an entire tree');
-            }
 
-            // nested_set behavior
-            if ($this->isInTree()) {
-                // fill up the room that was used by the node
-                PublicationPeer::shiftRLValues(-2, $this->getRightValue() + 1, null, $this->getScopeValue(), $con);
-
-                $this->setTreeLeft(null)
-                    ->setTreeRight(null)
-                    ->setTreeLevel(null)
-                    ->setScopeValue($this->getId())
-                    ->save($con);
-
-                //$query = PublicationQuery::create()
-                 //   ->filterByPrimaryKey($this->getPrimaryKey());
-                //$query->setScopeValue($this->getId())->save($con);
-            }
-            $con->commit();
-
-            //$this->setScopeValue($this->getId())->save($con);
-        } catch (Exception $e) {
-            $con->rollBack();
-            throw $e;
-        }
-    }
 }
