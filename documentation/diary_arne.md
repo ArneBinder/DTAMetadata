@@ -231,8 +231,14 @@
  o added links to all entries which are objects in table view
  
 2015-01-22
- o implemented convertion of Book <-> Volume
+ o implemented conversion of Book <-> Volume
  o got new database dumps (mysql and postgres) from Frank. Not yet imported!
+ o current TODO: 
+	- import new data
+	- add padding (above search box) 
+	- add missing "Herausgeber" (editing form) 
+	- modify "Buchband hinzufügen": show List of volumes, don't create a new one!
+	- implement MultiVolume/removeVolume
  
  TODO:
  o Tab-Constraint DONE

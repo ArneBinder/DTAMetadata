@@ -128,36 +128,11 @@ class Volume extends BaseVolume
                     ->setTreeLevel(null)
                     ->setScopeValue($this->getId())
                     ->save($con);
-
-                //$query = PublicationQuery::create()
-                //   ->filterByPrimaryKey($this->getPrimaryKey());
-                //$query->setScopeValue($this->getId())->save($con);
             }
             $con->commit();
-
-            //$this->setScopeValue($this->getId())->save($con);
         } catch (\Exception $e) {
             $con->rollBack();
             throw $e;
         }
     }
-
-    /*
-    public function convertToBook(){
-        $publication = $this->getPublication();
-        $parent = $publication->getParent();
-        $this->delete();
-
-        $newBook = new Book();
-        $newBook->setPublication($this->getPublication());
-        $newBook->getPublication()
-            ->setType(PublicationPeer::TYPE_BOOK)
-            ->setScopeValue($publication->getId());
-        if($parent->countChildren()==0){
-            //$parent->delete();
-            $parent->getPeer()->deleteTree($parent->getScopeValue());
-        }
-        return $newBook;
-    }
-    */
 }

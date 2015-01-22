@@ -72,21 +72,4 @@ class Book extends BaseBook
         return $this;
     }
 
-
-    /**
-     * @param MultiVolume $parent
-     * @return Volume
-     * @throws \Exception
-     * @throws \PropelException
-     */
-    /*public function convertToVolume(MultiVolume $parent){
-        $newVolume = new Volume();
-        $newVolume->setPublication($this->getPublication());
-        $newVolume->getPublication()
-            ->setType(PublicationPeer::TYPE_VOLUME)
-            ->setScopeValue($parent->getPublication()->getId())
-            ->insertAsLastChildOf($parent->getPublication());
-        $this->delete();
-        return $newVolume;
-    }*/
 }

@@ -21,6 +21,9 @@ class MultiVolume extends BaseMultiVolume
     }
 
     public function getVolumes(){
+        if($this->getPublication()===null){
+            return array();
+        }
         $children = $this->getPublication()->getChildren();
         $result = array();
         foreach($children as $child) {
@@ -47,16 +50,7 @@ class MultiVolume extends BaseMultiVolume
      * @param Volume $oldVolume
      */
     public function removeVolume($oldVolume){
-        /*$oldPublication = $oldVolume->getPublication();
-        $oldPublication->delete();
-        $oldPublication->
-        $oldVolume->getPublication()
-            ->setScopeValue($publication->getId())
-            ->insertAsLastChildOf($publication)
-            ->save();
-
-        $this->setVolumesTotal($this->getPublication()->countChildren())->save();
-        */
+        //TODO: implement!
     }
 
     public function __toString(){
