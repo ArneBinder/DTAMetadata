@@ -15,6 +15,7 @@
 /* The sidebar is overflown if the table is too wide, so add scrollbars. */
 #core .dta-data-listing{
     overflow: auto;
+    padding-top: 5px;
 }
 
 /* The well has its own padding, no need to have two paddings if there's nothing but the ul in the well. */
