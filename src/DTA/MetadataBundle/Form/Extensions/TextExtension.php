@@ -38,12 +38,12 @@ class TextExtension extends AbstractTypeExtension{
         // to merge duplicated spaces in input data (no feedback for the user is implemented yet!)...
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
             $text = $event->getData();
-            $form = $event->getForm();
-            if(preg_match('/  /',$text)===1){
+            //$form = $event->getForm();
+            //if(preg_match('/  /',$text)===1){
                 //$form->addError(new FormError('text field contains double spaces'));
+                $text = str_replace('\t',' ',$text);
                 $event->setData(preg_replace('/  +/',' ',$text));
-                $event->setData(preg_replace('/\t+/',' ', preg_replace('/  +/',' ',$text)));
-            }
+            //}
 
         });
     }

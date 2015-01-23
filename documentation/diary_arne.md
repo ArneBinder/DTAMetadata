@@ -242,7 +242,7 @@
  
  TODO:
  o Tab-Constraint DONE
- o merge multiple spaces
+ o merge multiple spaces DONE
  
  o Fix delete task buttons DONE
  o Fix display of validation errors
