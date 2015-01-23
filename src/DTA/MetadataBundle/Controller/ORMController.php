@@ -141,7 +141,6 @@ class ORMController extends DTADomainController {
             $useQuery = "use$embeddedAccessor[1]Query";
             $criteriaAccessor = $embeddedAccessor[0];
             $query = $query->$useQuery();
-            // is it a representative?
         }
 
         // adding "String" to the function name prevents collision with propel filter method
@@ -254,6 +253,20 @@ class ORMController extends DTADomainController {
 //        }
     }
 
+    private function getEditingLinkForObject($obj){
+        $classNameParts = explode('\\',get_class($obj));
+        $linkClassName = array_pop($classNameParts);
+        $linkPackage = array_pop($classNameParts);
+        return $this->generateUrl(
+            $linkPackage . '_genericCreateOrEdit',
+            array(
+                'package' => $linkPackage,
+                'className' => $linkClassName,
+                'recordId' => $obj->getId()
+            )
+        );
+    }
+
     /**
      *
      * @param type $entities Propel entities
@@ -281,29 +294,8 @@ class ORMController extends DTADomainController {
                 }
                 // add an edit button to the first column entry
                 if($i === 0){
-                    $editLink = "";
-                    if($entity->getSpecialization()!== null){
-                        $classNameParts = explode('\\',get_class($entity->getSpecialization()));
-                        $linkClassName = array_pop($classNameParts);
-                        $linkPackage = array_pop($classNameParts);
-                        $editLink = $this->generateUrl(
-                            $linkPackage . '_genericCreateOrEdit',
-                            array(
-                                'package' => $linkPackage,
-                                'className' => $linkClassName,
-                                'recordId' => $entity->getSpecialization()->getId()
-                            )
-                        );
-                    }else{
-                        $editLink = $this->generateUrl(
-                            $package . '_genericCreateOrEdit',
-                            array(
-                                'package' => $package,
-                                'className' => $className,
-                                'recordId' => $entity->getId()
-                            )
-                        );
-                    }
+                    $specialized = $entity->getSpecialization();
+                    $editLink = $specialized!==null?$this->getEditingLinkForObject($specialized):$this->getEditingLinkForObject($entity);
 //                    $deleteLink = $this->generateUrl($package . '_deleteRecord', array(
 //                        'package'=>$package, 'className'=>$className, 'recordId'=>$entity->getId() 
 //                    ));
@@ -311,18 +303,7 @@ class ORMController extends DTADomainController {
 //                            ."<a href='$deleteLink'><span class='glyphicon glyphicon-trash'></span></a> "
                             ."$value";
                 } elseif(is_object($attribute)) {
-                        // reflection
-                        $classNameParts = explode('\\',get_class($attribute));
-                        $linkClassName = array_pop($classNameParts);
-                        $linkPackage = array_pop($classNameParts);
-                        $editLink = $this->generateUrl(
-                            $linkPackage . '_genericCreateOrEdit',
-                            array(
-                                'package' => $linkPackage,
-                                'className' => $linkClassName,
-                                'recordId' => $attribute->getId()
-                            )
-                        );
+                        $editLink = $this->getEditingLinkForObject($attribute);
                         $row[] = "<a href='$editLink'>$value</a>";
                 }else{
                     $row[] = $value;
