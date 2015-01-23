@@ -50,7 +50,7 @@ class MultiVolume extends BaseMultiVolume
      * @param Volume $oldVolume
      */
     public function removeVolume($oldVolume){
-        //TODO: implement!
+        $oldVolume->deleteFromTree();
     }
 
     public function __toString(){

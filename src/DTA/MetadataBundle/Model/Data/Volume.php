@@ -96,9 +96,9 @@ class Volume extends BaseVolume
                     ->save();
                 $multiVolume->setVolumesTotal($newParent->countChildren())->save();
 
-                if ($oldParent!==null and $oldParent->countChildren() == 0) {
-                   $oldParent->getPeer()->deleteTree($oldParent->getScopeValue());
-                }
+                //if ($oldParent!==null and $oldParent->countChildren() == 0) {
+                //   $oldParent->getPeer()->deleteTree($oldParent->getScopeValue());
+                //}
             }
         }
         return $this;

@@ -237,8 +237,8 @@
 	- import new data
 	- add padding (above search box) DONE
 	- add missing "Herausgeber" (editing form) DONE
-	- modify "Buchband hinzufügen": show List of volumes, don't create a new one!
-	- implement MultiVolume/removeVolume
+	- modify "Buchband hinzufügen": show List of volumes, don't create a new one! 
+	- implement MultiVolume/removeVolume (DONE not tested yet!)
  
  TODO:
  o Tab-Constraint DONE
