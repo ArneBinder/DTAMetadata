@@ -235,8 +235,8 @@
  o got new database dumps (mysql and postgres) from Frank. Not yet imported!
  o current TODO: 
 	- import new data
-	- add padding (above search box) 
-	- add missing "Herausgeber" (editing form) 
+	- add padding (above search box) DONE
+	- add missing "Herausgeber" (editing form) DONE
 	- modify "Buchband hinzufügen": show List of volumes, don't create a new one!
 	- implement MultiVolume/removeVolume
  

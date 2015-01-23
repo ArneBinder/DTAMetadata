@@ -54,6 +54,7 @@ return array(
     'PUBLISHER' => 'Verleger',
     'TRANSLATOR' => 'Übsersetzer',
     'PRINTER' => 'Drucker',
+    'EDITOR' => 'Herausgeber',
 
     'LAST_NAME' => 'Nachmname',
     'FIRST_NAME' => 'Vorname',
