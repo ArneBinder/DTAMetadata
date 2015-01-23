@@ -281,9 +281,29 @@ class ORMController extends DTADomainController {
                 }
                 // add an edit button to the first column entry
                 if($i === 0){
-                    $editLink = $this->generateUrl($package . '_genericCreateOrEdit', array(
-                        'package'=>$package, 'className'=>$className, 'recordId'=>$entity->getId()
-                    ));
+                    $editLink = "";
+                    if($entity->getSpecialization()!== null){
+                        $classNameParts = explode('\\',get_class($entity->getSpecialization()));
+                        $linkClassName = array_pop($classNameParts);
+                        $linkPackage = array_pop($classNameParts);
+                        $editLink = $this->generateUrl(
+                            $linkPackage . '_genericCreateOrEdit',
+                            array(
+                                'package' => $linkPackage,
+                                'className' => $linkClassName,
+                                'recordId' => $entity->getSpecialization()->getId()
+                            )
+                        );
+                    }else{
+                        $editLink = $this->generateUrl(
+                            $package . '_genericCreateOrEdit',
+                            array(
+                                'package' => $package,
+                                'className' => $className,
+                                'recordId' => $entity->getId()
+                            )
+                        );
+                    }
 //                    $deleteLink = $this->generateUrl($package . '_deleteRecord', array(
 //                        'package'=>$package, 'className'=>$className, 'recordId'=>$entity->getId() 
 //                    ));
@@ -294,11 +314,11 @@ class ORMController extends DTADomainController {
                         // reflection
                         $classNameParts = explode('\\',get_class($attribute));
                         $linkClassName = array_pop($classNameParts);
-                        $linkÜackage = array_pop($classNameParts);
+                        $linkPackage = array_pop($classNameParts);
                         $editLink = $this->generateUrl(
-                            $package . '_genericCreateOrEdit',
+                            $linkPackage . '_genericCreateOrEdit',
                             array(
-                                'package' => $linkÜackage,
+                                'package' => $linkPackage,
                                 'className' => $linkClassName,
                                 'recordId' => $attribute->getId()
                             )

@@ -246,12 +246,12 @@
  
  o Fix delete task buttons DONE
  o Fix display of validation errors
- o Fix sortable tables
+ o Fix sortable tables DONE
  
  o add confirm form when deleting entries
  o add genre and tag import from old database DEPRICATED?
  o change tag list to tag field
  
- o add filter to search for entries
+ o add filter to search for entries FONE
  
  o use inherit_data (http://symfony.com/doc/current/cookbook/form/inherit_data_option.html)

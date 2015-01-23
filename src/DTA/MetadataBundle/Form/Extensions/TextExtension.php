@@ -42,6 +42,7 @@ class TextExtension extends AbstractTypeExtension{
             if(preg_match('/  /',$text)===1){
                 //$form->addError(new FormError('text field contains double spaces'));
                 $event->setData(preg_replace('/  +/',' ',$text));
+                $event->setData(preg_replace('/\t+/',' ', preg_replace('/  +/',' ',$text)));
             }
 
         });
