@@ -235,6 +235,14 @@
  o got new database dumps (mysql and postgres) from Frank. Not yet imported!
  o current TODO: 
 	- import new data
+	   modify script to use psql-dump: 
+	   > remove "1" from IMCREMENT 1 (?)
+	   > adapt CONCAT
+	   > adapt show columns / tables (http://www.linuxscrew.com/2009/07/03/postgresql-show-tables-show-databases-show-columns/)
+	   > adapt SUBSTRING_INDEX
+	   > adapt FIND_IN_SET
+	   > adapt NULLIF(... '0000-00-00 00:00:00')
+	   > adapt _utf8
 	- add padding (above search box) DONE
 	- add missing "Herausgeber" (editing form) DONE
 	- modify "Buchband hinzufügen": show List of volumes, don't create a new one! 
