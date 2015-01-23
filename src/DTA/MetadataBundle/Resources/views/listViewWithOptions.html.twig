@@ -55,7 +55,7 @@
         </table>
         {% endspaceless %}
 </div>
-<div class="col-md-3">
+<div class="col-md-3 dta-data-options">
     <h3> {{ title|default(className|default('Listview'))|trans }}
         {% set publicationType = className != 'Publication'?className:'Book' %}
         <a class="btn btn-mini listView-add-button pull-right" href="{{ path('Data_newPublication', {'publicationType':publicationType}) }}" class="btn btn-default btn-sm">
@@ -103,12 +103,12 @@ $(document).ready(function() {
     $('table.table').on("click", "tr", recordClicked);
     
     dataTable = $('table.table').DataTable();
-    if(dataTable!=null){
+   // if(dataTable!=null){
         // hide the column containg the ID
         var idCol = 0;
         //dataTable.fnSetColumnVis( idCol, false );
         dataTable.column(idCol).visible(false);
-    }
+   // }
 {#    var bVis = dataTable.fnSettings().aoColumns[idCol].bVisible;#}
     
 }); // document ready

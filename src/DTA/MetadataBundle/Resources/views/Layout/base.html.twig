@@ -124,7 +124,6 @@
                         dataTable = $('.table.fullyFeatured');
 
                         dataTable.DataTable( {
-
                             "processing": true
                             ,"serverSide": true
                             ,"ajax": "{{path(package~'_dataTablesDataSource', {'package': package, 'className': className}) }}"
@@ -137,7 +136,7 @@
                                 [10, 50, 100, "Alle"] ]
                             ,"pageLength" : 50
                             ,"dom": '<"top"fl>rt<"bottom"ip>'
-                            ,"scrollY": calcTableHeight()+"px"//"1px"
+                            ,"scrollY": calcTableHeight()+"px"//"1px"//
                             ,"paging": true
                             ,"pagingType": "full_numbers"
                             ,"language": { "url": "{{asset('js/DataTables-1.10.4/dataTablesGermanTranslation.json')}}" }
@@ -157,56 +156,44 @@
                 }
 
 
-                //adjustTableHeight();
-
-                //dataTable.css('height',100);
-                //var tableSettings = dataTable.;
-                //console.debug(tableSettings);
-                //tableSettings.oScroll.sY = 101;
-                //var scrollBody = $('.table.fullyFeatured').first();
-                //console.debug(scrollBody.style);//.style.height = '100px';
-                 //   $('div.dataTables_wrapper').height();
-
-                        {#var tt = new $.fn.dataTable.TableTools( $('.table.fullyFeatured') );
-
-                        $( tt.fnContainer() ).insertBefore('div.dataTables_wrapper');#}
                 {% endif %}
 
-                //adjustTableHeight();
 
             });
 
 
             $(window).on('resize', function () {
-                //dataTable = $('table.table');
-                //console.debug(dataTable);
                 if(dataTable!=null)
                 {
                     dataTable.columns.adjust();
-
-                    //adjustTableHeight();
-                    $('.dataTables_scrollBody').css('height', calcTableHeight());
+                    adjustTableHeight();
+                    //$('.dataTables_scrollBody').css('height', calcTableHeight());
                 }
             } );
 
             function adjustTableHeight(){
-                //if(scrolly==0) {
 
-                //$('.dta-data-options').css('visibility', 'hidden');
-                $('.dataTables_scrollBody').css('height', 0);
+                options = $('.dta-data-options');
+                listing = $('.dta-data-listing');
+                scrollBody = $('.dataTables_scrollBody');
+
+                listingTop = listing.offset().top;
+                optionsTop = options.offset().top;
+                //console.debug(optionHeight);
+                options.css('height', 0);
+                options.css('overflow', 'hidden');
+                scrollBody.css('height', 0);
                 dataTable.draw();
                 var scrolly = $(window).innerHeight() - $('html').outerHeight();
-                //scrolly = $(window).height() - $('html').height();
-                //var tableWrapper = $('.dataTables_wrapper').first();
-                //var container = $('.dataTables_wrapper').parent();
-                //console.debug($('html').height());
-                console.debug("dta-data-listing: \t" + $('div.dta-data-listing').height());
-                console.debug("datatable_wrapper: \t" + $('#datatable_wrapper').height());
 
-                $('.dta-data-options').css('visibility', 'visible');
-                //$('.dataTables_scrollBody').css('height', 400);
-                //$('.dta-data-options').css('visibility', 'visible');
-                //}
+                options.css('height', '');
+                options.css('overflow', '');
+                if(listingTop != optionsTop) {
+                    //console.debug(listingTop);
+                    console.debug(options.outerHeight());
+                    scrolly = Math.max(0, scrolly - options.outerHeight());
+                }
+                scrollBody.css('height', scrolly);
             }
 
             function calcTableHeight(){
