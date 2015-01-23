@@ -294,9 +294,12 @@ class ORMController extends DTADomainController {
                 }
                 // add an edit button to the first column entry
                 if($i === 0){
-                    $specialized = $entity->getSpecialization();
-                    $editLink = $specialized!==null?$this->getEditingLinkForObject($specialized):$this->getEditingLinkForObject($entity);
-//                    $deleteLink = $this->generateUrl($package . '_deleteRecord', array(
+                    if(method_exists($entity,'getSpecialization')){
+                        $editLink = $this->getEditingLinkForObject($entity->getSpecialization());
+                    }else{
+                        $editLink =  $this->getEditingLinkForObject($entity);
+                    }
+                     // $deleteLink = $this->generateUrl($package . '_deleteRecord', array(
 //                        'package'=>$package, 'className'=>$className, 'recordId'=>$entity->getId() 
 //                    ));
                     $row[] = "<a href='$editLink'><span class='glyphicon glyphicon-edit'></span></a>"

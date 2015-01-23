@@ -122,17 +122,6 @@
 
 
                         dataTable = $('.table.fullyFeatured');
-                        //var topHeight = Math.max.apply(Math, $.map($('.top'),function(el){return $(el).height()}));
-
-                        var paginationControlsHeight = 45;
-                        var filterInputHeight = 50;//$('#datatable_filter').outerHeight();
-                        //console.debug(filterInputHeight);
-                        var tableHeaderHeight = $('thead').first().outerHeight();
-                        //console.debug(tableHeaderHeight);
-                        var tableTop = dataTable.offset().top;
-                        var tableHeight = $(window).innerHeight() - tableTop - tableHeaderHeight - paginationControlsHeight - filterInputHeight;
-                        //console.debug(tableHeight);
-
 
                         dataTable.DataTable( {
 
@@ -148,7 +137,7 @@
                                 [10, 50, 100, "Alle"] ]
                             ,"pageLength" : 50
                             ,"dom": '<"top"fl>rt<"bottom"ip>'
-                            ,"scrollY": tableHeight+"px"//"1px"
+                            ,"scrollY": calcTableHeight()+"px"//"1px"
                             ,"paging": true
                             ,"pagingType": "full_numbers"
                             ,"language": { "url": "{{asset('js/DataTables-1.10.4/dataTablesGermanTranslation.json')}}" }
@@ -196,13 +185,14 @@
                     dataTable.columns.adjust();
 
                     //adjustTableHeight();
+                    $('.dataTables_scrollBody').css('height', calcTableHeight());
                 }
             } );
 
             function adjustTableHeight(){
                 //if(scrolly==0) {
 
-                $('.dta-data-options').css('visibility', 'hidden');
+                //$('.dta-data-options').css('visibility', 'hidden');
                 $('.dataTables_scrollBody').css('height', 0);
                 dataTable.draw();
                 var scrolly = $(window).innerHeight() - $('html').outerHeight();
@@ -210,14 +200,25 @@
                 //var tableWrapper = $('.dataTables_wrapper').first();
                 //var container = $('.dataTables_wrapper').parent();
                 //console.debug($('html').height());
-                console.debug("html: \t" + $('html').height());
-                console.debug("window: \t" + $(window).height());
+                console.debug("dta-data-listing: \t" + $('div.dta-data-listing').height());
+                console.debug("datatable_wrapper: \t" + $('#datatable_wrapper').height());
 
                 $('.dta-data-options').css('visibility', 'visible');
-                $('.dataTables_scrollBody').css('height', scrolly);
+                //$('.dataTables_scrollBody').css('height', 400);
                 //$('.dta-data-options').css('visibility', 'visible');
                 //}
             }
+
+            function calcTableHeight(){
+                var paginationControlsHeight = 45;
+                var filterInputHeight = 50;//$('#datatable_filter').outerHeight();
+                //console.debug(filterInputHeight);
+                var tableHeaderHeight = $('thead').first().outerHeight();
+                //console.debug(tableHeaderHeight);
+                var tableTop = dataTable.offset().top;
+                return $(window).innerHeight() - tableTop - tableHeaderHeight - paginationControlsHeight - filterInputHeight;
+            }
+
             /**
              * Requests a confirmation on clicking a link which e.g. deletes something.
              * Uses the link's title attribute to determine the warning message for the dialog.
