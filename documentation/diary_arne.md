@@ -247,6 +247,10 @@
 	- add missing "Herausgeber" (editing form) DONE
 	- modify "Buchband hinzufügen": show List of volumes, don't create a new one! 
 	- implement MultiVolume/removeVolume (DONE not tested yet!)
+	
+2015-01-27
+ o adapted schema files
+ o started to modify convertAction()
  
  TODO:
  o Tab-Constraint DONE

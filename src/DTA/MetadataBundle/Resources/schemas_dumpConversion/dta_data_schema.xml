@@ -91,27 +91,24 @@
             
         <behavior name="table_row_view">
             <!--<parameter name="Datenbank ID" value="id"/>-->
-            <parameter name="Titel" value="accessor:getTitleString"/>
-            <parameter name="erster Autor" value="accessor:getFirstAuthorName"/>
+            <parameter name="Titel" value="accessor:getTitleString filterColumn:"/>
+            <parameter name="erster Autor" value="accessor:getFirstAuthorName filterColumn:"/>
             <!--<parameter name="entstanden" value="accessor:getDatespecificationRelatedByCreationdateId"/>-->
-            <parameter name="veröffentlicht" value="accessor:getDatespecificationRelatedByPublicationdateId"/>
-            <parameter name="Verlag" value="accessor:getPublishingCompany"/>
+            <parameter name="veröffentlicht" value="accessor:getDatespecificationRelatedByPublicationdateId filterColumn:"/>
+            <parameter name="Verlag" value="accessor:getPublishingcompany"/>
             <parameter name="Ort" value="accessor:getPlace"/>
-            <!--<parameter name="embedcolumnsstatus" value="status"/>-->
-            <parameter name="Typ" value="type"/>
-            <parameter name="query" value="\DTA\MetadataBundle\Model\Data\PublicationQuery::create()
-                    ->leftJoinWith('Title')
-                    ->leftJoinWith('Title.Titlefragment')
-                    ->leftJoinWith('DatespecificationRelatedByPublicationdateId')
-                    ->leftJoinWith('PersonPublication')
-                    ->leftJoinWith('PersonPublication.Person')
-                    ->leftJoinWith('Person.Personalname')
-                    ->leftJoinWith('Personalname.Namefragment')
-                    ->leftJoinWith('Volume')
-                    ->orderBy('Titlefragment.type', 'asc')
-                    ->orderBy('Titlefragment.Name', 'asc')
-                    ->orderBy('Title.Id', 'asc')
-                    ->orderBy('Volume.VolumeNumeric', 'asc');" />
+            <!--<parameter name="Typ" value="type"/>-->
+            <parameter name="attribute1" value="query:\DTA\MetadataBundle\Model\Data\PublicationQuery::create()
+                    ->join('Title')
+                    ->join('Title.Titlefragment')
+                    ->join('DatespecificationRelatedByPublicationdateId')
+                    ->join('PersonPublication')
+                    ->join('PersonPublication.Person')
+                    ->join('Person.Personalname')
+                    ->join('Personalname.Namefragment')
+                    ->join('Volume')
+                    ->join('Place')
+;" />
         </behavior>
         
         <behavior name="reconstructed_flaggable">
@@ -140,6 +137,7 @@
     <table name="book">
         <column name="id" type="INTEGER" primaryKey="true" required="true"/>
         <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
+		<behavior name="table_row_view"> <parameter name="embedColumns" value="embedColumns:publication"/> </behavior>
     </table> 
     
     <!--Zeitschrift/Zeitung
@@ -148,6 +146,7 @@
     <table name="journal">
         <column name="id" type="INTEGER" primaryKey="true" required="true"/>
         <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
+		<behavior name="table_row_view"> <parameter name="embedColumns" value="embedColumns:publication"/> </behavior>
     </table> 
 
     <!--MULTI-VOLUME               
@@ -159,10 +158,16 @@
         
         <column name="volumes_total" description="Anzahl Bände (gesamt)" type="INTEGER"/>
         
-        <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="embedColumns:publication"/> </behavior>
-        
-        <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
-        <validator column="volumes_total"><rule name="minValue" value="2" message="Ein mehrbändiges Werk muss aus mindestens ${value} Bänden bestehen."/></validator>
+        <foreign-key foreignTable="publication"> 
+			<reference local="id" foreign="id"/>
+		</foreign-key>
+        <validator column="volumes_total">
+			<rule name="minValue" value="2" message="Ein mehrbändiges Werk muss aus mindestens ${value} Bänden bestehen."/>
+		</validator>
+		<behavior name="table_row_view"> 
+            <parameter name="embedColumns" value="embedColumns:publication"/>
+            <parameter name="Anzahl Bände" value="volumes_total"/>
+        </behavior>
     </table> 
     
     <!--VOLUME               
@@ -175,9 +180,13 @@
         <column name="volume_description" description="Bezeichnung des Bandes (alphanumerisch)" type="LONGVARCHAR"/>
         <column name="volume_numeric" description="Bezeichnung des Bandes (numerisch)" type="INTEGER"/>
         
-        <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="embedColumns:publication"/> </behavior>
-        
         <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
+		<behavior name="table_row_view"> 
+            <parameter name="embedColumns" value="embedColumns:publication"/>
+            <parameter name="Band (numerisch)" value="volume_numeric"/>
+            <parameter name="Bandbeschreibung" value="volume_description"/>
+            <parameter name="Übergeordnetes Werk" value="accessor:getParentPublication"/>
+        </behavior>
     </table>   
     
     <!--CHAPTER
@@ -189,9 +198,11 @@
         
         <column name="pages" description="Seitenangabe" type="LONGVARCHAR"/>
         
-        <!--<behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="embedColumns:publication"/> </behavior>-->
-        
         <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
+		<behavior name="table_row_view"> 
+            <parameter name="embedColumns" value="embedColumns:publication"/>
+            <parameter name="Seitenangabe" value="pages"/>
+        </behavior>
     </table> 
     
     <!--ARTICLE
@@ -203,9 +214,11 @@
         
         <column name="pages" description="Seitenangabe" type="LONGVARCHAR"/>
         
-        <!--<behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="embedColumns:publication"/> </behavior>-->
-        
         <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
+		<behavior name="table_row_view"> 
+            <parameter name="embedColumns" value="embedColumns:publication"/>
+            <parameter name="Seitenangabe" value="pages"/>
+        </behavior>
     </table> 
     
      <!--SERIES
@@ -215,9 +228,10 @@
     <table name="series">
         <column name="id" type="INTEGER" primaryKey="true" required="true"/>
         
-        <behavior name="table_row_view"> <parameter name="embedcolumnspublication" value="embedColumns:publication"/> </behavior>
-        
         <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
+		<behavior name="table_row_view"> 
+			<parameter name="embedColumns" value="embedColumns:publication"/> 
+		</behavior>
     </table> 
     
     <!-- Other entities that can be considered historical facts. -->
@@ -234,17 +248,24 @@
             <parameter name="query" value="query:\DTA\MetadataBundle\Model\Data\PublishingcompanyQuery::create()
                     ->orderBy('Name', 'asc');" />
         </behavior>
-        
-        <unique> <unique-column name="gnd"/> </unique>
-        <validator column="gnd"> <rule name="unique" message="GND ist schon vergeben!"/> </validator>
-    </table>
+		<unique> 
+            <unique-column name="gnd"/> 
+        </unique>
+        <validator column="gnd"> 
+            <rule name="unique" message="GND ist schon vergeben!"/> 
+        </validator>      
+	  </table>
 
     <table name="place">
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         <column name="name" type="LONGVARCHAR" required="true" primaryString="true"/>
         <column name="gnd" type="VARCHAR" size="255"/> 
-        <unique> <unique-column name="gnd"/> </unique>
-        <validator column="gnd"> <rule name="unique" message="GND ist schon vergeben!"/> </validator>
+		<unique> 
+			<unique-column name="gnd"/> 
+		</unique>
+        <validator column="gnd"> 
+			<rule name="unique" message="GND ist schon vergeben!"/> 
+		</validator>
     </table>
 
     <table name="datespecification">
@@ -269,7 +290,9 @@
             <parameter name="zugeordnet (personen-id)" value="person_id"/>
             <parameter name="reihenfolge" value="accessor:getSortableRank"/>
         </behavior>
-        <foreign-key foreignTable="person" onDelete="cascade"> <reference local="person_id" foreign="id"/> </foreign-key>
+		<foreign-key foreignTable="person" onDelete="cascade"> 
+			<reference local="person_id" foreign="id"/> 
+		</foreign-key>
     </table>
     
     <!-- Namensfragmente sind Bestandteile eines Namens, z.B. Vor- oder Nachname. -->
@@ -280,9 +303,9 @@
         
         <column name="type" description="Bedeutung des Fragments. Zum Beispiel Vorname, Nachname, Peerage (Adelstitel), Spelling (alternative schreibweise) etc." 
                 type="ENUM" valueSet="FIRST_NAME,LAST_NAME,PEERAGE,GENERATION,PSEUDONYM,SPELLING" />
-        <foreign-key foreignTable="personalname" onDelete="cascade"> <reference local="personalname_id" foreign="id"/> </foreign-key>
-        
-        
+        <foreign-key foreignTable="personalname" onDelete="cascade"> 
+			<reference local="personalname_id" foreign="id"/> 
+		</foreign-key>       
         <behavior name="sortable">
             <parameter name="use_scope" value="true"/>
             <parameter name="scope_column" value="personalname_id"/>
@@ -308,9 +331,11 @@
         
         <column name="type" description="Bedeutung des Fragments. Zum Beispiel Haupttitel, Untertitel, etc." 
                 type="ENUM" valueSet="MAIN_TITLE,SUBTITLE,SHORT_TITLE" />
-        
-        <foreign-key foreignTable="title" onDelete="cascade"> <reference local="title_id" foreign="id"/> </foreign-key>
-        
+       
+		<foreign-key foreignTable="title" onDelete="cascade">
+			<reference local="title_id" foreign="id"/> 
+		</foreign-key>
+
         <behavior name="sortable">
             <parameter name="use_scope" value="true"/>
             <parameter name="scope_column" value="title_id"/>
@@ -331,15 +356,15 @@
             <parameter name="erster name@representative" value="personalname"/>
             <!--<parameter name="namen gesamt@count" value="personalname"/>-->
             <parameter name="gnd" value="gnd"/>
-            <parameter name="query" 
+            <parameter name="attribute3"
                        value="query:DTA\MetadataBundle\Model\Data\PersonQuery::create()
-                            ->joinWith('Personalname')
-                            ->joinWith('Personalname.Namefragment')
-                            ->orderBy('Namefragment.type',\Criteria::DESC)
-                            ->orderBy('Namefragment.name');"/>
+                            ->join('Personalname')
+                            ->join('Personalname.Namefragment');"/>
         </behavior>
         
-        <unique> <unique-column name="gnd"/> </unique>
+        <unique> 
+            <unique-column name="gnd"/> 
+        </unique>
     </table>
     
     <table name="font">

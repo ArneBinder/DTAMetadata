@@ -197,7 +197,7 @@ propel > dbal > connections for connection setup. -->
         <column name="id" type="INTEGER" primaryKey="true" required="true"/>
         
         <column name="pages" description="Seitenangabe" type="LONGVARCHAR"/>
-        
+     
         <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
         <behavior name="table_row_view"> 
             <parameter name="embedColumns" value="embedColumns:publication"/>
@@ -229,7 +229,9 @@ propel > dbal > connections for connection setup. -->
         <column name="id" type="INTEGER" primaryKey="true" required="true"/>
         
         <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
-        <behavior name="table_row_view"> <parameter name="embedColumns" value="embedColumns:publication"/> </behavior>
+        <behavior name="table_row_view"> 
+			<parameter name="embedColumns" value="embedColumns:publication"/> 
+		</behavior>
     </table> 
     
     <!-- Other entities that can be considered historical facts. -->
@@ -243,10 +245,9 @@ propel > dbal > connections for connection setup. -->
         <behavior name="table_row_view">
             <parameter name="Name" value="name"/>
             <parameter name="GND" value="gnd"/> 
-            <parameter name="attribute2" value="query:\DTA\MetadataBundle\Model\Data\PublishingcompanyQuery::create()
+            <parameter name="query" value="query:\DTA\MetadataBundle\Model\Data\PublishingcompanyQuery::create()
                     ->orderBy('Name', 'asc');" />
         </behavior>
-        
         <unique> 
             <unique-column name="gnd"/> 
         </unique>
@@ -304,9 +305,7 @@ propel > dbal > connections for connection setup. -->
                 type="ENUM" valueSet="FIRST_NAME,LAST_NAME,PEERAGE,GENERATION,PSEUDONYM,SPELLING" />
         <foreign-key foreignTable="personalname" onDelete="cascade"> 
             <reference local="personalname_id" foreign="id"/> 
-        </foreign-key>
-        
-        
+        </foreign-key>     
         <behavior name="sortable">
             <parameter name="use_scope" value="true"/>
             <parameter name="scope_column" value="personalname_id"/>
@@ -354,9 +353,9 @@ propel > dbal > connections for connection setup. -->
         <!--The name is added in the personalName table because it's a one-to-many relationship.-->
         
         <behavior name="table_row_view">
-            <parameter name="erster name@representative" value="personalname filterColumn:"/>
+            <parameter name="erster name@representative" value="personalname"/>
             <!--<parameter name="namen gesamt@count" value="personalname"/>-->
-            <parameter name="gnd" value="gnd filterColumn:"/>
+            <parameter name="gnd" value="gnd"/>
             <parameter name="attribute3"
                        value="query:DTA\MetadataBundle\Model\Data\PersonQuery::create()
                             ->join('Personalname')
@@ -373,7 +372,7 @@ propel > dbal > connections for connection setup. -->
         <column name="name" type="LONGVARCHAR" required="true" primaryString="true"/>
         <behavior name="table_row_view">
             <parameter name="Name" value="name"/>
-            <parameter name="attribute4"
+            <parameter name="query"
                        value="query:DTA\MetadataBundle\Model\Data\FontQuery::create()
                             ->orderBy('Name');"/>
         </behavior>
@@ -384,7 +383,7 @@ propel > dbal > connections for connection setup. -->
         <column name="name" type="LONGVARCHAR" required="true" primaryString="true"/>
         <behavior name="table_row_view">
             <parameter name="Name" value="name"/>
-            <parameter name="attribute5"
+            <parameter name="query"
                        value="query:DTA\MetadataBundle\Model\Data\LanguageQuery::create()
                             ->orderBy('Name');"/>
         </behavior>

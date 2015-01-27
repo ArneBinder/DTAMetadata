@@ -218,18 +218,18 @@ class TableRowViewBehavior extends Behavior {
             }
 
             // check whether the string starts with 'embedColumns'
-            if($parameters['embedColumns']){
+            if(array_key_exists('embedColumns',$parameters)){
                 $entity = $parameters['embedColumns'];
                 $behavior->resolveEmbeddedColumns($entity);
                 // ... or to insert a complex entity as single column ...
-            } elseif($parameters['query']) {
+            } elseif(array_key_exists('query',$parameters)) {
                 $behavior->queryConstructionString = $parameters['query'];
-            } elseif ($parameters['propelAccessor'] && $behavior->getTable()->getDatabase()->hasTable($parameters['propelAccessor'])) {
+            } elseif (array_key_exists('propelAccessor',$parameters) && $behavior->getTable()->getDatabase()->hasTable($parameters['propelAccessor'])) {
                 $entity = $parameters['propelAccessor'];
                 $caption = $captionOrIndicator;
                 $behavior->resolveRepresentativeColumn($caption, $entity);
                 // ... or an explicitly defined accessor to the object ...
-            } elseif($parameters['accessor']) {
+            } elseif(array_key_exists('accessor',$parameters)) {
                 // the prefix 'accessor:' is left as an indicator for the generated getAttributeByTableViewColumName method
                 // to prevent using a standard propel getter
                 $accessor = 'accessor:'.$parameters['accessor'];

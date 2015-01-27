@@ -25,13 +25,16 @@ class DumpConversionController extends ORMController {
     private $sourceUsername  = 'root';
     private $sourcePassword  = 'root'; //garamond4000
     private $sourceDatabase  = 'dtadb'; //will be created if it does not exist
-    private $sourceDumpPath  = '../dbdumps/dtadb_2013-09-29_07-10-01.sql'; //'/Users/macbookdata/Dropbox/DTA/dumpConversion/dtadb_2013-09-29_07-10-01.sql';
+    private $sourceDumpPath  = '../dbdumps/server_2015-01-22/dtaq_partiell-pgsql.sql'; //'../dbdumps/dtadb_2013-09-29_07-10-01.sql';//'/Users/macbookdata/Dropbox/DTA/dumpConversion/dtadb_2013-09-29_07-10-01.sql';
+
+    private $tempDumpPGDatabaseName = 'temp_dump';
 
     // This dump file can be used to import into the production system
     private $targetDumpPath = '../dbdumps/dtadb_pg';
 
     /** Used programs */
     private $mysqlExec  = 'mysql'; //added "C:\Program Files\MySQL\MySQL Server 5.6\bin" to $PATH
+    private $psqlExec = 'psql';
     private $pgDropDB = 'dropdb';
     private $pgCreateDB = 'createdb';
     private $phpExec   = 'php'; //'/usr/local/php5/bin/php';
@@ -58,10 +61,19 @@ class DumpConversionController extends ORMController {
      * @return \PDO
      * @throws Exception
      */
-    function connect() {
-        $dsn = "mysql:dbname=" . $this->sourceDatabase . ";host=127.0.0.1";
+    /*function connect() {
+        $dsn = "mysql:dbname=" . $this->sourceDatabase . ";host=" . $this->getDatabaseHost();
         try {
             return new \PDO($dsn, $this->sourceUsername, $this->sourcePassword);
+        } catch (\PDOException $e) {
+            throw new \Exception("Connection failed: " . $e->getMessage());
+        }
+    }*/
+
+    function connectPostgres(){
+        $dsn = "pgsql:dbname=" . $this->getDatabaseName() . ";host=" . $this->getDatabaseHost();
+        try {
+            return new \PDO($dsn, $this->getDatabaseUser(), $this->getDatabasePass());
         } catch (\PDOException $e) {
             throw new \Exception("Connection failed: " . $e->getMessage());
         }
@@ -69,6 +81,7 @@ class DumpConversionController extends ORMController {
         
     /** Converts the legacy database dump into the new format. */
     function convertAction() {
+
         // during conversion, a lot of memory is allocated
         ini_set('memory_limit', '1200M');
         ini_set('max_execution_time', 1800); //300 seconds = 5 minutes
@@ -89,17 +102,17 @@ class DumpConversionController extends ORMController {
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // ERASE ALL DATA FROM THE WORKING (TARGET DATABASE) ^^^^^^^
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+/*
         // connect to imported (legacy) database
         $dbh = $this->connect();
-            
+
         // trim and NULL empty strings, remove some old records
         $this->cleanUpOldDatabase($dbh);
         // assert that certain assumptions hold for the dump (unused fields)
         $this->checkOldDatabase($dbh);
         
         $this->propelConnection = \Propel::getConnection(Model\Master\DtaUserPeer::DATABASE_NAME);
-        $this->messages[] = array('message' => 'transaction begun on '.Model\Master\DtaUserPeer::DATABASE_NAME);
+        $this->addLogging(array('message' => 'transaction begun on '.Model\Master\DtaUserPeer::DATABASE_NAME);
         
         $this->createTaskTypes();
         
@@ -132,12 +145,13 @@ class DumpConversionController extends ORMController {
 
         // dump new database
         $dbname = $this->getDatabaseName();
-        $dbuser = $this->getDataseUser();
+        $dbuser = $this->getDatabaseUser();
         $dumpfile = $this->targetDumpPath.'_'.date("Y-m-d").'.sql';
-        $this->messages[] = array('dump database: ' => $dbname);
-        $this->messages[] = array('database user: ' => $dbuser);
-        $this->messages[] = array('dumped' => shell_exec("pg_dump -d $dbname -U $dbuser -f $dumpfile"));
+        $this->addLogging(array('dump database: ' => $dbname);
+        $this->addLogging(array('database user: ' => $dbuser);
+        $this->addLogging(array('dumped' => shell_exec("pg_dump -d $dbname -U $dbuser -f $dumpfile"));
 
+        */
         return $this->renderWithDomainData('DTAMetadataBundle:DumpConversion:conversionResult.html.twig', array(
             'warnings' => $this->warnings,
             'messages' => $this->messages,
@@ -154,7 +168,7 @@ class DumpConversionController extends ORMController {
         $this->propelConnection->commit();
         $time_taken = microtime(true) - $start;
         echo $task." ".$time_taken;
-        $this->messages[] = array("finished transaction ".$task=>$time_taken);
+        $this->addLogging(array("finished transaction ".$task=>$time_taken));
     }
     
     /** Use the schema files for dump conversion */
@@ -167,10 +181,10 @@ class DumpConversionController extends ORMController {
             //// WARNING: IF DUMP CONVERTION ABORTS AND IS RESTARTED WITHOUT MANUAL MOVING THE PRODUCTION SCHEMA FILES BACK IN PLACE, THE DUMPCONVERSION SCHEMA FILES ARE CONSIDERED AS PRODUCTION FILES!!!
             //copy("$dumpConversionSchemasDir/../config/$schema", "$dumpConversionSchemasDir/../schemas_final/$schema");
 
-            $this->messages[] = array("bringing dump conversion version of $schema into place", copy("$dumpConversionSchemasDir/$schema","$dumpConversionSchemasDir/../config/$schema"));
+            $this->addLogging(array("bringing dump conversion version of $schema into place", copy("$dumpConversionSchemasDir/$schema","$dumpConversionSchemasDir/../config/$schema")));
         }
         // build propel entity classes
-        $this->messages[] = array('building model from dump conversion schemas', shell_exec("$this->phpExec ../app/console propel:model:build"));
+        $this->addLogging(array('building model from dump conversion schemas', shell_exec("$this->phpExec ../app/console propel:model:build")));
     }
     
     /** Use the schema files for dump conversion */
@@ -178,48 +192,56 @@ class DumpConversionController extends ORMController {
         // current working directory is web
         $productionSchemasDir = "../src/DTA/MetadataBundle/Resources/schemas_final";
         foreach (array('dta_data_schema.xml', 'dta_master_schema.xml', 'dta_workflow_schema.xml', 'dta_classification_schema.xml') as $schema) {
-            $this->messages[] = array(
+            $this->addLogging(array(
                 "bringing dump conversion version of $schema into place",
                 //system("cp $productionSchemasDir/$schema $productionSchemasDir/../config/$schema")
                 copy("$productionSchemasDir/$schema","$productionSchemasDir/../config/$schema")
-            );
+            ));
         }
         // build propel entity classes
-        //$this->messages[] = array('building model from production schemas', system("$this->phpExec ../app/console propel:model:build"));
-        $this->messages[] = array('building model from production schemas', shell_exec("$this->phpExec ../app/console propel:model:build"));
+        //$this->addLogging(array('building model from production schemas', system("$this->phpExec ../app/console propel:model:build")));
+        $this->addLogging(array('building model from production schemas', shell_exec("$this->phpExec ../app/console propel:model:build")));
     }
     
     function dropAndSetupTargetDB(){
+        $dbuser = $this->getDatabaseUser();
 
         //recreate source database
-        shell_exec("$this->mysqlExec -u $this->sourceUsername -p$this->sourcePassword -e \"DROP DATABASE IF EXISTS $this->sourceDatabase\"");
-        shell_exec("$this->mysqlExec -u $this->sourceUsername -p$this->sourcePassword -e \"CREATE DATABASE $this->sourceDatabase\"");
+        //MYSQL
+        //shell_exec("$this->mysqlExec -u $this->sourceUsername -p$this->sourcePassword -e \"DROP DATABASE IF EXISTS $this->sourceDatabase\"");
+        //shell_exec("$this->mysqlExec -u $this->sourceUsername -p$this->sourcePassword -e \"CREATE DATABASE $this->sourceDatabase\"");
+        //POSTGRES
+        $this->addLogging(array("delete $this->tempDumpPGDatabaseName:", shell_exec("$this->pgDropDB -U $dbuser --if-exists $this->tempDumpPGDatabaseName 2>&1")));
+        $this->addLogging(array("recreate $this->tempDumpPGDatabaseName:",shell_exec("$this->pgCreateDB -U $dbuser -E UTF8 -T template0 $this->tempDumpPGDatabaseName 2>&1")));
+
 
         // import dump
-        $importDumpCommand = "$this->mysqlExec -u $this->sourceUsername -p$this->sourcePassword $this->sourceDatabase < $this->sourceDumpPath";
-        $this->messages[] = array("import dump command: " => $importDumpCommand);
+        // MYSQL
+        // $importDumpCommand = "$this->mysqlExec -u $this->sourceUsername -p$this->sourcePassword $this->sourceDatabase < $this->sourceDumpPath";
+        // POSTGRES
+        $importDumpCommand = "$this->psqlExec -U $dbuser -d $this->tempDumpPGDatabaseName -f $this->sourceDumpPath 2>&1";
+        $this->addLogging(array("import dump command: " => $importDumpCommand));
         //system($importDumpCommand);
-        $this->messages[] = array(shell_exec($importDumpCommand));
+        $this->addLogging(array(shell_exec($importDumpCommand)));
 
         //recreate target database
         $dbname = $this->getDatabaseName();
-        $dbuser = $this->getDataseUser();
-        shell_exec("$this->pgDropDB -U $dbuser --if-exists $dbname");
-        shell_exec("$this->pgCreateDB -U $dbuser -E UTF8 -T template0 $dbname");
+        $this->addLogging(array("delete $dbname:", shell_exec("$this->pgDropDB -U $dbuser --if-exists $dbname 2>&1")));
+        $this->addLogging(array("recreate $dbname:", shell_exec("$this->pgCreateDB -U $dbuser -E UTF8 -T template0 $dbname 2>&1")));
         // build current database schema
         //$resultBuildDBCode = system("$this->phpExec ../app/console propel:sql:build");
         $resultBuildDBCode = shell_exec("$this->phpExec ../app/console propel:sql:build");
-        $this->messages[] = array("building database schema from xml model: " => $resultBuildDBCode );
+        $this->addLogging(array("building database schema from xml model: " => $resultBuildDBCode ));
         
         // import current database schema to target database (ERASES ALL DATA)
         //$resultSetupDB = system("$this->phpExec ../app/console propel:sql:insert --force");
         $resultSetupDB = shell_exec("$this->phpExec ../app/console propel:sql:insert --force");
-        $this->messages[] = array("resetting target database: " => $resultSetupDB);
+        $this->addLogging(array("resetting target database: " => $resultSetupDB));
         
         // loads fixtures (task types, name fragment types, etc.)
         //$resultFixturesLoad = system("$this->phpExec ../app/console propel:fixtures:load @DTAMetadataBundle");
         $resultFixturesLoad = shell_exec("$this->phpExec ../app/console propel:fixtures:load @DTAMetadataBundle");
-        $this->messages[] = array("loading database fixtures: " => $resultFixturesLoad);
+        $this->addLogging(array("loading database fixtures: " => $resultFixturesLoad));
         
     }
     
@@ -530,7 +552,7 @@ class DumpConversionController extends ORMController {
                     $titleFragmentIdx++;
                 }
             }
-            if($titleFragmentIdx == 1) $this->errors[] = array('message'=>'Keine Titelangabe gefunden für','book.id_book'=>$row['id']);
+            if($titleFragmentIdx == 1) $this->addLogging(array('message'=>'Keine Titelangabe gefunden für','book.id_book'=>$row['id']),'error');
             
             // date ------------------------------------------------------------------------------------
             $publishedDate = NULL;
@@ -854,10 +876,10 @@ class DumpConversionController extends ORMController {
             array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
                         
             if($row['publication_id'] === NULL){
-                $this->errors[] = array(
+                $this->addLogging(array(
                     'message' => 'Fundstelle verweist auf nicht-existierende Publikation.',
                     'action' => 'Fundstelle nicht übernommen.'
-                );
+                ), 'error');
                 continue;
             }
                 
@@ -876,7 +898,7 @@ class DumpConversionController extends ORMController {
             $copyLocation->save($this->propelConnection);
             
             } catch (\PropelException $exc) {
-                $this->errors[] = array('message' => $exc . 'on inserting copy location');
+                $this->addLogging(array('message' => $exc . 'on inserting copy location'),'error');
             }
         }
     }
@@ -935,20 +957,20 @@ class DumpConversionController extends ORMController {
             array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
 
             if($row['reference_object'] === NULL){
-                $this->errors[] = array(
+                $this->addLogging(array(
                     'message' => 'Task verweist auf nicht-existente Publikation.',
                     'typ'     => $row['type'],
                     'action'  => "Task $row[task_id] übersprungen",
-                    );
+                    ), 'error');
                 continue;
             }
             
             if($row['task_type_id'] === NULL){
-                $this->warnings[] = array(
+                $this->addLogging(array(
                     'message' => "Task hat unbekannten Tasktyp.",
                     'action'  => 'Datensatz übersprungen',
                     'task_id in old dump' => $row['task_id']
-                    );
+                    ), 'warning');
                 continue;
             }
             
@@ -977,7 +999,7 @@ class DumpConversionController extends ORMController {
                         ->save($this->propelConnection);
                 
             } else{
-                $this->errors[] = array('task refers neither to single publication nor to publication group. legacy task id'=>$row['task_id']);
+                $this->addLogging(array('task refers neither to single publication nor to publication group. legacy task id'=>$row['task_id']),'error');
             }
             
         }
@@ -1315,7 +1337,7 @@ class DumpConversionController extends ORMController {
 
                 // falls es sich um den Autor einer Serie handelt, bitte per Hand Daten übernehmen
                 if($row['role'] === "AUTHOR"){
-                    $this->errors[] = array('Bitte von Hand konvertieren'=>$row['person'], 'autor in: '=>$row['publication_id']);
+                    $this->addLogging(array('Bitte von Hand konvertieren'=>$row['person'], 'autor in: '=>$row['publication_id']),'error');
                 } else {
                     $publications->findOneById($row['publication_id'])
                             ->addPersonPublication($personPublication)
@@ -1337,10 +1359,10 @@ class DumpConversionController extends ORMController {
 
         foreach ($dbh->query($checkYearPubDateSame)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             
-            $this->warnings[] = array(
+            $this->addLogging(array(
                 'year and dta_pub_date differ (only year will be converted to new database)'=>
                 $row['book_id'] . " year: $row[year] dta_pub_date: $row[dta_pub_date]"
-            );
+            ),'warning');
         }
         
         // the "seiten" field refers to excerpts and shouldn't be used on monographs and multivolumes 
@@ -1354,13 +1376,13 @@ class DumpConversionController extends ORMController {
         
         foreach ($dbh->query($checkQuery)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             
-            $this->warnings[] = array(
+            $this->addLogging(array(
                 'seitenangabe auf publikationstyp, der dies nicht unterstützt'=>"",
                 'id_book' => $row['id_book'],
                 'title' => $row['title'],
                 'autor' => $row['autor1_lastname'],
                 'dta_seiten' => $row['dta_seiten']
-            );
+            ),'warning');
         }
         
         // fields that contain no data or outdated data. They are not covered by the dump conversion routines.
@@ -1417,9 +1439,9 @@ class DumpConversionController extends ORMController {
                 
                 $query = "SELECT `$field` FROM `$table` WHERE `$field` IS NOT NULL GROUP BY `$field`;";
                 foreach ($dbh->query($query)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
-                    $this->warnings[] = array(
+                    $this->addLogging(array(
                         'some values in ignored column are not null'=> "$table.$field",
-                    );
+                    ),'warning');
                     break;
                  }
                 
@@ -1459,10 +1481,10 @@ class DumpConversionController extends ORMController {
                 $pdoStatement = $dbh->query($updateQuery);
                 $affectedRows = $pdoStatement !== false ? $pdoStatement->rowCount() : $dbh->errorInfo();
 
-                $this->messages[] = array(
+                $this->addLogging(array(
                     'message' => "All columns of table $relation trimmed. Empty strings are set to NULL.", 
                     'affected rows' => $affectedRows,
-                    'query'=>$updateQuery);
+                    'query'=>$updateQuery));
             }
         }
         
@@ -1474,7 +1496,7 @@ class DumpConversionController extends ORMController {
         // !!!
             
         foreach ($queries as $query) {
-            $this->messages[] = array("clean up database command: " => $query);
+            $this->addLogging(array("clean up database command: " => $query));
             $dbh->query($query);
         }
     }
@@ -1628,7 +1650,7 @@ class DumpConversionController extends ORMController {
 
     public function getDatabaseName(){
         $propelConf = \Propel::getConfiguration();
-        //$this->messages[] = array("test" => print_r($propelConf, true));
+        //$this->addLogging(array("test" => print_r($propelConf, true));
         preg_match('/dbname=([^; ]+)/', $propelConf['datasources']['dtametadata']['connection']['dsn'], $matches);
         if($matches!=null and count($matches)>1){
             return $matches[1];
@@ -1636,10 +1658,227 @@ class DumpConversionController extends ORMController {
         throw new Exception('Could not fetch database name from propel config.');
     }
 
-    public function getDataseUser(){
+    public function getDatabaseHost(){
+        $propelConf = \Propel::getConfiguration();
+
+        //$this->addLogging(array("test" => print_r($propelConf, true));
+        //$this->get('logger')->critical(print_r($propelConf, true));
+        preg_match('/host=([^; ]+)/', $propelConf['datasources']['dtametadata']['connection']['dsn'], $matches);
+        if($matches!=null and count($matches)>1){
+            return $matches[1];
+        }
+        throw new Exception('Could not fetch database name from propel config.');
+    }
+
+    public function getDatabaseUser(){
         $propelConf = \Propel::getConfiguration();
         return $propelConf['datasources']['dtametadata']['connection']['user'];
     }
+
+    public function getDatabasePass(){
+        $propelConf = \Propel::getConfiguration();
+        return $propelConf['datasources']['dtametadata']['connection']['password'];
+    }
+
+    private function addLogging($string, $type='message'){
+        $arraytype = $type.'s';
+        if(!isset($this->$arraytype)){
+            throw new \InvalidArgumentException("$arraytype is not defined.");
+        }
+        array_push($this->$arraytype, $string);
+        $this->get('logger')->critical("$type: ".print_r($string,true));
+    }
+
+}
+
+/***************************************************************************
+ *                             sql_parse.php
+ *                              -------------------
+ *     begin                : Thu May 31, 2001
+ *     copyright            : (C) 2001 The phpBB Group
+ *     email                : support@phpbb.com
+ *
+ *     $Id: sql_parse.php,v 1.8 2002/03/18 23:53:12 psotfx Exp $
+ *
+ ****************************************************************************/
+
+/***************************************************************************
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation; either version 2 of the License, or
+ *   (at your option) any later version.
+ *
+ ***************************************************************************/
+
+/***************************************************************************
+ *
+ *   These functions are mainly for use in the db_utilities under the admin
+ *   however in order to make these functions available elsewhere, specifically
+ *   in the installation phase of phpBB I have seperated out a couple of
+ *   functions into this file.  JLH
+ *
+\***************************************************************************/
+
+//
+// remove_comments will strip the sql comment lines out of an uploaded sql file
+// specifically for mssql and postgres type files in the install....
+//
+function remove_comments(&$output)
+{
+    $lines = explode("\n", $output);
+    $output = "";
+
+    // try to keep mem. use down
+    $linecount = count($lines);
+
+    $in_comment = false;
+    for($i = 0; $i < $linecount; $i++)
+    {
+        if( preg_match("/^\/\*/", preg_quote($lines[$i])) )
+        {
+            $in_comment = true;
+        }
+
+        if( !$in_comment )
+        {
+            $output .= $lines[$i] . "\n";
+        }
+
+        if( preg_match("/\*\/$/", preg_quote($lines[$i])) )
+        {
+            $in_comment = false;
+        }
+    }
+
+    unset($lines);
+    return $output;
+}
+
+//
+// remove_remarks will strip the sql comment lines out of an uploaded sql file
+//
+function remove_remarks($sql)
+{
+    $lines = explode("\n", $sql);
+
+    // try to keep mem. use down
+    $sql = "";
+
+    $linecount = count($lines);
+    $output = "";
+
+    for ($i = 0; $i < $linecount; $i++)
+    {
+        if (($i != ($linecount - 1)) || (strlen($lines[$i]) > 0))
+        {
+            if (isset($lines[$i][0]) && $lines[$i][0] != "#")
+            {
+                $output .= $lines[$i] . "\n";
+            }
+            else
+            {
+                $output .= "\n";
+            }
+            // Trading a bit of speed for lower mem. use here.
+            $lines[$i] = "";
+        }
+    }
+
+    return $output;
+
+}
+
+//
+// split_sql_file will split an uploaded sql file into single sql statements.
+// Note: expects trim() to have already been run on $sql.
+//
+function split_sql_file($sql, $delimiter)
+{
+    // Split up our string into "possible" SQL statements.
+    $tokens = explode($delimiter, $sql);
+
+    // try to save mem.
+    $sql = "";
+    $output = array();
+
+    // we don't actually care about the matches preg gives us.
+    $matches = array();
+
+    // this is faster than calling count($oktens) every time thru the loop.
+    $token_count = count($tokens);
+    for ($i = 0; $i < $token_count; $i++)
+    {
+        // Don't wanna add an empty string as the last thing in the array.
+        if (($i != ($token_count - 1)) || (strlen($tokens[$i] > 0)))
+        {
+            // This is the total number of single quotes in the token.
+            $total_quotes = preg_match_all("/'/", $tokens[$i], $matches);
+            // Counts single quotes that are preceded by an odd number of backslashes,
+            // which means they're escaped quotes.
+            $escaped_quotes = preg_match_all("/(?<!\\\\)(\\\\\\\\)*\\\\'/", $tokens[$i], $matches);
+
+            $unescaped_quotes = $total_quotes - $escaped_quotes;
+
+            // If the number of unescaped quotes is even, then the delimiter did NOT occur inside a string literal.
+            if (($unescaped_quotes % 2) == 0)
+            {
+                // It's a complete sql statement.
+                $output[] = $tokens[$i];
+                // save memory.
+                $tokens[$i] = "";
+            }
+            else
+            {
+                // incomplete sql statement. keep adding tokens until we have a complete one.
+                // $temp will hold what we have so far.
+                $temp = $tokens[$i] . $delimiter;
+                // save memory..
+                $tokens[$i] = "";
+
+                // Do we have a complete statement yet?
+                $complete_stmt = false;
+
+                for ($j = $i + 1; (!$complete_stmt && ($j < $token_count)); $j++)
+                {
+                    // This is the total number of single quotes in the token.
+                    $total_quotes = preg_match_all("/'/", $tokens[$j], $matches);
+                    // Counts single quotes that are preceded by an odd number of backslashes,
+                    // which means they're escaped quotes.
+                    $escaped_quotes = preg_match_all("/(?<!\\\\)(\\\\\\\\)*\\\\'/", $tokens[$j], $matches);
+
+                    $unescaped_quotes = $total_quotes - $escaped_quotes;
+
+                    if (($unescaped_quotes % 2) == 1)
+                    {
+                        // odd number of unescaped quotes. In combination with the previous incomplete
+                        // statement(s), we now have a complete statement. (2 odds always make an even)
+                        $output[] = $temp . $tokens[$j];
+
+                        // save memory.
+                        $tokens[$j] = "";
+                        $temp = "";
+
+                        // exit the loop.
+                        $complete_stmt = true;
+                        // make sure the outer loop continues at the right point.
+                        $i = $j;
+                    }
+                    else
+                    {
+                        // even number of unescaped quotes. We still don't have a complete statement.
+                        // (1 odd and 1 even always make an odd)
+                        $temp .= $tokens[$j] . $delimiter;
+                        // save memory.
+                        $tokens[$j] = "";
+                    }
+
+                } // for..
+            } // else
+        }
+    }
+
+    return $output;
 }
     
 ?>

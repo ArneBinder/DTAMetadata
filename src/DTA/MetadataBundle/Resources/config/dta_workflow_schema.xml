@@ -99,7 +99,7 @@
         <foreign-key foreignTable="license"> <reference local="license_id" foreign="id"/> </foreign-key>
         
         <behavior name="table_row_view">
-            <!--<parameter name="embedColumns1" value="partner"/>-->
+            <!--<parameter name="embedColumns1" value="embedColumns:partner"/>-->
             <parameter name="Signatur" value="catalogue_signature"/>
             <parameter name="embedColumns2" value="embedColumns:publication"/>
             <parameter name="query" value="query:\DTA\MetadataBundle\Model\Workflow\CopyLocationQuery::create()
