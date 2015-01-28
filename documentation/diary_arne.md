@@ -251,6 +251,9 @@
 2015-01-27
  o adapted schema files
  o started to modify convertAction()
+
+2015-01-28
+ o adapted cleanUpOldDatabase() and checkOldDatabase() for PostgreSQL
  
  TODO:
  o Tab-Constraint DONE

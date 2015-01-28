@@ -70,10 +70,12 @@ class DumpConversionController extends ORMController {
         }
     }*/
 
-    function connectPostgres(){
-        $dsn = "pgsql:dbname=" . $this->getDatabaseName() . ";host=" . $this->getDatabaseHost();
+    function connectPostgres($databaseName){
+        $dsn = "pgsql:dbname=" . $databaseName . ";host=" . $this->getDatabaseHost();
         try {
-            return new \PDO($dsn, $this->getDatabaseUser(), $this->getDatabasePass());
+            $this->addLogging("connect via $dsn...");
+            $pdo = new \PDO($dsn, $this->getDatabaseUser(), $this->getDatabasePass());
+            return $pdo;
         } catch (\PDOException $e) {
             throw new \Exception("Connection failed: " . $e->getMessage());
         }
@@ -92,54 +94,61 @@ class DumpConversionController extends ORMController {
         $this->errors   = array();
         
         $this->useDumpConversionFiles();
-        
+
+        $this->dropAndImportLegacyDB($this->tempDumpPGDatabaseName);
+
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // ERASE ALL DATA FROM THE WORKING (TARGET DATABASE) vvvvvv
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         
-        $this->dropAndSetupTargetDB();
+        $this->dropAndSetupTargetDB($this->getDatabaseName());
         
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // ERASE ALL DATA FROM THE WORKING (TARGET DATABASE) ^^^^^^^
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-/*
+
         // connect to imported (legacy) database
-        $dbh = $this->connect();
+        //$dbh = $this->connect();
+        $dbh = $this->connectPostgres($this->tempDumpPGDatabaseName);
+
 
         // trim and NULL empty strings, remove some old records
         $this->cleanUpOldDatabase($dbh);
         // assert that certain assumptions hold for the dump (unused fields)
+
         $this->checkOldDatabase($dbh);
-        
+        /*
+
+
         $this->propelConnection = \Propel::getConnection(Model\Master\DtaUserPeer::DATABASE_NAME);
         $this->addLogging(array('message' => 'transaction begun on '.Model\Master\DtaUserPeer::DATABASE_NAME);
-        
+
         $this->createTaskTypes();
-        
+
         // names of the functions to wrap in transaction code
         $conversionTasks = array(
             'convertUsers',                 // users first: they are referenced in "last changed by" columns
-            'convertPublications',  
+            'convertPublications',
             'convertFirstEditions',
             'convertPublicationGroups',
             'convertPartners',
             'convertCopyLocations',
             'convertTasks',                 // tasks are linked to publications and publication groups
-            'convertFonts',                 
+            'convertFonts',
             'convertPublishingCompanies',
-            'convertPlaces',                
-            'convertAuthors',               
+            'convertPlaces',
+            'convertAuthors',
             'convertSingleFieldPersons',
             'convertSeries',
             'convertMultiVolumes',
             'convertGenres',
             'convertTags',
             );
-        
+
         foreach ($conversionTasks as $task){
             $this->runTransaction($task, $dbh);
         }
-        
+
         $this->enableAutoIncrement($this->propelConnection);
         $this->useProductionFiles();
 
@@ -202,32 +211,60 @@ class DumpConversionController extends ORMController {
         //$this->addLogging(array('building model from production schemas', system("$this->phpExec ../app/console propel:model:build")));
         $this->addLogging(array('building model from production schemas', shell_exec("$this->phpExec ../app/console propel:model:build")));
     }
-    
-    function dropAndSetupTargetDB(){
-        $dbuser = $this->getDatabaseUser();
 
+    private function  checkOpenConnections($databaseName, $close = false){
+        $dbh_temp = $this->connectPostgres($databaseName);
+        $stmt = $dbh_temp->prepare("SELECT count(*) FROM pg_stat_activity WHERE datname = '$databaseName'");
+        $stmt->execute();
+        $activeCount = $stmt->fetch()['count'] -1;
+        $stmt->closeCursor();
+        $stmt = null; // IMPORTANT TO CLOSE _THIS_ CONNECTION!
+        $this->addLogging(array("count of active connections to $databaseName",$activeCount));
+        if($activeCount > 0){
+            if($close){
+                // WARNING: Notice that if you use PostgreSQL version 9.1 or earlier, use the procpid column instead of the pid column because PostgreSQL changed procid column to pid column since version 9.2
+                $dbh_temp->query("SELECT pg_terminate_backend (pg_stat_activity.pid)
+                                    FROM pg_stat_activity
+                                    WHERE pg_stat_activity.datname = '$databaseName';");
+                $dbh_temp = null;
+            }else{
+                $dbh_temp = null;
+                throw new Exception("There are $activeCount open connections to the database '$databaseName'.");
+            }
+        }
+        return $activeCount;
+    }
+
+    function dropAndImportLegacyDB($databaseName){
+
+        $this->checkOpenConnections($databaseName, true);
+        $dbuser = $this->getDatabaseUser();
         //recreate source database
         //MYSQL
         //shell_exec("$this->mysqlExec -u $this->sourceUsername -p$this->sourcePassword -e \"DROP DATABASE IF EXISTS $this->sourceDatabase\"");
         //shell_exec("$this->mysqlExec -u $this->sourceUsername -p$this->sourcePassword -e \"CREATE DATABASE $this->sourceDatabase\"");
         //POSTGRES
-        $this->addLogging(array("delete $this->tempDumpPGDatabaseName:", shell_exec("$this->pgDropDB -U $dbuser --if-exists $this->tempDumpPGDatabaseName 2>&1")));
-        $this->addLogging(array("recreate $this->tempDumpPGDatabaseName:",shell_exec("$this->pgCreateDB -U $dbuser -E UTF8 -T template0 $this->tempDumpPGDatabaseName 2>&1")));
-
+        $this->addLogging(array("delete $databaseName:", shell_exec("$this->pgDropDB -U $dbuser --if-exists $databaseName 2>&1")));
+        $this->addLogging(array("recreate $databaseName:",shell_exec("$this->pgCreateDB -U $dbuser -E UTF8 -T template0 $databaseName 2>&1")));
 
         // import dump
         // MYSQL
         // $importDumpCommand = "$this->mysqlExec -u $this->sourceUsername -p$this->sourcePassword $this->sourceDatabase < $this->sourceDumpPath";
         // POSTGRES
-        $importDumpCommand = "$this->psqlExec -U $dbuser -d $this->tempDumpPGDatabaseName -f $this->sourceDumpPath 2>&1";
+        $importDumpCommand = "$this->psqlExec -U $dbuser -d $databaseName -f $this->sourceDumpPath 2>&1";
         $this->addLogging(array("import dump command: " => $importDumpCommand));
         //system($importDumpCommand);
         $this->addLogging(array(shell_exec($importDumpCommand)));
+    }
 
+    function dropAndSetupTargetDB($databaseName){
+
+        $this->checkOpenConnections($databaseName, true);
         //recreate target database
-        $dbname = $this->getDatabaseName();
-        $this->addLogging(array("delete $dbname:", shell_exec("$this->pgDropDB -U $dbuser --if-exists $dbname 2>&1")));
-        $this->addLogging(array("recreate $dbname:", shell_exec("$this->pgCreateDB -U $dbuser -E UTF8 -T template0 $dbname 2>&1")));
+        //$dbname = $this->getDatabaseName();
+        $dbuser = $this->getDatabaseUser();
+        $this->addLogging(array("delete $databaseName:", shell_exec("$this->pgDropDB -U $dbuser --if-exists $databaseName 2>&1")));
+        $this->addLogging(array("recreate $databaseName:", shell_exec("$this->pgCreateDB -U $dbuser -E UTF8 -T template0 $databaseName 2>&1")));
         // build current database schema
         //$resultBuildDBCode = system("$this->phpExec ../app/console propel:sql:build");
         $resultBuildDBCode = shell_exec("$this->phpExec ../app/console propel:sql:build");
@@ -1355,7 +1392,11 @@ class DumpConversionController extends ORMController {
 
         // normally, book.year and book.dta_pub_date contain the same values in all rows.
         // check if that is still the case with the current input dump
-        $checkYearPubDateSame = "select id_book as book_id, `year`, `dta_pub_date` from book where `year` <> `dta_pub_date`";
+        $checkYearPubDateSame = "select id_book as book_id, year, dta_pub_date
+                                 from book
+                                 where
+                                    year <> dta_pub_date
+                                    and dta_pub_date is not null";
 
         foreach ($dbh->query($checkYearPubDateSame)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             
@@ -1371,7 +1412,7 @@ class DumpConversionController extends ORMController {
                         FROM
                             book join metadaten on book.id_book = metadaten.id_book
                         WHERE
-                            dta_seiten is not null 
+                            dta_seiten is not null
                             AND type in ('M','MM','DM')";
         
         foreach ($dbh->query($checkQuery)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
@@ -1437,7 +1478,8 @@ class DumpConversionController extends ORMController {
             
             foreach($fields as $field){
                 
-                $query = "SELECT `$field` FROM `$table` WHERE `$field` IS NOT NULL GROUP BY `$field`;";
+                $query = "SELECT \"$field\" FROM \"$table\" WHERE \"$field\" IS NOT NULL GROUP BY \"$field\";";
+                //$this->addLogging(array("QUERY"=>$query));
                 foreach ($dbh->query($query)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
                     $this->addLogging(array(
                         'some values in ignored column are not null'=> "$table.$field",
@@ -1451,54 +1493,69 @@ class DumpConversionController extends ORMController {
         
     }
     function cleanUpOldDatabase(\PDO $dbh) {
-        
+        //$currentDatabaseName = $dbh->query("select current_database()")->fetch()['current_database'];
+        //$this->addLogging(array("currentDatabaseName",$currentDatabaseName));
         // remove unused tables
-        $queries[] = "DROP table `dtadb`.`corpus_use`;
-                      DROP table `dtadb`.`lastusergroups`;";
-        
-        
-        
+        $queries[] = "DROP table corpus_use;
+                      DROP table lastusergroups;";
+
+        foreach ($queries as $query) {
+            $this->addLogging(array("clean up database command: " => $query));
+            $stmt = $dbh->prepare($query);
+            $stmt->execute();
+        }
         
         // trim all text columns and set empty strings to NULL
-        foreach ($dbh->query("SHOW tables") as $row) {
+        foreach ($dbh->query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'") as $row) {
             
-            $relation = $row["Tables_in_" . $this->sourceDatabase];
-            
-            $getTextColumns = "SHOW COLUMNS FROM $relation WHERE 
-                                `Type` LIKE 'varchar%' -- varchars of any length 
-                                OR `Type` LIKE '%text' -- text and mediumtext";
+            $relation = $row["table_name"];
+
+            $getTextColumns = "SELECT column_name, is_nullable
+                                FROM information_schema.columns
+                                WHERE
+                                  table_name ='$relation'
+                                  AND (data_type like '%char%' OR data_type like 'text')";
+            //$getTextColumns = "SHOW COLUMNS FROM $relation WHERE
+            //                    `Type` LIKE 'varchar%' -- varchars of any length
+            //                    OR `Type` LIKE '%text' -- text and mediumtext";
             
             $trimCommands = array();
             
             foreach ($dbh->query($getTextColumns) as $col) {
-                
+                $colName = $col['column_name'];
+                //delete NOT NULL constraint from textual column, if necessary
+                if($col['is_nullable'] === 'NO'){
+                    $this->addLogging(array("drop not null","ALTER TABLE \"$relation\" ALTER COLUMN \"$colName\" DROP NOT NULL"));
+                    $stmt = $dbh->prepare("ALTER TABLE \"$relation\" ALTER COLUMN \"$colName\" DROP NOT NULL");
+                    $stmt->execute();
+                }
 //                $fields[$relation][] = array($col["Field"], $col["Type"]);
-                $trimCommands[] = "$col[Field] = NULLIF(trim(CHAR(9) FROM trim($col[Field])),'')";
+                //$trimCommands[] = "$col[column_name] = NULLIF(trim(CHAR(9) FROM trim($col[column_name])),'')";
+                $trimCommands[] = "$col[column_name] = NULLIF(trim($col[column_name]),'')";
             }
             
             if(count($trimCommands) > 0){
-                $updateQuery = "UPDATE $relation SET " . implode(",", $trimCommands);
+                $updateQuery = "UPDATE \"$relation\" SET " . implode(",", $trimCommands);
+                //$this->addLogging(array("updateQuery",$updateQuery));
                 $pdoStatement = $dbh->query($updateQuery);
                 $affectedRows = $pdoStatement !== false ? $pdoStatement->rowCount() : $dbh->errorInfo();
 
                 $this->addLogging(array(
                     'message' => "All columns of table $relation trimmed. Empty strings are set to NULL.", 
                     'affected rows' => $affectedRows,
-                    'query'=>$updateQuery));
+                    'query'=>$updateQuery)
+                );
             }
         }
         
         // !!! remove an old test record
             
-        $queries[] = "DELETE FROM `dtadb`.`book` WHERE `id_book`='17251';
-                      DELETE FROM `dtadb`.`metadaten` WHERE `id_book`='17251';";
+        //$queries[] = "DELETE FROM `dtadb`.`book` WHERE `id_book`='17251';
+        //              DELETE FROM `dtadb`.`metadaten` WHERE `id_book`='17251';";
                           
         // !!!
             
-        foreach ($queries as $query) {
-            $this->addLogging(array("clean up database command: " => $query));
-            $dbh->query($query);
-        }
+
     }
         
     function nearDuplicateProposalAction() {
@@ -1680,13 +1737,13 @@ class DumpConversionController extends ORMController {
         return $propelConf['datasources']['dtametadata']['connection']['password'];
     }
 
-    private function addLogging($string, $type='message'){
+    private function addLogging($messageWithCaption, $type='message'){
         $arraytype = $type.'s';
         if(!isset($this->$arraytype)){
             throw new \InvalidArgumentException("$arraytype is not defined.");
         }
-        array_push($this->$arraytype, $string);
-        $this->get('logger')->critical("$type: ".print_r($string,true));
+        array_push($this->$arraytype, $messageWithCaption);
+        $this->get('logger')->critical("$type: ".print_r($messageWithCaption,true));
     }
 
 }
