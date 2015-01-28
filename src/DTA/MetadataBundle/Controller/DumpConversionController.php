@@ -117,11 +117,12 @@ class DumpConversionController extends ORMController {
         // assert that certain assumptions hold for the dump (unused fields)
 
         $this->checkOldDatabase($dbh);
-        /*
+
 
 
         $this->propelConnection = \Propel::getConnection(Model\Master\DtaUserPeer::DATABASE_NAME);
-        $this->addLogging(array('message' => 'transaction begun on '.Model\Master\DtaUserPeer::DATABASE_NAME);
+        $this->addLogging(array('message' => 'transaction begun on '.Model\Master\DtaUserPeer::DATABASE_NAME));
+
 
         $this->createTaskTypes();
 
@@ -145,10 +146,12 @@ class DumpConversionController extends ORMController {
             'convertTags',
             );
 
+        /*
+
         foreach ($conversionTasks as $task){
             $this->runTransaction($task, $dbh);
         }
-
+        */
         $this->enableAutoIncrement($this->propelConnection);
         $this->useProductionFiles();
 
@@ -156,11 +159,12 @@ class DumpConversionController extends ORMController {
         $dbname = $this->getDatabaseName();
         $dbuser = $this->getDatabaseUser();
         $dumpfile = $this->targetDumpPath.'_'.date("Y-m-d").'.sql';
-        $this->addLogging(array('dump database: ' => $dbname);
-        $this->addLogging(array('database user: ' => $dbuser);
-        $this->addLogging(array('dumped' => shell_exec("pg_dump -d $dbname -U $dbuser -f $dumpfile"));
+        $this->addLogging(array('dump database: ' => $dbname));
+        $this->addLogging(array('database user: ' => $dbuser));
+        $this->addLogging(array('dump new database...' => shell_exec("pg_dump -d $dbname -U $dbuser -f $dumpfile")));
+        $this->addLogging(array('dumped to: ' => $dumpfile));
 
-        */
+
         return $this->renderWithDomainData('DTAMetadataBundle:DumpConversion:conversionResult.html.twig', array(
             'warnings' => $this->warnings,
             'messages' => $this->messages,
@@ -1679,30 +1683,6 @@ class DumpConversionController extends ORMController {
         $enableAutoIncrement('publicationgroup', 'id', $propelConnection);
         
     }
-
-    //DEBUG
-    //public $propelConnection;
-    /*public function addUserAction($name, $password){
-        echo "addUser ".$name;
-        //$this->propelConnection = \Propel::getConnection(Model\Master\DtaUserPeer::DATABASE_NAME);
-        $this->get('logger')->log('error','ADD USER '.$name);
-        $this->propelConnection = \Propel::getConnection(Model\Master\DtaUserPeer::DATABASE_NAME);
-        $this->propelConnection->beginTransaction();
-        $user = new Model\Master\DtaUser();
-
-        // password encryption
-        $encoder = $this->get('security.encoder_factory')->getEncoder($user);
-        $user->setSalt(md5(rand(-1239432, 23429304)));
-        $saltedPassword = $encoder->encodePassword($password, $user->getSalt());
-
-        $user->setUsername($name)
-            ->setPassword($saltedPassword)
-            ->save($this->propelConnection);
-
-        $this->propelConnection->commit();
-        return $this->forward('DTAMetadataBundle:Home:index',array());
-    }*/
-    //DEBUG END
 
 
     public function getDatabaseName(){
