@@ -77,7 +77,7 @@ class DumpConversionController extends ORMController {
             $pdo = new \PDO($dsn, $this->getDatabaseUser(), $this->getDatabasePass());
             return $pdo;
         } catch (\PDOException $e) {
-            throw new \Exception("Connection failed: " . $e->getMessage());
+            throw new \PDOException("Connection failed: " . $e->getMessage());
         }
     }
         
@@ -129,7 +129,7 @@ class DumpConversionController extends ORMController {
         // names of the functions to wrap in transaction code
         $conversionTasks = array(
             'convertUsers',                 // users first: they are referenced in "last changed by" columns
-            'convertPublications',
+            /*'convertPublications',
             'convertFirstEditions',
             'convertPublicationGroups',
             'convertPartners',
@@ -143,15 +143,15 @@ class DumpConversionController extends ORMController {
             'convertSeries',
             'convertMultiVolumes',
             'convertGenres',
-            'convertTags',
+            'convertTags',*/
             );
 
-        /*
+
 
         foreach ($conversionTasks as $task){
             $this->runTransaction($task, $dbh);
         }
-        */
+
         $this->enableAutoIncrement($this->propelConnection);
         $this->useProductionFiles();
 
@@ -217,7 +217,12 @@ class DumpConversionController extends ORMController {
     }
 
     private function  checkOpenConnections($databaseName, $close = false){
-        $dbh_temp = $this->connectPostgres($databaseName);
+        try {
+            $dbh_temp = $this->connectPostgres($databaseName);
+        }catch(\PDOException $e){
+            $this->addLogging(array("Exception while counting connections to $databaseName" => $e->getMessage()));
+            return 0;
+        }
         $stmt = $dbh_temp->prepare("SELECT count(*) FROM pg_stat_activity WHERE datname = '$databaseName'");
         $stmt->execute();
         $activeCount = $stmt->fetch()['count'] -1;
@@ -1177,11 +1182,11 @@ class DumpConversionController extends ORMController {
          
     function convertUsers($dbh) {
         
-        $rawData = "SELECT * FROM user";
+        $rawData = "SELECT * FROM \"user\"";
         
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
-            array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
+            //array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); }); inserts encoding errors!
                         
             $user = new Model\Master\DtaUser();
                 

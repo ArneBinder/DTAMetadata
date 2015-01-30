@@ -255,6 +255,9 @@
 2015-01-28
  o adapted cleanUpOldDatabase() and checkOldDatabase() for PostgreSQL
  
+2015-01-29
+ o adapted convertUsers()
+ 
  TODO:
  o Tab-Constraint DONE
  o merge multiple spaces DONE
