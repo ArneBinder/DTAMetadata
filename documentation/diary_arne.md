@@ -259,6 +259,10 @@
  o adapted convertUsers()
  o adapted convertPublications() TODO: check legacy_publication_types J, N and NULL!
  o adapted remaining converting functions
+ o current TODO:
+    - fix convertMultiVolume
+    - fix doublets in table_row_view of Publications 
+ 
  
  TODO:
  o Tab-Constraint DONE
