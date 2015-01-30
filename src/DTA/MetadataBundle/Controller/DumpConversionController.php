@@ -197,7 +197,7 @@ class DumpConversionController extends ORMController {
             //// WARNING: IF DUMP CONVERTION ABORTS AND IS RESTARTED WITHOUT MANUAL MOVING THE PRODUCTION SCHEMA FILES BACK IN PLACE, THE DUMPCONVERSION SCHEMA FILES ARE CONSIDERED AS PRODUCTION FILES!!!
             //copy("$dumpConversionSchemasDir/../config/$schema", "$dumpConversionSchemasDir/../schemas_final/$schema");
 
-            $this->addLogging(array("bringing dump conversion version of $schema into place", copy("$dumpConversionSchemasDir/$schema","$dumpConversionSchemasDir/../config/$schema")));
+            $this->addLogging(array("bringing dump conversion version of $schema into place", shell_exec("cp $dumpConversionSchemasDir/$schema $dumpConversionSchemasDir/../config/$schema")));
         }
         // build propel entity classes
         $this->addLogging(array('building model from dump conversion schemas', shell_exec("$this->phpExec ../app/console propel:model:build")));
@@ -211,7 +211,8 @@ class DumpConversionController extends ORMController {
             $this->addLogging(array(
                 "bringing dump conversion version of $schema into place",
                 //system("cp $productionSchemasDir/$schema $productionSchemasDir/../config/$schema")
-                copy("$productionSchemasDir/$schema","$productionSchemasDir/../config/$schema")
+                //copy("$productionSchemasDir/$schema","$productionSchemasDir/../config/$schema")
+				shell_exec("cp $productionSchemasDir/$schema productionSchemasDir/../config/$schema")
             ));
         }
         // build propel entity classes
