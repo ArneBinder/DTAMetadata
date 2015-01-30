@@ -144,7 +144,7 @@ class Person extends BasePerson {
         $firstName = $firstNameFragment === NULL ? NULL : $firstNameFragment->getName();
 
         $lastNameFragment = $this->getNamePart(NamefragmentPeer::TYPE_LAST_NAME);
-        $lastName = $firstNameFragment === NULL ? NULL : $lastNameFragment->getName();
+        $lastName = $lastNameFragment === NULL ? NULL : $lastNameFragment->getName();
         
         // if person has gnd, things are easier
         if( $this->getGnd() !== NULL){

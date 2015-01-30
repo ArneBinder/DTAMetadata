@@ -27,7 +27,7 @@ class DumpConversionController extends ORMController {
     private $sourceDatabase  = 'dtadb'; //will be created if it does not exist
     private $sourceDumpPath  = '../dbdumps/server_2015-01-22/dtaq_partiell-pgsql.sql'; //'../dbdumps/dtadb_2013-09-29_07-10-01.sql';//'/Users/macbookdata/Dropbox/DTA/dumpConversion/dtadb_2013-09-29_07-10-01.sql';
 
-    private $tempDumpPGDatabaseName = 'temp_dump';
+    private $tempDumpPGDatabaseName = 'temp_dump2';
 
     // This dump file can be used to import into the production system
     private $targetDumpPath = '../dbdumps/dtadb_pg';
@@ -133,7 +133,7 @@ class DumpConversionController extends ORMController {
         $conversionTasks = array(
             'convertUsers',                 // users first: they are referenced in "last changed by" columns
             'convertPublications',
-            /*'convertFirstEditions',
+            'convertFirstEditions',
             'convertPublicationGroups',
             'convertPartners',
             'convertCopyLocations',
@@ -145,8 +145,8 @@ class DumpConversionController extends ORMController {
             'convertSingleFieldPersons',
             'convertSeries',
             'convertMultiVolumes',
-            'convertGenres',
-            'convertTags',*/
+            //'convertGenres',
+            //'convertTags',
             );
 
 
@@ -307,6 +307,19 @@ class DumpConversionController extends ORMController {
         $result->setTime($dateTime['hour'], $dateTime['minute'], $dateTime['second']);
         return $result;
     }
+    // parses date string in format 2007-12-11 17:39:30 to \DateTime objects
+    function parseSQLTimeToDate($dateString){
+
+        if($dateString === NULL)
+            return NULL;
+
+        $dateTime = date_parse($dateString);
+        $currentDate = getdate();
+        $result = new \DateTime();
+        $result->setDate($currentDate['year'], $currentDate['mon'], $currentDate['mday']);
+        $result->setTime($dateTime['hour'], $dateTime['minute'], $dateTime['second']);
+        return $result;
+    }
 
     function addSQLFunctions(\PDO $dbh){
 
@@ -318,42 +331,23 @@ class DumpConversionController extends ORMController {
                                 SELECT array_upper(string_to_array($2,'',''), 1) -- last value is default
                                 LIMIT 1'
                                 LANGUAGE 'sql';");
-        $this->addLogging(array("added FIND_IN_SET functionality to database " => $stmt1->execute()));
-        $stmt2 = $dbh->prepare("CREATE OR REPLACE FUNCTION IF(condition boolean, result1 anyelement, result2 anyelement) RETURNS anyelement AS '
+        $this->addLogging(array("added FIND_IN_SET(text, text) functionality to database " => $stmt1->execute()));
+        $stmt2 = $dbh->prepare("CREATE OR REPLACE FUNCTION FIND_IN_SET(needle bigint, haystack text) RETURNS bigint AS '
+                                SELECT cast(i as bigint) AS result
+                                FROM generate_series(1, array_upper(string_to_array($2,'',''), 1)) AS g(i)
+                                WHERE  (string_to_array($2,'',''))[i] = CAST($1 AS text)
+                                UNION ALL
+                                SELECT cast(0 as bigint)
+                                LIMIT 1'
+                                LANGUAGE 'sql'");
+        $this->addLogging(array("added FIND_IN_SET(integer, text) functionality to database " => $stmt2->execute()));
+        $stmt3 = $dbh->prepare("CREATE OR REPLACE FUNCTION IF(condition boolean, result1 anyelement, result2 anyelement) RETURNS anyelement AS '
                         SELECT CASE WHEN $1 THEN $2
                                            ELSE $3
                                       END AS result'
                         LANGUAGE 'sql';");
-        $this->addLogging(array("added IF functionality to database " => $stmt2->execute()));
+        $this->addLogging(array("added IF functionality to database " => $stmt3->execute()));
 
-
-        /*
-         CREATE OR REPLACE FUNCTION FIND_IN_SET(needle text, haystack text) RETURNS integer AS '
-    SELECT i AS result
-    FROM generate_series(1, array_upper(string_to_array($2,'',''), 1)) AS g(i)
-    WHERE  (string_to_array($2,'',''))[i] = $1
-    UNION ALL
-    SELECT 0
-    LIMIT 1'
-    LANGUAGE 'sql';
-
-
-        CREATE OR REPLACE FUNCTION FIND_IN_SET(needle integer, haystack text) RETURNS integer AS '
-    SELECT i AS result
-    FROM generate_series(1, array_upper(string_to_array($2,'',''), 1)) AS g(i)
-    WHERE  (string_to_array($2,'',''))[i] = CAST($1 AS text)
-    UNION ALL
-    SELECT 0
-    LIMIT 1'
-    LANGUAGE 'sql';
-
-
-        CREATE OR REPLACE FUNCTION IF(condition boolean, result1 anyelement, result2 anyelement) RETURNS anyelement AS '
-    SELECT CASE WHEN $1 THEN $2
-                       ELSE $3
-                  END AS result'
-    LANGUAGE 'sql';
-         */
 
     }
     
@@ -424,7 +418,7 @@ class DumpConversionController extends ORMController {
 
         $rawData = "SELECT 
                         book.id_book as publication_id
-                        ,schriftart as `font_name`
+                        ,schriftart as font_name
                     FROM
                         metadaten JOIN book ON book.id_book = metadaten.id_book
                     WHERE 
@@ -435,7 +429,7 @@ class DumpConversionController extends ORMController {
         $publications = Model\Data\PublicationQuery::create();
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
-            array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
+ //           array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
             
             if($currentFont->getName() !== $row['font_name']){
                 
@@ -595,9 +589,9 @@ class DumpConversionController extends ORMController {
                     WHEN 'JA' THEN 'Article'
                     WHEN 'Reihe' THEN 'Series'
                     WHEN 'Zeitschrift' THEN 'Journal'
-                    WHEN 'J' THEN 'Journal'                -- WARNING DEBUG added
-                    WHEN 'N'THEN 'Book'                    -- WARNING DEBUG added
-                    ELSE 'Book'                            -- WARNING DEBUG former value: type
+                    WHEN 'J' THEN 'Journal'                -- TODO: WARNING DEBUG added 'J' => 'Journal'
+                    WHEN 'N'THEN 'Book'                    -- TODO: WARNING DEBUG added 'N' => 'Book'
+                    ELSE 'Book'                            -- TODO: WARNING DEBUG else => 'Book' (former value: type)
                 END as publication_type
 
                 ,IF(band_zaehlung = 0, band_zaehlung + 1, band_zaehlung) as volume_numeric    -- single volumes seem to have a zero based index
@@ -629,7 +623,7 @@ class DumpConversionController extends ORMController {
         
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
-            array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
+            //array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
     
             // title ------------------------------------------------------------------------------------
             $title = new Model\Data\Title();
@@ -753,7 +747,7 @@ class DumpConversionController extends ORMController {
         Since mostly, only a year, location and a publishing company are needed, the entire information is stored in a plain text format. */
     function convertFirstEditions($dbh){
         
-        $rawData = "SELECT 
+        $rawData = "SELECT
                         book.id_book as id,
                         first_pub_date,
                         first_pub_name,
@@ -765,12 +759,12 @@ class DumpConversionController extends ORMController {
                         first_in_title,
                         first_comments,
                         CASE first_status
-                            WHEN '0' THEN NULL
-                            WHEN '1' THEN _utf8'Erstveröffentlichung'
-                            WHEN '2' THEN _utf8'Keine Erstveröffentlichung'
-                            WHEN '3' THEN _utf8'Unklar, ob Erstveröffentlichung'
-                            ELSE first_status
-                        END as `first_status`,
+                            WHEN 0 THEN NULL
+                            WHEN 1 THEN 'Erstveröffentlichung'
+                            WHEN 2 THEN 'Keine Erstveröffentlichung'
+                            WHEN 3 THEN 'Unklar, ob Erstveröffentlichung'
+                            ELSE cast ( first_status as text)
+                        END as first_status,
                         first_status_date
                     FROM
                         book
@@ -788,7 +782,7 @@ class DumpConversionController extends ORMController {
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             
             // encode all data from the old database as UTF8
-            array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
+            //array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
 
             $fields = array(
                 'first_status',
@@ -849,7 +843,7 @@ class DumpConversionController extends ORMController {
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             
             // encode all data from the old database as UTF8
-            array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
+            //array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
 
             // create new series if the series title hasn't been seen before
             if($currentSeriesTitle === NULL || $row['title'] != $currentSeriesTitle){
@@ -887,7 +881,7 @@ class DumpConversionController extends ORMController {
                         book.id_book as publication_id, 
                         groups.id_group as group_id, 
                         group_name,
-                        groups.log_last_change as 'last_change'
+                        groups.log_last_change as last_change
                     FROM groups, group_books, book
                     WHERE
                             book.id_book = group_books.id_book
@@ -899,7 +893,7 @@ class DumpConversionController extends ORMController {
         $publications = Model\Data\PublicationQuery::create();
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
-            array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
+            //array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
 
             if($row['group_id'] !== $lastGroupId){
                 
@@ -927,13 +921,13 @@ class DumpConversionController extends ORMController {
                         name,
                         person,
                         mail, web, phone1, adress,
-                        NULLIF(log_last_change, '0000-00-00 00:00:00') as `log_last_change`,
+                        log_last_change,
                         comments
                     FROM partner";
             
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
-            array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
+            //array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
                         
             $partner = new Model\Workflow\Partner();
             $partner->setId($row['id_book_locations'])
@@ -943,25 +937,25 @@ class DumpConversionController extends ORMController {
                     ->setWeb($row['web'])
                     ->setContactdata('Telefon: ' . $row['phone1'] . "\nAdresse: " . $row['adress'])
                     ->setComments($row['comments'])
-                    ->setUpdatedAt($this->parseSQLDate($row['log_last_change']))
+                    ->setUpdatedAt($this->parseSQLTimeToDate($row['log_last_change'])) //TODO: is time instead of timestamp useful? (in temp_dump database schema)
                     ->save($this->propelConnection);
         }
     }
         
       // after publications and partners
-    function convertCopyLocations($dbh){
+    function convertCopyLocations(\PDO $dbh){
         
         $rawData = "SELECT 
-                        id_Fundstellen as `copylocation_id`
-                        ,book.id_book as `publication_id`
-                        ,partner.id_book_locations as `partner_id`
-                        ,NULLIF(fundstellen.dta_insert_date, '0000-00-00 00:00:00') as `created_at`
-                        ,fundstellen.comments as `comments`
-                        ,NULLIF(`accessible`, 2) as `accessible`      -- 2 is currently used for 'not clear'
-                        ,fundstellen.log_last_user as `updated_by`
-                        ,fundstellen.log_last_change as `updated_at`
-                        ,signatur as `catalogue_signature`
-                        ,bib_id as `catalogue_internal`
+                        id_Fundstellen as copylocation_id
+                        ,book.id_book as publication_id
+                        ,partner.id_book_locations as partner_id
+                        ,fundstellen.dta_insert_date as created_at
+                        ,fundstellen.comments as comments
+                        ,NULLIF(accessible, 2) as accessible      -- 2 is currently used for 'not clear'
+                        ,fundstellen.log_last_user as updated_by
+                        ,fundstellen.log_last_change as updated_at
+                        ,signatur as catalogue_signature
+                        ,bib_id as catalogue_internal
                     FROM
                         fundstellen 
                         LEFT JOIN partner ON 
@@ -971,13 +965,13 @@ class DumpConversionController extends ORMController {
             
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
-            array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
+            //array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
                         
             if($row['publication_id'] === NULL){
                 $this->addLogging(array(
-                    'message' => 'Fundstelle verweist auf nicht-existierende Publikation.',
-                    'action' => 'Fundstelle nicht übernommen.'
-                ), 'error');
+                    'message' => "Fundstelle verweist auf nicht-existierende Publikation.",
+                    'action' => "Fundstelle $row[copylocation_id] nicht übernommen."
+                ), 'warning');
                 continue;
             }
                 
@@ -1005,58 +999,58 @@ class DumpConversionController extends ORMController {
         
         $rawData = "
                     SELECT -- normal tasks (refering to a single publication)
-                        id_task as `task_id`
-                        ,'single' as `type` 
-                        ,IF(FIND_IN_SET(task_type,'5,10,20,30,31,40,45,50,55,58,59,60,65,70,75') = 0, null, task_type) as `task_type_id`
-                        ,book.id_book as `reference_object`
-                        ,NULLIF(open_tasks.id_book_locations,0) as `partner_id`
-                        ,NULLIF(id_fundstelle,0) as `copy_location_id`
-                        ,NULLIF(open_tasks.id_user,0) as `user_id`
-                        ,NULLIF(starttime, '0000-00-00 00:00:00') as `start_date`
-                        ,NULLIF(endtime, '0000-00-00 00:00:00') as `end_date`
+                        id_task as task_id
+                        ,'single' as type
+                        ,IF(FIND_IN_SET(task_type,'5,10,20,30,31,40,45,50,55,58,59,60,65,70,75') = 0, null, task_type) as task_type_id
+                        ,book.id_book as reference_object
+                        ,NULLIF(open_tasks.id_book_locations,0) as partner_id
+                        ,NULLIF(id_fundstelle,0) as copy_location_id
+                        ,NULLIF(open_tasks.id_user,0) as user_id
+                        ,starttime as start_date
+                        ,endtime as end_date
                         ,open_tasks.comments
                         ,closed
-                        ,NULLIF(createDate, '0000-00-00 00:00:00') as `created_at`
-                        ,NULLIF(open_tasks.log_last_change, '0000-00-00 00:00:00') as `updated_at`
+                        ,createDate as created_at
+                        ,open_tasks.log_last_change as updated_at
                     FROM
-                        open_tasks 
-                            left join book on open_tasks.id_book = book.id_book
-                            left join user on open_tasks.id_user = user.id_user
-                            left join fundstellen on open_tasks.id_fundstelle = fundstellen.id_Fundstellen
+                        open_tasks
+                             left join book on open_tasks.id_book = book.id_book
+                             left join \"user\" on open_tasks.id_user = \"user\".id_user
+                             left join fundstellen on open_tasks.id_fundstelle = fundstellen.id_Fundstellen
                     WHERE
                             -- ignore tasks that refer to publication groups.
                             -- they are redundantly created, the publication group task contains all the information
-                            grouped_task = 0 
+                            grouped_task = 0
                     UNION
                     -- group tasks (referring to all publications of a group)
-                    SELECT 
-                        id_task as `task_id`
-                        ,'group' as `type`
-                        ,IF(FIND_IN_SET(task_type,'5,10,20,30,31,40,45,50,55,58,59,60,65,70,75') = 0, null, task_type) as `task_type_id`
-                        ,groups.id_group as `reference_object`
-                        ,NULLIF(id_book_locations,0)  as `partner_id`
-                        ,null as `copy_location_id`
-                        ,user.id_user as `user_id`
-                        ,NULLIF(starttime, '0000-00-00 00:00:00') as `start_date`
-                        ,NULLIF(endtime, '0000-00-00 00:00:00') as `end_date`
+                    SELECT
+                        id_task as task_id
+                        ,'group' as type
+                        ,IF(FIND_IN_SET(task_type,'5,10,20,30,31,40,45,50,55,58,59,60,65,70,75') = 0, null, task_type) as task_type_id
+                        ,groups.id_group as reference_object
+                        ,NULLIF(id_book_locations,0)  as partner_id
+                        ,null as copy_location_id
+                        ,\"user\".id_user as user_id
+                        ,starttime as start_date
+                        ,endtime as end_date
                         ,comments
                         ,closed
-                        ,NULLIF(createDate, '0000-00-00 00:00:00') as `created_at`
-                        ,NULLIF(open_tasks_groups.log_last_change, '0000-00-00 00:00:00') as `updated_at`
+                        ,createDate as created_at
+                        ,open_tasks_groups.log_last_change as updated_at
                     FROM
                         open_tasks_groups
-                            LEFT JOIN user on open_tasks_groups.id_user = user.id_user
-                            LEFT JOIN groups ON open_tasks_groups.id_group = groups.id_group";
+                             LEFT JOIN \"user\" on open_tasks_groups.id_user = \"user\".id_user
+                             LEFT JOIN groups ON open_tasks_groups.id_group = groups.id_group";
             
         $publications = Model\Data\PublicationQuery::create();
         $groups = Model\Workflow\PublicationgroupQuery::create();
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
-            array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
+            //array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
 
             if($row['reference_object'] === NULL){
                 $this->addLogging(array(
-                    'message' => 'Task verweist auf nicht-existente Publikation.',
+                    'message' => "Task verweist auf nicht-existente Publikation $row[reference_object].",
                     'typ'     => $row['type'],
                     'action'  => "Task $row[task_id] übersprungen",
                     ), 'error');
@@ -1065,13 +1059,47 @@ class DumpConversionController extends ORMController {
             
             if($row['task_type_id'] === NULL){
                 $this->addLogging(array(
-                    'message' => "Task hat unbekannten Tasktyp.",
+                    'message' => "Task $row[task_id] hat unbekannten Tasktyp.",
                     'action'  => 'Datensatz übersprungen',
                     'task_id in old dump' => $row['task_id']
                     ), 'warning');
                 continue;
             }
-            
+
+            //TODO: check this!
+           $partner = Model\Workflow\PartnerQuery::create()->findOneById($row['partner_id']);
+            if($partner === null){
+                $this->addLogging(array(
+                    'message' => "Task verweist auf nicht-existenten Partner $row[partner_id].",
+                    'partner_id'     => "$row[partner_id]",
+                    'action'  => "Task $row[task_id] übersprungen",
+                ), 'warning');
+                continue;
+            }
+            //TODO: check this!
+            $partner = Model\Workflow\CopyLocationQuery::create()->findOneById($row['copy_location_id']);
+            if($partner === null){
+                $this->addLogging(array(
+                    'message' => "Task verweist auf nicht-existente CopyLocation $row[copy_location_id].",
+                    'copy_location_id'     => "$row[copy_location_id]",
+                    'action'  => "Task $row[task_id] übersprungen",
+                ), 'warning');
+                continue;
+            }
+
+            //TODO: check this!
+            $partner = Model\Master\DtaUserQuery::create()->findOneById($row['user_id']);
+            if($partner === null){
+                $this->addLogging(array(
+                    'message' => "Task verweist auf nicht-existenten DtaUser $row[user_id].",
+                    'user_id'     => "$row[user_id]",
+                    'action'  => "Task $row[task_id] übersprungen",
+                ), 'warning');
+                continue;
+            }
+
+
+
             $task = new Model\Workflow\Task();
             
             $task->setTasktypeId($row['task_type_id'])
@@ -1112,17 +1140,21 @@ class DumpConversionController extends ORMController {
         
         $rawData = "SELECT 
                         id_book as publication_id
-                        ,trim(char(9) from trim(publishing_company)) as `publishing_company`
+                        ,trim(publishing_company) as publishing_company
                     FROM
                         (
-                            SELECT id_book, SUBSTRING_INDEX( SUBSTRING_INDEX( dta_pub_verlag, ';', 1), ';', -1 ) AS publishing_company FROM book 
-                            UNION 
-                            SELECT id_book, SUBSTRING_INDEX( SUBSTRING_INDEX( dta_pub_verlag, ';', 2), ';', -1 ) AS publishing_company FROM book 
-                            UNION 
-                            SELECT id_book, SUBSTRING_INDEX( SUBSTRING_INDEX( first_pub_verlag, ';', 1), ';', -1 ) AS publishing_company FROM book 
-                            UNION 
-                            SELECT id_book, SUBSTRING_INDEX( SUBSTRING_INDEX( first_pub_verlag, ';', 2), ';', -1 ) AS publishing_company FROM book 
-                        ) 
+                           select id_book, split_part(dta_pub_verlag,';',1) as publishing_company FROM book
+                           UNION
+                           select id_book, split_part(dta_pub_verlag,';',2) as publishing_company FROM book
+                           UNION
+                           select id_book, split_part(dta_pub_verlag,';',3) as publishing_company FROM book
+                           UNION
+                           select id_book, split_part(first_pub_verlag,';',1) as publishing_company FROM book
+                           UNION
+                           select id_book, split_part(first_pub_verlag,';',2) as publishing_company FROM book
+                           UNION
+                           select id_book, split_part(first_pub_verlag,';',3) as publishing_company FROM book
+                         )
                     as publishingCompanies
                     WHERE publishing_company <> ''
                     order by publishing_company";
@@ -1131,7 +1163,7 @@ class DumpConversionController extends ORMController {
         $publications = Model\Data\PublicationQuery::create();
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
-            array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
+            //array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
                         
             if($row['publishing_company'] !== $currentPublishingCompany->getName()){
                 
@@ -1160,27 +1192,27 @@ class DumpConversionController extends ORMController {
                         WHEN 'Freiburg i. Br.' THEN 'Freiburg (Breisgau)'
                         WHEN 'Halle a. S.' THEN 'Halle (Saale)'
                         WHEN 'Leipzig (fingierte Druckorte)' THEN 'Leipzig'
-                        ELSE trim(CHAR(9) FROM trim(location))
-                    END as `location`
+                        ELSE trim(location)
+                    END as location
                 FROM
                     -- split und union semicolon-separated places
-                    (SELECT 
+                    (SELECT
                         id_book
-                        ,SUBSTRING_INDEX(SUBSTRING_INDEX(location, ';', 1), ';', - 1) as location
+                        ,split_part(location, ';', 1) as location
                     FROM
-                        (SELECT id_book, dta_pub_location AS location FROM book 
+                        (SELECT id_book, dta_pub_location AS location FROM book
                          UNION SELECT id_book, first_pub_location AS location FROM book) as places
-                        
+
                     UNION SELECT
                         id_book
-                        ,SUBSTRING_INDEX(SUBSTRING_INDEX(location, ';', 2), ';', - 1) as location
+                        ,split_part(location, ';', 2) as location
                     FROM
-                        (SELECT id_book, dta_pub_location AS location FROM book 
+                        (SELECT id_book, dta_pub_location AS location FROM book
                          UNION SELECT id_book, first_pub_location AS location FROM book) as places
-                        
-                    UNION SELECT 
+
+                    UNION SELECT
                         id_book
-                        ,SUBSTRING_INDEX(SUBSTRING_INDEX(location, ';', 3), ';', - 1) as location
+                        ,split_part(location, ';', 3) as location
                     FROM
                         (SELECT id_book, dta_pub_location AS location FROM book 
                          UNION SELECT id_book, first_pub_location AS location FROM book) as places
@@ -1195,7 +1227,7 @@ class DumpConversionController extends ORMController {
         $publications = Model\Data\PublicationQuery::create();
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
-            array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
+            //array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
                 
             if($currentPlace->getName() !== $row['location']){
                 
@@ -1209,22 +1241,6 @@ class DumpConversionController extends ORMController {
              $publication->setPlace($currentPlace)
                          ->save($this->propelConnection);
         }
-    }
-
-    /* ---------------------------------------------------------------------
-    * genre TODO
-    * ------------------------------------------------------------------ */
-
-    function convertGenres($dbh){
-
-    }
-
-    /* ---------------------------------------------------------------------
-    * tag TODO
-    * ------------------------------------------------------------------ */
-
-    function convertTags($dbh){
-
     }
 
 
@@ -1294,13 +1310,13 @@ class DumpConversionController extends ORMController {
                         lastname, 
                         firstname, 
                         pnd DESC -- NULL pnds come second and the record with a pnd is used as base for the merge of subsequent persons with same name";
-                      
-        
+
+
         $currentPerson = NULL;
         
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
-            array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
+            //array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
 
             // create new person if the next row can not be considered duplicate of the current person
             if( NULL === $currentPerson || FALSE === $currentPerson->match($row) ){
@@ -1331,8 +1347,17 @@ class DumpConversionController extends ORMController {
                 }
                 
             }
-            
+
             $publication = Model\Data\PublicationQuery::create()->findOneById($row['id_book']);
+            /*if($publication === null){
+                $personId = $currentPerson->getId();
+                $this->addLogging(array(
+                    'message' => 'Author verweist auf nicht existente Publikation.',
+                    'id_book'     => "$row[id_book]",
+                    'action'  => "addPersonPublication von Author $personId für Buch $row[id_book] übersprungen",
+                ), 'error');
+                continue;
+            }*/
             $publication
                     ->addPersonPublication(Model\Master\PersonPublication::create($currentPerson->getId(), 'AUTHOR'))
                     ->save($this->propelConnection);
@@ -1347,19 +1372,18 @@ class DumpConversionController extends ORMController {
     function convertSingleFieldPersons($dbh) {
         
         // there are a few persons which don't have first name/last name columns, so the names must be split
-        $rawData = "
-            SELECT 
-                id_book as publication_id            
-                ,trim(char(9) from trim(person)) as person
+        $rawData = "SELECT
+                id_book as publication_id
+                ,trim(split_part( person, '#', 1)) as person -- TODO: extraction of non-gnd part is done in Model Data Person::createFromArray() too!
                 ,role
-                ,LOCATE(',', person) as comma_position
-                ,LOCATE(' ', person) as space_position
-                ,NULLIF(substring(substring(person FROM LOCATE('#', person)) from 2), '') as gnd
+                ,strpos(person, ',') as comma_position
+                ,strpos(person, ' ') as space_position
+                ,IF(strpos(person,'#')>0,substring(person FROM strpos(person,'#') +1) ,NULL) as gnd
             FROM (
-                
+
             -- first persons (if separated by ';')
-                SELECT DISTINCT 
-                    id_book, SUBSTRING_INDEX( SUBSTRING_INDEX( person, ';', 1), ';', -1 ) as person, role
+                SELECT DISTINCT
+                    id_book, split_part( person, ';', 1) as person, role
                 FROM (
                     SELECT id_book, uebersetzer AS person, 'TRANSLATOR' as role FROM book
                     UNION
@@ -1368,14 +1392,14 @@ class DumpConversionController extends ORMController {
                     SELECT id_book, dta_in_autor AS person, 'AUTHOR' as role FROM book
                     UNION
                     SELECT id_book, autor1_syn_names AS person, 'SYNONYM' as role FROM book
-                ) as condensedNames 
+                ) as condensedNames
                 WHERE person IS NOT NULL AND LENGTH(person) > 2 	-- for some reason, strings of length 2 survive the trim operation
-                    
+
                 UNION
-                    
+
             -- second persons (if separated by ';')
-                SELECT DISTINCT 
-                        id_book, SUBSTRING_INDEX( SUBSTRING_INDEX( person, ';', 2), ';', -1 ) as person, role
+                SELECT DISTINCT
+                        id_book, split_part( person, ';', 2) as person, role
                 FROM (
                     SELECT id_book, uebersetzer AS person, 'TRANSLATOR' as role FROM book
                     UNION
@@ -1384,9 +1408,10 @@ class DumpConversionController extends ORMController {
                     SELECT id_book, dta_in_autor AS person, 'AUTHOR' as role FROM book
                     UNION
                     SELECT id_book, autor1_syn_names AS person, 'SYNONYM' as role FROM book
-                ) as condensedNames 
+                ) as condensedNames
                 WHERE person IS NOT NULL AND LENGTH(person) > 2
             ) as names
+            where person not like ''
             ORDER BY person";
                 
         $publications = Model\Data\PublicationQuery::create();
@@ -1396,7 +1421,7 @@ class DumpConversionController extends ORMController {
         
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
-            array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
+            //array_walk($row, function(&$value) { $value = $value === NULL ? NULL : utf8_encode($value); });
                 
             // check if a new person identifier is found
             if($row['person'] !== $currentPersonIdentifier){
