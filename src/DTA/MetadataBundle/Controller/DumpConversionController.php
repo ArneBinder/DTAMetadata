@@ -118,6 +118,9 @@ class DumpConversionController extends ORMController {
 
         $this->checkOldDatabase($dbh);
 
+        // add IF and FIND_IN_SET functionality to temporary dump database
+       $this->addSQLFunctions($dbh);
+
 
 
         $this->propelConnection = \Propel::getConnection(Model\Master\DtaUserPeer::DATABASE_NAME);
@@ -129,8 +132,8 @@ class DumpConversionController extends ORMController {
         // names of the functions to wrap in transaction code
         $conversionTasks = array(
             'convertUsers',                 // users first: they are referenced in "last changed by" columns
-            /*'convertPublications',
-            'convertFirstEditions',
+            'convertPublications',
+            /*'convertFirstEditions',
             'convertPublicationGroups',
             'convertPartners',
             'convertCopyLocations',
@@ -303,6 +306,55 @@ class DumpConversionController extends ORMController {
         $result->setDate($dateTime['year'], $dateTime['month'], $dateTime['day']);
         $result->setTime($dateTime['hour'], $dateTime['minute'], $dateTime['second']);
         return $result;
+    }
+
+    function addSQLFunctions(\PDO $dbh){
+
+        $stmt1 = $dbh->prepare("CREATE OR REPLACE FUNCTION FIND_IN_SET(needle text, haystack text) RETURNS integer AS '
+                                SELECT i AS result
+                                FROM generate_series(1, array_upper(string_to_array($2,'',''), 1)) AS g(i)
+                                WHERE  (string_to_array($2,'',''))[i] = $1
+                                UNION ALL
+                                SELECT array_upper(string_to_array($2,'',''), 1) -- last value is default
+                                LIMIT 1'
+                                LANGUAGE 'sql';");
+        $this->addLogging(array("added FIND_IN_SET functionality to database " => $stmt1->execute()));
+        $stmt2 = $dbh->prepare("CREATE OR REPLACE FUNCTION IF(condition boolean, result1 anyelement, result2 anyelement) RETURNS anyelement AS '
+                        SELECT CASE WHEN $1 THEN $2
+                                           ELSE $3
+                                      END AS result'
+                        LANGUAGE 'sql';");
+        $this->addLogging(array("added IF functionality to database " => $stmt2->execute()));
+
+
+        /*
+         CREATE OR REPLACE FUNCTION FIND_IN_SET(needle text, haystack text) RETURNS integer AS '
+    SELECT i AS result
+    FROM generate_series(1, array_upper(string_to_array($2,'',''), 1)) AS g(i)
+    WHERE  (string_to_array($2,'',''))[i] = $1
+    UNION ALL
+    SELECT 0
+    LIMIT 1'
+    LANGUAGE 'sql';
+
+
+        CREATE OR REPLACE FUNCTION FIND_IN_SET(needle integer, haystack text) RETURNS integer AS '
+    SELECT i AS result
+    FROM generate_series(1, array_upper(string_to_array($2,'',''), 1)) AS g(i)
+    WHERE  (string_to_array($2,'',''))[i] = CAST($1 AS text)
+    UNION ALL
+    SELECT 0
+    LIMIT 1'
+    LANGUAGE 'sql';
+
+
+        CREATE OR REPLACE FUNCTION IF(condition boolean, result1 anyelement, result2 anyelement) RETURNS anyelement AS '
+    SELECT CASE WHEN $1 THEN $2
+                       ELSE $3
+                  END AS result'
+    LANGUAGE 'sql';
+         */
+
     }
     
     function createTaskTypes(){
@@ -494,41 +546,39 @@ class DumpConversionController extends ORMController {
 
         
     }
-    
+
     function convertPublications($dbh) {
         
-        $rawData = "
-            SELECT 
+        $rawData = "SELECT
                 book.id_book as id
+                ,title as title
+                ,subtitle as subtitle
+                ,other_title as subtitle2
+                ,short_title as shorttitle
+                ,dta_auflage as printrun
+                ,dta_bibl_angabe as citation
+                ,FIND_IN_SET(sources.source,'aedit,avh,blumenbach,china,correspondent,don,dtae,dwds1,gutenberg_de,gutenberg_org,gutzkow,hab,kosmos,kt,mc,mkhz,sbb_funeralschriften,wikisource,n/a') as source_id -- WARNING in database 'don, kosmos, dtae, aedit, correspondent, mkhz, gutzkow, china, gutenberg_org, mc, kt, sbb_funeralschriften, dwds1, hab, avh, blumenbach, gutenberg_de, wikisource'
+                ,ready as www_ready
 
-                ,title as `title`
-                ,subtitle as `subtitle`
-                ,other_title as `subtitle2`
-                ,short_title as `shorttitle`
-                ,dta_auflage as `printrun`
-                ,dta_bibl_angabe as `citation`
-                ,FIND_IN_SET(sources.source,'china,don,kt,n/a') as `source_id`
-                ,ready as `www_ready`
-                
-                ,IF(LENGTH(`year`) < 3, NULL, `year`) as `year` -- to sort out a 0 entry
-                ,LOCATE('[', `year`) as `year_is_reconstructed`
+                ,IF(LENGTH(year) < 3, NULL, year) as year -- to sort out a 0 entry
+                ,strpos(year, '[') as year_is_reconstructed
 
                 ,CASE format
-                    WHEN '' THEN NULL 
-                    WHEN '4º' THEN '4°' 
+                    WHEN '' THEN NULL
+                    WHEN '4º' THEN '4°'
                     WHEN '8º' THEN '8°'		-- merge character based differences
                     ELSE format
-                END as `format`
-    
-                ,dta_comments as `dta_comments`
+                END as format
+
+                ,dta_comments as dta_comments
                 ,special_comment as encoding_comment
-                ,metadaten.planung as `metadata_comment`
-                ,dta_comment2 as `edition_comment`
-                
-                ,dirname as `dirname`
-                
-                ,genre as `genre`
-                ,untergenre as `subgenre`
+                ,metadaten.planung as metadata_comment
+                ,dta_comment2 as edition_comment
+
+                ,dirname as dirname
+
+                ,genre as genre
+                ,untergenre as subgenre
                 ,metadaten.dwds_kategorie1
                 ,metadaten.dwds_unterkategorie1
                 ,metadaten.dwds_kategorie2
@@ -545,35 +595,37 @@ class DumpConversionController extends ORMController {
                     WHEN 'JA' THEN 'Article'
                     WHEN 'Reihe' THEN 'Series'
                     WHEN 'Zeitschrift' THEN 'Journal'
-                    ELSE type
-                END as `publication_type`
-                
-                ,IF(band_zaehlung = 0, 1, band_zaehlung) as `volume_numeric`    -- single volumes seem to have a zero based index
-                ,NULLIF(band_anzahl, 0) as `volumes_total`
-                ,band_alphanum as `volume_description`
-                ,autor1_lastname    -- to detect multi-volume publications, the author name and title need to match
-                
-                ,doi as `doi`
-                ,umfang as `numpages`
-                ,umfang_normiert as `numpages_numeric`
-                ,dta_seiten as `pages`
-                ,book.log_last_change
-                ,user.id_user as `updated_by`
-                ,usecase as `usecase`
+                    WHEN 'J' THEN 'Journal'                -- WARNING DEBUG added
+                    WHEN 'N'THEN 'Book'                    -- WARNING DEBUG added
+                    ELSE 'Book'                            -- WARNING DEBUG former value: type
+                END as publication_type
 
-                ,dta_edition as `edition`
+                ,IF(band_zaehlung = 0, band_zaehlung + 1, band_zaehlung) as volume_numeric    -- single volumes seem to have a zero based index
+                ,NULLIF(band_anzahl, 0) as volumes_total
+                ,band_alphanum as volume_description
+                ,autor1_lastname    -- to detect multi-volume publications, the author name and title need to match
+
+                ,doi as doi
+                ,umfang as numpages
+                ,umfang_normiert as numpages_numeric
+                ,dta_seiten as pages
+                ,book.log_last_change as log_last_change
+                ,\"user\".id_user as updated_by
+                ,usecase as usecase
+
+                ,dta_edition as edition
                 ,availability                                   -- is 0 only for 16 publications
                 ,book.dta_insert_date                           -- is set for for approx. 40 publications
-                
-                ,fundstellen.id_Fundstellen as `used_copy_location`
-                ,NULLIF(startseite,0) as `first_text_page`
-                
-            FROM book 
-                LEFT JOIN metadaten ON book.id_book = metadaten.id_book 
+
+                ,fundstellen.id_Fundstellen as used_copy_location
+                ,NULLIF(startseite,0) as first_text_page
+
+            FROM book
+                LEFT JOIN metadaten ON book.id_book = metadaten.id_book
                 LEFT JOIN sources   ON book.id_book = sources.id_book
-                LEFT JOIN user      ON book.log_last_user = user.id_user
+                LEFT JOIN \"user\"     ON book.log_last_user = \"user\".id_user
                 LEFT JOIN fundstellen ON id_nachweis = id_Fundstellen
-            ;";
+                ;";
         
         foreach ($dbh->query($rawData)->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             // encode all data from the old database as UTF8
@@ -951,8 +1003,8 @@ class DumpConversionController extends ORMController {
             
     function convertTasks($dbh){
         
-        $rawData = "-- normal tasks (refering to a single publication)
-                    SELECT 
+        $rawData = "
+                    SELECT -- normal tasks (refering to a single publication)
                         id_task as `task_id`
                         ,'single' as `type` 
                         ,IF(FIND_IN_SET(task_type,'5,10,20,30,31,40,45,50,55,58,59,60,65,70,75') = 0, null, task_type) as `task_type_id`
@@ -1505,6 +1557,7 @@ class DumpConversionController extends ORMController {
         //$currentDatabaseName = $dbh->query("select current_database()")->fetch()['current_database'];
         //$this->addLogging(array("currentDatabaseName",$currentDatabaseName));
         // remove unused tables
+        //TODO: why does this not work?
         $queries[] = "DROP table corpus_use;
                       DROP table lastusergroups;";
 
@@ -1512,6 +1565,7 @@ class DumpConversionController extends ORMController {
             $this->addLogging(array("clean up database command: " => $query));
             $stmt = $dbh->prepare($query);
             $stmt->execute();
+            $stmt = null;
         }
         
         // trim all text columns and set empty strings to NULL

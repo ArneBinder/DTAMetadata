@@ -257,6 +257,7 @@
  
 2015-01-29
  o adapted convertUsers()
+ o adapted convertPublications() TODO: check legacy_publication_types J, N and NULL!
  
  TODO:
  o Tab-Constraint DONE

@@ -71,12 +71,42 @@ DTA\MetadataBundle\Model\Workflow\License:
         applicable_to_text: true
 DTA\MetadataBundle\Model\Classification\Source:
     Source_1:
-        name: 'china'
+        name: 'aedit'
     Source_2:
         name: 'don'
     Source_3:
         name: 'kt'
     Source_4:
+        name: 'china'
+    Source_5:
+        name: 'correspondent'
+    Source_6:
+        name: 'don'
+    Source_7:
+        name: 'dtae'
+    Source_8:
+        name: 'dwds1'
+    Source_9:
+        name: 'gutenberg_de'
+    Source_10:
+        name: 'gutenberg_org'
+    Source_11:
+        name: 'gutzkow'
+    Source_12:
+        name: 'hab'
+    Source_13:
+        name: 'kosmos'
+    Source_14:
+        name: 'kt'
+    Source_15:
+        name: 'mc'
+    Source_16:
+        name: 'mkhz'
+    Source_17:
+        name: 'sbb_funeralschriften'
+    Source_18:
+        name: 'wikisource'
+    Source_19:
         name: 'n/a'
         
 # ------------------------------------------------------------------------------        
