@@ -271,6 +271,7 @@
  o preconditions to use the dumpConversionScript on khan:
 		CREATE ROLE "www-data" with CREATEDB LOGIN IN ROLE dtametadata;
 		CREATE DATABASE "www-data";
+		ALTER ROLE dtametadata WITH SUPERUSER;
  
  
  TODO:

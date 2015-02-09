@@ -27,7 +27,7 @@ class DumpConversionController extends ORMController {
     private $sourceDatabase  = 'dtadb'; //will be created if it does not exist
     private $sourceDumpPath  = '../dbdumps/server_2015-01-22/dtaq_partiell-pgsql.sql'; //'../dbdumps/dtadb_2013-09-29_07-10-01.sql';//'/Users/macbookdata/Dropbox/DTA/dumpConversion/dtadb_2013-09-29_07-10-01.sql';
 
-    private $tempDumpPGDatabaseName = 'temp_dump5';
+    private $tempDumpPGDatabaseName = 'temp_dump6';
 
     // This dump file can be used to import into the production system
     private $targetDumpPath = '../dbdumps/dtadb_pg';
@@ -93,35 +93,39 @@ class DumpConversionController extends ORMController {
         $this->messages = array();
         $this->errors   = array();
         
-        $this->useDumpConversionFiles();
+        $this->useDumpConversionFiles();/*
 
         $this->dropAndImportLegacyDB($this->tempDumpPGDatabaseName);
 
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // ERASE ALL DATA FROM THE WORKING (TARGET DATABASE) vvvvvv
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        
+
         $this->dropAndSetupTargetDB($this->getDatabaseName());
-        
+
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // ERASE ALL DATA FROM THE WORKING (TARGET DATABASE) ^^^^^^^
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-        /*
+
 
         // connect to imported (legacy) database
         //$dbh = $this->connect();
         $dbh = $this->connectPostgres($this->tempDumpPGDatabaseName);
 
 
+
+
         // trim and NULL empty strings, remove some old records
         $this->cleanUpOldDatabase($dbh);
+
         // assert that certain assumptions hold for the dump (unused fields)
 
         $this->checkOldDatabase($dbh);
 
         // add IF and FIND_IN_SET functionality to temporary dump database
        $this->addSQLFunctions($dbh);
+
 
 
 
@@ -157,8 +161,9 @@ class DumpConversionController extends ORMController {
             $this->runTransaction($task, $dbh);
         }
 
-        $this->enableAutoIncrement($this->propelConnection);
 
+
+        $this->enableAutoIncrement($this->propelConnection);
 
         // dump new database
         $dbname = $this->getDatabaseName();
@@ -170,6 +175,7 @@ class DumpConversionController extends ORMController {
         $this->addLogging(array('dumped to: ' => $dumpfile));
 
 */
+
         $this->useProductionFiles();
 
         return $this->renderWithDomainData('DTAMetadataBundle:DumpConversion:conversionResult.html.twig', array(
@@ -201,7 +207,8 @@ class DumpConversionController extends ORMController {
             //// WARNING: IF DUMP CONVERTION ABORTS AND IS RESTARTED WITHOUT MANUAL MOVING THE PRODUCTION SCHEMA FILES BACK IN PLACE, THE DUMPCONVERSION SCHEMA FILES ARE CONSIDERED AS PRODUCTION FILES!!!
             //copy("$dumpConversionSchemasDir/../config/$schema", "$dumpConversionSchemasDir/../schemas_final/$schema");
 
-            $this->addLogging(array("bringing dump conversion version of $schema into place", shell_exec("cp $dumpConversionSchemasDir/$schema $dumpConversionSchemasDir/../config/$schema")));
+            $command = "cp $dumpConversionSchemasDir/$schema $dumpConversionSchemasDir/../config/$schema 2>&1";
+            $this->addLogging(array("bringing dump conversion version of $schema into place ($command)", shell_exec($command)));
         }
         // build propel entity classes
         $this->addLogging(array('building model from dump conversion schemas', shell_exec("$this->phpExec ../app/console propel:model:build")));
@@ -212,11 +219,12 @@ class DumpConversionController extends ORMController {
         // current working directory is web
         $productionSchemasDir = "../src/DTA/MetadataBundle/Resources/schemas_final";
         foreach (array('dta_data_schema.xml', 'dta_master_schema.xml', 'dta_workflow_schema.xml', 'dta_classification_schema.xml') as $schema) {
+            $command = "cp $productionSchemasDir/$schema $productionSchemasDir/../config/$schema 2>&1";
             $this->addLogging(array(
-                "bringing dump conversion version of $schema into place",
+                "bringing production version of $schema into place ($command)",
                 //system("cp $productionSchemasDir/$schema $productionSchemasDir/../config/$schema")
                 //copy("$productionSchemasDir/$schema","$productionSchemasDir/../config/$schema")
-				shell_exec("cp $productionSchemasDir/$schema productionSchemasDir/../config/$schema")
+				shell_exec($command)
             ));
         }
         // build propel entity classes
