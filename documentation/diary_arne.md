@@ -268,6 +268,10 @@
         for tbl in `psql -qAt -c "select tablename from pg_tables where schemaname = 'public';" dtametadata_new` ; do  psql -c "alter table $tbl owner to dtametadata" dtametadata_new ; done
  o new dbcreate comand
 		psql -c "CREATE DATABASE dtametadata_new2 OWNER = dtametadata TEMPLATE = template0 ENCODING = 'UTF8'"
+ o preconditions to use the dumpConversionScript on khan:
+		CREATE ROLE "www-data" with CREATEDB LOGIN IN ROLE dtametadata;
+		CREATE DATABASE "www-data";
+ 
  
  TODO:
  o Tab-Constraint DONE

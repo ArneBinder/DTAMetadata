@@ -27,7 +27,7 @@ class DumpConversionController extends ORMController {
     private $sourceDatabase  = 'dtadb'; //will be created if it does not exist
     private $sourceDumpPath  = '../dbdumps/server_2015-01-22/dtaq_partiell-pgsql.sql'; //'../dbdumps/dtadb_2013-09-29_07-10-01.sql';//'/Users/macbookdata/Dropbox/DTA/dumpConversion/dtadb_2013-09-29_07-10-01.sql';
 
-    private $tempDumpPGDatabaseName = 'temp_dump3';
+    private $tempDumpPGDatabaseName = 'temp_dump5';
 
     // This dump file can be used to import into the production system
     private $targetDumpPath = '../dbdumps/dtadb_pg';
@@ -276,7 +276,7 @@ class DumpConversionController extends ORMController {
         // MYSQL
         // $importDumpCommand = "$this->mysqlExec -u $this->sourceUsername -p$this->sourcePassword $this->sourceDatabase < $this->sourceDumpPath";
         // POSTGRES
-        $importDumpCommand = "$this->psqlExec -U $dbUser -d $databaseName -f $this->sourceDumpPath 2>&1";
+        $importDumpCommand = "$this->psqlExec -d $databaseName -f $this->sourceDumpPath 2>&1";
         $this->addLogging(array("import dump command: " => $importDumpCommand));
         //system($importDumpCommand);
         $this->addLogging(array(shell_exec($importDumpCommand)));
