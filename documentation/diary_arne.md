@@ -272,6 +272,17 @@
 		CREATE ROLE "www-data" with CREATEDB LOGIN IN ROLE dtametadata;
 		CREATE DATABASE "www-data";
 		ALTER ROLE dtametadata WITH SUPERUSER;
+ o to get all sequences in current db:
+		SELECT relname
+		FROM pg_class
+		WHERE relkind = 'S'
+		AND relnamespace IN (
+			SELECT oid
+			FROM pg_namespace
+			WHERE nspname NOT LIKE 'pg_%'
+			AND nspname != 'information_schema'
+		) order by relname;
+ o conversion: CHECK FOR "FAILED" IN MESSAGES!
  
  
  TODO:

@@ -73,7 +73,7 @@ class DumpConversionController extends ORMController {
     function connectPostgres($databaseName){
         $dsn = "pgsql:dbname=" . $databaseName . ";host=" . $this->getDatabaseHost();
         try {
-            $this->addLogging("connect via $dsn...");
+            $this->addLogging(array("connect via $dsn..."=>""));
             $pdo = new \PDO($dsn, $this->getDatabaseUser(), $this->getDatabasePass());
             return $pdo;
         } catch (\PDOException $e) {
@@ -203,7 +203,7 @@ class DumpConversionController extends ORMController {
         foreach (array('dta_data_schema.xml', 'dta_master_schema.xml', 'dta_workflow_schema.xml', 'dta_classification_schema.xml') as $schema) {
             //$command = "cp $expandedSchemaFilesDir/$schema $expandedSchemaFilesDir/../config/$schema 2>&1";
             $this->addLogging(array(
-                "bringing $schema from $schemaFilesDir into place",
+                "bringing $schema from $schemaFilesDir into place" =>
                 //system("cp $productionSchemasDir/$schema $productionSchemasDir/../config/$schema")
                 copy("$expandedSchemaFilesDir/$schema","$expandedSchemaFilesDir/../config/$schema")
                 //shell_exec($command)
@@ -212,7 +212,7 @@ class DumpConversionController extends ORMController {
         }
         // build propel entity classes
         //$this->addLogging(array('building model from production schemas', system("$this->phpExec ../app/console propel:model:build")));
-        $this->addLogging(array("building model from $schemaFilesDir", shell_exec("$this->phpExec ../app/console propel:model:build 2>&1")));
+        $this->addLogging(array("building model from $schemaFilesDir" => shell_exec("$this->phpExec ../app/console propel:model:build 2>&1")));
     }
 
 
@@ -228,7 +228,7 @@ class DumpConversionController extends ORMController {
         $activeCount = $stmt->fetch()['count'] -1;
         $stmt->closeCursor();
         $stmt = null; // IMPORTANT TO CLOSE _THIS_ CONNECTION!
-        $this->addLogging(array("count of active connections to $databaseName",$activeCount));
+        $this->addLogging(array("count of active connections to $databaseName" => "$activeCount"));
         if($activeCount > 0){
             if($close){
                 // WARNING: Notice that if you use PostgreSQL version 9.1 or earlier, use the procpid column instead of the pid column because PostgreSQL changed procid column to pid column since version 9.2
@@ -246,9 +246,9 @@ class DumpConversionController extends ORMController {
 
     function recreateDatabase($databaseName, $dbUser){
         $deleteCommand = "$this->psqlExec -c \"DROP DATABASE $databaseName\" 2>&1";
-        $this->addLogging(array("delete $databaseName with command $deleteCommand:", shell_exec($deleteCommand)));
+        $this->addLogging(array("delete $databaseName with command $deleteCommand:" => shell_exec($deleteCommand)));
         $createCommand = "$this->psqlExec -c \"CREATE DATABASE $databaseName OWNER = $dbUser TEMPLATE = template0 ENCODING = 'UTF8'\" 2>&1";
-        $this->addLogging(array("recreate $databaseName with command $createCommand:",shell_exec($createCommand)));
+        $this->addLogging(array("recreate $databaseName with command $createCommand:" => shell_exec($createCommand)));
     }
 
     function dropAndImportLegacyDB($databaseName){
@@ -269,9 +269,8 @@ class DumpConversionController extends ORMController {
         // $importDumpCommand = "$this->mysqlExec -u $this->sourceUsername -p$this->sourcePassword $this->sourceDatabase < $this->sourceDumpPath";
         // POSTGRES
         $importDumpCommand = "$this->psqlExec -d $databaseName -f $this->sourceDumpPath 2>&1";
-        $this->addLogging(array("import dump command: " => $importDumpCommand));
         //system($importDumpCommand);
-        $this->addLogging(array(shell_exec($importDumpCommand)));
+        $this->addLogging(array("import dump ($importDumpCommand): " => shell_exec($importDumpCommand)));
     }
 
     function dropAndSetupTargetDB($databaseName){
@@ -1619,7 +1618,7 @@ class DumpConversionController extends ORMController {
                 $colName = $col['column_name'];
                 //delete NOT NULL constraint from textual column, if necessary
                 if($col['is_nullable'] === 'NO'){
-                    $this->addLogging(array("drop not null","ALTER TABLE \"$relation\" ALTER COLUMN \"$colName\" DROP NOT NULL"));
+                    $this->addLogging(array("drop not null" => "ALTER TABLE \"$relation\" ALTER COLUMN \"$colName\" DROP NOT NULL"));
                     $stmt = $dbh->prepare("ALTER TABLE \"$relation\" ALTER COLUMN \"$colName\" DROP NOT NULL");
                     $stmt->execute();
                 }
@@ -1808,6 +1807,14 @@ class DumpConversionController extends ORMController {
     }
 
     private function addLogging($messageWithCaption, $type='message'){
+        if(!is_array($messageWithCaption)){
+            throw new \InvalidArgumentException("The argument \"messageWithCaption\" has to be an array.");
+        }
+        foreach($messageWithCaption as $caption => $message){
+            if (strpos(strtolower($message),'failed') !== false) {
+                $type = 'error';
+            }
+        }
         $arraytype = $type.'s';
         if(!isset($this->$arraytype)){
             throw new \InvalidArgumentException("$arraytype is not defined.");
