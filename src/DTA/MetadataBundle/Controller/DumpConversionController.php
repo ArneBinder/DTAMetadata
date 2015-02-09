@@ -12,8 +12,10 @@ use Exception;
  *
  * Preconditions:
  *   - postgreSQL has to be installed and running
- *   - the PostgreSQL user <database_user> (defined via parameters.yml) has to exist WITH SUPERUSER;
- *   - the PostgreSQL user "www-data" has to exist WITH CREATEDB LOGIN IN ROLE <database_user>;
+ *   - the PostgreSQL user <database_user> (defined via parameters.yml) has to exist WITH SUPERUSER:
+ *          CREATE ROLE <database_user> WITH SUPERUSER;
+ *   - the PostgreSQL user <user> has to exist WITH CREATEDB LOGIN IN ROLE <database_user>; <user> is either "www-data"(server) or the windows user name (local):
+ *          CREATE ROLE <user> with CREATEDB LOGIN IN ROLE <database_user>;
  *   - the PostgreSQL dump file which contains the data to convert
  */
 class DumpConversionController extends ORMController {
@@ -238,12 +240,12 @@ class DumpConversionController extends ORMController {
 
     function recreateDatabase($databaseName, $dbUser){
         $this->deleteDatabase($databaseName);
-        $createCommand = "$this->psqlExec -c \"CREATE DATABASE $databaseName OWNER = $dbUser TEMPLATE = template0 ENCODING = 'UTF8'\" 2>&1";
+        $createCommand = "$this->psqlExec postgres -c \"CREATE DATABASE $databaseName OWNER = $dbUser TEMPLATE = template0 ENCODING = 'UTF8'\" 2>&1";
         $this->addLogging(array("recreate $databaseName with command $createCommand:" => shell_exec($createCommand)));
     }
 
     function deleteDatabase($databaseName){
-        $deleteCommand = "$this->psqlExec -c \"DROP DATABASE $databaseName\" 2>&1";
+        $deleteCommand = "$this->psqlExec postgres -c \"DROP DATABASE $databaseName\" 2>&1";
         $this->addLogging(array("delete $databaseName with command $deleteCommand:" => shell_exec($deleteCommand)));
     }
 
