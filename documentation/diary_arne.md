@@ -272,7 +272,7 @@
 		CREATE ROLE "www-data" with CREATEDB LOGIN IN ROLE dtametadata;
 		CREATE DATABASE "www-data";
 		ALTER ROLE dtametadata WITH SUPERUSER;
- o to get all sequences in current db:
+ o to get all sequences in current db (http://www.alberton.info/postgresql_meta_info.html):
 		SELECT relname
 		FROM pg_class
 		WHERE relkind = 'S'
@@ -282,7 +282,11 @@
 			WHERE nspname NOT LIKE 'pg_%'
 			AND nspname != 'information_schema'
 		) order by relname;
- o conversion: CHECK FOR "FAILED" IN MESSAGES!
+ o conversion: CHECK FOR "FAILED" IN MESSAGES! --> displayed as "error"
+ o current ToDo: 
+		- fix convertMultiVolumes
+		- fix duplicated entries in table_row_view (all publications)
+ 
  
  
  TODO:
