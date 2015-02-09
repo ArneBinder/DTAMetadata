@@ -45,7 +45,11 @@ clearCache:
     defaults:  { _controller: DTAMetadataBundle:MasterDomain:clearCache, applicationMode: 'dev' }
     requirements:
         applicationMode:  (dev|prod)
-  
+
+rebuildPropelModel:
+    path:      /Admin/RebuildPropelModel
+    defaults:  { _controller: DTAMetadataBundle:MasterDomain:rebuildPropelModel }
+
 sourceMonitor:
   path: /Dev/sourceMonitor
   defaults: { _controller: DTAMetadataBundle:MasterDomain:sourceMonitor }

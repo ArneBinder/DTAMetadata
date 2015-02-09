@@ -123,6 +123,19 @@ class MasterDomainController extends ORMController {
         return \Symfony\Component\HttpFoundation\Response::create($result);
         
     }
+
+    public function rebuildPropelModelAction(Request $request){
+        $phpBinary = exec("which php");
+        echo $phpBinary." -- ";
+        $workingDirectory = exec("pwd");
+        echo exec("whoami")." -- ";
+//        echo implode(DIRECTORY_SEPARATOR, array($workingDirectory, '..', 'app', 'cache', 'dev'));
+        $propelRebuildCommand = "$phpBinary $workingDirectory/../app/console propel:model:build 2>&1";
+        echo $propelRebuildCommand;
+        $result = exec($propelRebuildCommand);
+        echo "rebuild propel model";
+        return \Symfony\Component\HttpFoundation\Response::create($result);
+    }
     
     /**
      * Only for development purposes.

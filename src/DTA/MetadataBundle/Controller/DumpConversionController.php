@@ -197,47 +197,6 @@ class DumpConversionController extends ORMController {
         echo $task." ".$time_taken;
         $this->addLogging(array("finished transaction ".$task=>$time_taken));
     }
-    
-    /** Use the schema files for dump conversion */
-    /*function useDumpConversionFiles(){
-        // current working directory is web
-        $dumpConversionSchemasDir = "../src/DTA/MetadataBundle/Resources/schemas_dumpConversion";
-        foreach (array('dta_data_schema.xml', 'dta_master_schema.xml', 'dta_workflow_schema.xml', 'dta_classification_schema.xml') as $schema) {
-            
-            // backup current version in config as production file
-            //// WARNING: IF DUMP CONVERTION ABORTS AND IS RESTARTED WITHOUT MANUAL MOVING THE PRODUCTION SCHEMA FILES BACK IN PLACE, THE DUMPCONVERSION SCHEMA FILES ARE CONSIDERED AS PRODUCTION FILES!!!
-            //copy("$dumpConversionSchemasDir/../config/$schema", "$dumpConversionSchemasDir/../schemas_final/$schema");
-
-            $command = "cp $dumpConversionSchemasDir/$schema $dumpConversionSchemasDir/../config/$schema 2>&1";
-            //$this->addLogging(array("bringing dump conversion version of $schema into place ($command)", shell_exec($command)));
-            $this->addLogging(array(
-                "bringing dump conversion version of $schema into place",
-                //shell_exec($command)
-                copy("$dumpConversionSchemasDir/$schema", "$dumpConversionSchemasDir/../config/$schema")
-            ));
-        }
-        // build propel entity classes
-        $this->addLogging(array('building model from dump conversion schemas', shell_exec("$this->phpExec ../app/console propel:model:build")));
-    }*/
-    
-    /** Use the schema files for dump conversion */
-    /*function useProductionFiles(){
-        // current working directory is web
-        $productionSchemasDir = "../src/DTA/MetadataBundle/Resources/schemas_final";
-        foreach (array('dta_data_schema.xml', 'dta_master_schema.xml', 'dta_workflow_schema.xml', 'dta_classification_schema.xml') as $schema) {
-            $command = "cp $productionSchemasDir/$schema $productionSchemasDir/../config/$schema 2>&1";
-            $this->addLogging(array(
-                "bringing production version of $schema into place",
-                //system("cp $productionSchemasDir/$schema $productionSchemasDir/../config/$schema")
-                copy("$productionSchemasDir/$schema","$productionSchemasDir/../config/$schema")
-				//shell_exec($command)
-            ));
-
-        }
-        // build propel entity classes
-        //$this->addLogging(array('building model from production schemas', system("$this->phpExec ../app/console propel:model:build")));
-        $this->addLogging(array('building model from production schemas', shell_exec("$this->phpExec ../app/console propel:model:build")));
-    }*/
 
     function useSchemaFiles($schemaFilesDir){
         $expandedSchemaFilesDir = "../src/DTA/MetadataBundle/Resources/$schemaFilesDir";
