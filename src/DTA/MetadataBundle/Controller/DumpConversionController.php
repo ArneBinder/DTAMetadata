@@ -11,20 +11,21 @@ use Exception;
  * into new database schema by carl witt.
  *
  * Preconditions:
- *   - mySQL, postgreSQL have to be installed and running
- *   - the mySQL user ($sourceUsername) and the postgreSQL user (defined via parameters.yml) have to exist
- *   - the mySQL dump file which contains the data to convert
+ *   - postgreSQL has to be installed and running
+ *   - the PostgreSQL user <database_user> (defined via parameters.yml) has to exist WITH SUPERUSER;
+ *   - the PostgreSQL user "www-data" has to exist WITH CREATEDB LOGIN IN ROLE <database_user>;
+ *   - the PostgreSQL dump file which contains the data to convert
  */
 class DumpConversionController extends ORMController {
     
     /**
      * Configure
-     * source: the mysql database where the dump will be imported to extract the data from
+     * source: the postgres database where the dump will be imported to extract the data from
      * target: the postgres database which will contain the converted data (the connection parameters from parameters.yml are used)
      */
-    private $sourceUsername  = 'root';
-    private $sourcePassword  = 'root'; //garamond4000
-    private $sourceDatabase  = 'dtadb'; //will be created if it does not exist
+    //private $sourceUsername  = 'root';
+    //private $sourcePassword  = 'root'; //garamond4000
+    //private $sourceDatabase  = 'dtadb'; //will be created if it does not exist
     private $sourceDumpPath  = '../dbdumps/server_2015-01-22/dtaq_partiell-pgsql_www-data.sql'; //'../dbdumps/dtadb_2013-09-29_07-10-01.sql';//'/Users/macbookdata/Dropbox/DTA/dumpConversion/dtadb_2013-09-29_07-10-01.sql';
 
     private $tempDumpPGDatabaseName = 'temp_dump2';
@@ -33,12 +34,11 @@ class DumpConversionController extends ORMController {
     private $targetDumpPath = '../dbdumps/dtadb_pg';
 
     /** Used programs */
-    private $mysqlExec  = 'mysql'; //added "C:\Program Files\MySQL\MySQL Server 5.6\bin" to $PATH
+    //private $mysqlExec  = 'mysql'; //added "C:\Program Files\MySQL\MySQL Server 5.6\bin" to $PATH
     private $psqlExec = 'psql';
-    private $pgDropDB = 'dropdb';
-    private $pgCreateDB = 'createdb';
+    //private $pgDropDB = 'dropdb';
+    //private $pgCreateDB = 'createdb';
     private $phpExec   = 'php'; //'/usr/local/php5/bin/php';
-    //private $psql = 'psql';
 
     /** Stores problematic actions taken in the conversion process. */
     private $messages;
@@ -157,6 +157,8 @@ class DumpConversionController extends ORMController {
 
         $this->enableAutoIncrement($this->propelConnection);
         $this->useSchemaFiles("schemas_final");
+
+        $this->deleteDatabase($this->tempDumpPGDatabaseName);
 /*
         // dump new database
         $dbname = $this->getDatabaseName();
@@ -235,10 +237,14 @@ class DumpConversionController extends ORMController {
     }
 
     function recreateDatabase($databaseName, $dbUser){
-        $deleteCommand = "$this->psqlExec -c \"DROP DATABASE $databaseName\" 2>&1";
-        $this->addLogging(array("delete $databaseName with command $deleteCommand:" => shell_exec($deleteCommand)));
+        $this->deleteDatabase($databaseName);
         $createCommand = "$this->psqlExec -c \"CREATE DATABASE $databaseName OWNER = $dbUser TEMPLATE = template0 ENCODING = 'UTF8'\" 2>&1";
         $this->addLogging(array("recreate $databaseName with command $createCommand:" => shell_exec($createCommand)));
+    }
+
+    function deleteDatabase($databaseName){
+        $deleteCommand = "$this->psqlExec -c \"DROP DATABASE $databaseName\" 2>&1";
+        $this->addLogging(array("delete $databaseName with command $deleteCommand:" => shell_exec($deleteCommand)));
     }
 
     function dropAndImportLegacyDB($databaseName){
