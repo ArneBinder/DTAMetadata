@@ -27,7 +27,7 @@ class DumpConversionController extends ORMController {
     private $sourceDatabase  = 'dtadb'; //will be created if it does not exist
     private $sourceDumpPath  = '../dbdumps/server_2015-01-22/dtaq_partiell-pgsql.sql'; //'../dbdumps/dtadb_2013-09-29_07-10-01.sql';//'/Users/macbookdata/Dropbox/DTA/dumpConversion/dtadb_2013-09-29_07-10-01.sql';
 
-    private $tempDumpPGDatabaseName = 'temp_dump2';
+    private $tempDumpPGDatabaseName = 'temp_dump3';
 
     // This dump file can be used to import into the production system
     private $targetDumpPath = '../dbdumps/dtadb_pg';
@@ -107,6 +107,8 @@ class DumpConversionController extends ORMController {
         // ERASE ALL DATA FROM THE WORKING (TARGET DATABASE) ^^^^^^^
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+        /*
+
         // connect to imported (legacy) database
         //$dbh = $this->connect();
         $dbh = $this->connectPostgres($this->tempDumpPGDatabaseName);
@@ -156,7 +158,7 @@ class DumpConversionController extends ORMController {
         }
 
         $this->enableAutoIncrement($this->propelConnection);
-        $this->useProductionFiles();
+
 
         // dump new database
         $dbname = $this->getDatabaseName();
@@ -167,6 +169,8 @@ class DumpConversionController extends ORMController {
         $this->addLogging(array('dump new database...' => shell_exec("pg_dump -d $dbname -U $dbuser -f $dumpfile")));
         $this->addLogging(array('dumped to: ' => $dumpfile));
 
+*/
+        $this->useProductionFiles();
 
         return $this->renderWithDomainData('DTAMetadataBundle:DumpConversion:conversionResult.html.twig', array(
             'warnings' => $this->warnings,
@@ -248,23 +252,31 @@ class DumpConversionController extends ORMController {
         return $activeCount;
     }
 
+    function recreateDatabase($databaseName, $dbUser){
+        $deleteCommand = "$this->psqlExec -c \"DROP DATABASE $databaseName\" 2>&1";
+        $this->addLogging(array("delete $databaseName with command $deleteCommand:", shell_exec($deleteCommand)));
+        $createCommand = "$this->psqlExec -c \"CREATE DATABASE $databaseName OWNER = $dbUser TEMPLATE = template0 ENCODING = 'UTF8'\" 2>&1";
+        $this->addLogging(array("recreate $databaseName with command $createCommand:",shell_exec($createCommand)));
+    }
+
     function dropAndImportLegacyDB($databaseName){
 
         $this->checkOpenConnections($databaseName, true);
-        $dbuser = $this->getDatabaseUser();
+        $dbUser = $this->getDatabaseUser();
         //recreate source database
+        $this->recreateDatabase($databaseName, $dbUser);
         //MYSQL
         //shell_exec("$this->mysqlExec -u $this->sourceUsername -p$this->sourcePassword -e \"DROP DATABASE IF EXISTS $this->sourceDatabase\"");
         //shell_exec("$this->mysqlExec -u $this->sourceUsername -p$this->sourcePassword -e \"CREATE DATABASE $this->sourceDatabase\"");
         //POSTGRES
-        $this->addLogging(array("delete $databaseName:", shell_exec("$this->pgDropDB -U $dbuser --if-exists $databaseName 2>&1")));
-        $this->addLogging(array("recreate $databaseName:",shell_exec("$this->pgCreateDB -U $dbuser -E UTF8 -T template0 $databaseName 2>&1")));
+       // $this->addLogging(array("delete $databaseName:", shell_exec("$this->psqlExec -c \"DROP DATABASE $databaseName\" 2>&1")));
+       // $this->addLogging(array("recreate $databaseName:",shell_exec("$this->psqlExec -c \"CREATE DATABASE $databaseName OWNER = $dbuser TEMPLATE = template0\" 2>&1")));
 
         // import dump
         // MYSQL
         // $importDumpCommand = "$this->mysqlExec -u $this->sourceUsername -p$this->sourcePassword $this->sourceDatabase < $this->sourceDumpPath";
         // POSTGRES
-        $importDumpCommand = "$this->psqlExec -U $dbuser -d $databaseName -f $this->sourceDumpPath 2>&1";
+        $importDumpCommand = "$this->psqlExec -U $dbUser -d $databaseName -f $this->sourceDumpPath 2>&1";
         $this->addLogging(array("import dump command: " => $importDumpCommand));
         //system($importDumpCommand);
         $this->addLogging(array(shell_exec($importDumpCommand)));
@@ -275,9 +287,10 @@ class DumpConversionController extends ORMController {
         $this->checkOpenConnections($databaseName, true);
         //recreate target database
         //$dbname = $this->getDatabaseName();
-        $dbuser = $this->getDatabaseUser();
-        $this->addLogging(array("delete $databaseName:", shell_exec("$this->pgDropDB -U $dbuser --if-exists $databaseName 2>&1")));
-        $this->addLogging(array("recreate $databaseName:", shell_exec("$this->pgCreateDB -U $dbuser -E UTF8 -T template0 $databaseName 2>&1")));
+        //$dbuser = $this->getDatabaseUser();
+        $this->recreateDatabase($databaseName, $this->getDatabaseUser());
+       // $this->addLogging(array("delete $databaseName:", shell_exec("$this->pgDropDB -U $dbuser --if-exists $databaseName 2>&1")));
+       // $this->addLogging(array("recreate $databaseName:", shell_exec("$this->pgCreateDB -U $dbuser -E UTF8 -T template0 $databaseName 2>&1")));
         // build current database schema
         //$resultBuildDBCode = system("$this->phpExec ../app/console propel:sql:build");
         $resultBuildDBCode = shell_exec("$this->phpExec ../app/console propel:sql:build");

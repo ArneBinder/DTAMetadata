@@ -262,7 +262,12 @@
  o current TODO:
     - fix convertMultiVolume
     - fix doublets in table_row_view of Publications 
- 
+  
+2015-02-09
+ o to change owner of all tables in a database (fixes access error on server):
+        for tbl in `psql -qAt -c "select tablename from pg_tables where schemaname = 'public';" dtametadata_new` ; do  psql -c "alter table $tbl owner to dtametadata" dtametadata_new ; done
+ o new dbcreate comand
+		psql -c "CREATE DATABASE dtametadata_new2 OWNER = dtametadata TEMPLATE = template0 ENCODING = 'UTF8'"
  
  TODO:
  o Tab-Constraint DONE
