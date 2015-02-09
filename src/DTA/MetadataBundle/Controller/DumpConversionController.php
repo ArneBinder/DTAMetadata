@@ -108,12 +108,9 @@ class DumpConversionController extends ORMController {
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
-
         // connect to imported (legacy) database
         //$dbh = $this->connect();
         $dbh = $this->connectPostgres($this->tempDumpPGDatabaseName);
-
-
 
 
         // trim and NULL empty strings, remove some old records
@@ -124,17 +121,15 @@ class DumpConversionController extends ORMController {
         $this->checkOldDatabase($dbh);
 
         // add IF and FIND_IN_SET functionality to temporary dump database
-       $this->addSQLFunctions($dbh);
+        $this->addSQLFunctions($dbh);
 
-
-
-
+		
         $this->propelConnection = \Propel::getConnection(Model\Master\DtaUserPeer::DATABASE_NAME);
         $this->addLogging(array('message' => 'transaction begun on '.Model\Master\DtaUserPeer::DATABASE_NAME));
 
 
         $this->createTaskTypes();
-/*
+
         // names of the functions to wrap in transaction code
         $conversionTasks = array(
             'convertUsers',                 // users first: they are referenced in "last changed by" columns
@@ -150,9 +145,7 @@ class DumpConversionController extends ORMController {
             'convertAuthors',
             'convertSingleFieldPersons',
             'convertSeries',
-            'convertMultiVolumes',
-            //'convertGenres',
-            //'convertTags',
+            //'convertMultiVolumes',
             );
 
 
@@ -160,7 +153,6 @@ class DumpConversionController extends ORMController {
         foreach ($conversionTasks as $task){
             $this->runTransaction($task, $dbh);
         }
-*/
 
 
         $this->enableAutoIncrement($this->propelConnection);
@@ -176,8 +168,6 @@ class DumpConversionController extends ORMController {
         $this->addLogging(array('dumped to: ' => $dumpfile));
 
 */
-
-
 
         return $this->renderWithDomainData('DTAMetadataBundle:DumpConversion:conversionResult.html.twig', array(
             'warnings' => $this->warnings,
@@ -1811,7 +1801,7 @@ class DumpConversionController extends ORMController {
             throw new \InvalidArgumentException("The argument \"messageWithCaption\" has to be an array.");
         }
         foreach($messageWithCaption as $caption => $message){
-            if (strpos(strtolower($message),'failed') !== false) {
+            if (strpos(strtolower($message),'failed') !== false or strpos(strtolower($message),'fehler') !== false or strpos(strtolower($message),'error') !== false) {
                 $type = 'error';
             }
         }
