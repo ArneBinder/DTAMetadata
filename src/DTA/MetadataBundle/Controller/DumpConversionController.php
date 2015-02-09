@@ -92,8 +92,8 @@ class DumpConversionController extends ORMController {
         $this->warnings = array();
         $this->messages = array();
         $this->errors   = array();
-        
-        $this->useDumpConversionFiles();
+
+        $this->useSchemaFiles("schemas_dumpConversion");
 
         $this->dropAndImportLegacyDB($this->tempDumpPGDatabaseName);
 
@@ -163,8 +163,8 @@ class DumpConversionController extends ORMController {
 */
 
 
-     //   $this->enableAutoIncrement($this->propelConnection);
-        $this->useProductionFiles();
+        $this->enableAutoIncrement($this->propelConnection);
+        $this->useSchemaFiles("schemas_final");
 /*
         // dump new database
         $dbname = $this->getDatabaseName();
@@ -199,7 +199,7 @@ class DumpConversionController extends ORMController {
     }
     
     /** Use the schema files for dump conversion */
-    function useDumpConversionFiles(){
+    /*function useDumpConversionFiles(){
         // current working directory is web
         $dumpConversionSchemasDir = "../src/DTA/MetadataBundle/Resources/schemas_dumpConversion";
         foreach (array('dta_data_schema.xml', 'dta_master_schema.xml', 'dta_workflow_schema.xml', 'dta_classification_schema.xml') as $schema) {
@@ -218,10 +218,10 @@ class DumpConversionController extends ORMController {
         }
         // build propel entity classes
         $this->addLogging(array('building model from dump conversion schemas', shell_exec("$this->phpExec ../app/console propel:model:build")));
-    }
+    }*/
     
     /** Use the schema files for dump conversion */
-    function useProductionFiles(){
+    /*function useProductionFiles(){
         // current working directory is web
         $productionSchemasDir = "../src/DTA/MetadataBundle/Resources/schemas_final";
         foreach (array('dta_data_schema.xml', 'dta_master_schema.xml', 'dta_workflow_schema.xml', 'dta_classification_schema.xml') as $schema) {
@@ -237,7 +237,25 @@ class DumpConversionController extends ORMController {
         // build propel entity classes
         //$this->addLogging(array('building model from production schemas', system("$this->phpExec ../app/console propel:model:build")));
         $this->addLogging(array('building model from production schemas', shell_exec("$this->phpExec ../app/console propel:model:build")));
+    }*/
+
+    function useSchemaFiles($schemaFilesDir){
+        $expandedSchemaFilesDir = "../src/DTA/MetadataBundle/Resources/$schemaFilesDir";
+        foreach (array('dta_data_schema.xml', 'dta_master_schema.xml', 'dta_workflow_schema.xml', 'dta_classification_schema.xml') as $schema) {
+            //$command = "cp $expandedSchemaFilesDir/$schema $expandedSchemaFilesDir/../config/$schema 2>&1";
+            $this->addLogging(array(
+                "bringing $schema from $schemaFilesDir into place",
+                //system("cp $productionSchemasDir/$schema $productionSchemasDir/../config/$schema")
+                copy("$expandedSchemaFilesDir/$schema","$expandedSchemaFilesDir/../config/$schema")
+                //shell_exec($command)
+            ));
+
+        }
+        // build propel entity classes
+        //$this->addLogging(array('building model from production schemas', system("$this->phpExec ../app/console propel:model:build")));
+        $this->addLogging(array("building model from $schemaFilesDir", shell_exec("$this->phpExec ../app/console propel:model:build 2>&1")));
     }
+
 
     private function  checkOpenConnections($databaseName, $close = false){
         try {
