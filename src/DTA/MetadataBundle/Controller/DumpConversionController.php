@@ -25,9 +25,9 @@ class DumpConversionController extends ORMController {
     private $sourceUsername  = 'root';
     private $sourcePassword  = 'root'; //garamond4000
     private $sourceDatabase  = 'dtadb'; //will be created if it does not exist
-    private $sourceDumpPath  = '../dbdumps/server_2015-01-22/dtaq_partiell-pgsql.sql'; //'../dbdumps/dtadb_2013-09-29_07-10-01.sql';//'/Users/macbookdata/Dropbox/DTA/dumpConversion/dtadb_2013-09-29_07-10-01.sql';
+    private $sourceDumpPath  = '../dbdumps/server_2015-01-22/dtaq_partiell-pgsql_www-data.sql'; //'../dbdumps/dtadb_2013-09-29_07-10-01.sql';//'/Users/macbookdata/Dropbox/DTA/dumpConversion/dtadb_2013-09-29_07-10-01.sql';
 
-    private $tempDumpPGDatabaseName = 'temp_dump8';
+    private $tempDumpPGDatabaseName = 'temp_dump2';
 
     // This dump file can be used to import into the production system
     private $targetDumpPath = '../dbdumps/dtadb_pg';
@@ -133,8 +133,8 @@ class DumpConversionController extends ORMController {
         $this->addLogging(array('message' => 'transaction begun on '.Model\Master\DtaUserPeer::DATABASE_NAME));
 
 
-        $this->createTaskTypes();/*
-
+        $this->createTaskTypes();
+/*
         // names of the functions to wrap in transaction code
         $conversionTasks = array(
             'convertUsers',                 // users first: they are referenced in "last changed by" columns
@@ -163,7 +163,7 @@ class DumpConversionController extends ORMController {
 */
 
 
-        $this->enableAutoIncrement($this->propelConnection);
+     //   $this->enableAutoIncrement($this->propelConnection);
         $this->useProductionFiles();
 /*
         // dump new database
@@ -211,7 +211,7 @@ class DumpConversionController extends ORMController {
             $command = "cp $dumpConversionSchemasDir/$schema $dumpConversionSchemasDir/../config/$schema 2>&1";
             //$this->addLogging(array("bringing dump conversion version of $schema into place ($command)", shell_exec($command)));
             $this->addLogging(array(
-                "bringing dump conversion version of $schema into place ($command)",
+                "bringing dump conversion version of $schema into place",
                 //shell_exec($command)
                 copy("$dumpConversionSchemasDir/$schema", "$dumpConversionSchemasDir/../config/$schema")
             ));
@@ -227,7 +227,7 @@ class DumpConversionController extends ORMController {
         foreach (array('dta_data_schema.xml', 'dta_master_schema.xml', 'dta_workflow_schema.xml', 'dta_classification_schema.xml') as $schema) {
             $command = "cp $productionSchemasDir/$schema $productionSchemasDir/../config/$schema 2>&1";
             $this->addLogging(array(
-                "bringing production version of $schema into place ($command)",
+                "bringing production version of $schema into place",
                 //system("cp $productionSchemasDir/$schema $productionSchemasDir/../config/$schema")
                 copy("$productionSchemasDir/$schema","$productionSchemasDir/../config/$schema")
 				//shell_exec($command)
