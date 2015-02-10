@@ -241,12 +241,12 @@ class DumpConversionController extends ORMController {
 
     function recreateDatabase($databaseName, $dbUser){
         $this->deleteDatabase($databaseName);
-        $createCommand = "$this->psqlExec postgres -c \"CREATE DATABASE $databaseName OWNER = $dbUser TEMPLATE = template0 ENCODING = 'UTF8'\" 2>&1";
+        $createCommand = "$this->psqlExec -d postgres -c \"CREATE DATABASE $databaseName OWNER = $dbUser TEMPLATE = template0 ENCODING = 'UTF8'\" 2>&1";
         $this->addLogging(array("recreate $databaseName with command $createCommand:" => shell_exec($createCommand)));
     }
 
     function deleteDatabase($databaseName){
-        $deleteCommand = "$this->psqlExec postgres -c \"DROP DATABASE $databaseName\" 2>&1";
+        $deleteCommand = "$this->psqlExec -d postgres -c \"DROP DATABASE $databaseName\" 2>&1";
         $this->addLogging(array("delete $databaseName with command $deleteCommand:" => shell_exec($deleteCommand)));
     }
 
@@ -1829,8 +1829,8 @@ class DumpConversionController extends ORMController {
         }else{
             array_push($this->$arraytype, $messageWithCaption);
         }
-        $this->get('logger')->$type(print_r($messageWithCaption,true));
-        //$this->get('logger')->critical("$type: ".print_r($messageWithCaption,true));
+        //$this->get('logger')->$type(print_r($messageWithCaption,true));
+        $this->get('logger')->critical("$type: ".print_r($messageWithCaption,true));
     }
 
 }
