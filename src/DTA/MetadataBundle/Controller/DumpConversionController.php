@@ -189,7 +189,7 @@ class DumpConversionController extends ORMController {
         
         $this->propelConnection->commit();
         $time_taken = microtime(true) - $start;
-        echo $task." ".$time_taken;
+        echo $task." ".$time_taken."<br>";
         $this->addLogging(array("finished transaction ".$task=>$time_taken));
     }
 
@@ -246,56 +246,31 @@ class DumpConversionController extends ORMController {
     }
 
     function deleteDatabase($databaseName){
+        $this->checkOpenConnections($databaseName, true); //close, if open
         $deleteCommand = "$this->psqlExec -d postgres -c \"DROP DATABASE $databaseName\" 2>&1";
         $this->addLogging(array("delete $databaseName with command $deleteCommand:" => shell_exec($deleteCommand)));
     }
 
     function dropAndImportLegacyDB($databaseName){
-
-        $this->checkOpenConnections($databaseName, true);
+        //$this->checkOpenConnections($databaseName, true);
         $dbUser = $this->getDatabaseUser();
-        //recreate source database
         $this->recreateDatabase($databaseName, $dbUser);
-        //MYSQL
-        //shell_exec("$this->mysqlExec -u $this->sourceUsername -p$this->sourcePassword -e \"DROP DATABASE IF EXISTS $this->sourceDatabase\"");
-        //shell_exec("$this->mysqlExec -u $this->sourceUsername -p$this->sourcePassword -e \"CREATE DATABASE $this->sourceDatabase\"");
-        //POSTGRES
-       // $this->addLogging(array("delete $databaseName:", shell_exec("$this->psqlExec -c \"DROP DATABASE $databaseName\" 2>&1")));
-       // $this->addLogging(array("recreate $databaseName:",shell_exec("$this->psqlExec -c \"CREATE DATABASE $databaseName OWNER = $dbuser TEMPLATE = template0\" 2>&1")));
-
-        // import dump
-        // MYSQL
-        // $importDumpCommand = "$this->mysqlExec -u $this->sourceUsername -p$this->sourcePassword $this->sourceDatabase < $this->sourceDumpPath";
-        // POSTGRES
         $importDumpCommand = "$this->psqlExec -d $databaseName -f $this->sourceDumpPath 2>&1";
-        //system($importDumpCommand);
         $this->addLogging(array("import dump ($importDumpCommand): " => shell_exec($importDumpCommand)));
     }
 
     function dropAndSetupTargetDB($databaseName){
-
-        $this->checkOpenConnections($databaseName, true);
-        //recreate target database
-        //$dbname = $this->getDatabaseName();
-        //$dbuser = $this->getDatabaseUser();
         $this->recreateDatabase($databaseName, $this->getDatabaseUser());
-       // $this->addLogging(array("delete $databaseName:", shell_exec("$this->pgDropDB -U $dbuser --if-exists $databaseName 2>&1")));
-       // $this->addLogging(array("recreate $databaseName:", shell_exec("$this->pgCreateDB -U $dbuser -E UTF8 -T template0 $databaseName 2>&1")));
-        // build current database schema
-        //$resultBuildDBCode = system("$this->phpExec ../app/console propel:sql:build");
         $resultBuildDBCode = shell_exec("$this->phpExec ../app/console propel:sql:build 2>&1");
         $this->addLogging(array("building database schema from xml model: " => $resultBuildDBCode ));
         
         // import current database schema to target database (ERASES ALL DATA)
-        //$resultSetupDB = system("$this->phpExec ../app/console propel:sql:insert --force");
         $resultSetupDB = shell_exec("$this->phpExec ../app/console propel:sql:insert --force 2>&1");
         $this->addLogging(array("resetting target database: " => $resultSetupDB));
         
         // loads fixtures (task types, name fragment types, etc.)
-        //$resultFixturesLoad = system("$this->phpExec ../app/console propel:fixtures:load @DTAMetadataBundle");
         $resultFixturesLoad = shell_exec("$this->phpExec ../app/console propel:fixtures:load @DTAMetadataBundle 2>&1");
         $this->addLogging(array("loading database fixtures: " => $resultFixturesLoad));
-        
     }
     
     
@@ -1810,7 +1785,7 @@ class DumpConversionController extends ORMController {
             throw new \InvalidArgumentException("The argument \"messageWithCaption\" has to be an array.");
         }
         foreach($messageWithCaption as $caption => $message){
-            if (strpos(strtolower($message),'failed') !== false or strpos(strtolower($message),'fehler') !== false or strpos(strtolower($message),'error') !== false) {
+            if (strpos(strtolower($message),'failed') !== false or strpos(strtolower($message),'fehler') !== false or strpos(strtolower($message),'error') !== false or strpos(strtolower($message),'fatal') !== false) {
                 $type = 'error';
             }
         }
