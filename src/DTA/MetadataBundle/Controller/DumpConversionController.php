@@ -46,6 +46,7 @@ class DumpConversionController extends ORMController {
     private $messages;
     private $warnings;
     private $errors;
+    private $maxMessageArraySize = 1000;
     
     /** Connection used in the target database, can be used to wrap multiple queries in a single transaction for a small speedup. */
     private $propelConnection;
@@ -1817,7 +1818,11 @@ class DumpConversionController extends ORMController {
         if(!isset($this->$arraytype)){
             throw new \InvalidArgumentException("$arraytype is not defined.");
         }
-        array_push($this->$arraytype, $messageWithCaption);
+        if(count($this->$arraytype) == $this->maxMessageArraySize + 1){
+            $this->$arraytype[$this->maxMessageArraySize] = "...";
+        }else{
+            array_push($this->$arraytype, $messageWithCaption);
+        }
         $this->get('logger')->critical("$type: ".print_r($messageWithCaption,true));
     }
 
