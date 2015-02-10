@@ -1818,8 +1818,10 @@ class DumpConversionController extends ORMController {
         if(!isset($this->$arraytype)){
             throw new \InvalidArgumentException("$arraytype is not defined.");
         }
-        if(count($this->$arraytype) == $this->maxMessageArraySize + 1){
-            $this->$arraytype[$this->maxMessageArraySize] = "...";
+        if(count($this->$arraytype) > $this->maxMessageArraySize){
+			array_pop($this->$arraytype);
+			array_push($this->$arraytype, array("..."=>"The array was cut to prevent memory issues. Have a look into the log file to view all entries."));
+            //$this->$arraytype[count($this->$arraytype)-1] = "... (The array was cut to prevent memory issues. Have a look into the log file to view all entries.)";
         }else{
             array_push($this->$arraytype, $messageWithCaption);
         }
