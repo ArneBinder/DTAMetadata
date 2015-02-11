@@ -154,7 +154,7 @@ monolog:
             handler: file
         file:
             type: stream
-            level: critical
+            level: info
         syslog:
             type: syslog
             level: error

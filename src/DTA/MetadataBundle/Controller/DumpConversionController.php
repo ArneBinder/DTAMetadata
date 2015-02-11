@@ -148,7 +148,7 @@ class DumpConversionController extends ORMController {
             'convertAuthors',
             'convertSingleFieldPersons',
             'convertSeries',
-            //'convertMultiVolumes',
+            'convertMultiVolumes',
             );
 
 
@@ -1804,8 +1804,8 @@ class DumpConversionController extends ORMController {
         }else{
             array_push($this->$arraytype, $messageWithCaption);
         }
-        //$this->get('logger')->$type(print_r($messageWithCaption,true));
-        $this->get('logger')->critical("$type: ".print_r($messageWithCaption,true));
+        $this->get('logger')->$type(print_r($messageWithCaption,true));
+        //$this->get('logger')->critical("$type: ".print_r($messageWithCaption,true));
     }
 
 }
