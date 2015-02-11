@@ -88,7 +88,7 @@ class DumpConversionController extends ORMController {
     function convertAction() {
 
         // during conversion, a lot of memory is allocated
-        ini_set('memory_limit', '1200M');
+        ini_set('memory_limit', -1); //'1200M'
         ini_set('max_execution_time', 1800); //300 seconds = 5 minutes
         //
         // stores warning messages generated during the conversion
@@ -148,7 +148,7 @@ class DumpConversionController extends ORMController {
             'convertAuthors',
             'convertSingleFieldPersons',
             'convertSeries',
-            'convertMultiVolumes',
+            //'convertMultiVolumes',
             );
 
 
@@ -221,21 +221,34 @@ class DumpConversionController extends ORMController {
         $stmt = $dbh_temp->prepare("SELECT count(*) FROM pg_stat_activity WHERE datname = '$databaseName'");
         $stmt->execute();
         $activeCount = $stmt->fetch()['count'] -1;
-        $stmt->closeCursor();
-        $stmt = null; // IMPORTANT TO CLOSE _THIS_ CONNECTION!
-        $this->addLogging(array("count of active connections to $databaseName" => "$activeCount"));
+        $this->addLogging(array("count of other active connections to $databaseName" => "$activeCount"));
         if($activeCount > 0){
+			$stmt = $dbh_temp->prepare("SELECT usename FROM pg_stat_activity WHERE datname = '$databaseName'");
+			$stmt->execute();
+			$currentDbUsers = array();
+			foreach($stmt->fetchAll() as $row){
+				$currentDbUsers[] = $row['usename'];
+			}
+            $stmt->closeCursor();
+			$stmt = null; // IMPORTANT TO CLOSE _THIS_ CONNECTION!
+			$this->addLogging(array("users currently connected to $databaseName" => implode(', ',$currentDbUsers)));
             if($close){
                 // WARNING: Notice that if you use PostgreSQL version 9.1 or earlier, use the procpid column instead of the pid column because PostgreSQL changed procid column to pid column since version 9.2
-                $dbh_temp->query("SELECT pg_terminate_backend (pg_stat_activity.pid)
-                                    FROM pg_stat_activity
-                                    WHERE pg_stat_activity.datname = '$databaseName';");
+				//$this->addLogging(array("close Connections to $databaseName" => 
+				$dbh_temp->query("SELECT pg_terminate_backend (pg_stat_activity.pid)
+												FROM pg_stat_activity
+												WHERE pg_stat_activity.datname = '$databaseName';");
                 $dbh_temp = null;
+				//checkOpenConnections($databaseName);
             }else{
                 $dbh_temp = null;
                 throw new Exception("There are $activeCount open connections to the database '$databaseName'.");
             }
-        }
+        }else{
+			$stmt->closeCursor();
+			$stmt = null; // IMPORTANT TO CLOSE _THIS_ CONNECTION!
+       
+		}
         return $activeCount;
     }
 
