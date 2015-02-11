@@ -28,7 +28,7 @@ class DumpConversionController extends ORMController {
     //private $sourceUsername  = 'root';
     //private $sourcePassword  = 'root'; //garamond4000
     //private $sourceDatabase  = 'dtadb'; //will be created if it does not exist
-    private $sourceDumpPath  = '../dbdumps/server_2015-01-22/dtaq_partiell-pgsql_www-data.sql'; //'../dbdumps/dtadb_2013-09-29_07-10-01.sql';//'/Users/macbookdata/Dropbox/DTA/dumpConversion/dtadb_2013-09-29_07-10-01.sql';
+    private $sourceDumpPath  = '../dbdumps/server_2015-01-22/dtaq_partiell-pgsql_no-owner.sql'; //'../dbdumps/dtadb_2013-09-29_07-10-01.sql';//'/Users/macbookdata/Dropbox/DTA/dumpConversion/dtadb_2013-09-29_07-10-01.sql';
 
     private $tempDumpPGDatabaseName = 'temp_dump2';
 
