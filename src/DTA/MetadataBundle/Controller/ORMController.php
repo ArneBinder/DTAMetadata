@@ -253,7 +253,7 @@ class ORMController extends DTADomainController {
 //        }
     }
 
-    private function getEditingLinkForObject($obj){
+    protected function getEditLinkForObject($obj){
         $classNameParts = explode('\\',get_class($obj));
         $linkClassName = array_pop($classNameParts);
         $linkPackage = array_pop($classNameParts);
@@ -265,6 +265,28 @@ class ORMController extends DTADomainController {
                 'recordId' => $obj->getId()
             )
         );
+    }
+
+    protected function getEditLinkForEntity($entity, $caption){
+        $editLink =  $this->getEditLinkForObject($entity);
+        return "<a href='$editLink'><span class='glyphicon glyphicon-edit'></span></a>"." $caption";
+    }
+
+    protected function formatTableEntry($entity, $columnName, $addEditLink = false){
+        $attribute = $entity->getAttributeByTableViewColumName($columnName);
+        if(is_object($attribute)){
+            $value = $attribute->__toString();
+        } else {
+            $value = $attribute;
+        }
+        if($addEditLink){
+            return $this->getEditLinkForEntity($entity, $value);
+        } elseif(is_object($attribute)) {
+            $editLink = $this->getEditLinkForObject($attribute);
+            return "<a href='$editLink'>$value</a>";
+        }else{
+            return $value;
+        }
     }
 
     /**
@@ -284,39 +306,8 @@ class ORMController extends DTADomainController {
                 $row = array($entity->getId());
             }
             for ($i = 0; $i < count($columns); $i++) {
-                $column = $columns[$i];
-                $attribute = $entity->getAttributeByTableViewColumName($column);
-
-                if(is_object($attribute)){
-                    $value = $attribute->__toString();
-                } else {
-                    $value = $attribute;
-                }
-                // add an edit button to the first column entry
-                if($i === 0){
-                    $specialisation = "";
-                    if(method_exists($entity,'getSpecialization')){
-                        $editLink = $this->getEditingLinkForObject($entity->getSpecialization());
-                        $classNameParts = explode('\\', get_class($entity));
-                        if(array_pop($classNameParts)==="Publication"){
-                            $specialisation = " <i>(".$this->get('translator')->trans($entity->getSpecializationClassName()).")</i>";
-                        }
-
-                    }else{
-                        $editLink =  $this->getEditingLinkForObject($entity);
-                    }
-                     // $deleteLink = $this->generateUrl($package . '_deleteRecord', array(
-//                        'package'=>$package, 'className'=>$className, 'recordId'=>$entity->getId() 
-//                    ));
-                    $row[] = "<a href='$editLink'><span class='glyphicon glyphicon-edit'></span></a>"
-//                            ."<a href='$deleteLink'><span class='glyphicon glyphicon-trash'></span></a> "
-                            ."$value$specialisation";
-                } elseif(is_object($attribute)) {
-                        $editLink = $this->getEditingLinkForObject($attribute);
-                        $row[] = "<a href='$editLink'>$value</a>";
-                }else{
-                    $row[] = $value;
-                }
+                $columnName = $columns[$i];
+                $row[] = $this->formatTableEntry($entity, $columnName, $i === 0);
             }
             $result[] = $row;
 	    }
