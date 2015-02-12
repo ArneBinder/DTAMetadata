@@ -35,7 +35,8 @@ class DumpConversionController extends ORMController {
     private $psqlExec = 'psql';
     private $phpExec   = 'php'; //'/usr/local/php5/bin/php';
 
-    /** Stores problematic actions taken in the conversion process. */
+    /** Stores problematic actions taken in the conversion process.
+     * The identifier name has to end with the plural 's'! (used via addLogging: the given message type defines the array)  */
     private $infos;
     private $warnings;
     private $errors;
@@ -126,7 +127,7 @@ class DumpConversionController extends ORMController {
 
         // names of the functions to wrap in transaction code
         $conversionTasks = array(
-          /*  'convertUsers',                 // users first: they are referenced in "last changed by" columns
+            'convertUsers',                 // users first: they are referenced in "last changed by" columns
             'convertPublications',
             'convertFirstEditions',
             'convertPublicationGroups',
@@ -138,8 +139,8 @@ class DumpConversionController extends ORMController {
             'convertPlaces',
             'convertAuthors',
             'convertSingleFieldPersons',
-            'convertSeries',*/
-            //'convertMultiVolumes',
+            'convertSeries',
+            'convertMultiVolumes',
             );
 
 
@@ -152,7 +153,8 @@ class DumpConversionController extends ORMController {
         $this->enableAutoIncrement($this->propelConnection);
         $this->useSchemaFiles("schemas_final");
 
-        $this->deleteDatabase($infoSchemaDBHandler,$this->tempDumpPGDatabaseName);
+        //DEBUG: off
+        //$this->deleteDatabase($infoSchemaDBHandler,$this->tempDumpPGDatabaseName);
 
 /*
         // dump new database
@@ -166,6 +168,7 @@ class DumpConversionController extends ORMController {
 
 */
 
+        $this->addLogging(array("FINISHED CONVERSION" => ""));
         return $this->renderWithDomainData('DTAMetadataBundle:DumpConversion:conversionResult.html.twig', array(
             'warnings' => $this->warnings,
             'messages' => $this->infos,
@@ -236,7 +239,7 @@ class DumpConversionController extends ORMController {
         try {
             $this->deleteDatabase($dbInfSchemaHandler, $databaseName);
         }catch(\PDOException $e){
-            $this->addLogging(array("could not delete database $databaseName (while recreation)" => $e->getMessage()));
+            $this->addLogging(array("could not delete database $databaseName (while recreation)" => $e->getMessage()), 'warning');
         }
         $createCommand = "CREATE DATABASE $databaseName OWNER = $dbUser TEMPLATE = template0 ENCODING = 'UTF8'";
         $this->addLogging(array("recreate $databaseName with command $createCommand:" => ""));
@@ -1788,10 +1791,12 @@ class DumpConversionController extends ORMController {
             throw new \InvalidArgumentException("The argument \"messageWithCaption\" has to be an array.");
         }
         foreach($messageWithCaption as $caption => $message){
-            if (strpos(strtolower($message),'failed') !== false or strpos(strtolower($message),'fehler') !== false or strpos(strtolower($message),'error') !== false or strpos(strtolower($message),'fatal') !== false) {
+            if ($type===null and (strpos(strtolower($message),'failed') !== false or strpos(strtolower($message),'fehler') !== false or strpos(strtolower($message),'error') !== false or strpos(strtolower($message),'fatal') !== false)) {
                 $type = 'error';
             }
         }
+        if($type===null)
+            $type='info';
         $arraytype = $type.'s';
         if(!isset($this->$arraytype)){
             throw new \InvalidArgumentException("$arraytype is not defined.");
