@@ -162,6 +162,8 @@ class DumpConversionController extends ORMController {
         $this->useSchemaFiles("schemas_final");
 
         $this->deleteDatabase($this->tempDumpPGDatabaseName);
+        //$currentUser = get_current_user();
+        //$this->executeDBStatement('postgres', "DROP ROLE \"$currentUser\"");
 /*
         // dump new database
         $dbname = $this->getDatabaseName();
@@ -211,7 +213,7 @@ class DumpConversionController extends ORMController {
     }
 
 
-    private function  checkOpenConnections($databaseName, $close = false){
+    private function checkOpenConnections($databaseName, $close = false){
         try {
             $dbh_temp = $this->connectPostgres($databaseName);
         }catch(\PDOException $e){
@@ -239,7 +241,6 @@ class DumpConversionController extends ORMController {
 												FROM pg_stat_activity
 												WHERE pg_stat_activity.datname = '$databaseName';");
                 $dbh_temp = null;
-				//checkOpenConnections($databaseName);
             }else{
                 $dbh_temp = null;
                 throw new Exception("There are $activeCount open connections to the database '$databaseName'.");
@@ -261,12 +262,33 @@ class DumpConversionController extends ORMController {
     function deleteDatabase($databaseName){
         $this->checkOpenConnections($databaseName, true); //close, if open
         $deleteCommand = "$this->psqlExec -d postgres -c \"DROP DATABASE $databaseName\" 2>&1";
+        // or: connect via PDO to database INFORMATION_SCHEMA
+        //     and execute delete command
+        //     but this doesn't return a good error message!
         $this->addLogging(array("delete $databaseName with command $deleteCommand:" => shell_exec($deleteCommand)));
     }
 
+    function executeDBStatement($databaseName, $statement){
+        try {
+            $dbh_temp = $this->connectPostgres($databaseName);
+        }catch(\PDOException $e){
+            $this->addLogging(array("Exception while executing statement \"$statement\" at $databaseName" => $e->getMessage()));
+            return false;
+        }
+        $stmt = $dbh_temp->prepare($statement);
+        $this->addLogging(array("execute statement \"$statement\" at database $databaseName"=> $stmt->execute()?"successful":"failed"));
+        $stmt->closeCursor();
+        $stmt = null;
+        return true;
+    }
+
     function dropAndImportLegacyDB($databaseName){
-        //$this->checkOpenConnections($databaseName, true);
+        $currentUser = get_current_user();
+        //echo getenv("username");
         $dbUser = $this->getDatabaseUser();
+        //$this->executeDBStatement('postgres', "CREATE ROLE '$dbUser' WITH SUPERUSER");
+        $this->executeDBStatement('postgres', "CREATE ROLE \"$currentUser\" with CREATEDB LOGIN IN ROLE \"$dbUser\"");
+
         $this->recreateDatabase($databaseName, $dbUser);
         $importDumpCommand = "$this->psqlExec -d $databaseName -f $this->sourceDumpPath 2>&1";
         $this->addLogging(array("import dump ($importDumpCommand): " => shell_exec($importDumpCommand)));
