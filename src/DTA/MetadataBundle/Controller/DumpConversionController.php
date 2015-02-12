@@ -4,6 +4,7 @@ namespace DTA\MetadataBundle\Controller;
 use DTA\MetadataBundle\Model;
 use DTA\MetadataBundle\Model\Data;
 use Exception;
+use \PDO;
     
 /**
  * @author Carl Witt <carl.witt@fu-berlin.de>
@@ -12,10 +13,8 @@ use Exception;
  *
  * Preconditions:
  *   - postgreSQL has to be installed and running
- *   - the PostgreSQL user <database_user> (defined via parameters.yml) has to exist WITH SUPERUSER:
- *          CREATE ROLE <database_user> WITH SUPERUSER;
- *   - the PostgreSQL user <user> has to exist WITH CREATEDB LOGIN IN ROLE <database_user>; <user> is either "www-data"(server) or the windows user name (local):
- *          CREATE ROLE <user> with CREATEDB LOGIN IN ROLE <database_user>;
+ *   - the PostgreSQL user <database_user> (defined via parameters.yml) has to exist WITH SUPERUSER CREATEDB:
+ *          CREATE ROLE <database_user> WITH SUPERUSER CREATEDB;
  *   - the PostgreSQL dump file which contains the data to convert
  */
 class DumpConversionController extends ORMController {
@@ -25,21 +24,15 @@ class DumpConversionController extends ORMController {
      * source: the postgres database where the dump will be imported to extract the data from
      * target: the postgres database which will contain the converted data (the connection parameters from parameters.yml are used)
      */
-    //private $sourceUsername  = 'root';
-    //private $sourcePassword  = 'root'; //garamond4000
-    //private $sourceDatabase  = 'dtadb'; //will be created if it does not exist
     private $sourceDumpPath  = '../dbdumps/server_2015-01-22/dtaq_partiell-pgsql_no-owner.sql'; //'../dbdumps/dtadb_2013-09-29_07-10-01.sql';//'/Users/macbookdata/Dropbox/DTA/dumpConversion/dtadb_2013-09-29_07-10-01.sql';
-
+    // will be (re)created if necessary
     private $tempDumpPGDatabaseName = 'temp_dump2';
 
     // This dump file can be used to import into the production system
     private $targetDumpPath = '../dbdumps/dtadb_pg';
 
     /** Used programs */
-    //private $mysqlExec  = 'mysql'; //added "C:\Program Files\MySQL\MySQL Server 5.6\bin" to $PATH
     private $psqlExec = 'psql';
-    //private $pgDropDB = 'dropdb';
-    //private $pgCreateDB = 'createdb';
     private $phpExec   = 'php'; //'/usr/local/php5/bin/php';
 
     /** Stores problematic actions taken in the conversion process. */
@@ -56,28 +49,26 @@ class DumpConversionController extends ORMController {
      * publication Ids in the old databse start somewhere from 16000 upwards.
      */
     private $publicationIdCounter = 1;
-    
-    /**
-     * @param type $username MySQL access parameters.
-     * @param type $password MySQL access parameters.
-     * @param type $database The schema name within the database.
-     * @return \PDO
-     * @throws Exception
-     */
-    /*function connect() {
-        $dsn = "mysql:dbname=" . $this->sourceDatabase . ";host=" . $this->getDatabaseHost();
-        try {
-            return new \PDO($dsn, $this->sourceUsername, $this->sourcePassword);
-        } catch (\PDOException $e) {
-            throw new \Exception("Connection failed: " . $e->getMessage());
-        }
-    }*/
 
-    function connectPostgres($databaseName){
-        $dsn = "pgsql:dbname=" . $databaseName . ";host=" . $this->getDatabaseHost();
+    /**
+     * @param String $databaseName
+     * @param String $username
+     * @return PDO PDO connection
+     * @throws \PDOException
+     */
+    function connectPostgres($databaseName = null, $username = null){
+        if($username === null)
+            $username =  $this->getPropelDatabaseUsername();
+        if($databaseName === null){
+            $dsn = "pgsql:host=" . $this->getDatabaseHost();
+        }else{
+            $dsn = "pgsql:dbname=" . $databaseName . ";host=" . $this->getDatabaseHost();
+        }
+
         try {
             $this->addLogging(array("connect via $dsn..."=>""));
-            $pdo = new \PDO($dsn, $this->getDatabaseUser(), $this->getDatabasePass());
+            $pdo = new \PDO($dsn, $username, $this->getDatabasePass());
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             return $pdo;
         } catch (\PDOException $e) {
             throw new \PDOException("Connection failed: " . $e->getMessage());
@@ -98,13 +89,14 @@ class DumpConversionController extends ORMController {
 
         $this->useSchemaFiles("schemas_dumpConversion");
 
-        $this->dropAndImportLegacyDB($this->tempDumpPGDatabaseName);
+        $infoSchemaDBHandler = $this->connectPostgres();
+        $this->dropAndImportLegacyDB($infoSchemaDBHandler,$this->tempDumpPGDatabaseName);
 
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // ERASE ALL DATA FROM THE WORKING (TARGET DATABASE) vvvvvv
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-        $this->dropAndSetupTargetDB($this->getDatabaseName());
+        $this->dropAndSetupTargetDB($infoSchemaDBHandler, $this->getDatabaseName());
 
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // ERASE ALL DATA FROM THE WORKING (TARGET DATABASE) ^^^^^^^
@@ -112,22 +104,21 @@ class DumpConversionController extends ORMController {
 
 
         // connect to imported (legacy) database
-        //$dbh = $this->connect();
-        $dbh = $this->connectPostgres($this->tempDumpPGDatabaseName);
+        $sourceDBHandler = $this->connectPostgres($this->tempDumpPGDatabaseName);
 
 
         // trim and NULL empty strings, remove some old records
-        $this->cleanUpOldDatabase($dbh);
+        $this->cleanUpOldDatabase($sourceDBHandler);
 
         // assert that certain assumptions hold for the dump (unused fields)
-
-        $this->checkOldDatabase($dbh);
+        $this->checkOldDatabase($sourceDBHandler);
 
         // add IF and FIND_IN_SET functionality to temporary dump database
-        $this->addSQLFunctions($dbh);
+        $this->addSQLFunctions($sourceDBHandler);
 
 		
         $this->propelConnection = \Propel::getConnection(Model\Master\DtaUserPeer::DATABASE_NAME);
+        $this->propelConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->addLogging(array('message' => 'transaction begun on '.Model\Master\DtaUserPeer::DATABASE_NAME));
 
 
@@ -135,7 +126,7 @@ class DumpConversionController extends ORMController {
 
         // names of the functions to wrap in transaction code
         $conversionTasks = array(
-            'convertUsers',                 // users first: they are referenced in "last changed by" columns
+          /*  'convertUsers',                 // users first: they are referenced in "last changed by" columns
             'convertPublications',
             'convertFirstEditions',
             'convertPublicationGroups',
@@ -147,23 +138,22 @@ class DumpConversionController extends ORMController {
             'convertPlaces',
             'convertAuthors',
             'convertSingleFieldPersons',
-            'convertSeries',
+            'convertSeries',*/
             //'convertMultiVolumes',
             );
 
 
 
         foreach ($conversionTasks as $task){
-            $this->runTransaction($task, $dbh);
+            $this->runTransaction($task, $sourceDBHandler);
         }
 
 
         $this->enableAutoIncrement($this->propelConnection);
         $this->useSchemaFiles("schemas_final");
 
-        $this->deleteDatabase($this->tempDumpPGDatabaseName);
-        //$currentUser = get_current_user();
-        //$this->executeDBStatement('postgres', "DROP ROLE \"$currentUser\"");
+        $this->deleteDatabase($infoSchemaDBHandler,$this->tempDumpPGDatabaseName);
+
 /*
         // dump new database
         $dbname = $this->getDatabaseName();
@@ -198,104 +188,82 @@ class DumpConversionController extends ORMController {
     function useSchemaFiles($schemaFilesDir){
         $expandedSchemaFilesDir = "../src/DTA/MetadataBundle/Resources/$schemaFilesDir";
         foreach (array('dta_data_schema.xml', 'dta_master_schema.xml', 'dta_workflow_schema.xml', 'dta_classification_schema.xml') as $schema) {
-            //$command = "cp $expandedSchemaFilesDir/$schema $expandedSchemaFilesDir/../config/$schema 2>&1";
             $this->addLogging(array(
                 "bringing $schema from $schemaFilesDir into place" =>
-                //system("cp $productionSchemasDir/$schema $productionSchemasDir/../config/$schema")
                 copy("$expandedSchemaFilesDir/$schema","$expandedSchemaFilesDir/../config/$schema")
-                //shell_exec($command)
             ));
 
         }
         // build propel entity classes
-        //$this->addLogging(array('building model from production schemas', system("$this->phpExec ../app/console propel:model:build")));
         $this->addLogging(array("building model from $schemaFilesDir" => shell_exec("$this->phpExec ../app/console propel:model:build 2>&1")));
     }
 
 
-    private function checkOpenConnections($databaseName, $close = false){
-        try {
-            $dbh_temp = $this->connectPostgres($databaseName);
-        }catch(\PDOException $e){
-            $this->addLogging(array("Exception while counting connections to $databaseName" => $e->getMessage()));
-            return 0;
-        }
-        $stmt = $dbh_temp->prepare("SELECT count(*) FROM pg_stat_activity WHERE datname = '$databaseName'");
-        $stmt->execute();
-        $activeCount = $stmt->fetch()['count'] -1;
+    /**
+     * @param PDO $dbInfSchemaHandler
+     * @param String $databaseName
+     * @param bool $close
+     * @return int
+     * @throws Exception
+     */
+    private function checkOpenConnections($dbInfSchemaHandler, $databaseName, $close = false){
+        $activeCount = $dbInfSchemaHandler->query("SELECT count(*) FROM pg_stat_activity WHERE datname = '$databaseName'")->fetch()['count'];
         $this->addLogging(array("count of other active connections to $databaseName" => "$activeCount"));
         if($activeCount > 0){
-			$stmt = $dbh_temp->prepare("SELECT usename FROM pg_stat_activity WHERE datname = '$databaseName'");
-			$stmt->execute();
-			$currentDbUsers = array();
-			foreach($stmt->fetchAll() as $row){
+			foreach($dbInfSchemaHandler->query("SELECT usename FROM pg_stat_activity WHERE datname = '$databaseName'")->fetchAll() as $row){
 				$currentDbUsers[] = $row['usename'];
 			}
-            $stmt->closeCursor();
-			$stmt = null; // IMPORTANT TO CLOSE _THIS_ CONNECTION!
-			$this->addLogging(array("users currently connected to $databaseName" => implode(', ',$currentDbUsers)));
+            $this->addLogging(array("users currently connected to $databaseName" => implode(', ',$currentDbUsers)));
             if($close){
                 // WARNING: Notice that if you use PostgreSQL version 9.1 or earlier, use the procpid column instead of the pid column because PostgreSQL changed procid column to pid column since version 9.2
-				//$this->addLogging(array("close Connections to $databaseName" => 
-				$dbh_temp->query("SELECT pg_terminate_backend (pg_stat_activity.pid)
+				$this->addLogging(array("close Connections to $databaseName" => ""));
+                $dbInfSchemaHandler->query("SELECT pg_terminate_backend (pg_stat_activity.pid)
 												FROM pg_stat_activity
 												WHERE pg_stat_activity.datname = '$databaseName';");
-                $dbh_temp = null;
             }else{
-                $dbh_temp = null;
                 throw new Exception("There are $activeCount open connections to the database '$databaseName'.");
             }
-        }else{
-			$stmt->closeCursor();
-			$stmt = null; // IMPORTANT TO CLOSE _THIS_ CONNECTION!
-       
-		}
+        }
         return $activeCount;
     }
 
-    function recreateDatabase($databaseName, $dbUser){
-        $this->deleteDatabase($databaseName);
-        $createCommand = "$this->psqlExec -d postgres -c \"CREATE DATABASE $databaseName OWNER = $dbUser TEMPLATE = template0 ENCODING = 'UTF8'\" 2>&1";
-        $this->addLogging(array("recreate $databaseName with command $createCommand:" => shell_exec($createCommand)));
-    }
-
-    function deleteDatabase($databaseName){
-        $this->checkOpenConnections($databaseName, true); //close, if open
-        $deleteCommand = "$this->psqlExec -d postgres -c \"DROP DATABASE $databaseName\" 2>&1";
-        // or: connect via PDO to database INFORMATION_SCHEMA
-        //     and execute delete command
-        //     but this doesn't return a good error message!
-        $this->addLogging(array("delete $databaseName with command $deleteCommand:" => shell_exec($deleteCommand)));
-    }
-
-    function executeDBStatement($databaseName, $statement){
+    /**
+     * @param PDO $dbInfSchemaHandler
+     * @param String $databaseName
+     * @param String $dbUser
+     */
+    function recreateDatabase($dbInfSchemaHandler, $databaseName, $dbUser){
         try {
-            $dbh_temp = $this->connectPostgres($databaseName);
+            $this->deleteDatabase($dbInfSchemaHandler, $databaseName);
         }catch(\PDOException $e){
-            $this->addLogging(array("Exception while executing statement \"$statement\" at $databaseName" => $e->getMessage()));
-            return false;
+            $this->addLogging(array("could not delete database $databaseName (while recreation)" => $e->getMessage()));
         }
-        $stmt = $dbh_temp->prepare($statement);
-        $this->addLogging(array("execute statement \"$statement\" at database $databaseName"=> $stmt->execute()?"successful":"failed"));
-        $stmt->closeCursor();
-        $stmt = null;
-        return true;
+        $createCommand = "CREATE DATABASE $databaseName OWNER = $dbUser TEMPLATE = template0 ENCODING = 'UTF8'";
+        $this->addLogging(array("recreate $databaseName with command $createCommand:" => ""));
+        $dbInfSchemaHandler->query($createCommand);
     }
 
-    function dropAndImportLegacyDB($databaseName){
-        $currentUser = get_current_user();
-        //echo getenv("username");
-        $dbUser = $this->getDatabaseUser();
-        //$this->executeDBStatement('postgres', "CREATE ROLE '$dbUser' WITH SUPERUSER");
-        $this->executeDBStatement('postgres', "CREATE ROLE \"$currentUser\" with CREATEDB LOGIN IN ROLE \"$dbUser\"");
+    /**
+     * @param PDO $dbInfSchemaHandler
+     * @param String $databaseName
+     * @throws \PDOException
+     */
+    function deleteDatabase($dbInfSchemaHandler, $databaseName){
+        $this->checkOpenConnections($dbInfSchemaHandler, $databaseName, true); //true => close, if open
+        $deleteCommand = "DROP DATABASE $databaseName";
+        $dbInfSchemaHandler->query($deleteCommand);
+        $this->addLogging(array("delete $databaseName with command $deleteCommand:" => ""));
+    }
 
-        $this->recreateDatabase($databaseName, $dbUser);
-        $importDumpCommand = "$this->psqlExec -d $databaseName -f $this->sourceDumpPath 2>&1";
+    function dropAndImportLegacyDB($dbInfSchemaHandler, $databaseName){
+        $dbUser = $this->getPropelDatabaseUsername();
+        $this->recreateDatabase($dbInfSchemaHandler,$databaseName, $dbUser);
+        $importDumpCommand = "$this->psqlExec -U $dbUser -d $databaseName -f $this->sourceDumpPath 2>&1";
         $this->addLogging(array("import dump ($importDumpCommand): " => shell_exec($importDumpCommand)));
     }
 
-    function dropAndSetupTargetDB($databaseName){
-        $this->recreateDatabase($databaseName, $this->getDatabaseUser());
+    function dropAndSetupTargetDB($infoSchemaDbHandler, $databaseName){
+        $this->recreateDatabase($infoSchemaDbHandler, $databaseName, $this->getPropelDatabaseUsername());
         $resultBuildDBCode = shell_exec("$this->phpExec ../app/console propel:sql:build 2>&1");
         $this->addLogging(array("building database schema from xml model: " => $resultBuildDBCode ));
         
@@ -1597,8 +1565,8 @@ class DumpConversionController extends ORMController {
         //$this->addLogging(array("currentDatabaseName",$currentDatabaseName));
         // remove unused tables
         //TODO: why does this not work?
-        $queries[] = "DROP table corpus_use;
-                      DROP table lastusergroups;";
+        $queries[] = "DROP table corpus_use";
+        $queries[] = "DROP table lastusergroups;";
 
         foreach ($queries as $query) {
             $this->addLogging(array("clean up database command: " => $query));
@@ -1805,7 +1773,7 @@ class DumpConversionController extends ORMController {
         throw new Exception('Could not fetch database name from propel config.');
     }
 
-    public function getDatabaseUser(){
+    public function getPropelDatabaseUsername(){
         $propelConf = \Propel::getConfiguration();
         return $propelConf['datasources']['dtametadata']['connection']['user'];
     }

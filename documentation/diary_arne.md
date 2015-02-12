@@ -292,6 +292,9 @@
      http://stackoverflow.com/questions/6203503/invalid-pdo-query-does-not-return-an-error 
      and 
      https://bugs.php.net/bug.php?id=61613
+ o TODO: connect via PDO to database INFORMATION_SCHEMA to delete/create new database (-> connect without database name). DONE
+ o Switched from psql to pdo commands for creation/deletion of database. The dump import uses still psql. Role <user> isn't necessary anymore.
+
  
  
  TODO:
