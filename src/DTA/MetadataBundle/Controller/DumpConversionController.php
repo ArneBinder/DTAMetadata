@@ -26,7 +26,7 @@ class DumpConversionController extends ORMController {
      */
     private $sourceDumpPath  = '../dbdumps/server_2015-01-22/dtaq_partiell-pgsql_no-owner.sql'; //'../dbdumps/dtadb_2013-09-29_07-10-01.sql';//'/Users/macbookdata/Dropbox/DTA/dumpConversion/dtadb_2013-09-29_07-10-01.sql';
     // will be (re)created if necessary
-    private $tempDumpPGDatabaseName = 'temp_dump2';
+    private $tempDumpPGDatabaseName = 'temp_dump';
 
     // This dump file can be used to import into the production system
     private $targetDumpPath = '../dbdumps/dtadb_pg';
@@ -45,11 +45,12 @@ class DumpConversionController extends ORMController {
     /** Connection used in the target database, can be used to wrap multiple queries in a single transaction for a small speedup. */
     private $propelConnection;
     
-    /** For convenience, old Ids are retained whereever possible in the new database. 
+    /** For convenience, old Ids are retained wherever possible in the new database.
      * This requires auto-increment to be off for some id columns and this counter can be used to get a free publication ID, since 
-     * publication Ids in the old databse start somewhere from 16000 upwards.
+     * publication Ids in the old database start somewhere from 16000 upwards.
      */
-    private $publicationIdCounter = 1;
+    //// DEBUG
+    private $publicationIdCounter = 1; // 1;
 
     /**
      * @param String $databaseName
@@ -117,7 +118,7 @@ class DumpConversionController extends ORMController {
         // add IF and FIND_IN_SET functionality to temporary dump database
         $this->addSQLFunctions($sourceDBHandler);
 
-		
+
         $this->propelConnection = \Propel::getConnection(Model\Master\DtaUserPeer::DATABASE_NAME);
         $this->propelConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->addLogging(array('message' => 'transaction begun on '.Model\Master\DtaUserPeer::DATABASE_NAME));
@@ -153,7 +154,6 @@ class DumpConversionController extends ORMController {
         $this->enableAutoIncrement($this->propelConnection);
         $this->useSchemaFiles("schemas_final");
 
-        //DEBUG: off
         //$this->deleteDatabase($infoSchemaDBHandler,$this->tempDumpPGDatabaseName);
 
 /*
@@ -425,7 +425,7 @@ class DumpConversionController extends ORMController {
             
             $publications->findOneById($row['publication_id'])
                          ->addFont($currentFont)
-                         ->save();
+                         ->save($this->propelConnection);
         }
     }
     
@@ -442,7 +442,23 @@ class DumpConversionController extends ORMController {
             /* @var $person \DTA\MetadataBundle\Model\Data\Person */
             // find publications with identical titles ('title' => array(pub1, pub2, ...), ...)
             $publicationsByTitle = array();
-            
+
+            $authorsVolumesQuery= Model\Data\VolumeQuery::create()
+                ->usePublicationQuery()
+                ->usePersonPublicationQuery()
+                ->filterByRole(Model\Master\PersonPublicationPeer::ROLE_AUTHOR)
+                ->filterByPerson($person)
+                ->endUse()
+                ->endUse()
+                ->joinWith("Publication")
+                ->joinWith("Publication.Title")
+                ->joinWith("Title.Titlefragment")
+                ->orderByVolumeNumeric();
+            $count = $authorsVolumesQuery->count();
+            if($count>0) {
+                $this->addLogging(array("authorsVolumesQuery" => $authorsVolumesQuery->toString()));
+                $this->addLogging(array("authorsVolumesQuery count" => $count));
+            }
             $authorsVolumes = Model\Data\VolumeQuery::create()
                 ->usePublicationQuery()
                     ->usePersonPublicationQuery()
@@ -460,6 +476,7 @@ class DumpConversionController extends ORMController {
                 /* @var $volume \DTA\MetadataBundle\Model\Data\Volume */
                 // volumes are identified by identical first author and title 
                 // additionally, further authors must be excluded to avoid duplicate creation of multivolumes
+                $this->addLogging(array("getAuthorIndex for ".$volume->getPublication()->getId()=>$person->getAuthorIndex($volume->getPublication())));
                 if( 1 === $person->getAuthorIndex($volume->getPublication())){
                     $title = $volume->getPublication()->getTitle()->__toString();
                     $publicationsByTitle[$title][] = $volume;
@@ -509,11 +526,12 @@ class DumpConversionController extends ORMController {
                 ->save($this->propelConnection);
         
         // create multi volume
+        $this->addLogging(array("create multi volume",$publicationId));
         $multiVolume = new Data\MultiVolume();
         $multiVolume->setId($publicationId)
                 ->setVolumesTotal(count($volumes))
                 ->save($this->propelConnection);
-        
+
         foreach ($volumes as $volume) {
             /* @var $volume Data\Volume */
             $volume->getPublication()
