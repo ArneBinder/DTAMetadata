@@ -1,6 +1,7 @@
 <?php
     
 namespace DTA\MetadataBundle\Controller;
+use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
 use DTA\MetadataBundle\Model;
 use DTA\MetadataBundle\Model\Data;
 use Exception;
@@ -82,7 +83,7 @@ class DumpConversionController extends ORMController {
 
         // during conversion, a lot of memory is allocated
         ini_set('memory_limit', -1); //'1200M'
-        ini_set('max_execution_time', 1800); //300 seconds = 5 minutes
+        ini_set('max_execution_time', 3800); //300 seconds = 5 minutes
         //
         // stores warning messages generated during the conversion
         $this->warnings = array();
@@ -456,7 +457,7 @@ class DumpConversionController extends ORMController {
                 ->orderByVolumeNumeric();
             $count = $authorsVolumesQuery->count();
             if($count>0) {
-                $this->addLogging(array("authorsVolumesQuery" => $authorsVolumesQuery->toString()));
+                //$this->addLogging(array("authorsVolumesQuery" => $authorsVolumesQuery->toString()));
                 $this->addLogging(array("authorsVolumesQuery count" => $count));
             }
             $authorsVolumes = Model\Data\VolumeQuery::create()
@@ -476,8 +477,9 @@ class DumpConversionController extends ORMController {
                 /* @var $volume \DTA\MetadataBundle\Model\Data\Volume */
                 // volumes are identified by identical first author and title 
                 // additionally, further authors must be excluded to avoid duplicate creation of multivolumes
-                $this->addLogging(array("getAuthorIndex for ".$volume->getPublication()->getId()=>$person->getAuthorIndex($volume->getPublication())));
-                if( 1 === $person->getAuthorIndex($volume->getPublication())){
+                //$this->addLogging(array("getAuthorIndex for ".$volume->getPublication()->getId()=>$person->getAuthorIndex($volume->getPublication())));
+                //if( 1 === $person->getAuthorIndex($volume->getPublication())){
+                if(!$volume->getPublication()->isInTree()){
                     $title = $volume->getPublication()->getTitle()->__toString();
                     $publicationsByTitle[$title][] = $volume;
                 }
@@ -485,7 +487,9 @@ class DumpConversionController extends ORMController {
             
             // aggregate into multivolumes
             foreach($publicationsByTitle as $title => $volumes){
-                
+                $volumeIds = $this->getColumnValues($volumes,"getPublication()->getId()");
+                $this->addLogging(array("volumes for title \"$title\"" => implode(", ",$volumeIds)));
+
 //                if( count($volumes) > 1 ){
                     // create multi volume with the given volumes as children
                     $this->createMultiVolume($volumes, $person);
@@ -1834,4 +1838,18 @@ class DumpConversionController extends ORMController {
         //$this->get('logger')->critical("$type: ".print_r($messageWithCaption,true));
     }
 
+    function getColumnValues($queryResult, $accessor){
+        $column = array();
+        foreach($queryResult as $row){
+            if(is_object($row)) {
+                eval("\$column[] = \$row->$accessor;");
+            }elseif(is_array($row)){
+                $column[] = $row[$accessor];
+            }else{
+                throw new InvalidArgumentException("The argument \"queryResult\" has to be an array containing rows as objects or arrays.");
+            }
+        }
+        return $column;
+
+    }
 }
