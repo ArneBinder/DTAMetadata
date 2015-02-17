@@ -13,8 +13,8 @@ use \PDO;
  *
  * Preconditions:
  *   - postgreSQL has to be installed and running
- *   - the PostgreSQL user <database_user> (defined via parameters.yml) has to exist WITH SUPERUSER CREATEDB:
- *          CREATE ROLE <database_user> WITH SUPERUSER CREATEDB;
+ *   - the PostgreSQL user <database_user> (defined via parameters.yml) has to exist WITH SUPERUSER CREATEDB LOGIN:
+ *          CREATE ROLE <database_user> WITH SUPERUSER CREATEDB LOGIN;
  *   - the PostgreSQL dump file which contains the data to convert
  */
 class DumpConversionController extends ORMController {
@@ -259,7 +259,7 @@ class DumpConversionController extends ORMController {
     }
 
     function dropAndImportLegacyDB($dbInfSchemaHandler, $databaseName){
-        $dbUser = '"www-data"';//$this->getPropelDatabaseUsername();
+        $dbUser = "\"".$this->getCurrentPhpUser()."\"";//'"www-data"';//$this->getPropelDatabaseUsername();
         $this->recreateDatabase($dbInfSchemaHandler,$databaseName, $dbUser);
         $importDumpCommand = "$this->psqlExec -U $dbUser -d $databaseName -f $this->sourceDumpPath 2>&1";
         $this->addLogging(array("import dump ($importDumpCommand): " => shell_exec($importDumpCommand)));
@@ -280,9 +280,12 @@ class DumpConversionController extends ORMController {
     }
     
 	function getCurrentPhpUser(){
-		file_put_contents("testFile", "test");
-		$user = fileowner("testFile");
-		unlink("testFile");
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $user = shell_exec("echo %USERNAME%");
+        } else {
+            $user = shell_exec( 'whoami');
+        }
+        $this->addLogging(array("determined current php user" => $user));
 		return $user;
     }
     // parses date string in format 2007-12-11 17:39:30 to \DateTime objects
