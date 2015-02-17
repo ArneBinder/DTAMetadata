@@ -92,7 +92,7 @@ class DumpConversionController extends ORMController {
 
         $this->useSchemaFiles("schemas_dumpConversion");
 
-        $infoSchemaDBHandler = $this->connectPostgres();
+        $infoSchemaDBHandler = $this->connectPostgres('postgres');
         $this->dropAndImportLegacyDB($infoSchemaDBHandler,$this->tempDumpPGDatabaseName);
 
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1594,9 +1594,13 @@ class DumpConversionController extends ORMController {
         $queries[] = "DROP table lastusergroups;";
 
         foreach ($queries as $query) {
-            $this->addLogging(array("clean up database command: " => $query));
+			$this->addLogging(array("clean up database command: " => $query));
             $stmt = $dbh->prepare($query);
-            $stmt->execute();
+			try{            
+				$stmt->execute();
+			}catch(PDOException $e){
+				$this->addLogging(array("could not execute query: $query" => $e.getMessage()));
+			}
             $stmt = null;
         }
         
@@ -1808,7 +1812,7 @@ class DumpConversionController extends ORMController {
         return $propelConf['datasources']['dtametadata']['connection']['password'];
     }
 
-    private function addLogging($messageWithCaption, $type='info'){
+    private function addLogging($messageWithCaption, $type=null){
         if(!is_array($messageWithCaption)){
             throw new \InvalidArgumentException("The argument \"messageWithCaption\" has to be an array.");
         }
