@@ -749,6 +749,11 @@ class DumpConversionController extends ORMController {
                     $volume->setPublication($publication)
                            ->save($this->propelConnection);
                     break;
+                case "Manuscript":
+                    $volume = new Model\Data\Manuscript();
+                    $volume->setPublication($publication)
+                        ->save($this->propelConnection);
+                    break;
                 // SERIES publications are handled in convertSeries()
                 // MULTIVOLUME publication type is handled in convertMultiVolumes()
             }
