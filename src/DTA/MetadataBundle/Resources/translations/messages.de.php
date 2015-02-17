@@ -42,6 +42,7 @@ return array(
     'Journal' => 'Zeitschrift/Zeitung',
     'Article' => 'Artikel',
     'Series' => 'Reihe',
+    'Manuscript' => 'Manuskript',
     
     'Volume description' => 'Bandbeschreibung',
     'Volume numeric' => 'Bandnummer',
