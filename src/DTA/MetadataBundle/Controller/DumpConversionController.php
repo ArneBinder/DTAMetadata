@@ -24,7 +24,7 @@ class DumpConversionController extends ORMController {
      * source: the postgres database where the dump will be imported to extract the data from
      * target: the postgres database which will contain the converted data (the connection parameters from parameters.yml are used)
      */
-    private $sourceDumpPath  = '../dbdumps/server_2015-01-22/dtaq_partiell-pgsql_no-owner.sql'; //'../dbdumps/dtadb_2013-09-29_07-10-01.sql';//'/Users/macbookdata/Dropbox/DTA/dumpConversion/dtadb_2013-09-29_07-10-01.sql';
+    private $sourceDumpPath  = '../dbdumps/dtaq_partiell_2015-02-03.sql'; //'../dbdumps/dtadb_2013-09-29_07-10-01.sql';//'/Users/macbookdata/Dropbox/DTA/dumpConversion/dtadb_2013-09-29_07-10-01.sql';
     // will be (re)created if necessary
     private $tempDumpPGDatabaseName = 'temp_dump';
 
@@ -91,7 +91,7 @@ class DumpConversionController extends ORMController {
 
         $this->useSchemaFiles("schemas_dumpConversion");
 
-        $infoSchemaDBHandler = $this->connectPostgres();
+        $infoSchemaDBHandler = $this->connectPostgres('postgres');
         $this->dropAndImportLegacyDB($infoSchemaDBHandler,$this->tempDumpPGDatabaseName);
 
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -283,8 +283,9 @@ class DumpConversionController extends ORMController {
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             $user = shell_exec("echo %USERNAME%");
         } else {
-            $user = shell_exec( 'whoami');
+            $user = shell_exec('whoami');
         }
+        $user = trim($user);
         $this->addLogging(array("determined current php user" => $user));
 		return $user;
     }
@@ -603,9 +604,9 @@ class DumpConversionController extends ORMController {
                     WHEN 'JA' THEN 'Article'
                     WHEN 'Reihe' THEN 'Series'
                     WHEN 'Zeitschrift' THEN 'Journal'
-                    WHEN 'J' THEN 'Journal'                -- TODO: WARNING DEBUG added 'J' => 'Journal'
-                    WHEN 'N'THEN 'Book'                    -- TODO: WARNING DEBUG added 'N' => 'Book'
-                    ELSE 'Book'                            -- TODO: WARNING DEBUG else => 'Book' (former value: type)
+                    WHEN 'J' THEN 'Journal'
+                    WHEN 'MAN' THEN 'Manuscript'
+                    ELSE 'Book'
                 END as publication_type
 
                 ,IF(band_zaehlung = 0, band_zaehlung + 1, band_zaehlung) as volume_numeric    -- single volumes seem to have a zero based index
