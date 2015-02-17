@@ -1,7 +1,6 @@
 <?php
     
 namespace DTA\MetadataBundle\Controller;
-use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
 use DTA\MetadataBundle\Model;
 use DTA\MetadataBundle\Model\Data;
 use Exception;
@@ -92,7 +91,7 @@ class DumpConversionController extends ORMController {
 
         $this->useSchemaFiles("schemas_dumpConversion");
 
-        $infoSchemaDBHandler = $this->connectPostgres('postgres');
+        $infoSchemaDBHandler = $this->connectPostgres();
         $this->dropAndImportLegacyDB($infoSchemaDBHandler,$this->tempDumpPGDatabaseName);
 
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -260,7 +259,7 @@ class DumpConversionController extends ORMController {
     }
 
     function dropAndImportLegacyDB($dbInfSchemaHandler, $databaseName){
-        $dbUser = $this->getPropelDatabaseUsername();
+        $dbUser = '"www-data"';//$this->getPropelDatabaseUsername();
         $this->recreateDatabase($dbInfSchemaHandler,$databaseName, $dbUser);
         $importDumpCommand = "$this->psqlExec -U $dbUser -d $databaseName -f $this->sourceDumpPath 2>&1";
         $this->addLogging(array("import dump ($importDumpCommand): " => shell_exec($importDumpCommand)));
@@ -280,7 +279,12 @@ class DumpConversionController extends ORMController {
         $this->addLogging(array("loading database fixtures: " => $resultFixturesLoad));
     }
     
-    
+	function getCurrentPhpUser(){
+		file_put_contents("testFile", "test");
+		$user = fileowner("testFile");
+		unlink("testFile");
+		return $user;
+    }
     // parses date string in format 2007-12-11 17:39:30 to \DateTime objects
     function parseSQLDate($dateString){
         
@@ -1598,8 +1602,8 @@ class DumpConversionController extends ORMController {
             $stmt = $dbh->prepare($query);
 			try{            
 				$stmt->execute();
-			}catch(PDOException $e){
-				$this->addLogging(array("could not execute query: $query" => $e.getMessage()));
+			}catch(\PDOException $e){
+				$this->addLogging(array("could not execute query: $query" => $e->getMessage()));
 			}
             $stmt = null;
         }
