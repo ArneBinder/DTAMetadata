@@ -17,3 +17,4 @@ php app/console propel:model:build
 # set permissions
 sudo chmod -R 0777 app/cache 
 sudo chmod -R 0777 app/logs 
+sudo chmod -R 0777 src/DTA/MetadataBundle/Resources/config/*schema.xml
