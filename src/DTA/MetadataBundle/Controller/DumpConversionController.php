@@ -1835,7 +1835,12 @@ class DumpConversionController extends ORMController {
             throw new \InvalidArgumentException("The argument \"messageWithCaption\" has to be an array.");
         }
         foreach($messageWithCaption as $caption => $message){
-            if ($type===null and (strpos(strtolower($message),'failed') !== false or strpos(strtolower($message),'fehler') !== false or strpos(strtolower($message),'error') !== false or strpos(strtolower($message),'fatal') !== false)) {
+            if ($type===null and
+                (strpos(strtolower($message),'failed') !== false or
+                    strpos(strtolower($message),'fehler') !== false or
+                    strpos(strtolower($message),'error') !== false or
+                    strpos(strtolower($message),'fatal') !== false or
+                    strpos(strtolower($message),'exception') !== false)) {
                 $type = 'error';
             }
         }
