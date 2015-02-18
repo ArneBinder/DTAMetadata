@@ -5,6 +5,7 @@ use DTA\MetadataBundle\Model;
 use DTA\MetadataBundle\Model\Data;
 use Exception;
 use \PDO;
+use Symfony\Component\HttpFoundation\Response;
     
 /**
  * @author Carl Witt <carl.witt@fu-berlin.de>
@@ -1760,8 +1761,9 @@ class DumpConversionController extends ORMController {
 
     public function updateAction(){
         $result = shell_exec("git pull 2>&1");
-        $this->addLogging(array("update source code" => $result));
-        return $result;
+        //echo $result;
+        //$this->addLogging(array("update source code" => $result));
+        return new Response($result);;
     }
 
     /** For conversion, some id columns are created as non-auto incrementing. To be able to work with the database conveniently, auto-incrementing is enabled manually. 
