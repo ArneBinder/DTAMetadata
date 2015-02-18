@@ -15,5 +15,5 @@ php app/console propel:model:build
 # php app/console propel:sql:insert --force
 
 # set permissions
-sudo chmod -R 077 app/cache 
-sudo chmod -R 077 app/logs 
+sudo chmod -R 0777 app/cache 
+sudo chmod -R 0777 app/logs 
