@@ -260,7 +260,7 @@
  o adapted convertPublications() TODO: check legacy_publication_types J, N and NULL!
  o adapted remaining converting functions
  o current TODO:
-    - fix convertMultiVolume
+    - fix convertMultiVolume 
     - fix doublets in table_row_view of Publications 
   
 2015-02-09
@@ -295,6 +295,10 @@
  o TODO: connect via PDO to database INFORMATION_SCHEMA to delete/create new database (-> connect without database name). DONE
  o Switched from psql to pdo commands for creation/deletion of database. The dump import uses still psql. Role <user> isn't necessary anymore.
 
+2015-02-17
+ o fixed convertMultiVolumes
+ o added publication type: manuscript
+ o fixed duplicated entries in table_row_view (all publications): deleted query for publication in schema files
  
  
  TODO:
