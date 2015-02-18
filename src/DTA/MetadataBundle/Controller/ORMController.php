@@ -133,6 +133,7 @@ class ORMController extends DTADomainController {
         if(!in_array($type, array('filter','order')))
             throw new \InvalidArgumentException(sprintf(
                 '\'%s\' is not allowed as value for $type. Use \'filter\' or \'order\'.',$type));
+        /** @var TYPE_NAME $tableRowViewAccessors */
         $criteriaAccessor = $type.'By'.ORMController::extractPureAccessor($modelClass::$tableRowViewAccessors[$columnCaption]);
 
         // is the column embedded?
@@ -163,6 +164,47 @@ class ORMController extends DTADomainController {
         return $query;
     }
 
+    protected function getFilterIds($request, $package, $className){
+        $classNames = $this->relatedClassNames($package, $className);
+        $modelClass = new $classNames["model"];
+        $query = $modelClass::getRowViewQueryObject();
+        //$columns = $modelClass::getTableViewColumnNames();
+
+        //$this->get('logger')->critical(urldecode($request));
+        //$this->get('logger')->critical("hiddenIdColumn: ".$hiddenIdColumn);
+
+        // FILTERING
+        if($request->get('search')['value']) {
+            $this->get('logger')->critical("filterColumns: " . implode(", ",$modelClass::getTableViewFilterColumns()));
+            $this->get('logger')->critical("FILTER");
+            $filterString = $request->get('search')['value'];
+
+            $filterColumnCaptions = $modelClass::getTableViewFilterColumns();
+            if(!empty($filterColumnCaptions)){
+                $query = $this->addCriteria($query,'filter',array_shift($filterColumnCaptions),$modelClass,$filterString);
+            }
+            foreach($filterColumnCaptions as $columnCaption){
+                $query = $this->addCriteria($query->_or(),'filter',$columnCaption,$modelClass,$filterString);
+            }
+        }else{
+            return null;
+        }
+        $this->get('logger')->critical("sorted filtered query: " . $query->toString());
+
+
+        $queryResult =  $query
+            ->setFormatter(\ModelCriteria::FORMAT_STATEMENT)
+            ->select(array('id'))
+            ->groupBy('id')
+            ->find()
+            ->fetchAll();
+        $ids = array();
+        foreach($queryResult as $elem){
+            $ids[] =  $elem['id'];
+        }
+        return $ids;
+    }
+
     /**
      * @param $request
      * @param $package
@@ -191,6 +233,7 @@ class ORMController extends DTADomainController {
         }
         // SORTING END
 
+        /*
         // FILTERING
         if($request->get('search')['value']) {
             $this->get('logger')->critical("filterColumns: " . implode(", ",$modelClass::getTableViewFilterColumns()));
@@ -205,6 +248,7 @@ class ORMController extends DTADomainController {
                 $query = $this->addCriteria($query->_or(),'filter',$columnCaption,$modelClass,$filterString);
             }
         }
+        */
         $this->get('logger')->critical("sorted filtered query: " . $query->toString());
 
         return $query;
@@ -333,29 +377,43 @@ class ORMController extends DTADomainController {
         $modelClass = new $classNames["model"];
         $columns = $modelClass::getTableViewColumnNames();
         //
+        $filterIds = $this->getFilterIds($request, $package, $className);
+        $this->get('logger')->critical("filterIds: ".print_r($filterIds, true));
+
         $totalRecords = $modelClass::getRowViewQueryObject()
             ->setFormatter(\ModelCriteria::FORMAT_STATEMENT)
-            ->select(array('id'))
-            ->groupBy('id')
+            //->select(array('id'))
+            //->groupBy('id')
             ->count();
         // construct the sorted and filtered query
         //$query = $this->getSortedFilteredQuery($request, $package, $className, $addIdColumn);
-	    $recordsFiltered = $this->getSortedFilteredQuery($request, $package, $className, $addIdColumn)
+	    /*$recordsFiltered = $this->getSortedFilteredQuery($request, $package, $className, $addIdColumn)
             ->setFormatter(\ModelCriteria::FORMAT_STATEMENT)
             ->select(array('id'))
             ->groupBy('id')
             ->count();
+	    */
+
+
+
+
+        $filterCount = $totalRecords;
+        $query = $this->getSortedFilteredQuery($request, $package, $className, $addIdColumn);
+        if($filterIds!==null){
+            $query = $query->filterById($filterIds);
+            $filterCount = count($filterIds);
+        }
 
         // Output
-	    $response = array(
+        $response = array(
             "sEcho" => intval($request->get('sEcho')),
             "recordsTotal" => $totalRecords,
-            "recordsFiltered" => $recordsFiltered,
+            "recordsFiltered" => $filterCount,
             "data" => array()
-	    );
+        );
 
         // retrieve entities: rebuild query to avoid formatter issues
-        $entities = $this->getPaginatedEntities($request, $this->getSortedFilteredQuery($request, $package, $className, $addIdColumn));
+        $entities = $this->getPaginatedEntities($request, $query);
 
         // format in data tables response format
         $response['data'] = $this->formatAsArray($entities, $columns, $package, $className, $addIdColumn);
