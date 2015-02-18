@@ -3,8 +3,8 @@
 # ==============================================================================
 
 convertDump:
-  path: /Convert
-  defaults: { _controller: DTAMetadataBundle:DumpConversion:convert }
+  path: /Convert/{skipTask}
+  defaults: { _controller: DTAMetadataBundle:DumpConversion:convert, skipTask: 'none' }
 
 nearDuplicateProposal:
   path: /Duplicate

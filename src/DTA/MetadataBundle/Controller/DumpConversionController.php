@@ -78,7 +78,7 @@ class DumpConversionController extends ORMController {
     }
         
     /** Converts the legacy database dump into the new format. */
-    function convertAction() {
+    function convertAction($skipTask) {
 
         // during conversion, a lot of memory is allocated
         ini_set('memory_limit', -1); //'1200M'
@@ -143,6 +143,11 @@ class DumpConversionController extends ORMController {
             'convertSeries',
             'convertMultiVolumes',
             );
+
+        if(array_search($skipTask, $conversionTasks)!==false){
+            unset($conversionTasks[array_search($skipTask, $conversionTasks)]);
+            $this->addLogging(array("skip task"=>$skipTask));
+        }
 
 
 
