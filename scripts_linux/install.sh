@@ -18,5 +18,5 @@ php app/console propel:model:build
 sudo chmod -R 0777 app/logs
 sudo chown -R www-data app/cache
 sudo chown -R www-data src/DTA/MetadataBundle/Resources/config/*schema.xml
+sudo chown -R www-data src/DTA/MetadataBundle/Model
 sudo chown -R www-data app/propel
-# sudo chown -R www-data src
