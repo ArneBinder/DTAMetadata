@@ -1759,7 +1759,9 @@ class DumpConversionController extends ORMController {
     }
 
     public function updateAction(){
-        $this->addLogging(array("update source code" => shell_exec("git pull 2>&1")));
+        $result = shell_exec("git pull 2>&1");
+        $this->addLogging(array("update source code" => $result));
+        return $result;
     }
 
     /** For conversion, some id columns are created as non-auto incrementing. To be able to work with the database conveniently, auto-incrementing is enabled manually. 
