@@ -301,6 +301,8 @@
  o fixed duplicated entries _COUNT_ in table_row_view (all publications): added select & group by id while counting. DUPLICATED ENTRIES NOT YET FIXED! query is inflated by filterBy critera...
  o tried to modify add volume to selectBox: still TODO
  
+2015-02-19
+ o Git pull from a php script: http://jondavidjohn.com/git-pull-from-a-php-script-not-so-simple/
  
  TODO:
  o Tab-Constraint DONE
