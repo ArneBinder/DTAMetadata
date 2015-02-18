@@ -10,6 +10,10 @@ nearDuplicateProposal:
   path: /Duplicate
   defaults: { _controller: DTAMetadataBundle:DumpConversion:nearDuplicateProposal }
 
+update:
+  path: /Update
+  defaults: { _controller: DTAMetadataBundle:DumpConversion:update }
+
 #addUser:
 #   path: /addUser/{name}/{password}
 #   defaults: { _controller: DTAMetadataBundle:DumpConversion:addUser }

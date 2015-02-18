@@ -17,6 +17,9 @@ php app/console propel:model:build
 # set permissions
 sudo chmod -R 0777 app/logs
 sudo chown -R www-data app/cache
+# conversion: schema files will be overwritten by content of Resources/schemas_final
 sudo chown -R www-data src/DTA/MetadataBundle/Resources/config/*schema.xml
+# for propel:model:build
 sudo chown -R www-data src/DTA/MetadataBundle/Model
+# for propel:sql:build
 sudo chown -R www-data app/propel

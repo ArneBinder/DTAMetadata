@@ -1758,6 +1758,10 @@ class DumpConversionController extends ORMController {
         return $this->render("DTAMetadataBundle:DumpConversion:pcDuplicates.csv.twig", array('candidates' => $candidates));
     }
 
+    public function updateAction(){
+        $this->addLogging(array("update source code" => shell_exec("git pull 2>&1")));
+    }
+
     /** For conversion, some id columns are created as non-auto incrementing. To be able to work with the database conveniently, auto-incrementing is enabled manually. 
      * This is postgres specific logic. Maybe that's also the reason why a migration won't do (propel doesn't even seem to recognize the difference between the schemas if auto-increment is on/off).
      * Note that changing the schema is necessary, and the propel classes need to be rebuild afterwards. 
