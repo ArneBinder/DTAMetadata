@@ -332,15 +332,25 @@ class ORMController extends DTADomainController {
         $classNames = $this->relatedClassNames($package, $className);
         $modelClass = new $classNames["model"];
         $columns = $modelClass::getTableViewColumnNames();
+        //
+        $totalRecords = $modelClass::getRowViewQueryObject()
+            ->setFormatter(\ModelCriteria::FORMAT_STATEMENT)
+            ->select(array('id'))
+            ->groupBy('id')
+            ->count();
         // construct the sorted and filtered query
-        $query = $this->getSortedFilteredQuery($request, $package, $className, $addIdColumn);
-	    $totalRecords = $query->setFormatter(\ModelCriteria::FORMAT_STATEMENT)->select(array('id'))->groupBy('id')->count();
+        //$query = $this->getSortedFilteredQuery($request, $package, $className, $addIdColumn);
+	    $recordsFiltered = $this->getSortedFilteredQuery($request, $package, $className, $addIdColumn)
+            ->setFormatter(\ModelCriteria::FORMAT_STATEMENT)
+            ->select(array('id'))
+            ->groupBy('id')
+            ->count();
 
         // Output
 	    $response = array(
             "sEcho" => intval($request->get('sEcho')),
             "recordsTotal" => $totalRecords,
-            "recordsFiltered" => $query->count(),
+            "recordsFiltered" => $recordsFiltered,
             "data" => array()
 	    );
 
