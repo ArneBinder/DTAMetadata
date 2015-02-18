@@ -39,6 +39,31 @@ class Volume extends BaseVolume
         
     }
 
+    public function getTitleString(){
+        return $this->getPublication()->getTitleString();
+    }
+
+    /**
+     * @param Volume $newVolume
+     */
+    public function setThis($newVolume){
+        //$newVolume->setParentPublication($this->getParentPublication());
+
+        /*
+        //$thisId = $this->getId();
+        $newVolume->copyInto($this);
+        $this->setPublication($newVolume->getPublication());
+        $newVolume->delete();
+        $this->save();
+        //$newVolume->setId($thisId)->save();
+        */
+        //$newVolume->delete();
+    }
+
+    public function getThis(){
+        return $this;
+    }
+
     /**
      * @return MultiVolume
      */

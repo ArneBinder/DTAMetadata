@@ -36,6 +36,9 @@ class MultiVolume extends BaseMultiVolume
      * @param Volume $newVolume
      */
     public function addVolume($newVolume){
+        if($newVolume===null)
+            return;
+        //$newVolume->deleteFromTree();
         $publication = $this->getPublication();
         $newVolume->getPublication()
                 ->setType(PublicationPeer::TYPE_VOLUME)

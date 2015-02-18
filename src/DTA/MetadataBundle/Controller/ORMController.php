@@ -299,11 +299,16 @@ class ORMController extends DTADomainController {
      * @return type array containing one array per record, listing the values of the given attributes (columns)
      */
     protected function formatAsArray($entities, $columns, $package, $className, $addIdColumn = false){
+        $usedIds = array();
         $result = array();
         foreach($entities as $entity) {
             $row = array();
+            $id = $entity->getId();
+            if(array_key_exists($id,$usedIds))
+                continue;
+            $usedIds[$id] = null;
             if($addIdColumn){
-                $row = array($entity->getId());
+                $row[] = $id;
             }
             for ($i = 0; $i < count($columns); $i++) {
                 $columnName = $columns[$i];
@@ -329,7 +334,7 @@ class ORMController extends DTADomainController {
         $columns = $modelClass::getTableViewColumnNames();
         // construct the sorted and filtered query
         $query = $this->getSortedFilteredQuery($request, $package, $className, $addIdColumn);
-	    $totalRecords = $query->count();
+	    $totalRecords = $query->setFormatter(\ModelCriteria::FORMAT_STATEMENT)->select(array('id'))->groupBy('id')->count();
 
         // Output
 	    $response = array(
@@ -339,8 +344,8 @@ class ORMController extends DTADomainController {
             "data" => array()
 	    );
 
-        // retrieve entities
-        $entities = $this->getPaginatedEntities($request, $query);
+        // retrieve entities: rebuild query to avoid formatter issues
+        $entities = $this->getPaginatedEntities($request, $this->getSortedFilteredQuery($request, $package, $className, $addIdColumn));
 
         // format in data tables response format
         $response['data'] = $this->formatAsArray($entities, $columns, $package, $className, $addIdColumn);

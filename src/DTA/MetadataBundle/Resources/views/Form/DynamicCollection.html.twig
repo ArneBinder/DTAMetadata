@@ -79,9 +79,11 @@
     {% endif %}
         {#onclick="function(){console.log('success')}"#}
 
+    {% if allow_add == true %}
         <a href="#" class="dynamic-collection add-entity">
             <i class='icon-plus'></i>{{ form.vars.modelClass|trans }} hinzufügen
         </a>
+    {% endif %}
 
     {# For the javascript to have access to the translated modelClass name.
        The up and down dynamic controls need this to be more expressive.   #}

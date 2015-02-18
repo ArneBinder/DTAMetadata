@@ -298,7 +298,8 @@
 2015-02-17
  o fixed convertMultiVolumes
  o added publication type: manuscript
- o fixed duplicated entries in table_row_view (all publications): deleted query for publication in schema files
+ o fixed duplicated entries _COUNT_ in table_row_view (all publications): added select & group by id while counting. DUPLICATED ENTRIES NOT YET FIXED! query is inflated by filterBy critera...
+ o tried to modify add volume to selectBox: still TODO
  
  
  TODO:
