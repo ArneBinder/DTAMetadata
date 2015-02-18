@@ -15,6 +15,8 @@ php app/console propel:model:build
 # php app/console propel:sql:insert --force
 
 # set permissions
-sudo chmod -R 0777 app/cache 
-sudo chmod -R 0777 app/logs 
-sudo chmod -R 0777 src/DTA/MetadataBundle/Resources/config/*schema.xml
+sudo chmod -R 0777 app/logs
+sudo chown -R www-data app/cache
+sudo chown -R www-data src/DTA/MetadataBundle/Resources/config/*schema.xml
+sudo chown -R www-data app/propel
+# sudo chown -R www-data src
