@@ -191,8 +191,6 @@ class ORMController extends DTADomainController {
         }
         // SORTING END
 
-        $this->get('logger')->critical("sorted query: " . $query->toString());
-
         // FILTERING
         if($request->get('search')['value']) {
             $this->get('logger')->critical("filterColumns: " . implode(", ",$modelClass::getTableViewFilterColumns()));
@@ -207,6 +205,8 @@ class ORMController extends DTADomainController {
                 $query = $this->addCriteria($query->_or(),'filter',$columnCaption,$modelClass,$filterString);
             }
         }
+        $this->get('logger')->critical("sorted filtered query: " . $query->toString());
+
         return $query;
 
         // filtering is more difficult than initially thought!

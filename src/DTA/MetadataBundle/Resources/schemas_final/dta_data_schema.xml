@@ -98,6 +98,7 @@ propel > dbal > connections for connection setup. -->
             <parameter name="Verlag" value="accessor:getPublishingcompany"/>
             <parameter name="Ort" value="accessor:getPlace"/>
             <!--<parameter name="Typ" value="type"/>-->
+            <!--
             <parameter name="attribute1" value="query:\DTA\MetadataBundle\Model\Data\PublicationQuery::create()
                     ->join('Title')
                     ->join('Title.Titlefragment')
@@ -108,7 +109,8 @@ propel > dbal > connections for connection setup. -->
                     ->join('Personalname.Namefragment')
                     ->join('Volume')
                     ->join('Place')
-;" />
+            ;" />
+            -->
         </behavior>
         
         <behavior name="reconstructed_flaggable">
