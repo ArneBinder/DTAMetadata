@@ -1766,6 +1766,14 @@ class DumpConversionController extends ORMController {
         return new Response($result);;
     }
 
+    public function rebuildPropelModelAction(){
+        $result = shell_exec("cp -r src/DTA/MetadataBundle/Resources/schemas_final/* src/DTA/MetadataBundle/Resources/config/ 2>&1");
+        $result .= shell_exec("php app/console propel:model:build 2>&1");
+        //echo $result;
+        //$this->addLogging(array("update source code" => $result));
+        return new Response($result);;
+    }
+
     /** For conversion, some id columns are created as non-auto incrementing. To be able to work with the database conveniently, auto-incrementing is enabled manually. 
      * This is postgres specific logic. Maybe that's also the reason why a migration won't do (propel doesn't even seem to recognize the difference between the schemas if auto-increment is on/off).
      * Note that changing the schema is necessary, and the propel classes need to be rebuild afterwards. 

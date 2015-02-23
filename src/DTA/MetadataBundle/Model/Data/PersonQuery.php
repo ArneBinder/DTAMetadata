@@ -18,8 +18,8 @@ class PersonQuery extends BasePersonQuery implements \DTA\MetadataBundle\Model\S
         return PersonalnameQuery::sqlFilter($this->usePersonalnameQuery(), $filterString)->endUse();
     }
 
+    //add filter keyword expansion
     public function filterByGnd($gnd = null, $comparison = null){
-
         if($gnd !== null and substr($gnd,-1)!=="%"){
             return parent::filterByGnd($gnd."%",$comparison);
         }else{
