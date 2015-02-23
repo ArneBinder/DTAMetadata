@@ -194,17 +194,21 @@ class DumpConversionController extends ORMController {
         $this->addLogging(array("finished transaction ".$task=>$time_taken));
     }
 
-    function useSchemaFiles($schemaFilesDir){
+    function useSchemaFiles($schemaFilesDir, $doLogging = true){
+        $result = array();
         $expandedSchemaFilesDir = "../src/DTA/MetadataBundle/Resources/$schemaFilesDir";
         foreach (array('dta_data_schema.xml', 'dta_master_schema.xml', 'dta_workflow_schema.xml', 'dta_classification_schema.xml') as $schema) {
-            $this->addLogging(array(
-                "bringing $schema from $schemaFilesDir into place" =>
-                copy("$expandedSchemaFilesDir/$schema","$expandedSchemaFilesDir/../config/$schema")
-            ));
-
+            $currentResult = copy("$expandedSchemaFilesDir/$schema","$expandedSchemaFilesDir/../config/$schema");
+            if($doLogging)
+                $this->addLogging(array("bringing $schema from $schemaFilesDir into place" => $currentResult));
+            $result[]= $currentResult;
         }
         // build propel entity classes
-        $this->addLogging(array("building model from $schemaFilesDir" => shell_exec("$this->phpExec ../app/console propel:model:build 2>&1")));
+        $currentResult = shell_exec("$this->phpExec ../app/console propel:model:build 2>&1");
+        if($doLogging)
+            $this->addLogging(array("building model from $schemaFilesDir" => $currentResult));
+        $result[]= $currentResult;
+        return implode(", ",$result);
     }
 
 
@@ -1760,18 +1764,11 @@ class DumpConversionController extends ORMController {
     }
 
     public function updateAction(){
-        $result = shell_exec("git pull 2>&1");
-        //echo $result;
-        //$this->addLogging(array("update source code" => $result));
-        return new Response($result);;
+        return new Response(shell_exec("git pull 2>&1"));
     }
 
     public function rebuildPropelModelAction(){
-        $result = shell_exec("cp -r src/DTA/MetadataBundle/Resources/schemas_final/* src/DTA/MetadataBundle/Resources/config/ 2>&1");
-        $result .= shell_exec("php app/console propel:model:build 2>&1");
-        //echo $result;
-        //$this->addLogging(array("update source code" => $result));
-        return new Response($result);;
+        return new Response($this->useSchemaFiles("schemas_final", false));
     }
 
     /** For conversion, some id columns are created as non-auto incrementing. To be able to work with the database conveniently, auto-incrementing is enabled manually. 
