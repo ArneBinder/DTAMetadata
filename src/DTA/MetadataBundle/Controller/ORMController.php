@@ -378,12 +378,12 @@ class ORMController extends DTADomainController {
         $columns = $modelClass::getTableViewColumnNames();
         //
         $filterIds = $this->getFilterIds($request, $package, $className);
-        $this->get('logger')->critical("filterIds: ".print_r($filterIds, true));
+        //$this->get('logger')->critical("filterIds: ".print_r($filterIds, true));
 
         $totalRecords = $modelClass::getRowViewQueryObject()
             ->setFormatter(\ModelCriteria::FORMAT_STATEMENT)
-            //->select(array('id'))
-            //->groupBy('id')
+            ->select(array('id'))
+            ->groupBy('id')
             ->count();
         // construct the sorted and filtered query
         //$query = $this->getSortedFilteredQuery($request, $package, $className, $addIdColumn);

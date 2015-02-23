@@ -18,6 +18,14 @@ class PersonQuery extends BasePersonQuery implements \DTA\MetadataBundle\Model\S
         return PersonalnameQuery::sqlFilter($this->usePersonalnameQuery(), $filterString)->endUse();
     }
 
+    public function filterByGnd($gnd = null, $comparison = null){
+
+        if($gnd !== null and substr($gnd,-1)!=="%"){
+            return parent::filterByGnd($gnd."%",$comparison);
+        }else{
+            return parent::filterByGnd($gnd,$comparison);
+        }
+    }
     /**
      * Adds a filtering clause to the database query that filters the entities by a given string.
      * @param $filterString the string which the entities have to contain
