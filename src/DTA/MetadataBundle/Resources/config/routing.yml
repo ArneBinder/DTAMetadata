@@ -124,9 +124,9 @@ Data_newPublication:
   defaults: { _controller: DTAMetadataBundle:DataDomain:newPublication }
 
 # displayed content in the right side bar of the list view (data overview and task/copy location edit options)
-publicationControls:
-  path: /Data/publicationControls/{publicationId}
-  defaults: { _controller: DTAMetadataBundle:DataDomain:publicationControls}
+controls:
+  path: /Data/controls/{className}/{id}
+  defaults: { _controller: DTAMetadataBundle:DataDomain:controls}
     
 #Data_viewPublicationsByType:
 #  path: /Data/showAll/{publicationType}

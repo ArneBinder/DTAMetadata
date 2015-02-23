@@ -57,14 +57,14 @@
 </div>
 <div class="col-md-3 dta-data-options">
     <h3> {{ title|default(className|default('Listview'))|trans }}
-        {% set publicationType = className != 'Publication'?className:'Book' %}
-        <a class="btn btn-mini listView-add-button pull-right" href="{{ path('Data_newPublication', {'publicationType':publicationType}) }}" class="btn btn-default btn-sm">
+        {#{% set publicationType = className != 'Publication'?className:'Book' %}#}
+        <a class="btn btn-mini listView-add-button pull-right" href="{{ newEntityLink }}" class="btn btn-default btn-sm">
             <i class="icon-plus"></i>
             neu anlegen
         </a>
     </h3>
     <div class="well" id="publicationOptions">
-        <h4> Auf eine Publikation klicken, um Informationen anzuzeigen. </h4>
+        <h4> Auf ein {{ className|trans }} klicken, um Informationen anzuzeigen. </h4>
     </div>
 </div>
 {% endblock core %}
