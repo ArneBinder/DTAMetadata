@@ -57,7 +57,7 @@ return array(
     'PRINTER' => 'Drucker',
     'EDITOR' => 'Herausgeber',
 
-    'LAST_NAME' => 'Nachmname',
+    'LAST_NAME' => 'Nachname',
     'FIRST_NAME' => 'Vorname',
 
     'KNOWLEDGE_DOMAIN' => 'Wissensdomäne',

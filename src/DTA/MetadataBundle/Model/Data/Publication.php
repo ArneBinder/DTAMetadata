@@ -97,18 +97,29 @@ class Publication extends BasePublication
     
     /** Returns a short title, suitable for displaying an overview. */
     public function getShortTitle(){
-        
+        return $this->getTitlePart();
+    }
+
+    public function getTitlePart($part = TitlefragmentPeer::TYPE_SHORT_TITLE, $withVolumeInformation=true){
         $titleFragments = $this->getTitle()->getTitleFragments();
-        // check if the title has a shortTitle fragment
+        $result = null;
+        // check if the title has the title fragment
         foreach ($titleFragments as $tf ){
             /* @var $tf Titlefragment */
-            if($tf->getType() == TitlefragmentPeer::TYPE_SHORT_TITLE)
-                return $tf->getName();
+            if($tf->getType() == $part)
+                $result = $tf->getName();
         }
-        
+        if($result===null){
+            $title = $this->getTitle();
+            $result = $title !== NULL ? $title->__toString() : "";
+        }
+        if($withVolumeInformation && $this->getType() === PublicationPeer::TYPE_VOLUME ){
+            $volume = $this->getVolume();
+            if($volume === NULL) throw new \Exception("No volume entity related to volume publication ".$this->getId()." ".$this->getShortTitle());
+            $result .= $volume->getVolumeSummary();
+        }
         // no short title available
-        return $this->getTitleString(false);
-        
+        return $result;
     }
 
 

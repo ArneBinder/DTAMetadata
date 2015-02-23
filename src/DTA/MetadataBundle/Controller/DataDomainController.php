@@ -159,8 +159,15 @@ class DataDomainController extends ORMController {
             if( is_null($entity)){
                 $this->get('logger')->critical("Can not retrieve Person with ID $id for display of person controls in ".__FILE__." controlsAction.");
             }
+            $relatedPublications = array();
+            $relatedPersonPublications = Model\Master\PersonPublicationQuery::create()->findByPersonId($entity->getId());
+            foreach($relatedPersonPublications as $relatedPersonPublication){
+                $relatedPublications[$relatedPersonPublication->getRole()][] = Model\Data\PublicationQuery::create()->findOneById($relatedPersonPublication->getPublicationId());
+            }
+            //$this->get('logger')->critical(print_r($relatedPublications, true));
             return $this->render('DTAMetadataBundle:Package_Data:personControls.html.twig', array(
                 'person' => $entity,
+                'relatedPublications' => $relatedPublications
             ));
         }
 
