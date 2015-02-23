@@ -304,6 +304,9 @@
 2015-02-19
  o Git pull from a php script: http://jondavidjohn.com/git-pull-from-a-php-script-not-so-simple/
  
+2015-02-23
+ o fixed table_row_view of persons and implemented personControls
+ 
  TODO:
  o Tab-Constraint DONE
  o merge multiple spaces DONE

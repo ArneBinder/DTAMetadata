@@ -89,10 +89,10 @@ class DataDomainController extends ORMController {
             $modelClass = new $classNames["model"];
 
             $newEntityLink = null;
-            $this->get('logger')->critical("className: $className");
             if($className==='Person'){
                 $newEntityLink = $this->generateUrl("Data_genericCreateOrEdit", array('className'=>$className));
             }else{
+                // assume entity is a kind of publication
                 $newEntityLink = $this->generateUrl("Data_newPublication", array('publicationType'=>$className!=='Publication'?$className:'Book'));
             }
             return $this->renderWithDomainData("DTAMetadataBundle::listViewWithOptions.html.twig", array(
