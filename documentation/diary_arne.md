@@ -319,6 +319,6 @@
  o add genre and tag import from old database DEPRICATED?
  o change tag list to tag field
  
- o add filter to search for entries FONE
+ o add filter to search for entries DONE
  
  o use inherit_data (http://symfony.com/doc/current/cookbook/form/inherit_data_option.html)

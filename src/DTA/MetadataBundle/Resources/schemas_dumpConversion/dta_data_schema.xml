@@ -370,9 +370,9 @@
         <!--The name is added in the personalName table because it's a one-to-many relationship.-->
         
         <behavior name="table_row_view">
-            <parameter name="erster name@representative" value="personalname"/>
+            <parameter name="Erster Name@representative" value="personalname"/>
             <!--<parameter name="namen gesamt@count" value="personalname"/>-->
-            <parameter name="gnd" value="gnd"/>
+            <parameter name="GND" value="gnd"/>
             <parameter name="attribute3"
                        value="query:DTA\MetadataBundle\Model\Data\PersonQuery::create()
                             ->join('Personalname')
