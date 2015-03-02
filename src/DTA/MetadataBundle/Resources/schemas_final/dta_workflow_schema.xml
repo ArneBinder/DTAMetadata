@@ -185,8 +185,8 @@
         <!--Ob diese Lizenz auf Text anwendbar ist -->
         <column name="applicable_to_text" type="BOOLEAN" required="true" default="false"/>
         <behavior name="table_row_view">
-            <parameter name="Name" value="name"/>
-            <parameter name="URL" value="url"/>
+            <parameter name="Name" value="name filterColumn:"/>
+            <parameter name="URL" value="url filterColumn:"/>
         </behavior>
     </table>
     

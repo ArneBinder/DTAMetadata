@@ -211,9 +211,9 @@ class TableRowViewBehavior extends Behavior {
             if(array_key_exists('filterColumn',$parameters)){
                 $splitted = explode('@',$captionOrIndicator);
                 if(count($splitted)>1){
-                    $behavior->filterColumns[]="'$splitted[0]'";
+                    $behavior->filterColumns[]=$splitted[0];
                 }else {
-                    $behavior->filterColumns[] = "'$captionOrIndicator'";
+                    $behavior->filterColumns[] = $captionOrIndicator;
                 }
             }
 
@@ -318,7 +318,7 @@ class TableRowViewBehavior extends Behavior {
             ));
 
             if(in_array("'$remoteCaption'", $otherBehavior->filterColumns)){
-                $this->filterColumns[] = "'$remoteCaption'";
+                $this->filterColumns[] = $remoteCaption;
             }
 
             $subAccessor = 'accessor:' . $embeddedGetterFunctionName;
@@ -418,7 +418,7 @@ class TableRowViewBehavior extends Behavior {
         $queryConstructionStringValue = $this->queryConstructionString === NULL ? 'NULL' : '"' . $this->queryConstructionString . '"';
         $queryConstructionString = 'public static $queryConstructionString = ' . $queryConstructionStringValue . ';';
 
-        $filterColumnsString = 'public static $filterColumns = array('. implode(",",$this->filterColumns). ");";
+        $filterColumnsString = 'public static $filterColumns = array('. implode(",",array_map(function($value) { return "'$value'"; },$this->filterColumns)). ");";
 
         return $captionsString . "\r\t" . $accessorsString . "\r\t" . $queryConstructionString . "\r\t" . $filterColumnsString . "\r";
     }
@@ -433,6 +433,18 @@ class TableRowViewBehavior extends Behavior {
                     'representativeGetterFunctions' => $this->representativeGetterFunctions,
                     'embeddedGetterFunctions' => $this->embeddedGetterFunctions,
                 ));
+    }
+
+    public function queryMethods(){
+        $filterFunctions = array();
+        foreach($this->filterColumns as $filterColumnCaption){
+            $filterFunctions[] = $this->renderTemplate('tableRowViewFilterMethodTemplate',array(
+                'filterElement' => $this->accessors[$filterColumnCaption]
+            ));
+        }
+        return $this->renderTemplate( 'tableRowViewQueryMethods',array(
+            'filterFunctionTemplates' => $filterFunctions
+        ));
     }
 
     // add interface implementation declaration
