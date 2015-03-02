@@ -81,10 +81,11 @@ class PublicationQuery extends BasePublicationQuery implements \DTA\MetadataBund
         //throw new Exception(ob_get_clean());
 
         if(!empty($filterMethods)){
-            $query = $query->$filterMethods[0]();
+            $firstMethod = array_pop($filterMethods);
+            $query = $query->$firstMethod($filterString);
         }
         foreach($filterMethods as $filterMethod){
-            $query = $query->_or()->$filterMethod();
+            $query = $query->_or()->$filterMethod($filterString);
         }
         return $query;
     }

@@ -7,6 +7,7 @@ interface SQLFilterable{
  
     /**
      * Adds a filtering clause to the database query that filters the entities by a given string.
+     * @param $query
      * @param $filterString the string which the entities have to contain
      * @return ModelCriteria the modified query object that will return the filtered entities
      */

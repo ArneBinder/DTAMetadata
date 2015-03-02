@@ -46,8 +46,8 @@
             <parameter name="Abgeschlossen" value="closed"/>
             <parameter name="Start" value="start_date"/>
             <parameter name="Ende" value="end_date"/>
-            <parameter name="Für" value="accessor:getReferee"/>
-            <parameter name="Verantwortlich" value="accessor:getResponsibleUser"/>
+            <parameter name="Für" value="accessor:getReferee filterColumn:"/>
+            <parameter name="Verantwortlich" value="accessor:getResponsibleUser filterColumn:"/>
             <parameter name="query" value="query:\DTA\MetadataBundle\Model\Workflow\TaskQuery::create()
                     ->leftJoin('Publication')
                     ->leftJoin('Publication.Title')
@@ -65,8 +65,8 @@
         <behavior name="nested_set"/>
         <behavior name="table_row_view">
             <parameter name="id" value="id"/>
-            <parameter name="Typ" value="name"/>
-            <parameter name="Zuordnung" value="accessor:getParent"/>
+            <parameter name="Typ" value="name filterColumn:"/>
+            <parameter name="Zuordnung" value="accessor:getParent filterColumn:"/>
         </behavior>
     </table>
     
