@@ -507,6 +507,7 @@ class ORMController extends DTADomainController {
                     'columns' => $modelClass::getTableViewColumnNames(),
                     'data' => $records,
                     'updatedObjectId' => $updatedObjectId,
+                    'enableSearch' => method_exists(new $classNames["query"], 'sqlFilter')
                 ));
     }
 

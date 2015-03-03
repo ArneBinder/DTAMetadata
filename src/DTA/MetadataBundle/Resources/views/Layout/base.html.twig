@@ -46,7 +46,7 @@
         <!-- Placed at the end of the document so the pages load faster -->
         {#<script src="{{ asset('js/jquery.min.js') }}"></script>#}
         {#<script src="{{ asset('js/jquery-ui.min.js') }}"></script>#}
-        
+        {% set search = (enableSearch|default(false))?'true':'false' %}
         <script type="text/javascript">
 
             /*function thisHeight(){
@@ -128,7 +128,7 @@
                             ,"serverSide": true
                             ,"ajax": "{{path(package~'_dataTablesDataSource', {'package': package, 'className': className}) }}"
                             ,"ordering":true // disables sorting completely
-                            ,"searching":true // disables filtering
+                            ,"searching":{{ search }}//true // disables filtering
                             ,orderClasses: false
                             ,order:[]
                             ,"lengthMenu": [

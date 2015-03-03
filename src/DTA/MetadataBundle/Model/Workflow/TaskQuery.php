@@ -12,19 +12,8 @@ class TaskQuery extends BaseTaskQuery
         return DtaUserQuery::sqlSort($this->useDtaUserQuery(), $direction)->endUse();
     }
 
-    public function filterByResponsibleUserString($filterString = null, $comparison = null){
-        return DtaUserQuery::sqlFilter($this->useDtaUserQuery(), $filterString)->endUse();
-    }
-
     public function orderByReferee($direction){
         //TODO: add PublicationGroups!!
         return PublicationQuery::sqlSort($this->usePublicationQuery(), $direction)->endUse();
     }
-
-    public function filterByRefereeString($filterString = null, $comparison = null){
-        //TODO: add PublicationGroups!!
-        return PublicationQuery::sqlFilter($this->usePublicationQuery(), $filterString)->endUse();
-        //return PublicationQuery::sqlFilter($this->usePublicationgroupQuery()->usePublicationPublicationgroupQuery()->usePublicationQuery(), $filterString)->endUse()->endUse();
-    }
-
 }

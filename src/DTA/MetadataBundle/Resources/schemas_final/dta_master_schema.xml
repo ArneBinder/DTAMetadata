@@ -140,7 +140,7 @@
         </behavior>
 
         <behavior name="filterable">
-            <parameter name="atomic" value="username"/>
+            <parameter name="username" value="atomic"/>
         </behavior>
         
     </table>

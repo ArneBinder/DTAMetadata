@@ -307,6 +307,17 @@
 2015-02-23
  o fixed table_row_view of persons and implemented personControls
  
+2015-03-03
+ o renewed filter functionality: implemented filterableBehavior
+    e.g.
+            <behavior name="filterable">
+                <parameter name="DatespecificationRelatedByPublicationdateId" value="many"/>
+                <parameter name="Title" value="many"/>
+                <parameter name="Person" value="manyToMany"/>
+            </behavior>
+    the value has to be "atomic" (for atomical values), "many" (embbeded one time) or "manyTomany" (embedded two times).
+    Furthermore the search string will be expanded for text columns via "%" and for numerical columns to 4 digits (assume it is a year).
+ 
  TODO:
  o Tab-Constraint DONE
  o merge multiple spaces DONE

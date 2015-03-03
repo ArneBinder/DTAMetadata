@@ -84,7 +84,7 @@ class DataDomainController extends ORMController {
             return parent::genericViewAllAction($package, $className);
         } else {
             $classNames = $this->relatedClassNames($package, $className);
-
++
             // for retrieving the column names
             $modelClass = new $classNames["model"];
 
@@ -102,6 +102,7 @@ class DataDomainController extends ORMController {
                 'updatedObjectId' => $updatedObjectId,
                 'optionsLinkTemplate' => $this->generateUrl("controls", array('className' => $className, 'id'=>'__id__')),
                 'newEntityLink' => $newEntityLink,
+                'enableSearch' => method_exists(new $classNames["query"], 'sqlFilter')
             ));
         }
         

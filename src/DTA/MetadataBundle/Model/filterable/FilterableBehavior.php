@@ -52,6 +52,9 @@ class FilterableBehavior extends Behavior {
                     'filterElement' => $key,
                     'thisElement' => $this->getTable()->getPhpName()
                 ));
+            }else{
+                $tableName = $this->getTable()->getName();
+                throw new Exception("Unknown value \"$value\" for \"$key\" in filterableBehavior for table \"$tableName\"");
             }
         }
 

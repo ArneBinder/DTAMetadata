@@ -55,6 +55,12 @@
                     ->leftJoin('Tasktype')
                     ->leftJoin('DtaUser');" />
         </behavior>
+        <behavior name="filterable">
+            <parameter name="tasktype" value="many"/>
+            <parameter name="publication" value="many"/>
+            <parameter name="dtaUser" value="many"/>
+            <parameter name="Publicationgroup" value="many"/>
+        </behavior>
     </table>
 
     <table name="tasktype">
@@ -69,7 +75,7 @@
             <parameter name="Zuordnung" value="accessor:getParent filterColumn:"/>
         </behavior>
         <behavior name="filterable">
-            <parameter name="column" value="name"/>
+            <parameter name="name" value="atomic"/>
         </behavior>
     </table>
     
@@ -198,6 +204,10 @@
         <column name="id" type="INTEGER" primaryKey="true" autoIncrement="true" required="true"/>
         
         <column name="name" type="LONGVARCHAR" required="true" primaryString="true"/>
+        <behavior name="filterable">
+            <!-- <parameter name="Publication" value="manyToMany"/> eliminates all results... ? -->
+            <parameter name="name" value="atomic"/>
+        </behavior>
     </table>
     
 </database>
