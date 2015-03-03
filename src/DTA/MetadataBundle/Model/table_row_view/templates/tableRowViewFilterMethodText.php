@@ -5,9 +5,9 @@
 */
 public function filterBy<?php echo ucfirst($filterElement);?>String($filterString = null, $comparison = null){
     if($filterString !== null and substr($filterString,-1)!=="%"){
-        return filterBy<?php echo ucfirst($filterElement);?>($filterString."%",$comparison);
+        return $this->filterBy<?php echo ucfirst($filterElement);?>($filterString."%",$comparison);
     }else{
-        return filterBy<?php echo ucfirst($filterElement);?>($filterString,$comparison);
+        return $this->filterBy<?php echo ucfirst($filterElement);?>($filterString,$comparison);
     }
 }
 

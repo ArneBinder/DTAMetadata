@@ -6,11 +6,11 @@
 public function filterBy<?php echo ucfirst($filterElement);?>String($filterString = null, $comparison = null, $paddingSize = 4){
     if(ctype_digit($filterString)) {
         if(strlen($filterString) < $paddingSize){
-            return $query->filterBy<?php echo ucfirst($filterElement);?>(array(intval(str_pad($filterString,$paddingSize,'0')),intval(str_pad($filterString,$paddingSize,'9'))));
+            return $this->filterBy<?php echo ucfirst($filterElement);?>(array(intval(str_pad($filterString,$paddingSize,'0')),intval(str_pad($filterString,$paddingSize,'9'))));
         }
-            return $query->filterBy<?php echo ucfirst($filterElement);?>(intval($filterString));
+            return $this->filterBy<?php echo ucfirst($filterElement);?>(intval($filterString));
     }else{
-        return $query;
+        return $this;
     }
 }
 
