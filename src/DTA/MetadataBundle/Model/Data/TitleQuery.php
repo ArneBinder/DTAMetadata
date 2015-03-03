@@ -4,7 +4,7 @@ namespace DTA\MetadataBundle\Model\Data;
 
 use DTA\MetadataBundle\Model\Data\om\BaseTitleQuery;
 
-class TitleQuery extends BaseTitleQuery implements \DTA\MetadataBundle\Model\SQLSortable, \DTA\MetadataBundle\Model\SQLFilterable
+class TitleQuery extends BaseTitleQuery implements \DTA\MetadataBundle\Model\SQLSortable
 {
     public static function sqlSort(\ModelCriteria $query, $direction = \ModelCriteria::ASC){
         return $query->useTitlefragmentQuery()
@@ -22,8 +22,8 @@ class TitleQuery extends BaseTitleQuery implements \DTA\MetadataBundle\Model\SQL
      * @param $filterString the string which the entities have to contain
      * @return ModelCriteria the modified query object that will return the filtered entities
      */
-    public static function sqlFilter(\ModelCriteria $query, $filterString)
+    /*public static function sqlFilter(\ModelCriteria $query, $filterString)
     {
        return TitlefragmentQuery::sqlFilter($query->useTitlefragmentQuery(),$filterString)->endUse();
-    }
+    }*/
 }

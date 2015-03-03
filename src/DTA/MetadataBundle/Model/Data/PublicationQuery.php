@@ -7,7 +7,7 @@ use DTA\MetadataBundle\Model\ModelCriteria;
 use Exception;
 use ReflectionMethod;
 
-class PublicationQuery extends BasePublicationQuery implements \DTA\MetadataBundle\Model\SQLSortable, \DTA\MetadataBundle\Model\SQLFilterable
+class PublicationQuery extends BasePublicationQuery implements \DTA\MetadataBundle\Model\SQLSortable
 {
     public static function sqlSort(\ModelCriteria $query, $direction = \ModelCriteria::ASC){
         return TitleQuery::sqlSort($query->useTitleQuery(), $direction)->endUse();
@@ -41,26 +41,26 @@ class PublicationQuery extends BasePublicationQuery implements \DTA\MetadataBund
         return PlaceQuery::sqlSort($this->usePlaceQuery(), $direction)->endUse();
     }
 
-    public function filterByTitleStringString($filterString = null, $comparison = null){
-        return TitleQuery::sqlFilter($this->useTitleQuery(), $filterString)->endUse();
+   /* public function filterByTitleStringString($filterString = null, $comparison = null){
+        return $this->useTitleQuery()->sqlFilter($filterString)->endUse();
     }
 
     public function filterByFirstAuthorNameString($filterString = null, $comparison = null){
-        return PersonQuery::sqlFilter($this->usePersonPublicationQuery()->usePersonQuery(),$filterString)->endUse()->endUse();
+        return $this->usePersonPublicationQuery()->usePersonQuery()->sqlFilter($filterString)->endUse()->endUse();
     }
 
     // adding "String" to the function name prevents collision with propel filter method
     public function filterByDatespecificationRelatedByPublicationdateIdString($filterString = null, $comparison = null){
-        return DatespecificationQuery::sqlFilter($this->useDatespecificationRelatedByPublicationdateIdQuery(), $filterString)->endUse();
+        return $this->useDatespecificationRelatedByPublicationdateIdQuery()->sqlFilter($filterString)->endUse();
     }
-
+*/
 
     /**
      * Adds a filtering clause to the database query that filters the entities by a given string.
      * @param $filterString the string which the entities have to contain
      * @return ModelCriteria the modified query object that will return the filtered entities
      */
-    public static function sqlFilter(\ModelCriteria $query, $filterString)
+    /*public static function sqlFilter(\ModelCriteria $query, $filterString)
     {
         // get all methods which start with 'filterBy' and end with 'String'
         $filterMethods = array();
@@ -91,5 +91,5 @@ class PublicationQuery extends BasePublicationQuery implements \DTA\MetadataBund
             $query = $query->_or()->$filterMethod($filterString);
         }
         return $query;
-    }
+    }*/
 }

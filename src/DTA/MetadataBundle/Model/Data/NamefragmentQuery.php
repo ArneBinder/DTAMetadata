@@ -4,7 +4,7 @@ namespace DTA\MetadataBundle\Model\Data;
 
 use DTA\MetadataBundle\Model\Data\om\BaseNamefragmentQuery;
 
-class NamefragmentQuery extends BaseNamefragmentQuery implements \DTA\MetadataBundle\Model\SQLSortable, \DTA\MetadataBundle\Model\SQLFilterable
+class NamefragmentQuery extends BaseNamefragmentQuery implements \DTA\MetadataBundle\Model\SQLSortable
 {
     public static function sqlSort(\ModelCriteria $query, $direction = \ModelCriteria::ASC){
         return $query->orderByType($direction)
@@ -16,9 +16,9 @@ class NamefragmentQuery extends BaseNamefragmentQuery implements \DTA\MetadataBu
      * @param $filterString the string which the entities have to contain
      * @return the modified query object that will return the filtered entities
      */
-    public static function sqlFilter(\ModelCriteria $query, $filterString)
+    /*public static function sqlFilter(\ModelCriteria $query, $filterString)
     {
         return $query->filterByName("$filterString*");
         //return $this->where('Name = ?', $filterString);
-    }
+    }*/
 }

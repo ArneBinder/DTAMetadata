@@ -6,7 +6,7 @@ use DTA\MetadataBundle\Model\Data\om\BaseTitlefragmentQuery;
 use DTA\MetadataBundle\Model\ModelCriteria;
 use DTA\MetadataBundle\Model\the;
 
-class TitlefragmentQuery extends BaseTitlefragmentQuery implements \DTA\MetadataBundle\Model\SQLFilterable
+class TitlefragmentQuery extends BaseTitlefragmentQuery
 {
 //    public static function sort(\ModelCriteria $query, $direction = \ModelCriteria::ASC){
 //        return $query
@@ -19,8 +19,8 @@ class TitlefragmentQuery extends BaseTitlefragmentQuery implements \DTA\Metadata
      * @param $filterString the string which the entities have to contain
      * @return ModelCriteria the modified query object that will return the filtered entities
      */
-    public static function sqlFilter(\ModelCriteria $query, $filterString)
+    /*public static function sqlFilter(\ModelCriteria $query, $filterString)
     {
         return $query->filterByName("$filterString*");
-    }
+    }*/
 }

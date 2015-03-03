@@ -118,6 +118,11 @@ class TableRowViewBehavior extends Behavior {
     public $orderColumnFunctions = array(
         // strings, containing the php code of the single methods
     );
+
+    /**
+     *
+     */
+    public $filterFunctions = array();
     
     /** [optional] Executable code that generates the propel query object for the class to return records in a certain manner (e.g. more efficient). 
      * A valid string would be 
@@ -166,7 +171,7 @@ class TableRowViewBehavior extends Behavior {
         $this->accessors[$caption] = $accessor;
     }
 
-    private static function extractPureAccessor($accessor){
+    /*private static function extractPureAccessor($accessor){
         if(strncmp($accessor, "accessor:", strlen("accessor:"))) {
             return $accessor;
         }elseif(!strncmp($accessor, "accessor:get", strlen("accessor:get"))) {
@@ -176,7 +181,7 @@ class TableRowViewBehavior extends Behavior {
             throw new InvalidArgumentException(sprintf(
                 'Could not extract pure accessor of \'%s\'.', $accessor));
         }
-    }
+    }*/
 
     /**
      * Extract local columns and embedded columns from the parameters.
@@ -305,6 +310,15 @@ class TableRowViewBehavior extends Behavior {
 
         // build the behavior (e.g. parse embed columns parameters recursively) 
         $otherBehavior->build();
+
+        /*$relatedPhpName = $relatedEntity->getPhpName();
+        $relatedPackage = end(explode('.',$relatedEntity->getPackage()));
+        if(method_exists("DTA\\MetadataBundle\\Model\\$relatedPackage\\$relatedPhpName".'Query', 'sqlFilter')){
+            $this->filterFunctions[] = $this->renderTemplate('tableRowViewFilterMethodEmbedded', array(
+                'filterElement' => $relatedPhpName,
+                'package' => $relatedPackage
+            ));
+        }*/
 
         // add all columns to the local view
         $i = 0;
@@ -439,33 +453,7 @@ class TableRowViewBehavior extends Behavior {
     }
 
     public function queryMethods(){
-        $filterFunctions = array();
-        foreach($this->filterColumns as $filterColumnCaption){
-            $accessor = ORMController::extractPureAccessor($this->accessors[$filterColumnCaption]);
-            //$accessor = $this->accessors[$filterColumnCaption];
-            $filterColumn = $this->getTable()->getColumnByPhpName($accessor);
-            $filterType = null;
-            $template = "tableRowViewFilterMethodNone";
-            if($filterColumn!==null){
-                $filterType = $filterColumn->getType();
-                if($filterColumn->isTextType()){
-                    $template = "tableRowViewFilterMethodText";
-                }elseif($filterColumn->isNumericType()){
-                    $template = "tableRowViewFilterMethodNumeric";
-                }elseif($filterColumn->isTemporalType()){
-                    //TODO
-                }else{
-                    // use template "tableRowViewFilterMethodNone"
-                }
-            }
-            $filterFunctions[] = $this->renderTemplate($template, array(
-                'filterElement' => $accessor,
-                'filterType' => $filterType
-            ));
-        }
-        return $this->renderTemplate( 'tableRowViewQueryMethods',array(
-            'filterFunctionTemplates' => $filterFunctions
-        ));
+
     }
 
     // add interface implementation declaration

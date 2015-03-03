@@ -138,6 +138,10 @@
             <parameter name="Mail" value="mail"/>
             <parameter name="Administratorrechte" value="accessor:adminToString"/>
         </behavior>
+
+        <behavior name="filterable">
+            <parameter name="atomic" value="username"/>
+        </behavior>
         
     </table>
 </database>

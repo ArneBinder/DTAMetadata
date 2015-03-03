@@ -68,6 +68,9 @@
             <parameter name="Typ" value="name filterColumn:"/>
             <parameter name="Zuordnung" value="accessor:getParent filterColumn:"/>
         </behavior>
+        <behavior name="filterable">
+            <parameter name="column" value="name"/>
+        </behavior>
     </table>
     
     <!--Bezugsquelle:

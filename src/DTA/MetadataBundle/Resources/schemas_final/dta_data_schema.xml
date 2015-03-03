@@ -116,6 +116,12 @@ propel > dbal > connections for connection setup. -->
         <behavior name="reconstructed_flaggable">
             <parameter name="column" value="publishingcompany_id"/>
         </behavior>
+
+        <behavior name="filterable">
+            <parameter name="DatespecificationRelatedByPublicationdateId" value="many"/>
+            <parameter name="Title" value="many"/>
+            <parameter name="Person" value="manyToMany"/>
+        </behavior>
         
         
         <foreign-key foreignTable="title"> <reference local="title_id" foreign="id"/> </foreign-key>
@@ -140,6 +146,7 @@ propel > dbal > connections for connection setup. -->
         <column name="id" type="INTEGER" primaryKey="true" required="true"/>
         <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
         <behavior name="table_row_view"> <parameter name="embedColumns" value="embedColumns:publication"/> </behavior>
+        <behavior name="filterable"> <parameter name="Publication" value="many"/> </behavior>
     </table> 
     
     <!--Zeitschrift/Zeitung
@@ -149,6 +156,7 @@ propel > dbal > connections for connection setup. -->
         <column name="id" type="INTEGER" primaryKey="true" required="true"/>
         <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
         <behavior name="table_row_view"> <parameter name="embedColumns" value="embedColumns:publication"/> </behavior>
+        <behavior name="filterable"> <parameter name="Publication" value="many"/> </behavior>
     </table> 
     
     <!--MULTI-VOLUME               
@@ -170,6 +178,7 @@ propel > dbal > connections for connection setup. -->
             <parameter name="embedColumns" value="embedColumns:publication"/>
             <parameter name="Anzahl Bände" value="volumes_total"/>
         </behavior>
+        <behavior name="filterable"> <parameter name="Publication" value="many"/> </behavior>
     </table> 
     
     <!--VOLUME               
@@ -189,6 +198,7 @@ propel > dbal > connections for connection setup. -->
             <parameter name="Bandbeschreibung" value="volume_description"/>
             <parameter name="Übergeordnetes Werk" value="accessor:getParentPublication"/>
         </behavior>
+        <behavior name="filterable"> <parameter name="Publication" value="many"/> </behavior>
     </table>   
     
     <!--CHAPTER
@@ -205,6 +215,7 @@ propel > dbal > connections for connection setup. -->
             <parameter name="embedColumns" value="embedColumns:publication"/>
             <parameter name="Seitenangabe" value="pages"/>
         </behavior>
+        <behavior name="filterable"> <parameter name="Publication" value="many"/> </behavior>
     </table> 
     
     <!--ARTICLE
@@ -221,6 +232,7 @@ propel > dbal > connections for connection setup. -->
             <parameter name="embedColumns" value="embedColumns:publication"/>
             <parameter name="Seitenangabe" value="pages"/>
         </behavior>
+        <behavior name="filterable"> <parameter name="Publication" value="many"/> </behavior>
     </table> 
     
     <!--SERIES
@@ -234,6 +246,7 @@ propel > dbal > connections for connection setup. -->
         <behavior name="table_row_view"> 
 			<parameter name="embedColumns" value="embedColumns:publication"/> 
 		</behavior>
+        <behavior name="filterable"> <parameter name="Publication" value="many"/> </behavior>
     </table>
 
     <!--MANUSCRIPT
@@ -247,6 +260,7 @@ propel > dbal > connections for connection setup. -->
         <behavior name="table_row_view">
             <parameter name="embedColumns" value="embedColumns:publication"/>
         </behavior>
+        <behavior name="filterable"> <parameter name="Publication" value="many"/> </behavior>
     </table>
 
     <!-- Other entities that can be considered historical facts. -->
@@ -291,6 +305,9 @@ propel > dbal > connections for connection setup. -->
         <behavior name="reconstructed_flaggable">
             <parameter name="column" value="year"/>
         </behavior>
+        <behavior name="filterable">
+            <parameter name="year" value="atomic"/>
+        </behavior>
     </table>
     
     <!-- Personenname, besteht aus mehreren Namensfragmenten (nameFragment). -->
@@ -308,6 +325,9 @@ propel > dbal > connections for connection setup. -->
         <foreign-key foreignTable="person" onDelete="cascade"> 
             <reference local="person_id" foreign="id"/> 
         </foreign-key>
+        <behavior name="filterable">
+            <parameter name="namefragment" value="many"/>
+        </behavior>
     </table>
     
     <!-- Namensfragmente sind Bestandteile eines Namens, z.B. Vor- oder Nachname. -->
@@ -328,6 +348,9 @@ propel > dbal > connections for connection setup. -->
         <behavior name="table_row_view">
             <parameter name="bestandteil" value="name"/>
         </behavior>
+        <behavior name="filterable">
+            <parameter name="name" value="atomic"/>
+        </behavior>
     </table>
     
     <table name="title">
@@ -335,6 +358,9 @@ propel > dbal > connections for connection setup. -->
         <behavior name="table_row_view">
             <!--<parameter name="id" value="id"/>-->
             <parameter name="titel" value="accessor:__toString"/>
+        </behavior>
+        <behavior name="filterable">
+            <parameter name="Titlefragment" value="many"/>
         </behavior>
     </table>
     
@@ -358,6 +384,9 @@ propel > dbal > connections for connection setup. -->
         <behavior name="reconstructed_flaggable">
             <parameter name="column" value="name"/>
         </behavior>
+        <behavior name="filterable">
+            <parameter name="name" value="atomic"/>
+        </behavior>
         
     </table>
     
@@ -380,6 +409,10 @@ propel > dbal > connections for connection setup. -->
         <unique> 
             <unique-column name="gnd"/> 
         </unique>
+        <behavior name="filterable">
+            <parameter name="personalname" value="many"/>
+            <parameter name="gnd" value="atomic"/>
+        </behavior>
     </table>
     
     <table name="font">
