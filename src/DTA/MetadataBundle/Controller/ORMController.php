@@ -114,8 +114,11 @@ class ORMController extends DTADomainController {
         }elseif(!strncmp($accessor, "accessor:get", strlen("accessor:get"))) {
             $modifiedAccessor = substr($accessor,strlen("accessor:get"));
             return $modifiedAccessor;
+        }elseif(!strncmp($accessor, "accessor:", strlen("accessor:"))) {
+            $modifiedAccessor = substr($accessor,strlen("accessor:"));
+            return $modifiedAccessor;
         }else{
-            throw new InvalidArgumentException(sprintf(
+            throw new \InvalidArgumentException(sprintf(
                 'Could not extract pure accessor of \'%s\'.', $accessor));
         }
     }

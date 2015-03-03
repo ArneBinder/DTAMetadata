@@ -320,7 +320,7 @@ class TableRowViewBehavior extends Behavior {
                 'caption' => $remoteCaption,
             ));
 
-            if(in_array("'$remoteCaption'", $otherBehavior->filterColumns)){
+            if(in_array($remoteCaption, $otherBehavior->filterColumns)){
                 $this->filterColumns[] = $remoteCaption;
             }
 
