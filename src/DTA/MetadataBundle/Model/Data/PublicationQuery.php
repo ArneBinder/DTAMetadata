@@ -64,12 +64,15 @@ class PublicationQuery extends BasePublicationQuery implements \DTA\MetadataBund
     {
         // get all methods which start with 'filterBy' and end with 'String'
         $filterMethods = array();
-        ob_start();
+        //ob_start();
         foreach(get_class_methods(new PublicationQuery) as $possibleFilterMethod){
+            //$methodNameParts = preg_split('/(?=[A-Z])/', $possibleFilterMethod);
+            //gives the same, but is slower:
+            //if($methodNameParts[0] === 'filter' and $methodNameParts[1] === 'By' and end($methodNameParts) === 'String')
             if(!substr_compare($possibleFilterMethod,'filterBy', 0, strlen('filterBy') ) and !substr_compare($possibleFilterMethod,'String',-strlen('String'),strlen('String'))){
                 $functionReflection = new ReflectionMethod(new PublicationQuery, $possibleFilterMethod);
                 $parameters = $functionReflection->getParameters();
-                if(count($parameters)==1 ){
+                if(count($parameters)==2 ){
                     //$rp = new \ReflectionParameter(array(new PublicationQuery, $possibleFilterMethod),$($parameters[0]->name));
                     //var_dump($rp->getClass()->getName());
                     //var_dump($rp);
