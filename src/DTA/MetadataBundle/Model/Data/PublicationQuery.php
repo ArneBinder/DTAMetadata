@@ -41,17 +41,17 @@ class PublicationQuery extends BasePublicationQuery implements \DTA\MetadataBund
         return PlaceQuery::sqlSort($this->usePlaceQuery(), $direction)->endUse();
     }
 
-    public function filterByTitleString($filterString){
+    public function filterByTitleStringString($filterString = null, $comparison = null){
         return TitleQuery::sqlFilter($this->useTitleQuery(), $filterString)->endUse();
     }
 
-    public function filterByFirstAuthorNameString($direction){
-        return PersonQuery::sqlFilter($this->usePersonPublicationQuery()->usePersonQuery(),$direction)->endUse()->endUse();
+    public function filterByFirstAuthorNameString($filterString = null, $comparison = null){
+        return PersonQuery::sqlFilter($this->usePersonPublicationQuery()->usePersonQuery(),$filterString)->endUse()->endUse();
     }
 
     // adding "String" to the function name prevents collision with propel filter method
-    public function filterByDatespecificationRelatedByPublicationdateIdString($direction){
-        return DatespecificationQuery::sqlFilter($this->useDatespecificationRelatedByPublicationdateIdQuery(), $direction)->endUse();
+    public function filterByDatespecificationRelatedByPublicationdateIdString($filterString = null, $comparison = null){
+        return DatespecificationQuery::sqlFilter($this->useDatespecificationRelatedByPublicationdateIdQuery(), $filterString)->endUse();
     }
 
 

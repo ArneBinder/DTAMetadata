@@ -12,7 +12,7 @@ class TaskQuery extends BaseTaskQuery
         return DtaUserQuery::sqlSort($this->useDtaUserQuery(), $direction)->endUse();
     }
 
-    public function filterByResponsibleUser($filterString){
+    public function filterByResponsibleUserString($filterString){
         return DtaUserQuery::sqlFilter($this->useDtaUserQuery(), $filterString)->endUse();
     }
 
@@ -21,7 +21,7 @@ class TaskQuery extends BaseTaskQuery
         return PublicationQuery::sqlSort($this->usePublicationQuery(), $direction)->endUse();
     }
 
-    public function filterByReferee($filterString){
+    public function filterByRefereeString($filterString){
         //TODO: add PublicationGroups!!
         return PublicationQuery::sqlFilter($this->usePublicationQuery(), $filterString)->endUse();
         //return PublicationQuery::sqlFilter($this->usePublicationgroupQuery()->usePublicationPublicationgroupQuery()->usePublicationQuery(), $filterString)->endUse()->endUse();

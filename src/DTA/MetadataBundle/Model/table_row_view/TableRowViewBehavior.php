@@ -68,6 +68,9 @@
  * 
  * @author stud
  */
+
+use DTA\MetadataBundle\Controller\ORMController;
+
 class TableRowViewBehavior extends Behavior {
 
     // default parameters value
@@ -438,8 +441,26 @@ class TableRowViewBehavior extends Behavior {
     public function queryMethods(){
         $filterFunctions = array();
         foreach($this->filterColumns as $filterColumnCaption){
-            $filterFunctions[] = $this->renderTemplate('tableRowViewFilterMethodTemplate',array(
-                'filterElement' => $this->accessors[$filterColumnCaption]
+            $accessor = ORMController::extractPureAccessor($this->accessors[$filterColumnCaption]);
+            //$accessor = $this->accessors[$filterColumnCaption];
+            $filterColumn = $this->getTable()->getColumnByPhpName($accessor);
+            $filterType = null;
+            $template = "tableRowViewFilterMethodNone";
+            if($filterColumn!==null){
+                $filterType = $filterColumn->getType();
+                if($filterColumn->isTextType()){
+                    $template = "tableRowViewFilterMethodText";
+                }elseif($filterColumn->isNumericType()){
+                    $template = "tableRowViewFilterMethodNumeric";
+                }elseif($filterColumn->isTemporalType()){
+                    //TODO
+                }else{
+                    // use template "tableRowViewFilterMethodNone"
+                }
+            }
+            $filterFunctions[] = $this->renderTemplate($template, array(
+                'filterElement' => $accessor,
+                'filterType' => $filterType
             ));
         }
         return $this->renderTemplate( 'tableRowViewQueryMethods',array(

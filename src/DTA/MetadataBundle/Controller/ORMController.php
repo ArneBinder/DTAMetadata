@@ -104,9 +104,11 @@ class ORMController extends DTADomainController {
     }
 
     /**
-     *
+     * @param $accessor the accessor given by $tableRowViewAccessors (potentially marked by the prefix "accessor:")
+     * @return String the pure accessor
+     * @throws InvalidArgumentException
      */
-    private static function extractPureAccessor($accessor){
+    public static function extractPureAccessor($accessor){
         if(strncmp($accessor, "accessor:", strlen("accessor:"))) {
             return $accessor;
         }elseif(!strncmp($accessor, "accessor:get", strlen("accessor:get"))) {
