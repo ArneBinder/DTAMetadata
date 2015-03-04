@@ -7,15 +7,6 @@ public static function getTableViewColumnNames(){
     return $rc->getStaticPropertyValue("tableRowViewCaptions");
 }
 
-/**
-* To specify which columns are used for filtering
-* (In the view that lists all database records of a class as a table)
-*/
-public static function getTableViewFilterColumns(){
-    $rc = new \ReflectionClass(get_called_class());
-    return $rc->getStaticPropertyValue("filterColumns");
-}
-
 /** 
  * To access the data using the specified column names.
  * @param string columnName 

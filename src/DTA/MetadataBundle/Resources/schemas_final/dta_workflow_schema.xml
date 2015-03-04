@@ -46,8 +46,8 @@
             <parameter name="Abgeschlossen" value="closed"/>
             <parameter name="Start" value="start_date"/>
             <parameter name="Ende" value="end_date"/>
-            <parameter name="Für" value="accessor:getReferee filterColumn:"/>
-            <parameter name="Verantwortlich" value="accessor:getResponsibleUser filterColumn:"/>
+            <parameter name="Für" value="accessor:getReferee"/>
+            <parameter name="Verantwortlich" value="accessor:getResponsibleUser"/>
             <parameter name="query" value="query:\DTA\MetadataBundle\Model\Workflow\TaskQuery::create()
                     ->leftJoin('Publication')
                     ->leftJoin('Publication.Title')
@@ -71,8 +71,8 @@
         <behavior name="nested_set"/>
         <behavior name="table_row_view">
             <parameter name="id" value="id"/>
-            <parameter name="Typ" value="name filterColumn:"/>
-            <parameter name="Zuordnung" value="accessor:getParent filterColumn:"/>
+            <parameter name="Typ" value="name"/>
+            <parameter name="Zuordnung" value="accessor:getParent"/>
         </behavior>
         <behavior name="filterable">
             <parameter name="name" value="atomic"/>
@@ -194,8 +194,8 @@
         <!--Ob diese Lizenz auf Text anwendbar ist -->
         <column name="applicable_to_text" type="BOOLEAN" required="true" default="false"/>
         <behavior name="table_row_view">
-            <parameter name="Name" value="name filterColumn:"/>
-            <parameter name="URL" value="url filterColumn:"/>
+            <parameter name="Name" value="name"/>
+            <parameter name="URL" value="url"/>
         </behavior>
     </table>
     

@@ -89,10 +89,6 @@ class TableRowViewBehavior extends Behavior {
         // 'caption'=>'accessor',
     );
 
-    public $filterColumns = array(
-
-    );
-
     /**
      * For each parameter that requires display of a representative entity of a *-to-many relationship, 
      * a selector method is generated, providing a default for overriding in the model classes derived from the generated base classes.
@@ -119,10 +115,6 @@ class TableRowViewBehavior extends Behavior {
         // strings, containing the php code of the single methods
     );
 
-    /**
-     *
-     */
-    public $filterFunctions = array();
     
     /** [optional] Executable code that generates the propel query object for the class to return records in a certain manner (e.g. more efficient). 
      * A valid string would be 
@@ -216,15 +208,6 @@ class TableRowViewBehavior extends Behavior {
                 }
             }
 
-            if(array_key_exists('filterColumn',$parameters)){
-                $splitted = explode('@',$captionOrIndicator);
-                if(count($splitted)>1){
-                    $behavior->filterColumns[]=$splitted[0];
-                }else {
-                    $behavior->filterColumns[] = $captionOrIndicator;
-                }
-            }
-
             // check whether the string starts with 'embedColumns'
             if(array_key_exists('embedColumns',$parameters)){
                 $entity = $parameters['embedColumns'];
@@ -311,15 +294,6 @@ class TableRowViewBehavior extends Behavior {
         // build the behavior (e.g. parse embed columns parameters recursively) 
         $otherBehavior->build();
 
-        /*$relatedPhpName = $relatedEntity->getPhpName();
-        $relatedPackage = end(explode('.',$relatedEntity->getPackage()));
-        if(method_exists("DTA\\MetadataBundle\\Model\\$relatedPackage\\$relatedPhpName".'Query', 'sqlFilter')){
-            $this->filterFunctions[] = $this->renderTemplate('tableRowViewFilterMethodEmbedded', array(
-                'filterElement' => $relatedPhpName,
-                'package' => $relatedPackage
-            ));
-        }*/
-
         // add all columns to the local view
         $i = 0;
         foreach ($otherBehavior->accessors as $remoteCaption => $remoteAccessor) {
@@ -333,10 +307,6 @@ class TableRowViewBehavior extends Behavior {
                 'relatedEntity' => $relatedEntityPhpName,
                 'caption' => $remoteCaption,
             ));
-
-            if(in_array($remoteCaption, $otherBehavior->filterColumns)){
-                $this->filterColumns[] = $remoteCaption;
-            }
 
             $subAccessor = 'accessor:' . $embeddedGetterFunctionName;
 //            visualizing the structure is useful but results in long table headlines, that are impractical
@@ -435,9 +405,7 @@ class TableRowViewBehavior extends Behavior {
         $queryConstructionStringValue = $this->queryConstructionString === NULL ? 'NULL' : '"' . $this->queryConstructionString . '"';
         $queryConstructionString = 'public static $queryConstructionString = ' . $queryConstructionStringValue . ';';
 
-        $filterColumnsString = 'public static $filterColumns = array('. implode(",",array_map(function($value) { return "'$value'"; },$this->filterColumns)). ");";
-
-        return $captionsString . "\r\t" . $accessorsString . "\r\t" . $queryConstructionString . "\r\t" . $filterColumnsString . "\r";
+        return $captionsString . "\r\t" . $accessorsString . "\r\t" . $queryConstructionString . "\r";
     }
 
     /**
@@ -465,12 +433,6 @@ class TableRowViewBehavior extends Behavior {
         $script = preg_replace($pattern, $replace, $script);
     }
 
-    /*public function queryMethods(){
-        return $this->renderTemplate('tableRowViewQueryMethods', array(
-            'orderColumnFunctions' => $this->orderColumnFunctions
-        ));
-    }
-*/
 }
 
 ?>

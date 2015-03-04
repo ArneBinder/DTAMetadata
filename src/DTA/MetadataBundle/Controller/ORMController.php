@@ -180,18 +180,7 @@ class ORMController extends DTADomainController {
 
         // FILTERING
         if($request->get('search')['value']) {
-            $this->get('logger')->critical("filterColumns: " . implode(", ",$modelClass::getTableViewFilterColumns()));
-            $this->get('logger')->critical("FILTER");
-            $filterString = $request->get('search')['value'];
-
-            /*$filterColumnCaptions = $modelClass::getTableViewFilterColumns();
-            if(!empty($filterColumnCaptions)){
-                $query = $this->addCriteria($query,'filter',array_shift($filterColumnCaptions),$modelClass,$filterString);
-            }
-            foreach($filterColumnCaptions as $columnCaption){
-                $query = $this->addCriteria($query->_or(),'filter',$columnCaption,$modelClass,$filterString);
-            }*/
-            $query = $query->sqlFilter($filterString);
+            $query = $query->sqlFilter($request->get('search')['value']);
         }else{
             return null;
         }
