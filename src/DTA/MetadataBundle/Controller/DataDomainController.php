@@ -84,7 +84,7 @@ class DataDomainController extends ORMController {
             return parent::genericViewAllAction($package, $className);
         } else {
             $classNames = $this->relatedClassNames($package, $className);
-+
+
             // for retrieving the column names
             $modelClass = new $classNames["model"];
 
