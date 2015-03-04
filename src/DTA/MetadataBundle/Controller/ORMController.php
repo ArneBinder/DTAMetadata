@@ -312,14 +312,14 @@ class ORMController extends DTADomainController {
     }
 
     protected function formatTableEntry($entity, $columnName, $addEditLink = false){
-        $this->get('logger')->critical("column: ".$columnName);
+        //$this->get('logger')->critical("column: ".$columnName);
         $attribute = $entity->getAttributeByTableViewColumName($columnName);
         if(is_object($attribute)){
             $value = $attribute->__toString();
         } else {
             $value = $attribute;
         }
-        $this->get('logger')->critical("value: ".$value);
+        //$this->get('logger')->critical("value: ".$value);
         if($addEditLink){
             return $this->getEditLinkForEntity($entity, $value);
         } elseif(is_object($attribute)) {
@@ -344,7 +344,7 @@ class ORMController extends DTADomainController {
         $result = array();
         $count = 0;
         foreach($entities as $entity) {
-            $this->get('logger')->critical("FORMAT ENTITY ".$count++." id: ".$entity->getId());
+            //$this->get('logger')->critical("FORMAT ENTITY ".$count++." id: ".$entity->getId());
             $row = array();
             $id = $entity->getId();
             if(array_key_exists($id,$usedIds))
@@ -414,11 +414,11 @@ class ORMController extends DTADomainController {
 
         // retrieve entities: rebuild query to avoid formatter issues
         $entities = $this->getPaginatedEntities($request, $query);
-        $this->get('logger')->critical("entities calculated!");
+        //$this->get('logger')->critical("entities calculated!");
         // format in data tables response format
         $response['data'] = $this->formatAsArray($entities, $columns, $package, $className, $addIdColumn);
 
-        $this->get('logger')->critical("response calculated!");
+        //$this->get('logger')->critical("response calculated!");
 	    return new Response(json_encode( $response ));
 
 //        $_GET['iDisplayStart'] // offset
