@@ -3,7 +3,7 @@
 * Implement this in the related Query class if needed.
 * filterType: "<?php if($filterType===null){echo "NULL";}else {echo $filterType;}?>"
 */
-public function filterBy<?php echo ucfirst($filterElement);?>String($filterString = null, $comparison = null){
+public function filterBy<?php echo $filterElement;?>String($filterString = null, $comparison = null){
     //TODO: Overwrite this method in related query class to implement filter functionality.
     return $this;
 }

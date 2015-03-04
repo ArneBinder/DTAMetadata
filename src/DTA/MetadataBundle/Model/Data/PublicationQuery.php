@@ -20,27 +20,6 @@ class PublicationQuery extends BasePublicationQuery
     return $personalNames[0];
      */
 
-     /*
-    public function orderByFirstAuthorName($direction){
-        return PersonQuery::sqlSort($this->usePersonPublicationQuery()->usePersonQuery(),$direction)->endUse()->endUse();
-    }
-
-    public function orderByTitleString($direction){
-        return TitleQuery::sqlSort($this->useTitleQuery(), $direction)->endUse();
-    }
-
-    public function orderByDatespecificationRelatedByPublicationdateId($direction){
-        return DatespecificationQuery::sqlSort($this->useDatespecificationRelatedByPublicationdateIdQuery(), $direction)->endUse();
-    }
-
-    public function orderByPublishingCompany($direction){
-        return PublishingcompanyQuery::sqlSort($this->usePublishingcompanyQuery(), $direction)->endUse();
-    }
-
-    public function orderByPlace($direction){
-        return PlaceQuery::sqlSort($this->usePlaceQuery(), $direction)->endUse();
-    }
- */
 
       public function orderByFirstAuthorName($direction){
         return $this->usePersonPublicationQuery()->usePersonQuery()->sqlSort($direction)->endUse()->endUse();

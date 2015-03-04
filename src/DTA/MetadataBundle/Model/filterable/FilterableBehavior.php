@@ -16,13 +16,16 @@ class FilterableBehavior extends Behavior {
     //\DTA\MetadataBundle\Model\SQLFilterable
     public function queryMethods(){
         $filterFunctions = array();
+        $filterFunctionNames = array();
         foreach($this->getParameters() as $key => $value){
         //foreach($this->filterColumns as $filterColumnCaption){
+            $filterElement = "";
             if($value === 'atomic') {
                 //$accessor = ORMController::extractPureAccessor($this->accessors[$filterColumnCaption]);
                 //$accessor = $this->accessors[$filterColumnCaption];
                 //$filterColumn = $this->getTable()->getColumnByPhpName($accessor);
                 $filterColumn = $this->getTable()->getColumn($key);
+                $filterElement = ucfirst($filterColumn->getPhpName());
                 $filterType = null;
                 $template = "filterableFilterNone";
                 if ($filterColumn !== null) {
@@ -38,30 +41,34 @@ class FilterableBehavior extends Behavior {
                     }
                 }
                 $filterFunctions[] = $this->renderTemplate($template, array(
-                    'filterElement' => $filterColumn->getPhpName(),
+                    'filterElement' => $filterElement,
                     'filterType' => $filterType
                 ));
             }elseif($value === 'many'){
+                $filterElement = ucfirst($key);
                 //$relatedTable = $this->getTable()->getDatabase()->getTable($key);
                 $filterFunctions[] = $this->renderTemplate('filterableFilterEmbedded', array(
-                    'filterElement' => $key
+                    'filterElement' => $filterElement
                 ));
             }elseif($value === 'manyToMany'){
+                $filterElement = ucfirst($key);
                 //$relatedTable = $this->getTable()->getDatabase()->getTable($key);
                 $filterFunctions[] = $this->renderTemplate('filterableFilterEmbeddedEmbedded', array(
-                    'filterElement' => $key,
-                    'thisElement' => $this->getTable()->getPhpName()
+                    'filterElement' => $filterElement,
+                    'thisElement' => ucfirst($this->getTable()->getPhpName())
                 ));
             }else{
                 $tableName = $this->getTable()->getName();
                 throw new Exception("Unknown value \"$value\" for \"$key\" in filterableBehavior for table \"$tableName\"");
             }
+            $filterFunctionNames[] = '\'filterBy'.$filterElement.'String\'';
         }
 
 
         return $this->renderTemplate( 'filterableSQLFilterMethod',array(
             'className' => $this->getTable()->getPhpName(),
-            'filterFunctions' => $filterFunctions
+            'filterFunctions' => $filterFunctions,
+            'filterFunctionNames' => $filterFunctionNames
         ));
     }
 

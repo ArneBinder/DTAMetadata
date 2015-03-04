@@ -3,11 +3,11 @@
 * Implement this in the related Query class if needed.
 * filterType: "<?php if($filterType===null){echo "NULL";}else {echo $filterType;}?>"
 */
-public function filterBy<?php echo ucfirst($filterElement);?>String($filterString = null, $comparison = null){
+public function filterBy<?php echo $filterElement;?>String($filterString = null, $comparison = null){
     if($filterString !== null and substr($filterString,-1)!=="%"){
-        return $this->filterBy<?php echo ucfirst($filterElement);?>($filterString."%",$comparison);
+        return $this->filterBy<?php echo $filterElement;?>($filterString."%",$comparison);
     }else{
-        return $this->filterBy<?php echo ucfirst($filterElement);?>($filterString,$comparison);
+        return $this->filterBy<?php echo $filterElement;?>($filterString,$comparison);
     }
 }
 

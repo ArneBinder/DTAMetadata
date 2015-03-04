@@ -3,12 +3,12 @@
 * Implement this in the related Query class if needed.
 * filterType: "<?php if($filterType===null){echo "NULL";}else {echo $filterType;}?>"
 */
-public function filterBy<?php echo ucfirst($filterElement);?>String($filterString = null, $comparison = null, $paddingSize = 4){
+public function filterBy<?php echo $filterElement;?>String($filterString = null, $comparison = null, $paddingSize = 4){
     if(ctype_digit($filterString)) {
         if(strlen($filterString) < $paddingSize){
-            return $this->filterBy<?php echo ucfirst($filterElement);?>(array(intval(str_pad($filterString,$paddingSize,'0')),intval(str_pad($filterString,$paddingSize,'9'))));
+            return $this->filterBy<?php echo $filterElement;?>(array(intval(str_pad($filterString,$paddingSize,'0')),intval(str_pad($filterString,$paddingSize,'9'))));
         }
-            return $this->filterBy<?php echo ucfirst($filterElement);?>(intval($filterString));
+            return $this->filterBy<?php echo $filterElement;?>(intval($filterString));
     }else{
         return $this;
     }
