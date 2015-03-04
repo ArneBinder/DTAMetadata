@@ -17,7 +17,7 @@ class Title extends BaseTitle
     }
     
     public function __toString(){
-        
+
         $fragmentStrings = [];
         // convert the fragment object to strings, possibly marking reconstructed title fragments
         foreach ($this->getTitlefragments() as $nf) {

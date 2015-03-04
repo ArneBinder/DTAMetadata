@@ -69,8 +69,6 @@
  * @author stud
  */
 
-use DTA\MetadataBundle\Controller\ORMController;
-
 class TableRowViewBehavior extends Behavior {
 
     // default parameters value
@@ -420,9 +418,6 @@ class TableRowViewBehavior extends Behavior {
                 ));
     }
 
-    public function queryMethods(){
-
-    }
 
     // add interface implementation declaration
     public function objectFilter(&$script) {

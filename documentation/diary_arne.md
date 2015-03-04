@@ -308,7 +308,7 @@
  o fixed table_row_view of persons and implemented personControls
  
 2015-03-03
- o renewed filter functionality: implemented filterableBehavior
+ o renewed filter functionality: implemented filterableBehavior which generates the sqlFilter() function
     e.g.
             <behavior name="filterable">
                 <parameter name="DatespecificationRelatedByPublicationdateId" value="many"/>
@@ -317,6 +317,20 @@
             </behavior>
     the value has to be "atomic" (for atomical values), "many" (embbeded one time) or "manyTomany" (embedded two times).
     Furthermore the search string will be expanded for text columns via "%" and for numerical columns to 4 digits (assume it is a year).
+ 
+2015-03-04
+  o implemented order_by behavior which generates the sqlSort() function
+    e.g.
+                <behavior name="order_by">
+                    <parameter name="1:use" value="Titlefragment"/>
+                    <parameter name="2:filter" value="Type('MAIN_TITLE')"/> 
+                    <parameter name="3:order" value="Name"/>
+                    <parameter name="4:endUse" value=""/>
+                    <parameter name="5:order" value="Id"/>
+                </behavior>
+     If the order doesn't matter, the ordinals can be omitted. If every "unclosed" use...Query will be closed by endUse() automatically.
+     No other than the parameter names "use", "filter", "order" and "endUse" are allowed.
+  o publication with id=17103 is erroneous: it is typed as Volume, but has no entry in volume table. So it's visualisation in table_row_view fails. 
  
  TODO:
  o Tab-Constraint DONE

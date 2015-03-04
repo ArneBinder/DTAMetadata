@@ -122,6 +122,10 @@ propel > dbal > connections for connection setup. -->
             <parameter name="Title" value="many"/>
             <parameter name="Person" value="manyToMany"/>
         </behavior>
+
+        <behavior name="order_by">
+            <parameter name="use" value="Title"/>
+        </behavior>
         
         
         <foreign-key foreignTable="title"> <reference local="title_id" foreign="id"/> </foreign-key>
@@ -147,6 +151,7 @@ propel > dbal > connections for connection setup. -->
         <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
         <behavior name="table_row_view"> <parameter name="embedColumns" value="embedColumns:publication"/> </behavior>
         <behavior name="filterable"> <parameter name="Publication" value="many"/> </behavior>
+        <behavior name="order_by"><parameter name="use" value="Publication"/> </behavior>
     </table> 
     
     <!--Zeitschrift/Zeitung
@@ -157,6 +162,7 @@ propel > dbal > connections for connection setup. -->
         <foreign-key foreignTable="publication"> <reference local="id" foreign="id"/> </foreign-key>
         <behavior name="table_row_view"> <parameter name="embedColumns" value="embedColumns:publication"/> </behavior>
         <behavior name="filterable"> <parameter name="Publication" value="many"/> </behavior>
+        <behavior name="order_by"><parameter name="use" value="Publication"/> </behavior>
     </table> 
     
     <!--MULTI-VOLUME               
@@ -179,6 +185,7 @@ propel > dbal > connections for connection setup. -->
             <parameter name="Anzahl Bände" value="volumes_total"/>
         </behavior>
         <behavior name="filterable"> <parameter name="Publication" value="many"/> </behavior>
+        <behavior name="order_by"><parameter name="use" value="Publication"/> </behavior>
     </table> 
     
     <!--VOLUME               
@@ -199,6 +206,7 @@ propel > dbal > connections for connection setup. -->
             <parameter name="Übergeordnetes Werk" value="accessor:getParentPublication"/>
         </behavior>
         <behavior name="filterable"> <parameter name="Publication" value="many"/> </behavior>
+        <behavior name="order_by"><parameter name="use" value="Publication"/> </behavior>
     </table>   
     
     <!--CHAPTER
@@ -216,6 +224,7 @@ propel > dbal > connections for connection setup. -->
             <parameter name="Seitenangabe" value="pages"/>
         </behavior>
         <behavior name="filterable"> <parameter name="Publication" value="many"/> </behavior>
+        <behavior name="order_by"><parameter name="use" value="Publication"/> </behavior>
     </table> 
     
     <!--ARTICLE
@@ -233,6 +242,7 @@ propel > dbal > connections for connection setup. -->
             <parameter name="Seitenangabe" value="pages"/>
         </behavior>
         <behavior name="filterable"> <parameter name="Publication" value="many"/> </behavior>
+        <behavior name="order_by"><parameter name="use" value="Publication"/> </behavior>
     </table> 
     
     <!--SERIES
@@ -247,6 +257,7 @@ propel > dbal > connections for connection setup. -->
 			<parameter name="embedColumns" value="embedColumns:publication"/> 
 		</behavior>
         <behavior name="filterable"> <parameter name="Publication" value="many"/> </behavior>
+        <behavior name="order_by"><parameter name="use" value="Publication"/> </behavior>
     </table>
 
     <!--MANUSCRIPT
@@ -283,6 +294,9 @@ propel > dbal > connections for connection setup. -->
         <validator column="gnd"> 
             <rule name="unique" message="GND ist schon vergeben!"/> 
         </validator>
+        <behavior name="order_by">
+            <parameter name="order" value="Name"/>
+        </behavior>
     </table>
 
     <table name="place">
@@ -295,6 +309,9 @@ propel > dbal > connections for connection setup. -->
         <validator column="gnd"> 
             <rule name="unique" message="GND ist schon vergeben!"/> 
         </validator>
+        <behavior name="order_by">
+            <parameter name="order" value="Name"/>
+        </behavior>
     </table>
 
     <table name="datespecification">
@@ -307,6 +324,9 @@ propel > dbal > connections for connection setup. -->
         </behavior>
         <behavior name="filterable">
             <parameter name="year" value="atomic"/>
+        </behavior>
+        <behavior name="order_by">
+            <parameter name="order" value="year"/>
         </behavior>
     </table>
     
@@ -327,6 +347,11 @@ propel > dbal > connections for connection setup. -->
         </foreign-key>
         <behavior name="filterable">
             <parameter name="namefragment" value="many"/>
+        </behavior>
+        <behavior name="order_by">
+            <parameter name="use" value="Namefragment"/>
+            <parameter name="filter" value="Type('LAST_NAME')"/>
+            <parameter name="order" value="Name"/>
         </behavior>
     </table>
     
@@ -351,6 +376,9 @@ propel > dbal > connections for connection setup. -->
         <behavior name="filterable">
             <parameter name="name" value="atomic"/>
         </behavior>
+        <behavior name="order_by">
+            <parameter name="order" value="Name"/>
+        </behavior>
     </table>
     
     <table name="title">
@@ -361,6 +389,13 @@ propel > dbal > connections for connection setup. -->
         </behavior>
         <behavior name="filterable">
             <parameter name="Titlefragment" value="many"/>
+        </behavior>
+        <behavior name="order_by">
+            <parameter name="1:use" value="Titlefragment"/>
+            <parameter name="2:filter" value="Type('MAIN_TITLE')"/>
+            <parameter name="3:order" value="Name"/>
+            <parameter name="4:endUse" value=""/>
+            <parameter name="5:order" value="Id"/>
         </behavior>
     </table>
     
@@ -412,6 +447,9 @@ propel > dbal > connections for connection setup. -->
         <behavior name="filterable">
             <parameter name="personalname" value="many"/>
             <parameter name="gnd" value="atomic"/>
+        </behavior>
+        <behavior name="order_by">
+            <parameter name="use" value="Personalname"/>
         </behavior>
     </table>
     

@@ -4,13 +4,16 @@ namespace DTA\MetadataBundle\Model\Data;
 
 use DTA\MetadataBundle\Model\Data\om\BaseVolumeQuery;
 
-class VolumeQuery extends BaseVolumeQuery implements \DTA\MetadataBundle\Model\SQLSortable
+class VolumeQuery extends BaseVolumeQuery
 {
-    public static function sqlSort(\ModelCriteria $query, $direction = \ModelCriteria::ASC){
-        return PublicationQuery::sqlSort($query->usePublicationQuery(), $direction)->endUse();
-    }
+    /*
+        public function orderByParentPublicationShortTitle($direction){
+            return PublicationQuery::sqlSort($this->usePublicationQuery(),$direction)->endUse();
+        }
+    */
 
-    public function orderByParentPublicationShortTitle($direction){
-        return PublicationQuery::sqlSort($this->usePublicationQuery(),$direction)->endUse();
-    }
+        public function orderByParentPublicationShortTitle($direction){
+            return $this->usePublicationQuery()->sqlSort($direction)->endUse();
+        }
+
 }

@@ -35,7 +35,11 @@ class Publication extends BasePublication
         $publicationType = ucwords(strtolower($this->getType()));
         $getter = 'get'.$publicationType;
         if(method_exists($this, $getter)){
-            return $this->$getter();
+            $result = $this->$getter();
+            if($result === null){
+                throw new \Exception("Specialisation of Publication with id=".$this->getId().", title=\"".$this->getTitle()."\" and type=\"".$this->getType()."\" is null");
+            }
+            return $result;
         } else {
             return $this;
         }
@@ -71,12 +75,14 @@ class Publication extends BasePublication
     
     /** Returns a single string combining all title fragments and a volume description. */
     public function getTitleString($withVolumeInformation = true){
-    
+
         $title = $this->getTitle();
         $result = $title !== NULL ? $title->__toString() : "";
         if($withVolumeInformation && $this->getType() === PublicationPeer::TYPE_VOLUME ){
             $volume = $this->getVolume(); 
-            if($volume === NULL) throw new \Exception("No volume entity related to volume publication ".$this->getId()." ".$this->getShortTitle());
+            if($volume === NULL){
+                throw new \Exception("No volume entity related to volume publication ");//.$this->getId()." ".$this->getShortTitle());
+            }
             $result .= $volume->getVolumeSummary();
         }
         

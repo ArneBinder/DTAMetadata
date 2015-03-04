@@ -142,6 +142,9 @@
         <behavior name="filterable">
             <parameter name="username" value="atomic"/>
         </behavior>
+        <behavior name="order_by">
+            <parameter name="order" value="username"/>
+        </behavior>
         
     </table>
 </database>

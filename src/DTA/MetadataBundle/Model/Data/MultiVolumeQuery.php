@@ -4,9 +4,6 @@ namespace DTA\MetadataBundle\Model\Data;
 
 use DTA\MetadataBundle\Model\Data\om\BaseMultiVolumeQuery;
 
-class MultiVolumeQuery extends BaseMultiVolumeQuery implements \DTA\MetadataBundle\Model\SQLSortable
+class MultiVolumeQuery extends BaseMultiVolumeQuery
 {
-    public static function sqlSort(\ModelCriteria $query, $direction = \ModelCriteria::ASC){
-        return PublicationQuery::sqlSort($query->usePublicationQuery(), $direction)->endUse();
-    }
 }

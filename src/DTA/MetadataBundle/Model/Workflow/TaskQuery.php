@@ -9,11 +9,11 @@ use DTA\MetadataBundle\Model\Master\DtaUserQuery;
 class TaskQuery extends BaseTaskQuery
 {
     public function orderByResponsibleUser($direction){
-        return DtaUserQuery::sqlSort($this->useDtaUserQuery(), $direction)->endUse();
+        return $this->useDtaUserQuery()->sqlSort($direction)->endUse();
     }
 
     public function orderByReferee($direction){
         //TODO: add PublicationGroups!!
-        return PublicationQuery::sqlSort($this->usePublicationQuery(), $direction)->endUse();
+        return $this->usePublicationQuery()->sqlSort($direction)->endUse();
     }
 }

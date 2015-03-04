@@ -152,11 +152,11 @@ class ORMController extends DTADomainController {
         // adding "String" to the function name prevents collision with propel filter method
         if(method_exists($query,$criteriaAccessor."String")){
             $criteriaAccessor = $criteriaAccessor."String";
-            //$this->get('logger')->critical($type." via: ".$criteriaAccessor." ".$data);
+            $this->get('logger')->critical($type." via: ".$criteriaAccessor." ".$data);
             $query = $query->$criteriaAccessor($data);
         }
         elseif(is_callable(array($query,$criteriaAccessor))){
-            //$this->get('logger')->critical($type." via: ".$criteriaAccessor." ".$data);
+            $this->get('logger')->critical($type." via: ".$criteriaAccessor." ".$data);
             $query = $query->$criteriaAccessor($data);
         }else{
             $this->get('logger')->critical("not callable: ".$criteriaAccessor);
@@ -223,8 +223,8 @@ class ORMController extends DTADomainController {
             $query = $this->addCriteria($query,'order',$orderColumnCaption,$modelClass,$direction);
 
             // use the class specific default sorting
-        }elseif(method_exists($classNames['query'], 'sqlSort')){
-            $query = $classNames['query']::sqlSort($query, \ModelCriteria::ASC);
+        }elseif(method_exists($query, 'sqlSort')){
+            $query = $query->sqlSort(\ModelCriteria::ASC);
         }
         // SORTING END
 
@@ -312,12 +312,14 @@ class ORMController extends DTADomainController {
     }
 
     protected function formatTableEntry($entity, $columnName, $addEditLink = false){
+        $this->get('logger')->critical("column: ".$columnName);
         $attribute = $entity->getAttributeByTableViewColumName($columnName);
         if(is_object($attribute)){
             $value = $attribute->__toString();
         } else {
             $value = $attribute;
         }
+        $this->get('logger')->critical("value: ".$value);
         if($addEditLink){
             return $this->getEditLinkForEntity($entity, $value);
         } elseif(is_object($attribute)) {
@@ -340,7 +342,9 @@ class ORMController extends DTADomainController {
     protected function formatAsArray($entities, $columns, $package, $className, $addIdColumn = false){
         $usedIds = array();
         $result = array();
+        $count = 0;
         foreach($entities as $entity) {
+            $this->get('logger')->critical("FORMAT ENTITY ".$count++." id: ".$entity->getId());
             $row = array();
             $id = $entity->getId();
             if(array_key_exists($id,$usedIds))
@@ -354,6 +358,7 @@ class ORMController extends DTADomainController {
                 $row[] = $this->formatTableEntry($entity, $columnName, $i === 0);
             }
             $result[] = $row;
+            //$this->get('logger')->critical(implode(": ",$row));
 	    }
 
         return $result;
@@ -409,10 +414,11 @@ class ORMController extends DTADomainController {
 
         // retrieve entities: rebuild query to avoid formatter issues
         $entities = $this->getPaginatedEntities($request, $query);
-
+        $this->get('logger')->critical("entities calculated!");
         // format in data tables response format
         $response['data'] = $this->formatAsArray($entities, $columns, $package, $className, $addIdColumn);
 
+        $this->get('logger')->critical("response calculated!");
 	    return new Response(json_encode( $response ));
 
 //        $_GET['iDisplayStart'] // offset
