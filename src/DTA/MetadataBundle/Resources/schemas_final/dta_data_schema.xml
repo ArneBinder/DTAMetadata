@@ -182,7 +182,7 @@ propel > dbal > connections for connection setup. -->
         </validator>
         <behavior name="table_row_view"> 
             <parameter name="embedColumns" value="embedColumns:publication"/>
-            <parameter name="Anzahl Bände" value="volumes_total orderColumnType:"/>
+            <parameter name="Anzahl Bände" value="volumes_total"/>
         </behavior>
         <behavior name="filterable"> <parameter name="Publication" value="many"/> </behavior>
         <behavior name="order_by"><parameter name="use" value="Publication"/> </behavior>
@@ -202,7 +202,7 @@ propel > dbal > connections for connection setup. -->
         <behavior name="table_row_view"> 
             <parameter name="embedColumns" value="embedColumns:publication"/>
             <parameter name="Band (numerisch)" value="volume_numeric"/>
-            <parameter name="Bandbeschreibung" value="volume_description orderColumnType:"/>
+            <parameter name="Bandbeschreibung" value="volume_description"/>
             <parameter name="Übergeordnetes Werk" value="accessor:getParentPublication orderColumnType:Publication"/>
         </behavior>
         <behavior name="filterable"> <parameter name="Publication" value="many"/> </behavior>

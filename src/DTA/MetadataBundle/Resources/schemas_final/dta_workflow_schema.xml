@@ -44,8 +44,8 @@
         <behavior name="table_row_view">
             <parameter name="embedColumns1" value="embedColumns:tasktype"/>
             <parameter name="Abgeschlossen" value="closed"/>
-            <parameter name="Start" value="start_date orderColumnType:"/>
-            <parameter name="Ende" value="end_date orderColumnType:"/>
+            <parameter name="Start" value="start_date"/>
+            <parameter name="Ende" value="end_date"/>
             <parameter name="Für" value="accessor:getReferee orderColumnType:Publication"/>
             <parameter name="Verantwortlich" value="accessor:getResponsibleUser orderColumnType:DtaUser"/>
             <parameter name="query" value="query:\DTA\MetadataBundle\Model\Workflow\TaskQuery::create()

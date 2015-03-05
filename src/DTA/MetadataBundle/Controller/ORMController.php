@@ -159,7 +159,11 @@ class ORMController extends DTADomainController {
             if($orderFunctionName === null){
                 throw new Exception("The column \"$orderColumnCaption\" is no order column.");
             }
-            $query = $query->$orderFunctionName($direction);
+            if(is_callable(array($query, $orderFunctionName))) {
+                $query = $query->$orderFunctionName($direction);
+            }else{
+                throw new Exception("Order function \"$orderFunctionName\" is not implemented in class ".$classNames['query'].".");
+            }
 
             // use the class specific default sorting
         }elseif(method_exists($query, 'sqlSort')){

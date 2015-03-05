@@ -246,9 +246,9 @@ class TableRowViewBehavior extends Behavior {
                 $accessor = $behavior->getTable()->getColumn($column)->getPhpName();
                 $behavior->addViewElement($caption, $accessor);
                 //$behavior->resolveAtomicColumn($caption, $column);
-                if(array_key_exists('orderColumnType',$parameters)) {
+                //if(array_key_exists('orderColumnType',$parameters)) {
                     $behavior->orderFunctionAccessors[$caption] = $accessor;
-                }
+                //}
             }
         }// each parameter
     }
