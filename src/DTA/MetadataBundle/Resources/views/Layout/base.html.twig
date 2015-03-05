@@ -47,6 +47,7 @@
         {#<script src="{{ asset('js/jquery.min.js') }}"></script>#}
         {#<script src="{{ asset('js/jquery-ui.min.js') }}"></script>#}
         {% set search = (enableSearch|default(false))?'true':'false' %}
+        {% set orderableTargets = orderableTargets|default(null) %}
         <script type="text/javascript">
 
             /*function thisHeight(){
@@ -140,6 +141,13 @@
                             ,"paging": true
                             ,"pagingType": "full_numbers"
                             ,"language": { "url": "{{asset('js/DataTables-1.10.4/dataTablesGermanTranslation.json')}}" }
+                            ,"columnDefs":[
+                                {% if orderableTargets is not null %}
+                                    { "orderable": true, "targets": [{{ orderableTargets }}] },
+                                {% endif %}
+                                { "orderable": false, "targets": '_all' }
+
+                            ]
                       {#    ,"oTableTools": {
                                     "aButtons": [
                                             "copy"

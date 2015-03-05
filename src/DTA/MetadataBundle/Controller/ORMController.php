@@ -103,25 +103,6 @@ class ORMController extends DTADomainController {
                 ));
     }
 
-    /**
-     * @param $accessor the accessor given by $tableRowViewAccessors (potentially marked by the prefix "accessor:")
-     * @return String the pure accessor
-     * @throws InvalidArgumentException
-     */
-    public static function extractPureAccessor($accessor){
-        if(strncmp($accessor, "accessor:", strlen("accessor:"))) {
-            return $accessor;
-        }elseif(!strncmp($accessor, "accessor:get", strlen("accessor:get"))) {
-            $modifiedAccessor = substr($accessor,strlen("accessor:get"));
-            return $modifiedAccessor;
-        }elseif(!strncmp($accessor, "accessor:", strlen("accessor:"))) {
-            $modifiedAccessor = substr($accessor,strlen("accessor:"));
-            return $modifiedAccessor;
-        }else{
-            throw new \InvalidArgumentException(sprintf(
-                'Could not extract pure accessor of \'%s\'.', $accessor));
-        }
-    }
 
     protected function getFilterIds($request, $package, $className){
         $classNames = $this->relatedClassNames($package, $className);
@@ -178,12 +159,7 @@ class ORMController extends DTADomainController {
             if($orderFunctionName === null){
                 throw new Exception("The column \"$orderColumnCaption\" is no order column.");
             }
-            //$query = $this->addCriteria($query,'order',$orderColumnCaption,$modelClass,$direction);
-            if(method_exists($query,$orderFunctionName)){
-                $query = $query->$orderFunctionName($direction);
-            }else{
-                throw new Exception("Order function \"$orderFunctionName\" is not implemented in class ".$classNames['query'].".");
-            }
+            $query = $query->$orderFunctionName($direction);
 
             // use the class specific default sorting
         }elseif(method_exists($query, 'sqlSort')){
@@ -465,7 +441,8 @@ class ORMController extends DTADomainController {
                     'columns' => $modelClass::getTableViewColumnNames(),
                     'data' => $records,
                     'updatedObjectId' => $updatedObjectId,
-                    'enableSearch' => method_exists(new $classNames["query"], 'sqlFilter')
+                    'enableSearch' => method_exists(new $classNames["query"], 'sqlFilter'),
+                    'orderableTargets' => implode(', ',$modelClass::getRowViewOrderColumnIndices())
                 ));
     }
 

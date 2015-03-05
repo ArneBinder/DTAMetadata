@@ -349,6 +349,8 @@
         }
         
     TODO: @representative and @count aren't handled yet (->PersonQuery)!
+   o disabled sorting functionality in table_row_view for columns without defined sorting function (via table_row_view behavior in the schema)
+    
     
  
  TODO:

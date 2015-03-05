@@ -8,6 +8,23 @@ public static function getTableViewColumnNames(){
 }
 
 /**
+* Calculates the indices of the sortable columns.
+*/
+public static function getRowViewOrderColumnIndices(){
+    $rc = new \ReflectionClass(get_called_class());
+    $orderAccessors = $rc->getStaticPropertyValue("tableRowViewOrderAccessors");
+    $indices = array();
+    $i = 0;
+    foreach($rc->getStaticPropertyValue("tableRowViewCaptions") as $caption){
+        if(array_key_exists($caption, $orderAccessors)){
+            $indices[] = $i;
+        }
+        $i++;
+    }
+    return $indices;
+}
+
+/**
 * Returns the order function name for a given column caption.
 */
 public static function getRowViewOrderFunctionName($columnName){

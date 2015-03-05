@@ -95,6 +95,8 @@ class DataDomainController extends ORMController {
                 // assume entity is a kind of publication
                 $newEntityLink = $this->generateUrl("Data_newPublication", array('publicationType'=>$className!=='Publication'?$className:'Book'));
             }
+            $orderableTargets = array_map(function($i){return ++$i;},$modelClass::getRowViewOrderColumnIndices());
+            $this->get('logger')->critical("orderableTargets: ".implode(', ',$orderableTargets));
             return $this->renderWithDomainData("DTAMetadataBundle::listViewWithOptions.html.twig", array(
                 'className' => $className,
                 'columns' => $modelClass::getTableViewColumnNames(),
@@ -102,7 +104,8 @@ class DataDomainController extends ORMController {
                 'updatedObjectId' => $updatedObjectId,
                 'optionsLinkTemplate' => $this->generateUrl("controls", array('className' => $className, 'id'=>'__id__')),
                 'newEntityLink' => $newEntityLink,
-                'enableSearch' => method_exists(new $classNames["query"], 'sqlFilter')
+                'enableSearch' => method_exists(new $classNames["query"], 'sqlFilter'),
+                'orderableTargets' => implode(', ',$orderableTargets)
             ));
         }
         

@@ -19,6 +19,9 @@ interface TableRowViewInterface {
 
     /* Returns the order function name for the specified column or null if it doesn't exist. */
     public static function getRowViewOrderFunctionName($columnName);
+
+    /* Returns the order column indices regarding TableViewColumnNames */
+    public static function getRowViewOrderColumnIndices();
 }
 
 ?>
