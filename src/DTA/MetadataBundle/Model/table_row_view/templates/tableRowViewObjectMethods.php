@@ -1,10 +1,21 @@
-/** 
- * To specify which columns are to be visible in the user display 
- * (In the view that lists all database records of a class as a table) 
+/**
+ * To specify which columns are to be visible in the user display
+ * (In the view that lists all database records of a class as a table)
  */
 public static function getTableViewColumnNames(){
     $rc = new \ReflectionClass(get_called_class());
     return $rc->getStaticPropertyValue("tableRowViewCaptions");
+}
+
+/**
+* Returns the order function name for a given column caption.
+*/
+public static function getRowViewOrderFunctionName($columnName){
+$rc = new \ReflectionClass(get_called_class());
+$orderAccessors = $rc->getStaticPropertyValue("tableRowViewOrderAccessors");
+if(!array_key_exists($columnName, $orderAccessors))
+    return null;
+return "orderBy".$orderAccessors[$columnName];
 }
 
 /** 

@@ -91,12 +91,12 @@ propel > dbal > connections for connection setup. -->
             
         <behavior name="table_row_view">
             <!--<parameter name="Datenbank ID" value="id"/>-->
-            <parameter name="Titel" value="accessor:getTitleString"/>
-            <parameter name="erster Autor" value="accessor:getFirstAuthorName"/>
+            <parameter name="Titel" value="accessor:getTitleString orderColumnType:Title"/>
+            <parameter name="erster Autor" value="accessor:getFirstAuthorName orderColumnType:PersonPublication|Person"/>
             <!--<parameter name="entstanden" value="accessor:getDatespecificationRelatedByCreationdateId"/>-->
-            <parameter name="veröffentlicht" value="accessor:getDatespecificationRelatedByPublicationdateId"/>
-            <parameter name="Verlag" value="accessor:getPublishingcompany"/>
-            <parameter name="Ort" value="accessor:getPlace"/>
+            <parameter name="veröffentlicht" value="accessor:getDatespecificationRelatedByPublicationdateId orderColumnType:DatespecificationRelatedByPublicationdateId"/>
+            <parameter name="Verlag" value="accessor:getPublishingcompany orderColumnType:Publishingcompany"/>
+            <parameter name="Ort" value="accessor:getPlace orderColumnType:Place"/>
             <!--<parameter name="Typ" value="type"/>-->
             <!--
             <parameter name="attribute1" value="query:\DTA\MetadataBundle\Model\Data\PublicationQuery::create()
@@ -182,7 +182,7 @@ propel > dbal > connections for connection setup. -->
         </validator>
         <behavior name="table_row_view"> 
             <parameter name="embedColumns" value="embedColumns:publication"/>
-            <parameter name="Anzahl Bände" value="volumes_total"/>
+            <parameter name="Anzahl Bände" value="volumes_total orderColumnType:"/>
         </behavior>
         <behavior name="filterable"> <parameter name="Publication" value="many"/> </behavior>
         <behavior name="order_by"><parameter name="use" value="Publication"/> </behavior>
@@ -202,8 +202,8 @@ propel > dbal > connections for connection setup. -->
         <behavior name="table_row_view"> 
             <parameter name="embedColumns" value="embedColumns:publication"/>
             <parameter name="Band (numerisch)" value="volume_numeric"/>
-            <parameter name="Bandbeschreibung" value="volume_description"/>
-            <parameter name="Übergeordnetes Werk" value="accessor:getParentPublication"/>
+            <parameter name="Bandbeschreibung" value="volume_description orderColumnType:"/>
+            <parameter name="Übergeordnetes Werk" value="accessor:getParentPublication orderColumnType:Publication"/>
         </behavior>
         <behavior name="filterable"> <parameter name="Publication" value="many"/> </behavior>
         <behavior name="order_by"><parameter name="use" value="Publication"/> </behavior>

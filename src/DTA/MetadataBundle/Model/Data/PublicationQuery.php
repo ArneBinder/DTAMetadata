@@ -3,9 +3,6 @@
 namespace DTA\MetadataBundle\Model\Data;
 
 use DTA\MetadataBundle\Model\Data\om\BasePublicationQuery;
-use DTA\MetadataBundle\Model\ModelCriteria;
-use Exception;
-use ReflectionMethod;
 
 class PublicationQuery extends BasePublicationQuery
 {
@@ -21,25 +18,7 @@ class PublicationQuery extends BasePublicationQuery
      */
 
 
-      public function orderByFirstAuthorName($direction){
-        return $this->usePersonPublicationQuery()->usePersonQuery()->sqlSort($direction)->endUse()->endUse();
-    }
 
-    public function orderByTitleString($direction){
-        return $this->useTitleQuery()->sqlSort($direction)->endUse();
-    }
-
-    public function orderByDatespecificationRelatedByPublicationdateId($direction){
-        return $this->useDatespecificationRelatedByPublicationdateIdQuery()->sqlSort($direction)->endUse();
-    }
-
-    public function orderByPublishingCompany($direction){
-        return $this->usePublishingcompanyQuery()->sqlSort($direction)->endUse();
-    }
-
-    public function orderByPlace($direction){
-        return $this->usePlaceQuery()->sqlSort($direction)->endUse();
-    }
 
 
 }

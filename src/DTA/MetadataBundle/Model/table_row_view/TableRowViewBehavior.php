@@ -109,9 +109,11 @@ class TableRowViewBehavior extends Behavior {
     /**
      *
      */
-    public $orderColumnFunctions = array(
+    public $orderFunctions = array(
         // strings, containing the php code of the single methods
     );
+
+    public $orderFunctionAccessors = array();
 
     
     /** [optional] Executable code that generates the propel query object for the class to return records in a certain manner (e.g. more efficient). 
@@ -189,7 +191,7 @@ class TableRowViewBehavior extends Behavior {
         foreach ($behavior->getParameters() as $captionOrIndicator => $columnOrEntityOrAccessor) {
 
             // split parameter into map
-            $parameterArray = preg_split('/(accessor|query|embedColumns|filterColumn):/',$columnOrEntityOrAccessor, null, PREG_SPLIT_DELIM_CAPTURE);
+            $parameterArray = preg_split('/(accessor|query|embedColumns|orderColumnType):/',$columnOrEntityOrAccessor, null, PREG_SPLIT_DELIM_CAPTURE);
             //echo implode(implode(', ',$parameterArray))."\n";
             $parameters = array();
             if(count($parameterArray) % 2 == 1){
@@ -224,18 +226,29 @@ class TableRowViewBehavior extends Behavior {
                 $accessor = 'accessor:'.$parameters['accessor'];
                 $caption = $captionOrIndicator;
                 $behavior->addViewElement($caption, $accessor);
-                /*if(!strncmp($parameters['accessor'], "get", strlen("get"))) {
-                    $modifiedAccessor = substr($parameters['accessor'], strlen("get"));
-                    $behavior->orderColumnFunctions[] = $behavior->renderTemplate('tableRowViewOrderColumnFunction', array(
-                        'functionName'=> $modifiedAccessor,
-                        'orderEntity' => $modifiedAccessor
-                    ));
-                }*/
+                if(array_key_exists('orderColumnType',$parameters)) {
+                    if (!strncmp($parameters['accessor'], "get", strlen("get"))) {
+                        $modifiedAccessor = substr($parameters['accessor'], strlen("get"));
+                        $behavior->orderFunctions[] = $behavior->renderTemplate(
+                            'tableRowViewOrderFunction',
+                            array(
+                                'elementName' => $modifiedAccessor,
+                                'useClasses' => explode('|',$parameters['orderColumnType'])
+                            )
+                        );
+                        $behavior->orderFunctionAccessors[$caption] = $modifiedAccessor;
+                    }
+                }
                 // or if it defines how to construct the query object
             } else {
                 $column = $parameters['propelAccessor'];
                 $caption = $captionOrIndicator;
-                $behavior->resolveAtomicColumn($caption, $column);
+                $accessor = $behavior->getTable()->getColumn($column)->getPhpName();
+                $behavior->addViewElement($caption, $accessor);
+                //$behavior->resolveAtomicColumn($caption, $column);
+                if(array_key_exists('orderColumnType',$parameters)) {
+                    $behavior->orderFunctionAccessors[$caption] = $accessor;
+                }
             }
         }// each parameter
     }
@@ -244,7 +257,7 @@ class TableRowViewBehavior extends Behavior {
      * @param string $name The value of the name attribute of the column tag that shall be visible in the table view.
      * @throws InvalidArgumentException 
      */
-    private function resolveAtomicColumn($caption, $column) {
+    /*private function resolveAtomicColumn($caption, $column) {
 
         // table on which the behavior is currently processed
         $table = $this->getTable();
@@ -254,13 +267,13 @@ class TableRowViewBehavior extends Behavior {
             throw new InvalidArgumentException(sprintf(
                             'The column \'%s\' referenced by the parameter \'%s\' in the table_row_view behavior of table \'%s\' doesn\'t exist. ', $column, $caption, $table->getName()));
 
-        $caption = $caption;
+
         // the generated getAttributeByTableViewColumName will use the propel standard getter 
         // $this->getByName($accessor, \BasePeer::TYPE_PHPNAME) to use the accessor
         $accessor = $table->getColumn($column)->getPhpName();
 
         $this->addViewElement($caption, $accessor);
-    }
+    }*/
 
     /**
      * Looks up and adds the columns designated for view in another table and adds all of them to the local column list.
@@ -306,6 +319,14 @@ class TableRowViewBehavior extends Behavior {
                 'caption' => $remoteCaption,
             ));
 
+            if(array_key_exists($remoteCaption, $otherBehavior->orderFunctionAccessors)){
+                $remoteOrderElement = $otherBehavior->orderFunctionAccessors[$remoteCaption];
+                $this->orderFunctions[] = $this->renderTemplate('tableRowViewOrderFunctionEmbedded',array(
+                    'elementName' => $remoteOrderElement,
+                    'sourceClass' => $relatedEntity->getPhpName()
+                ));
+                $this->orderFunctionAccessors[$remoteCaption] = $remoteOrderElement;
+            }
             $subAccessor = 'accessor:' . $embeddedGetterFunctionName;
 //            visualizing the structure is useful but results in long table headlines, that are impractical
 //            $this->addViewElement($relatedEntityPhpName."_".$remoteCaption, $subAccessor);
@@ -350,7 +371,7 @@ class TableRowViewBehavior extends Behavior {
             $representativeAccessor = 'accessor:getRepresentative' . $relatedPhpName;
             $this->addViewElement($representativeCaption, $representativeAccessor);
 
-            /*$this->orderColumnFunctions[] = $this->renderTemplate('tableRowViewOrderColumnFunction', array(
+            /*$this->orderFunctions[] = $this->renderTemplate('tableRowViewOrderColumnFunction', array(
                 'functionName'=> "Representative$relatedPhpName",
                 'orderEntity' => $relatedPhpName
             ));*/
@@ -394,16 +415,21 @@ class TableRowViewBehavior extends Behavior {
 
         // accessors will be available as $tableRowViewAccessors
         $accessorsString = 'public static $tableRowViewAccessors = array(';
+
         foreach ($this->accessors as $caption => $accessor) {
             $accessorsString .= "'$caption'=>'$accessor', ";
-
         }
         $accessorsString .= ");";
+        $orderAccessorsString = 'public static $tableRowViewOrderAccessors = array(';
+        foreach ($this->orderFunctionAccessors as $caption => $accessor) {
+            $orderAccessorsString .= "'$caption'=>'$accessor', ";
+        }
+        $orderAccessorsString .= ");";
 
         $queryConstructionStringValue = $this->queryConstructionString === NULL ? 'NULL' : '"' . $this->queryConstructionString . '"';
         $queryConstructionString = 'public static $queryConstructionString = ' . $queryConstructionStringValue . ';';
 
-        return $captionsString . "\r\t" . $accessorsString . "\r\t" . $queryConstructionString . "\r";
+        return $captionsString . "\r\t" . $accessorsString . "\r\t" . $queryConstructionString ."\r\t" . $orderAccessorsString . "\r";
     }
 
     /**
@@ -416,6 +442,10 @@ class TableRowViewBehavior extends Behavior {
                     'representativeGetterFunctions' => $this->representativeGetterFunctions,
                     'embeddedGetterFunctions' => $this->embeddedGetterFunctions,
                 ));
+    }
+
+    public function queryMethods(){
+        return implode("", $this->orderFunctions);
     }
 
 

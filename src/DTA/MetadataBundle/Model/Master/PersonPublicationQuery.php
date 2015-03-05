@@ -7,6 +7,7 @@ use DTA\MetadataBundle\Model;
 
 class PersonPublicationQuery extends BasePersonPublicationQuery
 {
+    //TODO: depricated?
     public function findAuthors($publicationId) {
         return $this
             ->filterByPersonroleId(Model\Classification\PersonrolePeer::getAuthorRoleId())

@@ -331,6 +331,25 @@
      If the order doesn't matter, the ordinals can be omitted. If every "unclosed" use...Query will be closed by endUse() automatically.
      No other than the parameter names "use", "filter", "order" and "endUse" are allowed.
   o publication with id=17103 is erroneous: it is typed as Volume, but has no entry in volume table. So it's visualisation in table_row_view fails. 
+  o modified table_row_view behavior: added parameter value "orderColumnType", which indicates an sortable column
+    e.g. 
+                <behavior name="table_row_view"> 
+                    <parameter name="embedColumns" value="embedColumns:publication"/>
+                    <parameter name="Band (numerisch)" value="volume_numeric"/>
+                    <parameter name="Bandbeschreibung" value="volume_description orderColumnType:"/>
+                    <parameter name="Übergeordnetes Werk" value="accessor:getParentPublication orderColumnType:Publication"/>
+                </behavior>
+    If no type is given, the propel orderBy method is used, otherwise the related query class of "orderColumnType" 
+    _has_ to implement sqlSort(), resp. use the order_by behavior which does this for you. 
+    The type value can be stacked to use many-to-many relations: 
+        <parameter name="erster Autor" value="accessor:getFirstAuthorName orderColumnType:PersonPublication|Person"/>
+    this results in:
+        public function orderByFirstAuthorName($direction){
+            return $this->usePersonPublicationQuery()->usePersonQuery()->sqlSort($direction)->endUse()->endUse();
+        }
+        
+    TODO: @representative and @count aren't handled yet (->PersonQuery)!
+    
  
  TODO:
  o Tab-Constraint DONE

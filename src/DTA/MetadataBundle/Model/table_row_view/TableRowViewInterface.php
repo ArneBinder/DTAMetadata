@@ -16,6 +16,9 @@ interface TableRowViewInterface {
     
     /* Returns the propel query object to retrieve the records. */
     public static function getRowViewQueryObject();
+
+    /* Returns the order function name for the specified column or null if it doesn't exist. */
+    public static function getRowViewOrderFunctionName($columnName);
 }
 
 ?>

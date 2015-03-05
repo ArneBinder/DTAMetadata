@@ -123,52 +123,6 @@ class ORMController extends DTADomainController {
         }
     }
 
-    /**
-     * Adds a sorting or filtering criteria to the given query.
-     * If no fitting filter/order method is available the original query will be returned and critical logging entry is added.
-     * @param $query The source query where the criteria will be added.
-     * @param $type 'filter' or 'order'
-     * @param $columnCaption The caption which determines the column of the criteria.
-     * @param $modelClass To get the correct accessors the model class is needed.
-     * @param $data depends on the type value: 'filter' -> filterstring, 'order' -> sorting direction (asc/desc)
-     * @return mixed the modifeid query
-     * @throws InvalidArgumentException
-     */
-    private function addCriteria($query, $type, $columnCaption, $modelClass, $data){
-        if(!in_array($type, array('filter','order')))
-            throw new \InvalidArgumentException(sprintf(
-                '\'%s\' is not allowed as value for $type. Use \'filter\' or \'order\'.',$type));
-        /** @var TYPE_NAME $tableRowViewAccessors */
-        $criteriaAccessor = $type.'By'.ORMController::extractPureAccessor($modelClass::$tableRowViewAccessors[$columnCaption]);
-
-        // is the column embedded?
-        $embeddedAccessor = explode('Of',$criteriaAccessor);
-        if(count($embeddedAccessor)>1){
-            $useQuery = "use$embeddedAccessor[1]Query";
-            $criteriaAccessor = $embeddedAccessor[0];
-            $query = $query->$useQuery();
-        }
-
-        // adding "String" to the function name prevents collision with propel filter method
-        if(method_exists($query,$criteriaAccessor."String")){
-            $criteriaAccessor = $criteriaAccessor."String";
-            $this->get('logger')->critical($type." via: ".$criteriaAccessor." ".$data);
-            $query = $query->$criteriaAccessor($data);
-        }
-        elseif(is_callable(array($query,$criteriaAccessor))){
-            $this->get('logger')->critical($type." via: ".$criteriaAccessor." ".$data);
-            $query = $query->$criteriaAccessor($data);
-        }else{
-            $this->get('logger')->critical("not callable: ".$criteriaAccessor);
-        }
-
-        // is the column embedded? Then Close it.
-        if(count($embeddedAccessor)>1){
-            $query = $query->endUse();
-        }
-        return $query;
-    }
-
     protected function getFilterIds($request, $package, $className){
         $classNames = $this->relatedClassNames($package, $className);
         $modelClass = new $classNames["model"];
@@ -220,7 +174,16 @@ class ORMController extends DTADomainController {
         if($request->get('order')) {
             $direction = $request->get('order')[0]['dir'];
             $orderColumnCaption = $columns[$request->get('order')[0]['column'] - ($hiddenIdColumn?1:0)];
-            $query = $this->addCriteria($query,'order',$orderColumnCaption,$modelClass,$direction);
+            $orderFunctionName = $modelClass::getRowViewOrderFunctionName($orderColumnCaption);
+            if($orderFunctionName === null){
+                throw new Exception("The column \"$orderColumnCaption\" is no order column.");
+            }
+            //$query = $this->addCriteria($query,'order',$orderColumnCaption,$modelClass,$direction);
+            if(method_exists($query,$orderFunctionName)){
+                $query = $query->$orderFunctionName($direction);
+            }else{
+                throw new Exception("Order function \"$orderFunctionName\" is not implemented in class ".$classNames['query'].".");
+            }
 
             // use the class specific default sorting
         }elseif(method_exists($query, 'sqlSort')){
