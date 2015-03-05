@@ -191,7 +191,7 @@ class TableRowViewBehavior extends Behavior {
         foreach ($behavior->getParameters() as $captionOrIndicator => $columnOrEntityOrAccessor) {
 
             // split parameter into map
-            $parameterArray = preg_split('/(accessor|query|embedColumns|orderColumnType):/',$columnOrEntityOrAccessor, null, PREG_SPLIT_DELIM_CAPTURE);
+            $parameterArray = preg_split('/(accessor|query|embedColumns|orderUseClasses):/',$columnOrEntityOrAccessor, null, PREG_SPLIT_DELIM_CAPTURE);
             //echo implode(implode(', ',$parameterArray))."\n";
             $parameters = array();
             if(count($parameterArray) % 2 == 1){
@@ -226,14 +226,14 @@ class TableRowViewBehavior extends Behavior {
                 $accessor = 'accessor:'.$parameters['accessor'];
                 $caption = $captionOrIndicator;
                 $behavior->addViewElement($caption, $accessor);
-                if(array_key_exists('orderColumnType',$parameters)) {
+                if(array_key_exists('orderUseClasses',$parameters)) {
                     if (!strncmp($parameters['accessor'], "get", strlen("get"))) {
                         $modifiedAccessor = substr($parameters['accessor'], strlen("get"));
                         $behavior->orderFunctions[] = $behavior->renderTemplate(
                             'tableRowViewOrderFunction',
                             array(
                                 'elementName' => $modifiedAccessor,
-                                'useClasses' => explode('|',$parameters['orderColumnType'])
+                                'useClasses' => explode('|',$parameters['orderUseClasses'])
                             )
                         );
                         $behavior->orderFunctionAccessors[$caption] = $modifiedAccessor;
@@ -246,7 +246,7 @@ class TableRowViewBehavior extends Behavior {
                 $accessor = $behavior->getTable()->getColumn($column)->getPhpName();
                 $behavior->addViewElement($caption, $accessor);
                 //$behavior->resolveAtomicColumn($caption, $column);
-                //if(array_key_exists('orderColumnType',$parameters)) {
+                //if(array_key_exists('orderUseClasses',$parameters)) {
                     $behavior->orderFunctionAccessors[$caption] = $accessor;
                 //}
             }

@@ -91,12 +91,12 @@ propel > dbal > connections for connection setup. -->
             
         <behavior name="table_row_view">
             <!--<parameter name="Datenbank ID" value="id"/>-->
-            <parameter name="Titel" value="accessor:getTitleString orderColumnType:Title"/>
-            <parameter name="erster Autor" value="accessor:getFirstAuthorName orderColumnType:PersonPublication|Person"/>
+            <parameter name="Titel" value="accessor:getTitleString orderUseClasses:Title"/>
+            <parameter name="erster Autor" value="accessor:getFirstAuthorName orderUseClasses:PersonPublication|Person"/>
             <!--<parameter name="entstanden" value="accessor:getDatespecificationRelatedByCreationdateId"/>-->
-            <parameter name="veröffentlicht" value="accessor:getDatespecificationRelatedByPublicationdateId orderColumnType:DatespecificationRelatedByPublicationdateId"/>
-            <parameter name="Verlag" value="accessor:getPublishingcompany orderColumnType:Publishingcompany"/>
-            <parameter name="Ort" value="accessor:getPlace orderColumnType:Place"/>
+            <parameter name="veröffentlicht" value="accessor:getDatespecificationRelatedByPublicationdateId orderUseClasses:DatespecificationRelatedByPublicationdateId"/>
+            <parameter name="Verlag" value="accessor:getPublishingcompany orderUseClasses:Publishingcompany"/>
+            <parameter name="Ort" value="accessor:getPlace orderUseClasses:Place"/>
             <!--<parameter name="Typ" value="type"/>-->
             <!--
             <parameter name="attribute1" value="query:\DTA\MetadataBundle\Model\Data\PublicationQuery::create()
@@ -203,7 +203,7 @@ propel > dbal > connections for connection setup. -->
             <parameter name="embedColumns" value="embedColumns:publication"/>
             <parameter name="Band (numerisch)" value="volume_numeric"/>
             <parameter name="Bandbeschreibung" value="volume_description"/>
-            <parameter name="Übergeordnetes Werk" value="accessor:getParentPublication orderColumnType:Publication"/>
+            <parameter name="Übergeordnetes Werk" value="accessor:getParentPublication orderUseClasses:Publication"/>
         </behavior>
         <behavior name="filterable"> <parameter name="Publication" value="many"/> </behavior>
         <behavior name="order_by"><parameter name="use" value="Publication"/> </behavior>
