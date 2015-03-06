@@ -17,7 +17,8 @@
     <tr>
         <td>GND</td>
         <td>
-            {%  set gndExists = person.gndExists() %}
+            {% set gndExists = person.gndExists() %}
+            "{{ gndExists }}"
             {% if(gndExists is null) %}
                 {{ person.getGnd() }}
             {% elseif(gndExists != '404') %}
