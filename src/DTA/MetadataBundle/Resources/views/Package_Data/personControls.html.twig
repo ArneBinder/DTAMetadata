@@ -17,10 +17,7 @@
     <tr>
         <td>GND</td>
         <td>
-            {% set gndExists = person.gndExists() %}
-            {% if(gndExists == 'null') %}
-                {{ person.getGnd() }}
-            {% elseif(gndExists != '404') %}
+            {% if(person.gndExists() != '404') %}
                 <a href="http://d-nb.info/gnd/{{ person.getGnd() }}/about/html">{{ person.getGnd() }}</a>
             {% else %}
                 <a style="color:red"> {{ person.getGnd() }}</a>
