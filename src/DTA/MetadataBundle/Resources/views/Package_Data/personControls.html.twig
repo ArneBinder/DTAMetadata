@@ -18,8 +18,7 @@
         <td>GND</td>
         <td>
             {% set gndExists = person.gndExists() %}
-            "{{ gndExists }}"
-            {% if(gndExists is null) %}
+            {% if(gndExists == 'null') %}
                 {{ person.getGnd() }}
             {% elseif(gndExists != '404') %}
                 <a href="http://d-nb.info/gnd/{{ person.getGnd() }}/about/html">{{ person.getGnd() }}</a>
