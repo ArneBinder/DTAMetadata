@@ -108,10 +108,6 @@ class ORMController extends DTADomainController {
         $classNames = $this->relatedClassNames($package, $className);
         $modelClass = new $classNames["model"];
         $query = $modelClass::getRowViewQueryObject();
-        //$columns = $modelClass::getTableViewColumnNames();
-
-        //$this->get('logger')->critical(urldecode($request));
-        //$this->get('logger')->critical("hiddenIdColumn: ".$hiddenIdColumn);
 
         // FILTERING
         if($request->get('search')['value']) {
@@ -120,7 +116,6 @@ class ORMController extends DTADomainController {
             return null;
         }
         $this->get('logger')->critical("sorted filtered query: " . $query->toString());
-
 
         $queryResult =  $query
             ->setFormatter(\ModelCriteria::FORMAT_STATEMENT)
@@ -135,83 +130,7 @@ class ORMController extends DTADomainController {
         return $ids;
     }
 
-    /**
-     * @param $request
-     * @param $package
-     * @param $className
-     * @param bool $hiddenIdColumn
-     * @return \ModelCriteria
-     */
-    protected function getSortedFilteredQuery($request, $package, $className, $hiddenIdColumn = false){
-        $classNames = $this->relatedClassNames($package, $className);
-        $modelClass = new $classNames["model"];
-        $query = $modelClass::getRowViewQueryObject();
-        $columns = $modelClass::getTableViewColumnNames();
-
-        //$this->get('logger')->critical(urldecode($request));
-        //$this->get('logger')->critical("hiddenIdColumn: ".$hiddenIdColumn);
-
-        // SORTING
-        if($request->get('order')) {
-            $direction = $request->get('order')[0]['dir'];
-            $orderColumnCaption = $columns[$request->get('order')[0]['column'] - ($hiddenIdColumn?1:0)];
-            $orderFunctionName = $modelClass::getRowViewOrderFunctionName($orderColumnCaption);
-            if($orderFunctionName === null){
-                throw new Exception("The column \"$orderColumnCaption\" is no order column.");
-            }
-            if(is_callable(array($query, $orderFunctionName))) {
-                $query = $query->$orderFunctionName($direction);
-            }else{
-                throw new Exception("Order function \"$orderFunctionName\" is not implemented in class ".$classNames['query'].".");
-            }
-
-            // use the class specific default sorting
-        }elseif(method_exists($query, 'sqlSort')){
-            $query = $query->sqlSort(\ModelCriteria::ASC);
-        }
-        // SORTING END
-
-        /*
-        // FILTERING
-        if($request->get('search')['value']) {
-            $this->get('logger')->critical("filterColumns: " . implode(", ",$modelClass::getTableViewFilterColumns()));
-            $this->get('logger')->critical("FILTER");
-            $filterString = $request->get('search')['value'];
-
-            $filterColumnCaptions = $modelClass::getTableViewFilterColumns();
-            if(!empty($filterColumnCaptions)){
-                $query = $this->addCriteria($query,'filter',array_shift($filterColumnCaptions),$modelClass,$filterString);
-            }
-            foreach($filterColumnCaptions as $columnCaption){
-                $query = $this->addCriteria($query->_or(),'filter',$columnCaption,$modelClass,$filterString);
-            }
-        }
-        */
-        $this->get('logger')->critical("sorted filtered query: " . $query->toString());
-
-        return $query;
-
-        // filtering is more difficult than initially thought!
-        // - using ILIKE, case insensitive search is performed
-        // - using % and _ several and a single character can be wildcarded, respectively
-        // - a union mechanism seems to be missing (search on each column and union the matches), could be simulated by appending the search results manually, but that destroys sorting
-        //   another option might be to use criteria (the $query->where(...) methods) because there is an _or() function to use with them but it is not obvious how to formulate
-        //   expressions like the ones below in this syntax (especially if it comes to date specifications which are related by different columns)
-
-        /* @var $query \DTA\MetadataBundle\Model\Data\BookQuery */
-//        $result2 = $modelClass::getRowViewQueryObject()->usePublicationQuery()->useTitleQuery()->useTitlefragmentQuery()->filterByName('%lage%', \ModelCriteria::ILIKE)->endUse()->endUse()->endUse()->find();
-//        $result1 = $modelClass::getRowViewQueryObject()->usePublicationQuery()->useTitleQuery()->useTitlefragmentQuery()->filterByName('%sinn%', \ModelCriteria::ILIKE)->endUse()->endUse()->endUse()->find();
-//        /* @var $result1 \PropelObjectCollection */
-//        foreach($result2 as $result)
-//        $result1->append($result);
-//        $query = $query->usePublicationQuery()->useDatespecificationRelatedByPublicationdateIdQuery()->filterByYear('1811')->endUse()->endUse();
-//        $query = $query->wh // where('year = ?', 1811);
-
-
-
-    }
-
-    protected function getPaginatedEntities($request, $query){
+   protected function getPaginatedEntities($request, $query){
         // pagination offset
         $offset = $request->get('start');
         $numRecords = $request->get('length');
@@ -223,16 +142,6 @@ class ORMController extends DTADomainController {
                           ->find();
 
         return $entities;
-
-//        } catch (\PropelException $exc) {
-////            $query = $modelClass::getRowViewQueryObject();
-//            $query->offset(NULL)->limit(NULL);
-//            $allEntities = $query->find();
-//            $entities = array();//array_slice($entities->toArray(), $offset, $numRecords);
-//            for ($i = 0; $i < $numRecords; $i++) {
-//                $entities[] = $allEntities->get($offset+$i);
-//            }
-//        }
     }
 
     protected function getEditLinkForObject($obj){
@@ -319,32 +228,40 @@ class ORMController extends DTADomainController {
         $classNames = $this->relatedClassNames($package, $className);
         $modelClass = new $classNames["model"];
         $columns = $modelClass::getTableViewColumnNames();
-        //
-        $filterIds = $this->getFilterIds($request, $package, $className);
-        //$this->get('logger')->critical("filterIds: ".print_r($filterIds, true));
 
         $totalRecords = $modelClass::getRowViewQueryObject()
             ->setFormatter(\ModelCriteria::FORMAT_STATEMENT)
             ->select(array('id'))
             ->groupBy('id')
             ->count();
-        // construct the sorted and filtered query
-        //$query = $this->getSortedFilteredQuery($request, $package, $className, $addIdColumn);
-	    /*$recordsFiltered = $this->getSortedFilteredQuery($request, $package, $className, $addIdColumn)
-            ->setFormatter(\ModelCriteria::FORMAT_STATEMENT)
-            ->select(array('id'))
-            ->groupBy('id')
-            ->count();
-	    */
-
-
-
-
         $filterCount = $totalRecords;
-        $query = $this->getSortedFilteredQuery($request, $package, $className, $addIdColumn);
+
+        $query = $modelClass::getRowViewQueryObject();
+
+        //FILTERING
+        $filterIds = $this->getFilterIds($request, $package, $className);
         if($filterIds!==null){
             $query = $query->filterById($filterIds);
             $filterCount = count($filterIds);
+        }
+
+        // SORTING
+        if($request->get('order')) {
+            $direction = $request->get('order')[0]['dir'];
+            $orderColumnCaption = $columns[$request->get('order')[0]['column'] - ($addIdColumn?1:0)];
+            $orderFunctionName = $modelClass::getRowViewOrderFunctionName($orderColumnCaption);
+            if($orderFunctionName === null){
+                throw new Exception("The column \"$orderColumnCaption\" is no order column.");
+            }
+            if(is_callable(array($query, $orderFunctionName))) {
+                $query = $query->$orderFunctionName($direction);
+            }else{
+                throw new Exception("Order function \"$orderFunctionName\" is not implemented in class ".$classNames['query'].".");
+            }
+
+            // use the class specific default sorting
+        }elseif(method_exists($query, 'sqlSort')){
+            $query = $query->sqlSort(\ModelCriteria::ASC);
         }
 
         // Output
@@ -357,69 +274,26 @@ class ORMController extends DTADomainController {
 
         // retrieve entities: rebuild query to avoid formatter issues
         $entities = $this->getPaginatedEntities($request, $query);
-        //$this->get('logger')->critical("entities calculated!");
         // format in data tables response format
         $response['data'] = $this->formatAsArray($entities, $columns, $package, $className, $addIdColumn);
 
-        //$this->get('logger')->critical("response calculated!");
 	    return new Response(json_encode( $response ));
 
-//        $_GET['iDisplayStart'] // offset
-//        $_GET['iDisplayLength'] // number of records to send back at most
+        // filtering is more difficult than initially thought!
+        // - using ILIKE, case insensitive search is performed
+        // - using % and _ several and a single character can be wildcarded, respectively
+        // - a union mechanism seems to be missing (search on each column and union the matches), could be simulated by appending the search results manually, but that destroys sorting
+        //   another option might be to use criteria (the $query->where(...) methods) because there is an _or() function to use with them but it is not obvious how to formulate
+        //   expressions like the ones below in this syntax (especially if it comes to date specifications which are related by different columns)
 
-	/*
-	 * Ordering
-	 */
-//        bSortable_<id>        is columns #id sortable?
-//        iSortingCols          the number of columns by which is sorted
-//        iSortCol_<id>         the id-th column to order by
-//        sSortDir_<id>         asc/desc sort order for column #id
-//        
-//	$sOrder = "";
-//	if ( isset( $_GET['iSortCol_0'] ) )
-//	{
-//		$sOrder = "ORDER BY  ";
-//		for ( $i=0 ; $i<intval( $_GET['iSortingCols'] ) ; $i++ )
-//		{
-//			if ( $_GET[ 'bSortable_'.intval($_GET['iSortCol_'.$i]) ] == "true" )
-//			{
-//				$sOrder .= "`".$aColumns[ intval( $_GET['iSortCol_'.$i] ) ]."` ".
-//					($_GET['sSortDir_'.$i]==='asc' ? 'asc' : 'desc') .", ";
-//			}
-//		}
-//	}
-
-	/*
-	 * Filtering
-	 */
-//	$sWhere = "";
-//	if ( isset($_GET['sSearch']) && $_GET['sSearch'] != "" )
-//	{
-//		$sWhere = "WHERE (";
-//		for ( $i=0 ; $i<count($aColumns) ; $i++ )
-//		{
-//			$sWhere .= "`".$aColumns[$i]."` LIKE '%".mysql_real_escape_string( $_GET['sSearch'] )."%' OR ";
-//		}
-//		$sWhere = substr_replace( $sWhere, "", -3 );
-//		$sWhere .= ')';
-//	}
-//	
-//	/* Individual column filtering */
-//	for ( $i=0 ; $i<count($aColumns) ; $i++ )
-//	{
-//		if ( isset($_GET['bSearchable_'.$i]) && $_GET['bSearchable_'.$i] == "true" && $_GET['sSearch_'.$i] != '' )
-//		{
-//			if ( $sWhere == "" )
-//			{
-//				$sWhere = "WHERE ";
-//			}
-//			else
-//			{
-//				$sWhere .= " AND ";
-//			}
-//			$sWhere .= "`".$aColumns[$i]."` LIKE '%".mysql_real_escape_string($_GET['sSearch_'.$i])."%' ";
-//		}
-//	}
+        /* @var $query \DTA\MetadataBundle\Model\Data\BookQuery */
+//        $result2 = $modelClass::getRowViewQueryObject()->usePublicationQuery()->useTitleQuery()->useTitlefragmentQuery()->filterByName('%lage%', \ModelCriteria::ILIKE)->endUse()->endUse()->endUse()->find();
+//        $result1 = $modelClass::getRowViewQueryObject()->usePublicationQuery()->useTitleQuery()->useTitlefragmentQuery()->filterByName('%sinn%', \ModelCriteria::ILIKE)->endUse()->endUse()->endUse()->find();
+//        /* @var $result1 \PropelObjectCollection */
+//        foreach($result2 as $result)
+//        $result1->append($result);
+//        $query = $query->usePublicationQuery()->useDatespecificationRelatedByPublicationdateIdQuery()->filterByYear('1811')->endUse()->endUse();
+//        $query = $query->wh // where('year = ?', 1811);
 
     }
     /**
