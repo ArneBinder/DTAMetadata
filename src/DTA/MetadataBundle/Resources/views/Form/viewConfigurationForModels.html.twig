@@ -245,6 +245,20 @@
             </span>
             <script type="text/javascript">
 
+                $("#{{ id}}_gnd").on("keyup",function (e) {
+                    checkGnd();
+                });
+
+                $(document).ready(function() {
+                    checkGnd();
+                });
+
+                function checkGnd(){
+                    var {{id}}_input_gnd = document.getElementById("{{ id }}_gnd");
+                    var value = {{id}}_input_gnd.value;
+                    console.log(value);
+                    checkGndAjax(value);
+                }
 
                 function checkGndAjax(gnd){
                     jQuery.ajax({
@@ -262,159 +276,8 @@
                         }
                     });
                 }
-/*
-                var $jsonp = (function(){
-                    var that = {};
-
-                    that.send = function(src, options) {
-                        var callback_name = options.callbackName || 'callback',
-                                on_success = options.onSuccess || function(){},
-                                on_timeout = options.onTimeout || function(){},
-                                timeout = options.timeout || 10; // sec
-
-                        var timeout_trigger = window.setTimeout(function(){
-                            window[callback_name] = function(){};
-                            on_timeout();
-                        }, timeout * 1000);
-
-                        window[callback_name] = function(data){
-                            window.clearTimeout(timeout_trigger);
-                            on_success(data);
-                        };
-
-                        var script = document.createElement('script');
-                        script.type = 'text/javascript';
-                        script.async = true;
-                        script.src = src;
-
-                        document.getElementsByTagName('head')[0].appendChild(script);
-                    };
-
-                    return that;
-                })();
 
 
-                function handleStuff(result){
-                    console.log("STUFF");
-                }
-                // Create the XHR object.
-                function createCORSRequest(method, url) {
-                    var xhr = new XMLHttpRequest();
-                    if ("withCredentials" in xhr) {
-                        // XHR for Chrome/Firefox/Opera/Safari.
-                        xhr.open(method, url, true);
-                    } else if (typeof XDomainRequest != "undefined") {
-                        // XDomainRequest for IE.
-                        xhr = new XDomainRequest();
-                        xhr.open(method, url);
-                    } else {
-                        // CORS not supported.
-                        xhr = null;
-                    }
-                    return xhr;
-                }
-
-                function checkGndJsonp(){
-                    var {{id}}_input_gnd = document.getElementById("{{ id }}_gnd");
-                    var value = {{id}}_input_gnd.value;
-                    console.log(value);
-                    document.getElementById("{{ id }}_gnd_valid_caption").innerHTML = "calculating...";
-                    var url = "http://d-nb.info/gnd/"+value+"/about/html";
-                    $jsonp.send(url+'?callback=handleStuff', {
-                        callbackName: 'handleStuff',
-                        onSuccess: function(json){
-                            console.log('success!');
-                        },
-                        onTimeout: function(){
-                            console.log('timeout!');
-                        },
-                        timeout: 2
-                    });
-                }
-
-                // Helper method to parse the title tag from the response.
-                function getTitle(text) {
-                    return text.match('<title>(.*)?</title>')[1];
-                }
-
-                function checkGndCors(){
-                    var {{id}}_input_gnd = document.getElementById("{{ id }}_gnd");
-                    var value = {{id}}_input_gnd.value;
-                    // All HTML5 Rocks properties support CORS.
-                    //var url = "http://d-nb.info/gnd/"+value+"/about/html";
-                    var url = 'http://d-nb.info/gnd/124786979/about/lds';//'http://updates.html5rocks.com';
-                    var xhr = createCORSRequest('HEAD', url);
-                    if (!xhr) {
-                        alert('CORS not supported');
-                        return;
-                    }
-
-                    // Response handlers.
-                    xhr.onload = function() {
-                        var text = xhr.responseText;
-                        //var title = getTitle(text);
-                        alert('Response status from CORS request to ' + url + ': ' + xhr.status);
-                    };
-
-                    xhr.onerror = function() {
-                        alert('Woops, there was an error making the request.');
-                    };
-
-                    xhr.send();
-                }*/
-
-                $("#{{ id}}_gnd").on("keyup",function (e) {
-                    checkGnd();
-                });
-                $(document).ready(function() {
-                    checkGnd();
-                });
-
-
-                function checkGnd(){
-                    var {{id}}_input_gnd = document.getElementById("{{ id }}_gnd");
-                    var value = {{id}}_input_gnd.value;
-                    console.log(value);
-                    checkGndAjax(value);
-                }
-
-                /*
-                function checkGnd_dep(){
-
-
-                    var {{id}}_input_gnd = document.getElementById("{{ id }}_gnd");
-                    var value = {{id}}_input_gnd.value;
-                    console.log(value);
-                    document.getElementById("{{ id }}_gnd_valid_caption").innerHTML = "calculating...";
-                    var xmlhttp;
-                    if (window.XMLHttpRequest)
-                    {// code for IE7+, Firefox, Chrome, Opera, Safari
-                        xmlhttp=new XMLHttpRequest();
-                    }
-                    else
-                    {// code for IE6, IE5
-                        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-                    }
-                    xmlhttp.onreadystatechange=xmlhttp.onreadystatechange=function()
-                        {
-                            if (xmlhttp.readyState==4) {
-                                console.log(xmlhttp.status);
-                                if (xmlhttp.status < 404) {
-                                    document.getElementById("{{ id }}_gnd_valid_caption").innerHTML = "<span style=\"color:lime\" class='glyphicon glyphicon-ok'></span> <a href=\"http://d-nb.info/gnd/"+value+"/about/html\"><span class='glyphicon glyphicon-arrow-right'></span> Eintrag im DNB</a>";
-                                    console.log("exists");
-                                }else{
-                                    document.getElementById("{{ id }}_gnd_valid_caption").innerHTML = "<span style=\"color:red\">GND existiert nicht</span>";
-                                    console.log("exists not");
-                                }
-                            }else{
-                                document.getElementById("{{ id }}_gnd_valid_caption").innerHTML = "calculating...";
-                                console.log("calculating");
-                            }
-                        };
-                    xmlhttp.open("HEAD", "http://d-nb.info/gnd/"+value+"/about/html",true);
-                    xmlhttp.send();
-                }
-                */
             </script>
         </div>
         {{ form_rest(form.gnd) }}

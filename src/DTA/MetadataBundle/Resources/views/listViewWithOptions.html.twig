@@ -93,6 +93,7 @@ function recordClicked(){
     console.log(rowData);
     var id = rowData[0];
     updateOptionsPanel(id);
+
 }
 var dataTable;
 $(document).ready(function() {
@@ -110,8 +111,27 @@ $(document).ready(function() {
         dataTable.column(idCol).visible(false);
    // }
 {#    var bVis = dataTable.fnSettings().aoColumns[idCol].bVisible;#}
-    
+
 }); // document ready
+
+
+function updateGndCheckAjax(gndElement){
+    var value = gndElement.textContent;
+    jQuery.ajax({
+        type: "GET",
+        url: "/CheckGnd/"+value,
+        success: function(response){
+            console.log(value+": "+response);
+            if (response != 404) {
+                gndElement.style.color = "";
+                gndElement.setAttribute('href', "http://d-nb.info/gnd/"+value+"/about/html");
+            }else{
+                gndElement.removeAttribute('href');
+                gndElement.style.color = "red";
+            }
+        }
+    });
+}
 
 {% endblock additionalJS %}
 

@@ -18,11 +18,11 @@
         <td>GND</td>
         <td>
             {% if person.gndExists() is null %}
-                <a href="http://d-nb.info/gnd/{{ person.getGnd() }}/about/html">{{ person.getGnd() }}</a>
+                <a class="gndValue" href="http://d-nb.info/gnd/{{ person.getGnd() }}/about/html">{{ person.getGnd() }}</a>
             {% elseif(person.gndExists() != '404') %}
-                <a href="http://d-nb.info/gnd/{{ person.getGnd() }}/about/html">{{ person.getGnd() }}</a>
+                <a class="gndValue" href="http://d-nb.info/gnd/{{ person.getGnd() }}/about/html">{{ person.getGnd() }}</a>
             {% else %}
-                <a style="color:red"> {{ person.getGnd() }}</a>
+                <a class="gndValue" style="color:red"> {{ person.getGnd() }}</a>
             {% endif %}
         </td>
     </tr>

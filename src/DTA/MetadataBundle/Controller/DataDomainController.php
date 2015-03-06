@@ -155,7 +155,7 @@ class DataDomainController extends ORMController {
 
             $gnd = $entity->getAttributeByTableViewColumName($columnName);
             if($gnd !== null and $gnd !== "")
-                $result = '<a href="http://d-nb.info/gnd/'.$gnd.'/about/html">'.$result.'</p>';
+                $result = '<a class="gndValue" href="http://d-nb.info/gnd/'.$gnd.'/about/html">'.$result.'</p>';
 
             /*$gndExists = ORMController::gndExists($gnd);
             $color = ($gndExists)?'lime':'red';
@@ -263,7 +263,10 @@ class DataDomainController extends ORMController {
 
     public function ajaxCheckGndAction(Request $request, $gnd){
         if($gnd === null or $gnd === "")
-            return null;
+            return new Response(0);
+        if(!function_exists('curl_init')){
+            return new Response(0);
+        }
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, "http://d-nb.info/gnd/$gnd/about/html");
         curl_setopt($ch, CURLOPT_HEADER, TRUE);
