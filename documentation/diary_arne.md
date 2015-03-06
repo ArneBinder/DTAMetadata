@@ -353,6 +353,7 @@
     
 2015-03-06
   o implemented gnd check (for persons): no check on_change implemented yet!
+  o implemented gnd check on keyup via curl (has to be enabled on php server!)
     
  
  TODO:

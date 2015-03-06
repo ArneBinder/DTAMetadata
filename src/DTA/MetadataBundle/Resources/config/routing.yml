@@ -18,6 +18,7 @@ rebuildModel:
   path: /RebuildModel
   defaults: { _controller: DTAMetadataBundle:DumpConversion:rebuildPropelModel }
 
+
 #addUser:
 #   path: /addUser/{name}/{password}
 #   defaults: { _controller: DTAMetadataBundle:DumpConversion:addUser }
@@ -137,7 +138,12 @@ controls:
 Data_viewPersonsByRole:
   path: /Data/viewPersonsByRole/{personRoleId}
   defaults: { _controller: DTAMetadataBundle:DataDomain:viewPersonsByRole }
-  
+
+
+ajaxCheckGnd:
+  path: /CheckGnd/{gnd}
+  defaults: { _controller: DTAMetadataBundle:DataDomain:ajaxCheckGnd, gnd: null }
+
 # ------------------------------------------------------------
 # inherited ORM methods
 # ------------------------------------------------------------
