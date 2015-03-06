@@ -3,6 +3,7 @@
 namespace DTA\MetadataBundle\Model\Data;
 
 use DTA\MetadataBundle\Model\Data\om\BasePerson;
+use DTA\MetadataBundle\Controller\ORMController;
 
 class Person extends BasePerson {
     

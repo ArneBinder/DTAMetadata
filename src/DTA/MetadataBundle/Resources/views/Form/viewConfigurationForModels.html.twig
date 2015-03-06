@@ -229,9 +229,28 @@
 
 {# --------------------- Personal Name --------------------- #}
 
+{% block gnd_row %}
+    <div class="form-group">
+        {# form_label automatically generates a label tag, with the correct id specified, the label class, added, etc. #}
+        {{ form_label(form.gnd, null , {'label_attr':{'class': 'control-label col-lg-'~formLabelWidth} }) }}
+        {{ form_errors(form.gnd) }}
+        <div class="col-lg-{{formWidgetWidth}} {#{ inlineChildren ? 'form-inline' : 'labelled' }#}">
+            {{ form_widget(form.gnd) }}
+            {% if(form.vars.value.gndExists()) %}
+                <span style="color:lime" class='glyphicon glyphicon-ok'></span> <a href="http://d-nb.info/gnd/{{ form.vars.value.gnd }}/about/html"><span class='glyphicon glyphicon-arrow-right'></span> Eintrag im DNB</a>
+            {% else %}
+                <span style="color:red">GND existiert nicht</span>
+            {% endif %}
+        </div>
+        {{ form_rest(form.gnd) }}
+
+    </div>
+
+{% endblock %}
+
 {% block person_row %}
     {{ form_row(form.personalNames, {'inlineLabel':false }) }}
-    {{ form_row(form.gnd) }}
+    {{ block('gnd_row') }}
     {{ form_rest(form) }}
 {% endblock %}
 

@@ -349,8 +349,10 @@
         }
         
     TODO: @representative and @count aren't handled yet (->PersonQuery)!
-   o disabled sorting functionality in table_row_view for columns without defined sorting function (via table_row_view behavior in the schema)
+  o disabled sorting functionality in table_row_view for columns without defined sorting function (via table_row_view behavior in the schema)
     
+2015-03-06
+  o implemented gnd check (for persons): no check on_change implemented yet!
     
  
  TODO:

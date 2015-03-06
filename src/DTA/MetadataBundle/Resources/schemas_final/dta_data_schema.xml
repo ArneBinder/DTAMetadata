@@ -297,6 +297,7 @@ propel > dbal > connections for connection setup. -->
         <behavior name="order_by">
             <parameter name="order" value="Name"/>
         </behavior>
+        <behavior name="gnd_check"/>
     </table>
 
     <table name="place">
@@ -312,6 +313,7 @@ propel > dbal > connections for connection setup. -->
         <behavior name="order_by">
             <parameter name="order" value="Name"/>
         </behavior>
+        <behavior name="gnd_check"/>
     </table>
 
     <table name="datespecification">
@@ -451,6 +453,7 @@ propel > dbal > connections for connection setup. -->
         <behavior name="order_by">
             <parameter name="use" value="Personalname"/>
         </behavior>
+        <behavior name="gnd_check"/>
     </table>
     
     <table name="font">
