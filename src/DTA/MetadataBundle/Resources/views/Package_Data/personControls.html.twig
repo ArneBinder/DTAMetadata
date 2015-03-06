@@ -17,6 +17,7 @@
     <tr>
         <td>GND</td>
         <td>
+            {{ dump(person.gndExists()) }}
             {% if(person.gndExists() != '404') %}
                 <a href="http://d-nb.info/gnd/{{ person.getGnd() }}/about/html">{{ person.getGnd() }}</a>
             {% else %}
