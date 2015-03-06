@@ -236,16 +236,46 @@
         {{ form_errors(form.gnd) }}
         <div class="col-lg-{{formWidgetWidth}} {#{ inlineChildren ? 'form-inline' : 'labelled' }#}">
             {{ form_widget(form.gnd) }}
-            {% if(form.vars.value.gndExists()) %}
-                <span style="color:lime" class='glyphicon glyphicon-ok'></span> <a href="http://d-nb.info/gnd/{{ form.vars.value.gnd }}/about/html"><span class='glyphicon glyphicon-arrow-right'></span> Eintrag im DNB</a>
-            {% else %}
-                <span style="color:red">GND existiert nicht</span>
-            {% endif %}
+            <span id="{{ id }}_gnd_valid_caption">
+                {% if(form.vars.value.gndExists()) %}
+                    <span style="color:lime" class='glyphicon glyphicon-ok'></span> <a href="http://d-nb.info/gnd/{{ form.vars.value.gnd }}/about/html"><span class='glyphicon glyphicon-arrow-right'></span> Eintrag im DNB</a>
+                {% else %}
+                    <span style="color:red">GND existiert nicht</span>
+                {% endif %}
+            </span>
+            <script type="text/javascript">
+               $(function () {
+                    $("#{{ id}}_gnd").on("change",function (e) {
+                        document.getElementById("{{ id }}_gnd_valid_caption").innerHTML = "calculating...";
+                        var xmlhttp;
+                        if (window.XMLHttpRequest)
+                        {// code for IE7+, Firefox, Chrome, Opera, Safari
+                            xmlhttp=new XMLHttpRequest();
+                        }
+                        else
+                        {// code for IE6, IE5
+                            xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+                        }
+                        xmlhttp.onreadystatechange=xmlhttp.onreadystatechange=function()
+                            {
+                                if (xmlhttp.readyState==4) {
+                                    if (xmlhttp.status < 400) {
+                                        document.getElementById("{{ id }}_gnd_valid_caption").innerHTML = "<span style=\"color:lime\" class='glyphicon glyphicon-ok'></span> <a href=\"http://d-nb.info/gnd/{{ form.vars.value.gnd }}/about/html\"><span class='glyphicon glyphicon-arrow-right'></span> Eintrag im DNB</a>';
+                                    }else{
+                                        document.getElementById("{{ id }}_gnd_valid_caption").innerHTML = "<span style=\"color:red\">GND existiert nicht</span>";
+                                    }
+                                }else{
+                                    document.getElementById("{{ id }}_gnd_valid_caption").innerHTML = "calculating...";
+                                }
+                            };
+                        xmlhttp.open("GET", "http://d-nb.info/gnd/{{ form.vars.value.gnd }}/about/html",true);
+                        xmlhttp.send();
+                    });
+                });
+            </script>
         </div>
         {{ form_rest(form.gnd) }}
-
     </div>
-
 {% endblock %}
 
 {% block person_row %}
