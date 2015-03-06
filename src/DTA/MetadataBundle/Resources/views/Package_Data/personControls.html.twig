@@ -17,10 +17,13 @@
     <tr>
         <td>GND</td>
         <td>
-            {% if(person.gndExists()) %}
+            {%  set gndExists = person.gndExists() %}
+            {% if(gndExists is null) %}
+                {{ person.getGnd() }}
+            {% elseif(gndExists != '404') %}
                 <a href="http://d-nb.info/gnd/{{ person.getGnd() }}/about/html">{{ person.getGnd() }}</a>
             {% else %}
-                <p style="color:red"> {{ person.getGnd() }}</p>
+                <a style="color:red"> {{ person.getGnd() }}</a>
             {% endif %}
         </td>
     </tr>
