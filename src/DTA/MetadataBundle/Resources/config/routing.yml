@@ -125,7 +125,7 @@ Data_newPublication:
   defaults: { _controller: DTAMetadataBundle:DataDomain:newPublication }
 
 # displayed content in the right side bar of the list view (data overview and task/copy location edit options)
-controls:
+Data_controls:
   path: /Data/controls/{className}/{id}
   defaults: { _controller: DTAMetadataBundle:DataDomain:controls}
     
@@ -140,7 +140,7 @@ Data_viewPersonsByRole:
   defaults: { _controller: DTAMetadataBundle:DataDomain:viewPersonsByRole }
 
 
-ajaxCheckGnd:
+Data_ajaxCheckGnd:
   path: /CheckGnd/{gnd}
   defaults: { _controller: DTAMetadataBundle:DataDomain:ajaxCheckGnd, gnd: null }
 

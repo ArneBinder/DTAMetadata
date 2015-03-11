@@ -257,20 +257,20 @@
                     var {{id}}_input_gnd = document.getElementById("{{ id }}_gnd");
                     var value = {{id}}_input_gnd.value;
                     console.log(value);
-                    checkGndAjax(value);
+                    checkGndAjax(value, '{{ id }}');
                 }
 
-                function checkGndAjax(gnd){
+                function checkGndAjax(gnd, id){
                     jQuery.ajax({
                         type: "GET",
-                        url: "/CheckGnd/"+gnd,
+                        url: "{{ path('Data_ajaxCheckGnd') }}"+"/"+gnd,
                         success: function(response){
                             console.log(response);
                             if (response != 404) {
-                                document.getElementById("{{ id }}_gnd_valid_caption").innerHTML = "<span style=\"color:lime\" class='glyphicon glyphicon-ok'></span> <a href=\"http://d-nb.info/gnd/"+gnd+"/about/html\"><span class='glyphicon glyphicon-arrow-right'></span> Eintrag im DNB</a>";
+                                document.getElementById(id+"_gnd_valid_caption").innerHTML = "<span style=\"color:lime\" class='glyphicon glyphicon-ok'></span> <a href=\"http://d-nb.info/gnd/"+gnd+"/about/html\"><span class='glyphicon glyphicon-arrow-right'></span> Eintrag im DNB</a>";
                                 console.log("exists");
                             }else{
-                                document.getElementById("{{ id }}_gnd_valid_caption").innerHTML = "<span style=\"color:red\">GND existiert nicht</span>";
+                                document.getElementById(id+"_gnd_valid_caption").innerHTML = "<span style=\"color:red\">GND existiert nicht</span>";
                                 console.log("exists not");
                             }
                         }

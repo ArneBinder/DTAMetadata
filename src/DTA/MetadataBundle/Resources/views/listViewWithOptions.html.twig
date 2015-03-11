@@ -116,15 +116,15 @@ $(document).ready(function() {
 
 
 function updateGndCheckAjax(gndElement){
-    var value = gndElement.textContent;
+    var gnd = gndElement.textContent;
     jQuery.ajax({
         type: "GET",
-        url: "/CheckGnd/"+value,
+        url: "{{ path('Data_ajaxCheckGnd') }}"+"/"+gnd,
         success: function(response){
             console.log(value+": "+response);
             if (response != 404) {
                 gndElement.style.color = "";
-                gndElement.setAttribute('href', "http://d-nb.info/gnd/"+value+"/about/html");
+                gndElement.setAttribute('href', "http://d-nb.info/gnd/"+gnd+"/about/html");
             }else{
                 gndElement.removeAttribute('href');
                 gndElement.style.color = "red";

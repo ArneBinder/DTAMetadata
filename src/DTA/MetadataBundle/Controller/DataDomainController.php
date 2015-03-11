@@ -102,7 +102,7 @@ class DataDomainController extends ORMController {
                 'columns' => $modelClass::getTableViewColumnNames(),
                 'data' => array(),
                 'updatedObjectId' => $updatedObjectId,
-                'optionsLinkTemplate' => $this->generateUrl("controls", array('className' => $className, 'id'=>'__id__')),
+                'optionsLinkTemplate' => $this->generateUrl("Data_controls", array('className' => $className, 'id'=>'__id__')),
                 'newEntityLink' => $newEntityLink,
                 'enableSearch' => method_exists(new $classNames["query"], 'sqlFilter'),
                 'orderableTargets' => implode(', ',$orderableTargets)
