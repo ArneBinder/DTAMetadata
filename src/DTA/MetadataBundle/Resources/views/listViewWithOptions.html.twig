@@ -121,7 +121,7 @@ function updateGndCheckAjax(gndElement){
         type: "GET",
         url: "{{ path('Data_ajaxCheckGnd') }}"+"/"+gnd,
         success: function(response){
-            console.log(value+": "+response);
+            console.log(gnd+": "+response);
             if (response != 404) {
                 gndElement.style.color = "";
                 gndElement.setAttribute('href', "http://d-nb.info/gnd/"+gnd+"/about/html");
