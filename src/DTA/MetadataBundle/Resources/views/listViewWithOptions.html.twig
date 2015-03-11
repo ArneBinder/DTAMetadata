@@ -133,7 +133,7 @@ function updateGndCheckAjax(gndElement){
         success: function(response){
             console.log(gnd+": "+response);
             if (response != 404) {
-                gndElement.style.color = "";
+                gndElement.style.color = "lime";
                 gndElement.setAttribute('href', "http://d-nb.info/gnd/"+gnd+"/about/html");
             }else{
                 gndElement.removeAttribute('href');
