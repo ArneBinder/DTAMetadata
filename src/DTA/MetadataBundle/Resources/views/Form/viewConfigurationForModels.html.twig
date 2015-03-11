@@ -229,64 +229,9 @@
 
 {# --------------------- Personal Name --------------------- #}
 
-{% block gnd_row %}
-    <div class="form-group">
-        {# form_label automatically generates a label tag, with the correct id specified, the label class, added, etc. #}
-        {{ form_label(form.gnd, null , {'label_attr':{'class': 'control-label col-lg-'~formLabelWidth} }) }}
-        {{ form_errors(form.gnd) }}
-        <div class="col-lg-{{formWidgetWidth}} {#{ inlineChildren ? 'form-inline' : 'labelled' }#}">
-            {{ form_widget(form.gnd) }}
-            <span id="{{ id }}_gnd_valid_caption">
-                {#{% if(form.vars.value.gndExists()) %}
-                    <span style="color:lime" class='glyphicon glyphicon-ok'></span> <a href="http://d-nb.info/gnd/{{ form.vars.value.gnd }}/about/html"><span class='glyphicon glyphicon-arrow-right'></span> Eintrag im DNB</a>
-                {% else %}
-                    <span style="color:red">GND existiert nicht</span>
-                {% endif %}#}
-            </span>
-            <script type="text/javascript">
-
-                $("#{{ id}}_gnd").on("keyup",function (e) {
-                    checkGnd();
-                });
-
-                $(document).ready(function() {
-                    checkGnd();
-                });
-
-                function checkGnd(){
-                    var {{id}}_input_gnd = document.getElementById("{{ id }}_gnd");
-                    var value = {{id}}_input_gnd.value;
-                    console.log(value);
-                    checkGndAjax(value, '{{ id }}');
-                }
-
-                function checkGndAjax(gnd, id){
-                    jQuery.ajax({
-                        type: "GET",
-                        url: "{{ path('Data_ajaxCheckGnd') }}"+"/"+gnd,
-                        success: function(response){
-                            console.log(response);
-                            if (response != 404) {
-                                document.getElementById(id+"_gnd_valid_caption").innerHTML = "<span style=\"color:lime\" class='glyphicon glyphicon-ok'></span> <a href=\"http://d-nb.info/gnd/"+gnd+"/about/html\"><span class='glyphicon glyphicon-arrow-right'></span> Eintrag im DNB</a>";
-                                console.log("exists");
-                            }else{
-                                document.getElementById(id+"_gnd_valid_caption").innerHTML = "<span style=\"color:red\">GND existiert nicht</span>";
-                                console.log("exists not");
-                            }
-                        }
-                    });
-                }
-
-
-            </script>
-        </div>
-        {{ form_rest(form.gnd) }}
-    </div>
-{% endblock %}
-
 {% block person_row %}
     {{ form_row(form.personalNames, {'inlineLabel':false }) }}
-    {{ block('gnd_row') }}
+    {{ form_row(form.gnd) }}
     {{ form_rest(form) }}
 {% endblock %}
 
@@ -353,6 +298,48 @@
 {% block worktag_row %}
     <div class="form-inline" style="position: relative;">
         {{ form_widget(form.tag)}}
+        {{ form_rest(form) }}
+    </div>
+{% endblock %}
+
+
+{% block gnd_row %}
+    <div class="form-group">
+        {# form_label automatically generates a label tag, with the correct id specified, the label class, added, etc. #}
+        {{ form_label(form, null , {'label_attr':{'class': 'control-label col-lg-'~formLabelWidth} }) }}
+        {{ form_errors(form) }}
+        <div class="col-lg-{{formWidgetWidth}} {#{ inlineChildren ? 'form-inline' : 'labelled' }#}">
+            {{ form_widget(form) }}
+            <span id="{{ form.parent.vars.id }}_gnd_valid_caption"></span>
+            <script type="text/javascript">
+                $("#{{ form.parent.vars.id }}_gnd").on("keyup",function (e) {
+                    checkGndAjax('{{ form.parent.vars.id }}');
+                });
+
+                $(document).ready(function() {
+                    checkGndAjax('{{ form.parent.vars.id }}');
+                });
+
+                function checkGndAjax(id){
+                    var input_gnd = document.getElementById(id+"_gnd");
+                    var gnd = input_gnd.value;
+                    jQuery.ajax({
+                        type: "GET",
+                        url: "{{ path('Data_ajaxCheckGnd') }}"+"/"+gnd,
+                        success: function(response){
+                            console.log(response);
+                            if (response != 404) {
+                                document.getElementById(id+"_gnd_valid_caption").innerHTML = "<span style=\"color:lime\" class='glyphicon glyphicon-ok'></span> <a href=\"http://d-nb.info/gnd/"+gnd+"/about/html\"><span class='glyphicon glyphicon-arrow-right'></span> Eintrag im DNB</a>";
+                                console.log("exists");
+                            }else{
+                                document.getElementById(id+"_gnd_valid_caption").innerHTML = "<span style=\"color:red\">GND existiert nicht</span>";
+                                console.log("exists not");
+                            }
+                        }
+                    });
+                }
+            </script>
+        </div>
         {{ form_rest(form) }}
     </div>
 {% endblock %}

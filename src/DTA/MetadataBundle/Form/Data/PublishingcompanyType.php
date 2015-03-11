@@ -18,6 +18,6 @@ class PublishingcompanyType extends BaseAbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('name');
-        $builder->add('gnd');
+        $builder->add('gnd', new GndType());
     }
 }

@@ -24,7 +24,7 @@ class PersonType extends BaseAbstractType {
             'type' => new PersonalnameType(),
             'label' => 'Namen',
         ));
-        $builder->add('gnd');
+        $builder->add('gnd', new GndType());
     }
 
 }
