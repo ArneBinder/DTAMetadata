@@ -66,6 +66,9 @@
     <div class="well" id="publicationOptions">
         <h4> Auf ein {{ className|trans }} klicken, um Informationen anzuzeigen. </h4>
     </div>
+    {% if className == 'Person' %}
+    <button type="button" onclick="checkAllGnd()">Teste GNDs</button>
+    {% endif %}
 </div>
 {% endblock core %}
 
@@ -114,6 +117,13 @@ $(document).ready(function() {
 
 }); // document ready
 
+
+function checkAllGnd(){
+    var gndElements = document.getElementsByClassName("gndValue");
+    for (var i = 0; i < gndElements.length; i++) {
+        updateGndCheckAjax(gndElements[i]);
+    }
+}
 
 function updateGndCheckAjax(gndElement){
     var gnd = gndElement.textContent;

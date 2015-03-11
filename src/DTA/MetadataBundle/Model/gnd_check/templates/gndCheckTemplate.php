@@ -1,6 +1,6 @@
 
 public function gndExists(){
-    $gnd = $this->getGnd();
+    $gnd = $this->get<?php echo ucfirst($gndColumnName);?>();
     if($gnd === null or $gnd === "")
         return null;
     if(!function_exists('curl_init')){

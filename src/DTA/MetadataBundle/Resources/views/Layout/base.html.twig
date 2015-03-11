@@ -128,12 +128,6 @@
                             "processing": true
                             ,"serverSide": true
                             ,"ajax": "{{path(package~'_dataTablesDataSource', {'package': package, 'className': className}) }}"
-                            ,"drawCallback": function( settings ){
-                                var gndElements = document.getElementsByClassName("gndValue");
-                                for (var i = 0; i < gndElements.length; i++) {
-                                    updateGndCheckAjax(gndElements[i]);
-                                }
-                            }
                             ,"ordering":true // disables sorting completely
                             ,"searching":{{ search }}//true // disables filtering
                             ,orderClasses: false

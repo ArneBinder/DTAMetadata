@@ -16,6 +16,10 @@ propel > dbal > connections for connection setup. -->
     <behavior name="table_row_view">
         <!--If no parameters are defined, all columns are added. (WITHOUT embedding any related entities) -->
     </behavior>
+
+    <behavior name="gnd_check">
+        <parameter name="gnd_column_name" value="gnd"/>
+    </behavior>
     
     <!-- Enthält die allen Publikationen gemeinsamen Daten.
     Bildet die Publikationstypen M, MM (teilweise, da volumes via $publication->addChild() hinzugefügt werden müssen), MS, DM und J ab. -->
@@ -453,7 +457,6 @@ propel > dbal > connections for connection setup. -->
         <behavior name="order_by">
             <parameter name="use" value="Personalname"/>
         </behavior>
-        <behavior name="gnd_check"/>
     </table>
     
     <table name="font">
