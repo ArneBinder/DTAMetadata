@@ -6,4 +6,4 @@ Installationsanweisung
 4.    SQL Schema wird in die Datenbank geschrieben mit app/console propel:sql:insert --force
 5.    PHP Code generieren app/console propel:model:build
 
-Aenderungen am XML Schema (src/DTA/MetadataBundle/Resources/config/dta_master_schema.xml) werden wie in Schritt 4 realisiert.
+Aenderungen am XML Schema (src/DTA/MetadataBundle/Resources/config/dta_master_schema.xml) werden wie in Schritt 5 realisiert.
